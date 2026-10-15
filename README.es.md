@@ -3,10 +3,10 @@
 Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.io (solo renderizador WebGPU).
 Basada en la especificación de `apiVersion: 1`. Incluye recetas y referencia de la API: con este único archivo puedes ir desde cero hasta la distribución.
 
-> Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.
-> Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.
-> Última revisión: 2026-10-15. Como no se encontró una referencia oficial pública de la API WGSL, sigue verificando las descripciones y recetas con la pantalla de carga y la compilación en el juego.
-> La función de paquetes de sombreadores es una función oficial accesible desde la interfaz del juego, y los paquetes son WGSL puro
+> Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.  
+> Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.  
+> Última revisión: 2026-10-15. Como no se encontró una referencia oficial pública de la API WGSL, sigue verificando las descripciones y recetas con la pantalla de carga y la compilación en el juego.  
+> La función de paquetes de sombreadores es una función oficial accesible desde la interfaz del juego, y los paquetes son WGSL puro  
 > (sin ejecución de JS ni red), así que nada peligroso ocurre con código normal.
 
 ## Índice
@@ -776,9 +776,9 @@ let phase = t * 0.15;
 
 > Recetas físicas para "reconstruir el aspecto vainilla desde los materiales". Lee estas premisas primero:
 >
-> 1. **El hook light se llama en la etapa final del fragmento**. Su color devuelto se convierte en el color final tal cual. **Debes reaplicar la niebla tú mismo** (R9.10)
-> 2. **La iluminación por defecto del motor es solo multiplicación**. Especular / fresnel / separación cálido-frío / ambiente hemisférico se construyen desde cero
-> 3. `l.engineColour` es el color terminado (ya con niebla). Reconstruir desde `s.colour` (albedo) es el enfoque completo
+> 1. **El hook light se llama en la etapa final del fragmento**. Su color devuelto se convierte en el color final tal cual. **Debes reaplicar la niebla tú mismo** (R9.10)  
+> 2. **La iluminación por defecto del motor es solo multiplicación**. Especular / fresnel / separación cálido-frío / ambiente hemisférico se construyen desde cero  
+> 3. `l.engineColour` es el color terminado (ya con niebla). Reconstruir desde `s.colour` (albedo) es el enfoque completo  
 > 4. Las texturas están prohibidas → todo el detalle debe ser **procedural** (hash/ruido) (R9.8)
 
 ### R9.1 Antorchas cálidas × luz de cielo fría
@@ -872,7 +872,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.6 Perspectiva aérea ("atmósfera" por desaturación con distancia)
 
-> A diferencia de la niebla (reemplazo de color), superponer "desaturación con distancia" hace las vistas lejanas mucho más realistas.
+> A diferencia de la niebla (reemplazo de color), superponer "desaturación con distancia" hace las vistas lejanas mucho más realistas.  
 > Precaución: reduce solo la saturación — nunca toques la luminancia.
 
 ```wgsl
@@ -968,8 +968,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Reaplicar niebla (obligatorio al descartar engineColour)
 
-> Poner un suelo como `max(l.fogFactor, 0.25)` limita "no más denso que esto"
-> (0.0 = fiel al motor / 0.3–0.5 = distancia más clara).
+> Poner un suelo como `max(l.fogFactor, 0.25)` limita "no más denso que esto"  
+> (0.0 = fiel al motor / 0.3–0.5 = distancia más clara).  
 > Nota: la niebla del motor es lineal solo de horizonte (cerca de la distancia de dibujado); la bruma media debe construirla el paquete.
 
 ```wgsl
@@ -1006,20 +1006,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.12 Sombras proyectadas — inversión del realce + corte por umbral (definitivo)
 
-> **Repaso de la premisa (sección 10)**: `l.skyLight` no es el valor de vóxel crudo (n/15) sino el valor tras la "curva de realce" del motor
+> **Repaso de la premisa (sección 10)**: `l.skyLight` no es el valor de vóxel crudo (n/15) sino el valor tras la "curva de realce" del motor  
 > `y = 1-(1-x/(3-2x))³` (una curva S que levanta zonas oscuras).
 >
-> | Lugar | vóxel crudo | realzado (= l.skyLight) | pow(·, 5.0) |
-> |---|---|---|---|
-> | cielo abierto | 1.00 | 1.00 | 1.00 |
-> | bajo árbol (radio 2) | 0.87 | **0.97** | **0.86** ← casi intacto |
-> | radio 3 | 0.80 | **0.92** | 0.66 |
+> | Lugar | vóxel crudo | realzado (= l.skyLight) | pow(·, 5.0) |  
+> |---|---|---|---|  
+> | cielo abierto | 1.00 | 1.00 | 1.00 |  
+> | bajo árbol (radio 2) | 0.87 | **0.97** | **0.86** ← casi intacto |  
+> | radio 3 | 0.80 | **0.92** | 0.66 |  
 > | radio 5 | 0.67 | 0.78 | 0.29 |
 >
-> **Esta es la causa demostrada de "las sombras no se profundizan con gamma"**. Pero la curva es monótona e invertible algebraicamente:
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Tras restaurar valores crudos, basta binarizar con un corte por umbral (`smoothstep`).
-> La dispersión BFS de LightEngine es "1 bloque = -1", así que el umbral `th = 1 - r/15` marca directamente
-> "la oclusión de radio r o más cuenta como sombra". Romper bloques mueve las sombras al instante (LightEngine recalcula en tiempo real).
+> **Esta es la causa demostrada de "las sombras no se profundizan con gamma"**. Pero la curva es monótona e invertible algebraicamente:  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Tras restaurar valores crudos, basta binarizar con un corte por umbral (`smoothstep`).  
+> La dispersión BFS de LightEngine es "1 bloque = -1", así que el umbral `th = 1 - r/15` marca directamente  
+> "la oclusión de radio r o más cuenta como sombra". Romper bloques mueve las sombras al instante (LightEngine recalcula en tiempo real).  
 > Limitación: las sombras usan como base "el cielo hacia arriba", así que no rotan con el sol (sección 15, "La verdad sobre las sombras").
 
 ```wgsl
@@ -1062,9 +1062,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 ```
 
-> Guía de ajuste: **el área de sombra la decide solo `shTh`** — `0.93` = radio 1.5+ / `0.87` = radio 2 / `0.80` = radio 3 / `0.67` = radio 5.
-> La dureza del borde es `shSoft` (0.02 = duro / 0.08 = suave). La oscuridad del núcleo es el doble ajuste de `0.09` (ambiente mínimo) y `0.16` (luz dispersa del cielo).
-> Para ensanchar sombras al atardecer, suma `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximación de sombras largas de tarde.
+> Guía de ajuste: **el área de sombra la decide solo `shTh`** — `0.93` = radio 1.5+ / `0.87` = radio 2 / `0.80` = radio 3 / `0.67` = radio 5.  
+> La dureza del borde es `shSoft` (0.02 = duro / 0.08 = suave). La oscuridad del núcleo es el doble ajuste de `0.09` (ambiente mínimo) y `0.16` (luz dispersa del cielo).  
+> Para ensanchar sombras al atardecer, suma `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximación de sombras largas de tarde.  
 > `sunDir` es `l.sunDirection / length(l.sunDirection)`). Para sombras más azules sube el B de `vec3f(0.72, 0.82, 1.05)`.
 >
 > ⚠️ "Profundizar contraste con `pow(skyLight, γ)`" **aplicaba gamma a valores realzados** y nunca afectaba bajo los árboles (0.97). Usa este método en su lugar.

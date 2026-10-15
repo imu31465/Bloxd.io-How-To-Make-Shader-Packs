@@ -3,10 +3,10 @@
 Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Bloxd.io (nur WebGPU-Renderer).
 Basierend auf der Spezifikation von `apiVersion: 1`. Enthält Rezepte und API-Referenz: Mit dieser einen Datei kommst du von null bis zur Verteilung.
 
-> Dies ist eine inoffizielle Anleitung und gibt nicht die Sicht der Entwickler wieder. Die API kann sich ohne Ankündigung ändern.
-> Zuletzt geprüft: 2026-10-15. Da keine öffentliche offizielle WGSL-API-Referenz gefunden werden konnte, prüfe Beschreibungen und Rezepte weiter anhand des Ladebildschirms und der Kompilierung im Spiel.
-> Die Shader-Paket-Funktion ist eine offizielle Funktion aus der Spieloberfläche, und Pakete sind reines WGSL
-> (keine JS-Ausführung, kein Netzwerk) – mit normalem Code passiert also nichts Gefährliches.
+> Dies ist eine inoffizielle Anleitung und gibt nicht die Sicht der Entwickler wieder. Die API kann sich ohne Ankündigung ändern.  
+> Zuletzt geprüft: 2026-10-15. Da keine öffentliche offizielle WGSL-API-Referenz gefunden werden konnte, prüfe Beschreibungen und Rezepte weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
+> Die Shader-Paket-Funktion ist eine offizielle Funktion aus der Spieloberfläche, und Pakete sind reines WGSL  
+> (keine JS-Ausführung, kein Netzwerk) – mit normalem Code passiert also nichts Gefährliches.  
 > Dieser Leitfaden wurde mit KI-Unterstützung erstellt; Korrektheit ist nicht garantiert. Prüfe am tatsächlichen Spielverhalten.
 
 ## Inhalt
@@ -776,9 +776,9 @@ let phase = t * 0.15;
 
 > Physik-Rezepte zum „Vanilla-Look aus Materialien neu aufbauen". Erst diese Prämissen lesen:
 >
-> 1. **Der Light-Hook läuft in der letzten Fragment-Stufe**. Seine zurückgegebene Farbe wird unverändert zur Endfarbe. **Fog selbst neu anwenden** (R9.10)
-> 2. **Das Engine-Standardlicht ist nur Multiplikation**. Specular / Fresnel / Warm-Kalt-Trennung / Hemisphären-Ambiente werden von null aufgebaut
-> 3. `l.engineColour` ist die fertige Farbe (bereits gefoggt). Neuaufbau aus `s.colour` (Albedo) ist der Königsweg
+> 1. **Der Light-Hook läuft in der letzten Fragment-Stufe**. Seine zurückgegebene Farbe wird unverändert zur Endfarbe. **Fog selbst neu anwenden** (R9.10)  
+> 2. **Das Engine-Standardlicht ist nur Multiplikation**. Specular / Fresnel / Warm-Kalt-Trennung / Hemisphären-Ambiente werden von null aufgebaut  
+> 3. `l.engineColour` ist die fertige Farbe (bereits gefoggt). Neuaufbau aus `s.colour` (Albedo) ist der Königsweg  
 > 4. Texturen verboten → alle Details müssen **prozedural** sein (Hash/Rauschen) (R9.8)
 
 ### R9.1 Warme Fackeln × kaltes Himmelslicht
@@ -872,7 +872,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.6 Luftperspektive („Atmosphäre" per Distanz-Entsättigung)
 
-> Anders als Fog (Farbtausch) macht überlagerte „Distanz-Entsättigung" Fernen deutlich realistischer.
+> Anders als Fog (Farbtausch) macht überlagerte „Distanz-Entsättigung" Fernen deutlich realistischer.  
 > Vorsicht: nur Sättigung senken — nie Luminanz anfassen.
 
 ```wgsl
@@ -968,8 +968,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Fog neu anwenden (Pflicht beim Verwerfen von engineColour)
 
-> Ein Floor wie `max(l.fogFactor, 0.25)` begrenzt „nicht dichter als dies"
-> (0.0 = engine-treu / 0.3–0.5 = klarere Ferne).
+> Ein Floor wie `max(l.fogFactor, 0.25)` begrenzt „nicht dichter als dies"  
+> (0.0 = engine-treu / 0.3–0.5 = klarere Ferne).  
 > Hinweis: Der Engine-Fog ist reiner Horizont-Linear-Fog (nur nahe Sichtweite); mittleren Dunst muss das Paket bauen.
 
 ```wgsl
@@ -1006,20 +1006,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.12 Projektionsschatten — Lift-Inversion + Schwellenwert-Schnitt (definitiv)
 
-> **Prämissen-Recheck (Abschnitt 10)**: `l.skyLight` ist nicht der rohe Voxel-Wert (n/15), sondern der Wert nach der Engine-„Lift-Kurve"
+> **Prämissen-Recheck (Abschnitt 10)**: `l.skyLight` ist nicht der rohe Voxel-Wert (n/15), sondern der Wert nach der Engine-„Lift-Kurve"  
 > `y = 1-(1-x/(3-2x))³` (dunkle Bereiche anhebende S-Kurve).
 >
-> | Ort | Voxel roh | geliftet (= l.skyLight) | pow(·, 5.0) |
-> |---|---|---|---|
-> | offener Himmel | 1.00 | 1.00 | 1.00 |
-> | unterm Baum (Radius 2) | 0.87 | **0.97** | **0.86** ← fast unversehrt |
-> | Radius 3 | 0.80 | **0.92** | 0.66 |
+> | Ort | Voxel roh | geliftet (= l.skyLight) | pow(·, 5.0) |  
+> |---|---|---|---|  
+> | offener Himmel | 1.00 | 1.00 | 1.00 |  
+> | unterm Baum (Radius 2) | 0.87 | **0.97** | **0.86** ← fast unversehrt |  
+> | Radius 3 | 0.80 | **0.92** | 0.66 |  
 > | Radius 5 | 0.67 | 0.78 | 0.29 |
 >
-> **Dies ist die bewiesene Wurzel von „Schatten werden mit Gamma nie tiefer"**. Die Kurve ist aber monoton und damit algebraisch exakt invertierbar:
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Nach Wiederherstellung der Rohwerte genügt Binarisierung per Schwellenschnitt (`smoothstep`).
-> Die LightEngine-BFS-Seitenausbreitung ist „1 Block = -1", also wählt die Schwelle `th = 1 - r/15` direkt
-> „Verdeckung ab Radius r zählt als Schatten". Blöcke zu brechen bewegt Schatten sofort (LightEngine rechnet in Echtzeit neu).
+> **Dies ist die bewiesene Wurzel von „Schatten werden mit Gamma nie tiefer"**. Die Kurve ist aber monoton und damit algebraisch exakt invertierbar:  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Nach Wiederherstellung der Rohwerte genügt Binarisierung per Schwellenschnitt (`smoothstep`).  
+> Die LightEngine-BFS-Seitenausbreitung ist „1 Block = -1", also wählt die Schwelle `th = 1 - r/15` direkt  
+> „Verdeckung ab Radius r zählt als Schatten". Blöcke zu brechen bewegt Schatten sofort (LightEngine rechnet in Echtzeit neu).  
 > Limit: Schatten basieren auf „Himmel nach oben", rotieren also nicht mit der Sonne (Abschnitt 15, „Die Wahrheit über Schatten").
 
 ```wgsl
@@ -1062,9 +1062,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 ```
 
-> Tuning-Guide: **Schattenfläche entscheidet allein `shTh`** — `0.93` = Radius 1.5+ / `0.87` = Radius 2 / `0.80` = Radius 3 / `0.67` = Radius 5.
-> Kanten­härte ist `shSoft` (0.02 = hart / 0.08 = weich). Kern­dunkelheit ist die Zwei-Punkt-Verschiebung aus `0.09` (Mindest-Ambiente) und `0.16` (Himmelsstreulicht).
-> Für breitere Abend­schatten `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` addieren (Näherung langer Abendschatten.
+> Tuning-Guide: **Schattenfläche entscheidet allein `shTh`** — `0.93` = Radius 1.5+ / `0.87` = Radius 2 / `0.80` = Radius 3 / `0.67` = Radius 5.  
+> Kanten­härte ist `shSoft` (0.02 = hart / 0.08 = weich). Kern­dunkelheit ist die Zwei-Punkt-Verschiebung aus `0.09` (Mindest-Ambiente) und `0.16` (Himmelsstreulicht).  
+> Für breitere Abend­schatten `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` addieren (Näherung langer Abendschatten.  
 > `sunDir` ist `l.sunDirection / length(l.sunDirection)`). Für blauere Schatten das B von `vec3f(0.72, 0.82, 1.05)` erhöhen.
 >
 > ⚠️ „Kontrast mit `pow(skyLight, γ)` vertiefen" **legte Gamma auf geliftete Werte** und wirkte unterm Baum nie (0.97). Stattdessen diese Methode verwenden.

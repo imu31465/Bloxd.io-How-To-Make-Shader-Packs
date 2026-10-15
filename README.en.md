@@ -3,10 +3,10 @@
 A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
 Based on the spec at `apiVersion: 1`. Includes a recipe collection and API reference, so you can go from zero to distribution with this single file.
 
-> This is an unofficial guide and does not represent the views of the developers. The API may change without notice.
-> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.
-> Last reviewed: 2026-10-15. Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.
-> The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL
+> This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
+> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
+> Last reviewed: 2026-10-15. Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
+> The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 
 ## Contents
@@ -776,9 +776,9 @@ let phase = t * 0.15;
 
 > Physical recipes for "rebuilding vanilla's look from materials". Read these premises first:
 >
-> 1. **The light hook is called at the final fragment stage**. Its returned colour becomes the final colour as-is. **You must re-apply fog yourself** (R9.10)
-> 2. **The engine's default lighting is multiplication only**. Specular / fresnel / warm-cool separation / hemisphere ambient can all be built from zero
-> 3. `l.engineColour` is the finished color (already fogged). Rebuilding from `s.colour` (albedo) is the full-fledged approach
+> 1. **The light hook is called at the final fragment stage**. Its returned colour becomes the final colour as-is. **You must re-apply fog yourself** (R9.10)  
+> 2. **The engine's default lighting is multiplication only**. Specular / fresnel / warm-cool separation / hemisphere ambient can all be built from zero  
+> 3. `l.engineColour` is the finished color (already fogged). Rebuilding from `s.colour` (albedo) is the full-fledged approach  
 > 4. Textures are prohibited → all detail must be **procedural** (hash/noise) (R9.8)
 
 ### R9.1 Warm torches × cool skylight
@@ -872,7 +872,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.6 Aerial perspective ("atmosphere" via distance desaturation)
 
-> Unlike fog (color replacement), layering "distance desaturation" makes distant views much more realistic.
+> Unlike fog (color replacement), layering "distance desaturation" makes distant views much more realistic.  
 > Caution: only reduce saturation — never touch luminance.
 
 ```wgsl
@@ -968,8 +968,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Re-applying fog (required when discarding engineColour)
 
-> Setting a floor like `max(l.fogFactor, 0.25)` caps "no denser than this"
-> (0.0 = engine-accurate / 0.3–0.5 = clearer distance).
+> Setting a floor like `max(l.fogFactor, 0.25)` caps "no denser than this"  
+> (0.0 = engine-accurate / 0.3–0.5 = clearer distance).  
 > Note the engine fog is a horizon-only linear fog (near render distance only); mid-distance haze must be built pack-side.
 
 ```wgsl
@@ -1006,20 +1006,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.12 Projected shadows — lift inversion + threshold cut (definitive)
 
-> **Premise recheck (section 10)**: `l.skyLight` is not the raw voxel value (n/15) but the value after the engine's "lift curve"
+> **Premise recheck (section 10)**: `l.skyLight` is not the raw voxel value (n/15) but the value after the engine's "lift curve"  
 > `y = 1-(1-x/(3-2x))³` (an S-curve lifting dark areas).
 >
-> | Place | raw voxel | lifted (= l.skyLight) | pow(·, 5.0) |
-> |---|---|---|---|
-> | open sky | 1.00 | 1.00 | 1.00 |
-> | under tree (radius 2) | 0.87 | **0.97** | **0.86** ← nearly untouched |
-> | radius 3 | 0.80 | **0.92** | 0.66 |
+> | Place | raw voxel | lifted (= l.skyLight) | pow(·, 5.0) |  
+> |---|---|---|---|  
+> | open sky | 1.00 | 1.00 | 1.00 |  
+> | under tree (radius 2) | 0.87 | **0.97** | **0.86** ← nearly untouched |  
+> | radius 3 | 0.80 | **0.92** | 0.66 |  
 > | radius 5 | 0.67 | 0.78 | 0.29 |
 >
-> **This is the proven root cause of "shadows won't deepen no matter the gamma"**. But the curve is monotonic, so it can be inverted algebraically:
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. After restoring raw values, just binarize with a threshold cut (`smoothstep`).
-> LightEngine's BFS lateral spread is "1 block = -1", so the threshold `th = 1 - r/15` directly dials
-> "occlusion of radius r or more counts as shadow". Breaking blocks moves shadows instantly (LightEngine recalculates in real time).
+> **This is the proven root cause of "shadows won't deepen no matter the gamma"**. But the curve is monotonic, so it can be inverted algebraically:  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. After restoring raw values, just binarize with a threshold cut (`smoothstep`).  
+> LightEngine's BFS lateral spread is "1 block = -1", so the threshold `th = 1 - r/15` directly dials  
+> "occlusion of radius r or more counts as shadow". Breaking blocks moves shadows instantly (LightEngine recalculates in real time).  
 > Limitation: shadows are "upward sky" based, so they don't rotate with the sun (section 15, "The truth about shadows").
 
 ```wgsl
@@ -1062,9 +1062,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 ```
 
-> Tuning guide: **shadow area is set by `shTh` alone** — `0.93` = radius 1.5+ / `0.87` = radius 2 / `0.80` = radius 3 / `0.67` = radius 5.
-> Edge hardness is `shSoft` (0.02 = hard / 0.08 = soft). Shadow core darkness is the two-point shift of `0.09` (minimum ambient) and `0.16` (sky scatter).
-> To widen shadows at dusk, add `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (long-dusk-shadow approximation.
+> Tuning guide: **shadow area is set by `shTh` alone** — `0.93` = radius 1.5+ / `0.87` = radius 2 / `0.80` = radius 3 / `0.67` = radius 5.  
+> Edge hardness is `shSoft` (0.02 = hard / 0.08 = soft). Shadow core darkness is the two-point shift of `0.09` (minimum ambient) and `0.16` (sky scatter).  
+> To widen shadows at dusk, add `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (long-dusk-shadow approximation.  
 > `sunDir` is `l.sunDirection / length(l.sunDirection)`). For bluer shadows raise the B of `vec3f(0.72, 0.82, 1.05)`.
 >
 > ⚠️ "Deepen contrast with `pow(skyLight, γ)`" **applied gamma to lifted values** and never affected under-tree areas (0.97). Use this method instead.

@@ -3,10 +3,10 @@
 Guide autonome pour créer et distribuer des packs de shaders pour Bloxd.io (moteur WebGPU uniquement).
 Basé sur la spécification `apiVersion: 1`. Inclut recettes et référence API : avec ce seul fichier, vous passez de zéro à la distribution.
 
-> Ce guide est non officiel et ne représente pas la position des développeurs. L'API peut changer sans préavis.
-> Dernière révision : 2026-10-15. Aucune référence officielle publique de l'API WGSL n'ayant été trouvée, continuez à vérifier descriptions et recettes face à l'écran de chargement et à la compilation en jeu.
-> La fonction de packs de shaders est une fonction officielle accessible depuis l'interface du jeu, et les packs sont du WGSL pur
-> (ni exécution JS ni réseau) : rien de dangereux ne se produit avec du code normal.
+> Ce guide est non officiel et ne représente pas la position des développeurs. L'API peut changer sans préavis.  
+> Dernière révision : 2026-10-15. Aucune référence officielle publique de l'API WGSL n'ayant été trouvée, continuez à vérifier descriptions et recettes face à l'écran de chargement et à la compilation en jeu.  
+> La fonction de packs de shaders est une fonction officielle accessible depuis l'interface du jeu, et les packs sont du WGSL pur  
+> (ni exécution JS ni réseau) : rien de dangereux ne se produit avec du code normal.  
 > Ce guide a été créé avec l'assistance de l'IA ; l'exactitude n'est pas garantie. Vérifiez avec le comportement réel en jeu.
 
 ## Sommaire
@@ -776,9 +776,9 @@ let phase = t * 0.15;
 
 > Recettes physiques pour « reconstruire le look vanille depuis les matériaux ». Lisez ces prémisses d'abord :
 >
-> 1. **Le hook light est appelé à l'étape finale du fragment**. Sa couleur rendue devient la couleur finale telle quelle. **Vous devez réappliquer le brouillard** (R9.10)
-> 2. **L'éclairage par défaut du moteur n'est que multiplication**. Specular / fresnel / séparation chaud-froid / ambiant hémisphérique se construisent de zéro
-> 3. `l.engineColour` est la couleur terminée (déjà brumée). Reconstruire depuis `s.colour` (albedo) est l'approche complète
+> 1. **Le hook light est appelé à l'étape finale du fragment**. Sa couleur rendue devient la couleur finale telle quelle. **Vous devez réappliquer le brouillard** (R9.10)  
+> 2. **L'éclairage par défaut du moteur n'est que multiplication**. Specular / fresnel / séparation chaud-froid / ambiant hémisphérique se construisent de zéro  
+> 3. `l.engineColour` est la couleur terminée (déjà brumée). Reconstruire depuis `s.colour` (albedo) est l'approche complète  
 > 4. Textures interdites → tout détail doit être **procédural** (hash/bruit) (R9.8)
 
 ### R9.1 Torches chaudes × ciel froid
@@ -872,7 +872,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.6 Perspective aérienne (« atmosphère » par désaturation à distance)
 
-> Contrairement au brouillard (remplacement de couleur), superposer « désaturation à distance » rend les lointains bien plus réalistes.
+> Contrairement au brouillard (remplacement de couleur), superposer « désaturation à distance » rend les lointains bien plus réalistes.  
 > Prudence : ne baissez que la saturation — jamais la luminance.
 
 ```wgsl
@@ -968,8 +968,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Réappliquer le brouillard (obligatoire en écartant engineColour)
 
-> Un plancher comme `max(l.fogFactor, 0.25)` limite « pas plus dense que ceci »
-> (0,0 = fidèle au moteur / 0,3–0,5 = lointain plus clair).
+> Un plancher comme `max(l.fogFactor, 0.25)` limite « pas plus dense que ceci »  
+> (0,0 = fidèle au moteur / 0,3–0,5 = lointain plus clair).  
 > Note : le brouillard moteur est linéaire d'horizon seul (près de la distance de dessin) ; la brume moyenne doit être construite côté pack.
 
 ```wgsl
@@ -1006,20 +1006,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.12 Ombres projetées — inversion du lift + coupe par seuil (définitif)
 
-> **Rappel de prémisse (section 10)** : `l.skyLight` n'est pas la valeur voxel brute (n/15) mais la valeur après la « courbe de lift » du moteur
+> **Rappel de prémisse (section 10)** : `l.skyLight` n'est pas la valeur voxel brute (n/15) mais la valeur après la « courbe de lift » du moteur  
 > `y = 1-(1-x/(3-2x))³` (courbe S relevant les zones sombres).
 >
-> | Lieu | voxel brut | lifté (= l.skyLight) | pow(·, 5.0) |
-> |---|---|---|---|
-> | ciel ouvert | 1,00 | 1,00 | 1,00 |
-> | sous arbre (rayon 2) | 0,87 | **0,97** | **0,86** ← presque intact |
-> | rayon 3 | 0,80 | **0,92** | 0,66 |
+> | Lieu | voxel brut | lifté (= l.skyLight) | pow(·, 5.0) |  
+> |---|---|---|---|  
+> | ciel ouvert | 1,00 | 1,00 | 1,00 |  
+> | sous arbre (rayon 2) | 0,87 | **0,97** | **0,86** ← presque intact |  
+> | rayon 3 | 0,80 | **0,92** | 0,66 |  
 > | rayon 5 | 0,67 | 0,78 | 0,29 |
 >
-> **C'est la cause démontrée de « les ombres ne se creusent pas avec gamma »**. Mais la courbe est monotone et inversible algébriquement :
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Après restauration des valeurs brutes, il suffit de binariser par coupe de seuil (`smoothstep`).
-> La dispersion BFS de LightEngine vaut « 1 bloc = -1 » : le seuil `th = 1 - r/15` règle donc directement
-> « l'occlusion de rayon r ou plus compte comme ombre ». Casser des blocs déplace les ombres aussitôt (LightEngine recalcule en temps réel).
+> **C'est la cause démontrée de « les ombres ne se creusent pas avec gamma »**. Mais la courbe est monotone et inversible algébriquement :  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Après restauration des valeurs brutes, il suffit de binariser par coupe de seuil (`smoothstep`).  
+> La dispersion BFS de LightEngine vaut « 1 bloc = -1 » : le seuil `th = 1 - r/15` règle donc directement  
+> « l'occlusion de rayon r ou plus compte comme ombre ». Casser des blocs déplace les ombres aussitôt (LightEngine recalcule en temps réel).  
 > Limite : les ombres partent du « ciel vers le haut » et ne tournent donc pas avec le soleil (section 15, « La vérité sur les ombres »).
 
 ```wgsl
@@ -1062,9 +1062,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 ```
 
-> Guide de réglage : **la surface d'ombre tient au seul `shTh`** — `0,93` = rayon 1,5+ / `0,87` = rayon 2 / `0,80` = rayon 3 / `0,67` = rayon 5.
-> La dureté du bord, c'est `shSoft` (0,02 = dur / 0,08 = doux). L'obscurité du cœur, c'est le double réglage de `0,09` (ambiant minimum) et `0,16` (lumière dispersée du ciel).
-> Pour élargir les ombres au couchant, ajoutez `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (approximation des longues ombres du soir.
+> Guide de réglage : **la surface d'ombre tient au seul `shTh`** — `0,93` = rayon 1,5+ / `0,87` = rayon 2 / `0,80` = rayon 3 / `0,67` = rayon 5.  
+> La dureté du bord, c'est `shSoft` (0,02 = dur / 0,08 = doux). L'obscurité du cœur, c'est le double réglage de `0,09` (ambiant minimum) et `0,16` (lumière dispersée du ciel).  
+> Pour élargir les ombres au couchant, ajoutez `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (approximation des longues ombres du soir.  
 > `sunDir` vaut `l.sunDirection / length(l.sunDirection)`). Pour des ombres plus bleues, montez le B de `vec3f(0.72, 0.82, 1.05)`.
 >
 > ⚠️ « Creuser le contraste avec `pow(skyLight, γ)` » **appliquait gamma à des valeurs liftées** et n'affectait jamais sous les arbres (0,97). Utilisez plutôt cette méthode.
