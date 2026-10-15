@@ -4,6 +4,7 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 Based on the spec at `apiVersion: 1`. Includes a recipe collection and API reference, so you can go from zero to distribution with this single file.
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.
+> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.
 > Last reviewed: 2026-10-15. Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL
 > (no JS execution or networking), so nothing dangerous happens with normal code.
