@@ -1,7 +1,7 @@
 # Como criar pacotes de shaders para Bloxd.io (Guia completo)
 
 Guia autocontido para criar e distribuir pacotes de shaders (shader packs) para Bloxd.io (somente renderizador WebGPU).
-Baseado na especificação da `apiVersion: 1`. Inclui receitas e referência da API: com este único arquivo você vai do zero à distribuição.
+Baseado na especificação da `apiVersion: 2`. Inclui receitas e referência da API: com este único arquivo você vai do zero à distribuição. Pacotes v1 não carregam no jogo atual (valores v1 de `apiVersion` e identificadores antigos são rejeitados). Para migrar da v1, ver a Parte VIII.
 
 > Este é um guia não oficial e não representa a posição dos desenvolvedores. A API pode mudar sem aviso.  
 > Última revisão: 2026-10-15 (ordem de aplicação de névoa, ajustes reais de névoa e renderização submarina verificados contra a implementação do motor). Como não foi encontrada uma referência oficial pública da API WGSL, continue verificando descrições e receitas contra a tela de carregamento e a compilação no jogo.  
@@ -18,6 +18,7 @@ Baseado na especificação da `apiVersion: 1`. Inclui receitas e referência da 
 - [Parte V: Solução de problemas e notas](#parte-v-solução-de-problemas-e-notas)
 - [Parte VI: Notas importantes de implementação](#parte-vi-notas-importantes-de-implementação)
 - [Parte VII: Suplemento de interioridades](#parte-vii-suplemento-de-interioridades)
+- [Parte VIII: Guia de migração para API Version 2](#parte-viii-guia-de-migração-para-api-version-2)
 
 ---
 
@@ -58,7 +59,7 @@ Baseado na especificação da `apiVersion: 1`. Inclui receitas e referência da 
 
 ```json
 {
-  "apiVersion": 1,
+  "apiVersion": 2,
   "name": "My Pack",
   "author": "your name"
 }
@@ -66,7 +67,7 @@ Baseado na especificação da `apiVersion: 1`. Inclui receitas e referência da 
 
 | Campo | Obrigatório | Descrição |
 |---|---|---|
-| `apiVersion` | obrigatório | Deve coincidir exatamente com `1` |
+| `apiVersion` | obrigatório | Deve coincidir exatamente com `2`. Pacotes com `1` são rejeitados com `shaderPack:loadWrongApiVersion` |
 | `name` | obrigatório | Não pode estar vazio. Exibido na interface de configurações |
 | `author` | opcional | Pode omitir. Valores não-string (números etc.) são erros |
 
@@ -80,8 +81,8 @@ Um pacote funcional só com `pack.json` (seção 4) e este `pack.wgsl`:
 // Pacote mínimo com leve tom quente
 const packWarmth = 0.18;
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let tint = mix(vec3f(1.0), vec3f(1.06, 1.0, 0.92), packWarmth);
     out.colour = clamp(out.colour * tint, vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
@@ -93,8 +94,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 Regras a seguir:
 
-- Nunca **construa as structs de saída diretamente** (`bloxd_Surface(...)` é erro). Comece sempre de `bloxd_defaultSurface(s)` / `bloxd_defaultLight(s, l)` / `bloxd_defaultVertex(v)` e modifique campos. Exceção: o primeiro parâmetro do hook light (`s: bloxd_Surface`) tem o tipo de saída: `var out = s;` também vale
-- `var x: bloxd_Surface;` sem inicializar (só anotação de tipo) também é erro
+- Nunca **construa as structs de saída diretamente** (`BloxdSurface(...)` é erro). Comece sempre de `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` e modifique campos. Exceção: o primeiro parâmetro do hook light (`s: BloxdSurface`) tem o tipo de saída: `var out = s;` também vale
+- `var x: BloxdSurface;` sem inicializar (só anotação de tipo) também é erro
 - Parâmetros dos hooks são **somente leitura**. Para mudá-los, copie antes, ex. `var sv = s;`
 - Você não pode usar o prefixo `bloxd_` nos seus identificadores (salvo os 6 nomes de hook)
 - Escreva constantes com `const` (`#define` não aceita valores)
@@ -105,16 +106,16 @@ Todos opcionais. Assinaturas devem coincidir exatamente nos tipos (nomes de par�
 
 | Hook | Papel |
 |---|---|
-| `fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex` | Animação de vértices do terreno. **Indisponível no modo estrito** |
-| `fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface` | Cor, transparência e emissão do terreno. `s.colour` é textura × cor de vértice |
-| `fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light` | Cor final do terreno. Chamado na **etapa final do fragmento**, e seu retorno vira a cor final como está |
-| `fn bloxd_liquid_vertex / _surface / _light` (mesmas formas) | Versões para líquidos. `alpha` age como transparência do líquido |
+| `fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex` | Animação de vértices do terreno. **Indisponível no modo estrito** |
+| `fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface` | Cor, transparência e emissão do terreno. `s.colour` é textura × cor de vértice |
+| `fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight` | Cor final do terreno. Chamado na **etapa final do fragmento**, e seu retorno vira a cor final como está |
+| `fn bloxdLiquidVertex / bloxdLiquidSurface / bloxdLiquidLight` (mesmas formas) | Versões para líquidos. `alpha` age como transparência do líquido |
 
 Regras de fallback:
 
 - Sem hook de líquido, **usa-se o hook de terreno de mesmo nome** (nunca o inverso). Escrever só surface aplica o mesmo efeito aos líquidos
-- Sem hook light, vale o comportamento padrão (`engineColour + emission × fogFactor`)
-- Se descartar `engineColour` e reconstruir da cor base, reaplique a névoa você mesmo: `mix(l.fogColour, col, l.fogFactor)`. Ao somar emissão, multiplique-a antes por `fogFactor`
+- Sem hook light, vale o comportamento padrão (`engineColour + emission × fogVisibility`)
+- Se descartar `engineColour` e reconstruir da cor base, reaplique a névoa você mesmo: `mix(l.fogColour, col, l.fogVisibility)`. Ao somar emissão, multiplique-a antes por `fogVisibility`
 
 ## 7. 8 variantes e guardas
 
@@ -145,7 +146,7 @@ Proibido / cuidado:
 - Atributos `@builtin` também são proibidos, então `fragCoord` (coordenadas de tela) e `vertex_index` não podem ser lidos
 - **Não use `let` de escopo de módulo** (use `const` ou `var`)
 - `atomic` é inutilizável
-- Coordenadas são locais-noa. Some `originOffset` para coordenadas de mundo. Coordenadas de bloco são `vec3i(floor(position - normal * 0.5)) + originOffset`
+- Coordenadas são locais-noa. Some `bloxdOriginOffset()` para coordenadas de mundo. Coordenadas de bloco são `bloxdFaceBlock(position, normal)`
 
 ## 9. Validação, testes e distribuição
 
@@ -170,32 +171,38 @@ Passos:
 O motor insere automaticamente o código abaixo antes do código do pacote (pacotes não podem redeclarar). Trechos em `#ifdef` variam por variante.
 
 ```wgsl
-// Engine-provided and read-only to packs. apiVersion 1.
-struct bloxd_VertexIn {
-    position: vec3f,     // noa-local world space (world minus originOffset)
+// Engine-provided and read-only to packs. apiVersion 2.
+const bloxdTimeWrap: f32 = 3600.0;   // seconds until time wraps to 0
+
+fn bloxdTime() -> f32;               // seconds. wraps to 0 every 3600 s
+fn bloxdOriginOffset() -> vec3i;     // whole blocks. noa-local + this = world coords
+fn bloxdEyePosition() -> vec3f;      // camera position (noa-local)
+fn bloxdSunDirection() -> vec3f;     // sun direction (unit vector, non-zero only with earth skybox)
+fn bloxdWorldPosition(position: vec3f) -> vec3f;  // noa-local -> world coords
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i;  // world block coords of this face
+fn bloxdApplyFog(colour: vec3f, l: BloxdLightIn) -> vec3f;   // mix(l.fogColour, colour, l.fogVisibility)
+
+struct BloxdVertexIn {
+    position: vec3f,   // noa-local world space (world minus bloxdOriginOffset())
     normal: vec3f,
-    originOffset: vec3i, // whole blocks
-    time: f32,           // seconds, wrapped every 3600 s (part of the API)
+    blockId: u32,      // owning block id (flat-interpolated, uniform across the face)
 }
 
 #ifndef BLOXD_STRICT
-struct bloxd_Vertex {
+struct BloxdVertex {
     position: vec3f,     // noa-local
 }
 #endif
 
-struct bloxd_SurfaceIn {
-    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher in v1)
+struct BloxdSurfaceIn {
+    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher)
     alpha: f32,
     normal: vec3f,
     position: vec3f,     // noa-local
-    originOffset: vec3i, // a face's world block is vec3i(floor(position - normal * 0.5)) + originOffset
-    eyePosition: vec3f,  // noa-local
-    time: f32,
-    sunDirection: vec3f, // unit, towards the sun, in world orientation; zero when the sky has no sun
+    blockId: u32,        // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Surface {
+struct BloxdSurface {
     colour: vec3f,
 #ifdef BLOXD_ALPHA
     alpha: f32,
@@ -203,63 +210,59 @@ struct bloxd_Surface {
     emission: vec3f,     // added after lighting, then fogged
 }
 
-struct bloxd_LightIn {
-    engineColour: vec3f, // the engine's result for this fragment, from the surface hook's colour
-    directional: f32,    // summed Lambert from the scene's directional lights (0 when off)
-    ambient: vec3f,      // the material's ambient times the scene's
-#ifdef BLOXD_LIGHTING
-    blockLight: vec3f,   // voxel block light, tone-mapped
-    skyLight: f32,       // voxel sky light, tone-mapped
-    ambientLightColour: vec3f,
-    skyLightColour: vec3f,
-    heldLight: vec3f,    // held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-#endif
+struct BloxdLightIn {
+    litColour: vec3f,          // engine lighting result (before emission and fog)
+    engineColour: vec3f,       // post-fog = bloxdApplyFog(litColour, l). excludes emission
+    directional: f32,          // summed Lambert from the scene's directional lights (0 when off)
+    ambient: vec3f,            // the material's ambient times the scene's
+    blockLight: vec3f,         // voxel block light, tone-mapped (all variants; 0 when unlit)
+    skyLight: f32,             // voxel sky light, tone-mapped (all variants; 1 when unlit)
+    ambientLightColour: vec3f, // present in all variants (white when unlit)
+    skyLightColour: vec3f,     // present in all variants (white when unlit)
+    heldLight: vec3f,          // held light here (all variants; 0 when unlit/out of range)
     fogColour: vec3f,
-    fogFactor: f32,      // 1 = no fog, 0 = fully fogged
-    position: vec3f,     // as in bloxd_SurfaceIn
+    fogVisibility: f32,        // 1 = no fog, 0 = fully fogged (renamed from v1 fogFactor)
+    position: vec3f,           // as in BloxdSurfaceIn
     normal: vec3f,
-    originOffset: vec3i,
-    eyePosition: vec3f,
-    time: f32,
-    sunDirection: vec3f,
+    blockId: u32,              // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Light {
+struct BloxdLight {
     colour: vec3f,
 }
 
+// liquid variants, surface / light hooks only
+struct BloxdOpaqueBehind {
+    found: bool,       // false when no opaque face behind (sky)
+    position: vec3f,   // opaque face position behind (noa-local)
+    distance: f32,     // distance from the eye
+}
+fn bloxdOpaqueBehind() -> BloxdOpaqueBehind;
+
 #ifndef BLOXD_STRICT
-fn bloxd_defaultVertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    return bloxd_Vertex(v.position);
-}
+fn bloxdDefaultVertex(v: BloxdVertexIn) -> BloxdVertex;
 #endif
 
-fn bloxd_defaultSurface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-#ifdef BLOXD_ALPHA
-    return bloxd_Surface(s.colour, s.alpha, vec3f(0.0));
-#else
-    return bloxd_Surface(s.colour, vec3f(0.0));
-#endif
-}
-
-fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    return bloxd_Light(l.engineColour + s.emission * l.fogFactor);
-}
+fn bloxdDefaultSurface(s: BloxdSurfaceIn) -> BloxdSurface;
+fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 ```
 
 Pontos-chave:
 
-- `time` envolve a cada 3600 segundos e é tempo decorrido. Não há garantia de sincronia com o relógio diurno do jogo.
-- `sunDirection` é vetor unitário só enquanto há sol; zero quando o céu não tem sol. **A lua está sempre em `-sunDirection`** (o motor calcula a posição lunar como o oposto exato do sol). Mas em mundos padrão o sol é estático e a lua também — uma lua em movimento só importa em mundos com ciclo dia/noite (ver Parte VII, seção 24)
-- ※Nota: antes escrito como "não reutilizável como direção lunar em zero". A direção em si está disponível via `-sunDirection`, mas pacotes de distribuição devem ramificar com `sunPresent` sob premissa zero (ver R2 para o pseudo look azul, Parte VII R-A para luar direcional)
-- `emission` é somado após o cálculo de iluminação, atenuado por **`fogFactor`** (a implementação defaultLight `engineColour + emission × fogFactor`. A emissão também some em distância totalmente enevoada)
-- **Ordem de aplicação de névoa**: o fragmento processa ① composição iluminação/emissão → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogFactor)` → ④ chamada ao hook light → ⑤ return. Logo **engineColour chega já com névoa**, e **o valor devolvido do hook light vira a cor final como está** (após o hook não se reaplica névoa)
-- **Origem de fogFactor**: distância em espaço de vista (calculada por vértice, interpolada). Em modo linear `fogFactor = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
+- `bloxdTime()` é tempo decorrido que envolve a cada 3600 segundos (`bloxdTimeWrap`). Não há garantia de sincronia com o relógio diurno do jogo. Como a visibilidade de etapa do bind group é VERTEX|FRAGMENT, **também pode ser chamada desde hooks vertex**
+- `bloxdSunDirection()` é vetor unitário só enquanto há sol; zero quando o céu não tem sol. **A lua está sempre em `-bloxdSunDirection()`** (o motor calcula a posição lunar como o oposto exato do sol). Mas em mundos padrão o sol é estático e a lua também — uma lua em movimento só importa em mundos com ciclo dia/noite (ver Parte VII, seção 24)
+- ※Nota: antes escrito como "não reutilizável como direção lunar em zero". A direção em si está disponível via `-bloxdSunDirection()`, mas pacotes de distribuição devem ramificar com `sunPresent` sob premissa zero (ver R2 para o pseudo look azul, Parte VII R-A para luar direcional)
+- `emission` é somado após o cálculo de iluminação, atenuado por **`fogVisibility`** (a implementação defaultLight `engineColour + emission × fogVisibility`. A emissão também some em distância totalmente enevoada)
+- **Ordem de aplicação de névoa**: o fragmento processa ① composição iluminação/emissão → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ chamada ao hook light → ⑤ return. Logo **engineColour chega já com névoa**, e **o valor devolvido do hook light vira a cor final como está** (após o hook não se reaplica névoa)
+- **Origem de fogVisibility**: distância em espaço de vista (calculada por vértice, interpolada). Em modo linear `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **Quando fogMode == 0**: `fogColour` chega como `vec3f(0.0)` (preto). Código que estime faixas horárias pelo tom de fogColour deve ter cuidado
 - **Ajustes reais de névoa em builds atuais**: **linear fixo**. `fogStart` = distância de chunks, `fogEnd` = +1 chunk (só horizonte). Com névoa off fixa-se em 100 / 101 chunks, efetivamente desativada. Cor de névoa padrão RGB(183, 191, 195)
-- Dentro do motor existe um uniform chamado `bloxd_packInputs`, mas **pacotes não podem referenciá-lo diretamente**. Use valores via campos de entrada dos hooks (`s.time` etc.)
+- O uniform `bloxdPackInputs` (`@group(3) @binding(0)`, 64B) é só para **uso via funções de cabeçalho**. Não o referencie diretamente desde pacotes. A visibilidade de etapa é VERTEX|FRAGMENT, logo funções de cabeçalho também podem ser chamadas desde funções de escopo de módulo fora dos hooks e desde hooks vertex. A textura de profundidade (binding 1) é só FRAGMENT, logo `bloxdOpaqueBehind()` fica limitado a hooks surface / light
 - **`skyLight` / `blockLight` / `heldLight` chegam após uma "curva de lift"**. O `tone-mapped` dos comentários do cabeçalho refere-se a isto: o motor sempre aplica `y = 1-(1-x/(3-2x))³` (curva S que levanta áreas escuras) aos fragmentos antes de entregar aos pacotes. Não são valores de voxel crus (n/15); ex. sob árvore (cru 0.87) chega elevado a **0.97**
 - `skyLight` é essencialmente o dado de oclusão por voxels de "se o céu é visível daqui" (= um mapa de sombras), não um simples parâmetro de brilho (ver seção 15, "A verdade sobre as sombras")
+- **`litColour` serve de ponto de partida**: na v1 só havia `engineColour` já com névoa, e a atmosfera própria tendia à névoa dupla. Na v2 parte-se de `litColour` pré-névoa e pré-emissão, e se reaplica névoa no próprio ritmo com `bloxdApplyFog()`
+- **`blockId` distingue tipos de bloco**: identificação independente da cor de textura. Mas a tabela ID-tipo vive dentro do motor: qual ID é qual bloco deve ser medido no mundo (ver Parte VIII)
+- **A construção direta de structs é proibida**: chamadas de construtor como `BloxdLight(...)` são rejeitadas na validação estática. Parta sempre de `bloxdDefault*` ou use uma cópia da entrada
 
 ## 11. Tabela de variantes
 
@@ -274,13 +277,13 @@ Pontos-chave:
 | strict + lit + terreno | ✓ | ✓ | – |
 | strict + lit + líquido | ✓ | ✓ | ✓ |
 
-As formas das structs do cabeçalho também mudam por variante (sem `bloxd_Vertex` em strict, sem `blockLight` etc. em unlit, sem `alpha` em terreno strict).
+As formas das structs do cabeçalho também mudam por variante (sem `BloxdVertex` em strict, sem `blockLight` etc. em unlit, sem `alpha` em terreno strict).
 
 ## 12. Cola de esqueleto
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);          // construção direta é proibida; comece sempre do default
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);          // construção direta é proibida; comece sempre do default
     out.colour = out.colour * vec3f(1.0, 0.9, 0.8);
     #ifdef BLOXD_ALPHA                          // terreno só tem alpha em allow
     out.alpha = s.alpha;
@@ -288,8 +291,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
     return out;
 }
 
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);         // engineColour + emission*fogFactor
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);         // engineColour + emission*fogVisibility
     #ifdef BLOXD_LIGHTING                       // proteja entradas só de iluminação
     out.colour += l.blockLight * 0.2;
     #endif
@@ -297,9 +300,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 
 #ifndef BLOXD_STRICT                            // vertex sempre com esta guarda
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.time) * 0.05;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(bloxdTime()) * 0.05;
     return out;
 }
 #endif
@@ -311,15 +314,15 @@ Cinco coisas para ter sempre em mente: compilar limpo nas 8 variantes / jogos es
 
 # Parte III: Receituário
 
-> **Importante:** as receitas abaixo são exemplos individuais, não para concatenar de cima abaixo. Colar várias definições do mesmo nome de hook (`bloxd_terrain_light` etc.) ou do mesmo nome de função auxiliar duplica definições num módulo e falha a compilação. Para combinar efeitos, funda-os numa função por tipo de hook.
+> **Importante:** as receitas abaixo são exemplos individuais, não para concatenar de cima abaixo. Colar várias definições do mesmo nome de hook (`bloxdTerrainLight` etc.) ou do mesmo nome de função auxiliar duplica definições num módulo e falha a compilação. Para combinar efeitos, funda-os numa função por tipo de hook.
 
 ## R1. Receitas de cor (surface)
 
 ### Tom único (o mais básico)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     out.colour = clamp(out.colour * vec3f(1.05, 1.0, 0.95), vec3f(0.0), vec3f(1.0));
     return out;
 }
@@ -360,9 +363,9 @@ fn pack_sepia(c: vec3f, amount: f32) -> vec3f {
 ### Gradiente de altitude (baixadas quentes)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let low = clamp(1.0 - worldY * 0.02, 0.0, 1.0);        // 1..0 na altura 0..50
     out.colour = clamp(mix(out.colour, out.colour * vec3f(1.10, 0.95, 0.80), low * 0.6), vec3f(0.0), vec3f(1.0));
     return out;
@@ -372,8 +375,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### Pintar por orientação (cima = claro, paredes = escuro)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let upness = clamp(s.normal.y, 0.0, 1.0);              // chão 1 / parede 0 / teto -1
     let downness = clamp(-s.normal.y, 0.0, 1.0);
     let shade = mix(0.82, 1.02, upness) - downness * 0.12; // paredes e tetos um pouco mais escuros
@@ -404,9 +407,9 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 ### Neblina de distância (névoa própria)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     // 0..0.35 de névoa própria de 64 a 192 blocos
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
@@ -417,8 +420,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### Noite (tom azul por skyLight + proteção de lamparinas)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     out.colour = mix(out.colour, out.colour * vec3f(0.55, 0.68, 1.0), sky * 0.55);
@@ -432,8 +435,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### Cavernas escuras (escurecer mais onde não há skyLight)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -447,13 +450,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### Azul noturno ambiente (pseudo look sem direção lunar)
 
-> Nesta API, `sunDirection` é zero quando o céu não tem sol. O abaixo não é luar direcional, só um tênue ambiente azul quando o céu está escuro. A direção lunar em si está disponível via `-sunDirection` (só mundos com ciclo dia/noite. Parte VII R-A).
+> Nesta API, `bloxdSunDirection()` é zero quando o céu não tem sol. O abaixo não é luar direcional, só um tênue ambiente azul quando o céu está escuro. A direção lunar em si está disponível via `-bloxdSunDirection()` (só mundos com ciclo dia/noite. Parte VII R-A).
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let upward = clamp(l.normal.y, 0.0, 1.0);
@@ -466,11 +469,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### Calor de pôr do sol (tom por altura do sol)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunLen = length(l.sunDirection);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // 1 no horizonte / 0 no zênite
         let sunset = lowness * lowness;
         out.colour = mix(out.colour, out.colour * vec3f(1.12, 0.88, 0.72), sunset * 0.55);
@@ -482,36 +485,36 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### Substituição total da saída do motor (reiluminação simples)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     #ifdef BLOXD_LIGHTING
-    // NOTA: construção direta de bloxd_Light(...) é proibida; reescreva colour a partir do default
-    var out = bloxd_defaultLight(s, l);
+    // NOTA: construção direta de BloxdLight(...) é proibida; reescreva colour a partir do default
+    var out = bloxdDefaultLight(s, l);
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let level = clamp(sky * 0.7 + block, 0.0, 1.0);
     // descarta engineColour (o resultado de iluminação do motor) e usa "cor base × brilho calculado"
     var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
-    col = mix(l.fogColour, col, l.fogFactor);   // descartado engineColour: refazer névoa é obrigatório
-    out.colour = col + s.emission * l.fogFactor;   // some emission você também (obrigatório)
+    col = mix(l.fogColour, col, l.fogVisibility);   // descartado engineColour: refazer névoa é obrigatório
+    out.colour = col + s.emission * l.fogVisibility;   // some emission você também (obrigatório)
     return out;
     #else
-    return bloxd_defaultLight(s, l);
+    return bloxdDefaultLight(s, l);
     #endif
 }
 ```
 
 ## R3. Receitas de emissão
 
-> `emission` é somado após o cálculo de iluminação, mas o processo padrão **o atenua com `fogFactor`. Em distância totalmente enevoada a emissão também some. Para manter brilho ao longe, não some a emission — some diretamente como `out.colour += ...` dentro do hook light** (engineColour já leva névoa, então ao longe a luz cai sobre a cor de névoa)
+> `emission` é somado após o cálculo de iluminação, mas o processo padrão **o atenua com `fogVisibility`. Em distância totalmente enevoada a emissão também some. Para manter brilho ao longe, não some a emission — some diretamente como `out.colour += ...` dentro do hook light** (engineColour já leva névoa, então ao longe a luz cai sobre a cor de névoa)
 
 ### Lamparinas pulsantes (tochas que respiram)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let glow = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
-    let pulse = 0.5 + 0.5 * sin(l.time * 2.3 + l.position.x * 0.8);
+    let pulse = 0.5 + 0.5 * sin(bloxdTime() * 2.3 + l.position.x * 0.8);
     out.colour += vec3f(1.0, 0.62, 0.25) * glow * 0.25 * (0.6 + 0.4 * pulse);
     #endif
     return out;
@@ -522,8 +525,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 // lado surface: quanto mais claro (branco) o material, mais emissão
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
     let shine = smoothstep(0.75, 0.9, luma);
     out.emission += out.colour * shine * 0.5;
@@ -534,15 +537,15 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### Enxame de vaga-lumes (pontos de luz à deriva)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let world = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let world = bloxdWorldPosition(l.position);
     // uns "orbes de luz" à deriva lenta; brilho por inverso da distância
-    let t = l.time * 0.15;
+    let t = bloxdTime() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);
     let firefly = clamp(1.0 - d1 / 6.0, 0.0, 1.0);
-    let flicker = 0.6 + 0.4 * sin(l.time * 9.0 + d1);
+    let flicker = 0.6 + 0.4 * sin(bloxdTime() * 9.0 + d1);
     out.colour += vec3f(0.9, 1.0, 0.4) * firefly * firefly * flicker * 0.6;
     return out;
 }
@@ -553,13 +556,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### Coordenadas de mundo
 
 ```wgsl
-let worldPos = s.position + vec3f(f32(s.originOffset.x), f32(s.originOffset.y), f32(s.originOffset.z));
+let worldPos = bloxdWorldPosition(s.position);
 ```
 
 ### Coordenadas de bloco
 
 ```wgsl
-let worldBlock = vec3i(floor(l.position - l.normal * 0.5)) + l.originOffset;
+let worldBlock = bloxdFaceBlock(l.position, l.normal);
 ```
 
 ### Xadrez (por bloco)
@@ -586,7 +589,7 @@ out.colour *= mix(0.94, 1.06, pack_hash3(worldBlock));
 ### Vetor de vista e luz de borda (rim)
 
 ```wgsl
-let viewDir = normalize(l.eyePosition - l.position);
+let viewDir = normalize(bloxdEyePosition() - l.position);
 let rim = pow(1.0 - clamp(dot(viewDir, l.normal), 0.0, 1.0), 2.2);
 out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ```
@@ -594,21 +597,21 @@ out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ### Ângulo de vista (fresnel caseiro — para líquidos)
 
 ```wgsl
-let viewDir = normalize(s.eyePosition - s.position);
+let viewDir = normalize(bloxdEyePosition() - s.position);
 let facing = clamp(dot(viewDir, s.normal), 0.0, 1.0);   // 1 de frente / 0 rasante
 let fresnel = pow(1.0 - facing, 3.0);
 ```
 
 ## R5. Receitas de tempo (animação)
 
-> `time` envolve a cada 3600 segundos (1 hora). É tempo decorrido do shader sem garantia de sincronia com o dia/noite do jogo. Use para animação periódica visual, mas prefira `sunDirection` e entradas de iluminação para detectar noite real.
+> `bloxdTime()` envolve a cada 3600 segundos (1 hora). É tempo decorrido do shader sem garantia de sincronia com o dia/noite do jogo. Use para animação periódica visual, mas prefira `bloxdSunDirection()` e entradas de iluminação para detectar noite real.
 
 ### Ciclo dia-noite (1 dia por hora)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let day = 0.5 + 0.5 * sin(l.time * 6.2831853 / 3600.0);   // 0..1 período de uma hora; não necessariamente sincronizado com o dia/noite do jogo
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let day = 0.5 + 0.5 * sin(bloxdTime() * 6.2831853 / 3600.0);   // 0..1 período de uma hora; não necessariamente sincronizado com o dia/noite do jogo
     out.colour = mix(out.colour * vec3f(0.6, 0.7, 1.0), out.colour, day);
     return out;
 }
@@ -640,11 +643,11 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ### Superfície ondulada (cintilação de cor)
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldX = s.position.x + f32(s.originOffset.x);
-    let worldZ = s.position.z + f32(s.originOffset.z);
-    let ripple = sin(s.time * 2.1 + worldX * 1.3 + worldZ * 0.9);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldX = s.position.x + f32(bloxdOriginOffset().x);
+    let worldZ = s.position.z + f32(bloxdOriginOffset().z);
+    let ripple = sin(bloxdTime() * 2.1 + worldX * 1.3 + worldZ * 0.9);
     out.colour = clamp(out.colour * (1.0 + ripple * 0.06), vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
     out.alpha = s.alpha;   // liquid sempre tem BLOXD_ALPHA — guarda por hábito
@@ -655,15 +658,15 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 ### Transparência pseudo por altura (não é teste real de baixio)
 
-> Profundidade de cena e posição do fundo não podem ser consultadas: a profundidade real não se calcula só com esta API. `s.position.y` é coordenada local e usá-la crua desloca o efeito com a origem do chunk. O abaixo só varia alpha por altura de mundo — pseudo efeito, não baixio por costa/fundo. Ajuste `packWaterReferenceY` à sua altura de mundo.
+> Na v1, profundidade de cena e posição do fundo não podiam ser consultadas: a profundidade real não se calculava só com aquela API. Na v2, `bloxdOpaqueBehind()` limitado a líquidos mede a espessura até a face opaca traseira (Parte VIII R-E). O que segue é o velho pseudo efeito sem isso: `s.position.y` é coordenada local e usá-la crua desloca o efeito com a origem do chunk. Para altura de mundo converta com `bloxdWorldPosition()`. O trecho só varia alpha por altura de mundo — pseudo efeito, não baixio por costa/fundo. Ajuste `packWaterReferenceY` à sua altura de mundo.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
 const packWaterHeightSpan: f32 = 8.0;
 
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
     // mais fino em baixa altura, mais perto do alpha base em cima; confira a direção no jogo
@@ -676,9 +679,9 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### Turbidez submarina por dentro
 
 ```wgsl
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let murk = clamp(dist / 40.0, 0.0, 0.5);
     out.colour = mix(out.colour, out.colour * vec3f(0.35, 0.55, 0.9) + vec3f(0.0, 0.02, 0.06), murk);
     return out;
@@ -701,9 +704,9 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let sway = sin(v.time * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let sway = sin(bloxdTime() * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
     let sideFactor = max(0.0, 1.0 - abs(v.normal.y));   // só faces verticais
     out.position.y += sway * 0.05 * sideFactor;
     return out;
@@ -715,12 +718,12 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
+fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
     let topness = clamp(v.normal.y * 2.0, 0.0, 1.0);
     if (topness > 0.001) {
-        let h = sin(v.position.x * 0.9 + v.time * 1.6) * 0.5
-              + sin(v.position.z * 1.2 + v.time * 1.3) * 0.3;
+        let h = sin(v.position.x * 0.9 + bloxdTime() * 1.6) * 0.5
+              + sin(v.position.z * 1.2 + bloxdTime() * 1.3) * 0.3;
         out.position.y += h * 0.14 * topness;
     }
     return out;
@@ -732,9 +735,9 @@ fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let pulse = sin(v.time * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let pulse = sin(bloxdTime() * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
     out.position += v.normal * pulse * 0.03;   // leve expansão/contração ao longo das normais
     return out;
 }
@@ -745,10 +748,10 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.position.x * 0.15 + v.time * 0.9) * 0.4
-                    + sin(v.position.z * 0.11 - v.time * 0.7) * 0.3;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(v.position.x * 0.15 + bloxdTime() * 0.9) * 0.4
+                    + sin(v.position.z * 0.11 - bloxdTime() * 0.7) * 0.3;
     return out;
 }
 #endif
@@ -793,16 +796,16 @@ let phase = t * 0.15;
 ### R9.1 Tochas quentes × céu frio
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let blockInt = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let torch   = mix(l.blockLight, blockInt * vec3f(1.00, 0.72, 0.42), 0.55);
     let sky     = mix(l.ambientLightColour, l.skyLightColour, l.skyLight) * vec3f(0.90, 0.95, 1.08);
     let voxel   = max(torch, sky);
     var col = clamp(s.colour * voxel, vec3f(0.0), vec3f(1.0));   // clamp intermediário
-    col = mix(l.fogColour, col, l.fogFactor);                    // refazer névoa
-    out.colour = col + s.emission * l.fogFactor;                 // re-somar emission
+    col = mix(l.fogColour, col, l.fogVisibility);                    // refazer névoa
+    out.colour = col + s.emission * l.fogVisibility;                 // re-somar emission
     #endif
     return out;
 }
@@ -811,14 +814,14 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.2 Especular solar (Blinn-Phong)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);          // vetor médio
         let ndh = max(dot(n, h), 0.0);
         let lambert = clamp(dot(n, sunDir), 0.0, 1.0);
@@ -836,11 +839,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 fn pack_schlick(cosT: f32, f0: f32) -> f32 {
     return f0 + (1.0 - f0) * pow(1.0 - clamp(cosT, 0.0, 1.0), 5.0);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let F = pack_schlick(dot(n, viewDir), 0.02);
     out.colour += F * 0.15 * l.skyLightColour * l.skyLight;   // tênue brilho de borda
     #endif
@@ -851,8 +854,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.4 Ambiente hemisférico (céu em cima / rebote do chão embaixo)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
     let upness = n.y * 0.5 + 0.5;
@@ -861,8 +864,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let hemi = vec3f(0.25) + mix(ground, skyH, upness);
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     var col = clamp(s.colour * voxel * hemi, vec3f(0.0), vec3f(1.0));   // clamp intermediário
-    col = mix(l.fogColour, col, l.fogFactor);                           // refazer névoa
-    out.colour = col + s.emission * l.fogFactor;                        // re-somar emission
+    col = mix(l.fogColour, col, l.fogVisibility);                           // refazer névoa
+    out.colour = col + s.emission * l.fogVisibility;                        // re-somar emission
     #endif
     return out;
 }
@@ -876,8 +879,8 @@ fn pack_aces(x: vec3f) -> vec3f {
                  (x * (vec3f(2.43) * x + vec3f(0.59)) + vec3f(0.14)),
                  vec3f(0.0), vec3f(1.0));
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     out.colour = pack_aces(out.colour * 1.2);   // 1.2 = exposição
     return out;
 }
@@ -889,9 +892,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > Cuidado: reduza só a saturação — nunca toque a luminância.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let aerial = 1.0 - exp(-dist * 0.0035);        // queda (~30% a 100blk / ~75% a 400blk)
     let luma = dot(out.colour, vec3f(0.2126, 0.7152, 0.0722));
     let hazy = mix(vec3f(luma), out.colour, 0.5);  // só cai saturação (luminância intacta)
@@ -912,16 +915,16 @@ fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
     let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // dh/dz
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let baseN = normalize(l.normal);
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
-    let n = normalize(mix(baseN, pack_waveNormal(worldPos, l.time), clamp(baseN.y * 2.0, 0.0, 1.0)));
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let worldPos = bloxdWorldPosition(l.position);
+    let n = normalize(mix(baseN, pack_waveNormal(worldPos, bloxdTime()), clamp(baseN.y * 2.0, 0.0, 1.0)));
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);
         let glint = pow(max(dot(n, h), 0.0), 240.0) * 1.1 * (0.25 + 0.75 * l.skyLight);
         out.colour += glint * vec3f(1.0);
@@ -946,14 +949,14 @@ fn pack_bumpNormal(p: vec3f, n: vec3f, strength: f32) -> vec3f {
     let tangentZ = normalize(cross(n, tangentX));
     return normalize(n + tangentX * (hx - h0) * strength + tangentZ * (hz - h0) * strength);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let local = fract(l.position - l.normal * 0.5);   // coords locais do bloco
     let n = pack_bumpNormal(local * 16.0, normalize(l.normal), 0.35);
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lam = clamp(dot(n, sunDir), 0.0, 1.0);
         let lamFlat = clamp(dot(normalize(l.normal), sunDir), 0.0, 1.0);
         out.colour *= mix(1.0, 0.85 + 0.15 * (lam / max(lamFlat, 0.001)), 0.5);
@@ -966,8 +969,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.9 Escurecimento não linear de cavernas + proteção de lamparinas
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -981,20 +984,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Reaplicar névoa (obrigatório ao descartar engineColour)
 
-> Por um piso como `max(l.fogFactor, 0.25)` limita "não mais denso que isto"  
+> Por um piso como `max(l.fogVisibility, 0.25)` limita "não mais denso que isto"  
 > (0.0 = fiel ao motor / 0.3–0.5 = distância mais clara).  
 > Nota: a névoa do motor é linear só de horizonte (perto da distância de desenho); a bruma média deve ser construída pelo pacote.
 > Ajustes reais de névoa (verificados em implementação): linear fixo / `fogStart` = distância de chunks / `fogEnd` = +1 chunk / efetivamente desativada a 100–101 chunks com névoa off / cor padrão RGB(183, 191, 195).
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     var col = s.colour * (voxel * 1.1 + vec3f(0.05));
     col = clamp(col, vec3f(0.0), vec3f(1.0));
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));  // refazer névoa (0.15 = piso leve)
-    col += s.emission * l.fogFactor;            // emissão também com névoa
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));  // refazer névoa (0.15 = piso leve)
+    col += s.emission * l.fogVisibility;            // emissão também com névoa
     out.colour = col;
     #endif
     return out;
@@ -1005,12 +1008,12 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let lum = pack_luma(out.colour);
     out.colour *= mix(vec3f(0.93, 1.00, 1.06), vec3f(1.06, 1.00, 0.93), lum);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;  // noite só quando a direção solar é zero; sem degradê de ocaso
     out.colour = mix(out.colour, vec3f(pack_luma(out.colour)), night * 0.28);
     #endif
@@ -1045,17 +1048,17 @@ fn sh_unlift(y: f32) -> f32 {
 }
 const shTh   = 0.87;   // dial de raio de sombra: th = 1 - r/15 (0.87 = raio 2+ é sombra)
 const shSoft = 0.04;   // suavidade de borda (0.02 = duro / 0.08 = suave)
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // 1. restaura valores crus (pular isto jamais dá sombras)
     let skyRaw = sh_unlift(l.skyLight);
     // 2. corte por limiar — separa limpo sol=1 / sombra=0
     let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
     // Lambert solar (recorre a l.directional quando não há sol)
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     let sunL = select(clamp(l.directional, 0.0, 1.0),
-                      clamp(dot(normalize(l.normal), l.sunDirection / sunLen), 0.0, 1.0),
+                      clamp(dot(normalize(l.normal), bloxdSunDirection() / sunLen), 0.0, 1.0),
                       sunLen > 0.5);
     // a essência da projeção: sol direto só chega onde o céu é visível
     let lit = sunL * sky;
@@ -1069,8 +1072,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let blockInt = max(blockRaw.r, max(blockRaw.g, blockRaw.b));
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
     // reaplica névoa (a parte do engineColour descartado)
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));
-    out.colour = clamp(col + s.emission * l.fogFactor, vec3f(0.0), vec3f(1.0));   // não esqueça emission (com névoa)
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));
+    out.colour = clamp(col + s.emission * l.fogVisibility, vec3f(0.0), vec3f(1.0));   // não esqueça emission (com névoa)
     #endif
     return out;
 }
@@ -1079,7 +1082,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > Guia de ajuste: **a área de sombra é só `shTh`** — `0.93` = raio 1.5+ / `0.87` = raio 2 / `0.80` = raio 3 / `0.67` = raio 5.  
 > A dureza da borda é `shSoft` (0.02 = duro / 0.08 = suave). A escuridão do núcleo é o duplo ajuste de `0.09` (ambiente mínimo) e `0.16` (luz dispersa do céu).  
 > Para alargar sombras ao entardecer, some `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximação de sombras longas de tarde.  
-> `sunDir` é `l.sunDirection / length(l.sunDirection)`). Para sombras mais azuis suba o B de `vec3f(0.72, 0.82, 1.05)`.
+> `sunDir` é `bloxdSunDirection() / length(bloxdSunDirection())`). Para sombras mais azuis suba o B de `vec3f(0.72, 0.82, 1.05)`.
 >
 > ⚠️ "Aprofundar contraste com `pow(skyLight, γ)`" **aplicava gamma a valores liftados** e nunca afetava sob árvores (0.97). Use este método em vez disso.
 
@@ -1093,7 +1096,7 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 
 | Função | Padrão | Reconstruível em pacotes? |
 |---|---|---|
-| Difuso (Lambert) | Só soma escalar de direcionais | ◎ Próprio com `sunDirection` (fontes envoltas etc.) |
+| Difuso (Lambert) | Só soma escalar de direcionais | ◎ Próprio com `bloxdSunDirection()` (fontes envoltas etc.) |
 | Especular | Nenhum | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Nenhum | ◎ Aproximação de Schlick (R9.3) |
 | Separação tocha quente / céu frio | Sem cor | ◎ (R9.1) |
@@ -1103,7 +1106,7 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 | Detalhe de superfície | Só resolução de textura | △ Micro-relevo procedural com hash (R9.8) |
 | Ondas de vértice (água) | Nenhuma (plano) | ◎ Só allow (R7) |
 | Normais de onda / brilho solar | Nenhumas | ◎ (R9.7) |
-| Luar noturno | A cor do céu só escurece | △ A direção lunar está em `-sunDirection`: pseudo looks (ambiente azul em R2 / dessaturação em R9.11) mais luar direcional (R-A, só ciclo dia/noite) |
+| Luar noturno | A cor do céu só escurece | △ A direção lunar está em `-bloxdSunDirection()`: pseudo looks (ambiente azul em R2 / dessaturação em R9.11) mais luar direcional (R-A, só ciclo dia/noite) |
 | Sombras (oclusão de céu) | Só mistura suave via `mix(ambiente, céu, skyLight)` | ◎ Inversão do lift + corte por limiar + porta solar (R9.12). Sombra de árvores e sob telhados cai claramente, seguindo edições de blocos em tempo real |
 
 ## 14. Duas escolas de implementação
@@ -1112,25 +1115,25 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 
 **Escola B: reiluminação total (de s.colour)** — descarta `l.engineColour` e reconstrói a iluminação de `s.colour` (albedo) e materiais LightIn crus. O caminho real ao realismo. Quatro regras:
 
-1. **Reaplique a névoa**: o hook light roda pós-névoa; aplique `mix(l.fogColour, col, l.fogFactor)` você mesmo (R9.10). Com névoa densa, ponha piso com `max(l.fogFactor, 0.3)`. E ao contrário: misturar mais cor de névoa em pacotes baseados em engineColour produz névoa branca dupla
+1. **Reaplique a névoa**: o hook light roda pós-névoa; aplique `mix(l.fogColour, col, l.fogVisibility)` você mesmo (R9.10). Com névoa densa, ponha piso com `max(l.fogVisibility, 0.3)`. E ao contrário: misturar mais cor de névoa em pacotes baseados em engineColour produz névoa branca dupla
 2. **Reserva unlit**: passe para `defaultLight` fora de `#ifdef BLOXD_LIGHTING`
-3. **Proteja funções compartilhadas inteiras**: envolva em `#ifdef BLOXD_LIGHTING` como funções completas as funções compartilhadas que tomam `bloxd_LightIn` (proteger só chamadas não basta)
-4. **Sem direção solar**: se `sunDirection` é zero, não compute especular direcional. `l.directional` é um escalar de quantidade de luz, não um vetor de direção: não restaura a direção do brilho. Troque para ambiente fraco sem direção se preciso. A direção lunar está disponível via `-sunDirection` (só se move em mundos com ciclo dia/noite. Parte VII R-A)
+3. **Proteja funções compartilhadas inteiras**: envolva em `#ifdef BLOXD_LIGHTING` como funções completas as funções compartilhadas que tomam `BloxdLightIn` (proteger só chamadas não basta)
+4. **Sem direção solar**: se `bloxdSunDirection()` é zero, não compute especular direcional. `l.directional` é um escalar de quantidade de luz, não um vetor de direção: não restaura a direção do brilho. Troque para ambiente fraco sem direção se preciso. A direção lunar está disponível via `-bloxdSunDirection()` (só se move em mundos com ciclo dia/noite. Parte VII R-A)
 
 ## 15. Looks inalcançáveis (o "teto" do realismo)
 
 | Look | Motivo |
 |---|---|
-| Mapas de sombra pixelados (sombras que giram com o sol, penumbra) | Texturas de profundidade não podem ser referenciadas. Oclusão de raios não chega aos hooks |
-| SSAO | Sem acesso à profundidade de cena (só AO de vértices do mesher) |
-| SSR (reflexos) | Igual. Só pseudo looks misturando cor de céu via fresnel |
+| Mapas de sombra pixelados (sombras que giram com o sol, penumbra) | Texturas de profundidade não podem ser referenciadas (`bloxdOpaqueBehind()` limitado a líquidos é só geometria e não serve como mapa de sombras). Oclusão de raios não chega aos hooks |
+| SSAO | Sem acesso à profundidade de cena (só AO de vértices do mesher; a profundidade limitada a líquidos não serve para SSAO) |
+| SSR (reflexos) | Sem cor de cena. Só pseudo looks misturando cor de céu via fresnel |
 | Bloom / glare | Sem hook ao pós-processamento |
 | Profundidade de campo, aberração cromática, grão | Requerem pós-processamento de tela cheia |
 | Luz volumétrica (god rays) | Igual |
 | Texturas PBR | Leituras de textura proibidas. Só pseudo estimativa desde luminância de cor |
-| Refração submarina | Sem entrada de profundidade de cena |
+| Refração submarina | Sem cor de cena. A profundidade limitada a líquidos (`bloxdOpaqueBehind()`) permite absorção por espessura e projeção de fundo (Parte VIII R-E) |
 | Véu submarino (tom azul): remover / mudar | O véu é um quad emissive de tela cheia gerado da cor/alpha de definição do bloco líquido da câmera, desenhado fora dos pipelines de hook (na frente de tudo): o pacote não muda nem cor nem densidade |
-| Detecção submarina direta | Nenhuma entrada indica submersão de câmera, e fogStart / fogEnd / fogColour não mudam debaixo d'água: tampouco há forma fiável de estimá-la desde fogFactor etc. |
+| Detecção submarina direta | Nenhuma entrada indica submersão de câmera, e fogStart / fogEnd / fogColour não mudam debaixo d'água: tampouco há forma fiável de estimá-la desde fogVisibility etc. |
 
 ### A verdade sobre as sombras — "sombras de árvores" dá para fazer
 
@@ -1156,7 +1159,7 @@ Os looks submarinos constam de 3 camadas:
 | ② Véu de definição líquida | Quad emissive de tela cheia da cor/alpha de definição do bloco líquido da câmera, desenhado na frente de tudo. O ajuste `cameraTint` ganha se existir | Não (nem cor nem densidade mudáveis) |
 | ③ cameraTint | Ajuste do jogo | Não |
 
-Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se remove / debaixo d'água não se ramifica (fogStart / fogEnd / fogColour não mudam debaixo d'água: fogFactor tampouco o detecta).
+Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se remove / debaixo d'água não se ramifica (fogStart / fogEnd / fogColour não mudam debaixo d'água: fogVisibility tampouco o detecta).
 
 ## 16. Dicas de depuração
 
@@ -1166,8 +1169,8 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 - Distância com bruma demais → baixe coeficientes aéreos
 - Tudo laranja em torno de tochas → baixe a proporção quente (conserve algo de luz crua tingida)
 - Blocos quase todo brancos → o total de saída do hook light supera 1.0 (sem clamp águas abaixo). Termine com `clamp(col, vec3f(0.0), vec3f(1.0))`
-- Branco sem somas → inversão un-fog por divisão com fogFactor. Tire un-fog; reconstrua desde `s.colour` e `mix` de névoa uma só vez ao final
-- Blocos emissivos não brilham → falta re-soma de emission em receitas de reconstrução. Some `+ s.emission * l.fogFactor`
+- Branco sem somas → inversão un-fog por divisão com fogVisibility. Tire un-fog; reconstrua desde `s.colour` e `mix` de névoa uma só vez ao final
+- Blocos emissivos não brilham → falta re-soma de emission em receitas de reconstrução. Some `+ s.emission * l.fogVisibility`
 - De noite só restam faces iluminadas → não escureça só sombras; atenue toda a cor terminada (`engineColour`) de noite. Para conservar lamparinas locais, atenue menos com `blockLight` / `heldLight` (Parte VI, seção 19)
 - Sombra não aprofunda com `pow(skyLight, γ)` → `l.skyLight` é pós-curva (seção 10). Mude para inversão + limiar de R9.12
 - Ajustar área/densidade de sombra → guia de ajuste de R9.12 (área = limiar `shTh` / borda = `shSoft` / escuridão do núcleo = duplo ajuste de ambiente mínimo e dispersão do céu)
@@ -1182,22 +1185,27 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 |---|---|
 | Não carrega em jogos estritos | Envolva o hook vertex em `#ifndef BLOXD_STRICT` |
 | `.alpha` reportado indefinido | Envolva em `#ifdef BLOXD_ALPHA` |
-| `blockLight` reportado indefinido | Envolva em `#ifdef BLOXD_LIGHTING`. Envolva funções auxiliares compartilhadas **como funções inteiras** |
-| `Packs can't construct bloxd_Surface directly` | Comece de `bloxd_defaultSurface(s)` |
-| `bloxd_Vertex only exists when BLOXD_STRICT isn't defined` | Envolva em `#ifndef BLOXD_STRICT` |
+| `blockLight` reportado indefinido | Envolva em `#ifdef BLOXD_LIGHTING`. Envolva funções auxiliares compartilhadas **como funções inteiras** (na v2 o campo existe em todas as variantes: raramente ocorre. Mantenha as guardas usadas para detecção) |
+| `Packs can't construct BloxdSurface directly` | Comece de `bloxdDefaultSurface(s)` |
+| `BloxdVertex only exists when BLOXD_STRICT isn't defined` | Envolva em `#ifndef BLOXD_STRICT` |
 | Distância branca e leitosa | Suele ser névoa dupla. A cor terminada já leva névoa: mantenha sutil a bruma própria e prefira reduzir só saturação |
 | Pacote excluído ao entrar no jogo | Falha a verificação ao vivo do jogo. Revise omissões de guardas |
-| `pack.json needs "apiVersion": 1.` | Falta `apiVersion`. Adicione o número `1` (a string `"1"` é rejeitada) |
+| `pack.json needs "apiVersion": 2.` | Falta `apiVersion` ou não é `2`. Adicione o número `2` (a string `"2"` é rejeitada). Pacotes v1 são rejeitados com `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Sem `pack.json` na raiz do ZIP. Confira não ter compactado a pasta em si |
-| `bloxd_terrain_vertex must be declared as: fn ...` | Assinatura distinta. Reescreva exatamente como mostrado |
-| `bloxd_terrain_vertex can't run in strict games...` | Envolva o hook vertex em `#ifndef BLOXD_STRICT` |
-| `bloxd_LightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | Envolva em `#ifdef BLOXD_LIGHTING` |
+| `bloxdTerrainVertex must be declared as: fn ...` | Assinatura distinta. Reescreva exatamente como mostrado |
+| `bloxdTerrainVertex can't run in strict games...` | Envolva o hook vertex em `#ifndef BLOXD_STRICT` |
+| `BloxdLightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | Envolva em `#ifdef BLOXD_LIGHTING` (na v2 o campo existe em todas as variantes: raramente ocorre) |
 | Subir `pow(l.skyLight, γ)` jamais aprofunda sombras | `skyLight` é valor pós-curva (cru 0.87 chega como 0.97). Mude para inversão + limiar de R9.12 (seção 10) |
-| `... can only be a function's parameter or return type, ...` | `var x: bloxd_Surface;` sem inicializar é rejeitado. Construa desde `bloxd_default*` |
-| `bloxd_packInputs isn't part of the bloxd_ header` | O uniform PackInputs não pode ser referenciado desde pacotes. Use campos de entrada de hooks (`s.time`, `s.originOffset`, `s.sunDirection`) |
+| `... can only be a function's parameter or return type, ...` | `var x: BloxdSurface;` sem inicializar é rejeitado. Construa desde `bloxdDefault*` |
+| `bloxdPackInputs isn't part of the bloxd_ header` | O uniform PackInputs não pode ser referenciado desde pacotes diretamente. Use-o via funções de cabeçalho como `bloxdTime()` |
 | `Packs can't declare bloxd_ names...` | Tire o prefixo `bloxd_` dos seus identificadores. Só os 6 nomes de hook podem ser definidos |
+| `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` é rejeitado. Escreva `_ = f();` |
+| `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | Envolva as chamadas `bloxdOpaqueBehind()` em hooks de terreno com `#ifdef BLOXD_SCENE_DEPTH` |
+| `...only surface and light hooks can use.` | Remova `bloxdOpaqueBehind()` de hooks vertex (só surface / light) |
+| `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | Não é erro mas autodesativação em jogos estritos (`shaderPack:offInStrict`). Envolva hooks vertex e `discard` com `#ifndef BLOXD_STRICT` |
+| `mixing '*' and '^' requires parenthesis (only in ...)` | Erro de segunda etapa (Tint do navegador). Ponha entre parênteses operandos de `^` `&` `\|` `<<` `>>` (§38) |
 | `loadDuplicateManifest` ao carregar zip | Dois `pack.json` (incluindo variantes de maiúsculas). Deixe um |
-| `Packs can't construct bloxd_Surface directly, since header structs gain fields; ...` | Reescreva desde `bloxd_defaultSurface(s)`. Começar de uma cópia do primeiro parâmetro do hook light (`var out = s;`) também vale |
+| `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | Reescreva desde `bloxdDefaultSurface(s)`. Começar de uma cópia do primeiro parâmetro do hook light (`var out = s;`) também vale |
 
 ## 18. Direitos e notas
 
@@ -1213,12 +1221,12 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 
 Escurecer só sombras deixa a cor terminada (`engineColour`) brilhante sem sol, e o salto face/sombra fica antinatural. Atenue toda a cor terminada.
 
-O exemplo trata `sunDirection` zero como noite e sol direcional como dia, atenuando as cores terminadas do terreno em horas escuras. Onde `blockLight` e `heldLight` são fortes, a atenuação enfraquece para preservar lamparinas próximas como tochas. `0.52` é valor de ajuste — baixe para noites mais escuras.
+O exemplo trata `bloxdSunDirection()` zero como noite e sol direcional como dia, atenuando as cores terminadas do terreno em horas escuras. Onde `blockLight` e `heldLight` são fortes, a atenuação enfraquece para preservar lamparinas próximas como tochas. `0.52` é valor de ajuste — baixe para noites mais escuras.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let nightDim = mix(0.52, 1.0, sunPresent);
     var scale = nightDim;
     #ifdef BLOXD_LIGHTING
@@ -1229,16 +1237,16 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     scale = mix(nightDim, 1.0, protectLocalLight);
     #endif
     // atenua a cor terminada; soma a emissão do material com névoa por padrão
-    out.colour = l.engineColour * scale + s.emission * l.fogFactor;
+    out.colour = l.engineColour * scale + s.emission * l.fogVisibility;
     return out;
 }
 ```
 
-**Limites desta correção:** se `sunDirection` se comporta como "direção unitária com sol, zero sem ele", dia/noite se distinguem mas o ocaso não se estima suavemente. E como atenua a cor terminada, enfraquece juntos a luz diurna e o ambiente do motor — não é reprodução total do horário. Para aplicar o mesmo a líquidos, revise a relação de fallback dos hooks de líquido.
+**Limites desta correção:** se `bloxdSunDirection()` se comporta como "direção unitária com sol, zero sem ele", dia/noite se distinguem mas o ocaso não se estima suavemente. E como atenua a cor terminada, enfraquece juntos a luz diurna e o ambiente do motor — não é reprodução total do horário. Para aplicar o mesmo a líquidos, revise a relação de fallback dos hooks de líquido.
 
 ## 20. Receita integrada para água com aparência natural
 
-Esta API não pode amostrar cor de cena, profundidade nem fundo: é **estilização pseudo com mistura de cor fresnel e realces solares, não matemática real de reflexão/refração/profundidade**. A amostra conserva a cor base, mistura um pouco para cor de céu em ângulos rasantes e adiciona um pequeno brilho só com sol.
+Esta API não pode amostrar cor de cena: é **estilização pseudo com mistura de cor fresnel e realces solares, não reflexo/refração reais** (o cálculo de profundidade chegou na v2 com `bloxdOpaqueBehind()`, separado na Parte VIII R-E). A amostra conserva a cor base, mistura um pouco para cor de céu em ângulos rasantes e adiciona um pequeno brilho só com sol.
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -1250,22 +1258,22 @@ fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
 
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     let baseN = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let facing = clamp(dot(baseN, viewDir), 0.0, 1.0);
     let fresnel = 0.02 + 0.98 * pow(1.0 - facing, 5.0);
     let fakeSkyReflection = vec3f(0.16, 0.29, 0.36);
     out.colour *= vec3f(0.88, 0.97, 1.04);
     out.colour = mix(out.colour, fakeSkyReflection, fresnel * 0.38);
     #ifdef BLOXD_LIGHTING
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+    let worldPos = bloxdWorldPosition(l.position);
     let topness = clamp(baseN.y * 2.0, 0.0, 1.0);
-    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, l.time), topness));
-    let sunLen = length(l.sunDirection);
+    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, bloxdTime()), topness));
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let halfDir = normalize(viewDir + sunDir);
         let glint = pow(max(dot(waveN, halfDir), 0.0), 180.0) * 0.55 * clamp(l.skyLight, 0.0, 1.0);
         out.colour += vec3f(1.0, 0.97, 0.90) * glint;
@@ -1280,9 +1288,9 @@ Pistas de ajuste:
 - Água branca/lavada: baixe `0.38` em `fresnel * 0.38` e o brilho `0.55`.
 - Água escura demais: misture um pouco mais de `fakeSkyReflection`. Em excesso parece plástico.
 - Linhas ou listras regulares na água: baixe frequências de onda e força de brilho. Este código não desloca vértices de malha.
-- Reflexos reais da paisagem: as entradas desta API não têm cor de tela nem profundidade: misturar cores jamais é reflexo real.
+- Reflexos reais da paisagem: as entradas desta API não têm cor de tela: misturar cores jamais é reflexo real (profundidade só limitada a líquidos. Parte VIII R-E).
 
-Esta receita **substitui** um `bloxd_liquid_light` existente. Não a cole junto à função de onda homônima de R9.7 nem outros hooks homônimos.
+Esta receita **substitui** um `bloxdLiquidLight` existente. Não a cole junto à função de onda homônima de R9.7 nem outros hooks homônimos.
 
 ## 21. Lista de testes no jogo
 
@@ -1299,10 +1307,10 @@ Sucesso de compilação e "boa aparência" são coisas distintas. Confira nesta 
 ### Restrições conhecidas como premissas
 
 - Pacotes se limitam a hooks de terreno / líquido — sem trato de céu, entidades ou UI com o mesmo código.
-- Não existem entradas para adicionar mapas de sombras, reflexos em espaço de tela, profundidade de cena, refração, bloom etc.
-- `time` é tempo de animação sem vínculo garantido com o dia/noite do jogo.
-- Com `sunDirection` zero a verdadeira direção lunar é desconhecida, não "física de luar" mas aproximação de ambiente. O luar direcional se constrói desde `-sunDirection` (só mundos com ciclo dia/noite. Parte VII R-A).
-- `s.position` / `l.position` são coordenadas locais: some `originOffset` para efeitos dependentes do mundo. Para padrões locais do bloco, as coordenadas locais são a ferramenta intencional.
+- Não existem entradas para adicionar mapas de sombras, reflexos em espaço de tela, refração, bloom etc. (a profundidade de cena foi desbloqueada limitada a líquidos como `bloxdOpaqueBehind()`. Ver Parte VIII).
+- `bloxdTime()` é tempo de animação sem vínculo garantido com o dia/noite do jogo.
+- Com `bloxdSunDirection()` zero a verdadeira direção lunar é desconhecida, não "física de luar" mas aproximação de ambiente. O luar direcional se constrói desde `-bloxdSunDirection()` (só mundos com ciclo dia/noite. Parte VII R-A).
+- `s.position` / `l.position` são coordenadas locais: some `bloxdOriginOffset()` para efeitos dependentes do mundo. Para padrões locais do bloco, as coordenadas locais são a ferramenta intencional.
 
 ## 22. Combinar com outros pacotes quando o shader sozinho bate no limite
 
@@ -1324,7 +1332,7 @@ Os looks submarinos constam de 3 camadas:
 | ② Véu de definição líquida | Quad emissive de tela cheia da cor/alpha de definição do bloco líquido da câmera, desenhado na frente de tudo. O ajuste `cameraTint` ganha se existir | Não (nem cor nem densidade mudáveis) |
 | ③ cameraTint | Ajuste do jogo | Não |
 
-Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se remove / debaixo d'água não se ramifica (fogStart / fogEnd / fogColour não mudam debaixo d'água: fogFactor tampouco o detecta).
+Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se remove / debaixo d'água não se ramifica (fogStart / fogEnd / fogColour não mudam debaixo d'água: fogVisibility tampouco o detecta).
 
 ---
 
@@ -1334,36 +1342,36 @@ Especificações extra achadas por análise de implementação do motor. Tudo re
 
 ## 24. Identidade do sol e da lua
 
-A fonte de `l.sunDirection` é um buffer de direção solar reescrito só quando muda o tipo de skybox — o critério não é "se o céu tem sol" mas **"se o skybox é tipo terra"**.
+A fonte de `bloxdSunDirection()` é um buffer de direção solar reescrito só quando muda o tipo de skybox — o critério não é "se o céu tem sol" mas **"se o skybox é tipo terra"**.
 
-| Skybox | `l.sunDirection` |
+| Skybox | `bloxdSunDirection()` |
 |---|---|
 | `default` (céu procedural) | Não zero (defeitos abaixo) |
 | `gloomy` / `interstellar` / `space_*` (texturas cubo) | **Sempre (0,0,0)** |
 
-**A lua está sempre em `-sunDirection`** (o motor calcula a posição lunar como o oposto exato do sol). A noite se julga por altura solar — há lua acima quando `sunDirection.y < 0` (sol sob o horizonte). Mas em mundos padrão o sol é estático e a lua também — só os mundos com ciclo dia/noite a veem mover-se.
+**A lua está sempre em `-bloxdSunDirection()`** (o motor calcula a posição lunar como o oposto exato do sol). A noite se julga por altura solar — há lua acima quando `bloxdSunDirection().y < 0` (sol sob o horizonte). Mas em mundos padrão o sol é estático e a lua também — só os mundos com ciclo dia/noite a veem mover-se.
 
 A direção solar padrão ronda `(-0.56, 0.81, -0.18)` (vetor unitário de inclination = −0.2 / azimuth = 0.55, estático). Referência prática para predizer direções de brilho ao testar pacotes de distribuição.
 
-Os ciclos dia/noite não estão integrados no motor — inclination é um número estático que os mundos com dia móvel atualizam lado jogo. `sunDirection` segue cada atualização.
+Os ciclos dia/noite não estão integrados no motor — inclination é um número estático que os mundos com dia móvel atualizam lado jogo. `bloxdSunDirection()` segue cada atualização.
 
-As luzes direcionais do terreno são só 2 lâmpadas criadas ao arrancar a cena, de **direção e intensidade fixas, sem mudança dia/noite**. Em curto: **nenhum fator de brilho do terreno depende do tempo. Os "looks" dia/noite vêm só do skybox e sunDirection**, assim os pacotes que escurecem de noite devem estimar a faixa horária desde sunDirection (a técnica `sunPresent` de §19).
+As luzes direcionais do terreno são só 2 lâmpadas criadas ao arrancar a cena, de **direção e intensidade fixas, sem mudança dia/noite**. Em curto: **nenhum fator de brilho do terreno depende do tempo. Os "looks" dia/noite vêm só do skybox e bloxdSunDirection()**, assim os pacotes que escurecem de noite devem estimar a faixa horária desde bloxdSunDirection() (a técnica `sunPresent` de §19).
 
-### R-A. Luar direcional — moonDir = −l.sunDirection
+### R-A. Luar direcional — moonDir = −bloxdSunDirection()
 
 Soma Lambert branco-azulado e especular fraca só enquanto a lua está acima. `moonUp` é 0 em mundos de sol estático padrão: ali nada acontece — **luar que só dispara em mundos com ciclo dia/noite, logo seguro**.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // a lua está sempre exatamente oposta ao sol; auto-off diurno via moonDir.y < 0
-    let moonDir = -l.sunDirection;
+    let moonDir = -bloxdSunDirection();
     let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
     if (moonUp > 0.0) {
         let n     = normalize(l.normal);
         let diff  = max(0.0, dot(n, moonDir));
-        let view  = normalize(l.eyePosition - l.position);
+        let view  = normalize(bloxdEyePosition() - l.position);
         let halfV = normalize(moonDir + view);
         let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
         out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
@@ -1375,21 +1383,21 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 25. Interioridades da névoa
 
-O cômputo de névoa é sempre modo LINEAR (`fogFactor = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), com `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = ajuste de névoa; só D = 0 é especial com fogEnd = 5). **A banda de gradiente é de só 32 blocos**, e `l.fogFactor` é menos "bruma por distância" que **distância normalizada à borda do mundo carregado**. Varia por jogador com a distância de carga: efeitos por distância devem calcular `distance(l.position, l.eyePosition)` eles mesmos (receita R-B).
+O cômputo de névoa é sempre modo LINEAR (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), com `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = ajuste de névoa; só D = 0 é especial com fogEnd = 5). **A banda de gradiente é de só 32 blocos**, e `l.fogVisibility` é menos "bruma por distância" que **distância normalizada à borda do mundo carregado**. Varia por jogador com a distância de carga: efeitos por distância devem calcular `distance(l.position, bloxdEyePosition())` eles mesmos (receita R-B).
 
-Cor de névoa padrão `rgb(183, 191, 195)` (cinza azul pálido). Criadores de mundos a mudam via `fogColourOverride` (hex). Com modo névoa 0 (NONE), **fogColour chega preto**. A forma padrão `mix(l.fogColour, col, l.fogFactor)` é segura pois a cor de névoa não se usa a fogFactor 1.
+Cor de névoa padrão `rgb(183, 191, 195)` (cinza azul pálido). Criadores de mundos a mudam via `fogColourOverride` (hex). Com modo névoa 0 (NONE), **fogColour chega preto**. A forma padrão `mix(l.fogColour, col, l.fogVisibility)` é segura pois a cor de névoa não se usa a fogVisibility 1.
 
-Ajustar `showFog` para false empurra a névoa a 3200–3328 blocos, desativando de fato (`fogFactor ≈ 1` segue vindo).
+Ajustar `showFog` para false empurra a névoa a 3200–3328 blocos, desativando de fato (`fogVisibility ≈ 1` segue vindo).
 
-### R-B. Banda de borda de carga — fogFactor como "borda do mundo"
+### R-B. Banda de borda de carga — fogVisibility como "borda do mundo"
 
 Esfria em silêncio só a banda de 32 blocos da borda de carga para disfarçar o fim do mundo (ou enfatizá-la como efeito). Sem distância autocalculada: segue auto os ajustes de distância de carga do jogador.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    // fogFactor: 1 = dentro (margem à borda), 0 = a ponto de sair da borda
-    let edge = 1.0 - l.fogFactor;
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    // fogVisibility: 1 = dentro (margem à borda), 0 = a ponto de sair da borda
+    let edge = 1.0 - l.fogVisibility;
     let band = smoothstep(0.0, 1.0, edge);
     out.colour = mix(out.colour, out.colour * vec3f(0.82, 0.86, 0.95), band * 0.5);
     return out;
@@ -1408,7 +1416,7 @@ Blocos personalizados podem levar `skyLightEmission` (0–15), que **injeta no p
 
 - **Os hooks surface correm "antes" de alphaTest**: `out.alpha` alimenta o teste de descarte diretamente. Materiais cutout (grama, folhas) permitem efeitos de dissolução tipo dither (receita R-C). Em líquidos (mistura) `out.alpha` é a transparência real (receita R-D). Sem efeito em terreno opaco normal — não confundir
 - **Conteúdo de `l.ambient`**: `material.ambient × sceneAmbient`, distinto por material. O lado cena ata ao ajuste gráfico "Ambient Lighting Intensity" (defeito 0.5) — nunca programe defeitos fixos
-- **`time` é realmente `performance.now()`**: o uptime do navegador enrolado a 1 hora. Sem relação com dia/noite do jogo nem tempo de mundo decorrido. Para animar sincronizado a um relógio de jogo, estime a hora desde o azimute `sunDirection` em mundos com ciclo dia/noite
+- **`bloxdTime()` é realmente `performance.now()`**: o uptime do navegador enrolado a 1 hora. Sem relação com dia/noite do jogo nem tempo de mundo decorrido. Para animar sincronizado a um relógio de jogo, estime a hora desde o azimute `bloxdSunDirection()` em mundos com ciclo dia/noite
 - Os finos damieiros em bordas de chunk ao carregar são o fundido de chunk por dither Bayer 4×4 em espaço de tela do motor, não bugs do pacote
 - **`mod` é palavra reservada**: rejeitado com `pack.wgsl:3 'mod' is a reserved word in WGSL.` Escreva restos com o operador `%`
 
@@ -1443,11 +1451,11 @@ fn sp_bayer4(pos: vec2f) -> f32 {
     }
 }
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
     // dissolve-se desde blocos baixos; maior dissolve persiste
-    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(s.originOffset).y);
+    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(bloxdOriginOffset()).y);
     let thresh   = sp_bayer4(s.position.xz);
     out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
     #endif
@@ -1460,10 +1468,10 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 O `out.alpha` do hook líquido alimenta a mistura diretamente. Despeja só a superfície sob a câmera para assegurar a vista ao mergulhar ou com câmera sobre a água.
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
-    let d = distance(s.position, s.eyePosition);
+    let d = distance(s.position, bloxdEyePosition());
     out.alpha *= smoothstep(0.0, 3.0, d);   // 0–3 blocos de transparente total a normal
     #endif
     return out;
@@ -1474,11 +1482,11 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 O mesmo pacote renderiza distinto segundo **mundo e ajustes de jogador**. Revise ao menos estes 3 ambientes antes de distribuir:
 
-1. **Mundo normal** (skybox default, sem overrides) — sunDirection presente, cores padrão
-2. **Mundo com skybox espacial** — sunDirection = 0. O look do ramo `sunPresent`
+1. **Mundo normal** (skybox default, sem overrides) — bloxdSunDirection() presente, cores padrão
+2. **Mundo com skybox espacial** — bloxdSunDirection() = 0. O look do ramo `sunPresent`
 3. **Mundo personalizado com `visionMinLightColour` / `skyLightColourOverride`** — escuros elevados e cores
 
-Fontes principais de variação: `lightingOverride` (iluminação forçada) / `skyLightColourOverride`, `ambientLightColourOverride` (trocas hex) / `visionMinLightColour` (piso "cor mais escura visível" sobre sky e ambient; Night Vision o usa — os pacotes "caverna às escuras" não escurecem o previsto) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (presença de sunDirection). `uSkyLightColour` padrão = (1,1,1) branco, `uAmbientLightColour` padrão = (0.25,0.25,0.30). `l.ambient` lado cena = ajuste gráfico "Ambient Lighting Intensity" (defeito 0.5). `l.fogFactor` segue os ajustes de névoa/distância de chunks do jogador.
+Fontes principais de variação: `lightingOverride` (iluminação forçada) / `skyLightColourOverride`, `ambientLightColourOverride` (trocas hex) / `visionMinLightColour` (piso "cor mais escura visível" sobre sky e ambient; Night Vision o usa — os pacotes "caverna às escuras" não escurecem o previsto) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (presença de bloxdSunDirection()). `uSkyLightColour` padrão = (1,1,1) branco, `uAmbientLightColour` padrão = (0.25,0.25,0.30). `l.ambient` lado cena = ajuste gráfico "Ambient Lighting Intensity" (defeito 0.5). `l.fogVisibility` segue os ajustes de névoa/distância de chunks do jogador.
 
 ## 29. Meios de depuração
 
@@ -1488,7 +1496,160 @@ Fontes principais de variação: `lightingOverride` (iluminação forçada) / `s
 - O renderizador WebGPU bloqueia-se "forçado ON" com pacote aplicado. O ajuste "Disable Block Texture Atlas" também se bloqueia (o atlas fica ON), e em ambientes sem WebGPU o pacote nem aplica. Base para escrever "precisa navegador WebGPU" em páginas de distribuição
 - A revalidação runtime por partida (`checkCompilation`) compila materiais de terreno reais em WebGPU do navegador (mais estrita que a validação estática de ajustes). Os pacotes que falham aqui se excluem desse jogo
 
-## 30. Sobre materiais independentemente similares
+---
+
+# Parte VIII: Guia de migração para API Version 2
+
+Build alvo: `6qxffk.main.5912a15f.js` (deploy em produção em 2026-10-16). As Partes I–VII deste guia já estão reescritas à base v2; esta Parte VIII recolhe os pontos de migração desde a v1 e as novidades da v2. Os exemplos de código das novidades passam a validação de 8/8 variantes no compilador v2 e a validação do compilador WGSL do navegador (Tint) (§38), mas a conversão v2 de receitas existentes é substituição mecânica de identificadores — verifique sempre com compilação em jogo antes de distribuir.
+
+## 31. Destino dos pacotes v1 (conclusão primeiro)
+
+O jogo exige que o `apiVersion` do manifesto **coincida estritamente com 2**. Carregar um pacote v1 é rejeitado com `This pack is for shader pack API version 1. Bloxd supports version 2.` (chave i18n `shaderPack:loadWrongApiVersion`). **Não há suporte paralelo v1/v2**. O motor também re-verifica o `validation.headerVersion` de pacotes salvos (hash do texto completo do cabeçalho): o mecanismo que marca pacotes salvos "a re-verificar" em atualizações do motor é igual ao da v1.
+
+## 32. Renomeação total de identificadores (tabela de correspondência)
+
+v2 unifica o nomeado com sublinhados em camelCase. **Nomes velhos são totalmente inutilizáveis.**
+
+| v1 | v2 |
+|---|---|
+| `bloxd_terrain_vertex` | `bloxdTerrainVertex` |
+| `bloxd_terrain_surface` | `bloxdTerrainSurface` |
+| `bloxd_terrain_light` | `bloxdTerrainLight` |
+| `bloxd_liquid_vertex` | `bloxdLiquidVertex` |
+| `bloxd_liquid_surface` | `bloxdLiquidSurface` |
+| `bloxd_liquid_light` | `bloxdLiquidLight` |
+| `bloxd_defaultVertex` | `bloxdDefaultVertex` |
+| `bloxd_defaultSurface` | `bloxdDefaultSurface` |
+| `bloxd_defaultLight` | `bloxdDefaultLight` |
+| `bloxd_VertexIn` | `BloxdVertexIn` |
+| `bloxd_Vertex` | `BloxdVertex` |
+| `bloxd_SurfaceIn` | `BloxdSurfaceIn` |
+| `bloxd_Surface` | `BloxdSurface` |
+| `bloxd_LightIn` | `BloxdLightIn` |
+| `bloxd_Light` | `BloxdLight` |
+| `bloxd_packInputs` (uniform interno) | `bloxdPackInputs` (`@group(3) @binding(0)`, 64B) |
+
+Os tipos de hook (vertex / surface / light × terrain / liquid, 6 no total) e o formato `pack.json` (`apiVersion` / `name` / `author`) não mudam. Os limites do carregador tampouco (zip 32MB / 1024 entradas / 256 arquivos `.wgsl` / 256KB total / 64KB manifesto).
+
+## 33. Destino dos campos removidos
+
+Na v1, `time` / `eyePosition` / `sunDirection` / `originOffset` eram campos de structs. Na v2 **esses campos são removidos; em vez disso usam-se funções de cabeçalho que leem o uniform do motor (`bloxdPackInputs`)**. Como as funções leem o uniform diretamente, **podem ser chamadas desde funções de escopo de módulo fora dos hooks e desde hooks vertex**.
+
+| v1 | v2 |
+|---|---|
+| `s.time` / `v.time` / `l.time` | `bloxdTime()` |
+| `s.sunDirection` / `l.sunDirection` | `bloxdSunDirection()` |
+| `s.eyePosition` / `l.eyePosition` | `bloxdEyePosition()` |
+| `s.originOffset` / `l.originOffset` | `bloxdOriginOffset()` |
+| `s.position + vec3f(...)` para conversão a coordenadas de mundo | `bloxdWorldPosition(s.position)` |
+| `vec3i(floor(pos - normal*0.5)) + originOffset` | `bloxdFaceBlock(pos, normal)` |
+
+## 34. Novidade ①: `blockId` (sombreamento por bloco)
+
+Os três structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganham `blockId: u32`. É o **ID do bloco dono** (0–65535), uniforme em toda a face (passado com `@interpolate(flat)`). Use-o para identificar tipos de bloco sem depender da cor de textura. Mas a tabela ID-tipo vive dentro do motor e é invisível desde pacotes: **qual ID é qual bloco só pode ser medido no mundo**.
+
+### R-F. Tinta por tipo de bloco via blockId
+
+```wgsl
+fn blockTint(blockId: u32) -> vec3f {
+    // ex. inclina ids pétreos (padrão de bits altos) ao frio
+    let stripe = f32((blockId >> 4u) & 1u);
+    return mix(vec3f(1.0), vec3f(0.85, 0.95, 1.0), stripe * 0.5);
+}
+
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    result.colour *= blockTint(surface.blockId);
+    return result;
+}
+```
+
+## 35. Novidade ②: `BLOXD_SCENE_DEPTH` e `bloxdOpaqueBehind()` (a principal)
+
+O acesso à profundidade, estruturalmente impossível na v1, é desbloqueado **só para programas liquid**. Sem cor, mas **a geometria — distância e posição da face opaca traseira — está disponível**. O uso típico é calcular cor de absorção desde a espessura de água medida.
+
+Regras de uso:
+
+| Uso | Resultado |
+|---|---|
+| Chamado sem guarda em `bloxdLiquidSurface` / `bloxdLiquidLight` | OK (sempre definido em variantes liquid) |
+| Chamado sem guarda em `bloxdTerrainSurface` | ERROR. Envolva com `#ifdef BLOXD_SCENE_DEPTH` |
+| Chamado em hooks vertex | ERROR (só hooks surface / light) |
+
+Para usar profundidade também em hooks de terreno, envolva com `#ifdef BLOXD_SCENE_DEPTH` (hooks de terreno são reutilizados em programas liquid: a profundidade só vive do lado liquid).
+
+### R-E. Absorção por espessura de água (Beer-Lambert)
+
+```wgsl
+fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    let behind = bloxdOpaqueBehind();
+    if (behind.found) {
+        // comprimento de coluna de água = daqui à face opaca traseira
+        let thickness = distance(behind.position, surface.position);
+        // absorção Beer-Lambert: o vermelho cai rápido, o azul chega longe
+        let absorb = exp(-thickness * vec3f(0.35, 0.14, 0.08));
+        result.colour *= absorb;
+    } else {
+        // nada atrás = tinta para azul de água profunda
+        result.colour = mix(result.colour, vec3f(0.05, 0.15, 0.30), 0.4);
+    }
+    return result;
+}
+```
+
+Aplicações: absorção/dispersão por espessura, projeção de ondas tipo cáustica desde coordenadas de mundo do fundo via `behind.position`, distinção céu-oclusão com `found=false` para reflexo de céu na água, turbidez por etapas segundo profundidade. Se o pipeline de cópia de profundidade não se constrói, degrada com segurança a "nada atrás".
+
+## 36. Outras mudanças da v2
+
+- **Fallback de hooks**: programas liquid usam o hook de terreno se `bloxdLiquidXxx` não está definido. **Pacotes só-terreno afetam a água como estão**. Defina hooks do lado liquid explícitos se não quiser.
+- **Sem guardas `BLOXD_LIGHTING` para campos**: `blockLight` etc. existem em todas as variantes, com defeitos em unlit (0 / 1 / branco / 0). Use `#ifdef BLOXD_LIGHTING` só para detectar iluminação. Manter as guardas existentes não muda nada.
+- **Muda a condição de `BLOXD_ALPHA`**: definido em variantes de terreno não estritas e em todas as liquid, indefinido em strict × terrain. Mantenha a guarda ao escrever alpha em hooks de terreno.
+- **Construção direta de structs proibida**: chamadas de construtor como `BloxdLight(...)` são rejeitadas na validação estática. Modifique sempre desde `bloxdDefault*` ou use uma cópia da entrada.
+- **`let _ =` vira `_ =`**: a atribuição de descarte WGSL `_ = f();` vale, mas `let _ = f();` é rejeitada.
+- **offInStrict**: definir um hook vertex, ou um `discard` alcançável desde hooks surface / light, autodesativa todo o pacote em jogos estritos em vez de erro (a UI mostra `shaderPack:offInStrict`; segue rodando em jogos allow). Envolva hooks vertex e `discard` com `#ifndef BLOXD_STRICT`.
+- **Extensões de névoa**: modos LINEAR / EXP / EXP2 implementados, mas os ajustes do jogo seguem sempre em LINEAR: as specs de névoa existentes seguem valendo. A semântica de `fogColour` fica documentada oficialmente (preto só em cenas sem névoa).
+- **Sem mudanças**: curva de lift, piso de canal 35%, queda de heldLight (`pow(lightDist, 0.75)`) e boost ambiental, spec de direções sol/lua, cor de névoa padrão, wrap de tempo (3600 s), luzes direcionais (máx 4), só Lite (WebGPU), mecanismo de salvamento (IndexedDB), `mod` palavra reservada.
+
+## 37. Lista de migração v1 → v2
+
+1. **pack.json**: `"apiVersion": 1` → `"apiVersion": 2`
+2. **Identificadores**: substitua tudo segundo a tabela §32 (nomes de hook, structs, funções default)
+3. **Porte de campos removidos**: para funções de cabeçalho segundo a tabela §33 (`s.time` → `bloxdTime()` etc.)
+4. **Renomeie `fogFactor` → `fogVisibility`**
+5. **Remova a construção direta de structs**
+6. **Corrija `let _ =` para `_ =`**
+7. **Envolva hooks vertex e discard com `#ifndef BLOXD_STRICT`**
+8. **Confirme que a água também sente os efeitos de hooks de terreno**; defina hooks liquid explícitos se não quiser
+9. (Opcional) Gerencie névoa desde `litColour` / adicione absorção por espessura com `bloxdOpaqueBehind()` / estilização por bloco com `blockId`
+10. **Valide também a segunda etapa (Tint do navegador)** — ponha parênteses em expressões com `^` `&` `|` `<<` `>>` sobretudo. Há código que passa a validação estática e o navegador o rejeita (§38)
+
+## 38. Segunda etapa de validação — o compilador WGSL do navegador é mais estrito que o analisador interno
+
+A validação de pacotes no jogo tem **2 etapas**. A primeira etapa é a validação estática (analisador JS interno do motor. Verifica regras próprias de pacotes como assinaturas de hook, sintaxe proibida, uso de sceneDepth), e a segunda etapa é a validação de navegador (compila stubs incluídos no resultado de compilação com uma implementação WebGPU real, remapeando erros às linhas do arquivo-fonte do pacote para exibi-los. O «Saved, but it won't run until you fix these errors» da UI é esta etapa). Um sufixo como `(only in terrain)` no fim de um erro é «a classe de program da variante onde esse erro ocorreu».
+
+O analisador interno não implementa as regras de ligação (Binding) de operadores do WGSL: **até o código que passa a validação estática pode ser rejeitado pelo navegador**. A vítima típica é o padrão clássico do hash inteiro:
+
+| Operador | Consequência |
+|---|---|
+| `<<` `>>` | Só podem ligar-se diretamente em nível unário. `a + b << c` é erro |
+| `&` `^` `\|` | Só podem ligar-se diretamente em nível unário. `a * b ^ c` é erro |
+| `&&` `\|\|` | Não podem misturar-se. `a && b \|\| c` é erro |
+
+### Como pôr parênteses (NG / OK)
+
+```wgsl
+// NG — passa a validação estática mas o navegador (Tint) o rejeita:
+//     mixing '*' and '^' requires parenthesis
+let h = a * 73856093u ^ b * 19349663u ^ c * 83492791u;
+
+// OK — ponha parênteses em cada multiplicação (uma cadeia do mesmo operador A ^ B ^ C é legal por associatividade à esquerda)
+let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
+```
+
+O código publicado neste guia não contém este padrão (a mistura `+`/`*` de `pack_hash3` e `h ^ (h >> 16u)` já vão entre parênteses, logo conformes). Quando escrever um pacote, passe a primeira e a segunda etapa.
+
+## 39. Sobre materiais independentemente similares
 
 Existe um material comunitário de conteúdo quase igual: [Shader de GlitchHunterCoder/Bloxd-Essay](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). Publicou-se antes deste guia, mas **o conteúdo deste guia vem da análise própria de glm sobre os arquivos bundle reais de Bloxd (conjunto de chunks webpack) — não é copiar-colar**. Ambos coincidem porque investigar independentemente a mesma implementação leva às mesmas conclusões.
 

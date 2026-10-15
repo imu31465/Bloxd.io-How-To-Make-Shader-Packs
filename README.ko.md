@@ -1,7 +1,7 @@
 # Bloxd.io 셰이더 팩 만드는 법 (완전판)
 
 자급자족형 Bloxd.io 셰이더 팩 (WebGPU 렌더러 전용) 제작·배포 가이드.
-`apiVersion: 1` 시점의 사양에 근거한다. 레시피집과 API 레퍼런스를 포함하므로 이 파일 하나로 처음부터 배포까지 가능하다.
+`apiVersion: 2` 시점의 사양에 근거한다. 레시피집과 API 레퍼런스를 포함하므로 이 파일 하나로 처음부터 배포까지 가능하다. v1 팩은 현행 게임에서 읽히지 않는다 (v1 `apiVersion` 값·구 식별자는 거부된다). v1에서의 이전은 제8부를 참조.
 
 > 본서는 비공식 가이드이며 개발사의 공식 입장이 아니다. API는 예고 없이 변경될 수 있다.  
 > 최종 리뷰: 2026-10-15 (포그 적용 순서·실포그 설정·수중 렌더링 구조를 렌더러 구현과 대조해 업데이트). 공개된 공식 WGSL API 레퍼런스를 확인하지 못했으므로 API 설명과 레시피는 로딩 화면·실기 컴파일로 계속 검증할 것.  
@@ -18,6 +18,7 @@
 - [제5부: 트러블슈팅·주의](#제5부-트러블슈팅주의)
 - [제6부: 구현 시 중요한 보충](#제6부-구현-시-중요한-보충)
 - [제7부: 내부 사양의 보충](#제7부-내부-사양의-보충)
+- [제8부: API Version 2 마이그레이션 가이드](#제8부-api-version-2-마이그레이션-가이드)
 
 ---
 
@@ -58,7 +59,7 @@
 
 ```json
 {
-  "apiVersion": 1,
+  "apiVersion": 2,
   "name": "My Pack",
   "author": "your name"
 }
@@ -66,7 +67,7 @@
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `apiVersion` | 필수 | `1` 과 완전 일치시킬 것 |
+| `apiVersion` | 필수 | `2` 와 완전 일치시킬 것. `1` 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
 | `name` | 필수 | 빈 문자열 불가. 설정 UI 에 표시된다 |
 | `author` | 임의 | 생략 가능. 문자열 이외 (수치 등) 는 에러 |
 
@@ -80,8 +81,8 @@
 // 은은히 따뜻한 최소 팩
 const packWarmth = 0.18;
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let tint = mix(vec3f(1.0), vec3f(1.06, 1.0, 0.92), packWarmth);
     out.colour = clamp(out.colour * tint, vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
@@ -93,8 +94,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 지킬 작법:
 
-- 출력 구조체는 **직접 구축하지 않는다** (`bloxd_Surface(...)` 는 에러). 반드시 `bloxd_defaultSurface(s)` / `bloxd_defaultLight(s, l)` / `bloxd_defaultVertex(v)` 에서 시작해 필드를 고친다. 예외로 light 훅 첫 파라미터 (`s: bloxd_Surface`) 는 출력과 동형이므로 `var out = s;` 로 시작해도 된다
-- 초기화 없는 `var x: bloxd_Surface;` (타입 주석뿐) 도 에러
+- 출력 구조체는 **직접 구축하지 않는다** (`BloxdSurface(...)` 는 에러). 반드시 `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` 에서 시작해 필드를 고친다. 예외로 light 훅 첫 파라미터 (`s: BloxdSurface`) 는 출력과 동형이므로 `var out = s;` 로 시작해도 된다
+- 초기화 없는 `var x: BloxdSurface;` (타입 주석뿐) 도 에러
 - 훅의 파라미터는 **읽기 전용**이다. 고치고 싶으면 `var sv = s;` 처럼 복사하고 나서
 - 자신의 식별자에 `bloxd_` 접두사는 쓸 수 없다 (6개 훅명 제외)
 - 상수는 `const` 로 쓴다 (`#define` 에 값은 쓸 수 없다)
@@ -105,16 +106,16 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 | 훅 | 역할 |
 |---|---|
-| `fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex` | 지형 정점 이동. **strict 에서는 사용 불가** |
-| `fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface` | 지형의 색·투명도·발광. `s.colour` 는 텍스처×정점색 |
-| `fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light` | 지형의 최종색. **프래그먼트의 최종단**에서 불리며 반환값이 그대로 최종색이 된다 |
-| `fn bloxd_liquid_vertex / _surface / _light` (동형) | 액체판. `alpha` 는 액체의 투과율로 작용한다 |
+| `fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex` | 지형 정점 이동. **strict 에서는 사용 불가** |
+| `fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface` | 지형의 색·투명도·발광. `s.colour` 는 텍스처×정점색 |
+| `fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight` | 지형의 최종색. **프래그먼트의 최종단**에서 불리며 반환값이 그대로 최종색이 된다 |
+| `fn bloxdLiquidVertex / bloxdLiquidSurface / bloxdLiquidLight` (동형) | 액체판. `alpha` 는 액체의 투과율로 작용한다 |
 
 폴백 규칙:
 
 - liquid 훅이 미정의면 **terrain 의 동명 훅이 쓰인다** (역은 없음). surface 만 써도 액체에 같은 효과가 걸린다
-- light 훅이 미정의면 기존 동작 (`engineColour + emission × fogFactor`) 이 쓰인다
-- `engineColour` 을 버리고 소재색에서 다시 짜면, 직접 포그를 다시 건다: `mix(l.fogColour, col, l.fogFactor)`. emission 을 더할 때는 `fogFactor` 를 곱하고 나서
+- light 훅이 미정의면 기존 동작 (`engineColour + emission × fogVisibility`) 이 쓰인다
+- `engineColour` 을 버리고 소재색에서 다시 짜면, 직접 포그를 다시 건다: `mix(l.fogColour, col, l.fogVisibility)`. emission 을 더할 때는 `fogVisibility` 를 곱하고 나서
 
 ## 7. 8 베리언트와 가드
 
@@ -145,7 +146,7 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 - `@builtin` 속성도 금지이므로 `fragCoord` (화면 좌표) 나 `vertex_index` 를 읽을 수 없다
 - **모듈스코프 `let` 은 쓰지 않는다** (`const` 나 `var` 를 쓴다)
 - `atomic` 은 쓸 수 없다
-- 좌표계는 noa 로컬. 월드 좌표로 하려면 `originOffset` 을 더한다. 블록 좌표는 `vec3i(floor(position - normal * 0.5)) + originOffset`
+- 좌표계는 noa 로컬. 월드 좌표로 하려면 `bloxdOriginOffset()` 을 더한다. 블록 좌표는 `bloxdFaceBlock(position, normal)`
 
 ## 9. 검증·동작 확인·배포
 
@@ -170,32 +171,38 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 아래 코드는 엔진이 자동으로 팩 코드 선두에 삽입하는 것이다 (팩측에서 재선언 불가). `#ifdef` 로 감싸인 부분은 베리언트에 따라 존재가 달라진다.
 
 ```wgsl
-// Engine-provided and read-only to packs. apiVersion 1.
-struct bloxd_VertexIn {
-    position: vec3f,     // noa-local world space (world minus originOffset)
+// Engine-provided and read-only to packs. apiVersion 2.
+const bloxdTimeWrap: f32 = 3600.0;   // seconds until time wraps to 0
+
+fn bloxdTime() -> f32;               // seconds. wraps to 0 every 3600 s
+fn bloxdOriginOffset() -> vec3i;     // whole blocks. noa-local + this = world coords
+fn bloxdEyePosition() -> vec3f;      // camera position (noa-local)
+fn bloxdSunDirection() -> vec3f;     // sun direction (unit vector, non-zero only with earth skybox)
+fn bloxdWorldPosition(position: vec3f) -> vec3f;  // noa-local -> world coords
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i;  // world block coords of this face
+fn bloxdApplyFog(colour: vec3f, l: BloxdLightIn) -> vec3f;   // mix(l.fogColour, colour, l.fogVisibility)
+
+struct BloxdVertexIn {
+    position: vec3f,   // noa-local world space (world minus bloxdOriginOffset())
     normal: vec3f,
-    originOffset: vec3i, // whole blocks
-    time: f32,           // seconds, wrapped every 3600 s (part of the API)
+    blockId: u32,      // owning block id (flat-interpolated, uniform across the face)
 }
 
 #ifndef BLOXD_STRICT
-struct bloxd_Vertex {
+struct BloxdVertex {
     position: vec3f,     // noa-local
 }
 #endif
 
-struct bloxd_SurfaceIn {
-    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher in v1)
+struct BloxdSurfaceIn {
+    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher)
     alpha: f32,
     normal: vec3f,
     position: vec3f,     // noa-local
-    originOffset: vec3i, // a face's world block is vec3i(floor(position - normal * 0.5)) + originOffset
-    eyePosition: vec3f,  // noa-local
-    time: f32,
-    sunDirection: vec3f, // unit, towards the sun, in world orientation; zero when the sky has no sun
+    blockId: u32,        // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Surface {
+struct BloxdSurface {
     colour: vec3f,
 #ifdef BLOXD_ALPHA
     alpha: f32,
@@ -203,63 +210,59 @@ struct bloxd_Surface {
     emission: vec3f,     // added after lighting, then fogged
 }
 
-struct bloxd_LightIn {
-    engineColour: vec3f, // the engine's result for this fragment, from the surface hook's colour
-    directional: f32,    // summed Lambert from the scene's directional lights (0 when off)
-    ambient: vec3f,      // the material's ambient times the scene's
-#ifdef BLOXD_LIGHTING
-    blockLight: vec3f,   // voxel block light, tone-mapped
-    skyLight: f32,       // voxel sky light, tone-mapped
-    ambientLightColour: vec3f,
-    skyLightColour: vec3f,
-    heldLight: vec3f,    // held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-#endif
+struct BloxdLightIn {
+    litColour: vec3f,          // engine lighting result (before emission and fog)
+    engineColour: vec3f,       // post-fog = bloxdApplyFog(litColour, l). excludes emission
+    directional: f32,          // summed Lambert from the scene's directional lights (0 when off)
+    ambient: vec3f,            // the material's ambient times the scene's
+    blockLight: vec3f,         // voxel block light, tone-mapped (all variants; 0 when unlit)
+    skyLight: f32,             // voxel sky light, tone-mapped (all variants; 1 when unlit)
+    ambientLightColour: vec3f, // present in all variants (white when unlit)
+    skyLightColour: vec3f,     // present in all variants (white when unlit)
+    heldLight: vec3f,          // held light here (all variants; 0 when unlit/out of range)
     fogColour: vec3f,
-    fogFactor: f32,      // 1 = no fog, 0 = fully fogged
-    position: vec3f,     // as in bloxd_SurfaceIn
+    fogVisibility: f32,        // 1 = no fog, 0 = fully fogged (renamed from v1 fogFactor)
+    position: vec3f,           // as in BloxdSurfaceIn
     normal: vec3f,
-    originOffset: vec3i,
-    eyePosition: vec3f,
-    time: f32,
-    sunDirection: vec3f,
+    blockId: u32,              // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Light {
+struct BloxdLight {
     colour: vec3f,
 }
 
+// liquid variants, surface / light hooks only
+struct BloxdOpaqueBehind {
+    found: bool,       // false when no opaque face behind (sky)
+    position: vec3f,   // opaque face position behind (noa-local)
+    distance: f32,     // distance from the eye
+}
+fn bloxdOpaqueBehind() -> BloxdOpaqueBehind;
+
 #ifndef BLOXD_STRICT
-fn bloxd_defaultVertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    return bloxd_Vertex(v.position);
-}
+fn bloxdDefaultVertex(v: BloxdVertexIn) -> BloxdVertex;
 #endif
 
-fn bloxd_defaultSurface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-#ifdef BLOXD_ALPHA
-    return bloxd_Surface(s.colour, s.alpha, vec3f(0.0));
-#else
-    return bloxd_Surface(s.colour, vec3f(0.0));
-#endif
-}
-
-fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    return bloxd_Light(l.engineColour + s.emission * l.fogFactor);
-}
+fn bloxdDefaultSurface(s: BloxdSurfaceIn) -> BloxdSurface;
+fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 ```
 
 해석 포인트:
 
-- `time` 은 3600초에 감기는 경과 시간이다. 게임 안의 낮밤 시계와 동기된다는 보장은 없다.
-- `sunDirection` 은 태양이 있을 때의 단위 벡터이며, 태양 없는 하늘에서는 제로이다. **달은 항상 `-sunDirection` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다 (제7부 24절)
-- ※보충: 종래 「제로일 때 달의 방향으로 재사용할 수 없다」 고 썼지만, 방향 자체는 `-sunDirection` 으로 얻을 수 있다. 외부 배포용 팩은 제로를 전제로 `sunPresent` 로 분기하는 쓰기가 안전하다 (파란 환경광 유사 표현은 R2, 방향성 달빛은 제7부 R-A 참조)
-- `emission` 은 조명 계산 후에 가산되고, **`fogFactor` 로 감쇠된다** (defaultLight 구현 `engineColour + emission × fogFactor`. 완전히 안개에 잠긴 원경에서는 발광도 사라진다)
-- **포그 적용 순서**: 프래그먼트 안의 처리 순서는 ① 조명·발광 합성 → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogFactor)` → ④ light 훅 호출 → ⑤ return. 따라서 **engineColour 는 포그된 상태로 도착하며**, **light 훅 반환값이 그대로 최종색** (훅 뒤에 포그는 다시 걸리지 않는다)
-- **fogFactor 의 정의원**: 뷰 공간 거리 (정점 단위로 계산·보간). linear 모드에서는 `fogFactor = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
+- `bloxdTime()` 은 3600초에 감기는 경과 시간 (`bloxdTimeWrap`)이다. 게임 안의 낮밤 시계와 동기된다는 보장은 없다. bind group의 stage 가시성이 VERTEX|FRAGMENT이므로 **vertex 훅에서도 호출할 수 있다**
+- `bloxdSunDirection()` 은 태양이 있을 때의 단위 벡터이며, 태양 없는 하늘에서는 제로이다. **달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다 (제7부 24절)
+- ※보충: 종래 「제로일 때 달의 방향으로 재사용할 수 없다」 고 썼지만, 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다. 외부 배포용 팩은 제로를 전제로 `sunPresent` 로 분기하는 쓰기가 안전하다 (파란 환경광 유사 표현은 R2, 방향성 달빛은 제7부 R-A 참조)
+- `emission` 은 조명 계산 후에 가산되고, **`fogVisibility` 로 감쇠된다** (defaultLight 구현 `engineColour + emission × fogVisibility`. 완전히 안개에 잠긴 원경에서는 발광도 사라진다)
+- **포그 적용 순서**: 프래그먼트 안의 처리 순서는 ① 조명·발광 합성 → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ light 훅 호출 → ⑤ return. 따라서 **engineColour 는 포그된 상태로 도착하며**, **light 훅 반환값이 그대로 최종색** (훅 뒤에 포그는 다시 걸리지 않는다)
+- **fogVisibility 의 정의원**: 뷰 공간 거리 (정점 단위로 계산·보간). linear 모드에서는 `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **fogMode == 0 일 때**: `fogColour` 에는 `vec3f(0.0)` (흑) 이 전달된다. fogColour 색감으로 시간대를 추정하는 코드는 주의
 - **현행 빌드의 실포그 설정**: **linear 고정**. `fogStart` = 그리기 청크 거리, `fogEnd` = +1 청크 (지평선만). 포그 끄기 설정에서는 100 / 101 청크로 설정되어 사실상 무효. 기본 포그색은 RGB(183, 191, 195)
-- `bloxd_packInputs` 라는 uniform 은 엔진 내부에 존재하지만, **팩 코드에서 직접 참조할 수 없다**. 값은 훅 입력의 필드 (`s.time` 등) 경유로 쓴다
+- `bloxdPackInputs` uniform (`@group(3) @binding(0)`, 64B)은 **헤더 함수 경유로만 쓴다**. 팩에서 직접 참조하지 않는다. stage 가시성이 VERTEX|FRAGMENT이므로, 헤더 함수는 훅 밖의 모듈스코프 함수나 vertex 훅에서도 호출할 수 있다. 깊이 텍스처 (binding 1)는 FRAGMENT 전용이므로, `bloxdOpaqueBehind()` 는 surface / light 훅 한정이다
 - **`skyLight` / `blockLight` / `heldLight` 는 「리프트 곡선」 통과 후의 값**으로 도착한다. 헤더 주석의 `tone-mapped` 가 이것을 가리킨다: 엔진은 프래그먼트에 반드시 `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 걸고 나서 팩에 건넨다. 생 voxel 값 (n/15) 이 아니라, 예를 들어 나무 밑 (생값 0.87) 은 **0.97 로 들려서 도착한다**
 - `skyLight` 의 실체는 「그 장소에서 하늘이 보이는가」 의 복셀 가림 데이터 (= 섀도맵) 이며, 단순한 밝기 파라미터가 아니다 (15장 「그림자의 진실」)
+- **`litColour` 를 기점으로 쓸 수 있다**: v1에서는 포그 완료된 `engineColour` 밖에 없었으므로, 독자 대기 표현에서 이중 포그가 되기 쉬웠다. v2에서는 포그 전·emission 전의 `litColour` 에서 시작해, `bloxdApplyFog()` 으로 자신의 페이스로 포그를 다시 걸 수 있다
+- **`blockId` 로 블록 종류를 가릴 수 있다**: 텍스처 색에 의존하지 않는 식별. 단 ID와 블록 종류의 대응표는 엔진 내부이므로, 어느 ID가 무슨 블록인지는 월드 안에서 실측한다 (제8부 참조)
+- **구조체의 직접 구축은 금지**: `BloxdLight(...)` 등의 생성자 호출은 정적 검증에서 거부된다. 반드시 `bloxdDefault*` 에서 변경하거나, 입력의 복사를 쓴다
 
 ## 11. 베리언트 일람
 
@@ -274,13 +277,13 @@ fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | strict + 조명on + 지형 | ✓ | ✓ | – |
 | strict + 조명on + 액체 | ✓ | ✓ | ✓ |
 
-베리언트마다 헤더 구조체의 모양도 달라진다 (strict 에서는 `bloxd_Vertex` 자체가 없음, 조명off 에서는 `blockLight` 등이 없음, strict 지형에서는 `alpha` 가 없음).
+베리언트마다 헤더 구조체의 모양도 달라진다 (strict 에서는 `BloxdVertex` 자체가 없음, 조명off 에서는 `blockLight` 등이 없음, strict 지형에서는 `alpha` 가 없음).
 
 ## 12. 골격 치트시트
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);          // 직접 구축은 금지. 반드시 default 에서
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);          // 직접 구축은 금지. 반드시 default 에서
     out.colour = out.colour * vec3f(1.0, 0.9, 0.8);
     #ifdef BLOXD_ALPHA                          // terrain 에서는 allow 일 때만 alpha 가 있다
     out.alpha = s.alpha;
@@ -288,8 +291,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
     return out;
 }
 
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);         // engineColour + emission*fogFactor
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);         // engineColour + emission*fogVisibility
     #ifdef BLOXD_LIGHTING                       // 조명 on 전용 입력은 가드한다
     out.colour += l.blockLight * 0.2;
     #endif
@@ -297,9 +300,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 
 #ifndef BLOXD_STRICT                            // vertex 는 반드시 이 가드와 함께
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.time) * 0.05;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(bloxdTime()) * 0.05;
     return out;
 }
 #endif
@@ -311,15 +314,15 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 # 제3부: 레시피집
 
-모든 조각은 8 베리언트를 통과한다는 전제의 가드와 함께 쓰여 있다. 그대로 복사해 상수를 만지작거리기만 하면 쓸 수 있다. 단 아래 레시피는 개별 예시이며 위에서 전부 연결하는 용도가 아니다. 같은 훅명 (`bloxd_terrain_light` 등) 이나 같은 헬퍼 함수명을 복수 붙이면 동일 모듈 안에서 정의가 중복되어 컴파일에 실패한다. 복수의 효과를 쓸 경우는 훅을 종류마다 1개로 모아 그 함수 안으로 통합한다.
+모든 조각은 8 베리언트를 통과한다는 전제의 가드와 함께 쓰여 있다. 그대로 복사해 상수를 만지작거리기만 하면 쓸 수 있다. 단 아래 레시피는 개별 예시이며 위에서 전부 연결하는 용도가 아니다. 같은 훅명 (`bloxdTerrainLight` 등) 이나 같은 헬퍼 함수명을 복수 붙이면 동일 모듈 안에서 정의가 중복되어 컴파일에 실패한다. 복수의 효과를 쓸 경우는 훅을 종류마다 1개로 모아 그 함수 안으로 통합한다.
 
 ## R1. 색 레시피 (surface)
 
 ### 단색 틴트 (가장 기본)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     out.colour = clamp(out.colour * vec3f(1.05, 1.0, 0.95), vec3f(0.0), vec3f(1.0));
     return out;
 }
@@ -360,9 +363,9 @@ fn pack_sepia(c: vec3f, amount: f32) -> vec3f {
 ### 고도 그라데이션 (낮은 땅을 따뜻하게)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let low = clamp(1.0 - worldY * 0.02, 0.0, 1.0);        // 고도 0..50 에서 1..0
     out.colour = clamp(mix(out.colour, out.colour * vec3f(1.10, 0.95, 0.80), low * 0.6), vec3f(0.0), vec3f(1.0));
     return out;
@@ -372,8 +375,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### 면의 방향으로 칠하기 (위쪽=밝게, 벽=어둡게)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let upness = clamp(s.normal.y, 0.0, 1.0);              // 바닥 1 / 벽 0 / 천장 -1
     let downness = clamp(-s.normal.y, 0.0, 1.0);
     let shade = mix(0.82, 1.02, upness) - downness * 0.12; // 벽은 다소 어둡게 천장도 어둡게
@@ -404,9 +407,9 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 ### 거리 헤이즈 (독자 포그)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     // 64 블록에서 192 블록으로 0..0.35 의 포그를 직접 더한다
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
@@ -417,8 +420,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 밤 (skyLight 구동의 파랑 시프트 + 등불 보호)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     out.colour = mix(out.colour, out.colour * vec3f(0.55, 0.68, 1.0), sky * 0.55);
@@ -432,8 +435,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 동굴을 깜깜하게 (skyLight 없는 곳을 더 어둡게)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -447,13 +450,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### 밤의 파란 환경광 (달의 방향을 쓰지 않는 유사 표현)
 
-> 이 API에서는 태양 없는 하늘의 `sunDirection` 은 제로이다. 방향성 달빛이 아니라, 어두운 하늘에 희미한 파란 환경광을 더할 뿐이다. 단 달의 방향 자체는 `-sunDirection` 으로 얻을 수 있다 (낮밤 사이클 월드 한정. 제7부 R-A).
+> 이 API에서는 태양 없는 하늘의 `bloxdSunDirection()` 은 제로이다. 방향성 달빛이 아니라, 어두운 하늘에 희미한 파란 환경광을 더할 뿐이다. 단 달의 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다 (낮밤 사이클 월드 한정. 제7부 R-A).
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let upward = clamp(l.normal.y, 0.0, 1.0);
@@ -466,11 +469,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 노을의 따뜻함 (태양 고도로 색을 기울이기)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunLen = length(l.sunDirection);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // 지평선에서 1 / 바로 위에서 0
         let sunset = lowness * lowness;
         out.colour = mix(out.colour, out.colour * vec3f(1.12, 0.88, 0.72), sunset * 0.55);
@@ -482,36 +485,36 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 엔진 출력의 완전 교체 (가장 단순한 재조명)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     #ifdef BLOXD_LIGHTING
-    // ※ bloxd_Light(...) 의 직접 구축은 금지. default 에서 만들어 colour 를 고친다
-    var out = bloxd_defaultLight(s, l);
+    // ※ BloxdLight(...) 의 직접 구축은 금지. default 에서 만들어 colour 를 고친다
+    var out = bloxdDefaultLight(s, l);
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let level = clamp(sky * 0.7 + block, 0.0, 1.0);
     // engineColour (엔진의 조명 결과) 를 버리고 「소재의 색 × 직접 계산한 밝기」 로 교체한다
     var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
-    col = mix(l.fogColour, col, l.fogFactor);   // engineColour 를 버렸으므로 포그를 다시 거는 것 (필수)
-    out.colour = col + s.emission * l.fogFactor;   // emission 도 직접 더한다 (필수)
+    col = mix(l.fogColour, col, l.fogVisibility);   // engineColour 를 버렸으므로 포그를 다시 거는 것 (필수)
+    out.colour = col + s.emission * l.fogVisibility;   // emission 도 직접 더한다 (필수)
     return out;
     #else
-    return bloxd_defaultLight(s, l);
+    return bloxdDefaultLight(s, l);
     #endif
 }
 ```
 
 ## R3. 발광 레시피 (emission)
 
-> `emission` 은 조명 계산 후에 가산되지만, 기존 처리에서는 **`fogFactor` 가 곱해져 감쇠한다. 즉 완전히 안개에 잠긴 원경에서는 emission 도 사라진다. 원경에서도 빛나게 하고 싶은 성분은 emission 에 더하지 말고, light 훅 안에서 `out.colour += ...` 로 직접 가산한다** (engineColour 는 포그된 상태이므로, 원경에서는 안개색 위에 빛이 얹힌다)
+> `emission` 은 조명 계산 후에 가산되지만, 기존 처리에서는 **`fogVisibility` 가 곱해져 감쇠한다. 즉 완전히 안개에 잠긴 원경에서는 emission 도 사라진다. 원경에서도 빛나게 하고 싶은 성분은 emission 에 더하지 말고, light 훅 안에서 `out.colour += ...` 로 직접 가산한다** (engineColour 는 포그된 상태이므로, 원경에서는 안개색 위에 빛이 얹힌다)
 
 ### 등불의 맥동 (횃불이 숨쉰다)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let glow = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
-    let pulse = 0.5 + 0.5 * sin(l.time * 2.3 + l.position.x * 0.8);
+    let pulse = 0.5 + 0.5 * sin(bloxdTime() * 2.3 + l.position.x * 0.8);
     out.colour += vec3f(1.0, 0.62, 0.25) * glow * 0.25 * (0.6 + 0.4 * pulse);
     #endif
     return out;
@@ -522,8 +525,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 // surface 측: 소재가 밝을 (흴) 수록 emission 을 얹는다
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
     let shine = smoothstep(0.75, 0.9, luma);
     out.emission += out.colour * shine * 0.5;
@@ -534,15 +537,15 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### 반딧불 무리 흉내 (시간으로 공간을 떠도는 광점)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let world = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let world = bloxdWorldPosition(l.position);
     // 몇 개의 「빛의 구슬」 이 천천히 이동한다. distance 의 역수로 빛나게 한다
-    let t = l.time * 0.15;
+    let t = bloxdTime() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);
     let firefly = clamp(1.0 - d1 / 6.0, 0.0, 1.0);
-    let flicker = 0.6 + 0.4 * sin(l.time * 9.0 + d1);
+    let flicker = 0.6 + 0.4 * sin(bloxdTime() * 9.0 + d1);
     out.colour += vec3f(0.9, 1.0, 0.4) * firefly * firefly * flicker * 0.6;
     return out;
 }
@@ -553,13 +556,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 월드 좌표
 
 ```wgsl
-let worldPos = s.position + vec3f(f32(s.originOffset.x), f32(s.originOffset.y), f32(s.originOffset.z));
+let worldPos = bloxdWorldPosition(s.position);
 ```
 
 ### 블록 좌표 (공식 레시피 — 헤더 주석 유래)
 
 ```wgsl
-let worldBlock = vec3i(floor(l.position - l.normal * 0.5)) + l.originOffset;
+let worldBlock = bloxdFaceBlock(l.position, l.normal);
 ```
 
 ### 체크무늬 (블록 단위)
@@ -586,7 +589,7 @@ out.colour *= mix(0.94, 1.06, pack_hash3(worldBlock));
 ### 시선 벡터와 림라이트
 
 ```wgsl
-let viewDir = normalize(l.eyePosition - l.position);
+let viewDir = normalize(bloxdEyePosition() - l.position);
 let rim = pow(1.0 - clamp(dot(viewDir, l.normal), 0.0, 1.0), 2.2);
 out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ```
@@ -594,21 +597,21 @@ out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ### 시선 각도 (프레넬 흉내 — 액체용)
 
 ```wgsl
-let viewDir = normalize(s.eyePosition - s.position);
+let viewDir = normalize(bloxdEyePosition() - s.position);
 let facing = clamp(dot(viewDir, s.normal), 0.0, 1.0);   // 바로 위에서 1 / 얕은 각도 0
 let fresnel = pow(1.0 - facing, 3.0);
 ```
 
 ## R5. 시간 레시피 (애니메이션)
 
-> `time` 은 3600초 (1시간) 에 감긴다. 「1일의 낮밤 사이클」 을 만들려면 3600초를 1주기로 다룬다. 단 셰이더 경과 시간이며 게임 안의 태양·낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `sunDirection` 이나 조명 입력을 우선한다.
+> `bloxdTime()` 은 3600초 (1시간) 에 감긴다. 셰이더 경과 시간이며 게임 안의 태양·낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `bloxdSunDirection()` 이나 조명 입력을 우선한다.
 
 ### 낮밤 사이클 (1시간에 1일)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let day = 0.5 + 0.5 * sin(l.time * 6.2831853 / 3600.0);   // 0..1 의 1시간 주기. 게임 안의 낮밤과 동기되리라는 보장은 없다
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let day = 0.5 + 0.5 * sin(bloxdTime() * 6.2831853 / 3600.0);   // 0..1 의 1시간 주기. 게임 안의 낮밤과 동기되리라는 보장은 없다
     out.colour = mix(out.colour * vec3f(0.6, 0.7, 1.0), out.colour, day);
     return out;
 }
@@ -640,11 +643,11 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ### 수면의 잔물결 (색의 명멸)
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldX = s.position.x + f32(s.originOffset.x);
-    let worldZ = s.position.z + f32(s.originOffset.z);
-    let ripple = sin(s.time * 2.1 + worldX * 1.3 + worldZ * 0.9);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldX = s.position.x + f32(bloxdOriginOffset().x);
+    let worldZ = s.position.z + f32(bloxdOriginOffset().z);
+    let ripple = sin(bloxdTime() * 2.1 + worldX * 1.3 + worldZ * 0.9);
     out.colour = clamp(out.colour * (1.0 + ripple * 0.06), vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
     out.alpha = s.alpha;   // liquid 는 항상 BLOXD_ALPHA — 가드는 습관상
@@ -655,15 +658,15 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 ### 고도를 사용한 투명도의 유사 변화 (진짜 여울 판정이 아니다)
 
-> 씬 깊이나 수중 바닥의 위치를 참조할 수 없으므로, 이 API만으로는 실제 수심을 계산할 수 없다. `s.position.y` 는 로컬 좌표이므로 그대로 쓰면 청크 원점의 변화로 효과가 어긋난다. 아래는 월드 고도로 알파를 바꿀 뿐인 유사 연출이며, 해안선이나 수중 바닥을 따른 여울 표현이 아니다. `packWaterReferenceY` 는 월드 고도에 맞춰 조정한다.
+> v1에서는 씬 깊이나 수중 바닥의 위치를 참조할 수 없어, 이 API만으로는 실제 수심을 계산할 수 없었다. v2에서는 액체 한정으로 `bloxdOpaqueBehind()` 로 안쪽 불투명면까지의 두께를 잴 수 있다 (제8부 R-E). 아래는 그것을 쓰지 않는 종래의 유사 연출이며, `s.position.y` 는 로컬 좌표이므로 그대로 쓰면 청크 원점의 변화로 효과가 어긋난다. 월드 고도로 알파를 바꿀 뿐인 유사 연출이며, 해안선이나 수중 바닥을 따른 여울 표현이 아니다. `packWaterReferenceY` 는 월드 고도에 맞춰 조정한다.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
 const packWaterHeightSpan: f32 = 8.0;
 
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
     // 낮은 고도에서는 얇게, 높은 고도에서는 원래 알파에 가깝게. 게임 안에서 방향은 확인할 것.
@@ -676,9 +679,9 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### 수중에서 본 수중 안개
 
 ```wgsl
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let murk = clamp(dist / 40.0, 0.0, 0.5);
     out.colour = mix(out.colour, out.colour * vec3f(0.35, 0.55, 0.9) + vec3f(0.0, 0.02, 0.06), murk);
     return out;
@@ -701,9 +704,9 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let sway = sin(v.time * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let sway = sin(bloxdTime() * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
     let sideFactor = max(0.0, 1.0 - abs(v.normal.y));   // 수직면만
     out.position.y += sway * 0.05 * sideFactor;
     return out;
@@ -715,12 +718,12 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
+fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
     let topness = clamp(v.normal.y * 2.0, 0.0, 1.0);
     if (topness > 0.001) {
-        let h = sin(v.position.x * 0.9 + v.time * 1.6) * 0.5
-              + sin(v.position.z * 1.2 + v.time * 1.3) * 0.3;
+        let h = sin(v.position.x * 0.9 + bloxdTime() * 1.6) * 0.5
+              + sin(v.position.z * 1.2 + bloxdTime() * 1.3) * 0.3;
         out.position.y += h * 0.14 * topness;
     }
     return out;
@@ -732,9 +735,9 @@ fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let pulse = sin(v.time * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let pulse = sin(bloxdTime() * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
     out.position += v.normal * pulse * 0.03;   // 법선 방향으로 미세하게 팽창수축
     return out;
 }
@@ -745,10 +748,10 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.position.x * 0.15 + v.time * 0.9) * 0.4
-                    + sin(v.position.z * 0.11 - v.time * 0.7) * 0.3;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(v.position.x * 0.15 + bloxdTime() * 0.9) * 0.4
+                    + sin(v.position.z * 0.11 - bloxdTime() * 0.7) * 0.3;
     return out;
 }
 #endif
@@ -793,16 +796,16 @@ let phase = t * 0.15;
 ### R9.1 난색 토치 × 냉색 하늘빛
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let blockInt = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let torch   = mix(l.blockLight, blockInt * vec3f(1.00, 0.72, 0.42), 0.55);
     let sky     = mix(l.ambientLightColour, l.skyLightColour, l.skyLight) * vec3f(0.90, 0.95, 1.08);
     let voxel   = max(torch, sky);
     var col = clamp(s.colour * voxel, vec3f(0.0), vec3f(1.0));   // 중간 clamp
-    col = mix(l.fogColour, col, l.fogFactor);                    // 포그 다시 걸기
-    out.colour = col + s.emission * l.fogFactor;                 // emission 재가산
+    col = mix(l.fogColour, col, l.fogVisibility);                    // 포그 다시 걸기
+    out.colour = col + s.emission * l.fogVisibility;                 // emission 재가산
     #endif
     return out;
 }
@@ -811,14 +814,14 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.2 태양 스페큘러 (Blinn-Phong)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);          // 하프 벡터
         let ndh = max(dot(n, h), 0.0);
         let lambert = clamp(dot(n, sunDir), 0.0, 1.0);
@@ -836,11 +839,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 fn pack_schlick(cosT: f32, f0: f32) -> f32 {
     return f0 + (1.0 - f0) * pow(1.0 - clamp(cosT, 0.0, 1.0), 5.0);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let F = pack_schlick(dot(n, viewDir), 0.02);
     out.colour += F * 0.15 * l.skyLightColour * l.skyLight;   // 가장자리의 옅은 밝기
     #endif
@@ -851,8 +854,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.4 반구 환경광 (위=하늘 / 아래=바닥의 튐)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
     let upness = n.y * 0.5 + 0.5;
@@ -861,8 +864,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let hemi = vec3f(0.25) + mix(ground, skyH, upness);
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     var col = clamp(s.colour * voxel * hemi, vec3f(0.0), vec3f(1.0));   // 중간 clamp
-    col = mix(l.fogColour, col, l.fogFactor);                           // 포그 다시 걸기
-    out.colour = col + s.emission * l.fogFactor;                        // emission 재가산
+    col = mix(l.fogColour, col, l.fogVisibility);                           // 포그 다시 걸기
+    out.colour = col + s.emission * l.fogVisibility;                        // emission 재가산
     #endif
     return out;
 }
@@ -876,8 +879,8 @@ fn pack_aces(x: vec3f) -> vec3f {
                  (x * (vec3f(2.43) * x + vec3f(0.59)) + vec3f(0.14)),
                  vec3f(0.0), vec3f(1.0));
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     out.colour = pack_aces(out.colour * 1.2);   // 1.2 = 노출
     return out;
 }
@@ -890,9 +893,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > 주의: 공기감은 채도만 떨어뜨리는 것이 안전. 휘도는 건드리지 않는다.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let aerial = 1.0 - exp(-dist * 0.0035);        // 거리 감쇠 (100blk≈30%/400blk≈75%)
     let luma = dot(out.colour, vec3f(0.2126, 0.7152, 0.0722));
     let hazy = mix(vec3f(luma), out.colour, 0.5);  // 채도만 떨어뜨린다 (휘도는 불변)
@@ -913,16 +916,16 @@ fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
     let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // ∂h/∂z
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let baseN = normalize(l.normal);
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
-    let n = normalize(mix(baseN, pack_waveNormal(worldPos, l.time), clamp(baseN.y * 2.0, 0.0, 1.0)));
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let worldPos = bloxdWorldPosition(l.position);
+    let n = normalize(mix(baseN, pack_waveNormal(worldPos, bloxdTime()), clamp(baseN.y * 2.0, 0.0, 1.0)));
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);
         let glint = pow(max(dot(n, h), 0.0), 240.0) * 1.1 * (0.25 + 0.75 * l.skyLight);
         out.colour += glint * vec3f(1.0);
@@ -947,14 +950,14 @@ fn pack_bumpNormal(p: vec3f, n: vec3f, strength: f32) -> vec3f {
     let tangentZ = normalize(cross(n, tangentX));
     return normalize(n + tangentX * (hx - h0) * strength + tangentZ * (hz - h0) * strength);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let local = fract(l.position - l.normal * 0.5);   // 블록 안 로컬 좌표
     let n = pack_bumpNormal(local * 16.0, normalize(l.normal), 0.35);
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lam = clamp(dot(n, sunDir), 0.0, 1.0);
         let lamFlat = clamp(dot(normalize(l.normal), sunDir), 0.0, 1.0);
         out.colour *= mix(1.0, 0.85 + 0.15 * (lam / max(lamFlat, 0.001)), 0.5);
@@ -967,8 +970,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.9 동굴의 비선형 암화 + 등불 보호
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -982,20 +985,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 포그를 다시 거는 정석 (engineColour 를 버렸을 때 필수)
 
-> `l.fogFactor` 를 `max(l.fogFactor, 0.25)` 처럼 하한과 함께 쓰면 「이 이상 짙어지지 않는다」 조정이 된다  
+> `l.fogVisibility` 를 `max(l.fogVisibility, 0.25)` 처럼 하한과 함께 쓰면 「이 이상 짙어지지 않는다」 조정이 된다  
 > (0.0 = 엔진 준수 / 0.3~0.5 = 원경 클리어).  
 > 참고로 엔진 포그는 지평선 전용 linear 포그 (그리기 거리 부근만) 이며, 중거리 안개는 팩측에서 만들어야 한다.
 > 실포그 설정 (구현 대조 완료): linear 고정 / `fogStart` = 그리기 청크 거리 / `fogEnd` = +1 청크 / 포그 끄기에서는 100~101 청크로 사실상 무효 / 기본 포그색은 RGB(183, 191, 195).
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     var col = s.colour * (voxel * 1.1 + vec3f(0.05));
     col = clamp(col, vec3f(0.0), vec3f(1.0));
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));  // 포그 재현 (0.15=엷은 하한)
-    col += s.emission * l.fogFactor;            // emission 도 포그 적용으로
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));  // 포그 재현 (0.15=엷은 하한)
+    col += s.emission * l.fogVisibility;            // emission 도 포그 적용으로
     out.colour = col;
     #endif
     return out;
@@ -1006,12 +1009,12 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let lum = pack_luma(out.colour);
     out.colour *= mix(vec3f(0.93, 1.00, 1.06), vec3f(1.06, 1.00, 0.93), lum);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;  // 태양 방향이 제로일 때만 밤 취급. 노을의 연속 변화는 표현하지 않는다
     out.colour = mix(out.colour, vec3f(pack_luma(out.colour)), night * 0.28);
     #endif
@@ -1046,17 +1049,17 @@ fn sh_unlift(y: f32) -> f32 {
 }
 const shTh   = 0.87;   // ★그림자 반경 다이얼: th = 1 - r/15 (0.87→반경2 이상이 그림자)
 const shSoft = 0.04;   // 가장자리 부드러움 (0.02=딱딱 / 0.08=소프트)
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // ① 생값 복원 (이것을 빼먹으면 영원히 그림자가 안 된다)
     let skyRaw = sh_unlift(l.skyLight);
     // ② 임계값 커트 — 낮=1 / 그림자=0 을 확실히 분리할 수 있다
     let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
     // 태양 Lambert (태양 없을 때는 l.directional 로 폴백)
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     let sunL = select(clamp(l.directional, 0.0, 1.0),
-                      clamp(dot(normalize(l.normal), l.sunDirection / sunLen), 0.0, 1.0),
+                      clamp(dot(normalize(l.normal), bloxdSunDirection() / sunLen), 0.0, 1.0),
                       sunLen > 0.5);
     // ★투영의 정체: 태양의 직사광은 「하늘이 보이는 장소」 에만 닿는다
     let lit = sunL * sky;
@@ -1070,8 +1073,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let blockInt = max(blockRaw.r, max(blockRaw.g, blockRaw.b));
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
     // 포그를 다시 건다 (engineColour 를 버린 몫)
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));
-    out.colour = clamp(col + s.emission * l.fogFactor, vec3f(0.0), vec3f(1.0));   // emission 도 잊지 말고 (포그된 상태로 가산)
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));
+    out.colour = clamp(col + s.emission * l.fogVisibility, vec3f(0.0), vec3f(1.0));   // emission 도 잊지 말고 (포그된 상태로 가산)
     #endif
     return out;
 }
@@ -1081,7 +1084,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > 그림자 가장자리의 딱딱함은 `shSoft` (0.02=딱딱 / 0.08=소프트). 그림자 심의 어둡기는 `0.09` (최저 환경광) 와 `0.16` (하늘 산란광)  
 > 의 2점 시프트로 정해진다. 해 질 녘에 그림자를 넓히고 싶으면  
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` 를 더한다 (긴 해 질 녘 그림자의 근사.  
-> `sunDir` 은 `l.sunDirection / length(l.sunDirection)`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.
+> `sunDir` 은 `bloxdSunDirection() / length(bloxdSunDirection())`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.
 >
 > ⚠️ 「`pow(skyLight, γ)` 로 콘트라스트를 깊게」 는**리프트 후의 값에 gamma 를 걸고 있었기** 때문에  
 > 나무 밑 (0.97) 에는 통하지 않았다. 이 방법은 비추천.
@@ -1096,7 +1099,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 | 기능 | 기존 | 팩으로 가능? |
 |---|---|---|
-| 확산 (Lambert) | 방향광의 스칼라 총합뿐 | ◎ `sunDirection` 으로 직접 구현 (랩광원 등) |
+| 확산 (Lambert) | 방향광의 스칼라 총합뿐 | ◎ `bloxdSunDirection()` 으로 직접 구현 (랩광원 등) |
 | 스페큘러 (경면 반사) | 전무 | ◎ Blinn-Phong (R9.2) |
 | 프레넬 | 전무 | ◎ Schlick 근사 (R9.3) |
 | 난색 토치 / 냉색 하늘빛 분리 | 무색 | ◎ (R9.1) |
@@ -1106,7 +1109,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | 표면 디테일 | 텍스처 해상도뿐 | △ 해시 노이즈 절차적 마이크로범프 (R9.8) |
 | 정점파 (수면) | 전무 (평면) | ◎ allow 한정 (R7) |
 | 파법선 / 태양 글린트 | 전무 | ◎ (R9.7) |
-| 밤의 달빛 처리 | 하늘색이 어두워질 뿐 | △ 달의 방향은 `-sunDirection` 에 있다: 유사 표현 (R2 밤의 파란 환경광 / R9.11) + 방향성 달빛 (R-A, 낮밤 사이클 한정) |
+| 밤의 달빛 처리 | 하늘색이 어두워질 뿐 | △ 달의 방향은 `-bloxdSunDirection()` 에 있다: 유사 표현 (R2 밤의 파란 환경광 / R9.11) + 방향성 달빛 (R-A, 낮밤 사이클 한정) |
 | 그림자 (하늘 가림) | `mix(환경색, 하늘색, skyLight)` 로 살짝 섞을 뿐 | ◎ 리프트 역변환 + 임계값 커트 + 태양 게이트 (R9.12). 나무 그늘·처마 밑이 명확히 떨어지고 블록 편집에 실시간 추종 |
 
 ## 14. 리얼화의 구현 유파 — 2가지
@@ -1115,25 +1118,25 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 **유파 B: 완전 리라이팅 (s.colour 기점)** — `l.engineColour` 을 버리고 `s.colour` (알베도) 와 LightIn 생소재에서 조명을 다시 짠다. 리얼화의 본명. 지킬 4점:
 
-1. **포그를 다시 건다**: light 훅은 최종단 (포그 뒤) 에서 불리므로 `mix(l.fogColour, col, l.fogFactor)` 를 직접 적용한다 (R9.10). 짙을 때는 `max(l.fogFactor, 0.3)` 으로 하한을 깐다. 반대로 engineColour 기점 팩에 포그색을 더 섞으면 이중 포그로 원경이 하얗게 뜬다
+1. **포그를 다시 건다**: light 훅은 최종단 (포그 뒤) 에서 불리므로 `mix(l.fogColour, col, l.fogVisibility)` 를 직접 적용한다 (R9.10). 짙을 때는 `max(l.fogVisibility, 0.3)` 으로 하한을 깐다. 반대로 engineColour 기점 팩에 포그색을 더 섞으면 이중 포그로 원경이 하얗게 뜬다
 2. **조명off 베리언트 폴백**: `#ifdef BLOXD_LIGHTING` 밖에서는 `defaultLight` 로 그대로 통과시킨다
-3. **공용 함수째 가드한다**: `bloxd_LightIn` 을 인수로 취하는 공용 함수는 fn째 `#ifdef BLOXD_LIGHTING` 로 감싼다 (호출측만으로는 불충분)
-4. **태양 방향이 없을 때**: `sunDirection` 이 제로면 방향성 스페큘러는 계산하지 않는다. `l.directional` 은 광량의 스칼라지 방향 벡터가 아니므로 하이라이트 방향을 복원하는 용도로는 쓸 수 없다. 필요하면 방향성 없는 약한 환경광으로 전환한다. 단 달의 방향은 `-sunDirection` 으로 얻을 수 있다 (낮밤 사이클 월드에서만 움직인다. 제7부 R-A)
+3. **공용 함수째 가드한다**: `BloxdLightIn` 을 인수로 취하는 공용 함수는 fn째 `#ifdef BLOXD_LIGHTING` 로 감싼다 (호출측만으로는 불충분)
+4. **태양 방향이 없을 때**: `bloxdSunDirection()` 이 제로면 방향성 스페큘러는 계산하지 않는다. `l.directional` 은 광량의 스칼라지 방향 벡터가 아니므로 하이라이트 방향을 복원하는 용도로는 쓸 수 없다. 필요하면 방향성 없는 약한 환경광으로 전환한다. 단 달의 방향은 `-bloxdSunDirection()` 으로 얻을 수 있다 (낮밤 사이클 월드에서만 움직인다. 제7부 R-A)
 
 ## 15. 도달할 수 없는 표현 (리얼화의 「천장」)
 
 | 표현 | 이유 |
 |---|---|
-| 픽셀 정밀 섀도맵 (태양과 함께 도는 그림자·반음영) | 깊이 텍스처 참조 불가. 광선 가림 판정도 훅에 입력되지 않는다 |
-| SSAO | 씬 깊이에 접근 불가 (메셔 구운 정점 AO 뿐) |
-| SSR (반사) | 마찬가지. 프레넬로 하늘색을 얹는 유사뿐 |
+| 픽셀 정밀 섀도맵 (태양과 함께 도는 그림자·반음영) | 깊이 텍스처 참조 불가 (액체 한정의 `bloxdOpaqueBehind()` 는 기하 정보뿐이라 섀도맵에 쓸 수 없다). 광선 가림 판정도 훅에 입력되지 않는다 |
+| SSAO | 씬 깊이에 접근 불가 (메셔 구운 정점 AO 뿐. 액체 한정의 깊이는 SSAO에 쓸 수 없다) |
+| SSR (반사) | 씬색을 얻을 수 없다. 프레넬로 하늘색을 얹는 유사뿐 |
 | 블룸 / 글레어 | 포스트프로세스에 훅이 존재하지 않는다 |
 | 피사계 심도·색수차·그레인 | 풀스크린 후처리가 필요 |
 | 체적광 (god rays) | 마찬가지 |
 | PBR 텍스처 | 텍스처 참조 금지. 색의 휘도에서 유사 추정뿐 |
-| 수중 굴절 | 씬 깊이 입력이 없다 |
+| 수중 굴절 | 씬색을 얻을 수 없다. 액체 한정의 깊이 (`bloxdOpaqueBehind()`) 로 두께 흡수·바닥 투영이 가능 (제8부 R-E) |
 | 수중 베일 (파란 틴트) 제거·변경 | 베일은 「카메라가 들어간 액체 블록 정의 color/alpha」 에서 생성되는 emissive 풀스크린 quad 로, 훅 파이프라인 밖 (최전면) 에 그려지므로 팩에서는 색도 농도도 바꿀 수 없다 |
-| 수중 직접 검출 | 카메라가 수중인지 나타내는 입력이 없고, 수중에서도 fogStart / fogEnd / fogColour 는 변하지 않으므로 fogFactor 등에서 수중을 추정하는 믿을 만한 방법도 없다 |
+| 수중 직접 검출 | 카메라가 수중인지 나타내는 입력이 없고, 수중에서도 fogStart / fogEnd / fogColour 는 변하지 않으므로 fogVisibility 등에서 수중을 추정하는 믿을 만한 방법도 없다 |
 
 ### 그림자의 진실 — 「나무 그림자」 는 만들 수 있다
 
@@ -1159,7 +1162,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | ② 액체 정의색 베일 | 카메라가 들어간 액체 블록 정의 color/alpha 의 emissive 풀스크린 quad 로, 훅 파이프라인 밖 (최전면) 에 그려진다. 게임 설정 `cameraTint` 이 있으면 그쪽이 우선 | 불가 (색도 농도도 바꿀 수 없다) |
 | ③ cameraTint | 게임 설정 | 불가 |
 
-실무 포인트: 팩은 수중에서도 계속 동작한다 / 베일은 없앨 수 없다 / 수중에서는 분기할 수 없다 (fogStart / fogEnd / fogColour 는 수중에서도 변하지 않으므로 fogFactor 로도 검출할 수 없다).
+실무 포인트: 팩은 수중에서도 계속 동작한다 / 베일은 없앨 수 없다 / 수중에서는 분기할 수 없다 (fogStart / fogEnd / fogColour 는 수중에서도 변하지 않으므로 fogVisibility 로도 검출할 수 없다).
 
 ## 16. 디버깅 요령
 
@@ -1169,8 +1172,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 - 원경이 너무 흐리다 → 대기 계수를 낮춘다
 - 횃불 주위가 오렌지투성이 → 난색 블렌드 비율을 낮춘다 (생 날색광을 남긴다)
 - 블록이 거의 새하얘진다 → light 훅 출력 합계가 1.0 초과 (출력 뒤에 클램프는 없음). 마지막에 `clamp(col, vec3f(0.0), vec3f(1.0))` 를 넣는다
-- 가산이 없는데 하얗다 → fogFactor 나눗셈 un-fog 역산이 원인. un-fog 를 빼고, 다시 짤 거면 `s.colour` 기점으로 포그는 마지막에 한 번만 `mix`
-- 발광 블록이 빛나지 않는다 → 재구축 계열에서 emission 재가산 누락. `+ s.emission * l.fogFactor` 를 더한다
+- 가산이 없는데 하얗다 → fogVisibility 나눗셈 un-fog 역산이 원인. un-fog 를 빼고, 다시 짤 거면 `s.colour` 기점으로 포그는 마지막에 한 번만 `mix`
+- 발광 블록이 빛나지 않는다 → 재구축 계열에서 emission 재가산 누락. `+ s.emission * l.fogVisibility` 를 더한다
 - 밤인데 비춰진 면만 밝게 남는다 → 그림자만 어둡게 하지 말고 완성색 (`engineColour`) 전체에 야간 감쇠를 건다. 국소광을 남기려면 `blockLight` / `heldLight` 로 감쇠를 약하게 한다 (제6부 19절)
 - `pow(skyLight, γ)` 를 올려도 그림자가 짙어지지 않는다 → `l.skyLight` 는 리프트 후의 값 (10장). R9.12 의 역변환 + 임계값 커트로 전환한다
 - 그림자 면적·농도를 조정하고 싶다 → R9.12 의 조정 가이드 참조 (면적=임계값 `shTh` / 가장자리=`shSoft` / 그림자 심의 어둡기는 최저 환경광과 하늘 산란광의 2점 시프트)
@@ -1185,22 +1188,27 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 |---|---|
 | strict 게임에서 읽히지 않는다 | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
 | `.alpha` 가 미정의라고 나온다 | `#ifdef BLOXD_ALPHA` 로 감싼다 |
-| `blockLight` 가 미정의라고 나온다 | `#ifdef BLOXD_LIGHTING` 로 감싼다. 공용 헬퍼 함수는**함수째** 감싼다 |
-| `Packs can't construct bloxd_Surface directly` | `bloxd_defaultSurface(s)` 를 기점으로 고친다 |
-| `bloxd_Vertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `blockLight` 가 미정의라고 나온다 | `#ifdef BLOXD_LIGHTING` 로 감싼다. 공용 헬퍼 함수는**함수째** 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다. 판정용 가드는 남긴다) |
+| `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` 를 기점으로 고친다 |
+| `BloxdVertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` 로 감싼다 |
 | 원경이 하얗게 흐리다 | 이중 포그가 원인인 경우가 많다. 완성색은 포그 완료 상태이므로 독자 안개는 삼가고 채도만 떨어뜨리는 방식을 검토한다 |
 | 게임 참가시에 팩이 제외된다 | 게임 개시시의 실기 체크에서 실패하고 있다. 가드 누락을 다시 본다 |
-| `pack.json needs "apiVersion": 1.` | `apiVersion` 이 없다. 수치 `1` 을 추가한다 (문자열 `"1"` 은 불가) |
+| `pack.json needs "apiVersion": 2.` | `apiVersion` 이 없거나 `2` 가 아니다. 수치 `2` 를 넣는다 (문자열 `"2"` 는 불가). v1 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
 | `There's no pack.json at the top of the pack.` | ZIP 최상위에 `pack.json` 이 없다. 폴더째 굳히지 않았는지 확인한다 |
-| `bloxd_terrain_vertex must be declared as: fn ...` | 시그니처 불일치. 표시된 선언대로 다시 쓴다 |
-| `bloxd_terrain_vertex can't run in strict games...` | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
-| `bloxd_LightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` 로 감싼다 |
+| `bloxdTerrainVertex must be declared as: fn ...` | 시그니처 불일치. 표시된 선언대로 다시 쓴다 |
+| `bloxdTerrainVertex can't run in strict games...` | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `BloxdLightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` 로 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다) |
 | `pow(l.skyLight, γ)` 를 올려도 그림자가 짙어지지 않는다 | `l.skyLight` 는 리프트 곡선 통과 후의 값 (생값 0.87 이 0.97 로 도착한다). R9.12 의 리프트 역변환 + 임계값 커트로 전환한다 (10장) |
-| `... can only be a function's parameter or return type, ...` | 초기화 없는 `var x: bloxd_Surface;` 는 거부된다. `bloxd_default*` 에서 만든다 |
-| `bloxd_packInputs isn't part of the bloxd_ header` | PackInputs uniform 은 팩에서 참조할 수 없다. 훅 입력 필드 (`s.time`, `s.originOffset`, `s.sunDirection`) 경유로 쓴다 |
+| `... can only be a function's parameter or return type, ...` | 초기화 없는 `var x: BloxdSurface;` 는 거부된다. `bloxdDefault*` 에서 만든다 |
+| `bloxdPackInputs isn't part of the bloxd_ header` | PackInputs uniform 은 팩에서 직접 참조 불가. `bloxdTime()` 등의 헤더 함수 경유로 쓴다 |
 | `Packs can't declare bloxd_ names...` | 자신의 식별자에서 `bloxd_` 접두사를 뺀다. 정의할 수 있는 것은 6개 훅명뿐 |
 | `loadDuplicateManifest` (zip 읽기에서) | `pack.json` 이 2개 있다 (대소문자 차이 포함). 1개로 한다 |
-| `Packs can't construct bloxd_Surface directly, since header structs gain fields; ...` | `bloxd_defaultSurface(s)` 를 기점으로 고친다. light 훅 첫 파라미터 복사 (`var out = s;`) 에서 시작해도 된다 |
+| `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | `bloxdDefaultSurface(s)` 등을 기점으로 고친다. light 훅 첫 파라미터 복사 (`var out = s;`) 에서 시작해도 된다 |
+| `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` 는 불가. `_ = f();` 로 쓴다 |
+| `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | 지형 훅 안의 `bloxdOpaqueBehind()` 호출을 `#ifdef BLOXD_SCENE_DEPTH` 로 감싼다 |
+| `...only surface and light hooks can use.` | vertex 훅 안의 `bloxdOpaqueBehind()` 를 지운다 (surface / light만 가능) |
+| `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | 에러가 아니라 strict 게임에서의 자동 비활성화 (`shaderPack:offInStrict`). vertex 훅과 `discard` 는 `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `mixing '*' and '^' requires parenthesis (only in ...)` | 제2단계 (브라우저 Tint) 의 에러. `^` `&` `\|` `<<` `>>` 의 피연산자는 괄호로 묶는다 (§38) |
 
 ## 18. 권리·주의
 
@@ -1216,12 +1224,12 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 그림자만 어둡게 하면, 태양 없을 때 엔진 완성색 (`engineColour`) 이 밝은 채 남아, 면과 그림자의 차이가 부자연스러워질 수 있다. 그림자의 색조가 아니라 완성색 전체에 감쇠를 걸 필요가 있다.
 
-다음 예는 `sunDirection` 이 제로면 밤측, 방향이 있으면 낮측으로 보고, 어두운 시간은 지형의 완성색을 감쇠시킨다. 조명 대응 베리언트에서는 `blockLight` 와 `heldLight` 가 강한 장소일수록 감쇠를 약하게 해, 횃불 등의 근거리광을 가급적 남긴다. `0.52` 는 조정값으로, 더 어둡게 하고 싶으면 작게 한다.
+다음 예는 `bloxdSunDirection()` 이 제로면 밤측, 방향이 있으면 낮측으로 보고, 어두운 시간은 지형의 완성색을 감쇠시킨다. 조명 대응 베리언트에서는 `blockLight` 와 `heldLight` 가 강한 장소일수록 감쇠를 약하게 해, 횃불 등의 근거리광을 가급적 남긴다. `0.52` 는 조정값으로, 더 어둡게 하고 싶으면 작게 한다.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let nightDim = mix(0.52, 1.0, sunPresent);
     var scale = nightDim;
     #ifdef BLOXD_LIGHTING
@@ -1232,16 +1240,16 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     scale = mix(nightDim, 1.0, protectLocalLight);
     #endif
     // 완성색을 감쇠시키고, 소재의 emission 은 기존대로 포그를 통해 가산한다
-    out.colour = l.engineColour * scale + s.emission * l.fogFactor;
+    out.colour = l.engineColour * scale + s.emission * l.fogVisibility;
     return out;
 }
 ```
 
-**이 처리의 한계:** `sunDirection` 의 동작이 「태양 있음=단위 방향, 태양 없음=제로」 의 두 값이라면, 낮과 밤의 구별은 되어도 노을·박명을 연속적으로 추정할 수 없다. 또 완성색을 감쇠시키므로, 엔진측의 주광·환경광을 함께 약하게 하는 방식이며, 시간대를 완전히 재현하는 것은 아니다. 액체에도 같은 처리를 적용하고 싶으면 액체 훅의 폴백 관계를 확인할 것.
+**이 처리의 한계:** `bloxdSunDirection()` 의 동작이 「태양 있음=단위 방향, 태양 없음=제로」 의 두 값이라면, 낮과 밤의 구별은 되어도 노을·박명을 연속적으로 추정할 수 없다. 또 완성색을 감쇠시키므로, 엔진측의 주광·환경광을 함께 약하게 하는 방식이며, 시간대를 완전히 재현하는 것은 아니다. 액체에도 같은 처리를 적용하고 싶으면 액체 훅의 폴백 관계를 확인할 것.
 
 ## 20. 물을 자연스럽게 보이게 하는 통합 레시피
 
-이 API에서는 씬색·깊이·수중 바닥의 깊이를 샘플링할 수 없으므로, **진짜 반사·굴절·수심 계산이 아니라, 프레넬풍의 색 블렌드와 태양 하이라이트에 의한 유사 표현**이 된다. 아래는 색의 베이스를 남기면서, 얕은 시선 각도로 하늘색에 가까운 색을 조금 섞고, 태양이 있을 때만 작은 글린트를 더하는 샘플.
+이 API에서는 씬색을 샘플링할 수 없으므로, **진짜 반사·굴절이 아니라, 프레넬풍의 색 블렌드와 태양 하이라이트에 의한 유사 표현**이 된다 (수심 계산은 v2의 `bloxdOpaqueBehind()` 로 가능해져, 제8부 R-E에 분리했다). 아래는 색의 베이스를 남기면서, 얕은 시선 각도로 하늘색에 가까운 색을 조금 섞고, 태양이 있을 때만 작은 글린트를 더하는 샘플.
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -1253,22 +1261,22 @@ fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
 
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     let baseN = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let facing = clamp(dot(baseN, viewDir), 0.0, 1.0);
     let fresnel = 0.02 + 0.98 * pow(1.0 - facing, 5.0);
     let fakeSkyReflection = vec3f(0.16, 0.29, 0.36);
     out.colour *= vec3f(0.88, 0.97, 1.04);
     out.colour = mix(out.colour, fakeSkyReflection, fresnel * 0.38);
     #ifdef BLOXD_LIGHTING
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+    let worldPos = bloxdWorldPosition(l.position);
     let topness = clamp(baseN.y * 2.0, 0.0, 1.0);
-    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, l.time), topness));
-    let sunLen = length(l.sunDirection);
+    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, bloxdTime()), topness));
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let halfDir = normalize(viewDir + sunDir);
         let glint = pow(max(dot(waveN, halfDir), 0.0), 180.0) * 0.55 * clamp(l.skyLight, 0.0, 1.0);
         out.colour += vec3f(1.0, 0.97, 0.90) * glint;
@@ -1283,9 +1291,9 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 - 물이 하얗다 / 밝다: `fresnel * 0.38` 의 `0.38` 과 글린트의 `0.55` 를 낮춘다.
 - 물이 진하다: `fakeSkyReflection` 의 혼합률을 조금 올린다. 단 올리면 플라스틱처럼 보인다.
 - 수면에 선도 규칙적인 줄무늬가 보인다: 파의 주파수나 글린트 강도를 낮춘다. 수면 메시 자체의 정점 변위는 이 코드에는 없다.
-- 실제 경치를 비추고 싶다: 이 API 입력에는 화면색이나 씬 깊이가 없으므로, 색을 섞을 뿐 실반사가 안 된다.
+- 실제 경치를 비추고 싶다: 이 API 입력에는 화면색이 없으므로, 색을 섞을 뿐 실반사가 안 된다 (깊이는 액체 한정으로 얻을 수 있다. 제8부 R-E).
 
-이 레시피는 기존의 `bloxd_liquid_light` 를**바꾼다**는 것. R9.7 의 동명 파법선 함수나 다른 동명 훅과 중복해 붙이지 않는다.
+이 레시피는 기존의 `bloxdLiquidLight` 를**바꾼다**는 것. R9.7 의 동명 파법선 함수나 다른 동명 훅과 중복해 붙이지 않는다.
 
 ## 21. 실기 테스트 체크리스트
 
@@ -1302,10 +1310,10 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### 알려진 제약을 전제로 한다
 
 - shader pack 은 terrain / liquid 훅에 한정되며, 하늘·엔티티·UI를 같은 코드로 처리하는 구조가 아니다.
-- 섀도맵, 화면 공간 반사, 씬 깊이, 굴절, 블룸 등을 추가하기 위한 입력은 이 API에 없다.
-- `time` 은 애니메이션용 시간으로, 게임 안의 낮밤과 연동된다는 보장은 없다.
-- `sunDirection` 이 제로면 진짜 달의 방향은 알 수 없으며, 파란 환경광을 더하는 처리는 분위기를 만드는 근사. 방향성 달빛은 `-sunDirection` 으로 만든다 (낮밤 사이클 월드 한정. 제7부 R-A).
-- `s.position` / `l.position` 은 로컬 좌표이므로, 월드 위치에 의존하는 효과에서는 `originOffset` 을 더한다. 블록 안 로컬 무늬를 만들 경우는, 의도적으로 로컬 좌표를 쓸 수도 있다.
+- 섀도맵, 화면 공간 반사, 굴절, 블룸 등을 추가하기 위한 입력은 이 API에 없다 (씬 깊이는 액체 한정으로 `bloxdOpaqueBehind()` 로 풀렸다. 제8부 참조).
+- `bloxdTime()` 은 애니메이션용 시간으로, 게임 안의 낮밤과 연동된다는 보장은 없다.
+- `bloxdSunDirection()` 이 제로면 진짜 달의 방향은 알 수 없으며, 파란 환경광을 더하는 처리는 분위기를 만드는 근사. 방향성 달빛은 `-bloxdSunDirection()` 으로 만든다 (낮밤 사이클 월드 한정. 제7부 R-A).
+- `s.position` / `l.position` 은 로컬 좌표이므로, 월드 위치에 의존하는 효과에서는 `bloxdOriginOffset()` 을 더한다. 블록 안 로컬 무늬를 만들 경우는, 의도적으로 로컬 좌표를 쓸 수도 있다.
 
 ## 22. 셰이더 단독으로 한계가 있을 경우의 조합
 
@@ -1323,7 +1331,7 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | ② 액체 정의색 베일 | 카메라가 들어간 액체 블록 정의 color/alpha 의 emissive 풀스크린 quad 로, 훅 파이프라인 밖 (최전면) 에 그려진다. 게임 설정 `cameraTint` 이 있으면 그쪽이 우선 | 불가 (색도 농도도 바꿀 수 없다) |
 | ③ cameraTint | 게임 설정 | 불가 |
 
-실무 포인트: 팩은 수중에서도 계속 동작한다 / 베일은 없앨 수 없다 / 수중에서는 분기할 수 없다 (fogStart / fogEnd / fogColour 는 수중에서도 변하지 않으므로 fogFactor 로도 검출할 수 없다).
+실무 포인트: 팩은 수중에서도 계속 동작한다 / 베일은 없앨 수 없다 / 수중에서는 분기할 수 없다 (fogStart / fogEnd / fogColour 는 수중에서도 변하지 않으므로 fogVisibility 로도 검출할 수 없다).
 
 ---
 
@@ -1333,36 +1341,36 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 24. 태양과 달의 정체
 
-`l.sunDirection` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
+`bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
 
-| 스카이박스 | `l.sunDirection` |
+| 스카이박스 | `bloxdSunDirection()` |
 |---|---|
 | `default` (절차 하늘) | 0이 아님 (기존값 아래) |
 | `gloomy` / `interstellar` / `space_*` (큐브 텍스처) | **항상 (0,0,0)** |
 
-**달은 항상 `-sunDirection` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 밤낮 판정은 태양 고도로 한다 — `sunDirection.y < 0` (태양이 지평선 밑) 일 때 달이 위에 있다. 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다.
+**달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 밤낮 판정은 태양 고도로 한다 — `bloxdSunDirection().y < 0` (태양이 지평선 밑) 일 때 달이 위에 있다. 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다.
 
 기존 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 에서 계산되는 단위 벡터, 정지). 배포 팩 테스트 때 하이라이트 방향을 미리 예측할 수 있는 실용 기준값이다.
 
-낮밤 사이클은 엔진에 내장되어 있지 않다 — inclination 은 정적인 수치이며, 낮밤이 움직이는 월드는 게임측이 갱신한다. 그 갱신 때마다 `sunDirection` 도 다시 쓰이므로 따라간다.
+낮밤 사이클은 엔진에 내장되어 있지 않다 — inclination 은 정적인 수치이며, 낮밤이 움직이는 월드는 게임측이 갱신한다. 그 갱신 때마다 `bloxdSunDirection()` 도 다시 쓰이므로 따라간다.
 
-지형의 방향광은 씬 기동시에 만들어지는 2등뿐이며 **방향도 강도도 고정, 낮밤에 변하지 않는다**. 정리하면 **지형 밝기를 정하는 요소는 어느 것도 시간에 의존하지 않는다. 낮밤의 「겉모습」 은 스카이박스와 sunDirection 뿐**이며, 밤에 지형을 어둡게 하고 싶은 팩은 sunDirection 에서 직접 시간대를 추정할 수밖에 없다 (§19 의 `sunPresent` 수법).
+지형의 방향광은 씬 기동시에 만들어지는 2등뿐이며 **방향도 강도도 고정, 낮밤에 변하지 않는다**. 정리하면 **지형 밝기를 정하는 요소는 어느 것도 시간에 의존하지 않는다. 낮밤의 「겉모습」 은 스카이박스와 bloxdSunDirection() 뿐**이며, 밤에 지형을 어둡게 하고 싶은 팩은 bloxdSunDirection() 에서 직접 시간대를 추정할 수밖에 없다 (§19 의 `sunPresent` 수법).
 
-### R-A. 방향성 달빛 — moonDir = −l.sunDirection
+### R-A. 방향성 달빛 — moonDir = −bloxdSunDirection()
 
 달이 위에 있을 때만 푸르스름한 흰 Lambert 와 약한 스페큘러를 더한다. `moonUp` 이 0인 세계 (기존 정지 태양 월드) 에서는 아무 일도 일어나지 않으므로, **낮밤 사이클 있는 월드에서만 발동하는 안전한 달빛**이 된다.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // 달은 항상 태양의 정반대. 낮 동안은 moonDir.y < 0 으로 자동 소등된다
-    let moonDir = -l.sunDirection;
+    let moonDir = -bloxdSunDirection();
     let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
     if (moonUp > 0.0) {
         let n     = normalize(l.normal);
         let diff  = max(0.0, dot(n, moonDir));
-        let view  = normalize(l.eyePosition - l.position);
+        let view  = normalize(bloxdEyePosition() - l.position);
         let halfV = normalize(moonDir + view);
         let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
         out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
@@ -1374,21 +1382,21 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 25. 포그의 내부 사양
 
-포그 계산은 항상 LINEAR 모드 (`fogFactor = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정. D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogFactor` 는 「거리 안개」 라기보다 **「읽힌 월드의 가장자리까지 정규화 거리」** 지표이다. 플레이어마다 읽기 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, l.eyePosition)` 을 계산해야 한다 (레시피 R-B).
+포그 계산은 항상 LINEAR 모드 (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정. D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogVisibility` 는 「거리 안개」 라기보다 **「읽힌 월드의 가장자리까지 정규화 거리」** 지표이다. 플레이어마다 읽기 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (레시피 R-B).
 
-기존 포그색은 `rgb(183, 191, 195)` (엷은 청회색). 월드 작성자는 `fogColourOverride` (hex) 로 바꾼다. 포그 모드 0 (NONE) 일 때 **fogColour 는 검정으로 도착한다**. 표준형 `mix(l.fogColour, col, l.fogFactor)` 는 fogFactor 가 1 일 때 안개색을 쓰지 않으므로 안전.
+기존 포그색은 `rgb(183, 191, 195)` (엷은 청회색). 월드 작성자는 `fogColourOverride` (hex) 로 바꾼다. 포그 모드 0 (NONE) 일 때 **fogColour 는 검정으로 도착한다**. 표준형 `mix(l.fogColour, col, l.fogVisibility)` 는 fogVisibility 가 1 일 때 안개색을 쓰지 않으므로 안전.
 
-플레이어측 `showFog` 를 끄면 포그는 3200~3328 블록으로 밀려나 사실상 무효가 된다 (`fogFactor ≈ 1` 이 계속 돌아온다).
+플레이어측 `showFog` 를 끄면 포그는 3200~3328 블록으로 밀려나 사실상 무효가 된다 (`fogVisibility ≈ 1` 이 계속 돌아온다).
 
-### R-B. 읽기 경계 밴드 — fogFactor 를 「월드 가장자리」 로 쓴다
+### R-B. 읽기 경계 밴드 — fogVisibility 를 「월드 가장자리」 로 쓴다
 
 읽기 경계의 32 블록대만 조용히 냉색으로 조여서, 월드 끝을 눈에 띄지 않게 한다 (또는 연출로 강조한다). 거리를 직접 계산하지 않으므로, 플레이어의 읽기 거리 설정에 자동 추종하는 것이 이점.
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    // fogFactor: 1 = 안쪽 (경계까지 여유 있음), 0 = 경계 밖으로 나갈 직전
-    let edge = 1.0 - l.fogFactor;
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    // fogVisibility: 1 = 안쪽 (경계까지 여유 있음), 0 = 경계 밖으로 나갈 직전
+    let edge = 1.0 - l.fogVisibility;
     let band = smoothstep(0.0, 1.0, edge);
     out.colour = mix(out.colour, out.colour * vec3f(0.82, 0.86, 0.95), band * 0.5);
     return out;
@@ -1407,7 +1415,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 - **surface 훅은 alphaTest 의 「앞」 에서 돈다**: `out.alpha` 가 그대로 discard 판정에 쓰인다. 컷아웃 소재 (풀·잎) 에서는 디더 패턴으로 녹는 듯한 이펙트를 만들 수 있다 (레시피 R-C). 액체 (블렌딩) 에서는 `out.alpha` 가 실제 투명도가 된다 (레시피 R-D). 통상 불투명 지형에서는 alpha 가 끝내 무시된다
 - **`l.ambient` 의 내용**은 `material.ambient × sceneAmbient` 로 소재마다 다른 값이다. 씬측은 그래픽 설정 「Ambient Lighting Intensity」 (기존 0.5) 에 직결되어 있으므로, 기존값 때려박기를 하지 않는다
-- **`time` 의 정체는 `performance.now()`**: 브라우저 기동 경과 시간을 1시간으로 감은 값이다. 게임 안 낮밤이나 월드 경과 시간과 무관하다. 게임 안 시계와 동기된 애니메이션을 만들고 싶으면, 낮밤 사이클 구현 월드의 `sunDirection` 방위각에서 추정하는 것이 현실적이다
+- **`bloxdTime()` 의 정체는 `performance.now()`**: 브라우저 기동 경과 시간을 1시간으로 감은 값이다. 게임 안 낮밤이나 월드 경과 시간과 무관하다. 게임 안 시계와 동기된 애니메이션을 만들고 싶으면, 낮밤 사이클 구현 월드의 `bloxdSunDirection()` 방위각에서 추정하는 것이 현실적이다
 - 로딩 때 청크 경계의 미세 체크무늬는 엔진의 화면 공간 Bayer 4×4 디더 청크 페이드이며, 팩 유래 버그가 아니다
 - **`mod` 는 예약어**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` 로 거부된다. 나머지는 `%` 연산자로 쓴다
 
@@ -1442,11 +1450,11 @@ fn sp_bayer4(pos: vec2f) -> f32 {
     }
 }
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
     // 낮은 블록부터 녹는다. dissolve 가 높을수록 남는다
-    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(s.originOffset).y);
+    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(bloxdOriginOffset()).y);
     let thresh   = sp_bayer4(s.position.xz);
     out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
     #endif
@@ -1459,10 +1467,10 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 액체 훅의 `out.alpha` 는 블렌딩에 직결된다. 카메라 바로 아래 수면만 비워서, 잠수·수상 카메라의 시야를 확보하는 레시피.
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
-    let d = distance(s.position, s.eyePosition);
+    let d = distance(s.position, bloxdEyePosition());
     out.alpha *= smoothstep(0.0, 3.0, d);   // 0~3 블록에서 완전 투명→통상
     #endif
     return out;
@@ -1473,11 +1481,11 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
 
-1. **통상 월드** (default 스카이박스·오버라이드 없음) — sunDirection 있음·기존색
-2. **space 계열 스카이박스 월드** — sunDirection = 0. `sunPresent` 분기의 겉모습
+1. **통상 월드** (default 스카이박스·오버라이드 없음) — bloxdSunDirection() 있음·기존색
+2. **space 계열 스카이박스 월드** — bloxdSunDirection() = 0. `sunPresent` 분기의 겉모습
 3. **`visionMinLightColour`·`skyLightColourOverride` 를 정한 커스텀 월드** — 어두운 곳과 색이 들려 있는 경우
 
-주된 변동원: `lightingOverride` (조명 강제) / `skyLightColourOverride`·`ambientLightColourOverride` (hex 교체) / `visionMinLightColour` (하늘과 앰비언트에 대한 「볼 수 있는 가장 어두운 색」 하한. Night Vision 이 쓴다 — 「동굴을 깜깜하게」 계열 팩은예상보다 어두워지지 않는다) / `heldLightColourOverride`·`Range`·`ConeAngle` / `fogChunkDistanceOverride`·`fogColourOverride`·`fogOnSkybox` / `skyBox` (sunDirection 유무). `uSkyLightColour` 기존 = (1,1,1) 흰색, `uAmbientLightColour` 기존 = (0.25,0.25,0.30). `l.ambient` 씬측 = 그래픽 설정 「Ambient Lighting Intensity」 (기존 0.5). `l.fogFactor` 는 플레이어 포그/청크 거리 설정을 따라간다.
+주된 변동원: `lightingOverride` (조명 강제) / `skyLightColourOverride`·`ambientLightColourOverride` (hex 교체) / `visionMinLightColour` (하늘과 앰비언트에 대한 「볼 수 있는 가장 어두운 색」 하한. Night Vision 이 쓴다 — 「동굴을 깜깜하게」 계열 팩은예상보다 어두워지지 않는다) / `heldLightColourOverride`·`Range`·`ConeAngle` / `fogChunkDistanceOverride`·`fogColourOverride`·`fogOnSkybox` / `skyBox` (bloxdSunDirection() 유무). `uSkyLightColour` 기존 = (1,1,1) 흰색, `uAmbientLightColour` 기존 = (0.25,0.25,0.30). `l.ambient` 씬측 = 그래픽 설정 「Ambient Lighting Intensity」 (기존 0.5). `l.fogVisibility` 는 플레이어 포그/청크 거리 설정을 따라간다.
 
 ## 29. 디버깅 수단
 
@@ -1487,7 +1495,158 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 - WebGPU 렌더러는 팩 적용 중 「강제 ON」 으로 잠긴다. 「Disable Block Texture Atlas」 설정도 잠기며 (아틀라스 ON 유지), WebGPU 미대응 환경에서는 애초 팩이 적용되지 않는다. 배포 페이지에 「WebGPU 대응 브라우저가 필요」 라고 쓰는 근거는 여기이다
 - 게임 참가 때마다 런타임 재검증 (`checkCompilation`) 이 돌아, 실재하는 전 지형 소재를 브라우저 WebGPU 로 실컴파일한다 (설정 화면의 정적 검증보다 엄격). 여기서 떨어지면 팩은 그 게임에서 제외된다
 
-## 30. 독립적인 유사 자료에 대하여
+# 제8부: API Version 2 마이그레이션 가이드
+
+대상 빌드: `6qxffk.main.5912a15f.js` (2026-10-16 시점의 정식 배포). 이 책의 제1부~제7부는 v2 기준으로 다시 쓴 상태이며, 이 제8부는 v1에서의 이전 포인트와 v2의 새로운 기능을 모은 것이다. 새 기능의 코드 예제는 v2 컴파일러에 의한 8/8 베리언트 검증과 브라우저 WGSL 컴파일러 (Tint) 검증 (§38)을 통과한 것이며, 기존 레시피의 v2 변환은 기계적인 식별자 교체이므로, 배포 전에는 반드시 실기 컴파일로 확인할 것.
+
+## 31. v1 팩의 운명 (먼저 결론)
+
+게임은 manifest의 `apiVersion` 이 **2와 엄밀히 일치할 것**을 요구한다. v1 팩을 읽히면 `This pack is for shader pack API version 1. Bloxd supports version 2.` (i18n 키 `shaderPack:loadWrongApiVersion`) 로 거부된다. v1/v2 **병행 지원은 존재하지 않는다**. 또 엔진은 저장된 팩의 `validation.headerVersion` (헤더 전체의 해시) 을 재검사하므로, 엔진 업데이트 때 저장 팩이 자동으로 「재확인 필요」 가 되는 구조는 v1과 같다.
+
+## 32. 식별자의 전면 개명 (대응표)
+
+v2에서는 언더스코어 명명에서 캐멜케이스로 통일됐다. **구명은 일절 쓸 수 없다.**
+
+| v1 | v2 |
+|---|---|
+| `bloxd_terrain_vertex` | `bloxdTerrainVertex` |
+| `bloxd_terrain_surface` | `bloxdTerrainSurface` |
+| `bloxd_terrain_light` | `bloxdTerrainLight` |
+| `bloxd_liquid_vertex` | `bloxdLiquidVertex` |
+| `bloxd_liquid_surface` | `bloxdLiquidSurface` |
+| `bloxd_liquid_light` | `bloxdLiquidLight` |
+| `bloxd_defaultVertex` | `bloxdDefaultVertex` |
+| `bloxd_defaultSurface` | `bloxdDefaultSurface` |
+| `bloxd_defaultLight` | `bloxdDefaultLight` |
+| `bloxd_VertexIn` | `BloxdVertexIn` |
+| `bloxd_Vertex` | `BloxdVertex` |
+| `bloxd_SurfaceIn` | `BloxdSurfaceIn` |
+| `bloxd_Surface` | `BloxdSurface` |
+| `bloxd_LightIn` | `BloxdLightIn` |
+| `bloxd_Light` | `BloxdLight` |
+| `bloxd_packInputs` (내부 uniform) | `bloxdPackInputs` (`@group(3) @binding(0)`, 64B) |
+
+훅의 종류 (vertex / surface / light · terrain / liquid 6종) 와 `pack.json` 형식 (`apiVersion` / `name` / `author`) 에는 변경이 없다. 로더 제한도 불변 (zip 32MB / 엔트리 1024 / `.wgsl` 256개 / 합계 256KB / manifest 64KB).
+
+## 33. 삭제 필드의 이식처
+
+v1에서는 `time` / `eyePosition` / `sunDirection` / `originOffset` 이 구조체의 필드였다. v2에서는 **이들 필드는 삭제되고, 대신 엔진 uniform (`bloxdPackInputs`) 을 읽는 헤더 함수**를 쓴다. 함수는 uniform을 직접 읽으므로, **훅 밖의 모듈스코프 함수나 vertex 훅에서도 호출할 수 있다**.
+
+| v1 | v2 |
+|---|---|
+| `s.time` / `v.time` / `l.time` | `bloxdTime()` |
+| `s.sunDirection` / `l.sunDirection` | `bloxdSunDirection()` |
+| `s.eyePosition` / `l.eyePosition` | `bloxdEyePosition()` |
+| `s.originOffset` / `l.originOffset` | `bloxdOriginOffset()` |
+| `s.position + vec3f(...)` 에 의한 월드 좌표화 | `bloxdWorldPosition(s.position)` |
+| `vec3i(floor(pos - normal*0.5)) + originOffset` | `bloxdFaceBlock(pos, normal)` |
+
+## 34. 새 기능 ①: `blockId` (블록 고유 셰이딩)
+
+`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` 3개 구조체 모두에 `blockId: u32` 가 추가됐다. **면이 속한 블록의 ID** (0~65535) 로, 같은 면 안에서는 일정 (`@interpolate(flat)` 으로 전달). 텍스처 색에 의존하지 않는 블록 종류 식별에 쓴다. 단 ID와 블록 종류의 대응표는 엔진 내부에 있어 팩에서는 참조할 수 없으므로, **어느 ID가 무슨 블록인지는 월드 안에서 실측**할 수밖에 없다.
+
+### R-F. blockId에 의한 블록 종류 틴트
+
+```wgsl
+fn blockTint(blockId: u32) -> vec3f {
+    // 예: 돌 계열 (id 상위 비트 패턴) 을 한색으로 기울이기
+    let stripe = f32((blockId >> 4u) & 1u);
+    return mix(vec3f(1.0), vec3f(0.85, 0.95, 1.0), stripe * 0.5);
+}
+
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    result.colour *= blockTint(surface.blockId);
+    return result;
+}
+```
+
+## 35. 새 기능 ②: `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` (본명)
+
+v1에서 구조적으로 불가능했던 깊이 액세스가 **액체 (liquid) 프로그램에 한해** 풀렸다. 색은 얻을 수 없지만, **안쪽 불투명면까지의 거리와 위치라는 기하 정보를 얻을 수 있다**. 전형적인 용법은 물의 두께를 잰 흡수색 계산이다.
+
+사용 규칙:
+
+| 용법 | 결과 |
+|---|---|
+| `bloxdLiquidSurface` / `bloxdLiquidLight` 안에서 가드 없이 호출 | OK (액체 베리언트에서는 항상 정의) |
+| `bloxdTerrainSurface` 안에서 가드 없이 호출 | ERROR. `#ifdef BLOXD_SCENE_DEPTH` 로 감싼다 |
+| vertex 훅 안에서 호출 | ERROR (surface / light 훅 한정) |
+
+지형 훅에서도 깊이를 쓰고 싶으면 `#ifdef BLOXD_SCENE_DEPTH` 로 감싼다 (지형 훅은 액체 프로그램에도 함께 쓰이므로, 액체 측에서만 깊이가 유효해진다).
+
+### R-E. 물의 두께 흡수 (Beer-Lambert)
+
+```wgsl
+fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    let behind = bloxdOpaqueBehind();
+    if (behind.found) {
+        // 물기둥의 길이 = 현재 위치에서 안쪽 불투명면까지
+        let thickness = distance(behind.position, surface.position);
+        // Beer-Lambert 흡수: 빨강은 빨리 떨어지고, 파랑은 멀리까지 닿는다
+        let absorb = exp(-thickness * vec3f(0.35, 0.14, 0.08));
+        result.colour *= absorb;
+    } else {
+        // 안쪽이 하늘 = 깊은 물색으로 기울이기
+        result.colour = mix(result.colour, vec3f(0.05, 0.15, 0.30), 0.4);
+    }
+    return result;
+}
+```
+
+응용: 두께 기반 흡수·산란, `behind.position` 에서의 바닥 월드 좌표에 의한 물결·코스틱풍 무늬 투영, `found=false` 에서의 하늘과 가림 구별에 의한 수면의 하늘 반사, 깊이에 의한 거품과 탁함의 단계 부여. 참고로 깊이 복사 파이프라인 구축에 실패한 경우는 「안쪽에 아무것도 없음」 으로 안전하게 열화된다.
+
+## 36. 그 밖의 v2 변경점
+
+- **훅의 폴백**: 액체 프로그램은 `bloxdLiquidXxx` 가 미정의일 때 지형 훅으로 폴백한다. **지형 훅뿐인 팩은 수면에도 그대로 통한다**. 의도하지 않으면 liquid 측 훅을 명시 정의한다.
+- **`BLOXD_LIGHTING` 의 필드 가드는 불필요하게**: 전 베리언트에 `blockLight` 등이 존재하며, 조명off에서는 기본값 (0 / 1 / 흰색 / 0) 이 들어간다. 조명 판정을 하고 싶을 때만 `#ifdef BLOXD_LIGHTING` 을 쓴다. 기존 가드를 남겨도 동작은 바뀌지 않는다.
+- **`BLOXD_ALPHA` 의 정의 조건이 변화**: 비 strict 지형 베리언트와 전 액체 베리언트에서 정의되며, strict · terrain에서는 정의되지 않는다. 지형 훅에서 alpha를 쓸 경우는 가드를 남길 것.
+- **구조체의 직접 구축은 금지**: `BloxdLight(...)` 등의 생성자 호출은 정적 검증에서 거부된다. 반드시 `bloxdDefault*` 에서 변경하거나, 입력의 복사를 쓴다.
+- **`let _ =` 는 `_ =` 로**: WGSL의 파기 대입 `_ = f();` 는 유효하지만 `let _ = f();` 는 거부된다.
+- **offInStrict**: vertex 훅의 정의, 또는 surface / light 훅에서 도달 가능한 `discard` 가 있으면, 에러가 아니라 팩 전체가 strict 게임에서 자동 비활성화된다 (설정 UI에 `shaderPack:offInStrict` 표시, allow 게임에서는 동작). vertex 훅과 `discard` 는 `#ifndef BLOXD_STRICT` 로 감싼다.
+- **포그의 확장**: 포그 계산에 LINEAR / EXP / EXP2 3가지 모드가 구현됐지만, 게임 측 설정은 종래대로 항상 LINEAR이므로, 기존 포그 사양은 그대로 쓸 수 있다. `fogColour` 의 의미도 공식적으로 명문화됐다 (완전히 포그 없는 씬에서만 흑).
+- **바뀌지 않은 것**: 리프트 곡선·35% 채널 바닥·heldLight 감쇠 (`pow(lightDist, 0.75)`) 와 환경광 부스트·태양과 달의 방향 사양·기존 포그색·time 감김 (3600초)·방향광 (최대 4개)·Lite (WebGPU) 전용·저장 구조 (IndexedDB)·`mod` 예약어.
+
+## 37. v1 → v2 이전 체크리스트
+
+1. **pack.json**: `"apiVersion": 1` → `"apiVersion": 2`
+2. **식별자**: §32 대응표로 전부 교체 (훅명·구조체명·default 함수명)
+3. **삭제 필드의 이식**: §33 표에 따라 헤더 함수로 (`s.time` → `bloxdTime()` 등)
+4. **`fogFactor` → `fogVisibility`** 로 개명
+5. **구조체 직접 구축을 제거**
+6. **`let _ =` 을 `_ =` 로** 수정
+7. **vertex 훅과 discard는 `#ifndef BLOXD_STRICT` 로 감싼다**
+8. **수면도 지형 훅의 효과를 받음**을 확인하고, 의도하지 않으면 liquid 훅을 명시 정의
+9. (임의) `litColour` 를 기점으로 포그를 직접 관리 / `bloxdOpaqueBehind()` 로 물의 두께 흡수를 추가 / `blockId` 로 블록 고유 표현
+10. **제2단계 (브라우저 Tint) 도 검증한다** — 특히 `^` `&` `|` `<<` `>>` 를 포함한 식의 괄호. 정적 검증을 통과해도 브라우저에서 거부되는 코드가 존재한다 (§38)
+
+## 38. 제2검증단계 — 브라우저의 WGSL 컴파일러는 내장 파서보다 엄격하다
+
+게임의 팩 검증은 **2단계**가 있다. 제1단계는 정적 검증 (엔진 내장 JS 파서. 훅 서명·금지 구문·sceneDepth 이용 등 팩 고유 규칙을 검사) 이며, 제2단계는 브라우저 검증 (컴파일 결과에 동봉되는 스텁을 진짜 WebGPU 구현으로 컴파일하고, 에러를 팩의 원본 파일 행으로 역매핑해 표시한다. UI의 「Saved, but it won't run until you fix these errors」가 이 단계) 이다. 에러 표시 말미의 `(only in terrain)` 등의 접미사는 「그 에러가 난 베리언트의 program 종」이다.
+
+내장 파서는 WGSL의 연산자 결합 (Binding) 규칙을 구현하지 않아, **정적 검증을 통과해도 브라우저에서 거부된다**. 피해가 나기 쉬운 것은 정수 해시의 정석 패턴이다:
+
+| 연산자 | 결과 |
+|---|---|
+| `<<` `>>` | 단항 레벨까지만 직접 결합할 수 없다. `a + b << c` 는 에러 |
+| `&` `^` `\|` | 단항 레벨까지만 직접 결합할 수 없다. `a * b ^ c` 는 에러 |
+| `&&` `\|\|` | 혼합 불가. `a && b \|\| c` 는 에러 |
+
+### 괄호 다는 법 (NG / OK)
+
+```wgsl
+// NG — 정적 검증은 통과하지만 브라우저 (Tint) 가 거부:
+//     mixing '*' and '^' requires parenthesis
+let h = a * 73856093u ^ b * 19349663u ^ c * 83492791u;
+
+// OK — 각 곱셈을 묶는다 (같은 연산자의 연속 A ^ B ^ C 자체는 좌결합으로 합법)
+let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
+```
+
+이 책의 게재 코드는 이 패턴을 포함하지 않는다 (`pack_hash3` 의 `+`/`*` 혼재와 `h ^ (h >> 16u)` 는 괄호 처리되어 있어 사양 적합). 팩을 쓰면 제1단계와 제2단계를 둘 다 통과시킬 것.
+
+## 39. 독립적인 유사 자료에 대하여
 
 내용이 거의 같은 커뮤니티 자료가 존재한다: [GlitchHunterCoder/Bloxd-Essay 의 Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). 이 가이드보다 먼저 공개되었지만, **이 가이드 내용은 glm 이 Bloxd 의 실제 번들 파일 (webpack 청크 묶음) 을 독자 해석한 것으로 — 베끼기가 아니다**. 둘이 일치하는 것은, 같은 구현을 독자 조사하면 같은 결론에 이르기 때문이다.
 

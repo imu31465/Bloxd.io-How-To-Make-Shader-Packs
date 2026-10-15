@@ -1,7 +1,7 @@
 # Bloxd.io शेडर पैक बनाना (पूर्ण गाइड)
 
 Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बनाने और वितरित करने की स्व-पर्याप्त गाइड।
-`apiVersion: 1` के विनिर्देश पर आधारित। रेसिपी संग्रह और API संदर्भ सहित: इस एक फ़ाइल से शून्य से वितरण तक जा सकते हैं।
+`apiVersion: 2` के विनिर्देश पर आधारित। रेसिपी संग्रह और API संदर्भ सहित: इस एक फ़ाइल से शून्य से वितरण तक जा सकते हैं। v1 पैक वर्तमान खेल में लोड नहीं हो सकते (v1 `apiVersion` मान व पुराने पहचानकर्ता अस्वीकृत)। v1 से प्रवासन हेतु भाग VIII देखें।
 
 > यह अनौपचारिक गाइड है और डेवलपर्स के आधिकारिक मत का प्रतिनिधित्व नहीं करती। API बिना सूचना बदला जा सकता है।  
 > अंतिम समीक्षा: 2026-10-15 (फ़ॉग प्रयोग क्रम, वास्तविक फ़ॉग सेटिंग व जलांत रेंडर रचना रेंडरर कार्यान्वयन से मिलान कर अद्यतित)। चूंकि कोई सार्वजनिक आधिकारिक WGSL API संदर्भ नहीं मिला, API विवरण और रेसिपी लोडिंग स्क्रीन व इन-गेम कंपाइल से सत्यापित करते रहें।  
@@ -18,6 +18,7 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 - [भाग V: समस्या-निवारण व नोट्स](#भाग-v-समस्या-निवारण-व-नोट्स)
 - [भाग VI: महत्वपूर्ण कार्यान्वयन नोट्स](#भाग-vi-महत्वपूर्ण-कार्यान्वयन-नोट्स)
 - [भाग VII: आंतरिक पूरक](#भाग-vii-आंतरिक-पूरक)
+- [भाग VIII: API Version 2 माइग्रेशन गाइड](#भाग-viii-api-version-2-माइग्रेशन-गाइड)
 
 ---
 
@@ -58,7 +59,7 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 
 ```json
 {
-  "apiVersion": 1,
+  "apiVersion": 2,
   "name": "My Pack",
   "author": "your name"
 }
@@ -66,7 +67,7 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 
 | फ़ील्ड | आवश्यक | विवरण |
 |---|---|---|
-| `apiVersion` | आवश्यक | ठीक-ठीक `1` से मेल खाना चाहिए |
+| `apiVersion` | आवश्यक | ठीक-ठीक `2` से मेल खाना चाहिए। `1` वाले पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
 | `name` | आवश्यक | खाली नहीं। सेटिंग्स UI में दिखता है |
 | `author` | वैकल्पिक | छोड़ा जा सकता है। गैर-स्ट्रिंग मान (संख्या आदि) त्रुटि हैं |
 
@@ -80,8 +81,8 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 // हल्के गर्म रंग का न्यूनतम पैक
 const packWarmth = 0.18;
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let tint = mix(vec3f(1.0), vec3f(1.06, 1.0, 0.92), packWarmth);
     out.colour = clamp(out.colour * tint, vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
@@ -93,10 +94,10 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 पालन योग्य नियम:
 
-- आउटपुट संरचनाएँ **कभी सीधे न बनाएँ** (`bloxd_Surface(...)` त्रुटि है)। हमेशा `bloxd_defaultSurface(s)` / `bloxd_defaultLight(s, l)` / `bloxd_defaultVertex(v)` से शुरू करके फ़ील्ड बदलें। अपवाद: light हुक प्रथम प्राचल (`s: bloxd_Surface`) निर्गम समरूप अतः `var out = s;` से आरंभ भी योग्य
+- आउटपुट संरचनाएँ **कभी सीधे न बनाएँ** (`BloxdSurface(...)` त्रुटि है)। हमेशा `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` से शुरू करके फ़ील्ड बदलें। अपवाद: light हुक प्रथम प्राचल (`s: BloxdSurface`) निर्गम समरूप अतः `var out = s;` से आरंभ भी योग्य
 - हुक पैरामीटर **केवल-पठन** हैं। बदलने के लिए पहले कॉपी करें, जैसे `var sv = s;`
 - अपने पहचानकर्ताओं में `bloxd_` उपसर्ग प्रयोग न करें (6 हुक नामों को छोड़कर)। परिभाषित केवल 6 हुक नाम कर सकते
-- अनारंभिक `var x: bloxd_Surface;` (केवल प्रकार टिप्पणी) भी त्रुटि है
+- अनारंभिक `var x: BloxdSurface;` (केवल प्रकार टिप्पणी) भी त्रुटि है
 - स्थिरांक `const` से लिखें (`#define` में मान नहीं लिख सकते)
 
 ## 6. छह हुक
@@ -105,16 +106,16 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 | हुक | भूमिका |
 |---|---|
-| `fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex` | टेरेन वर्टेक्स एनिमेशन। **strict में अनुपलब्ध** |
-| `fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface` | टेरेन रंग, पारदर्शिता, उत्सर्जन। `s.colour` = टेक्सचर × वर्टेक्स रंग |
-| `fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light` | टेरेन अंतिम रंग। फ्रैगमेंट के **अंतिम चरण** में बुलाया जाता है, वापसी मान ज्यों का त्यों अंतिम रंग बनता है |
-| `fn bloxd_liquid_vertex / _surface / _light` (सम रूप) | तरल संस्करण। `alpha` तरल पारदर्शिता के रूप में काम करता है |
+| `fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex` | टेरेन वर्टेक्स एनिमेशन। **strict में अनुपलब्ध** |
+| `fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface` | टेरेन रंग, पारदर्शिता, उत्सर्जन। `s.colour` = टेक्सचर × वर्टेक्स रंग |
+| `fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight` | टेरेन अंतिम रंग। फ्रैगमेंट के **अंतिम चरण** में बुलाया जाता है, वापसी मान ज्यों का त्यों अंतिम रंग बनता है |
+| `fn bloxdLiquidVertex / bloxdLiquidSurface / bloxdLiquidLight` (सम रूप) | तरल संस्करण। `alpha` तरल पारदर्शिता के रूप में काम करता है |
 
 फॉलबैक नियम:
 
 - तरल हुक अपरिभाषित हो तो **उसी नाम का टेरेन हुक प्रयुक्त** होता है (विपरीत नहीं)। केवल surface लिखने से तरल पर भी वही प्रभाव लगता है
-- light हुक अपरिभाषित हो तो डिफ़ॉल्ट व्यवहार (`engineColour + emission × fogFactor`)
-- `engineColour` त्यागकर आधार रंग से पुनर्निर्माण करें तो स्वयं फ़ॉग दोबारा लगाएँ: `mix(l.fogColour, col, l.fogFactor)`। emission जोड़ते समय पहले `fogFactor` से गुणा करें
+- light हुक अपरिभाषित हो तो डिफ़ॉल्ट व्यवहार (`engineColour + emission × fogVisibility`)
+- `engineColour` त्यागकर आधार रंग से पुनर्निर्माण करें तो स्वयं फ़ॉग दोबारा लगाएँ: `mix(l.fogColour, col, l.fogVisibility)`। emission जोड़ते समय पहले `fogVisibility` से गुणा करें
 
 ## 7. आठ वेरिएंट और गार्ड
 
@@ -145,7 +146,7 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 - `@builtin` विशेषण भी निषिद्ध, `fragCoord` (स्क्रीन निर्देशांक) व `vertex_index` पढ़े नहीं जा सकते
 - **मॉड्यूल-स्कोप `let` प्रयोग न करें** (`const` या `var` प्रयोग करें)
 - `atomic` अनुपयोगी
-- निर्देशांक noa-स्थानीय हैं। विश्व निर्देशांक हेतु `originOffset` जोड़ें। ब्लॉक निर्देशांक = `vec3i(floor(position - normal * 0.5)) + originOffset`
+- निर्देशांक noa-स्थानीय हैं। विश्व निर्देशांक हेतु `bloxdOriginOffset()` जोड़ें। ब्लॉक निर्देशांक = `bloxdFaceBlock(position, normal)`
 
 ## 9. सत्यापन, परीक्षण व वितरण
 
@@ -170,32 +171,38 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 नीचे कोड इंजन पैक कोड के आगे स्वतः डालता है (पैक पुनः घोषित नहीं कर सकते)। `#ifdef` में लिपटे भाग वेरिएंट अनुसार बदलते हैं।
 
 ```wgsl
-// Engine-provided and read-only to packs. apiVersion 1.
-struct bloxd_VertexIn {
-    position: vec3f,     // noa-local world space (world minus originOffset)
+// Engine-provided and read-only to packs. apiVersion 2.
+const bloxdTimeWrap: f32 = 3600.0;   // seconds until time wraps to 0
+
+fn bloxdTime() -> f32;               // seconds. wraps to 0 every 3600 s
+fn bloxdOriginOffset() -> vec3i;     // whole blocks. noa-local + this = world coords
+fn bloxdEyePosition() -> vec3f;      // camera position (noa-local)
+fn bloxdSunDirection() -> vec3f;     // sun direction (unit vector, non-zero only with earth skybox)
+fn bloxdWorldPosition(position: vec3f) -> vec3f;  // noa-local -> world coords
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i;  // world block coords of this face
+fn bloxdApplyFog(colour: vec3f, l: BloxdLightIn) -> vec3f;   // mix(l.fogColour, colour, l.fogVisibility)
+
+struct BloxdVertexIn {
+    position: vec3f,   // noa-local world space (world minus bloxdOriginOffset())
     normal: vec3f,
-    originOffset: vec3i, // whole blocks
-    time: f32,           // seconds, wrapped every 3600 s (part of the API)
+    blockId: u32,      // owning block id (flat-interpolated, uniform across the face)
 }
 
 #ifndef BLOXD_STRICT
-struct bloxd_Vertex {
+struct BloxdVertex {
     position: vec3f,     // noa-local
 }
 #endif
 
-struct bloxd_SurfaceIn {
-    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher in v1)
+struct BloxdSurfaceIn {
+    colour: vec3f,       // texture x vertex colour (tint x AO, baked together by the mesher)
     alpha: f32,
     normal: vec3f,
     position: vec3f,     // noa-local
-    originOffset: vec3i, // a face's world block is vec3i(floor(position - normal * 0.5)) + originOffset
-    eyePosition: vec3f,  // noa-local
-    time: f32,
-    sunDirection: vec3f, // unit, towards the sun, in world orientation; zero when the sky has no sun
+    blockId: u32,        // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Surface {
+struct BloxdSurface {
     colour: vec3f,
 #ifdef BLOXD_ALPHA
     alpha: f32,
@@ -203,63 +210,59 @@ struct bloxd_Surface {
     emission: vec3f,     // added after lighting, then fogged
 }
 
-struct bloxd_LightIn {
-    engineColour: vec3f, // the engine's result for this fragment, from the surface hook's colour
-    directional: f32,    // summed Lambert from the scene's directional lights (0 when off)
-    ambient: vec3f,      // the material's ambient times the scene's
-#ifdef BLOXD_LIGHTING
-    blockLight: vec3f,   // voxel block light, tone-mapped
-    skyLight: f32,       // voxel sky light, tone-mapped
-    ambientLightColour: vec3f,
-    skyLightColour: vec3f,
-    heldLight: vec3f,    // held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-#endif
+struct BloxdLightIn {
+    litColour: vec3f,          // engine lighting result (before emission and fog)
+    engineColour: vec3f,       // post-fog = bloxdApplyFog(litColour, l). excludes emission
+    directional: f32,          // summed Lambert from the scene's directional lights (0 when off)
+    ambient: vec3f,            // the material's ambient times the scene's
+    blockLight: vec3f,         // voxel block light, tone-mapped (all variants; 0 when unlit)
+    skyLight: f32,             // voxel sky light, tone-mapped (all variants; 1 when unlit)
+    ambientLightColour: vec3f, // present in all variants (white when unlit)
+    skyLightColour: vec3f,     // present in all variants (white when unlit)
+    heldLight: vec3f,          // held light here (all variants; 0 when unlit/out of range)
     fogColour: vec3f,
-    fogFactor: f32,      // 1 = no fog, 0 = fully fogged
-    position: vec3f,     // as in bloxd_SurfaceIn
+    fogVisibility: f32,        // 1 = no fog, 0 = fully fogged (renamed from v1 fogFactor)
+    position: vec3f,           // as in BloxdSurfaceIn
     normal: vec3f,
-    originOffset: vec3i,
-    eyePosition: vec3f,
-    time: f32,
-    sunDirection: vec3f,
+    blockId: u32,              // owning block id (flat-interpolated, uniform across the face)
 }
 
-struct bloxd_Light {
+struct BloxdLight {
     colour: vec3f,
 }
 
+// liquid variants, surface / light hooks only
+struct BloxdOpaqueBehind {
+    found: bool,       // false when no opaque face behind (sky)
+    position: vec3f,   // opaque face position behind (noa-local)
+    distance: f32,     // distance from the eye
+}
+fn bloxdOpaqueBehind() -> BloxdOpaqueBehind;
+
 #ifndef BLOXD_STRICT
-fn bloxd_defaultVertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    return bloxd_Vertex(v.position);
-}
+fn bloxdDefaultVertex(v: BloxdVertexIn) -> BloxdVertex;
 #endif
 
-fn bloxd_defaultSurface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-#ifdef BLOXD_ALPHA
-    return bloxd_Surface(s.colour, s.alpha, vec3f(0.0));
-#else
-    return bloxd_Surface(s.colour, vec3f(0.0));
-#endif
-}
-
-fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    return bloxd_Light(l.engineColour + s.emission * l.fogFactor);
-}
+fn bloxdDefaultSurface(s: BloxdSurfaceIn) -> BloxdSurface;
+fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 ```
 
 मुख्य बिंदु:
 
-- `time` हर 3600 सेकंड लपेटता है, बीता समय है। खेल की दिन-रात घड़ी से समन्वय की गारंटी नहीं।
-- `sunDirection` सूर्य रहते समय इकाई वेक्टर है; सूर्यहीन आकाश में शून्य। **चंद्रमा सदा `-sunDirection` में है** (इंजन चंद्र स्थिति सूर्य के ठीक विपरीत गिनता है)। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर, चंद्रमा भी स्थिर — गतिशील चंद्रमा केवल दिन-रात चक्र दुनियाओं में मायने रखता है (भाग VII, अनुभाग 24 देखें)
-- ※टिप्पणी: पहले "शून्य पर चंद्र दिशा पुनःप्रयोग असंभव" लिखा था। दिशा स्वयं `-sunDirection` से उपलब्ध है, पर वितरण पैक शून्य आधार मानकर `sunPresent` शाखा प्रयोग करें (नीला परिवेश छद्म हेतु R2, दिशात्मक चांदनी हेतु भाग VII R-A देखें)
-- `emission` प्रकाश गणना के बाद जुड़ता है, **`fogFactor` से क्षीण होकर** (defaultLight कार्यान्वयन `engineColour + emission × fogFactor`। पूर्णतः धुंधली दूरी में उत्सर्जन भी लुप्त होता है)
-- **फ़ॉग प्रयोग क्रम**: फ्रैगमेंट भीतर प्रक्रिया क्रम ① प्रकाश·उत्सर्जन संश्लेषण → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogFactor)` → ④ light हुक आह्वान → ⑤ वापसी। अतः **engineColour फ़ॉग लगा हुआ आता है**, **light हुक वापसी मान ज्यों का त्यों अंतिम रंग** (हुक बाद फ़ॉग पुनः नहीं लगता)
-- **fogFactor परिभाषा स्रोत**: दृश्य-अंतरिक्ष दूरी (शीर्ष इकाई संगणित·अंतर्वेशित)। linear विधा में `fogFactor = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
+- `bloxdTime()` हर 3600 सेकंड लपेटने वाला बीता समय है (`bloxdTimeWrap`)। खेल की दिन-रात घड़ी से समन्वय की गारंटी नहीं। bind group चरण दृश्यता VERTEX|FRAGMENT होने से **vertex हुकों से भी बुलाया जा सकता है**
+- `bloxdSunDirection()` सूर्य रहते समय इकाई वेक्टर है; सूर्यहीन आकाश में शून्य। **चंद्रमा सदा `-bloxdSunDirection()` में है** (इंजन चंद्र स्थिति सूर्य के ठीक विपरीत गिनता है)। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर, चंद्रमा भी स्थिर — गतिशील चंद्रमा केवल दिन-रात चक्र दुनियाओं में मायने रखता है (भाग VII, अनुभाग 24 देखें)
+- ※टिप्पणी: पहले "शून्य पर चंद्र दिशा पुनःप्रयोग असंभव" लिखा था। दिशा स्वयं `-bloxdSunDirection()` से उपलब्ध है, पर वितरण पैक शून्य आधार मानकर `sunPresent` शाखा प्रयोग करें (नीला परिवेश छद्म हेतु R2, दिशात्मक चांदनी हेतु भाग VII R-A देखें)
+- `emission` प्रकाश गणना के बाद जुड़ता है, **`fogVisibility` से क्षीण होकर** (defaultLight कार्यान्वयन `engineColour + emission × fogVisibility`। पूर्णतः धुंधली दूरी में उत्सर्जन भी लुप्त होता है)
+- **फ़ॉग प्रयोग क्रम**: फ्रैगमेंट भीतर प्रक्रिया क्रम ① प्रकाश·उत्सर्जन संश्लेषण → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ light हुक आह्वान → ⑤ वापसी। अतः **engineColour फ़ॉग लगा हुआ आता है**, **light हुक वापसी मान ज्यों का त्यों अंतिम रंग** (हुक बाद फ़ॉग पुनः नहीं लगता)
+- **fogVisibility परिभाषा स्रोत**: दृश्य-अंतरिक्ष दूरी (शीर्ष इकाई संगणित·अंतर्वेशित)। linear विधा में `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **fogMode == 0 पर**: `fogColour` `vec3f(0.0)` (काला) होकर आता है। fogColour रंगत से समय अनुमान कोड सावधान रहे
 - **वर्तमान बिल्ड वास्तविक फ़ॉग सेटिंग**: **linear स्थिर**। `fogStart` = आरेखन खंड दूरी, `fogEnd` = +1 खंड (क्षितिज ही)। फ़ॉग बंद सेटिंग में 100 / 101 खंड रखकर व्यावहारिक अमान्य। डिफ़ॉल्ट फ़ॉग वर्ण RGB(183, 191, 195)
-- इंजन के अंदर `bloxd_packInputs` नामक uniform है, पर **पैक सीधे संदर्भ नहीं ले सकते**। हुक निवेश फ़ील्डों (`s.time` आदि) से मान लें
+- `bloxdPackInputs` uniform (`@group(3) @binding(0)`, 64B) **केवल शीर्ष फ़ंक्शन से प्रयोग करें**। पैक से सीधे संदर्भ न लें। चरण दृश्यता VERTEX|FRAGMENT होने से शीर्ष फ़ंक्शन हुक बाहर मॉड्यूल-स्कोप फ़ंक्शन व vertex हुकों से भी बुलाए जा सकते हैं। गहराई टेक्सचर (binding 1) FRAGMENT-केवल होने से `bloxdOpaqueBehind()` surface / light हुक सीमित है
 - **`skyLight` / `blockLight` / `heldLight` "लिफ्ट वक्र" बाद के मान** होकर आते हैं। शीर्ष टिप्पणी का `tone-mapped` इसी को कहता है: इंजन फ्रैगमेंटों पर अवश्य `y = 1-(1-x/(3-2x))³` (अंधेरे उठाने वाला S वक्र) लगाकर पैकों को देता है। कच्चे वोक्सेल मान (n/15) नहीं; जैसे पेड़ नीचे (कच्चा 0.87) **0.97 उठकर** आता है
 - `skyLight` वास्तव में "उस जगह से आकाश दिखता है" का वोक्सेल अवरोध डेटा (= शैडो मानचित्र) है, मात्र चमक पैरामीटर नहीं (अध्याय 15 "छाया का सत्य")
+- **`litColour` आरंभ बिंदु प्रयोज्य है**: v1 में केवल फ़ॉग लगा `engineColour` था, अतः स्वनिर्मित वातावरण अभिव्यक्ति में द्वि-फ़ॉग हो जाता था। v2 में फ़ॉग-पूर्व व उत्सर्जन-पूर्व `litColour` से आरंभ कर `bloxdApplyFog()` से अपनी गति से फ़ॉग दोबारा लगाएँ
+- **`blockId` से खंड प्रकार पहचाने जा सकते हैं**: टेक्सचर वर्ण अनाश्रित पहचान। पर ID-खंड-प्रकार संगति तालिका इंजन भीतर होने से कौन ID कौन खंड दुनिया में मापें (भाग VIII देखें)
+- **संरचना सीधा निर्माण निषिद्ध**: `BloxdLight(...)` जैसे निर्माता आह्वान स्थैतिक सत्यापन में अस्वीकृत होते हैं। सदा `bloxdDefault*` से बदलें या निवेश प्रतिलिपि प्रयोग करें
 
 ## 11. वेरिएंट सूची
 
@@ -274,13 +277,13 @@ fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | strict + लिट + टेरेन | ✓ | ✓ | – |
 | strict + लिट + तरल | ✓ | ✓ | ✓ |
 
-शीर्ष संरचना आकार भी वेरिएंट अनुसार बदलते हैं (strict में `bloxd_Vertex` स्वयं नहीं, अलिट में `blockLight` आदि नहीं, strict टेरेन में `alpha` नहीं)।
+शीर्ष संरचना आकार भी वेरिएंट अनुसार बदलते हैं (strict में `BloxdVertex` स्वयं नहीं, अलिट में `blockLight` आदि नहीं, strict टेरेन में `alpha` नहीं)।
 
 ## 12. कंकाल चीटशीट
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);          // सीधा निर्माण निषिद्ध। हमेशा default से
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);          // सीधा निर्माण निषिद्ध। हमेशा default से
     out.colour = out.colour * vec3f(1.0, 0.9, 0.8);
     #ifdef BLOXD_ALPHA                          // टेरेन में केवल allow पर alpha है
     out.alpha = s.alpha;
@@ -288,8 +291,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
     return out;
 }
 
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);         // engineColour + emission*fogFactor
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);         // engineColour + emission*fogVisibility
     #ifdef BLOXD_LIGHTING                       // प्रकाश-केवल निवेश सुरक्षित करें
     out.colour += l.blockLight * 0.2;
     #endif
@@ -297,9 +300,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 
 #ifndef BLOXD_STRICT                            // vertex अवश्य इस गार्ड सहित
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.time) * 0.05;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(bloxdTime()) * 0.05;
     return out;
 }
 #endif
@@ -311,15 +314,15 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 # भाग III: रेसिपी संग्रह
 
-सभी टुकड़े 8 वेरिएंट पास की शर्त वाली गार्ड सहित लिखे हैं, ज्यों का त्यों कॉपी कर स्थिरांक बदलने भर से प्रयोज्य हैं। पर नीचे रेसिपी अलग-अलग उदाहरण हैं, ऊपर से सब जोड़ने के काम की नहीं — एक ही हुक नाम (`bloxd_terrain_light` आदि) या एक ही सहायक फ़ंक्शन नाम कई चिपकाने से एक ही मॉड्यूल में परिभाषा दुहराकर कंपाइल विफल करता है। कई प्रभाव साथ प्रयोग करें तो हुकों को प्रकार अनुसार 1 में समेटकर उस फ़ंक्शन में एकीकृत करें।
+सभी टुकड़े 8 वेरिएंट पास की शर्त वाली गार्ड सहित लिखे हैं, ज्यों का त्यों कॉपी कर स्थिरांक बदलने भर से प्रयोज्य हैं। पर नीचे रेसिपी अलग-अलग उदाहरण हैं, ऊपर से सब जोड़ने के काम की नहीं — एक ही हुक नाम (`bloxdTerrainLight` आदि) या एक ही सहायक फ़ंक्शन नाम कई चिपकाने से एक ही मॉड्यूल में परिभाषा दुहराकर कंपाइल विफल करता है। कई प्रभाव साथ प्रयोग करें तो हुकों को प्रकार अनुसार 1 में समेटकर उस फ़ंक्शन में एकीकृत करें।
 
 ## R1. रंग रेसिपी (surface)
 
 ### एकल रंगत (सबसे बुनियादी)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     out.colour = clamp(out.colour * vec3f(1.05, 1.0, 0.95), vec3f(0.0), vec3f(1.0));
     return out;
 }
@@ -360,9 +363,9 @@ fn pack_sepia(c: vec3f, amount: f32) -> vec3f {
 ### ऊँचाई प्रवणता (निचली भूमि गर्म)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let low = clamp(1.0 - worldY * 0.02, 0.0, 1.0);        // ऊँचाई 0..50 पर 1..0
     out.colour = clamp(mix(out.colour, out.colour * vec3f(1.10, 0.95, 0.80), low * 0.6), vec3f(0.0), vec3f(1.0));
     return out;
@@ -372,8 +375,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### फलक अभिविन्यास से रंगना (ऊपर=उजला, दीवार=गाढ़ा)
 
 ```wgsl
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let upness = clamp(s.normal.y, 0.0, 1.0);              // फ़र्श 1 / दीवार 0 / छत -1
     let downness = clamp(-s.normal.y, 0.0, 1.0);
     let shade = mix(0.82, 1.02, upness) - downness * 0.12; // दीवार थोड़ी गाढ़ी, छत भी गाढ़ी
@@ -404,9 +407,9 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 ### दूरी धुंध (स्वनिर्मित फ़ॉग)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     // 64 ब्लॉक से 192 ब्लॉक पर 0..0.35 स्वनिर्मित फ़ॉग जोड़ना
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
@@ -417,8 +420,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### रात (skyLight नीला झुकाव + दीया रक्षा)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     out.colour = mix(out.colour, out.colour * vec3f(0.55, 0.68, 1.0), sky * 0.55);
@@ -432,8 +435,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### गुफा अंधेरा (skyLight-हीन और गाढ़ा)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -447,13 +450,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### रात का नीला परिवेश (चंद्र दिशा बिना छद्म अभिव्यक्ति)
 
-> इस API में सूर्यहीन आकाश का `sunDirection` शून्य है। नीचे दिशात्मक चांदनी नहीं, मात्र अंधेरे आकाश में क्षीण नीला परिवेश। चंद्र दिशा स्वयं `-sunDirection` से उपलब्ध (केवल दिन-रात चक्र दुनियाएँ। भाग VII R-A)।
+> इस API में सूर्यहीन आकाश का `bloxdSunDirection()` शून्य है। नीचे दिशात्मक चांदनी नहीं, मात्र अंधेरे आकाश में क्षीण नीला परिवेश। चंद्र दिशा स्वयं `-bloxdSunDirection()` से उपलब्ध (केवल दिन-रात चक्र दुनियाएँ। भाग VII R-A)।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let upward = clamp(l.normal.y, 0.0, 1.0);
@@ -466,11 +469,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### संध्या ताप (सूर्य ऊँचाई से रंग झुकाव)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunLen = length(l.sunDirection);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // क्षितिज 1 / ठीक ऊपर 0
         let sunset = lowness * lowness;
         out.colour = mix(out.colour, out.colour * vec3f(1.12, 0.88, 0.72), sunset * 0.55);
@@ -482,10 +485,10 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### इंजन निर्गम पूर्ण प्रतिस्थापन (सरलतम पुनःप्रकाशन)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     #ifdef BLOXD_LIGHTING
-    // ※ bloxd_Light(...) सीधा निर्माण निषिद्ध। default से बनाकर colour बदलें
-    var out = bloxd_defaultLight(s, l);
+    // ※ BloxdLight(...) सीधा निर्माण निषिद्ध। default से बनाकर colour बदलें
+    var out = bloxdDefaultLight(s, l);
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let level = clamp(sky * 0.7 + block, 0.0, 1.0);
@@ -493,23 +496,23 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     out.colour = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
     return out;
     #else
-    return bloxd_defaultLight(s, l);
+    return bloxdDefaultLight(s, l);
     #endif
 }
 ```
 
 ## R3. उत्सर्जन रेसिपी (emission)
 
-> `emission` प्रकाश गणना बाद जुड़ता है, पर डिफ़ॉल्ट प्रक्रिया **`fogFactor` से क्षीण करती है। पूर्णतः धुंधली दूरी में उत्सर्जन भी लुप्त होता है। दूर भी चमकाने घटक emission में न जोड़ें, light हुक भीतर `out.colour += ...` सीधे जोड़ें** (engineColour फ़ॉग लगा हुआ अतः दूर धुंध वर्ण ऊपर प्रकाश चढ़ता है)
+> `emission` प्रकाश गणना बाद जुड़ता है, पर डिफ़ॉल्ट प्रक्रिया **`fogVisibility` से क्षीण करती है। पूर्णतः धुंधली दूरी में उत्सर्जन भी लुप्त होता है। दूर भी चमकाने घटक emission में न जोड़ें, light हुक भीतर `out.colour += ...` सीधे जोड़ें** (engineColour फ़ॉग लगा हुआ अतः दूर धुंध वर्ण ऊपर प्रकाश चढ़ता है)
 
 ### दीया स्पंदन (मशाल श्वास)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let glow = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
-    let pulse = 0.5 + 0.5 * sin(l.time * 2.3 + l.position.x * 0.8);
+    let pulse = 0.5 + 0.5 * sin(bloxdTime() * 2.3 + l.position.x * 0.8);
     out.colour += vec3f(1.0, 0.62, 0.25) * glow * 0.25 * (0.6 + 0.4 * pulse);
     #endif
     return out;
@@ -520,8 +523,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 // surface पक्ष: सामग्री जितनी उजली (श्वेत) emission उतना चढ़ाएँ
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
     let shine = smoothstep(0.75, 0.9, luma);
     out.emission += out.colour * shine * 0.5;
@@ -532,15 +535,15 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### जुगनू समूह भाव (काल से अंतरिक्ष तैरते प्रकाश बिंदु)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let world = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let world = bloxdWorldPosition(l.position);
     // कुछ 「प्रकाश गोल」 धीमे तैरते हैं। दूरी व्युत्क्रम से चमकाएँ
-    let t = l.time * 0.15;
+    let t = bloxdTime() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);
     let firefly = clamp(1.0 - d1 / 6.0, 0.0, 1.0);
-    let flicker = 0.6 + 0.4 * sin(l.time * 9.0 + d1);
+    let flicker = 0.6 + 0.4 * sin(bloxdTime() * 9.0 + d1);
     out.colour += vec3f(0.9, 1.0, 0.4) * firefly * firefly * flicker * 0.6;
     return out;
 }
@@ -551,13 +554,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### विश्व निर्देशांक
 
 ```wgsl
-let worldPos = s.position + vec3f(f32(s.originOffset.x), f32(s.originOffset.y), f32(s.originOffset.z));
+let worldPos = bloxdWorldPosition(s.position);
 ```
 
 ### ब्लॉक निर्देशांक (आधिकारिक रेसिपी — शीर्ष टिप्पणी उद्गम)
 
 ```wgsl
-let worldBlock = vec3i(floor(l.position - l.normal * 0.5)) + l.originOffset;
+let worldBlock = bloxdFaceBlock(l.position, l.normal);
 ```
 
 ### शतरंजी (ब्लॉक इकाई)
@@ -584,7 +587,7 @@ out.colour *= mix(0.94, 1.06, pack_hash3(worldBlock));
 ### दृष्टि सदिश व रिमप्रकाश
 
 ```wgsl
-let viewDir = normalize(l.eyePosition - l.position);
+let viewDir = normalize(bloxdEyePosition() - l.position);
 let rim = pow(1.0 - clamp(dot(viewDir, l.normal), 0.0, 1.0), 2.2);
 out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ```
@@ -592,21 +595,21 @@ out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ### दृष्टि कोण (फ्रेनेल भाव — तरल हेतु)
 
 ```wgsl
-let viewDir = normalize(s.eyePosition - s.position);
+let viewDir = normalize(bloxdEyePosition() - s.position);
 let facing = clamp(dot(viewDir, s.normal), 0.0, 1.0);   // ठीक ऊपर से 1 / छिछला कोण 0
 let fresnel = pow(1.0 - facing, 3.0);
 ```
 
 ## R5. काल रेसिपी (एनिमेशन)
 
-> `time` हर 3600 सेकंड (1 घंटा) लपेटता है। "1 दिन का दिन-रात चक्र" बनाने हेतु 3600 सेकंड 1 आवर्त मानें। पर शेडर बीता काल है, खेल के सूर्य·दिन-रात समन्वय की गारंटी नहीं। दिखावटी आवर्त एनिमेशन प्रयोज्य, वास्तविक रात निर्णय में `sunDirection` व प्रकाश निवेश को प्राथमिकता दें।
+> `bloxdTime()` हर 3600 सेकंड (1 घंटा) लपेटता है। शेडर बीता काल है, खेल के सूर्य·दिन-रात समन्वय की गारंटी नहीं। दिखावटी आवर्त एनिमेशन प्रयोज्य, वास्तविक रात निर्णय में `bloxdSunDirection()` व प्रकाश निवेश को प्राथमिकता दें।
 
 ### दिन-रात चक्र (1 घंटे में 1 दिन)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let day = 0.5 + 0.5 * sin(l.time * 6.2831853 / 3600.0);   // 0..1 एक घंटा आवर्त। खेल के दिन-रात समन्वय की गारंटी नहीं
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let day = 0.5 + 0.5 * sin(bloxdTime() * 6.2831853 / 3600.0);   // 0..1 एक घंटा आवर्त। खेल के दिन-रात समन्वय की गारंटी नहीं
     out.colour = mix(out.colour * vec3f(0.6, 0.7, 1.0), out.colour, day);
     return out;
 }
@@ -638,11 +641,11 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ### जलपृष्ठ लहर (रंग झिलमिल)
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldX = s.position.x + f32(s.originOffset.x);
-    let worldZ = s.position.z + f32(s.originOffset.z);
-    let ripple = sin(s.time * 2.1 + worldX * 1.3 + worldZ * 0.9);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldX = s.position.x + f32(bloxdOriginOffset().x);
+    let worldZ = s.position.z + f32(bloxdOriginOffset().z);
+    let ripple = sin(bloxdTime() * 2.1 + worldX * 1.3 + worldZ * 0.9);
     out.colour = clamp(out.colour * (1.0 + ripple * 0.06), vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
     out.alpha = s.alpha;   // liquid सदा BLOXD_ALPHA — गार्ड आदतन
@@ -653,15 +656,15 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 ### ऊँचाई छद्म पारदर्शिता (सच्चा छिछला निर्णय नहीं)
 
-> दृश्य गहराई व जलतल स्थिति संदर्भ असंभव, अतः इस API भर से वास्तविक जल गहराई परिकलित नहीं। `s.position.y` स्थानीय निर्देशांक, अतः ज्यों का त्यों प्रयोग से खंड मूल विचलन से प्रभाव हटता है। नीचे केवल विश्व ऊँचाई से alpha बदलने का छद्म प्रदर्शन, तटरेखा व जलतल अनुरूप छिछला अभिव्यक्ति नहीं। `packWaterReferenceY` विश्व ऊँचाई अनुरूप समायोजित करें।
+> v1 में दृश्य गहराई व जलतल स्थिति संदर्भ असंभव था, अतः इस API भर से वास्तविक जल गहराई परिकलित नहीं हो सकती थी। v2 में तरल सीमित `bloxdOpaqueBehind()` से पीछे अपारदर्शी फलक तक मोटाई मापी जा सकती है (भाग VIII R-E)। नीचे इसका प्रयोग न करने वाला पुराना छद्म प्रदर्शन है, `s.position.y` स्थानीय निर्देशांक, अतः ज्यों का त्यों प्रयोग से खंड मूल विचलन से प्रभाव हटता है। नीचे केवल विश्व ऊँचाई से alpha बदलने का छद्म प्रदर्शन, तटरेखा व जलतल अनुरूप छिछला अभिव्यक्ति नहीं। `packWaterReferenceY` विश्व ऊँचाई अनुरूप समायोजित करें।
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
 const packWaterHeightSpan: f32 = 8.0;
 
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
-    let worldY = s.position.y + f32(s.originOffset.y);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
     // निम्न ऊँचाई पतला, उच्च ऊँचाई मूल alpha निकट। खेल में दिशा जाँचें।
@@ -674,9 +677,9 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ### जलांदर से देखा जल धुंध
 
 ```wgsl
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let murk = clamp(dist / 40.0, 0.0, 0.5);
     out.colour = mix(out.colour, out.colour * vec3f(0.35, 0.55, 0.9) + vec3f(0.0, 0.02, 0.06), murk);
     return out;
@@ -699,9 +702,9 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let sway = sin(v.time * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let sway = sin(bloxdTime() * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
     let sideFactor = max(0.0, 1.0 - abs(v.normal.y));   // लंब फलक ही
     out.position.y += sway * 0.05 * sideFactor;
     return out;
@@ -713,12 +716,12 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
+fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
     let topness = clamp(v.normal.y * 2.0, 0.0, 1.0);
     if (topness > 0.001) {
-        let h = sin(v.position.x * 0.9 + v.time * 1.6) * 0.5
-              + sin(v.position.z * 1.2 + v.time * 1.3) * 0.3;
+        let h = sin(v.position.x * 0.9 + bloxdTime() * 1.6) * 0.5
+              + sin(v.position.z * 1.2 + bloxdTime() * 1.3) * 0.3;
         out.position.y += h * 0.14 * topness;
     }
     return out;
@@ -730,9 +733,9 @@ fn bloxd_liquid_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    let pulse = sin(v.time * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    let pulse = sin(bloxdTime() * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
     out.position += v.normal * pulse * 0.03;   // अभिलंब दिशा में हल्का फैलाव-सिकुड़न
     return out;
 }
@@ -743,10 +746,10 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ```wgsl
 #ifndef BLOXD_STRICT
-fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
-    var out = bloxd_defaultVertex(v);
-    out.position.y += sin(v.position.x * 0.15 + v.time * 0.9) * 0.4
-                    + sin(v.position.z * 0.11 - v.time * 0.7) * 0.3;
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    out.position.y += sin(v.position.x * 0.15 + bloxdTime() * 0.9) * 0.4
+                    + sin(v.position.z * 0.11 - bloxdTime() * 0.7) * 0.3;
     return out;
 }
 #endif
@@ -791,8 +794,8 @@ let phase = t * 0.15;
 ### R9.1 उष्ण मशाल × शीत आकाशप्रकाश
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let blockInt = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let torch   = mix(l.blockLight, blockInt * vec3f(1.00, 0.72, 0.42), 0.55);
@@ -807,14 +810,14 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.2 सूर्य स्पेक्युलर (Blinn-Phong)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);          // अर्ध सदिश
         let ndh = max(dot(n, h), 0.0);
         let lambert = clamp(dot(n, sunDir), 0.0, 1.0);
@@ -832,11 +835,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 fn pack_schlick(cosT: f32, f0: f32) -> f32 {
     return f0 + (1.0 - f0) * pow(1.0 - clamp(cosT, 0.0, 1.0), 5.0);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let F = pack_schlick(dot(n, viewDir), 0.02);
     out.colour += F * 0.15 * l.skyLightColour * l.skyLight;   // किनारे की हल्की चमक
     #endif
@@ -847,8 +850,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.4 अर्धगोल परिवेश (ऊपर=आकाश / नीचे=भूमि उछाल)
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let n = normalize(l.normal);
     let upness = n.y * 0.5 + 0.5;
@@ -870,8 +873,8 @@ fn pack_aces(x: vec3f) -> vec3f {
                  (x * (vec3f(2.43) * x + vec3f(0.59)) + vec3f(0.14)),
                  vec3f(0.0), vec3f(1.0));
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     out.colour = pack_aces(out.colour * 1.2);   // 1.2 = अनावृति
     return out;
 }
@@ -884,9 +887,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > ध्यान: वायु भावना केवल संतृप्ति घटाने से सुरक्षित। चमक न छुएँ।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let dist = distance(l.eyePosition, l.position);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let dist = distance(bloxdEyePosition(), l.position);
     let aerial = 1.0 - exp(-dist * 0.0035);        // दूरी क्षय (100blk≈30%/400blk≈75%)
     let luma = dot(out.colour, vec3f(0.2126, 0.7152, 0.0722));
     let hazy = mix(vec3f(luma), out.colour, 0.5);  // संतृप्ति ही घटाएँ (चमक अपरिवर्तित)
@@ -907,16 +910,16 @@ fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
     let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // ∂h/∂z
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let baseN = normalize(l.normal);
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
-    let n = normalize(mix(baseN, pack_waveNormal(worldPos, l.time), clamp(baseN.y * 2.0, 0.0, 1.0)));
-    let viewDir = normalize(l.eyePosition - l.position);
-    let sunLen = length(l.sunDirection);
+    let worldPos = bloxdWorldPosition(l.position);
+    let n = normalize(mix(baseN, pack_waveNormal(worldPos, bloxdTime()), clamp(baseN.y * 2.0, 0.0, 1.0)));
+    let viewDir = normalize(bloxdEyePosition() - l.position);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let h = normalize(viewDir + sunDir);
         let glint = pow(max(dot(n, h), 0.0), 240.0) * 1.1 * (0.25 + 0.75 * l.skyLight);
         out.colour += glint * vec3f(1.0);
@@ -941,14 +944,14 @@ fn pack_bumpNormal(p: vec3f, n: vec3f, strength: f32) -> vec3f {
     let tangentZ = normalize(cross(n, tangentX));
     return normalize(n + tangentX * (hx - h0) * strength + tangentZ * (hz - h0) * strength);
 }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let local = fract(l.position - l.normal * 0.5);   // ब्लॉक भीतर स्थानीय निर्देशांक
     let n = pack_bumpNormal(local * 16.0, normalize(l.normal), 0.35);
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let lam = clamp(dot(n, sunDir), 0.0, 1.0);
         let lamFlat = clamp(dot(normalize(l.normal), sunDir), 0.0, 1.0);
         out.colour *= mix(1.0, 0.85 + 0.15 * (lam / max(lamFlat, 0.001)), 0.5);
@@ -961,8 +964,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### R9.9 गुफा अरैखिक अंधेरा + दीया रक्षा
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let sky = clamp(l.skyLight, 0.0, 1.0);
     let underground = 1.0 - sky;
@@ -976,20 +979,20 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 फ़ॉग पुनः लगाना (engineColour त्याग पर आवश्यक)
 
-> `l.fogFactor` को `max(l.fogFactor, 0.25)` निम्नसीमा सहित प्रयोग से "इससे सघन नहीं" समायोजन बनता है  
+> `l.fogVisibility` को `max(l.fogVisibility, 0.25)` निम्नसीमा सहित प्रयोग से "इससे सघन नहीं" समायोजन बनता है  
 > (0.0 = इंजन अनुरूप / 0.3–0.5 = दूर स्पष्ट)।  
 > ध्यान रहे इंजन फ़ॉग क्षितिज समर्पित linear फ़ॉग (आरेखन दूरी समीप ही) है, मध्य दूरी धुंध पैक पक्ष बनाएँ।
 > वास्तविक फ़ॉग सेटिंग (कार्यान्वयन मिलान अद्यतित): linear स्थिर / `fogStart` = आरेखन खंड दूरी / `fogEnd` = +1 खंड / फ़ॉग बंद सेटिंग में 100–101 खंड व्यावहारिक अमान्य / डिफ़ॉल्ट फ़ॉग वर्ण RGB(183, 191, 195)।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     var col = s.colour * (voxel * 1.1 + vec3f(0.05));
     col = clamp(col, vec3f(0.0), vec3f(1.0));
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));  // फ़ॉग पुनरुत्पादन (0.15=हल्की निम्नसीमा)
-    col += s.emission * l.fogFactor;            // emission भी फ़ॉग सहित
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));  // फ़ॉग पुनरुत्पादन (0.15=हल्की निम्नसीमा)
+    col += s.emission * l.fogVisibility;            // emission भी फ़ॉग सहित
     out.colour = col;
     #endif
     return out;
@@ -1000,12 +1003,12 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let lum = pack_luma(out.colour);
     out.colour *= mix(vec3f(0.93, 1.00, 1.06), vec3f(1.06, 1.00, 0.93), lum);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let night = 1.0 - sunPresent;  // सूर्य दिशा शून्य पर ही रात। संध्या सतत परिवर्तन अभिव्यक्त नहीं
     out.colour = mix(out.colour, vec3f(pack_luma(out.colour)), night * 0.28);
     #endif
@@ -1040,17 +1043,17 @@ fn sh_unlift(y: f32) -> f32 {
 }
 const shTh   = 0.87;   // ★छाया त्रिज्या डायल: th = 1 - r/15 (0.87→त्रिज्या2 व अधिक छाया)
 const shSoft = 0.04;   // किनारा कोमलता (0.02=कठोर / 0.08=कोमल)
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // 1. कच्चा मान पुनः प्राप्त (छूटा तो कभी छाया नहीं)
     let skyRaw = sh_unlift(l.skyLight);
     // 2. देहली कट — धूप=1 / छाया=0 निश्चयपूर्वक पृथक् करें
     let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
     // सूर्य Lambert (सूर्य न होने पर l.directional पर फॉलबैक)
-    let sunLen = length(l.sunDirection);
+    let sunLen = length(bloxdSunDirection());
     let sunL = select(clamp(l.directional, 0.0, 1.0),
-                      clamp(dot(normalize(l.normal), l.sunDirection / sunLen), 0.0, 1.0),
+                      clamp(dot(normalize(l.normal), bloxdSunDirection() / sunLen), 0.0, 1.0),
                       sunLen > 0.5);
     // ★प्रक्षेपण सार: सूर्य सीधी धूप "आकाश दिखने वाली जगह" पर ही पहुँचती है
     let lit = sunL * sky;
@@ -1064,7 +1067,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let blockInt = max(blockRaw.r, max(blockRaw.g, blockRaw.b));
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
     // फ़ॉग पुनः लगाएँ (engineColour त्याग अंश)
-    col = mix(l.fogColour, col, max(l.fogFactor, 0.15));
+    col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));
     out.colour = clamp(col, vec3f(0.0), vec3f(1.0));
     #endif
     return out;
@@ -1075,7 +1078,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 > छाया किनारा कठोरता `shSoft` (0.02=कठोर / 0.08=कोमल)। छाया क्रोड अंधेरा `0.09` (न्यूनतम परिवेश) व `0.16` (आकाश प्रकीर्ण प्रकाश)  
 > 2-बिंदु स्थानांतरण से तय होता है। संध्या में छाया फैलानी हो तो  
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें (लंबी संध्या छाया सन्निकटन।  
-> `sunDir` यानी `l.sunDirection / length(l.sunDirection)`)। छाया नीलापन हेतु `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
+> `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। छाया नीलापन हेतु `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
 >
 > ⚠️ "`pow(skyLight, γ)` से कंट्रास्ट गहरा" **लिफ्ट बाद मानों पर gamma लगा रहा था** इसलिए  
 > पेड़ नीचे (0.97) कभी प्रभावित नहीं हुआ। यह विधि अनुशंसित नहीं।
@@ -1090,7 +1093,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 | कार्य | डिफ़ॉल्ट | पैक में संभव? |
 |---|---|---|
-| विसरित (Lambert) | केवल दिशात्मक अदिश योग | ◎ `sunDirection` से स्वयं कार्यान्वित (आवरण स्रोत आदि) |
+| विसरित (Lambert) | केवल दिशात्मक अदिश योग | ◎ `bloxdSunDirection()` से स्वयं कार्यान्वित (आवरण स्रोत आदि) |
 | स्पेक्युलर (दर्पण परावर्तन) | कुछ नहीं | ◎ Blinn-Phong (R9.2) |
 | फ्रेनेल | कुछ नहीं | ◎ Schlick सन्निकटन (R9.3) |
 | उष्ण मशाल / शीत आकाशप्रकाश पृथक्करण | अवर्ण | ◎ (R9.1) |
@@ -1100,7 +1103,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | पृष्ठ विवरण | केवल टेक्सचर विभेदन | △ हैश शोर प्रक्रियात्मक सूक्ष्म उभार (R9.8) |
 | शीर्ष तरंग (जलपृष्ठ) | कुछ नहीं (समतल) | ◎ केवल allow (R7) |
 | तरंग अभिलंब / सूर्य चमक | कुछ नहीं | ◎ (R9.7) |
-| रात्रि चंद्रप्रकाश निरूपण | केवल आकाशवर्ण अंधेरा | △ चंद्र दिशा `-sunDirection` में: छद्म अभिव्यक्ति (R2 नीला परिवेश / R9.11) संग दिशात्मक चांदनी (R-A, केवल दिन-रात चक्र) |
+| रात्रि चंद्रप्रकाश निरूपण | केवल आकाशवर्ण अंधेरा | △ चंद्र दिशा `-bloxdSunDirection()` में: छद्म अभिव्यक्ति (R2 नीला परिवेश / R9.11) संग दिशात्मक चांदनी (R-A, केवल दिन-रात चक्र) |
 | छाया (आकाश अवरोध) | केवल `mix(परिवेश वर्ण, आकाश वर्ण, skyLight)` हल्का मिश्रण | ◎ लिफ्ट व्युत्क्रम + देहली कट + सूर्य गेट (R9.12)। वृक्ष छाया, छज्जा नीचे स्पष्ट अवनमन, ब्लॉक संपादन वास्तविक-समय अनुगमन |
 
 ## 14. यथार्थवाद कार्यान्वयन पंथ —— दो
@@ -1109,25 +1112,25 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 **पंथ B: पूर्ण पुनःप्रकाशन (s.colour आरंभ)** —— `l.engineColour` त्यागकर, `s.colour` (एल्बिडो) व LightIn कच्ची सामग्री से प्रकाश पुनर्गठित करें। यथार्थवाद का प्रामाणिक मार्ग। 4 नियम मानें:
 
-1. **फ़ॉग पुनः लगाएँ**: light हुक फ़ॉग के बाद चलता है, स्वयं `mix(l.fogColour, col, l.fogFactor)` लगाएँ (R9.10)। घने फ़ॉग में `max(l.fogFactor, 0.3)` निम्नसीमा रखें। उल्टा engineColour-आधारित पैकों में और फ़ॉग रंग मिलाने से श्वेत द्वि-फ़ॉग बनता है
+1. **फ़ॉग पुनः लगाएँ**: light हुक फ़ॉग के बाद चलता है, स्वयं `mix(l.fogColour, col, l.fogVisibility)` लगाएँ (R9.10)। घने फ़ॉग में `max(l.fogVisibility, 0.3)` निम्नसीमा रखें। उल्टा engineColour-आधारित पैकों में और फ़ॉग रंग मिलाने से श्वेत द्वि-फ़ॉग बनता है
 2. **अप्रकाशित वेरिएंट वापसी**: `#ifdef BLOXD_LIGHTING` के बाहर सीधे `defaultLight` लौटाएँ
-3. **साझा फ़ंक्शन समग्र रक्षा**: `bloxd_LightIn` पैरामीटर वाले साझा फ़ंक्शन पूरे fn सहित `#ifdef BLOXD_LIGHTING` में लपेटें (केवल कॉल-स्थल अपर्याप्त)
-4. **सूर्य दिशा अनुपस्थिति पर**: `sunDirection` शून्य हो तो दिशात्मक स्पेक्युलर न गिनें। `l.directional` प्रकाश-मात्रा अदिश है, दिशा सदिश नहीं; झलक दिशा पुनः प्राप्त नहीं होती। आवश्यक हो तो अदिशात्मक मंद परिवेश पर जाएँ। चंद्र दिशा `-sunDirection` से उपलब्ध (केवल दिन-रात चक्र दुनियाओं में गतिशील। भाग VII R-A)
+3. **साझा फ़ंक्शन समग्र रक्षा**: `BloxdLightIn` पैरामीटर वाले साझा फ़ंक्शन पूरे fn सहित `#ifdef BLOXD_LIGHTING` में लपेटें (केवल कॉल-स्थल अपर्याप्त)
+4. **सूर्य दिशा अनुपस्थिति पर**: `bloxdSunDirection()` शून्य हो तो दिशात्मक स्पेक्युलर न गिनें। `l.directional` प्रकाश-मात्रा अदिश है, दिशा सदिश नहीं; झलक दिशा पुनः प्राप्त नहीं होती। आवश्यक हो तो अदिशात्मक मंद परिवेश पर जाएँ। चंद्र दिशा `-bloxdSunDirection()` से उपलब्ध (केवल दिन-रात चक्र दुनियाओं में गतिशील। भाग VII R-A)
 
 ## 15. अप्राप्य रूप (यथार्थवाद की "छत")
 
 | रूप | कारण |
 |---|---|
-| पिक्सेल-सटीक छाया मानचित्र (सूर्य संग घूमती छाया, उपच्छाया) | गहराई टेक्सचर संदर्भ असंभव। किरण अवरोध निर्णय हुकों में निवेश नहीं |
-| SSAO | दृश्य गहराई अगम्य (केवल जाल सेकी वर्टेक्स AO) |
-| SSR (परावर्तन) | वही। केवल फ्रेनेल मिश्रित आकाश वर्ण छद्म |
+| पिक्सेल-सटीक छाया मानचित्र (सूर्य संग घूमती छाया, उपच्छाया) | गहराई टेक्सचर संदर्भ असंभव (तरल सीमित `bloxdOpaqueBehind()` केवल ज्यामिति सूचना, शैडो मानचित्र में अप्रयोज्य)। किरण अवरोध निर्णय हुकों में निवेश नहीं |
+| SSAO | दृश्य गहराई अगम्य (केवल जाल सेकी वर्टेक्स AO। तरल सीमित गहराई SSAO में अप्रयोज्य) |
+| SSR (परावर्तन) | दृश्य वर्ण अप्राप्य। केवल फ्रेनेल मिश्रित आकाश वर्ण छद्म |
 | ब्लूम / चकाचौंध | पश्च-प्रक्रमण में हुक नहीं |
 | क्षेत्र गहराई, वर्ण विपथन, दाना | पूर्ण-परदा पश्च-प्रक्रमण आवश्यक |
 | आयतन प्रकाश (god rays) | वही |
 | PBR टेक्सचर | टेक्सचर पठन निषिद्ध। केवल वर्ण चमक छद्म अनुमान |
-| जलांत अपवर्तन | दृश्य गहराई निवेश नहीं |
+| जलांत अपवर्तन | दृश्य वर्ण अप्राप्य। तरल सीमित गहराई (`bloxdOpaqueBehind()`) से मोटाई अवशोषण व तल प्रक्षेपण संभव (भाग VIII R-E) |
 | जलांत आवरण (नीला रंगत) हटाव / बदलाव | आवरण "कैमरा तरल खंड परिभाषा color/alpha" जनित emissive पूर्ण-परदा quad है, हुक पाइपलाइन बाहर (सबसे आगे) चित्रित, अतः पैक न वर्ण न सघनता बदल सकता |
-| जलांत सीधा संसूचन | कैमरा निमज्जन दर्शाने वाला निवेश नहीं, जलांत में fogStart / fogEnd / fogColour अपरिवर्तित अतः fogFactor आदि से अनुमान की विश्वसनीय विधि भी नहीं |
+| जलांत सीधा संसूचन | कैमरा निमज्जन दर्शाने वाला निवेश नहीं, जलांत में fogStart / fogEnd / fogColour अपरिवर्तित अतः fogVisibility आदि से अनुमान की विश्वसनीय विधि भी नहीं |
 
 ### छाया का सत्य —— "वृक्ष छाया" बनती है
 
@@ -1153,7 +1156,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | ② तरल परिभाषा आवरण | कैमरा तरल खंड परिभाषा color/alpha का emissive पूर्ण-परदा quad, हुक पाइपलाइन बाहर (सबसे आगे) चित्रित। खेल सेटिंग `cameraTint` हो तो वही जीतती है | नहीं (न वर्ण न सघनता बदल सकते) |
 | ③ cameraTint | खेल सेटिंग | नहीं |
 
-व्यावहारिक बिंदु: पैक जलांत में भी चलते रहते हैं / आवरण हटता नहीं / जलांत में शाखा नहीं होती (fogStart / fogEnd / fogColour जलांत में अपरिवर्तित अतः fogFactor भी संसूचित नहीं करता)।
+व्यावहारिक बिंदु: पैक जलांत में भी चलते रहते हैं / आवरण हटता नहीं / जलांत में शाखा नहीं होती (fogStart / fogEnd / fogColour जलांत में अपरिवर्तित अतः fogVisibility भी संसूचित नहीं करता)।
 
 ## 16. दोषमार्जन युक्तियाँ
 
@@ -1163,8 +1166,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 - दूर धुंध अधिक → वायुमंडल गुणांक घटाएँ
 - मशाल चारों ओर नारंगी → उष्ण मिश्रण अनुपात घटाएँ (कच्चा रंजित प्रकाश अंश रखें)
 - खंड लगभग पूर्णतः श्वेत → light हुक निर्गम योग 1.0 अधिक (अनुप्रवाह clamp नहीं)। अंत में `clamp(col, vec3f(0.0), vec3f(1.0))` लगाएँ
-- योग बिना श्वेत → fogFactor विभाजन un-fog व्युत्क्रमण कारण। un-fog हटाएँ; पुनर्निर्माण `s.colour` आधार, फ़ॉग अंत में एक बार `mix`
-- उत्सर्जक खंड नहीं चमकते → पुनर्निर्माण क्रम में emission पुनर्योग चूक। `+ s.emission * l.fogFactor` जोड़ें
+- योग बिना श्वेत → fogVisibility विभाजन un-fog व्युत्क्रमण कारण। un-fog हटाएँ; पुनर्निर्माण `s.colour` आधार, फ़ॉग अंत में एक बार `mix`
+- उत्सर्जक खंड नहीं चमकते → पुनर्निर्माण क्रम में emission पुनर्योग चूक। `+ s.emission * l.fogVisibility` जोड़ें
 - रात केवल प्रदीप्त फलक शेष → केवल छाया न दबाएँ, पूर्ण रंग (`engineColour`) समग्र रात्रि क्षय लगाएँ। स्थानीय दीये रखें तो `blockLight` / `heldLight` से क्षय घटाएँ (छठा भाग 19)
 - `pow(skyLight, γ)` कितना भी छाया सघन नहीं → `l.skyLight` लिफ्ट बाद मान (अध्याय 10)। R9.12 व्युत्क्रम + देहली कट पर जाएँ
 - छाया क्षेत्र/सघनता समायोजन चाहिए → R9.12 समायोजन मार्ग देखें (क्षेत्र=देहली `shTh` / किनारा=`shSoft` / छाया क्रोड अंधेरा=न्यून परिवेश व आकाश प्रकीर्ण प्रकाश दो-बिंदु विचलन)
@@ -1179,22 +1182,27 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 |---|---|
 | strict खेल लोड नहीं | vertex हुक `#ifndef BLOXD_STRICT` में लपेटें |
 | `.alpha` अपरिभाषित कथित | `#ifdef BLOXD_ALPHA` में लपेटें |
-| `blockLight` अपरिभाषित कथित | `#ifdef BLOXD_LIGHTING` में लपेटें। साझा सहायक फ़ंक्शन **समग्र फ़ंक्शन** लपेटें |
-| `Packs can't construct bloxd_Surface directly` | `bloxd_defaultSurface(s)` से आरंभ बदलें |
-| `bloxd_Vertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` में लपेटें |
+| `blockLight` अपरिभाषित कथित | `#ifdef BLOXD_LIGHTING` में लपेटें। साझा सहायक फ़ंक्शन **समग्र फ़ंक्शन** लपेटें (v2 में फ़ील्ड सर्वदा होने से सामान्यतः नहीं होता। निर्णय प्रयोजन रक्षक रखें) |
+| `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` से आरंभ बदलें |
+| `BloxdVertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` में लपेटें |
 | दूर श्वेत धुंधला | बहुधा द्वि-फ़ॉग। पूर्ण रंग फ़ॉग लगा हुआ, स्वनिर्मित संयत रखें, संतृप्ति ही घटाना श्रेष्ठ |
 | खेल प्रवेश पर पैक निष्कासित | खेल आरंभ वास्तविक-मशीन जाँच विफल। रक्षक चूक पुनः देखें |
-| `pack.json needs "apiVersion": 1.` | `apiVersion` अभाव। अंक `1` पूरें (स्ट्रिंग `"1"` अस्वीकृत) |
+| `pack.json needs "apiVersion": 2.` | `apiVersion` अभाव या `2` नहीं। अंक `2` पूरें (स्ट्रिंग `"2"` अस्वीकृत)। v1 पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
 | `There's no pack.json at the top of the pack.` | ZIP मूल में `pack.json` नहीं। फ़ोल्डर समग्र संवेष्टित जाँचें |
-| `bloxd_terrain_vertex must be declared as: fn ...` | हस्ताक्षर भिन्न। दर्शित घोषणा अक्षरशः पुनः लिखें |
-| `bloxd_terrain_vertex can't run in strict games...` | vertex हुक `#ifndef BLOXD_STRICT` में लपेटें |
-| `bloxd_LightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` में लपेटें |
+| `bloxdTerrainVertex must be declared as: fn ...` | हस्ताक्षर भिन्न। दर्शित घोषणा अक्षरशः पुनः लिखें |
+| `bloxdTerrainVertex can't run in strict games...` | vertex हुक `#ifndef BLOXD_STRICT` में लपेटें |
+| `BloxdLightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` में लपेटें (v2 में फ़ील्ड सर्वदा होने से सामान्यतः नहीं होता) |
 | `pow(l.skyLight, γ)` कितना भी छाया सघन नहीं | `skyLight` लिफ्ट वक्र बाद मान (कच्चा 0.87 से 0.97 आगमन)। R9.12 लिफ्ट व्युत्क्रम + देहली कट पर जाएँ (अध्याय 10) |
-| `... can only be a function's parameter or return type, ...` | अनारंभिक `var x: bloxd_Surface;` अस्वीकृत। `bloxd_default*` से बनाएँ |
-| `bloxd_packInputs isn't part of the bloxd_ header` | PackInputs uniform पैक से संदर्भ नहीं। हुक निवेश फ़ील्ड (`s.time`, `s.originOffset`, `s.sunDirection`) से लें |
+| `... can only be a function's parameter or return type, ...` | अनारंभिक `var x: BloxdSurface;` अस्वीकृत। `bloxdDefault*` से बनाएँ |
+| `bloxdPackInputs isn't part of the bloxd_ header` | PackInputs uniform पैक से सीधा संदर्भ असंभव। `bloxdTime()` आदि शीर्ष फ़ंक्शन से प्रयोग करें |
 | `Packs can't declare bloxd_ names...` | अपने पहचानकर्ताओं से `bloxd_` उपसर्ग हटाएँ। केवल 6 हुक नाम परिभाषित कर सकते |
 | `loadDuplicateManifest` (zip पठन में) | `pack.json` 2 हैं (अक्षर-भेद सहित)। 1 करें |
-| `Packs can't construct bloxd_Surface directly, since header structs gain fields; ...` | `bloxd_defaultSurface(s)` से आरंभ बदलें। light हुक प्रथम प्राचल प्रतिलिपि (`var out = s;`) से आरंभ भी योग्य |
+| `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | `bloxdDefaultSurface(s)` आदि से आरंभ बदलें। light हुक प्रथम प्राचल प्रतिलिपि (`var out = s;`) से आरंभ भी योग्य |
+| `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` असंभव। `_ = f();` लिखें |
+| `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | टेरेन हुक भीतर `bloxdOpaqueBehind()` आह्वान `#ifdef BLOXD_SCENE_DEPTH` से लपेटें |
+| `...only surface and light hooks can use.` | vertex हुक भीतर `bloxdOpaqueBehind()` हटाएँ (केवल surface / light) |
+| `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | त्रुटि नहीं, strict खेलों में स्वतः अक्षमता (`shaderPack:offInStrict`)। vertex हुक व `discard` `#ifndef BLOXD_STRICT` से लपेटें |
+| `mixing '*' and '^' requires parenthesis (only in ...)` | दूसरा चरण (ब्राउज़र Tint) त्रुटि। `^` `&` `\|` `<<` `>>` के संक्रियांड कोष्ठकबद्ध करें (§38) |
 
 ## 18. अधिकार व टिप्पण
 
@@ -1210,12 +1218,12 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 केवल छाया दबाने से, सूर्य अनुपस्थिति में इंजन पूर्ण रंग (`engineColour`) अब भी उजला रहता है, फलक-छाया अंतर अप्राकृतिक दिखता है। पूर्ण रंग समग्र क्षय लगाकर उत्तर दें।
 
-नीचे उदाहरण `sunDirection` शून्य रात्रि निर्णय, दिशायुक्त दिन निर्णय मान, रात्रि टेरेन पूर्ण रंग क्षय करता है। `blockLight` व `heldLight` प्रबल स्थल क्षय घटाकर, मशाल आदि निकट प्रकाश यथासंभव रखें। `0.52` समायोज्य मान है, अधिक अंधेरा चाहिए तो घटाएँ।
+नीचे उदाहरण `bloxdSunDirection()` शून्य रात्रि निर्णय, दिशायुक्त दिन निर्णय मान, रात्रि टेरेन पूर्ण रंग क्षय करता है। `blockLight` व `heldLight` प्रबल स्थल क्षय घटाकर, मशाल आदि निकट प्रकाश यथासंभव रखें। `0.52` समायोज्य मान है, अधिक अंधेरा चाहिए तो घटाएँ।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
     let nightDim = mix(0.52, 1.0, sunPresent);
     var scale = nightDim;
     #ifdef BLOXD_LIGHTING
@@ -1226,16 +1234,16 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     scale = mix(nightDim, 1.0, protectLocalLight);
     #endif
     // पूर्ण रंग क्षय, सामग्री emission डिफ़ॉल्ट अनुसार फ़ॉग सहित योग
-    out.colour = l.engineColour * scale + s.emission * l.fogFactor;
+    out.colour = l.engineColour * scale + s.emission * l.fogVisibility;
     return out;
 }
 ```
 
-**इस निरूपण की सीमा:** यदि `sunDirection` "सूर्य=इकाई दिशा, नहीं=शून्य" द्विमान हो, दिन-रात पृथक् संभव पर संध्या क्षीण सतत अनुमान असंभव। और पूर्ण रंग क्षय से, इंजन दिन-प्रकाश व परिवेश एक साथ क्षीण होते हैं, पूर्ण कालपट्टी पुनरुत्पादन नहीं। तरल भी वही निरूपण चाहिए तो तरल हुक वापसी संबंध जाँचें।
+**इस निरूपण की सीमा:** यदि `bloxdSunDirection()` "सूर्य=इकाई दिशा, नहीं=शून्य" द्विमान हो, दिन-रात पृथक् संभव पर संध्या क्षीण सतत अनुमान असंभव। और पूर्ण रंग क्षय से, इंजन दिन-प्रकाश व परिवेश एक साथ क्षीण होते हैं, पूर्ण कालपट्टी पुनरुत्पादन नहीं। तरल भी वही निरूपण चाहिए तो तरल हुक वापसी संबंध जाँचें।
 
 ## 20. जल प्राकृतिक दिखाने वाली जल समेकित रेसिपी
 
-यह API दृश्य वर्ण, गहराई व जलतल गहराई नमूना नहीं ले सकता, अतः **फ्रेनेल पवन वर्ण मिश्रण व सूर्य झलक छद्म अभिव्यक्ति है, वास्तविक परावर्तन/अपवर्तन/जल गहराई परिकलन नहीं**। नीचे आधार वर्ण रखते हुए, छिछले दृष्टिकोण निकट-आकाश वर्ण मिलाकर, केवल सूर्य रहते छोटी चमक जोड़ने का नमूना है।
+यह API दृश्य वर्ण नमूना नहीं ले सकता, अतः **फ्रेनेल पवन वर्ण मिश्रण व सूर्य झलक छद्म अभिव्यक्ति है, वास्तविक परावर्तन/अपवर्तन नहीं** (जल गहराई परिकलन v2 `bloxdOpaqueBehind()` से संभव होकर भाग VIII R-E में पृथक)। नीचे आधार वर्ण रखते हुए, छिछले दृष्टिकोण निकट-आकाश वर्ण मिलाकर, केवल सूर्य रहते छोटी चमक जोड़ने का नमूना है।
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -1247,22 +1255,22 @@ fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
 
-fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     let baseN = normalize(l.normal);
-    let viewDir = normalize(l.eyePosition - l.position);
+    let viewDir = normalize(bloxdEyePosition() - l.position);
     let facing = clamp(dot(baseN, viewDir), 0.0, 1.0);
     let fresnel = 0.02 + 0.98 * pow(1.0 - facing, 5.0);
     let fakeSkyReflection = vec3f(0.16, 0.29, 0.36);
     out.colour *= vec3f(0.88, 0.97, 1.04);
     out.colour = mix(out.colour, fakeSkyReflection, fresnel * 0.38);
     #ifdef BLOXD_LIGHTING
-    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+    let worldPos = bloxdWorldPosition(l.position);
     let topness = clamp(baseN.y * 2.0, 0.0, 1.0);
-    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, l.time), topness));
-    let sunLen = length(l.sunDirection);
+    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, bloxdTime()), topness));
+    let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
-        let sunDir = l.sunDirection / sunLen;
+        let sunDir = bloxdSunDirection() / sunLen;
         let halfDir = normalize(viewDir + sunDir);
         let glint = pow(max(dot(waveN, halfDir), 0.0), 180.0) * 0.55 * clamp(l.skyLight, 0.0, 1.0);
         out.colour += vec3f(1.0, 0.97, 0.90) * glint;
@@ -1277,9 +1285,9 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 - जल श्वेत/अति उजला: `fresnel * 0.38` का `0.38` व चमक `0.55` घटाएँ।
 - जल अति सघन: `fakeSkyReflection` मिश्रण अनुपात थोड़ा बढ़ाएँ। पर अधिक प्लास्टिक जैसा।
 - जलपृष्ठ रेखा व नियमित धारी दिखे: तरंग आवृत्ति व चमक तीव्रता घटाएँ। इस कोड में जलपृष्ठ जाल शीर्ष विस्थापन नहीं।
-- वास्तविक दृश्य प्रतिबिंब चाहिए: इस API निवेश में परदा वर्ण व दृश्य गहराई नहीं, केवल वर्ण मिश्रण से सत्य परावर्तन नहीं।
+- वास्तविक दृश्य प्रतिबिंब चाहिए: इस API निवेश में परदा वर्ण नहीं, केवल वर्ण मिश्रण से सत्य परावर्तन नहीं (गहराई तरल सीमित उपलब्ध। भाग VIII R-E)।
 
-यह रेसिपी **विद्यमान `bloxd_liquid_light` प्रतिस्थापित** करती है। R9.7 समनाम तरंग अभिलंब फ़ंक्शन व अन्य समनाम हुकों से दुहरा चिपकाएँ नहीं।
+यह रेसिपी **विद्यमान `bloxdLiquidLight` प्रतिस्थापित** करती है। R9.7 समनाम तरंग अभिलंब फ़ंक्शन व अन्य समनाम हुकों से दुहरा चिपकाएँ नहीं।
 
 ## 21. वास्तविक-मशीन परीक्षण सूची
 
@@ -1296,10 +1304,10 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 ### ज्ञात निर्बंध आधार मानकर
 
 - पैक टेरेन/तरल हुक सीमित, एक ही कोड आकाश, एंटिटी व UI निरूपण नहीं।
-- छाया मानचित्र जोड़ने, परदा-स्थान परावर्तन, दृश्य गहराई, अपवर्तन, ब्लूम आदि निवेश नहीं।
-- `time` एनिमेशन काल है, खेल दिन-रात संबंध गारंटी नहीं।
-- `sunDirection` शून्य तो सत्य चंद्र दिशा अज्ञात, वातावरण सन्निकटन "चंद्र भौतिकी" नहीं। दिशात्मक चांदनी `-sunDirection` से बनती है (केवल दिन-रात चक्र दुनियाएँ। भाग VII R-A)।
-- `s.position` / `l.position` स्थानीय निर्देशांक, विश्व निर्भर प्रभाव हेतु `originOffset` जोड़ें। खंड भीतर स्थानीय पैटर्न हेतु सचेत स्थानीय निर्देशांक प्रयोग करें।
+- छाया मानचित्र जोड़ने, परदा-स्थान परावर्तन, अपवर्तन, ब्लूम आदि निवेश नहीं (दृश्य गहराई तरल सीमित `bloxdOpaqueBehind()` रूप में खुली। भाग VIII देखें)।
+- `bloxdTime()` एनिमेशन काल है, खेल दिन-रात संबंध गारंटी नहीं।
+- `bloxdSunDirection()` शून्य तो सत्य चंद्र दिशा अज्ञात, वातावरण सन्निकटन "चंद्र भौतिकी" नहीं। दिशात्मक चांदनी `-bloxdSunDirection()` से बनती है (केवल दिन-रात चक्र दुनियाएँ। भाग VII R-A)।
+- `s.position` / `l.position` स्थानीय निर्देशांक, विश्व निर्भर प्रभाव हेतु `bloxdOriginOffset()` जोड़ें। खंड भीतर स्थानीय पैटर्न हेतु सचेत स्थानीय निर्देशांक प्रयोग करें।
 
 ## 22. शेडर सीमा आने पर संयोजन
 
@@ -1319,7 +1327,7 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | ② तरल परिभाषा आवरण | कैमरा तरल खंड परिभाषा color/alpha का emissive पूर्ण-परदा quad, हुक पाइपलाइन बाहर (सबसे आगे) चित्रित। खेल सेटिंग `cameraTint` हो तो वही जीतती है | नहीं (न वर्ण न सघनता बदल सकते) |
 | ③ cameraTint | खेल सेटिंग | नहीं |
 
-व्यावहारिक बिंदु: पैक जलांत में भी चलते रहते हैं / आवरण हटता नहीं / जलांत में शाखा नहीं होती (fogStart / fogEnd / fogColour जलांत में अपरिवर्तित अतः fogFactor भी संसूचित नहीं करता)।
+व्यावहारिक बिंदु: पैक जलांत में भी चलते रहते हैं / आवरण हटता नहीं / जलांत में शाखा नहीं होती (fogStart / fogEnd / fogColour जलांत में अपरिवर्तित अतः fogVisibility भी संसूचित नहीं करता)।
 
 ---
 
@@ -1329,36 +1337,36 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 24. सूर्य व चंद्रमा अभिज्ञान
 
-`l.sunDirection` स्रोत केवल आकाशपेटी प्रकार बदलने पर पुनर्लिखित सूर्य दिशा बफर है — कसौटी "आकाश में सूर्य है" नहीं, **"आकाशपेटी पृथ्वी प्रकार है"** है।
+`bloxdSunDirection()` स्रोत केवल आकाशपेटी प्रकार बदलने पर पुनर्लिखित सूर्य दिशा बफर है — कसौटी "आकाश में सूर्य है" नहीं, **"आकाशपेटी पृथ्वी प्रकार है"** है।
 
-| आकाशपेटी | `l.sunDirection` |
+| आकाशपेटी | `bloxdSunDirection()` |
 |---|---|
 | `default` (प्रक्रियात्मक आकाश) | अशून्य (डिफ़ॉल्ट नीचे) |
 | `gloomy` / `interstellar` / `space_*` (घन टेक्सचर) | **सदा (0,0,0)** |
 
-**चंद्रमा सदा `-sunDirection` में है** (इंजन चंद्र स्थिति सूर्य के ठीक विपरीत गिनता है)। रात्रि सूर्य ऊँचाई से जाँची जाती है — `sunDirection.y < 0` (सूर्य क्षितिज नीचे) पर चंद्रमा ऊपर है। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर, अतः चंद्रमा भी स्थिर — गतिशील चंद्रमा केवल दिन-रात चक्र दुनियाओं में दिखता है।
+**चंद्रमा सदा `-bloxdSunDirection()` में है** (इंजन चंद्र स्थिति सूर्य के ठीक विपरीत गिनता है)। रात्रि सूर्य ऊँचाई से जाँची जाती है — `bloxdSunDirection().y < 0` (सूर्य क्षितिज नीचे) पर चंद्रमा ऊपर है। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर, अतः चंद्रमा भी स्थिर — गतिशील चंद्रमा केवल दिन-रात चक्र दुनियाओं में दिखता है।
 
 डिफ़ॉल्ट दुनिया सूर्य दिशा लगभग `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 से संगणित इकाई सदिश, स्थिर)। वितरण पैक परीक्षण में झलक दिशाएँ कागज़ पर भविष्यवाणी का व्यावहारिक संदर्भ मान।
 
-दिन-रात चक्र इंजन में अंतर्निहित नहीं — inclination स्थिर अंक है, गतिशील दिन वाली दुनियाएँ खेल पक्ष अद्यतित करती हैं। हर अद्यतन पर `sunDirection` भी पुनर्लिखित अनुगमन करता है।
+दिन-रात चक्र इंजन में अंतर्निहित नहीं — inclination स्थिर अंक है, गतिशील दिन वाली दुनियाएँ खेल पक्ष अद्यतित करती हैं। हर अद्यतन पर `bloxdSunDirection()` भी पुनर्लिखित अनुगमन करता है।
 
-टेरेन दिशात्मक प्रकाश दृश्य आरंभ निर्मित केवल 2 दीप हैं, **दिशा व तीव्रता स्थिर, दिन-रात अपरिवर्तित**। संक्षेप में **टेरेन चमक का कोई घटक काल निर्भर नहीं। दिन-रात "रूप" केवल आकाशपेटी व sunDirection से आते हैं**, अतः रात्रि अवनमन पैकों को समय-पट्टी स्वयं sunDirection से अनुमान करनी चाहिए (§19 `sunPresent` तकनीक)।
+टेरेन दिशात्मक प्रकाश दृश्य आरंभ निर्मित केवल 2 दीप हैं, **दिशा व तीव्रता स्थिर, दिन-रात अपरिवर्तित**। संक्षेप में **टेरेन चमक का कोई घटक काल निर्भर नहीं। दिन-रात "रूप" केवल आकाशपेटी व bloxdSunDirection() से आते हैं**, अतः रात्रि अवनमन पैकों को समय-पट्टी स्वयं bloxdSunDirection() से अनुमान करनी चाहिए (§19 `sunPresent` तकनीक)।
 
-### R-A. दिशात्मक चांदनी — moonDir = −l.sunDirection
+### R-A. दिशात्मक चांदनी — moonDir = −bloxdSunDirection()
 
 चंद्रमा ऊपर रहते ही नील-श्वेत Lambert व मंद स्पेक्युलर जोड़ता है। `moonUp` डिफ़ॉल्ट स्थिर-सूर्य दुनियाओं में 0 है, वहाँ कुछ नहीं होता — **केवल दिन-रात चक्र दुनियाओं में छूटने वाली सुरक्षित चांदनी**।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     // चंद्रमा सदा सूर्य के ठीक विपरीत; दिन में moonDir.y < 0 से स्वतः बुझता है
-    let moonDir = -l.sunDirection;
+    let moonDir = -bloxdSunDirection();
     let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
     if (moonUp > 0.0) {
         let n     = normalize(l.normal);
         let diff  = max(0.0, dot(n, moonDir));
-        let view  = normalize(l.eyePosition - l.position);
+        let view  = normalize(bloxdEyePosition() - l.position);
         let halfV = normalize(moonDir + view);
         let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
         out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
@@ -1370,21 +1378,21 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 25. फ़ॉग आंतरिक
 
-फ़ॉग परिकलन सदा LINEAR विधा (`fogFactor = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` सहित (D = फ़ॉग सेटिंग; केवल D = 0 विशेष fogEnd = 5 सहित)। **प्रवणता पट्टी केवल 32 खंड चौड़ी** है, व `l.fogFactor` "दूरी धुंध" से कम **लोडेड दुनिया किनारे तक प्रसामान्यीकृत दूरी** है। खिलाड़ी अनुसार लोड दूरी बदलती है, अतः दूरी प्रभाव स्वयं `distance(l.position, l.eyePosition)` गिनें (रेसिपी R-B)।
+फ़ॉग परिकलन सदा LINEAR विधा (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` सहित (D = फ़ॉग सेटिंग; केवल D = 0 विशेष fogEnd = 5 सहित)। **प्रवणता पट्टी केवल 32 खंड चौड़ी** है, व `l.fogVisibility` "दूरी धुंध" से कम **लोडेड दुनिया किनारे तक प्रसामान्यीकृत दूरी** है। खिलाड़ी अनुसार लोड दूरी बदलती है, अतः दूरी प्रभाव स्वयं `distance(l.position, bloxdEyePosition())` गिनें (रेसिपी R-B)।
 
-डिफ़ॉल्ट फ़ॉग वर्ण `rgb(183, 191, 195)` (हल्का नील-धूसर)। दुनिया रचयिता `fogColourOverride` (hex) से बदलते हैं। फ़ॉग विधा 0 (NONE) पर **fogColour काला आता है**। मानक रूप `mix(l.fogColour, col, l.fogFactor)` सुरक्षित क्योंकि फ़ॉग वर्ण fogFactor 1 पर अप्रयुक्त रहता है।
+डिफ़ॉल्ट फ़ॉग वर्ण `rgb(183, 191, 195)` (हल्का नील-धूसर)। दुनिया रचयिता `fogColourOverride` (hex) से बदलते हैं। फ़ॉग विधा 0 (NONE) पर **fogColour काला आता है**। मानक रूप `mix(l.fogColour, col, l.fogVisibility)` सुरक्षित क्योंकि फ़ॉग वर्ण fogVisibility 1 पर अप्रयुक्त रहता है।
 
-खिलाड़ी-पक्ष `showFog` बंद करने पर फ़ॉग 3200–3328 खंड धकेला जाकर व्यावहारिक अमान्य होता है (`fogFactor ≈ 1` आता रहता है)।
+खिलाड़ी-पक्ष `showFog` बंद करने पर फ़ॉग 3200–3328 खंड धकेला जाकर व्यावहारिक अमान्य होता है (`fogVisibility ≈ 1` आता रहता है)।
 
-### R-B. लोड-सीमा पट्टी — fogFactor "दुनिया किनारा" रूप में
+### R-B. लोड-सीमा पट्टी — fogVisibility "दुनिया किनारा" रूप में
 
 लोड-सीमा की 32-खंड पट्टी ही चुपचाप शीतल कर दुनिया अंत छिपाता है (या प्रभावतः रेखांकित करता है)। स्वयं दूरी गिने बिना, खिलाड़ी लोड-दूरी सेटिंग स्वतः अनुगमन ही लाभ है।
 
 ```wgsl
-fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
-    var out = bloxd_defaultLight(s, l);
-    // fogFactor: 1 = भीतर (किनारे तक गुंजाइश), 0 = किनारे बाहर निकलने वाला
-    let edge = 1.0 - l.fogFactor;
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    // fogVisibility: 1 = भीतर (किनारे तक गुंजाइश), 0 = किनारे बाहर निकलने वाला
+    let edge = 1.0 - l.fogVisibility;
     let band = smoothstep(0.0, 1.0, edge);
     out.colour = mix(out.colour, out.colour * vec3f(0.82, 0.86, 0.95), band * 0.5);
     return out;
@@ -1403,7 +1411,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 - **surface हुक alphaTest "पूर्व" चलते हैं**: `out.alpha` सीधे त्याग परीक्षण खिलाता है। कटआउट सामग्री (घास, पत्ते) dither-ढंग विलयन प्रभाव अनुमति (रेसिपी R-C)। तरलों (मिश्रण) में `out.alpha` वास्तविक पारदर्शिता है (रेसिपी R-D)। सामान्य अपारदर्शी टेरेन पर प्रभाव नहीं — भ्रमित न हों
 - **`l.ambient` सामग्री** `material.ambient × sceneAmbient` है, सामग्री अनुसार भिन्न। दृश्य पक्ष ग्राफिक सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5) बाँधता है — नियत डिफ़ॉल्ट कभी न प्रोग्राम करें
-- **`time` वास्तव में `performance.now()` है**: ब्राउज़र अपटाइम 1 घंटे लिपटा हुआ। खेल दिन-रात व दुनिया बीता काल असंबद्ध। खेल घड़ी समकालिक एनिमेशन हेतु दिन-रात चक्र दुनियाओं में `sunDirection` दिगंश से काल अनुमान करें
+- **`bloxdTime()` वास्तव में `performance.now()` है**: ब्राउज़र अपटाइम 1 घंटे लिपटा हुआ। खेल दिन-रात व दुनिया बीता काल असंबद्ध। खेल घड़ी समकालिक एनिमेशन हेतु दिन-रात चक्र दुनियाओं में `bloxdSunDirection()` दिगंश से काल अनुमान करें
 - लोड पर खंड सीमाओं पर महीन चेकर पैटर्न इंजन परदा-अंतरिक्ष Bayer 4×4 dither खंड फ़ेड हैं, पैक बग नहीं
 - **`mod` आरक्षित शब्द है**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` से अस्वीकृत। शेष `%` ऑपरेटर से लिखें
 
@@ -1438,11 +1446,11 @@ fn sp_bayer4(pos: vec2f) -> f32 {
     }
 }
 
-fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
     // निचले खंडों से विलीन होता है; अधिक dissolve टिका रहता है
-    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(s.originOffset).y);
+    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(bloxdOriginOffset()).y);
     let thresh   = sp_bayer4(s.position.xz);
     out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
     #endif
@@ -1455,10 +1463,10 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 तरल हुक `out.alpha` मिश्रण सीधे खिलाता है। कैमरा ठीक नीचे पृष्ठ ही पतला करके, गोता/जलोपरि कैमरा दृष्टि सुनिश्चित करने की रेसिपी।
 
 ```wgsl
-fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
-    var out = bloxd_defaultSurface(s);
+fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
-    let d = distance(s.position, s.eyePosition);
+    let d = distance(s.position, bloxdEyePosition());
     out.alpha *= smoothstep(0.0, 3.0, d);   // 0–3 खंड पूर्ण पारदर्शी से सामान्य
     #endif
     return out;
@@ -1469,11 +1477,11 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 वही पैक **दुनिया व खिलाड़ी सेटिंग अनुसार** भिन्न दिखता है। वितरण पूर्व कम से कम इन 3 परिवेशों में देखें:
 
-1. **सामान्य दुनिया** (डिफ़ॉल्ट आकाशपेटी, ओवरराइड नहीं) — sunDirection विद्यमान, डिफ़ॉल्ट वर्ण
-2. **अंतरिक्ष आकाशपेटी दुनिया** — sunDirection = 0। `sunPresent` शाखा रूप
+1. **सामान्य दुनिया** (डिफ़ॉल्ट आकाशपेटी, ओवरराइड नहीं) — bloxdSunDirection() विद्यमान, डिफ़ॉल्ट वर्ण
+2. **अंतरिक्ष आकाशपेटी दुनिया** — bloxdSunDirection() = 0। `sunPresent` शाखा रूप
 3. **अनुकूलित दुनिया `visionMinLightColour` / `skyLightColourOverride` सहित** — उठे अंधेरे व वर्ण
 
-मुख्य भिन्नता स्रोत: `lightingOverride` (बलात् प्रकाश) / `skyLightColourOverride`, `ambientLightColourOverride` (hex अदला-बदली) / `visionMinLightColour` ("दिखने वाला सबसे गाढ़ा वर्ण" फ़र्श sky व ambient पर; Night Vision प्रयोग करता है — "गुफा घोर अंधेरी" पैक सोचा अंधेरा नहीं करते) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (sunDirection विद्यमानता)। `uSkyLightColour` डिफ़ॉल्ट = (1,1,1) श्वेत, `uAmbientLightColour` डिफ़ॉल्ट = (0.25,0.25,0.30)। `l.ambient` दृश्य पक्ष = ग्राफिक सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5)। `l.fogFactor` खिलाड़ी फ़ॉग/खंड दूरी सेटिंग अनुगमन करता है।
+मुख्य भिन्नता स्रोत: `lightingOverride` (बलात् प्रकाश) / `skyLightColourOverride`, `ambientLightColourOverride` (hex अदला-बदली) / `visionMinLightColour` ("दिखने वाला सबसे गाढ़ा वर्ण" फ़र्श sky व ambient पर; Night Vision प्रयोग करता है — "गुफा घोर अंधेरी" पैक सोचा अंधेरा नहीं करते) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (bloxdSunDirection() विद्यमानता)। `uSkyLightColour` डिफ़ॉल्ट = (1,1,1) श्वेत, `uAmbientLightColour` डिफ़ॉल्ट = (0.25,0.25,0.30)। `l.ambient` दृश्य पक्ष = ग्राफिक सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5)। `l.fogVisibility` खिलाड़ी फ़ॉग/खंड दूरी सेटिंग अनुगमन करता है।
 
 ## 29. दोषमार्जन साधन
 
@@ -1483,7 +1491,158 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 - WebGPU रेंडरर पैक सहित "बलात् चालू" तालाबंद होता है। "Disable Block Texture Atlas" सेटिंग भी तालाबंद (Atlas चालू रहता है), व WebGPU बिना परिवेश पैक बिल्कुल लागू नहीं होता। वितरण पृष्ठों पर "WebGPU ब्राउज़र आवश्यक" लिखने का आधार
 - खेल प्रवेश रनटाइम पुनः सत्यापन (`checkCompilation`) ब्राउज़र WebGPU में वास्तविक टेरेन सामग्री संकलित करता है (सेटिंग परदा स्थैतिक सत्यापन से कठोर)। यहाँ गिरने वाले पैक उस खेल से वर्जित होते हैं
 
-## 30. स्वतंत्रतः समान सामग्री विषयक
+# भाग VIII: API Version 2 माइग्रेशन गाइड
+
+लक्ष्य बिल्ड: `6qxffk.main.5912a15f.js` (2026-10-16 का उत्पादन परिनियोजन)। इस पुस्तक के भाग I–VII v2 आधार पर पुनः लिखे जा चुके हैं; यह भाग VIII v1 से प्रवासन बिंदु व v2 नई सुविधाएँ समेटता है। नई सुविधा कोड उदाहरण v2 कंपाइलर द्वारा 8/8 वेरिएंट सत्यापन व ब्राउज़र WGSL कंपाइलर (Tint) सत्यापन (§38) उत्तीर्ण हैं, पर विद्यमान रेसिपी v2 रूपांतरण यांत्रिक पहचानकर्ता प्रतिस्थापन है, अतः वितरण पूर्व वास्तविक-मशीन कंपाइल से अवश्य सत्यापित करें।
+
+## 31. v1 पैकों का भाग्य (पहले निष्कर्ष)
+
+खेल manifest `apiVersion` **ठीक-ठीक 2 मिलान** माँगता है। v1 पैक लोड `This pack is for shader pack API version 1. Bloxd supports version 2.` (i18n कुजी `shaderPack:loadWrongApiVersion`) से अस्वीकृत होता है। v1/v2 **समानांतर समर्थन नहीं**। इंजन संरक्षित पैकों का `validation.headerVersion` (शीर्ष पूर्ण पाठ हैश) पुनः जाँचता है, अतः इंजन अद्यतन पर संरक्षित पैक स्वतः "पुनः जाँच आवश्यक" होने की व्यवस्था v1 समान है।
+
+## 32. पहचानकर्ता पूर्ण पुनर्नामकरण (संगति तालिका)
+
+v2 में अंडरस्कोर नामकरण कैमलकेस में एकीकृत हुआ। **पुराने नाम सर्वथा अप्रयोज्य।**
+
+| v1 | v2 |
+|---|---|
+| `bloxd_terrain_vertex` | `bloxdTerrainVertex` |
+| `bloxd_terrain_surface` | `bloxdTerrainSurface` |
+| `bloxd_terrain_light` | `bloxdTerrainLight` |
+| `bloxd_liquid_vertex` | `bloxdLiquidVertex` |
+| `bloxd_liquid_surface` | `bloxdLiquidSurface` |
+| `bloxd_liquid_light` | `bloxdLiquidLight` |
+| `bloxd_defaultVertex` | `bloxdDefaultVertex` |
+| `bloxd_defaultSurface` | `bloxdDefaultSurface` |
+| `bloxd_defaultLight` | `bloxdDefaultLight` |
+| `bloxd_VertexIn` | `BloxdVertexIn` |
+| `bloxd_Vertex` | `BloxdVertex` |
+| `bloxd_SurfaceIn` | `BloxdSurfaceIn` |
+| `bloxd_Surface` | `BloxdSurface` |
+| `bloxd_LightIn` | `BloxdLightIn` |
+| `bloxd_Light` | `BloxdLight` |
+| `bloxd_packInputs` (आंतरिक uniform) | `bloxdPackInputs` (`@group(3) @binding(0)`, 64B) |
+
+हुक प्रकार (vertex / surface / light × terrain / liquid 6) व `pack.json` रूप (`apiVersion` / `name` / `author`) अपरिवर्तित। लोडर सीमाएँ भी अपरिवर्तित (zip 32MB / प्रविष्टि 1024 / `.wgsl` 256 फाइलें / कुल 256KB / manifest 64KB)।
+
+## 33. हटाए फ़ील्डों का नया ठिकाना
+
+v1 में `time` / `eyePosition` / `sunDirection` / `originOffset` संरचना फ़ील्ड थे। v2 में **ये फ़ील्ड हटाए गए; बदले में इंजन uniform (`bloxdPackInputs`) पढ़ने वाले शीर्ष फ़ंक्शन** प्रयोग करें। फ़ंक्शन uniform सीधे पढ़ते हैं, अतः **हुक बाहर मॉड्यूल-स्कोप फ़ंक्शन व vertex हुकों से भी बुलाए जा सकते हैं**।
+
+| v1 | v2 |
+|---|---|
+| `s.time` / `v.time` / `l.time` | `bloxdTime()` |
+| `s.sunDirection` / `l.sunDirection` | `bloxdSunDirection()` |
+| `s.eyePosition` / `l.eyePosition` | `bloxdEyePosition()` |
+| `s.originOffset` / `l.originOffset` | `bloxdOriginOffset()` |
+| `s.position + vec3f(...)` से विश्व निर्देशांक रूपांतरण | `bloxdWorldPosition(s.position)` |
+| `vec3i(floor(pos - normal*0.5)) + originOffset` | `bloxdFaceBlock(pos, normal)` |
+
+## 34. नई सुविधा ①: `blockId` (खंड-विशिष्ट शेडिंग)
+
+तीनों संरचनाओं `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` में `blockId: u32` जुड़ा। **फलक स्वामी खंड ID** (0–65535), उसी फलक सर्वत्र समान (`@interpolate(flat)` से पारित)। टेक्सचर वर्ण अनाश्रित खंड प्रकार पहचान हेतु प्रयोग करें। पर ID-खंड-प्रकार संगति तालिका इंजन भीतर है, पैकों से अदृश्य, अतः **कौन ID कौन खंड केवल दुनिया में मापकर** जानें।
+
+### R-F. blockId से खंड प्रकार रंगत
+
+```wgsl
+fn blockTint(blockId: u32) -> vec3f {
+    // जैसे: प्रस्तर परिवार (id उच्च बिट प्रतिरूप) शीतल झुकाएँ
+    let stripe = f32((blockId >> 4u) & 1u);
+    return mix(vec3f(1.0), vec3f(0.85, 0.95, 1.0), stripe * 0.5);
+}
+
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    result.colour *= blockTint(surface.blockId);
+    return result;
+}
+```
+
+## 35. नई सुविधा ②: `BLOXD_SCENE_DEPTH` व `bloxdOpaqueBehind()` (मुख्य)
+
+v1 में संरचनात्मक असंभव गहराई पहुच **केवल तरल (liquid) प्रोग्रामों हेतु** खुली। वर्ण नहीं, पर **पीछे अपारदर्शी फलक दूरी व स्थिति ज्यामिति उपलब्ध**। प्ररूपी उपयोग मापी जल मोटाई से अवशोषण वर्ण परिकलन है।
+
+उपयोग नियम:
+
+| उपयोग | परिणाम |
+|---|---|
+| `bloxdLiquidSurface` / `bloxdLiquidLight` में अरक्षित आह्वान | ठीक (तरल वेरिएंटों में सदा परिभाषित) |
+| `bloxdTerrainSurface` में अरक्षित आह्वान | त्रुटि। `#ifdef BLOXD_SCENE_DEPTH` से लपेटें |
+| vertex हुकों में आह्वान | त्रुटि (केवल surface / light हुक) |
+
+टेरेन हुकों में भी गहराई चाहें तो `#ifdef BLOXD_SCENE_DEPTH` से लपेटें (टेरेन हुक तरल प्रोग्रामों में पुनः प्रयुक्त होते हैं, अतः गहराई केवल तरल पक्ष जीवित)।
+
+### R-E. जल मोटाई अवशोषण (Beer-Lambert)
+
+```wgsl
+fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var result = bloxdDefaultSurface(surface);
+    let behind = bloxdOpaqueBehind();
+    if (behind.found) {
+        // जल स्तंभ लंबाई = यहाँ से पीछे अपारदर्शी फलक तक
+        let thickness = distance(behind.position, surface.position);
+        // Beer-Lambert अवशोषण: लाल शीघ्र गिरता, नीला दूर पहुचता
+        let absorb = exp(-thickness * vec3f(0.35, 0.14, 0.08));
+        result.colour *= absorb;
+    } else {
+        // पीछे आकाश = गहरे जल नील की ओर खींचें
+        result.colour = mix(result.colour, vec3f(0.05, 0.15, 0.30), 0.4);
+    }
+    return result;
+}
+```
+
+अनुप्रयोग: मोटाई आधारित अवशोषण/प्रकीर्णन, `behind.position` से तल विश्व निर्देशांक से तरंग-कास्टिक-ढंग पैटर्न प्रक्षेपण, `found=false` से आकाश व अवरोध भेद से जलपृष्ठ आकाश परावर्तन, गहराई से झाग व मैलापन चरणबद्ध। गहराई प्रतिलिपि पाइपलाइन निर्माण विफल हो तो "पीछे कुछ नहीं" सुरक्षित अवनति।
+
+## 36. अन्य v2 परिवर्तन
+
+- **हुक फॉलबैक**: `bloxdLiquidXxx` अपरिभाषित हो तो तरल प्रोग्राम टेरेन हुकों पर गिरते हैं। **केवल टेरेन हुक पैक जल पर भी ज्यों का त्यों असर करता है**। अनभीष्ट हो तो तरल पक्ष हुक स्पष्ट परिभाषित करें।
+- **`BLOXD_LIGHTING` फ़ील्ड रक्षक अनावश्यक**: `blockLight` आदि सभी वेरिएंटों में हैं, अलिट में डिफ़ॉल्ट (0 / 1 / श्वेत / 0) रहते हैं। केवल प्रकाश परीक्षण हेतु `#ifdef BLOXD_LIGHTING` प्रयोग करें। विद्यमान रक्षक रखने से कुछ नहीं बदलता।
+- **`BLOXD_ALPHA` परिभाषा शर्त बदली**: गैर-strict टेरेन वेरिएंटों व सभी तरल वेरिएंटों में परिभाषित, strict × टेरेन में अपरिभाषित। टेरेन हुकों में alpha लिखें तो रक्षक रखें।
+- **संरचना सीधा निर्माण निषिद्ध**: `BloxdLight(...)` जैसे निर्माता आह्वान स्थैतिक सत्यापन में अस्वीकृत। सदा `bloxdDefault*` से बदलें या निवेश प्रतिलिपि प्रयोग करें।
+- **`let _ =` से `_ =`**: WGSL त्याग समनुदेशन `_ = f();` वैध, पर `let _ = f();` अस्वीकृत।
+- **offInStrict**: vertex हुक परिभाषा या surface / light हुकों से पहुच योग्य `discard` हो तो त्रुटि नहीं, पूरा पैक strict खेलों में स्वतः अक्षम (सेटिंग UI में `shaderPack:offInStrict`; allow खेलों में चलता है)। vertex हुक व `discard` `#ifndef BLOXD_STRICT` से लपेटें।
+- **फ़ॉग विस्तार**: फ़ॉग परिकलन LINEAR / EXP / EXP2 विधाएँ कार्यान्वित, पर खेल सेटिंग अब भी सदा LINEAR, अतः विद्यमान फ़ॉग विनिर्देश ज्यों के त्यों चलते हैं। `fogColour` अर्थ अब आधिकारिक दस्तावेज़ित (केवल पूर्णतः फ़ॉगहीन दृश्यों में काला)।
+- **अपरिवर्तित**: लिफ्ट वक्र, 35% चैनल तल, heldLight क्षय (`pow(lightDist, 0.75)`) व परिवेश बढ़त, सूर्य/चंद्र दिशा विनिर्देश, डिफ़ॉल्ट फ़ॉग वर्ण, काल लपेटन (3600 सेकंड), दिशात्मक प्रकाश (अधिकतम 4), केवल Lite (WebGPU), संरक्षण तंत्र (IndexedDB), `mod` आरक्षित शब्द।
+
+## 37. v1 → v2 प्रवासन जाँच सूची
+
+1. **pack.json**: `"apiVersion": 1` → `"apiVersion": 2`
+2. **पहचानकर्ता**: §32 तालिका से सब बदलें (हुक नाम, संरचना नाम, default फ़ंक्शन नाम)
+3. **हटाए फ़ील्ड स्थानांतरण**: §33 तालिका से शीर्ष फ़ंक्शनों में (`s.time` → `bloxdTime()` आदि)
+4. **`fogFactor` → `fogVisibility`** पुनर्नामकरण
+5. **संरचना सीधा निर्माण हटाएँ**
+6. **`let _ =` से `_ =`** सुधारें
+7. **vertex हुक व discard `#ifndef BLOXD_STRICT` से लपेटें**
+8. **जल भी टेरेन हुक प्रभाव अनुभव करता है** सत्यापित करें; अनभीष्ट हो तो liquid हुक स्पष्ट परिभाषित करें
+9. (वैकल्पिक) `litColour` से स्वयं फ़ॉग प्रबंधित करें / `bloxdOpaqueBehind()` से जल मोटाई अवशोषण जोड़ें / `blockId` से खंड-विशिष्ट अभिव्यक्ति
+10. **दूसरा चरण (ब्राउज़र Tint) भी सत्यापित करें** — विशेषतः `^` `&` `|` `<<` `>>` वाले व्यंजकों के कोष्ठक। स्थैतिक सत्यापन उत्तीर्ण फिर भी ब्राउज़र में अस्वीकृत कोड संभव है (§38)
+
+## 38. दूसरा सत्यापन चरण — ब्राउज़र WGSL कंपाइलर अंतर्निहित पार्सर से कठोर है
+
+खेल का पैक सत्यापन **2-चरण** है। पहला चरण स्थैतिक सत्यापन (इंजन-अंतर्निहित JS पार्सर। हुक हस्ताक्षर, निषिद्ध वाक्यरचना, sceneDepth उपयोग आदि पैक-विशिष्ट नियमों का निरीक्षण) है, दूसरा चरण ब्राउज़र सत्यापन (संकलन परिणाम में संलग्न स्टब का वास्तविक WebGPU कार्यान्वयन से संकलन, त्रुटियों का पैक मूल फ़ाइल पंक्तियों पर प्रतिलोम-मैपिंग सहित प्रदर्शन। UI का "Saved, but it won't run until you fix these errors" यही चरण) है। त्रुटि प्रदर्शन अंत के `(only in terrain)` आदि प्रत्यय "उस त्रुटि वाले वेरिएंट की program किस्म" हैं।
+
+अंतर्निहित पार्सर WGSL संक्रियक बंधन (Binding) नियम लागू नहीं करता, अतः **स्थैतिक सत्यापन उत्तीर्ण होकर भी ब्राउज़र में अस्वीकृत होता है**। क्षति-प्रवण नियत पूर्णांक-हैश प्रतिरूप हैं:
+
+| संक्रियक | परिणाम |
+|---|---|
+| `<<` `>>` | केवल एकल स्तर तक सीधे बंध सकते हैं। `a + b << c` त्रुटि है |
+| `&` `^` `\|` | केवल एकल स्तर तक सीधे बंध सकते हैं। `a * b ^ c` त्रुटि है |
+| `&&` `\|\|` | मिश्रण असंभव। `a && b \|\| c` त्रुटि है |
+
+### कोष्ठक लगाने की विधि (NG / OK)
+
+```wgsl
+// NG — स्थैतिक सत्यापन उत्तीर्ण पर ब्राउज़र (Tint) अस्वीकृत:
+//     mixing '*' and '^' requires parenthesis
+let h = a * 73856093u ^ b * 19349663u ^ c * 83492791u;
+
+// OK — प्रत्येक गुणन कोष्ठकबद्ध (एक ही संक्रियक की श्रृंखला A ^ B ^ C स्वयं वाम-साहचर्य से वैध)
+let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
+```
+
+इस पुस्तक प्रकाशित कोड में यह प्रतिरूप नहीं है (`pack_hash3` का `+`/`*` मिश्रण व `h ^ (h >> 16u)` कोष्ठकबद्ध होने से विनिर्देश-अनुरूप)। पैक लिखें तो पहला व दूसरा दोनों चरण उत्तीर्ण कराएँ।
+
+## 39. स्वतंत्रतः समान सामग्री विषयक
 
 लगभग समान सामग्री वाली समुदाय सामग्री विद्यमान है: [GlitchHunterCoder/Bloxd-Essay का Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader)। इस गाइड से पहले प्रकाशित, पर **इस गाइड सामग्री glm के Bloxd वास्तविक बंडल फ़ाइलों (webpack खंड समुच्चय) के स्वतंत्र विश्लेषण से है — प्रतिलिपि नहीं**। दोनों मिलते हैं क्योंकि एक ही कार्यान्वयन की स्वतंत्र जाँच समान निष्कर्ष लाती है।
 
