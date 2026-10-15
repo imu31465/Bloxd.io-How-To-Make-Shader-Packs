@@ -129,6 +129,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 - WGSL の組み込み関数 (`sin`、`mix`、`clamp`、`distance`、`smoothstep`、`reflect`、`select` 等)
 - 自作の `fn` / `struct` / `const` / `alias` / `var<private>`、関数内の `let`・制御構文 (if/for/while/switch 等)
+- 導関数 (`dpdx` / `dpdy` / `fwidth`) は surface/light フック (フラグメント段) でのみ使用可。vertex では不可
+- `const` 配列 (カラーパレットLUT等)、ポインタ (`ptr<function, T>`)、行列 (`mat3x3f` 等) も使用可
 - フラグ定義 `#define 名前` + `#ifdef` による条件分岐
 
 禁止・注意:
@@ -136,6 +138,7 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 - **テクスチャ不可**: `texture_*` / `sampler` 型は使えない。質感はハッシュノイズ等の手続き的計算で作る
 - **`discard` は strict で禁止** (`#ifndef BLOXD_STRICT` で囲む)
 - `@属性` / `enable` / `requires` / `override` は禁止。`enable f16;` が書けないため **f16系の型は使えない**
+- `@builtin` 属性も禁止のため、`fragCoord` (画面座標) や `vertex_index` は取得できない
 - **モジュールスコープの `let` は使わない** (`const` か `var` を使う)
 - `atomic` は使えない
 - 座標は noaローカル座標。ワールド座標にするには `originOffset` を足す。ブロック座標は `vec3i(floor(position - normal * 0.5)) + originOffset`
@@ -966,6 +969,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 > `l.fogFactor` を `max(l.fogFactor, 0.25)` のように下限付きにすると「これ以上濃くならない」調整ができる
 > (0.0 = エンジン準拠 / 0.3〜0.5 = 遠景クリア)。
+> なおエンジンのフォグは地平線専用のlinearフォグ (描画距離付近のみ) であり、中距離の霧はパック側で作る必要がある。
 
 ```wgsl
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
@@ -1043,6 +1047,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | 被写界深度・色収差・グレイン | フルスクリーン後処理が必要 |
 | 体積光 (god rays) | 同上 |
 | PBR テクスチャ | テクスチャ参照禁止。色の輝度からの擬似推定のみ |
+| 水中検出・水中ヴェールの除去 | カメラが水中か示すフィールドが無く、水中の青ヴェールはフックのパイプライン外 (フルスクリーンquad + 水中スカイボックス) のため検出も除去も不可 |
 | 水中屈折 | シーン深度の入力が無い |
 
 ## 16. デバッグのコツ
