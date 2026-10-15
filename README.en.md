@@ -5,7 +5,7 @@ Based on the spec at `apiVersion: 1`. Includes a recipe collection and API refer
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-10-15. Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
+> Last reviewed: 2026-10-15 (fog application order, real fog settings, and underwater rendering verified against renderer implementation). Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 
@@ -17,6 +17,7 @@ Based on the spec at `apiVersion: 1`. Includes a recipe collection and API refer
 - [Part IV: Realism guide](#part-iv-realism-guide)
 - [Part V: Troubleshooting & notes](#part-v-troubleshooting--notes)
 - [Part VI: Important implementation notes](#part-vi-important-implementation-notes)
+- [Part VII: Internals supplement](#part-vii-internals-supplement)
 
 ---
 
@@ -92,7 +93,8 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 Rules to follow:
 
-- Never **construct output structs directly** (`bloxd_Surface(...)` is an error). Always start from `bloxd_defaultSurface(s)` / `bloxd_defaultLight(s, l)` / `bloxd_defaultVertex(v)` and modify fields
+- Never **construct output structs directly** (`bloxd_Surface(...)` is an error). Always start from `bloxd_defaultSurface(s)` / `bloxd_defaultLight(s, l)` / `bloxd_defaultVertex(v)` and modify fields. Exception: the light hook's first parameter (`s: bloxd_Surface`) has the output type, so `var out = s;` also works
+- Uninitialized `var x: bloxd_Surface;` (type annotation only) is also an error
 - Hook parameters are **read-only**. To change them, copy first, e.g. `var sv = s;`
 - You cannot use the `bloxd_` prefix for your own identifiers (except the 6 hook names)
 - Write constants with `const` (`#define` cannot hold values)
@@ -248,8 +250,13 @@ fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 Key points:
 
 - `time` wraps every 3600 seconds and is elapsed time. It is not guaranteed to sync with the in-game day/night clock.
-- `sunDirection` is a unit vector only while a sun exists; zero when the sky has no sun. Moon direction data is not part of this API's inputs, so it cannot be reused as the moon direction when zero.
-- `emission` is added after the lighting calculation, then fogged
+- `sunDirection` is a unit vector only while a sun exists; zero when the sky has no sun. **The moon is always `-sunDirection`** (the engine computes the moon position as the exact opposite of the sun). But in default worlds the sun is static, so the moon is static too — a moving moon only matters in worlds implementing a day/night cycle (see Part VII, section 24)
+- ※Note: previously written as "cannot be reused as the moon direction when zero". Direction itself is available via `-sunDirection`, but packs for external distribution should branch on `sunPresent` with zero as the premise (see R2 for the blue-ambient pseudo look, Part VII R-A for directional moonlight)
+- `emission` is added after the lighting calculation, attenuated by **`fogFactor`** (the defaultLight implementation `engineColour + emission × fogFactor`. Emission also disappears in fully fogged distance)
+- **Fog application order**: fragment processing runs ① lighting/emission composition → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogFactor)` → ④ light hook call → ⑤ return. So **engineColour arrives already fogged**, and **the light hook's return value becomes the final color as-is** (no fog re-applied after the hook)
+- **fogFactor source**: view-space distance (computed per-vertex, interpolated). In linear mode `fogFactor = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
+- **When fogMode == 0**: `fogColour` arrives as `vec3f(0.0)` (black). Code estimating time-of-day from fogColour tint should be careful
+- **Real fog settings in current builds**: **linear fixed**. `fogStart` = chunk render distance, `fogEnd` = +1 chunk (horizon only). With fog off it is set to 100 / 101 chunks, effectively disabling. Default fog color is RGB(183, 191, 195)
 - A uniform called `bloxd_packInputs` exists inside the engine, but **packs cannot reference it directly**. Use values via hook input fields (`s.time` etc.)
 - **`skyLight` / `blockLight` / `heldLight` arrive after a "lift curve"**. The `tone-mapped` in the header comments refers to this: the engine always applies `y = 1-(1-x/(3-2x))³` (an S-curve lifting dark areas) to fragments before handing them to packs. Values are not raw voxel values (n/15); e.g. under a tree (raw 0.87) arrives lifted to **0.97**
 - `skyLight` is essentially voxel occlusion data of "whether sky is visible from here" (= a shadow map), not just a brightness parameter (see section 15, "The truth about shadows")
@@ -440,7 +447,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### Blue night ambience (pseudo look without moon direction)
 
-> In this API, `sunDirection` is zero when the sky has no sun. There is no moon direction data, so moon-facing surfaces cannot be identified. This is not directional moonlight — just a faint blue ambient added when the sky is dark.
+> In this API, `sunDirection` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-sunDirection` (day/night-cycle worlds only. Part VII R-A).
 
 ```wgsl
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
@@ -483,7 +490,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let level = clamp(sky * 0.7 + block, 0.0, 1.0);
     // discard engineColour (the engine lighting result) and use "base color × self-computed brightness"
-    out.colour = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
+    var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
+    col = mix(l.fogColour, col, l.fogFactor);   // discarded engineColour, so fog redo is required
+    out.colour = col + s.emission * l.fogFactor;   // add emission yourself too (required)
     return out;
     #else
     return bloxd_defaultLight(s, l);
@@ -493,7 +502,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## R3. Emission recipes
 
-> `emission` is added after the lighting calculation, then fogged. Multiply distant glow by `fogFactor` yourself.
+> `emission` is added after the lighting calculation, but the default process **attenuates it with `fogFactor`. In fully fogged distance, emission disappears too. To keep glowing at distance, don't add to emission — add directly as `out.colour += ...` inside the light hook** (engineColour is already fogged, so light lands on top of fog color at distance)
 
 ### Pulsing lamps (breathing torches)
 
@@ -791,7 +800,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let torch   = mix(l.blockLight, blockInt * vec3f(1.00, 0.72, 0.42), 0.55);
     let sky     = mix(l.ambientLightColour, l.skyLightColour, l.skyLight) * vec3f(0.90, 0.95, 1.08);
     let voxel   = max(torch, sky);
-    out.colour = s.colour * voxel;
+    var col = clamp(s.colour * voxel, vec3f(0.0), vec3f(1.0));   // intermediate clamp
+    col = mix(l.fogColour, col, l.fogFactor);                    // fog redo
+    out.colour = col + s.emission * l.fogFactor;                 // emission re-add
     #endif
     return out;
 }
@@ -849,7 +860,9 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let skyH   = l.ambientLightColour * 0.30 + l.skyLightColour * 0.45 * l.skyLight; // above: skylight
     let hemi = vec3f(0.25) + mix(ground, skyH, upness);
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
-    out.colour = s.colour * voxel * hemi;
+    var col = clamp(s.colour * voxel * hemi, vec3f(0.0), vec3f(1.0));   // intermediate clamp
+    col = mix(l.fogColour, col, l.fogFactor);                           // fog redo
+    out.colour = col + s.emission * l.fogFactor;                        // emission re-add
     #endif
     return out;
 }
@@ -968,9 +981,10 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ### R9.10 Re-applying fog (required when discarding engineColour)
 
-> Setting a floor like `max(l.fogFactor, 0.25)` caps "no denser than this"  
-> (0.0 = engine-accurate / 0.3–0.5 = clearer distance).  
+> Setting a floor like `max(l.fogFactor, 0.25)` caps "no denser than this"
+> (0.0 = engine-accurate / 0.3–0.5 = clearer distance).
 > Note the engine fog is a horizon-only linear fog (near render distance only); mid-distance haze must be built pack-side.
+> Real fog settings (implementation-verified): linear fixed / `fogStart` = chunk render distance / `fogEnd` = +1 chunk / effectively disabled at 100–101 chunks when fog is off / default color RGB(183, 191, 195).
 
 ```wgsl
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
@@ -1056,7 +1070,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
     // re-apply fog (discarded engineColour's share)
     col = mix(l.fogColour, col, max(l.fogFactor, 0.15));
-    out.colour = clamp(col, vec3f(0.0), vec3f(1.0));
+    out.colour = clamp(col + s.emission * l.fogFactor, vec3f(0.0), vec3f(1.0));   // don't forget emission (fogged)
     #endif
     return out;
 }
@@ -1101,7 +1115,7 @@ Engine default lighting is "multiplication only" — no specular, fresnel, warm/
 1. **Re-apply fog**: the light hook runs post-fog, so apply `mix(l.fogColour, col, l.fogFactor)` yourself (R9.10). When fog is too dense, floor it with `max(l.fogFactor, 0.3)`. Conversely, mixing more fog color onto engineColour-based packs double-fogs into white distance
 2. **Unlit fallback**: pass through to `defaultLight` outside `#ifdef BLOXD_LIGHTING`
 3. **Guard whole shared functions**: wrap shared functions taking `bloxd_LightIn` in `#ifdef BLOXD_LIGHTING` as entire functions (guarding only call sites is not enough)
-4. **When there is no sun direction**: if `sunDirection` is zero, don't compute directional specular. `l.directional` is a light-amount scalar, not a direction vector, so it cannot restore highlight direction. Switch to weak directionless ambient as needed
+4. **When there is no sun direction**: if `sunDirection` is zero, don't compute directional specular. `l.directional` is a light-amount scalar, not a direction vector, so it cannot restore highlight direction. Switch to weak directionless ambient as needed. Moon direction is available via `-sunDirection` (only moves in day/night-cycle worlds. Part VII R-A)
 
 ## 15. Unreachable looks (the realism "ceiling")
 
@@ -1115,7 +1129,8 @@ Engine default lighting is "multiplication only" — no specular, fresnel, warm/
 | Volumetric light (god rays) | Same |
 | PBR textures | Texture reads prohibited. Only pseudo estimation from color luminance |
 | Underwater refraction | No scene-depth input |
-| Underwater detection / veil removal | No field indicates camera submersion; the blue veil is outside hook pipelines (fullscreen quad + underwater skybox), so it can be neither detected nor removed |
+| Underwater veil (blue tint) removal / change | The veil is an emissive fullscreen quad generated from the liquid block definition color/alpha the camera is in, drawn outside hook pipelines (frontmost), so packs can change neither its color nor density |
+| Direct underwater detection | No input indicates camera submersion, and fogStart / fogEnd / fogColour don't change underwater, so there is no reliable way to estimate underwater from fogFactor etc. |
 
 ### The truth about shadows — "tree shadows" are buildable
 
@@ -1131,6 +1146,18 @@ The right tools are R9.12's two steps (**restore raw values via lift inversion �
 
 **Honest limits**: these shadows are "upward sky" based, so **they don't rotate as the sun moves over time**. Resolution is per block (soft edges come from BFS spread). The engine lighting template still contains a closed `var shadow: f32 = 1.;` stub for shadow maps (always 1.0 = disabled) — interpreted as a trace of "planned" pixel-accurate rotating shadows. If pixel-accurate rotating shadows are a must, only out-of-API approaches remain (e.g. userscript GLSL injection, with policy risk).
 
+### Underwater reality
+
+Underwater looks consist of 3 layers:
+
+| Layer | Content | Operable from packs? |
+|---|---|---|
+| ① Terrain/liquid rendering | Hook-processable. Light hooks are called normally underwater | Yes (works "under the veil") |
+| ② Liquid-definition veil | Emissive fullscreen quad from the liquid block definition color/alpha at the camera position, drawn frontmost. The game setting `cameraTint` wins if set | No (neither color nor density changeable) |
+| ③ cameraTint | Game setting | No |
+
+Practical points: packs keep working underwater / the veil cannot be removed / underwater cannot be branched on (fogStart / fogEnd / fogColour don't change underwater, so fogFactor can't detect it either).
+
 ## 16. Debugging tips
 
 - Caves too bright → missing nonlinear `skyLight` curve (R2 cave recipe / R9.9)
@@ -1138,6 +1165,9 @@ The right tools are R9.12's two steps (**restore raw values via lift inversion �
 - Nights too dark to see → secure minimum ambient (night `skyLightColour` is nearly black by premise)
 - Over-hazed distance → lower aerial coefficients
 - Torch surroundings all orange → lower the warm blend ratio (keep some raw tinted light)
+- Blocks almost all white → light hook output total exceeds 1.0 (no clamp downstream). End with `clamp(col, vec3f(0.0), vec3f(1.0))`
+- White without additions → un-fog inversion via fogFactor division. Drop un-fog; rebuild from `s.colour` and `mix` fog once at the end
+- Emissive blocks don't glow → missing emission re-add in rebuild recipes. Add `+ s.emission * l.fogFactor`
 - Night looks wrong only on lit faces → don't darken just shadow colors; decay the whole engine finished color (`engineColour`) at night. To keep local lamps, weaken decay with `blockLight` / `heldLight` (Part VI, section 19)
 - Shade won't deepen no matter the `pow(skyLight, γ)` → `l.skyLight` is post-lift (section 10). Switch to R9.12 inversion + threshold cut
 - Tuning shadow area/density → see the R9.12 tuning guide (area = threshold `shTh` / edge = `shSoft` / core darkness = two-point shift of minimum ambient and sky scatter)
@@ -1163,6 +1193,11 @@ The right tools are R9.12's two steps (**restore raw values via lift inversion �
 | `bloxd_terrain_vertex can't run in strict games...` | Wrap the vertex hook in `#ifndef BLOXD_STRICT` |
 | `bloxd_LightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | Wrap in `#ifdef BLOXD_LIGHTING` |
 | Raising `pow(l.skyLight, γ)` never deepens shadows | `skyLight` is a post-lift-curve value (raw 0.87 arrives as 0.97). Switch to R9.12 lift inversion + threshold cut (section 10) |
+| `... can only be a function's parameter or return type, ...` | Uninitialized `var x: bloxd_Surface;` is rejected. Build from `bloxd_default*` |
+| `bloxd_packInputs isn't part of the bloxd_ header` | PackInputs uniform cannot be referenced from packs. Use hook input fields (`s.time`, `s.originOffset`, `s.sunDirection`) |
+| `Packs can't declare bloxd_ names...` | Strip the `bloxd_` prefix from your identifiers. Only the 6 hook names may be defined |
+| `loadDuplicateManifest` on zip load | Two `pack.json` files (including case variants). Keep one |
+| `Packs can't construct bloxd_Surface directly, since header structs gain fields; ...` | Rewrite from `bloxd_defaultSurface(s)`. Starting from a copy of the light hook's first parameter (`var out = s;`) also works |
 
 ## 18. Rights and notes
 
@@ -1257,7 +1292,7 @@ Compile success and "good looks" are different things. Check in this order:
 2. **8 variants:** no type-guard omissions across strict / allow, lighting on / off, terrain / liquid. Even if a game only uses some conditions, distribution packs should assume all 8.
 3. **Daytime:** no blown colors per material (grass, stone, sand, wood); natural bright/dark split between tops and sides.
 4. **Night:** compare same materials in former daylight, shadows, and near torches. If only lit faces remain, tune exposure decay; if everything is dark, tune local-light protection.
-5. **Water:** look from above, grazing angles, shores, underwater, and night separately. Alpha behavior and underwater looks depend on the game's compositing — never judge from one viewpoint.
+5. **Water:** look from above, grazing angles, shores, underwater, and night separately. Alpha behavior and underwater looks depend on the game's compositing — never judge from one viewpoint. Underwater, the liquid-definition veil covers frontmost per Part VII discussion, so pack differences show mainly on the surface and terrain through the veil.
 6. **Borders and distance:** no popping waves/patterns at chunk / origin transitions; no double fog or white haze in the distance.
 7. **Performance:** effects heavy on per-fragment hash/trig/`pow` calls should be minimal. Add detail gradually and compare FPS.
 
@@ -1266,7 +1301,7 @@ Compile success and "good looks" are different things. Check in this order:
 - Shader packs are limited to terrain / liquid hooks — no same-code handling of sky, entities, or UI.
 - No inputs exist for adding shadow maps, screen-space reflections, scene depth, refraction, bloom, etc.
 - `time` is animation time with no guaranteed link to in-game day/night.
-- Zero `sunDirection` means true moon direction is unknown. Blue-ambient additions are mood approximations, not "moonlight physics".
+- Zero `sunDirection` means true moon direction is unknown, not "moonlight physics" but a mood approximation. Directional moonlight can be built from `-sunDirection` (day/night-cycle worlds only. Part VII R-A).
 - `s.position` / `l.position` are local coordinates, so add `originOffset` for world-dependent effects. For in-block-local patterns, local coordinates are intentionally the tool.
 
 ## 22. Combining with other packs when shaders alone hit limits
@@ -1276,6 +1311,186 @@ Since shader packs cannot add or sample textures, don't try to solve fine materi
 For reference, community "cinematic shader" distributions analyzed in one case turned out to be texture packs (128x128 textures with no `pack.json` / `.wgsl`).
 
 In practice, **tune light and color with shaders, and cover materials and sky with a matching resource pack**. But verify co-use and load order against the game's implementation and settings.
+
+In practice, **tune light and color with shaders, and cover materials and sky with a matching resource pack**. But verify co-use and load order against the game's implementation and settings.
+
+## 23. Underwater reality with shader packs
+
+Underwater looks consist of 3 layers:
+
+| Layer | Content | Operable from packs? |
+|---|---|---|
+| ① Terrain/liquid rendering | Hook-processable. Light hooks are called normally underwater | Yes (works "under the veil") |
+| ② Liquid-definition veil | Emissive fullscreen quad from the liquid block definition color/alpha at the camera position, drawn frontmost. The game setting `cameraTint` wins if set | No (neither color nor density changeable) |
+| ③ cameraTint | Game setting | No |
+
+Practical points: packs keep working underwater / the veil cannot be removed / underwater cannot be branched on (fogStart / fogEnd / fogColour don't change underwater, so fogFactor can't detect it either).
+
+---
+
+# Part VII: Internals supplement
+
+Extra specs found by engine-implementation analysis. All restored directly from current production-build JavaScript.
+
+## 24. Sun and moon identity
+
+The `l.sunDirection` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
+
+| Skybox | `l.sunDirection` |
+|---|---|
+| `default` (procedural sky) | Non-zero (defaults below) |
+| `gloomy` / `interstellar` / `space_*` (cube textures) | **Always (0,0,0)** |
+
+**The moon is always `-sunDirection`** (the engine computes the moon position as the exact opposite of the sun). Night is judged by sun elevation — the moon is up when `sunDirection.y < 0` (sun below horizon). But in default worlds the sun is static, so the moon is static too; only worlds implementing a day/night cycle see it move.
+
+The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector computed from inclination = −0.2 / azimuth = 0.55, static). A practical reference for predicting highlight directions on paper when testing distribution packs.
+
+Day/night cycles are not built into the engine — inclination is a static number, and worlds with moving day/night update it game-side. `sunDirection` follows each update.
+
+Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and sunDirection**, so packs darkening terrain at night must estimate the time band from sunDirection themselves (the §19 `sunPresent` technique).
+
+### R-A. Directional moonlight — moonDir = −l.sunDirection
+
+Adds bluish-white Lambert and weak specular only while the moon is up. `moonUp` is 0 in static-sun default worlds, so nothing happens there — **moonlight that only fires in day/night-cycle worlds, hence safe**.
+
+```wgsl
+fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+    var out = bloxd_defaultLight(s, l);
+    #ifdef BLOXD_LIGHTING
+    // the moon is always exactly opposite the sun; auto-off in daytime via moonDir.y < 0
+    let moonDir = -l.sunDirection;
+    let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+    if (moonUp > 0.0) {
+        let n     = normalize(l.normal);
+        let diff  = max(0.0, dot(n, moonDir));
+        let view  = normalize(l.eyePosition - l.position);
+        let halfV = normalize(moonDir + view);
+        let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+        out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+    }
+    #endif
+    return out;
+}
+```
+
+## 25. Fog internals
+
+Fog computation is always LINEAR mode (`fogFactor = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), with `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = fog distance setting; only D = 0 is special with fogEnd = 5). **The fog gradient band is only 32 blocks wide**, and `l.fogFactor` is less "distance haze" than a **normalized distance to the edge of the loaded world**. It varies per player with load distance, so distance-based effects should compute `distance(l.position, l.eyePosition)` themselves (recipe R-B).
+
+Default fog color is `rgb(183, 191, 195)` (pale blue-gray). World creators can change it via `fogColourOverride` (hex). With fog mode 0 (NONE), **fogColour arrives black**. The standard `mix(l.fogColour, col, l.fogFactor)` form is safe since fog color is unused at fogFactor 1.
+
+Setting player-side `showFog` to false pushes fog to 3200–3328 blocks, effectively disabling it (`fogFactor ≈ 1` keeps coming back).
+
+### R-B. Load-border band — fogFactor as "world edge"
+
+Quietly cools just the 32-block load-border band to de-emphasize the world edge (or emphasize it as an effect). No self-computed distance, so it auto-follows player load-distance settings.
+
+```wgsl
+fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+    var out = bloxd_defaultLight(s, l);
+    // fogFactor: 1 = inside (margin to border), 0 = about to exit the border
+    let edge = 1.0 - l.fogFactor;
+    let band = smoothstep(0.0, 1.0, edge);
+    out.colour = mix(out.colour, out.colour * vec3f(0.82, 0.86, 0.95), band * 0.5);
+    return out;
+}
+```
+
+## 26. blockLight / heldLight internals
+
+When decoding `aPackedLightLevels`, the engine floors each channel at **35% of the brightest RGB channel**. E.g. a "pure red light" is lifted to (1.00, 0.35, 0) at vertices before interpolation and lift. Torch orange looking "whitish-pink rather than red" in game comes from this — tune warm-torch recipe (R9.1) saturation against this default.
+
+Handheld light (`heldLight`) range follows the brightest light-color channel (max 15 blocks) with `dist^0.75` preprocessing, the same 35% channel floor, and `l.heldLight` is the pre-ambient-boost value. Custom items can set `spotlightRange` and cone angle — a "beam while held" mode whose cone position follows the camera. Packs cannot know beam direction.
+
+Custom blocks may carry `skyLightEmission` (0–15), which **injects into the skyLight channel itself, separately from blockLight BFS**. R9.12-style packs judging sun/shadow by skyLight threshold can misjudge in worlds where artificial lights lift skyLight. Distribution packs should judge combined with blockLight to stay robust.
+
+## 27. Pipeline details
+
+- **Surface hooks run "before" alphaTest**: `out.alpha` feeds the discard test directly. Cutout materials (grass, leaves) allow dissolve-style dither effects (recipe R-C). For liquids (blended) `out.alpha` is the real transparency (recipe R-D). No effect on normal opaque terrain — don't misunderstand
+- **`l.ambient` content** is `material.ambient × sceneAmbient`, differing per material. The scene side ties to the graphics setting "Ambient Lighting Intensity" (default 0.5) — never hardcode defaults
+- **`time` is really `performance.now()`**: the browser's uptime wrapped at 1 hour. Unrelated to in-game day/night and world elapsed time. To animate synced to a game clock, estimate time from the `sunDirection` azimuth in day/night-cycle worlds
+- Fine checker patterns at chunk borders during loading are the engine's screen-space Bayer 4×4 dither chunk fade, not pack bugs
+- **`mod` is a reserved word**: rejected with `pack.wgsl:3 'mod' is a reserved word in WGSL.` Write remainders with the `%` operator
+
+### R-C. Bayer dither dissolve — out.alpha drives discard
+
+Reproduces the **same Bayer 4×4 table** the engine uses for chunk fades, dissolving cutouts from low blocks upward. discard fires on alphaTest materials (grass, leaves); in liquids it becomes blend transparency.
+
+```wgsl
+fn sp_bayer4(pos: vec2f) -> f32 {
+    // mod is reserved, so use the % operator
+    let p = floor(vec2f(pos.x % 4.0, pos.y % 4.0));
+    if (p.y < 0.5) {
+        if (p.x < 0.5) { return 1.0 / 16.0; }
+        else if (p.x < 1.5) { return 9.0 / 16.0; }
+        else if (p.x < 2.5) { return 3.0 / 16.0; }
+        else { return 11.0 / 16.0; }
+    } else if (p.y < 1.5) {
+        if (p.x < 0.5) { return 13.0 / 16.0; }
+        else if (p.x < 1.5) { return 5.0 / 16.0; }
+        else if (p.x < 2.5) { return 15.0 / 16.0; }
+        else { return 7.0 / 16.0; }
+    } else if (p.y < 2.5) {
+        if (p.x < 0.5) { return 4.0 / 16.0; }
+        else if (p.x < 1.5) { return 12.0 / 16.0; }
+        else if (p.x < 2.5) { return 2.0 / 16.0; }
+        else { return 10.0 / 16.0; }
+    } else {
+        if (p.x < 0.5) { return 16.0 / 16.0; }
+        else if (p.x < 1.5) { return 8.0 / 16.0; }
+        else if (p.x < 2.5) { return 14.0 / 16.0; }
+        else { return 6.0 / 16.0; }
+    }
+}
+
+fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
+    var out = bloxd_defaultSurface(s);
+    #ifdef BLOXD_ALPHA
+    // dissolve from low blocks upward; higher dissolve persists
+    let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(s.originOffset).y);
+    let thresh   = sp_bayer4(s.position.xz);
+    out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
+    #endif
+    return out;
+}
+```
+
+### R-D. Near-camera water fade — liquid alpha keeps sightlines
+
+Liquid-hook `out.alpha` feeds blending directly. Fades just the water surface under the camera to keep diving/above-water camera sightlines.
+
+```wgsl
+fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
+    var out = bloxd_defaultSurface(s);
+    #ifdef BLOXD_ALPHA
+    let d = distance(s.position, s.eyePosition);
+    out.alpha *= smoothstep(0.0, 3.0, d);   // fully transparent → normal over 0–3 blocks
+    #endif
+    return out;
+}
+```
+
+## 28. What changes pack-visible values — test checklist
+
+The same pack renders differently across **world and player settings**. Check at least these 3 environments before distribution:
+
+1. **Normal world** (default skybox, no overrides) — sunDirection present, default colors
+2. **Space-skybox world** — sunDirection = 0. The `sunPresent` branch look
+3. **Custom world with `visionMinLightColour` / `skyLightColourOverride`** — lifted darks and colors
+
+Main variance sources: `lightingOverride` (forced lighting) / `skyLightColourOverride`・`ambientLightColourOverride` (hex swaps) / `visionMinLightColour` ("darkest visible color" floor on sky and ambient; Night Vision uses it — "pitch-dark cave" packs won't get as dark as intended) / `heldLightColourOverride`・`Range`・`ConeAngle` / `fogChunkDistanceOverride`・`fogColourOverride`・`fogOnSkybox` / `skyBox` (sunDirection presence). `uSkyLightColour` default = (1,1,1) white, `uAmbientLightColour` default = (0.25,0.25,0.30). `l.ambient` scene component = graphics setting "Ambient Lighting Intensity" (default 0.5). `l.fogFactor` follows player fog/chunk distance settings.
+
+## 29. Debug means
+
+- URL parameter `?renderer=lite` — force the Lite renderer (`?renderer=webgl2` / `babylon` also work)
+- URL parameter `?vconsole` — on-screen console (VConsole). Handy for mobile device verification
+- Console shows `noa-engine v0.33.0` and `Renderer: lite from <source>` — check these first to avoid render-path misdiagnosis
+- The WebGPU renderer locks "forced ON" while a pack applies. The "Disable Block Texture Atlas" setting also locks (atlas stays ON), and packs can't apply at all on WebGPU-less devices. The basis for writing "needs a WebGPU browser" on distribution pages
+- Per-game-join runtime re-validation (`checkCompilation`) compiles real terrain materials in browser WebGPU (stricter than settings-screen static validation). Packs failing here are excluded from that game
+
+## 30. On independently similar materials
+
+A community material with nearly the same content exists: [GlitchHunterCoder/Bloxd-Essay's Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). It was published before this guide, but **this guide's content comes from glm's own analysis of Bloxd's actual bundle files (webpack chunk set) — not copy-paste**. Both match because independently investigating the same implementation leads to the same conclusions.
 
 ---
 
