@@ -1478,7 +1478,7 @@ Dasselbe Paket rendert je nach **Welt und Spieler-Einstellungen** anders. Vor Ve
 2. **Space-Skybox-Welt** — sunDirection = 0. Der `sunPresent`-Zweig-Look
 3. **Custom-Welt mit `visionMinLightColour` / `skyLightColourOverride`** — gehobene Dunkelheiten und Farben
 
-Haupt-Varianzquellen: `lightingOverride` (Zwangslicht) / `skyLightColourOverride`・`ambientLightColourOverride` (Hex-Tausch) / `visionMinLightColour` (Floor „dunkelste sichtbare Farbe" auf Sky und Ambient; Night Vision nutzt es — „stockdunkle Höhlen"-Pakete werden nicht so dunkel wie gedacht) / `heldLightColourOverride`・`Range`・`ConeAngle` / `fogChunkDistanceOverride`・`fogColourOverride`・`fogOnSkybox` / `skyBox` (sunDirection-Präsenz). `uSkyLightColour`-Standard = (1,1,1) weiß, `uAmbientLightColour`-Standard = (0.25,0.25,0.30). `l.ambient`-Szenenseite = Grafik-Einstellung „Ambient Lighting Intensity" (Standard 0.5). `l.fogFactor` folgt Spieler-Fog/Chunk-Distanz-Einstellungen.
+Haupt-Varianzquellen: `lightingOverride` (Zwangslicht) / `skyLightColourOverride`, `ambientLightColourOverride` (Hex-Tausch) / `visionMinLightColour` (Floor „dunkelste sichtbare Farbe" auf Sky und Ambient; Night Vision nutzt es — „stockdunkle Höhlen"-Pakete werden nicht so dunkel wie gedacht) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (sunDirection-Präsenz). `uSkyLightColour`-Standard = (1,1,1) weiß, `uAmbientLightColour`-Standard = (0.25,0.25,0.30). `l.ambient`-Szenenseite = Grafik-Einstellung „Ambient Lighting Intensity" (Standard 0.5). `l.fogFactor` folgt Spieler-Fog/Chunk-Distanz-Einstellungen.
 
 ## 29. Debugging-Mittel
 
