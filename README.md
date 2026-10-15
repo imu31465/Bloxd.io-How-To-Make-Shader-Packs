@@ -1285,4 +1285,6 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ---
 
+作成: ltf_ahel (glm を使用して作成)
+
 
