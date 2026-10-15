@@ -9,6 +9,7 @@ How to make Bloxd.io shader packs (WebGPU renderer only) — self-contained guid
 - [Version française ici (README.fr.md)](README.fr.md)
 - [Deutsche Version hier (README.de.md)](README.de.md)
 - [简体中文版 (README.zh-CN.md)](README.zh-CN.md)
+- [한국어판 (README.ko.md)](README.ko.md)
 
 Researched by ltf_ahel (researched with glm)
 
