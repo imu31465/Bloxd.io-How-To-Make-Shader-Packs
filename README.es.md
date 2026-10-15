@@ -1478,7 +1478,7 @@ El mismo paquete renderiza distinto según **mundo y ajustes de jugador**. Revis
 2. **Mundo con skybox espacial** — sunDirection = 0. El look de la rama `sunPresent`
 3. **Mundo personalizado con `visionMinLightColour` / `skyLightColourOverride`** — oscuros elevados y colores
 
-Fuentes principales de variación: `lightingOverride` (iluminación forzada) / `skyLightColourOverride`・`ambientLightColourOverride` (cambios hex) / `visionMinLightColour` (suelo "color más oscuro visible" sobre sky y ambient; Night Vision lo usa — los paquetes "cueva a oscuras" no oscurecen lo previsto) / `heldLightColourOverride`・`Range`・`ConeAngle` / `fogChunkDistanceOverride`・`fogColourOverride`・`fogOnSkybox` / `skyBox` (presencia de sunDirection). `uSkyLightColour` por defecto = (1,1,1) blanco, `uAmbientLightColour` por defecto = (0.25,0.25,0.30). `l.ambient` lado escena = ajuste gráfico "Ambient Lighting Intensity" (defecto 0.5). `l.fogFactor` sigue los ajustes de niebla/distancia de chunks del jugador.
+Fuentes principales de variación: `lightingOverride` (iluminación forzada) / `skyLightColourOverride`, `ambientLightColourOverride` (cambios hex) / `visionMinLightColour` (suelo "color más oscuro visible" sobre sky y ambient; Night Vision lo usa — los paquetes "cueva a oscuras" no oscurecen lo previsto) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (presencia de sunDirection). `uSkyLightColour` por defecto = (1,1,1) blanco, `uAmbientLightColour` por defecto = (0.25,0.25,0.30). `l.ambient` lado escena = ajuste gráfico "Ambient Lighting Intensity" (defecto 0.5). `l.fogFactor` sigue los ajustes de niebla/distancia de chunks del jugador.
 
 ## 29. Medios de depuración
 

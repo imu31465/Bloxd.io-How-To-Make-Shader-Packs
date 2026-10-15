@@ -1478,7 +1478,7 @@ The same pack renders differently across **world and player settings**. Check at
 2. **Space-skybox world** — sunDirection = 0. The `sunPresent` branch look
 3. **Custom world with `visionMinLightColour` / `skyLightColourOverride`** — lifted darks and colors
 
-Main variance sources: `lightingOverride` (forced lighting) / `skyLightColourOverride`・`ambientLightColourOverride` (hex swaps) / `visionMinLightColour` ("darkest visible color" floor on sky and ambient; Night Vision uses it — "pitch-dark cave" packs won't get as dark as intended) / `heldLightColourOverride`・`Range`・`ConeAngle` / `fogChunkDistanceOverride`・`fogColourOverride`・`fogOnSkybox` / `skyBox` (sunDirection presence). `uSkyLightColour` default = (1,1,1) white, `uAmbientLightColour` default = (0.25,0.25,0.30). `l.ambient` scene component = graphics setting "Ambient Lighting Intensity" (default 0.5). `l.fogFactor` follows player fog/chunk distance settings.
+Main variance sources: `lightingOverride` (forced lighting) / `skyLightColourOverride`, `ambientLightColourOverride` (hex swaps) / `visionMinLightColour` ("darkest visible color" floor on sky and ambient; Night Vision uses it — "pitch-dark cave" packs won't get as dark as intended) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (sunDirection presence). `uSkyLightColour` default = (1,1,1) white, `uAmbientLightColour` default = (0.25,0.25,0.30). `l.ambient` scene component = graphics setting "Ambient Lighting Intensity" (default 0.5). `l.fogFactor` follows player fog/chunk distance settings.
 
 ## 29. Debug means
 
