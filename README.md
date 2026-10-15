@@ -40,8 +40,9 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 ## 3. パックの構成
 
 - **配布形態**: `.zip` 1つ、またはフォルダ (フォルダ読み込みはデスクトップ版ブラウザのみ)
-- **中身**: `pack.json` 1つ (パックの最上位に配置) + `.wgsl` ファイル 1〜256個
-- 複数の `.wgsl` は連結されて1モジュールとして扱われるため、分割・ディレクトリ分けは自由。ファイル名に制約は無い
+- **中身**: `pack.json` 1つ (パックの最上位に配置。大文字小文字は区別されない) + `.wgsl` ファイル 1〜256個
+- 複数の `.wgsl` は連結されて1モジュールとして扱われるため、分割・ディレクトリ分けは自由。ファイル名に制約は無い。`.wgsl` 以外のファイル (README等) は無視される
+- ZIP化のコツ: フォルダごと固めると `folder/pack.json` になって最上位判定を失う。フォルダの中に入って `pack.json` と `.wgsl` を直接指定して固める (`pack.json` がZIP直下に来ることを確認する)
 
 | 項目 | 上限 |
 |---|---|
@@ -151,9 +152,9 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 1. 設定 → Shader Pack から zip / フォルダを読み込む
 2. ステータスを確認する。「Ready to use」になれば成功。「Saved, but it won't run until you fix these errors...」の場合はエラー一覧 (file:行 + バリアント付き) を直して再読み込み
-3. 読み込み後はページの再読込で有効化される
+3. 読み込み後はページの再読込で有効化される。URLパラメータやlocalStorageにレンダラーオーバーライドが残っているとパックが起動を拒否されるため、取り除いてから再読み込みする
 4. まず制限の緩いゲームで確認し、次に strict のゲーム (大多数はこちら) で確認する。頂点移動を使う場合は allow のゲームでのみ動作する
-5. 配布時は `pack.json` を最上位にした zip に固める (3章の上限内であること)
+5. 配布時は `pack.json` を最上位にした zip に固める (3章の上限内であること)。パックの差し替えは同じ画面で読み込み直すだけ、削除は Remove Pack で行う。ゲーム更新後の再検証はページ読み込み時に自動で行われる
 
 ---
 
@@ -447,6 +448,22 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let upward = clamp(l.normal.y, 0.0, 1.0);
     out.colour += vec3f(0.025, 0.04, 0.075) * night * sky * upward;
     #endif
+    return out;
+}
+```
+
+### 夕暮れの暖色化 (太陽高度で色を寄せる)
+
+```wgsl
+fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+    var out = bloxd_defaultLight(s, l);
+    let sunLen = length(l.sunDirection);
+    if (sunLen > 0.5) {
+        let sunDir = l.sunDirection / sunLen;
+        let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // 地平線で1/真上で0
+        let sunset = lowness * lowness;
+        out.colour = mix(out.colour, out.colour * vec3f(1.12, 0.88, 0.72), sunset * 0.55);
+    }
     return out;
 }
 ```
@@ -1049,6 +1066,11 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 | `.alpha` が未定義と言われる | `#ifdef BLOXD_ALPHA` で囲む |
 | `blockLight` が未定義と言われる | `#ifdef BLOXD_LIGHTING` で囲む。共用ヘルパー関数は**関数ごと**囲む |
 | `Packs can't construct bloxd_Surface directly` | `bloxd_defaultSurface(s)` を起点に書き換える |
+| `pack.json needs "apiVersion": 1.` | `apiVersion` が無い。数値の `1` を追加する (文字列の `"1"` は不可) |
+| `There's no pack.json at the top of the pack.` | ZIP直下に `pack.json` が無い。フォルダごと固めていないか確認する |
+| `bloxd_terrain_vertex must be declared as: fn ...` | シグネチャ不一致。表示された宣言どおりに書き直す |
+| `bloxd_terrain_vertex can't run in strict games...` | vertex フックを `#ifndef BLOXD_STRICT` で囲む |
+| `bloxd_LightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` で囲む |
 | `bloxd_Vertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` で囲む |
 | 遠景が白く濁る | フォグの二重掛けが原因のことが多い。完成色はフォグ済みなので独自の霧色は控えめに、彩度だけ落とす方式を検討する |
 | ゲーム参加時にパックが除外される | ゲーム開始時の実機チェックで失敗している。ガード漏れを見直す |
