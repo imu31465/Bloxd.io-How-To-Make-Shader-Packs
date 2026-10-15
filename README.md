@@ -4,6 +4,7 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 `apiVersion: 1` 時点の仕様に基づく。レシピ集と API リファレンスを含むため、この1ファイルだけで最初から配布まで行える。
 
 > 本書は非公式の手順書であり、開発元の公式見解ではない。API は予告なく変更されうる。
+> 最終レビュー: 2026-10-15。専用の公開公式WGSL APIリファレンスを確認できていないため、API説明とレシピは読み込み画面・実機コンパイルで継続検証すること。
 > シェーダーパック機能自体はゲーム内 UI から読み込める公式機能であり、パックは純粋な WGSL
 > (JS 実行・通信不可) のため、通常の記述で危険なことは起きない。
 
@@ -14,8 +15,7 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 - [第三部: レシピ集](#第三部-レシピ集)
 - [第四部: リアル化ガイド](#第四部-リアル化ガイド)
 - [第五部: トラブルシューティング・注意](#第五部-トラブルシューティング注意)
-
----
+- [第六部: 実装時の重要な補足](#第六部-実装時の重要な補足)
 
 ---
 
@@ -157,8 +157,6 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 ---
 
----
-
 # 第二部: API リファレンス
 
 ## 10. エンジンヘッダ (パックコードの先頭に自動付与される)
@@ -245,7 +243,9 @@ fn bloxd_defaultLight(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 解釈の要点:
 
-- `time` は3600秒で折り返す。`sunDirection` は太陽への単位ベクトル (夜は月方向として使える)
+- `time` は3600秒で折り返す経過時間。ゲーム内の昼夜時計と同期しているとは限らない。
+- `sunDirection` は太陽が存在するときの単位ベクトルで、空に太陽がない場合はゼロ。したがって、ゼロ時に月の方向として再利用することはできない。月の方向データはこのAPIの入力に含まれていない。
+- ※補足: 夜間に月方向らしきベクトルが入るとの報告もあるが、ヘッダが保証するのは「太陽あり=単位方向・なし=ゼロ」のみ。外部配布するパックはゼロを前提に `sunPresent` で分岐する書き方にしておくのが安全。
 - `emission` は照明計算の後に加算され、その後フォグがかかる
 - `bloxd_packInputs` という uniform はエンジン内部に存在するが、**パックから直接参照できない**。値はフック入力のフィールド (`s.time` 等) 経由で使う
 
@@ -297,13 +297,13 @@ fn bloxd_terrain_vertex(v: bloxd_VertexIn) -> bloxd_Vertex {
 
 ---
 
----
-
 # 第三部: レシピ集
 
 すべての断片は8バリアントを通す前提のガード付きで書いてある。そのままコピペして定数をいじるだけで使える。
 
 ## R1. 色のレシピ (surface)
+
+> **重要:** 以下のレシピは個別の例であり、上からすべて連結する用途ではない。同じフック名 (`bloxd_terrain_light` など) や同じヘルパー関数名を複数貼ると、同一モジュール内で定義が重複してコンパイルに失敗する。複数の効果を使う場合は、フックを各種類1つにまとめ、処理をその関数内へ統合する。
 
 ### 単色ティント (最も基本)
 
@@ -376,7 +376,7 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 
 ```wgsl
 fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
-    return clamp(floor(c * steps + 0.5) / steps, vec3f(0.0), vec3f(1.0));
+    return clamp(floor(c * steps + vec3f(0.5)) / steps, vec3f(0.0), vec3f(1.0));
 }
 ```
 
@@ -387,7 +387,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ```wgsl
 fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
     let c01 = clamp(c, vec3f(0.0), vec3f(1.0));
-    return mix(c01, c01 * c01 * (3.0 - 2.0 * c01), strength);
+    return mix(c01, c01 * c01 * (vec3f(3.0) - 2.0 * c01), strength);
 }
 ```
 
@@ -433,15 +433,19 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 }
 ```
 
-### 満月ライト (月方向を向いた面を持ち上げる)
+### 夜の青い環境光 (月の方向を使わない擬似表現)
+
+> このAPIでは、空に太陽がないとき `sunDirection` はゼロになる。月の方向データもないため、月に向いた面を特定することはできない。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。
 
 ```wgsl
-// sunDirection は「太陽への方向」。夜は下を向く = 月方向として使える
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     var out = bloxd_defaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    let moonFace = clamp(dot(l.normal, l.sunDirection), 0.0, 1.0);
-    out.colour += vec3f(0.7, 0.8, 1.0) * moonFace * l.directional * 0.10;
+    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let night = 1.0 - sunPresent;
+    let sky = clamp(l.skyLight, 0.0, 1.0);
+    let upward = clamp(l.normal.y, 0.0, 1.0);
+    out.colour += vec3f(0.025, 0.04, 0.075) * night * sky * upward;
     #endif
     return out;
 }
@@ -502,7 +506,7 @@ fn bloxd_terrain_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 ```wgsl
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     var out = bloxd_defaultLight(s, l);
-    let world = l.position + vec3f(f32(l.originOffset));
+    let world = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
     // 数個の「光の玉」がゆっくり移動する。distance の逆数で光らせる
     let t = l.time * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
@@ -567,14 +571,14 @@ let fresnel = pow(1.0 - facing, 3.0);
 
 ## R5. 時間のレシピ (アニメーション)
 
-> `time` は 3600 秒 (1 時間) で折り返す。「1 日の昼夜サイクル」を作るには 3600 秒を 1 周期として扱う。
+> `time` は 3600 秒 (1 時間) で折り返す。ただしこれはシェーダーの経過時間であり、ゲーム内の太陽・昼夜と同期する保証はない。見た目の周期アニメーションには使えるが、実際の夜判定には `sunDirection` や照明入力を優先する。
 
 ### 昼夜サイクル (1 時間で 1 日)
 
 ```wgsl
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     var out = bloxd_defaultLight(s, l);
-    let day = 0.5 + 0.5 * sin(l.time * 6.2831853 / 3600.0);   // 0..1、1 時間周期
+    let day = 0.5 + 0.5 * sin(l.time * 6.2831853 / 3600.0);   // 0..1 の1時間周期。ゲーム内の昼夜と同期するとは限らない
     out.colour = mix(out.colour * vec3f(0.6, 0.7, 1.0), out.colour, day);
     return out;
 }
@@ -608,7 +612,9 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ```wgsl
 fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
     var out = bloxd_defaultSurface(s);
-    let ripple = sin(s.time * 2.1 + s.position.x * 1.3 + s.position.z * 0.9);
+    let worldX = s.position.x + f32(s.originOffset.x);
+    let worldZ = s.position.z + f32(s.originOffset.z);
+    let ripple = sin(s.time * 2.1 + worldX * 1.3 + worldZ * 0.9);
     out.colour = clamp(out.colour * (1.0 + ripple * 0.06), vec3f(0.0), vec3f(1.0));
     #ifdef BLOXD_ALPHA
     out.alpha = s.alpha;   // liquid は常に BLOXD_ALPHA — ガードは習慣として
@@ -617,15 +623,21 @@ fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
 }
 ```
 
-### 浅瀬を透けさせる
+### 高度を使った透明度の疑似変化 (本当の浅瀬判定ではない)
+
+> シーン深度や水底の位置を参照できないため、このAPIだけでは実際の水深を計算できない。`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
 
 ```wgsl
+const packWaterReferenceY: f32 = 0.0;
+const packWaterHeightSpan: f32 = 8.0;
+
 fn bloxd_liquid_surface(s: bloxd_SurfaceIn) -> bloxd_Surface {
     var out = bloxd_defaultSurface(s);
-    // 水面の y が小さい = 浅い (液体は源から 7 ブロック程度と想定して調整)
-    let shallow = clamp(1.0 - abs(s.position.y) * 0.25, 0.0, 1.0);
+    let worldY = s.position.y + f32(s.originOffset.y);
+    let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
-    out.alpha = clamp(mix(0.9, 0.45, shallow), 0.0, 1.0) * s.alpha;
+    // 低高度では薄く、高高度では元のアルファに近づける。ゲーム内で向きは要確認。
+    out.alpha = mix(0.45, 0.9, heightFactor) * s.alpha;
     #endif
     return out;
 }
@@ -814,7 +826,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     let upness = n.y * 0.5 + 0.5;
     let ground = l.ambientLightColour * 0.55;                          // 下: 跳ね返り
     let skyH   = l.ambientLightColour * 0.30 + l.skyLightColour * 0.45 * l.skyLight; // 上: 空光
-    let hemi = 0.25 + mix(ground, skyH, upness);
+    let hemi = vec3f(0.25) + mix(ground, skyH, upness);
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
     out.colour = s.colour * voxel * hemi;
     #endif
@@ -826,7 +838,8 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ```wgsl
 fn pack_aces(x: vec3f) -> vec3f {
-    return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14),
+    return clamp((x * (vec3f(2.51) * x + vec3f(0.03))) /
+                 (x * (vec3f(2.43) * x + vec3f(0.59)) + vec3f(0.14)),
                  vec3f(0.0), vec3f(1.0));
 }
 fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
@@ -859,7 +872,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
     // 高さ h = 0.50 sin(px+1.6t) + 0.35 sin(1.35pz+1.28t) + 0.15 sin(0.7(px+pz)-1.76t)
     let c1 = cos(p.x * 1.00 + t * 1.60);
-    let c2 = cos(p.z * 1.35 + t * 1.28 + 1.7);
+    let c2 = cos(p.z * 1.35 + t * 1.28);
     let c3 = cos((p.x + p.z) * 0.70 - t * 1.76);
     let dhdx = 0.50 * c1 + 0.15 * 0.70 * c3;      // ∂h/∂x
     let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // ∂h/∂z
@@ -869,7 +882,8 @@ fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     var out = bloxd_defaultLight(s, l);
     #ifdef BLOXD_LIGHTING
     let baseN = normalize(l.normal);
-    let n = mix(baseN, pack_waveNormal(l.position, l.time), clamp(baseN.y * 2.0, 0.0, 1.0));
+    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+    let n = normalize(mix(baseN, pack_waveNormal(worldPos, l.time), clamp(baseN.y * 2.0, 0.0, 1.0)));
     let viewDir = normalize(l.eyePosition - l.position);
     let sunLen = length(l.sunDirection);
     if (sunLen > 0.5) {
@@ -960,14 +974,13 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
     #ifdef BLOXD_LIGHTING
     let lum = pack_luma(out.colour);
     out.colour *= mix(vec3f(0.93, 1.00, 1.06), vec3f(1.06, 1.00, 0.93), lum);
-    let night = 1.0 - clamp(pack_luma(l.skyLightColour) * 3.0, 0.0, 1.0);
+    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let night = 1.0 - sunPresent;  // 太陽方向がゼロのときだけ夜扱い。夕暮れの連続変化は表現しない
     out.colour = mix(out.colour, vec3f(pack_luma(out.colour)), night * 0.28);
     #endif
     return out;
 }
 ```
-
----
 
 ---
 
@@ -1000,7 +1013,7 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 1. **フォグをかけ直す**: light フックは最終段 (フォグの後) なので `mix(l.fogColour, col, l.fogFactor)` を自分で適用する (R9.10)。霧が濃すぎるときは `max(l.fogFactor, 0.3)` のように下限を敷く。逆に engineColour 起点のパックで更に霧色を混ぜると二重フォグで白濁する
 2. **unlit バリアントのフォールバック**: `#ifdef BLOXD_LIGHTING` の外では `defaultLight` に素通りさせる
 3. **共用関数ごとガードする**: `bloxd_LightIn` を引数に取る共用関数は fn ごと `#ifdef BLOXD_LIGHTING` で囲む (呼び出し側だけでは不十分)
-4. **太陽が無い場合のフォールバック**: `length(l.sunDirection) > 0.5` が偽のときは `l.directional` を使う
+4. **太陽方向が無いとき**: `sunDirection` がゼロなら方向性スペキュラは計算しない。`l.directional` は光量のスカラーで方向ベクトルではないため、ハイライトの方向を復元する用途には使えない。必要なら方向性のない弱い環境光に切り替える
 
 ## 15. 到達できない表現 (リアル化の「天井」)
 
@@ -1019,11 +1032,10 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 - 洞窟が明るすぎる → `skyLight` の非線形カーブが足りない (R2 洞窟レシピ / R9.9)
 - 昼間が白飛びする → ACES 前の露出を下げる
-- 夜が暗すぎる → 最小環境光を確保する (夜の `skyLightColour` はほぼ黒になる前提で)
+- 夜が暗すぎる → 最小環境光を確保する。`sunDirection` がゼロのときは真の月方向は分からないため、青い環境光などの擬似表現にする
+- 夜なのに照らされた面だけ明るすぎる → 影の色だけを暗くせず、エンジンの完成色 (`engineColour`) 全体にも夜間減衰をかける。局所光を残す場合は `blockLight` / `heldLight` を使って減衰を弱める (第六部 19節)
 - 遠景が霞みすぎる → 大気減衰の係数を下げる
 - 松明の周りがオレンジだらけ → 暖色ブレンドの比率を下げる (素の色つき光を残す)
-
----
 
 ---
 
@@ -1043,6 +1055,115 @@ fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
 
 ## 18. 権利・注意
 
-- シェーダーパック機能自体はゲーム内 UI から読み込める公式機能であり、パック制作は想定内の行為と考えられる。ただし公式ドキュメントは現状存在しない
+- シェーダーパック機能自体はゲーム内 UI から読み込める公式機能であり、パック制作は想定内の行為と考えられる。ただし公開公式ドキュメントは確認できていない
 - パックは純粋な WGSL であり、JS 実行・ネットワークアクセスは設計上不可能
 - 本書は非公式の手順書であり、開発元の公式見解ではない。API は予告なく変更されうる
+
+---
+
+# 第六部: 実装時の重要な補足
+
+## 19. 夜間に「影は暗いのに表面だけ明るい」を直す
+
+影だけを暗くする処理では、太陽がない時間にもエンジンの完成色 (`engineColour`) が明るいまま残り、面と影の差が不自然になることがある。影の色調ではなく、完成色全体に減衰をかける必要がある。
+
+次の例は `sunDirection` がゼロなら夜側、方向があるなら昼側として扱い、暗い時間は地形の完成色を減衰させる。照明対応バリアントでは `blockLight` と `heldLight` が強い場所ほど減衰を弱め、松明などの近距離光をなるべく残す。`0.52` は調整値で、より暗くしたいなら小さくする。
+
+```wgsl
+fn bloxd_terrain_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+    var out = bloxd_defaultLight(s, l);
+    let sunPresent = smoothstep(0.0, 0.5, length(l.sunDirection));
+    let nightDim = mix(0.52, 1.0, sunPresent);
+    var scale = nightDim;
+    #ifdef BLOXD_LIGHTING
+    let blockAmt = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
+    let heldAmt = max(l.heldLight.r, max(l.heldLight.g, l.heldLight.b));
+    let localLight = clamp(max(blockAmt, heldAmt), 0.0, 1.0);
+    let protectLocalLight = smoothstep(0.03, 0.35, localLight);
+    scale = mix(nightDim, 1.0, protectLocalLight);
+    #endif
+    // 完成色を減衰させ、素材の emission は既定どおりフォグを通して加算する
+    out.colour = l.engineColour * scale + s.emission * l.fogFactor;
+    return out;
+}
+```
+
+**この処理の限界:** `sunDirection` の仕様が「太陽あり=単位方向、太陽なし=ゼロ」の二値なら、昼と夜の区別はできても夕焼け・薄明を連続的に推定できない。また完成色を減衰するため、エンジン側の昼光・環境光をまとめて弱める方式であり、時間帯を完全に再現するものではない。液体にも同じ処理を適用したい場合は液体フックのフォールバック関係を確認すること。
+
+## 20. 水を自然に見せるための統合レシピ
+
+このAPIではシーン色・深度・水底の深度をサンプリングできないため、**本物の反射・屈折・水深計算ではなく、フレネル風の色ブレンドと太陽ハイライトによる疑似表現**になる。以下は色のベースを残しながら、浅い視線角度で空色に近い色を少し混ぜ、太陽があるときだけ小さなグリントを足すサンプル。
+
+```wgsl
+fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
+    let c1 = cos(p.x * 1.00 + t * 1.60);
+    let c2 = cos(p.z * 1.35 + t * 1.28);
+    let c3 = cos((p.x + p.z) * 0.70 - t * 1.76);
+    let dhdx = 0.50 * c1 + 0.15 * 0.70 * c3;
+    let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3;
+    return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
+}
+
+fn bloxd_liquid_light(s: bloxd_Surface, l: bloxd_LightIn) -> bloxd_Light {
+    var out = bloxd_defaultLight(s, l);
+    let baseN = normalize(l.normal);
+    let viewDir = normalize(l.eyePosition - l.position);
+    let facing = clamp(dot(baseN, viewDir), 0.0, 1.0);
+    let fresnel = 0.02 + 0.98 * pow(1.0 - facing, 5.0);
+    let fakeSkyReflection = vec3f(0.16, 0.29, 0.36);
+    out.colour *= vec3f(0.88, 0.97, 1.04);
+    out.colour = mix(out.colour, fakeSkyReflection, fresnel * 0.38);
+    #ifdef BLOXD_LIGHTING
+    let worldPos = l.position + vec3f(f32(l.originOffset.x), f32(l.originOffset.y), f32(l.originOffset.z));
+    let topness = clamp(baseN.y * 2.0, 0.0, 1.0);
+    let waveN = normalize(mix(baseN, pack_waterWaveNormal(worldPos, l.time), topness));
+    let sunLen = length(l.sunDirection);
+    if (sunLen > 0.5) {
+        let sunDir = l.sunDirection / sunLen;
+        let halfDir = normalize(viewDir + sunDir);
+        let glint = pow(max(dot(waveN, halfDir), 0.0), 180.0) * 0.55 * clamp(l.skyLight, 0.0, 1.0);
+        out.colour += vec3f(1.0, 0.97, 0.90) * glint;
+    }
+    #endif
+    return out;
+}
+```
+
+調整の目安:
+
+- 水が白っぽい / 明るすぎる: `fresnel * 0.38` の `0.38` とグリントの `0.55` を下げる。
+- 水が濃すぎる: `fakeSkyReflection` の混合率を少し上げる。ただし上げすぎるとプラスチックのようになる。
+- 水面に線や規則的な縞が見える: 波の周波数やグリント強度を下げる。水面メッシュ自体の頂点変位はこのコードにはない。
+- 実際の景色を映したい: このAPIの入力には画面色やシーン深度がないため、色を混ぜるだけでは実反射にならない。
+
+このレシピは既存の `bloxd_liquid_light` を**置き換える**もの。R9.7 の同名波法線関数や他の同名フックと重複して貼らない。
+
+## 21. 実機テストのチェックリスト
+
+コンパイル成功と「見た目が良い」は別なので、次の順で確認する。
+
+1. **読み込み:** `pack.json` が ZIP 直下にあること、設定画面で `Ready to use` になることを確認する。
+2. **8バリアント:** strict / allow、照明 on / off、terrain / liquid の各条件で型ガード漏れがないことを確認する。ゲームが一部条件しか使わない場合でも、配布用パックは8通りを想定する。
+3. **日中:** 草・石・砂・木材など素材ごとに色が飛んでいないか、上面と側面で明暗差が不自然でないかを見る。
+4. **夜間:** 日向だった場所と同じ素材、影、松明の近くを比較する。明るい面だけが残るなら露出減衰、全部が暗くなるなら局所光保護を調整する。
+5. **水:** 真上・浅い視線角度・岸辺・水中・夜を別々に見る。アルファの挙動と水中の見え方はゲーム側の合成方法に依存するため、ひとつの視点だけで判断しない。
+6. **境界と距離:** チャンク / 原点の切り替わりで波や模様が飛ばないか、遠景で二重フォグや白い霞が出ないかを確認する。
+7. **性能:** ハッシュ・三角関数・`pow` を多用する効果は必要最小限にする。ディテールを少しずつ追加し、FPSを比較する。
+
+### 既知の制約を前提にする
+
+- shader pack は terrain / liquid のフックに限定され、空・エンティティ・UIを同じコードで処理する仕組みではない。
+- 影マップ、画面空間反射、シーン深度、屈折、ブルームなどを追加するための入力はこのAPIにない。
+- `time` はアニメーション用の時間で、ゲーム内の昼夜と連動する保証はない。
+- `sunDirection` がゼロなら月の方向を特定できない。青い環境光を加える処理は「月光の物理再現」ではなく、雰囲気を作る近似。
+- `s.position` / `l.position` はローカル座標なので、ワールド位置に依存する効果では `originOffset` を加える。ブロック内ローカルの模様を作る場合は、意図的にローカル座標を使うこともある。
+
+## 22. シェーダー単独で限界がある場合の組み合わせ
+
+シェーダーパック側でテクスチャを追加・サンプリングできない制約があるため、素材そのものの細かな凹凸や空の画像を変えたい場合は、シェーダーだけで解決しようとしない。Bloxd.io向けの公開テクスチャーパックリポジトリ [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) には、テクスチャ、skybox、モデル等を扱う別方式の例がある。これはシェーダーパックAPIの公式仕様書ではなく、別システムのリソース例として参照する。
+
+現実的には、**シェーダーで光と色を調整し、対応する別のリソースパックで素材や空を補う**方針がよい。ただし、別パックとの同時利用可否や読み込み順はゲーム側の実装・設定で確認する。
+
+---
+
+
