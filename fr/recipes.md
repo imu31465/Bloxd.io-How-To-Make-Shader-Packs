@@ -1,4 +1,4 @@
-> [← Retour au manuel](../README.fr.md)
+> [← Retour au manuel](README.md)
 
 # Partie III : Recettes
 

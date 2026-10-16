@@ -1,4 +1,4 @@
-> [← Voltar ao manual](../README.pt.md)
+> [← Voltar ao manual](README.md)
 
 # Parte III: Receituário
 
