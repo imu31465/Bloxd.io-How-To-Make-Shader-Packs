@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Vertex-Rezepte (nur allow)
 
 > Alles in `#ifndef BLOXD_STRICT` einpacken.
+> Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe §30: [§30 Anwendungsmodi je Spiel](README.md#30-anwendungsmodi-je-spiel-shaderpackpolicy)
 
 ### Gras im Wind (nur Spitzen bewegen)
 

@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Recetas de vértices (solo allow)
 
 > Envuelve todo en `#ifndef BLOXD_STRICT`.
+> Para las condiciones exactas (lista de títulos allow; Custom Games es estricto) ver §30: [§30 Modos de aplicación por juego](README.md#30-modos-de-aplicación-por-juego-shaderpackpolicy)
 
 ### Hierba al viento (mueve solo las puntas)
 

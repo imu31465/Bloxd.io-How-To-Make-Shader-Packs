@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Recettes de sommets (allow seul)
 
 > Tout entourer de `#ifndef BLOXD_STRICT`.
+> Pour les conditions exactes (liste des titres allow ; Custom Games est strict) voir §30 : [§30 Modes d'application par jeu](README.md#30-modes-dapplication-par-jeu-shaderpackpolicy)
 
 ### Herbe au vent (ne bouger que les pointes)
 

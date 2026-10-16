@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 顶点配方 (仅 allow)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
+> 关于执行条件 (allow 标题一览; Custom Games 为 strict) 的细节参见本篇 §30 → [§30 每个游戏的适用模式](README.md#30-每个游戏的适用模式-shaderpackpolicy)
 
 ### 草随风摆 (只动上端)
 

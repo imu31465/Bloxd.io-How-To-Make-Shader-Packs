@@ -718,6 +718,30 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 - WebGPU レンダラーはパック適用中「強制 ON」でロックされる。「Disable Block Texture Atlas」設定もロックされ (アトラス ON を維持)、WebGPU 非対応環境ではそもそもパックが適用できない。配布ページに「WebGPU 対応ブラウザが必要」と書く根拠はここである
 - ゲーム参加毎にランタイム再検証 (`checkCompilation`) が走り、実在する全地形マテリアルで実コンパイルする (設定画面の静的検証より厳しい)。ここで落ちるとパックはそのゲームで除外される
 
+## 30. ゲーム別の適用モード (`shaderPackPolicy`)
+
+§7 の「allow / strict」がタイトル単位の設定であることをここで確定する。ゲーム定義側の `shaderPackPolicy` が明示的に `"allow"` のタイトルのみ full モード (vertex フック・`discard`・地形 `alpha`) で動き、指定が無い (または allow 以外の) タイトルは strict となる — `BLOXD_STRICT` が定義され、ガード内コードは自動的に無効化される。この判定はパック側からは選べないため、どのタイトルで何が動くかを知っておくのが配布の前提になる。
+
+- 根拠ビルド: `szby6g.main.94a7596c.js` (2026-10-17 時点の本番デプロイ)。全 111 ゲーム定義を静的解析した結果、**allow 26 エントリ (12 タイトル) / strict 85 エントリ**。
+- allow は基底定義の直書き 8 箇所と基底変数 (`tb` / `kz` / `cb` / `Fb`) の 4 箇所の計 12 箇所で宣言され、バリエーションはスプレッド継承 (`{...tb,...}`) で受け継ぐ。バリエーション単位の個別上書き (親 allow・子 strict の逆パターン) は現状ゼロ。
+
+allow の 12 タイトル (計 26 エントリ):
+
+- **Test Gym** — 本体 + Empty / Mobs / Mobs & Worldgen / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles (計 11 エントリ)
+- **Doodle Cube** — 本体 + Solos / Duos (計 3)
+- **Rocket Obby** — 本体 + Sheep / January (計 3)
+- **単独タイトル (9)**: Creative (`classic_creative`) / Bloxd Hop / Fishing / Dress Up / Evil Tower / Plots / Test Mode (`schematicTester`) / Tsunami Steal Brainrots / Work at a Restaurant (`cooking`)
+
+strict 側で特に誤解しやすい点:
+
+- **Superflat Creative (classic_creativeFlat) は strict**。「Creative」を名に含むが、classic 家族で allow なのは通常の Creative (`classic_creative`) のみ。Peaceful / Survival / SMP / Worlds / Anarchy / Survival with Guns 等も全件 strict
+- **Custom Games (customGames) は strict**。自作カスタムゲームでは vertex フック系の効果は発動しない。作業用の検証は Test Gym で行うのが確実
+- bedwars / skywars / skyblock / oneBlock / greenville / pirates / shooting (cubeWarfare) 系の主要 PvP・サーバー系タイトルはすべて strict
+
+なお strict タイトルでもパックの読み込みとコンパイル自体は行われ、surface / light 等のフラグメント側レシピは通常通り動く。制約を受けるのは vertex フック (`bloxdTerrainVertex` / `bloxdLiquidVertex`) と `discard`、および地形の `alpha` (液体は常に存在) である。
+
+この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新で allow/strict の配分は変わり得る。新版が出たら再確認すること。
+
 ---
 
 # 第八部: API Version 2 移行ガイド

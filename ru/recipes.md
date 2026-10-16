@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Рецепты вершин (только allow)
 
 > Всё оборачивайте в `#ifndef BLOXD_STRICT`.
+> Подробности условий (список allow-игр; Custom Games — strict) в §30: [§30 Режимы применения по играм](README.md#30-режимы-применения-по-играм-shaderpackpolicy)
 
 ### Трава на ветру (шевелим только верхушки)
 
