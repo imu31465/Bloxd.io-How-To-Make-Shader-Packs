@@ -1,4 +1,4 @@
-> [← 返回手册](README.md)
+> [← 上一部分](api.md)·[返回手册](README.md)·[下一部分 →](realism.md)
 
 # 第三部分: 配方集
 
@@ -358,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 高度伪透明度 (非真正的浅滩判定)
 
-> v1 中场景深度与水底位置无法引用，仅凭本 API 算不出真实水深。v2 中经液体限定的 `bloxdOpaqueBehind()` 可测得至后方不透明面的厚度 (第八部分 R-E)。以下为不使用它的旧式拟似演出：`s.position.y` 是局部坐标，直接用会随区块原点漂移。以下仅按世界高度改变 alpha 的拟似演出，非沿岸线/水底的浅滩表现。`packWaterReferenceY` 请按世界高度调整。
+> v1 中场景深度与水底位置无法引用，仅凭本 API 算不出真实水深。v2 中经液体限定的 `bloxdOpaqueBehind()` 可测得至后方不透明面的厚度 ([第八部分](apiv2.md) R-E)。以下为不使用它的旧式拟似演出：`s.position.y` 是局部坐标，直接用会随区块原点漂移。以下仅按世界高度改变 alpha 的拟似演出，非沿岸线/水底的浅滩表现。`packWaterReferenceY` 请按世界高度调整。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -399,7 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 顶点配方 (仅 allow)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
-> 关于执行条件 (allow 标题一览; Custom Games 为 strict) 的细节参见本篇 §30 → [§30 每个游戏的适用模式](README.md#30-每个游戏的适用模式-shaderpackpolicy)
+> 关于执行条件 (allow 标题一览; Custom Games 为 strict) 的细节参见本篇 §30 → [§30 每个游戏的适用模式](internals.md#30-每个游戏的适用模式-shaderpackpolicy)
 
 ### 草随风摆 (只动上端)
 

@@ -1,4 +1,4 @@
-> [← Back to the manual](README.md)
+> [← Previous part](api.md)·[Back to the manual](README.md)·[Next part →](realism.md)
 
 # Part III: Recipe collection
 
@@ -150,7 +150,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### Blue night ambience (pseudo look without moon direction)
 
-> In this API, `bloxdSunDirection()` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-bloxdSunDirection()` (day/night-cycle worlds only. Part VII R-A).
+> In this API, `bloxdSunDirection()` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-bloxdSunDirection()` (day/night-cycle worlds only. [Part VII](internals.md) R-A).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -358,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Pseudo depth-based transparency by height (not a real shallows test)
 
-> In v1, scene depth and the water bottom position could not be referenced, so true water depth could not be computed with that API alone. In v2, liquid-only `bloxdOpaqueBehind()` measures the thickness to the opaque face behind (Part VIII R-E). The following is the old pseudo styling without it: `s.position.y` is a local coordinate, so using it raw shifts the effect as the chunk origin changes. Convert with `bloxdWorldPosition()` for world height. The following only varies alpha by world height — a pseudo effect, not shoreline/bottom-aware shallows. Adjust `packWaterReferenceY` to your world height.
+> In v1, scene depth and the water bottom position could not be referenced, so true water depth could not be computed with that API alone. In v2, liquid-only `bloxdOpaqueBehind()` measures the thickness to the opaque face behind ([Part VIII](apiv2.md) R-E). The following is the old pseudo styling without it: `s.position.y` is a local coordinate, so using it raw shifts the effect as the chunk origin changes. Convert with `bloxdWorldPosition()` for world height. The following only varies alpha by world height — a pseudo effect, not shoreline/bottom-aware shallows. Adjust `packWaterReferenceY` to your world height.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -399,7 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Vertex recipes (allow only)
 
 > Wrap everything in `#ifndef BLOXD_STRICT`.
-> For exact conditions (the allow title list; Custom Games being strict) see §30: [§30 Per-game apply modes](README.md#30-per-game-apply-modes-shaderpackpolicy)
+> For exact conditions (the allow title list; Custom Games being strict) see §30: [§30 Per-game apply modes](internals.md#30-per-game-apply-modes-shaderpackpolicy)
 
 ### Grass swaying in wind (move only the tops)
 

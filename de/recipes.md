@@ -1,4 +1,4 @@
-> [← Zurück zum Handbuch](README.md)
+> [← Vorheriger Teil](api.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](realism.md)
 
 # Teil III: Rezeptsammlung
 
@@ -150,7 +150,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### Blaues Nacht-Ambiente (Pseudo-Look ohne Mondrichtung)
 
-> In dieser API ist `bloxdSunDirection()` null, wenn der Himmel keine Sonne hat. Folgendes ist kein gerichtetes Mondlicht, nur schwaches blaues Ambiente bei dunklem Himmel. Die Mondrichtung selbst ist via `-bloxdSunDirection()` verfügbar (nur Welten mit Tag/Nacht-Zyklus. Teil VII R-A).
+> In dieser API ist `bloxdSunDirection()` null, wenn der Himmel keine Sonne hat. Folgendes ist kein gerichtetes Mondlicht, nur schwaches blaues Ambiente bei dunklem Himmel. Die Mondrichtung selbst ist via `-bloxdSunDirection()` verfügbar (nur Welten mit Tag/Nacht-Zyklus. [Teil VII](internals.md) R-A).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -358,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Höhen-Pseudo-Transparenz (kein echter Flachwassertest)
 
-> In v1 waren Szenentiefe und Grundposition nicht abfragbar: echte Wassertiefe ließ sich mit dieser API allein nicht berechnen. In v2 misst `bloxdOpaqueBehind()` — nur in Flüssigkeiten — die Dicke bis zur opaken Fläche dahinter (Teil VIII R-E). Folgendes ist der alte Pseudo-Effekt ohne das: `s.position.y` ist eine lokale Koordinate und roh verwendet verschiebt sich der Effekt mit dem Chunk-Ursprung. Er variiert alpha nur über Welthöhe — Pseudo-Effekt, kein küsten-/grundbewusstes Flachwasser. `packWaterReferenceY` an die eigene Welthöhe anpassen.
+> In v1 waren Szenentiefe und Grundposition nicht abfragbar: echte Wassertiefe ließ sich mit dieser API allein nicht berechnen. In v2 misst `bloxdOpaqueBehind()` — nur in Flüssigkeiten — die Dicke bis zur opaken Fläche dahinter ([Teil VIII](apiv2.md) R-E). Folgendes ist der alte Pseudo-Effekt ohne das: `s.position.y` ist eine lokale Koordinate und roh verwendet verschiebt sich der Effekt mit dem Chunk-Ursprung. Er variiert alpha nur über Welthöhe — Pseudo-Effekt, kein küsten-/grundbewusstes Flachwasser. `packWaterReferenceY` an die eigene Welthöhe anpassen.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -399,7 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Vertex-Rezepte (nur allow)
 
 > Alles in `#ifndef BLOXD_STRICT` einpacken.
-> Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe §30: [§30 Anwendungsmodi je Spiel](README.md#30-anwendungsmodi-je-spiel-shaderpackpolicy)
+> Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe §30: [§30 Anwendungsmodi je Spiel](internals.md#30-anwendungsmodi-je-spiel-shaderpackpolicy)
 
 ### Gras im Wind (nur Spitzen bewegen)
 

@@ -1,0 +1,37 @@
+[← 이전 부](realism.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](implementation.md)
+
+# 제5부: 트러블슈팅·주의
+
+## 17. 자주 나오는 에러와 고치기
+
+| 증상 | 고치기 |
+|---|---|
+| strict 게임에서 읽히지 않는다 | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `.alpha` 가 미정의라고 나온다 | `#ifdef BLOXD_ALPHA` 로 감싼다 |
+| `blockLight` 가 미정의라고 나온다 | `#ifdef BLOXD_LIGHTING` 로 감싼다. 공용 헬퍼 함수는**함수째** 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다. 판정용 가드는 남긴다) |
+| `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` 를 기점으로 고친다 |
+| `BloxdVertex only exists when BLOXD_STRICT isn't defined` | `#ifndef BLOXD_STRICT` 로 감싼다 |
+| 원경이 하얗게 흐리다 | 이중 포그가 원인인 경우가 많다. 완성색은 포그 완료 상태이므로 독자 안개는 삼가고 채도만 떨어뜨리는 방식을 검토한다 |
+| 게임 참가시에 팩이 제외된다 | 게임 개시시의 실기 체크에서 실패하고 있다. 가드 누락을 다시 본다 |
+| `pack.json needs "apiVersion": 2.` | `apiVersion` 이 없거나 `2` 가 아니다. 수치 `2` 를 넣는다 (문자열 `"2"` 는 불가). v1 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
+| `There's no pack.json at the top of the pack.` | ZIP 최상위에 `pack.json` 이 없다. 폴더째 굳히지 않았는지 확인한다 |
+| `bloxdTerrainVertex must be declared as: fn ...` | 시그니처 불일치. 표시된 선언대로 다시 쓴다 |
+| `bloxdTerrainVertex can't run in strict games...` | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `BloxdLightIn.blockLight only exists when BLOXD_LIGHTING is defined...` | `#ifdef BLOXD_LIGHTING` 로 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다) |
+| `pow(l.skyLight, γ)` 를 올려도 그림자가 짙어지지 않는다 | `l.skyLight` 는 리프트 곡선 통과 후의 값 (생값 0.87 이 0.97 로 도착한다). R9.12 의 리프트 역변환 + 임계값 커트로 전환한다 (10장) |
+| `... can only be a function's parameter or return type, ...` | 초기화 없는 `var x: BloxdSurface;` 는 거부된다. `bloxdDefault*` 에서 만든다 |
+| `bloxdPackInputs isn't part of the bloxd_ header` | PackInputs uniform 은 팩에서 직접 참조 불가. `bloxdTime()` 등의 헤더 함수 경유로 쓴다 |
+| `Packs can't declare bloxd_ names...` | 자신의 식별자에서 `bloxd_` 접두사를 뺀다. 정의할 수 있는 것은 6개 훅명뿐 |
+| `loadDuplicateManifest` (zip 읽기에서) | `pack.json` 이 2개 있다 (대소문자 차이 포함). 1개로 한다 |
+| `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | `bloxdDefaultSurface(s)` 등을 기점으로 고친다. light 훅 첫 파라미터 복사 (`var out = s;`) 에서 시작해도 된다 |
+| `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` 는 불가. `_ = f();` 로 쓴다 |
+| `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | 지형 훅 안의 `bloxdOpaqueBehind()` 호출을 `#ifdef BLOXD_SCENE_DEPTH` 로 감싼다 |
+| `...only surface and light hooks can use.` | vertex 훅 안의 `bloxdOpaqueBehind()` 를 지운다 (surface / light만 가능) |
+| `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | 에러가 아니라 strict 게임에서의 자동 비활성화 (`shaderPack:offInStrict`). vertex 훅과 `discard` 는 `#ifndef BLOXD_STRICT` 로 감싼다 |
+| `mixing '*' and '^' requires parenthesis (only in ...)` | 제2단계 (브라우저 Tint) 의 에러. `^` `&` `\|` `<<` `>>` 의 피연산자는 괄호로 묶는다 (§38) |
+
+## 18. 권리·주의
+
+- 셰이더 팩 기능 자체는 게임 내 UI에서 불러올 수 있는 공식 기능이며, 팩 제작은 예정된 행위로 간주된다. 단 공개된 공식 문서는 현재 존재하지 않는다
+- 팩은 순수 WGSL이며, JS 실행·네트워크 액세스는 설계상 불가능하다
+- 본서는 비공식 안내서이며, 개발사의 공식 입장이 아니다. API는 예고 없이 변경될 수 있다

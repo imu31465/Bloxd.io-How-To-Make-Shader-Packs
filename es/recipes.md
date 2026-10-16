@@ -1,4 +1,4 @@
-> [← Volver al manual](README.md)
+> [← Parte anterior](api.md)·[Volver al manual](README.md)·[Parte siguiente →](realism.md)
 
 # Parte III: Recetario
 
@@ -150,7 +150,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### Azul nocturno ambiental (pseudo look sin dirección lunar)
 
-> En esta API, `bloxdSunDirection()` es cero cuando el cielo no tiene sol. Lo siguiente no es luz lunar direccional, solo un tenue ambiente azul cuando el cielo está oscuro. La dirección lunar en sí está disponible vía `-bloxdSunDirection()` (solo mundos con ciclo día/noche. Parte VII R-A).
+> En esta API, `bloxdSunDirection()` es cero cuando el cielo no tiene sol. Lo siguiente no es luz lunar direccional, solo un tenue ambiente azul cuando el cielo está oscuro. La dirección lunar en sí está disponible vía `-bloxdSunDirection()` (solo mundos con ciclo día/noche. [Parte VII](internals.md) R-A).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -358,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Transparencia pseudo por altura (no es una prueba real de bajío)
 
-> En v1, la profundidad de escena y la posición del fondo no se podían consultar: la profundidad real no se calculaba solo con aquella API. En v2, `bloxdOpaqueBehind()` limitado a líquidos mide el grosor hasta la cara opaca trasera (Parte VIII R-E). Lo que sigue es el viejo pseudo efecto sin ello: `s.position.y` es coordenada local y usarla cruda desplaza el efecto con el origen del chunk. Para altura de mundo convierte con `bloxdWorldPosition()`. El trecho solo varía alpha por altura de mundo — pseudo efecto, no bajío por costa/fondo. Ajusta `packWaterReferenceY` a tu altura de mundo.
+> En v1, la profundidad de escena y la posición del fondo no se podían consultar: la profundidad real no se calculaba solo con aquella API. En v2, `bloxdOpaqueBehind()` limitado a líquidos mide el grosor hasta la cara opaca trasera ([Parte VIII](apiv2.md) R-E). Lo que sigue es el viejo pseudo efecto sin ello: `s.position.y` es coordenada local y usarla cruda desplaza el efecto con el origen del chunk. Para altura de mundo convierte con `bloxdWorldPosition()`. El trecho solo varía alpha por altura de mundo — pseudo efecto, no bajío por costa/fondo. Ajusta `packWaterReferenceY` a tu altura de mundo.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -399,7 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Recetas de vértices (solo allow)
 
 > Envuelve todo en `#ifndef BLOXD_STRICT`.
-> Para las condiciones exactas (lista de títulos allow; Custom Games es estricto) ver §30: [§30 Modos de aplicación por juego](README.md#30-modos-de-aplicación-por-juego-shaderpackpolicy)
+> Para las condiciones exactas (lista de títulos allow; Custom Games es estricto) ver §30: [§30 Modos de aplicación por juego](internals.md#30-modos-de-aplicación-por-juego-shaderpackpolicy)
 
 ### Hierba al viento (mueve solo las puntas)
 

@@ -1,4 +1,4 @@
-> [← 매뉴얼로 돌아가기](README.md)
+> [← 이전 부](api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](realism.md)
 
 # 제3부: 레시피집
 
@@ -150,7 +150,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 밤의 파란 환경광 (달의 방향을 쓰지 않는 유사 표현)
 
-> 이 API에서는 태양 없는 하늘의 `bloxdSunDirection()` 은 제로이다. 방향성 달빛이 아니라, 어두운 하늘에 희미한 파란 환경광을 더할 뿐이다. 단 달의 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다 (낮밤 사이클 월드 한정. 제7부 R-A).
+> 이 API에서는 태양 없는 하늘의 `bloxdSunDirection()` 은 제로이다. 방향성 달빛이 아니라, 어두운 하늘에 희미한 파란 환경광을 더할 뿐이다. 단 달의 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다 (낮밤 사이클 월드 한정. [제7부](internals.md) R-A).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -358,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 고도를 사용한 투명도의 유사 변화 (진짜 여울 판정이 아니다)
 
-> v1에서는 씬 깊이나 수중 바닥의 위치를 참조할 수 없어, 이 API만으로는 실제 수심을 계산할 수 없었다. v2에서는 액체 한정으로 `bloxdOpaqueBehind()` 로 안쪽 불투명면까지의 두께를 잴 수 있다 (제8부 R-E). 아래는 그것을 쓰지 않는 종래의 유사 연출이며, `s.position.y` 는 로컬 좌표이므로 그대로 쓰면 청크 원점의 변화로 효과가 어긋난다. 월드 고도로 알파를 바꿀 뿐인 유사 연출이며, 해안선이나 수중 바닥을 따른 여울 표현이 아니다. `packWaterReferenceY` 는 월드 고도에 맞춰 조정한다.
+> v1에서는 씬 깊이나 수중 바닥의 위치를 참조할 수 없어, 이 API만으로는 실제 수심을 계산할 수 없었다. v2에서는 액체 한정으로 `bloxdOpaqueBehind()` 로 안쪽 불투명면까지의 두께를 잴 수 있다 ([제8부](apiv2.md) R-E). 아래는 그것을 쓰지 않는 종래의 유사 연출이며, `s.position.y` 는 로컬 좌표이므로 그대로 쓰면 청크 원점의 변화로 효과가 어긋난다. 월드 고도로 알파를 바꿀 뿐인 유사 연출이며, 해안선이나 수중 바닥을 따른 여울 표현이 아니다. `packWaterReferenceY` 는 월드 고도에 맞춰 조정한다.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -399,7 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 정점 레시피 (allow 한정)
 
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
-> 실행 조건 (allow 타이틀 일람·Custom Games 는 strict) 의 상세는 본편 §30 참조 → [§30 게임별 적용 모드](README.md#30-게임별-적용-모드-shaderpackpolicy)
+> 실행 조건 (allow 타이틀 일람·Custom Games 는 strict) 의 상세는 본편 §30 참조 → [§30 게임별 적용 모드](internals.md#30-게임별-적용-모드-shaderpackpolicy)
 
 ### 풀잎이 바람에 흔들린다 (위쪽만 움직인다)
 

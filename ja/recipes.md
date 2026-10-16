@@ -1,4 +1,4 @@
-> [← マニュアルに戻る](README.md)
+> [← 前の部](api.md)・[マニュアルに戻る](README.md)・[次の部 →](realism.md)
 
 # 第三部: レシピ集
 
@@ -152,7 +152,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 夜の青い環境光 (月の方向を使わない擬似表現)
 
-> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定。第七部 R-A)。
+> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定。[第七部](internals.md) R-A)。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -360,7 +360,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 高度を使った透明度の疑似変化 (本当の浅瀬判定ではない)
 
-> v1 ではシーン深度や水底の位置を参照できず、このAPIだけでは実際の水深を計算できなかった。v2 では液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れる (第八部 R-E)。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
+> v1 ではシーン深度や水底の位置を参照できず、このAPIだけでは実際の水深を計算できなかった。v2 では液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れる ([第八部](apiv2.md) R-E)。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -401,7 +401,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 頂点のレシピ (allow 限定)
 
 > すべて `#ifndef BLOXD_STRICT` で囲むこと。
-> 実行条件の詳細 (allow のタイトル一覧・Custom Games は strict) は本編 §30 参照 → [§30 ゲーム別の適用モード](README.md#30-ゲーム別の適用モード-shaderpackpolicy)
+> 実行条件の詳細 (allow のタイトル一覧・Custom Games は strict) は本編 §30 参照 → [§30 ゲーム別の適用モード](internals.md#30-ゲーム別の適用モード-shaderpackpolicy)
 
 ### 草が風に揺れる (上端だけ動かす)
 
