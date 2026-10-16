@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 정점 레시피 (allow 한정)
 
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
+> 실행 조건 (allow 타이틀 일람·Custom Games 는 strict) 의 상세는 본편 §30 참조 → [§30 게임별 적용 모드](README.md#30-게임별-적용-모드-shaderpackpolicy)
 
 ### 풀잎이 바람에 흔들린다 (위쪽만 움직인다)
 

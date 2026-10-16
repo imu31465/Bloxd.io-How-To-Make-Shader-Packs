@@ -401,6 +401,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. 頂点のレシピ (allow 限定)
 
 > すべて `#ifndef BLOXD_STRICT` で囲むこと。
+> 実行条件の詳細 (allow のタイトル一覧・Custom Games は strict) は本編 §30 参照 → [§30 ゲーム別の適用モード](README.md#30-ゲーム別の適用モード-shaderpackpolicy)
 
 ### 草が風に揺れる (上端だけ動かす)
 

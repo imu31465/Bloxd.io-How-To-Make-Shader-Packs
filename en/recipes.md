@@ -399,6 +399,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. Vertex recipes (allow only)
 
 > Wrap everything in `#ifndef BLOXD_STRICT`.
+> For exact conditions (the allow title list; Custom Games being strict) see §30: [§30 Per-game apply modes](README.md#30-per-game-apply-modes-shaderpackpolicy)
 
 ### Grass swaying in wind (move only the tops)
 

@@ -397,6 +397,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## R7. वर्टेक्स रेसिपी (केवल allow)
 
 > सब `#ifndef BLOXD_STRICT` से लपेटें।
+> सटीक शर्तों (allow शीर्षक सूची; Custom Games strict है) के लिए §30 देखें: [§30 गेम-अनुसार अनुप्रयोग मोड](README.md#30-गेम-अनुसार-अनुप्रयोग-मोड-shaderpackpolicy)
 
 ### घास पवन दोलन (शीर्ष ही हिलाएँ)
 

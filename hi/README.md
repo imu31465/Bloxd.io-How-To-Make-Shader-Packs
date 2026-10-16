@@ -718,6 +718,30 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 - WebGPU रेंडरर पैक सहित "बलात् चालू" तालाबंद होता है। "Disable Block Texture Atlas" सेटिंग भी तालाबंद (Atlas चालू रहता है), व WebGPU बिना परिवेश पैक बिल्कुल लागू नहीं होता। वितरण पृष्ठों पर "WebGPU ब्राउज़र आवश्यक" लिखने का आधार
 - खेल प्रवेश रनटाइम पुनः सत्यापन (`checkCompilation`) ब्राउज़र WebGPU में वास्तविक टेरेन सामग्री संकलित करता है (सेटिंग परदा स्थैतिक सत्यापन से कठोर)। यहाँ गिरने वाले पैक उस खेल से वर्जित होते हैं
 
+## 30. गेम-अनुसार अनुप्रयोग मोड (`shaderPackPolicy`)
+
+यहाँ §7 की `allow / strict` अवधारणा का शीर्षक-स्तरीय अर्थ निश्चित किया जाता है। केवल वही शीर्षक, जिनकी गेम-परिभाषा में स्पष्ट रूप से `shaderPackPolicy: "allow"` है, पूर्ण मोड (vertex हुक, `discard`, टेरेन `alpha`) में चलते हैं; बिना निर्दिष्ट शीर्षक (या allow के अतिरिक्त मान) strict होते हैं — `BLOXD_STRICT` परिभाषित होता है और गार्ड में लिखा कोड स्वतः निष्क्रिय हो जाता है। यह निर्णय पैके के पक्ष से नहीं चुना जा सकता; अतः किस शीर्षक में क्या चलता है, यह जान लेना वितरण की पूर्वशर्त है।
+
+- संदर्भ-बिल्ड: `szby6g.main.94a7596c.js` (2026-10-17 का प्रोडक्शन-डिप्लॉय)। सभी 111 गेम-परिभाषाओं का स्थैतिक विश्लेषण — परिणाम: **allow 26 प्रविष्टियाँ (12 शीर्षक) / strict 85 प्रविष्टियाँ**।
+- allow 12 स्थानों पर घोषित है: गेम-परिभाषाओं में सीधे लिखे गए 8 स्थान और आधार-चर (`tb` / `kz` / `cb` / `Fb`) के 4 स्थान; वेरिएंट्स स्प्रेड विरासत (`{...tb,...}`) से इसे ग्रहण करते हैं। वेरिएंट-स्तरीय अलग ओवरराइड (पिता-allow / पुत्र-strict की उलटी रूपरेखा) अभी कोई नहीं।
+
+12 allow शीर्षक (कुल 26 प्रविष्टियाँ):
+
+- **Test Gym** — मुख्य + Empty / Mobs / Mobs & Worldgen / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles (कुल 11 प्रविष्टियाँ)
+- **Doodle Cube** — मुख्य + Solos / Duos (कुल 3)
+- **Rocket Obby** — मुख्य + Sheep / January (कुल 3)
+- **9 एकल शीर्षक**: Creative (`classic_creative`) / Bloxd Hop / Fishing / Dress Up / Evil Tower / Plots / Test Mode (`schematicTester`) / Tsunami Steal Brainrots / Work at a Restaurant (`cooking`)
+
+strict पक्ष में विशेष रूप से भ्रामक बिंदु:
+
+- **Superflat Creative (classic_creativeFlat) strict है**। नाम में "Creative" है, पर classic परिवार में allow केवल साधारण Creative (`classic_creative`) है। Peaceful / Survival / SMP / Worlds / Anarchy / Survival with Guns आदि भी सब strict
+- **Custom Games (customGames) strict है**। स्वनिर्मित कस्टम गेम में vertex हुक-धारा के प्रभाव सक्रिय नहीं होते। सत्यापन कार्य के लिए Test Gym ही भरोसेमंद विकल्प है
+- bedwars / skywars / skyblock / oneBlock / greenville / pirates / shooting (cubeWarfare) जैसे प्रमुख PvP व सर्वर शीर्षक सब strict
+
+इसके अलावा strict शीर्षकों में भी पैक का लोड व कंपाइल होता रहता है, और surface / light जैसी फ़्रैगमेंट-पक्ष की रेसिपी सामान्य रूप से चलती हैं। प्रतिबंध केवल vertex हुक (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard` और टेरेन `alpha` पर हैं (तरल में हमेशा मौजूद)।
+
+यह सूची उपरोक्त बिल्ड के स्थैतिक विश्लेषण का परिणाम है; इंजन-अपडेट से allow/strict का वितरण बदल सकता है। नया संस्करण आने पर पुनः जाँचें।
+
 # भाग VIII: API Version 2 माइग्रेशन गाइड
 
 लक्ष्य बिल्ड: `6qxffk.main.5912a15f.js` (2026-10-16 का उत्पादन परिनियोजन)। इस पुस्तक के भाग I–VII v2 आधार पर पुनः लिखे जा चुके हैं; यह भाग VIII v1 से प्रवासन बिंदु व v2 नई सुविधाएँ समेटता है। नई सुविधा कोड उदाहरण v2 कंपाइलर द्वारा 8/8 वेरिएंट सत्यापन व ब्राउज़र WGSL कंपाइलर (Tint) सत्यापन (§38) उत्तीर्ण हैं, पर विद्यमान रेसिपी v2 रूपांतरण यांत्रिक पहचानकर्ता प्रतिस्थापन है, अतः वितरण पूर्व वास्तविक-मशीन कंपाइल से अवश्य सत्यापित करें।
