@@ -1,4 +1,4 @@
-> [← Back to the manual](../README.en.md)
+> [← Back to the manual](README.md)
 
 # Part III: Recipe collection
 

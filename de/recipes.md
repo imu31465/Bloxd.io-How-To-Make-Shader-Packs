@@ -1,4 +1,4 @@
-> [← Zurück zum Handbuch](../README.de.md)
+> [← Zurück zum Handbuch](README.md)
 
 # Teil III: Rezeptsammlung
 

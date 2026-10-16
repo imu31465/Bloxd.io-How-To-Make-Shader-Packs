@@ -13,7 +13,7 @@ Basierend auf der Spezifikation von `apiVersion: 2`. Enthält Rezepte und API-Re
 
 - [Teil I: Pakete erstellen](#teil-i-pakete-erstellen)
 - [Teil II: API-Referenz](#teil-ii-api-referenz)
-- [Teil III: Rezeptsammlung](de/recipes.md)
+- [Teil III: Rezeptsammlung](recipes.md)
 - [Teil IV: Realismus-Leitfaden](#teil-iv-realismus-leitfaden)
 - [Teil V: Fehlersuche & Hinweise](#teil-v-fehlersuche--hinweise)
 - [Teil VI: Wichtige Umsetzungshinweise](#teil-vi-wichtige-umsetzungshinweise)

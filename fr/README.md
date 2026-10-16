@@ -13,7 +13,7 @@ Basé sur la spécification `apiVersion: 2`. Inclut recettes et référence API 
 
 - [Partie I : Créer des packs](#partie-i--créer-des-packs)
 - [Partie II : Référence API](#partie-ii--référence-api)
-- [Partie III : Recettes](fr/recipes.md)
+- [Partie III : Recettes](recipes.md)
 - [Partie IV : Guide du réalisme](#partie-iv--guide-du-réalisme)
 - [Partie V : Dépannage et notes](#partie-v--dépannage-et-notes)
 - [Partie VI : Notes d'implémentation importantes](#partie-vi--notes-dimplémentation-importantes)

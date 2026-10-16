@@ -2,16 +2,16 @@
 
 How to make Bloxd.io shader packs (WebGPU renderer only) — self-contained guide with recipes and API reference.
 
-- [日本語版はこちら (README.ja.md)](README.ja.md)
-- [English version here (README.en.md)](README.en.md)
-- [Versión en español aquí (README.es.md)](README.es.md)
-- [Versão em português aqui (README.pt.md)](README.pt.md)
-- [Version française ici (README.fr.md)](README.fr.md)
-- [Deutsche Version hier (README.de.md)](README.de.md)
-- [简体中文版 (README.zh-CN.md)](README.zh-CN.md)
-- [한국어판 (README.ko.md)](README.ko.md)
-- [Русская версия (README.ru.md)](README.ru.md)
-- [हिन्दी संस्करण (README.hi.md)](README.hi.md)
+- [日本語版はこちら (ja/README.md)](ja/README.md)
+- [English version here (en/README.md)](en/README.md)
+- [Versión en español aquí (es/README.md)](es/README.md)
+- [Versão em português aqui (pt/README.md)](pt/README.md)
+- [Version française ici (fr/README.md)](fr/README.md)
+- [Deutsche Version hier (de/README.md)](de/README.md)
+- [简体中文版 (zh-CN/README.md)](zh-CN/README.md)
+- [한국어판 (ko/README.md)](ko/README.md)
+- [Русская версия (ru/README.md)](ru/README.md)
+- [हिन्दी संस्करण (hi/README.md)](hi/README.md)
 
 Researched by ltf_ahel (researched with glm)
 

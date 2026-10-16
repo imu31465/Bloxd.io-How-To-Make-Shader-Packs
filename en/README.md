@@ -13,7 +13,7 @@ Based on the spec at `apiVersion: 2`. Includes a recipe collection and API refer
 
 - [Part I: Making packs](#part-i-making-packs)
 - [Part II: API reference](#part-ii-api-reference)
-- [Part III: Recipe collection](en/recipes.md)
+- [Part III: Recipe collection](recipes.md)
 - [Part IV: Realism guide](#part-iv-realism-guide)
 - [Part V: Troubleshooting & notes](#part-v-troubleshooting--notes)
 - [Part VI: Important implementation notes](#part-vi-important-implementation-notes)
