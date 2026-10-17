@@ -17,3 +17,9 @@ Researched by ltf_ahel (researched with glm)
 
 > Note: this guide was created with AI assistance. Not all content is guaranteed to be accurate — verify against actual in-game behavior.  
 > 注意: 本書はAIの支援を受けて作成されており、内容の正確性は保証されません。実際のゲーム動作で確認してください。
+
+## License
+
+This guide is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). If you reuse or adapt it, credit the original (imu31465/Bloxd.io-How-To-Make-Shader-Packs) and license your adaptation under the same terms.
+
+> ライセンス: CC BY-SA 4.0。二次利用・改変の際は元ガイド (imu31465/Bloxd.io-How-To-Make-Shader-Packs) へのクレジット明示と、派生物への同一ライセンス適用をお願いします。
