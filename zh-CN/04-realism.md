@@ -86,3 +86,5 @@
 - 夜晚只剩受光面偏亮 → 别只压暗阴影，对完成色 (`engineColour`) 整体施加夜间衰减。保留局部灯光时用 `blockLight` / `heldLight` 减弱衰减 ([第六部分](06-implementation.md) 19 节)
 - `pow(skyLight, γ)` 怎么也压不黑影 → `l.skyLight` 为提升后之值 (第 10 章)。切换 R9.12 逆变换 + 阈值切割
 - 想调阴影面积/浓度 → 看 R9.12 调整指南 (面积=阈值 `shTh` / 边缘=`shSoft` / 影芯暗度=最低环境光与天空散射光的两点偏移)
+
+[← 上一部分](03-recipes.md)·[返回手册](README.md)·[下一部分 →](05-troubleshooting.md)

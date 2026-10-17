@@ -118,3 +118,5 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ③ cameraTint | 游戏设置 | 不可 |
 
 实用要点：包在水下也继续工作 / 幕去不掉 / 水下不可分支 (fogStart / fogEnd / fogColour 在水下不变，fogVisibility 也检测不到)。
+
+[← 上一部分](05-troubleshooting.md)·[返回手册](README.md)·[下一部分 →](07-internals.md)

@@ -1,4 +1,4 @@
-> [← Предыдущая часть](02-api.md)·[Вернуться к руководству](README.md)·[Следующая часть →](04-realism.md)
+[← Предыдущая часть](02-api.md)·[Вернуться к руководству](README.md)·[Следующая часть →](04-realism.md)
 
 # Часть III: Сборник рецептов
 
@@ -785,3 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Чтобы расширить тени к вечеру, добавьте `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (приближение длинных вечерних теней.  
 > `sunDir` — это `bloxdSunDirection() / length(bloxdSunDirection())`). Для более синих теней поднимите B в `vec3f(0.72, 0.82, 1.05)`.
 >
+
+[← Предыдущая часть](02-api.md)·[Вернуться к руководству](README.md)·[Следующая часть →](04-realism.md)

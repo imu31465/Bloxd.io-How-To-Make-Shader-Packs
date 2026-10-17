@@ -35,3 +35,5 @@
 - La función de paquetes de sombreadores es una función oficial cargable desde la interfaz del juego, y crear paquetes se considera uso previsto. Pero no se ha confirmado documentación oficial pública
 - Los paquetes son WGSL puro — la ejecución de JS y el acceso a red son imposibles por diseño
 - Esta es una guía no oficial, no la postura oficial de los desarrolladores. La API puede cambiar sin aviso
+
+[← Parte anterior](04-realism.md)·[Volver al manual](README.md)·[Parte siguiente →](06-implementation.md)

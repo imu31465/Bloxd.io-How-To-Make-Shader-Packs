@@ -86,3 +86,5 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 - Nachts bleiben nur beleuchtete Flächen → nicht nur Schatten abdunkeln; die ganze fertige Farbe (`engineColour`) nachts dämpfen. Lokale Lampen per `blockLight` / `heldLight` weniger dämpfen ([Teil VI](06-implementation.md), Abschnitt 19)
 - Schatten vertiefen sich mit `pow(skyLight, γ)` nicht → `l.skyLight` ist post-Kurve (Abschnitt 10). Auf R9.12-Inversion + Schwelle wechseln
 - Schattenfläche/-dichte tunen → R9.12-Tuning-Guide (Fläche = Schwelle `shTh` / Kante = `shSoft` / Kerndunkelheit = Zwei-Punkt-Verschiebung aus Mindest-Ambiente und Himmelsstreulicht)
+
+[← Vorheriger Teil](03-recipes.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](05-troubleshooting.md)

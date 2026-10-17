@@ -86,3 +86,5 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 - De noche solo quedan caras iluminadas → no oscurezcas solo sombras; atenúa todo el color terminado (`engineColour`) de noche. Para conservar lámparas locales, atenúa menos con `blockLight` / `heldLight` ([Parte VI](06-implementation.md), sección 19)
 - La sombra no se profundiza con `pow(skyLight, γ)` → `l.skyLight` es post-curva (sección 10). Cambia a inversión + umbral de R9.12
 - Ajustar área/densidad de sombra → guía de ajuste de R9.12 (área = umbral `shTh` / borde = `shSoft` / oscuridad del núcleo = doble ajuste de ambiente mínimo y dispersión del cielo)
+
+[← Parte anterior](03-recipes.md)·[Volver al manual](README.md)·[Parte siguiente →](05-troubleshooting.md)

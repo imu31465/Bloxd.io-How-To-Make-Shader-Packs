@@ -1,4 +1,4 @@
-> [← 上一部分](02-api.md)·[返回手册](README.md)·[下一部分 →](04-realism.md)
+[← 上一部分](02-api.md)·[返回手册](README.md)·[下一部分 →](04-realism.md)
 
 # 第三部分: 配方集
 
@@ -787,3 +787,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` 为 `bloxdSunDirection() / length(bloxdSunDirection())`)。阴影偏蓝请调高 `vec3f(0.72, 0.82, 1.05)` 的 B。
 >
 > ⚠️ 「用 `pow(skyLight, γ)` 加深对比」**对提升后之值加了 gamma**  
+
+[← 上一部分](02-api.md)·[返回手册](README.md)·[下一部分 →](04-realism.md)

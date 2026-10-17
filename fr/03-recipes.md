@@ -1,4 +1,4 @@
-> [← Partie précédente](02-api.md)·[Retour au manuel](README.md)·[Partie suivante →](04-realism.md)
+[← Partie précédente](02-api.md)·[Retour au manuel](README.md)·[Partie suivante →](04-realism.md)
 
 # Partie III : Recettes
 
@@ -785,3 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Pour élargir les ombres au couchant, ajoutez `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (approximation des longues ombres du soir.  
 > `sunDir` vaut `bloxdSunDirection() / length(bloxdSunDirection())`). Pour des ombres plus bleues, montez le B de `vec3f(0.72, 0.82, 1.05)`.
 >
+
+[← Partie précédente](02-api.md)·[Retour au manuel](README.md)·[Partie suivante →](04-realism.md)

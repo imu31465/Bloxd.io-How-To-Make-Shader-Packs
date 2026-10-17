@@ -183,3 +183,5 @@ strict 側で特に誤解しやすい点:
 なお strict タイトルでもパックの読み込みとコンパイル自体は行われ、surface / light 等のフラグメント側レシピは通常通り動く。制約を受けるのは vertex フック (`bloxdTerrainVertex` / `bloxdLiquidVertex`) と `discard`、および地形の `alpha` (液体は常に存在) である。
 
 この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新で allow/strict の配分は変わり得る。新版が出たら再確認すること。
+
+[← 前の部](06-implementation.md)・[マニュアルに戻る](README.md)・[次の部 →](08-apiv2.md)

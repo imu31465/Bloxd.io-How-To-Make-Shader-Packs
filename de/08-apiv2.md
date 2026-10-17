@@ -160,3 +160,5 @@ Es existiert ein Community-Material mit fast gleichem Inhalt: [Shader von Glitch
 ---
 
 Recherchiert von ltf_ahel (recherchiert mit glm)
+
+[← Vorheriger Teil](07-internals.md)·[Zurück zum Handbuch](README.md)

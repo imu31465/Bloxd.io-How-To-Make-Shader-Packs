@@ -183,3 +183,5 @@ The most misleading strict-side cases:
 Note that in strict titles the pack itself is still loaded and compiled, and fragment-side recipes such as surface / light run as usual. What is constrained: the vertex hooks (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard`, and terrain `alpha` (liquids always have it).
 
 This list reflects the static analysis of the build above; engine updates can change the allow/strict split. Re-check when a new version ships.
+
+[← Previous part](06-implementation.md)·[Back to the manual](README.md)·[Next part →](08-apiv2.md)

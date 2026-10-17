@@ -141,3 +141,5 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 3. 重新加载页面以激活。URL 参数或 localStorage 中若残留渲染器覆盖会导致包拒绝启动，请先清除
 4. 先在限制宽松的游戏中确认，再到严格游戏 (占大多数) 确认。顶点动画仅 allow 游戏有效
 5. 分发时将 `pack.json` 置顶打包 (遵守第 3 章上限)。同一界面重新加载即替换包；Remove Pack 删除。游戏更新后的重验证在页面加载时自动执行
+
+[返回手册](README.md)·[下一部分 →](02-api.md)

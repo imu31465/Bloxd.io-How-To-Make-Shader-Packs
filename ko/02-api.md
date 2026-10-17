@@ -145,3 +145,5 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ```
 
 항상 의식할 5점: 8 베리언트 전부에서 통할 것 / strict 게임이 대다수일 것 / 텍스처 불가 / 훅 파라미터는 읽기 전용일 것 / `let` 은 모듈스코프에 두지 않을 것.
+
+[← 이전 부](01-making.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](03-recipes.md)

@@ -116,3 +116,5 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ③ cameraTint | खेल सेटिंग | नहीं |
 
 व्यावहारिक बिंदु: पैक जलांत में भी चलते रहते हैं / आवरण हटता नहीं / जलांत में शाखा नहीं होती (fogStart / fogEnd / fogColour जलांत में अपरिवर्तित अतः fogVisibility भी संसूचित नहीं करता)।
+
+[← पिछला भाग](05-troubleshooting.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](07-internals.md)

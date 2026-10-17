@@ -141,3 +141,5 @@ Steps:
 3. Reload the page to activate. Remove any renderer overrides in URL parameters or localStorage first, or the pack will refuse to start
 4. Test in lenient games first, then in strict games (the majority). Vertex animation only works in allow games
 5. For distribution, zip with `pack.json` at the top (within section 3 caps). Re-loading the same screen replaces the pack; Remove Pack deletes it. Re-validation after game updates runs automatically on page load
+
+[Back to the manual](README.md)·[Next part →](02-api.md)

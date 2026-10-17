@@ -183,3 +183,5 @@ En el lado estricto, los casos que más confunden:
 En los títulos estrictos el paquete sí se carga y compila, y las recetas del lado fragment como surface / light funcionan con normalidad. Lo restringido: los hooks vertex (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard` y la `alpha` de terreno (en líquidos existe siempre).
 
 Esta lista refleja el análisis estático del build indicado; las actualizaciones del motor pueden cambiar el reparto allow/strict. Vuelve a comprobarlo al salir versiones nuevas.
+
+[← Parte anterior](06-implementation.md)·[Volver al manual](README.md)·[Parte siguiente →](08-apiv2.md)

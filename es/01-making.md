@@ -141,3 +141,5 @@ Pasos:
 3. Recarga la página para activar. Elimina antes cualquier override de renderizador en parámetros URL o localStorage, o el paquete se negará a iniciar
 4. Prueba primero en juegos permisivos y luego en juegos estrictos (la mayoría). La animación de vértices solo funciona en juegos allow
 5. Para distribuir, comprime con `pack.json` en la parte superior (dentro de los límites de la sección 3). Recargar la misma pantalla reemplaza el paquete; Remove Pack lo elimina. La revalidación tras actualizaciones del juego se ejecuta sola al cargar la página
+
+[Volver al manual](README.md)·[Parte siguiente →](02-api.md)

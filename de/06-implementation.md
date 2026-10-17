@@ -118,3 +118,5 @@ Unterwasser-Looks bestehen aus 3 Schichten:
 | ③ cameraTint | Spieleinstellung | Nein |
 
 Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nicht entfernbar / unter Wasser ist keine Verzweigung möglich (fogStart / fogEnd / fogColour ändern sich unter Wasser nicht: fogVisibility erkennt es auch nicht).
+
+[← Vorheriger Teil](05-troubleshooting.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](07-internals.md)

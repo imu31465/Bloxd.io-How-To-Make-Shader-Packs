@@ -141,3 +141,5 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 3. 읽힌 후는 페이지를 새로고침해 유효화한다
 4. 먼저 제한이 널널한 게임에서 확인하고, 다음에 strict 게임 (대다수는 이쪽) 에서 확인한다. 정점 이동을 쓰는 경우는 allow 게임에서만 동작한다
 5. 완성되면 `pack.json` 을 최상위로 굳혀서 zip 으로 배포한다 (3장의 상한 이내일 것)
+
+[매뉴얼로 돌아가기](README.md)·[다음 부 →](02-api.md)

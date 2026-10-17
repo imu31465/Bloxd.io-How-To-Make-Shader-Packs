@@ -86,3 +86,5 @@ Points pratiques : les packs continuent sous l'eau / le voile ne se retire pas /
 - La nuit, seules restent des faces éclairées → n'assombrissez pas que les ombres ; atténuez toute la couleur terminée (`engineColour`) de nuit. Pour conserver les lampes locales, atténuez moins avec `blockLight` / `heldLight` ([Partie VI](06-implementation.md), section 19)
 - L'ombre ne se creuse pas avec `pow(skyLight, γ)` → `l.skyLight` est post-courbe (section 10). Passez à inversion + seuil de R9.12
 - Régler surface/densité d'ombre → guide de réglage de R9.12 (surface = seuil `shTh` / bord = `shSoft` / obscurité du cœur = double réglage d'ambiant minimum et de dispersion du ciel)
+
+[← Partie précédente](03-recipes.md)·[Retour au manuel](README.md)·[Partie suivante →](05-troubleshooting.md)

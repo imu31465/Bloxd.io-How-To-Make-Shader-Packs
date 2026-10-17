@@ -1,4 +1,4 @@
-> [← Vorheriger Teil](02-api.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](04-realism.md)
+[← Vorheriger Teil](02-api.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](04-realism.md)
 
 # Teil III: Rezeptsammlung
 
@@ -785,3 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Für breitere Abend­schatten `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` addieren (Näherung langer Abendschatten.  
 > `sunDir` ist `bloxdSunDirection() / length(bloxdSunDirection())`). Für blauere Schatten das B von `vec3f(0.72, 0.82, 1.05)` erhöhen.
 >
+
+[← Vorheriger Teil](02-api.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](04-realism.md)

@@ -1,4 +1,4 @@
-> [← पिछला भाग](02-api.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](04-realism.md)
+[← पिछला भाग](02-api.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](04-realism.md)
 
 # भाग III: रेसिपी संग्रह
 
@@ -782,3 +782,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। छाया नीलापन हेतु `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
 >
 > ⚠️ "`pow(skyLight, γ)` से कंट्रास्ट गहरा" **लिफ्ट बाद मानों पर gamma लगा रहा था** इसलिए  
+
+[← पिछला भाग](02-api.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](04-realism.md)

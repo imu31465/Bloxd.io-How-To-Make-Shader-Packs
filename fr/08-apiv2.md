@@ -160,3 +160,5 @@ Il existe un matériau communautaire au contenu presque pareil : [Shader de Glit
 ---
 
 Recherché par ltf_ahel (recherché avec glm)
+
+[← Partie précédente](07-internals.md)·[Retour au manuel](README.md)

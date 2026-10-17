@@ -141,3 +141,5 @@ Schritte:
 3. Seite neu laden zum Aktivieren. Renderer-Overrides in URL-Parametern oder localStorage vorher entfernen, sonst verweigert das Paket den Start
 4. Erst in permissiven Spielen testen, dann in strikten Spielen (die Mehrheit). Vertex-Animation geht nur in Allow-Spielen
 5. Zum Verteilen mit `pack.json` obenauf zippen (innerhalb der Abschnitt-3-Limits). Dieselbe Seite neu zu laden ersetzt das Paket; Remove Pack löscht es. Re-Validierung nach Spiel-Updates läuft beim Seitenladen automatisch
+
+[Zurück zum Handbuch](README.md)·[Nächster Teil →](02-api.md)

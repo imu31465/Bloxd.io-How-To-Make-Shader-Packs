@@ -35,3 +35,5 @@
 - The shader pack feature itself is an official feature loadable from the in-game UI, and creating packs is considered intended use. But no public official documentation has been confirmed
 - Packs are pure WGSL — JS execution and network access are impossible by design
 - This is an unofficial guide, not the developers' official position. The API may change without notice
+
+[← Previous part](04-realism.md)·[Back to the manual](README.md)·[Next part →](06-implementation.md)

@@ -118,3 +118,5 @@ Los looks submarinos constan de 3 capas:
 | ③ cameraTint | Ajuste del juego | No |
 
 Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se puede quitar / bajo el agua no se puede ramificar (fogStart / fogEnd / fogColour no cambian bajo el agua: fogVisibility tampoco lo detecta).
+
+[← Parte anterior](05-troubleshooting.md)·[Volver al manual](README.md)·[Parte siguiente →](07-internals.md)

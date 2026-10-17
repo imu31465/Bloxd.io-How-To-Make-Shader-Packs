@@ -1,4 +1,4 @@
-> [← Previous part](02-api.md)·[Back to the manual](README.md)·[Next part →](04-realism.md)
+[← Previous part](02-api.md)·[Back to the manual](README.md)·[Next part →](04-realism.md)
 
 # Part III: Recipe collection
 
@@ -785,3 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > To widen shadows at dusk, add `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (long-dusk-shadow approximation.  
 > `sunDir` is `bloxdSunDirection() / length(bloxdSunDirection())`). For bluer shadows raise the B of `vec3f(0.72, 0.82, 1.05)`.
 >
+
+[← Previous part](02-api.md)·[Back to the manual](README.md)·[Next part →](04-realism.md)

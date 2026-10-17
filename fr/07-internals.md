@@ -183,3 +183,5 @@ Côté strict, les points les plus trompeurs :
 Notez qu'en titres stricts le paquet reste chargé et compilé, et que les recettes côté fragment comme surface / light fonctionnent normalement. Ce qui est limité : les hooks vertex (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard`, et la `alpha` de terrain (en liquides elle existe toujours).
 
 Cette liste reflète l'analyse statique du build cité ; des mises à jour du moteur peuvent modifier la répartition allow/strict. À revérifier à chaque nouvelle version.
+
+[← Partie précédente](06-implementation.md)·[Retour au manuel](README.md)·[Partie suivante →](08-apiv2.md)
