@@ -118,3 +118,5 @@ Underwater looks consist of 3 layers:
 | ③ cameraTint | Game setting | No |
 
 Practical points: packs keep working underwater / the veil cannot be removed / underwater cannot be branched on (fogStart / fogEnd / fogColour don't change underwater, so fogVisibility can't detect it either).
+
+[← Previous part](05-troubleshooting.md)·[Back to the manual](README.md)·[Next part →](07-internals.md)

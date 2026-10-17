@@ -160,3 +160,5 @@ A community material with nearly the same content exists: [GlitchHunterCoder/Blo
 ---
 
 Researched by ltf_ahel (researched with glm)
+
+[← Previous part](07-internals.md)·[Back to the manual](README.md)

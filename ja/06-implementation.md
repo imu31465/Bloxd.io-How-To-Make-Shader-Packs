@@ -116,3 +116,5 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ③ cameraTint | ゲーム設定 | 不可 |
 
 実用上の要点: 水中でもパックは動いている / ヴェールは消せない / 水中を条件分岐できない (fogStart / fogEnd / fogColour は水中でも不変のため、fogVisibility から推定する方法も無い)。
+
+[← 前の部](05-troubleshooting.md)・[マニュアルに戻る](README.md)・[次の部 →](07-internals.md)

@@ -183,3 +183,5 @@ Die missverständlichsten Punkte auf der strict-Seite:
 Auch in strict-Titeln wird das Paket geladen und kompiliert; Fragment-Rezepte wie surface / light funktionieren normal. Eingeschränkt sind die Vertex-Hooks (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard` und Terrain-`alpha` (bei Flüssigkeiten stets vorhanden).
 
 Diese Liste spiegelt die statische Analyse des genannten Builds wider; Engine-Updates können die allow/strict-Aufteilung ändern. Bei neuen Versionen nachkontrollieren.
+
+[← Vorheriger Teil](06-implementation.md)·[Zurück zum Handbuch](README.md)·[Nächster Teil →](08-apiv2.md)

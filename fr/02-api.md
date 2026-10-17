@@ -145,3 +145,5 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ```
 
 Cinq points à garder en tête : compiler propre dans les 8 variantes / les jeux stricts sont la majorité / pas de textures / paramètres de hooks en lecture seule / pas de `let` en portée module.
+
+[← Partie précédente](01-making.md)·[Retour au manuel](README.md)·[Partie suivante →](03-recipes.md)

@@ -141,3 +141,5 @@ Le chargement exécute ces contrôles dans l'ordre :
 3. Rechargez la page pour activer. Supprimez avant tout forçage de moteur (renderer override) en paramètres URL ou localStorage, sinon le pack refusera de démarrer
 4. Testez d'abord en jeux permissifs puis en jeux stricts (la majorité). L'animation de sommets ne marche qu'en jeux allow
 5. Pour distribuer, zippez avec `pack.json` au sommet (dans les limites de la section 3). Recharger le même écran remplace le pack ; Remove Pack le supprime. La revalidation après mises à jour du jeu tourne seule au chargement de page
+
+[Retour au manuel](README.md)·[Partie suivante →](02-api.md)

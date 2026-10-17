@@ -160,3 +160,5 @@ Existe um material comunitário de conteúdo quase igual: [Shader de GlitchHunte
 ---
 
 Pesquisado por ltf_ahel (pesquisado com glm)
+
+[← Parte anterior](07-internals.md)·[Voltar ao manual](README.md)

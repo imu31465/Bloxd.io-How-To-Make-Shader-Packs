@@ -145,3 +145,5 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ```
 
 Five things to always keep in mind: compile clean in all 8 variants / strict games are the majority / no textures / hook parameters are read-only / no `let` at module scope.
+
+[← Previous part](01-making.md)·[Back to the manual](README.md)·[Next part →](03-recipes.md)

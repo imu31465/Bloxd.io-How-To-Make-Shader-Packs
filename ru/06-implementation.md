@@ -118,3 +118,5 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ③ cameraTint | Настройка игры | Нет |
 
 Практические пункты: паки продолжают работать под водой / вуаль не снять / под водой не разветвиться (fogStart / fogEnd / fogColour под водой не меняются: fogVisibility её тоже не детектирует).
+
+[← Предыдущая часть](05-troubleshooting.md)·[Вернуться к руководству](README.md)·[Следующая часть →](07-internals.md)

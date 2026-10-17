@@ -35,3 +35,5 @@
 - O recurso de pacotes de shaders é um recurso oficial carregável pela interface do jogo, e criar pacotes é considerado uso previsto. Mas não se confirmou documentação oficial pública
 - Pacotes são WGSL puro — execução de JS e acesso à rede são impossíveis por projeto
 - Este é um guia não oficial, não a posição oficial dos desenvolvedores. A API pode mudar sem aviso
+
+[← Parte anterior](04-realism.md)·[Voltar ao manual](README.md)·[Parte seguinte →](06-implementation.md)

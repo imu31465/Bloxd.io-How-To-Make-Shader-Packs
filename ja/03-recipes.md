@@ -1,4 +1,4 @@
-> [← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
+[← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
 
 # 第三部: レシピ集
 
@@ -789,3 +789,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 >
 > ⚠️ 「`pow(skyLight, γ)` でコントラストを深く」は**リフト後の値に gamma を掛けていた**ため  
+
+[← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)

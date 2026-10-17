@@ -1,4 +1,4 @@
-> [← 이전 부](02-api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](04-realism.md)
+[← 이전 부](02-api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](04-realism.md)
 
 # 제3부: 레시피집
 
@@ -788,3 +788,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` 은 `bloxdSunDirection() / length(bloxdSunDirection())`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.
 >
 > ⚠️ 「`pow(skyLight, γ)` 로 콘트라스트를 깊게」 는**리프트 후의 값에 gamma 를 걸고 있었기** 때문에  
+
+[← 이전 부](02-api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](04-realism.md)

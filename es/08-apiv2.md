@@ -160,3 +160,5 @@ Existe un material comunitario de contenido casi igual: [Shader de GlitchHunterC
 ---
 
 Investigado por ltf_ahel (investigado con glm)
+
+[← Parte anterior](07-internals.md)·[Volver al manual](README.md)

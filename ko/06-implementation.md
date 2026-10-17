@@ -114,3 +114,5 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ③ cameraTint | 게임 설정 | 불가 |
 
 실무 포인트: 팩은 수중에서도 계속 동작한다 / 베일은 없앨 수 없다 / 수중에서는 분기할 수 없다 (fogStart / fogEnd / fogColour 는 수중에서도 변하지 않으므로 fogVisibility 로도 검출할 수 없다).
+
+[← 이전 부](05-troubleshooting.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](07-internals.md)

@@ -1,4 +1,4 @@
-> [← Parte anterior](02-api.md)·[Voltar ao manual](README.md)·[Parte seguinte →](04-realism.md)
+[← Parte anterior](02-api.md)·[Voltar ao manual](README.md)·[Parte seguinte →](04-realism.md)
 
 # Parte III: Receituário
 
@@ -785,3 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Para alargar sombras ao entardecer, some `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximação de sombras longas de tarde.  
 > `sunDir` é `bloxdSunDirection() / length(bloxdSunDirection())`). Para sombras mais azuis suba o B de `vec3f(0.72, 0.82, 1.05)`.
 >
+
+[← Parte anterior](02-api.md)·[Voltar ao manual](README.md)·[Parte seguinte →](04-realism.md)

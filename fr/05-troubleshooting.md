@@ -35,3 +35,5 @@
 - La fonction de packs de shaders est une fonction officielle chargeable depuis l'interface du jeu, et créer des packs est considéré comme un usage prévu. Mais aucune documentation officielle publique n'a été confirmée
 - Les packs sont du WGSL pur — exécution JS et accès réseau impossibles par conception
 - Ceci est un guide non officiel, pas la position officielle des développeurs. L'API peut changer sans avis
+
+[← Partie précédente](04-realism.md)·[Retour au manuel](README.md)·[Partie suivante →](06-implementation.md)

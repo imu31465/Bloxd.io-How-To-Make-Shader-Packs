@@ -145,3 +145,5 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ```
 
 时刻牢记 5 点：8 变体全部通过 / 严格游戏占大多数 / 纹理不可 / 钩子参数只读 / 模块级不用 `let`。
+
+[← 上一部分](01-making.md)·[返回手册](README.md)·[下一部分 →](03-recipes.md)

@@ -86,3 +86,5 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 - De noite só restam faces iluminadas → não escureça só sombras; atenue toda a cor terminada (`engineColour`) de noite. Para conservar lamparinas locais, atenue menos com `blockLight` / `heldLight` ([Parte VI](06-implementation.md), seção 19)
 - Sombra não aprofunda com `pow(skyLight, γ)` → `l.skyLight` é pós-curva (seção 10). Mude para inversão + limiar de R9.12
 - Ajustar área/densidade de sombra → guia de ajuste de R9.12 (área = limiar `shTh` / borda = `shSoft` / escuridão do núcleo = duplo ajuste de ambiente mínimo e dispersão do céu)
+
+[← Parte anterior](03-recipes.md)·[Voltar ao manual](README.md)·[Parte seguinte →](05-troubleshooting.md)

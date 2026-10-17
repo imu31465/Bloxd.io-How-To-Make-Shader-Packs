@@ -84,3 +84,5 @@
 - ブロックがほとんど真っ白になる → light フック出力の合計が 1.0 超過 (出力の先にクランプは無い)。最後に `clamp(col, vec3f(0.0), vec3f(1.0))` を入れる
 - 加算が無いのに白い → fogVisibility の除算による un-fog 逆算が原因。un-fog を外し、再構築するなら `s.colour` 起点にしてフォグは最後に一度だけ `mix`
 - 発光ブロックが光らない → 再構築系で emission の再加算漏れ。`+ s.emission * l.fogVisibility` を足す
+
+[← 前の部](03-recipes.md)・[マニュアルに戻る](README.md)・[次の部 →](05-troubleshooting.md)

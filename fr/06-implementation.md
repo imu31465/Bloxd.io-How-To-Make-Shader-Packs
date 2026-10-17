@@ -118,3 +118,5 @@ Les looks sous-marins constent de 3 couches :
 | ③ cameraTint | Réglage du jeu | Non |
 
 Points pratiques : les packs continuent sous l'eau / le voile ne se retire pas / sous l'eau on ne branche pas (fogStart / fogEnd / fogColour ne changent pas sous l'eau : fogVisibility ne le détecte pas non plus).
+
+[← Partie précédente](05-troubleshooting.md)·[Retour au manuel](README.md)·[Partie suivante →](07-internals.md)

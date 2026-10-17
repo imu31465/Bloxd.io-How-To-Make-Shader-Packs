@@ -183,3 +183,5 @@ strict 侧特别容易误解的点:
 另外，strict 标题中包的加载与编译本身照常进行，surface / light 等片元侧配方也正常工作。受到约束的是 vertex 钩子 (`bloxdTerrainVertex` / `bloxdLiquidVertex`)、`discard` 与地形 `alpha` (液体恒有)。
 
 此一览为上述构建时点的静态解析结果；引擎更新会改变 allow/strict 的分布。新版发布时请再确认。
+
+[← 上一部分](06-implementation.md)·[返回手册](README.md)·[下一部分 →](08-apiv2.md)

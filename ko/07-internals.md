@@ -183,3 +183,5 @@ strict 측에서 특히 오해하기 쉬운 점:
 한편 strict 타이틀에서도 팩의 로드와 컴파일 자체는 이루어지고, surface / light 등 프래그먼트 측 레시피는 통상대로 움직인다. 제한을 받는 것은 vertex 훅 (`bloxdTerrainVertex` / `bloxdLiquidVertex`) 과 `discard`, 그리고 지형 `alpha` (액체는 항상 존재) 이다.
 
 이 일람은 상기 빌드 시점의 정적 분석 결과이며, 엔진 갱신으로 allow/strict 의 배분은 변할 수 있다. 새판이 나오면 재확인할 것.
+
+[← 이전 부](06-implementation.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](08-apiv2.md)
