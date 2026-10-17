@@ -148,7 +148,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-> `skyLight` はリフト後の値 (10章) のため、浅い遮蔽 (木の下など。生値 0.87 → リフト後 0.97) はこの方法ではほとんど暗くならない。洞窟 (生値 0) には効く。「木陰」をはっきりさせたい場合は R9.12 のリフト逆変換 + しきい値方式を使う。
+> `skyLight` はリフト後の値 (10章) なので、浅い遮蔽 (木の下など。生値 0.87 → リフト後 0.97) はこの方法ではほとんど暗くならない。洞窟 (生値 0) には効果がある。「木陰」をはっきりさせたい場合は R9.12 のリフト逆変換 + しきい値方式を使う。
 
 ### 夜の青い環境光 (月の方向を使わない擬似表現)
 
@@ -226,7 +226,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ### 発光鉱石っぽい処理 (明るい素材を光らせる)
 
 ```wgsl
-// surface 側: 素材が明るい (白い) ほど emission を盛る
+// surface 側: 素材が明るい (白い) ほど emission を強調する
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
@@ -242,7 +242,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let world = bloxdWorldPosition(l.position);
-    // 数個の「光の玉」がゆっくり移動する。distance の逆数で光らせる
+    // 数個の「光の玉」がゆっくり移動する。distance の逆数で発光させる
     let t = bloxdTime() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);
@@ -306,7 +306,7 @@ let fresnel = pow(1.0 - facing, 3.0);
 
 ## R5. 時間のレシピ (アニメーション)
 
-> `bloxdTime()` は 3600 秒 (1 時間) で折り返す。ただしこれはシェーダーの経過時間であり、ゲーム内の太陽・昼夜と同期する保証はない。見た目の周期アニメーションには使えるが、実際の夜判定には `bloxdSunDirection()` や照明入力を優先する。
+> `bloxdTime()` は 3600 秒 (1 時間) で折り返す。ただし、これはシェーダー内の経過時間であり、ゲーム内の太陽や昼夜サイクルと同期するとは限らない。視覚的な周期アニメーションには利用できるが、実際の夜間判定には `bloxdSunDirection()` やライティング入力を優先すべきである。
 
 ### 昼夜サイクル (1 時間で 1 日)
 
@@ -330,7 +330,7 @@ fn pack_wobble(x: f32, t: f32) -> f32 {
 ### バンドが流れるオーロラ / 蛍光の帯
 
 ```wgsl
-// XZ 位置と時間で 3 色を混ぜる
+// XZ 位置と時間に基づき、3 色を混合する
 fn pack_auroraColour(x: f32, t: f32) -> vec3f {
     let phase = x * 0.05 + t * 0.05;
     let w1 = 0.5 + 0.5 * sin(phase);
@@ -371,7 +371,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     let worldY = s.position.y + f32(bloxdOriginOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
-    // 低高度では薄く、高高度では元のアルファに近づける。ゲーム内で向きは要確認。
+    // 低高度では薄く、高高度では元のアルファ値に近づける。ゲーム内で向きを確認する必要がある。
     out.alpha = mix(0.45, 0.9, heightFactor) * s.alpha;
     #endif
     return out;
@@ -393,8 +393,8 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ### 液体だけに効くパック (地形無傷の構成)
 
 ```wgsl
-// terrain_* フックを一切書かない。すると:
-//  - terrain バリアント = フック無し = 地形はエンジン既定のまま
+// terrain_* フックは一切記述しない。これにより:
+//  - terrain バリアント = フック無し = 地形はエンジンの既定設定のまま
 //  - liquid バリアント  = liquid_* フックのみ有効
 ```
 
@@ -491,10 +491,10 @@ let phase = t * 0.15;
 
 > 「バニラの見た目を素材から組み直す」ための物理系レシピ集。前提:
 >
-> 1. **light フックはフラグメントの最終段で呼ばれる**。返した colour がそのまま最終色。**自分でフォグをかけ直す必要がある** (R9.10)  
-> 2. **エンジン既定の照明は掛け算だけ**。スペキュラ / フレネル / 暖色-冷色分離 / 半球環境光はゼロから作れる  
-> 3. `l.engineColour` は完成色 (フォグ済み)。捨てて `s.colour` (アルベド) から組み直すのが本格派  
-> 4. テクスチャは禁止 → ディテールはすべて**手続き的** (ハッシュ/ノイズ) に入れる (R9.8)
+> 1. **light フックはフラグメントの最終段で呼ばれる**。返す colour がそのまま最終色。**自分でフォグをかけ直す必要がある** (R9.10)  
+> 2. **エンジン既定の照明は掛け算のみ**。スペキュラ / フレネル / 暖色-冷色分離 / 半球環境光はゼロから実装可能  
+> 3. `l.engineColour` は完成色 (フォグ済み)。これを破棄し `s.colour` (アルベド) から再構築するのが本格的な手法  
+> 4. テクスチャ使用は禁止 → ディテールはすべて**手続き的** (ハッシュ/ノイズ) で生成 (R9.8)
 
 ### R9.1 暖色トーチ × 冷色空光
 
@@ -591,8 +591,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### R9.6 大気遠近法 (距離で彩度が落ちる「空気感」)
 
-> 注意: 霞の色に輝度を持ち上げる処理 (`normalize` 等) を掛けると、霧の色が暗い場面で「明るい白い靄」が浮き、  
-> engineColour (フォグ済み) の上にさらに霧色を混ぜると二重フォグで白濁する。**空気感は彩度だけを落とす**のが安全。
+> 注意: 霞の色に輝度を持ち上げる処理 (`normalize` 等) を適用すると、霧が暗いシーンで「明るい白い靄」が浮かび、  
+> engineColour (フォグ済み) にさらに霧色を加算すると二重フォグで白濁する。**空気感は彩度の低下のみで表現**するのが安全。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -687,10 +687,10 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### R9.10 フォグをかけ直す定石 (engineColour を捨てたとき必須)
 
-> `l.fogVisibility` を `max(l.fogVisibility, 0.25)` のように下限付きにすると「これ以上濃くならない」調整ができる
+> `l.fogVisibility` を `max(l.fogVisibility, 0.25)` のように下限を設けることで、「これ以上濃くしない」調整が可能になる。
 > (0.0 = エンジン準拠 / 0.3〜0.5 = 遠景クリア)。
-> なおエンジンのフォグは地平線専用のlinearフォグ (描画距離付近のみ) であり、中距離の霧はパック側で作る必要がある。
-> 実フォグ設定 (実装照合済み): linear 固定 / `fogStart` = 描画チャンク距離 / `fogEnd` = +1 チャンク / フォグオフ時は 100〜101 チャンクで実質無効 / 既定色 RGB(183, 191, 195)。
+> なお、エンジンのフォグは地平線専用の線形フォグ (描画距離付近のみ) であり、中距離の霧はパック側で生成する必要がある。
+> 実際のフォグ設定 (実装照合済み): 線形固定 / `fogStart` = 描画チャンク距離 / `fogEnd` = +1 チャンク / フォグオフ時は 100〜101 チャンクで実質無効 / デフォルト色 RGB (183, 191, 195)。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -726,21 +726,21 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### R9.12 投影風シャドウ — リフト逆変換 + しきい値カット (決定版)
 
-> **前提の再確認 (10章)**: `l.skyLight` は生の voxel 値 (n/15) ではなく、エンジンが「リフト曲線」  
-> `y = 1-(1-x/(3-2x))³` (暗部を持ち上げる S 字カーブ) を通した後の値。
+> **前提の再確認 (10章)**: `l.skyLight` は生のボクセル値 (n/15) ではなく、エンジンが「リフト曲線」  
+> `y = 1-(1-x/(3-2x))³` (暗部を持ち上げる S 字カーブ) を適用した後の値である。
 >
-> | 場所 | voxel 生値 | リフト後 (= l.skyLight) | pow(·, 5.0) |  
+> | 場所 | ボクセル生値 | リフト後 (= l.skyLight) | pow (·, 5.0) |  
 > |---|---|---|---|  
 > | 開けた空 | 1.00 | 1.00 | 1.00 |  
-> | 木の下 (半径2) | 0.87 | **0.97** | **0.86** ← ほぼ無傷 |  
+> | 木の下 (半径2) | 0.87 | **0.97** | **0.86** ← ほぼ維持 |  
 > | 半径3 | 0.80 | **0.92** | 0.66 |  
 > | 半径5 | 0.67 | 0.78 | 0.29 |
 >
-> **これが「ガンマを上げても影が濃くならない」の真因** (数値で証明)。しかし曲線は単調なので代数的に厳密に逆変換できる:  
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`。生値を復元したら、後は**しきい値カット** (`smoothstep`) で二値化するだけ。  
-> LightEngine の BFS 横拡散は「隣接 1 ブロック = -1」なので、しきい値 `th = 1 - r/15` はそのまま  
-> 「r ブロック以上の遮蔽を影とみなす」ダイヤルになる。ブロックを壊せば影も即座に動く (LightEngine がリアルタイム再計算)。  
-> 制限: 影は「上方向の空」基準なので太陽の移動では回らない (15章「影の真実」)。
+> **これが「ガンマを上げても影が濃くならない」根本原因** (数値で証明済み)。ただし曲線は単調であるため、代数的に厳密に逆変換可能である:  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`。生値を復元した後は、**しきい値カット** (`smoothstep`) で二値化すればよい。  
+> LightEngine の BFS 横拡散は「隣接 1 ブロック = -1」としているため、しきい値 `th = 1 - r/15` はそのまま  
+> 「r ブロック以上の遮蔽を影とする」ダイヤルとなる。ブロックを破壊すれば、影も即座に更新される (LightEngine がリアルタイム再計算)。  
+> 制限: 影は「上方向の空」を基準とするため、太陽の移動では回転しない (15章「影の真実」)。
 
 ```wgsl
 // ★エンジンのリフトを厳密に逆変換して生の voxel skyLight (n/15) を復元
@@ -754,27 +754,27 @@ const shSoft = 0.04;   // 縁の柔らかさ (0.02=硬い / 0.08=ソフト)
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    // ① 生値復元 (これを飛ばすと永久に影にならない)
+    // ① 生値の復元 (これを飛ばすと永久に影にならない)
     let skyRaw = sh_unlift(l.skyLight);
-    // ② しきい値カット — 日向=1 / 影=0 を確実に分離できる
+    // ② しきい値でカット — 日向は1、影は0と確実に分離
     let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
-    // 太陽 Lambert (太陽が無い空では l.directional にフォールバック)
+    // 太陽に対する Lambert 計算 (太陽がない空では l.directional にフォールバック)
     let sunLen = length(bloxdSunDirection());
     let sunL = select(clamp(l.directional, 0.0, 1.0),
                       clamp(dot(normalize(l.normal), bloxdSunDirection() / sunLen), 0.0, 1.0),
                       sunLen > 0.5);
     // ★投影の正体: 太陽の直接光は「空が見える場所」にしか届かない
     let lit = sunL * sky;
-    // 影側: 黒ではなく空色に染まる + 最低環境光
+    // 影側: 黒ではなく空色に染まり、さらに最低環境光が加算される
     let shade = 0.09 + 0.16 * sky * vec3f(0.72, 0.82, 1.05);
     var col = s.colour * (shade + lit * vec3f(1.00, 0.90, 0.72) * 1.18);
-    // トーチ光は影を貫通する (blockLight もリフト後なので一緒に復元)
+    // トーチ光は影を貫通する (blockLight もリフト後に復元されるため)
     let blockRaw = vec3f(sh_unlift(l.blockLight.r),
                          sh_unlift(l.blockLight.g),
                          sh_unlift(l.blockLight.b));
     let blockInt = max(blockRaw.r, max(blockRaw.g, blockRaw.b));
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
-    // フォグをかけ直す (engineColour を捨てたぶん)
+    // フォグを再適用 (engineColour を破棄した分を補正)
     col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));
     out.colour = clamp(col + s.emission * l.fogVisibility, vec3f(0.0), vec3f(1.0));   // emission も忘れずに (フォグ済みで加算)
     #endif

@@ -31,11 +31,11 @@ v2 ではアンダースコア命名からキャメルケースへ統一され�
 | `bloxd_Light` | `BloxdLight` |
 | `bloxd_packInputs` (内部 uniform) | `bloxdPackInputs` (`@group(3) @binding(0)`、64B) |
 
-フックの種類 (vertex / surface / light × terrain / liquid の6種) と `pack.json` の形式 (`apiVersion` / `name` / `author`) に変更はない。ローダー制限も不変 (zip 32MB / エントリ 1024 / `.wgsl` 256 個 / 合計 256KB / manifest 64KB)。
+フックの種類 (vertex / surface / light × terrain / liquid の6種) と `pack.json` の形式 (`apiVersion` / `name` / `author`) に変更はない。ローダー制限も変わらない (zip 32MB / エントリ 1024 / `.wgsl` 256 個 / 合計 256KB / manifest 64KB)。
 
 ## 33. 削除フィールドの移植先
 
-v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体のフィールドだった。v2 では**これらのフィールドは削除され、代わりにエンジン uniform (`bloxdPackInputs`) を読むヘッダ関数**を使う。関数は uniform を直接読むため、**フックの外のモジュールスコープ関数や vertex フックからでも呼べる**。
+v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体のフィールドだった。v2 では**これらのフィールドは削除され、代わりにエンジン uniform (`bloxdPackInputs`) を読み取るヘッダ関数**を使用する。この関数は uniform を直接参照するため、**フック外のモジュールスコープ関数や vertex フックからでも呼び出し可能**。
 
 | v1 | v2 |
 |---|---|
@@ -48,7 +48,7 @@ v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体�
 
 ## 34. 新機能 ①: `blockId` (ブロック固有シェーディング)
 
-`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` の3構造体すべてに `blockId: u32` が追加された。**面が属するブロックの ID** (0〜65535) で、同じ面の全域で一定 (`@interpolate(flat)` で渡される)。テクスチャの色に依存しないブロック種別の識別に使う。ただし ID とブロック種の対応表はエンジン内部にありパックからは参照できないため、**どの ID が何ブロックかは、ワールド内で実測するか、下記の参考データを用いて調べる**。
+`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` の3構造体すべてに `blockId: u32` が追加された。**面が属するブロックの ID** (0〜65535) で、同一面内で一定 (`@interpolate(flat)` で渡される)。テクスチャの色に依存しないブロック種別の識別に利用できる。ただし ID とブロック種の対応表はエンジン内部にありパックからは参照できないため、**どの ID が何のブロックに対応するかは、ワールド内で実測するか、後述の参考データを用いて調査する必要がある**。
 
 **参考**: 作者がゲーム内エントリ一覧を [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) で公開している (`entries.json`: id ↔ ブロック名の対応表。`Furnace|meta|rot2` のような回転・meta の変種 ID も収録)。ゲームの更新で対応は変わる可能性があるため、最終的な確認は実機で行うこと。
 
@@ -56,7 +56,7 @@ v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体�
 
 ```wgsl
 fn blockTint(blockId: u32) -> vec3f {
-    // 例: 石系 (id の上位ビットパターン) を寒色に傾ける
+    // 例: 石系 (id の上位ビットパターン) を寒色寄りにする
     let stripe = f32((blockId >> 4u) & 1u);
     return mix(vec3f(1.0), vec3f(0.85, 0.95, 1.0), stripe * 0.5);
 }
@@ -70,17 +70,17 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 35. 新機能 ②: `BLOXD_SCENE_DEPTH` と `bloxdOpaqueBehind()` (本命)
 
-v1 で構造的に不可能とされた深度アクセスが、**液体 (liquid) プログラムに限り**解禁された。色は取れないが、**奥の不透明面までの距離と位置という幾何情報が取れる**。典型的な使い方は水の厚みを測った吸収色の計算である。
+v1 では構造上不可能とされていた深度アクセスが、**液体 (liquid) プログラムに限り**解禁された。色は取得できないが、**奥の不透明面までの距離と位置という幾何情報が取得できる**。典型的な用途は、水の厚みを測定して吸収色を計算することである。
 
 使用ルール:
 
 | 使い方 | 結果 |
 |---|---|
-| `bloxdLiquidSurface` / `bloxdLiquidLight` 内でガード無しで呼ぶ | OK (液体バリアントでは常に定義) |
-| `bloxdTerrainSurface` 内でガード無しで呼ぶ | ERROR。`#ifdef BLOXD_SCENE_DEPTH` で囲む |
-| vertex フック内で呼ぶ | ERROR (surface / light フック限定) |
+| `bloxdLiquidSurface` / `bloxdLiquidLight` 内でガードなしで呼び出す | OK (液体バリアントでは常に定義されている) |
+| `bloxdTerrainSurface` 内でガードなしで呼び出す | ERROR。`#ifdef BLOXD_SCENE_DEPTH` で囲む必要がある |
+| vertex フック内で呼び出す | ERROR (surface / light フックでのみ使用可能) |
 
-地形フックでも深度を使いたい場合は `#ifdef BLOXD_SCENE_DEPTH` で囲む (地形フックは液体プログラムにも流用されるため、液体側でのみ深度が有効になる)。
+地形フックでも深度を使用したい場合は `#ifdef BLOXD_SCENE_DEPTH` で囲む (地形フックは液体プログラムにも流用されるため、液体側でのみ深度が有効になる)。
 
 ### R-E. 水の厚み吸収 (Beer-Lambert)
 
@@ -91,7 +91,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     if (behind.found) {
         // 水の柱の長さ = 現在位置から奥の不透明面まで
         let thickness = distance(behind.position, surface.position);
-        // Beer-Lambert 吸収: 赤は速く落ち、青は遠くまで届く
+        // Beer-Lambert 吸収: 赤は速く減衰し、青は遠くまで届く
         let absorb = exp(-thickness * vec3f(0.35, 0.14, 0.08));
         result.colour *= absorb;
     } else {
@@ -106,25 +106,25 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 36. その他の v2 変更点
 
-- **フックのフォールバック**: 液体プログラムは `bloxdLiquidXxx` が未定義のとき地形フックにフォールバックする。**地形フックだけのパックは水面にもそのまま効く**。意図しない場合は liquid 側のフックを明示定義する。
-- **`BLOXD_LIGHTING` のフィールドガードは不要に**: 全バリアントで `blockLight` 等が存在し、unlit では既定値 (0 / 1 / 白 / 0) が入る。ライト判定をしたい場合のみ `#ifdef BLOXD_LIGHTING` を使う。既存のガードを残しても動作は変わらない。
-- **`BLOXD_ALPHA` の定義条件が変化**: 非 strict の地形バリアントと全液体バリアントで定義され、strict × terrain では定義されない。地形フックで alpha を書く場合はガードを残すこと。
-- **構造体の直接構築は禁止**: `BloxdLight(...)` 等のコンストラクタ呼び出しは静的検証で拒否される。必ず `bloxdDefault*` から変更する、または入力のコピーを使う。
-- **`let _ =` は `_ =` に**: WGSL の破棄代入 `_ = f();` は有効だが `let _ = f();` は拒否される。
-- **offInStrict**: vertex フックの定義、または surface / light フックから到達可能な `discard` があると、エラーではなくパック全体が strict ゲームで自動無効化される (設定 UI に `shaderPack:offInStrict` と表示、allow ゲームでは動作)。vertex フックと `discard` は `#ifndef BLOXD_STRICT` で囲む。
-- **フォグの拡張**: フォグ計算に LINEAR / EXP / EXP2 の3モードが実装されたが、ゲーム側の設定は従来どおり常に LINEAR のため、既存のフォグ仕様はそのまま使える。`fogColour` の意味も公式に明文化された (完全にフォグの無いシーンでのみ黒)。
+- **フックのフォールバック**: 液体プログラムは `bloxdLiquidXxx` が未定義の場合、地形フックにフォールバックする。**地形フックのみのパックは水面にもそのまま適用される**。意図しない場合は、liquid 側のフックを明示的に定義すること。
+- **`BLOXD_LIGHTING` のフィールドガードは不要に**: すべてのバリアントで `blockLight` 等が存在し、unlit では既定値 (0 / 1 / 白 / 0) が設定される。ライト判定を行う場合にのみ `#ifdef BLOXD_LIGHTING` を使用すること。既存のガードを残しても動作に影響はない。
+- **`BLOXD_ALPHA` の定義条件が変化**: 非 strict の地形バリアントおよびすべての液体バリアントで定義され、strict × terrain では定義されない。地形フックで alpha を記述する場合は、ガードを残すこと。
+- **構造体の直接構築は禁止**: `BloxdLight(...)` などのコンストラクタ呼び出しは静的検証で拒否される。必ず `bloxdDefault*` を変更するか、入力のコピーを使用すること。
+- **`let _ =` は `_ =` に**: WGSL の破棄代入 `_ = f();` は有効であるが、`let _ = f();` は拒否される。
+- **offInStrict**: vertex フックの定義、または surface / light フックから到達可能な `discard` が存在する場合、エラーではなく、パック全体が strict ゲームで自動的に無効化される (設定 UI に `shaderPack:offInStrict` と表示され、allow ゲームでは動作する)。vertex フックと `discard` は `#ifndef BLOXD_STRICT` で囲むこと。
+- **フォグの拡張**: フォグ計算に LINEAR / EXP / EXP2 の3モードが実装されたが、ゲーム側の設定は従来通り常に LINEAR であるため、既存のフォグ仕様はそのまま使用可能。`fogColour` の意味も公式に明文化された (完全にフォグのないシーンでのみ黒となる)。
 - **変わっていないもの**: リフト曲線・35% チャンネル床・heldLight 減衰 (`pow(lightDist, 0.75)`) と環境光ブースト・太陽と月の方向仕様・既定フォグ色・time ラップ (3600 秒)・方向光 (最大 4 個)・Lite (WebGPU) 専用・保存機構 (IndexedDB)・`mod` 予約語。
 
 ## 37. v1 → v2 移行チェックリスト
 
 1. **pack.json**: `"apiVersion": 1` → `"apiVersion": 2`
-2. **識別子**: §32 の対応表で全部置換 (フック名・構造体名・default 関数名)
-3. **削除フィールドの移植**: §33 の表に従いヘッダ関数へ (`s.time` → `bloxdTime()` 等)
+2. **識別子**: §32 の対応表に従ってすべて置換 (フック名・構造体名・default 関数名)
+3. **削除フィールドの移植**: §33 の表に従い、ヘッダ関数へ移行 (`s.time` → `bloxdTime()` など)
 4. **`fogFactor` → `fogVisibility`** に改名
 5. **構造体直接構築を除去**
 6. **`let _ =` を `_ =` に**修正
 7. **vertex フックと discard は `#ifndef BLOXD_STRICT` で囲む**
-8. **水面も地形フックの効果を受ける**ことを確認し、意図しなければ liquid フックを明示定義
+8. **水面も地形フックの効果を受ける**ことを確認し、意図しない場合は liquid フックを明示的に定義すること
 9. (任意) `litColour` を起点にフォグを自前管理 / `bloxdOpaqueBehind()` で水の厚み吸収を追加 / `blockId` でブロック固有表現
 10. **第2段階 (ブラウザ Tint) も検証する** — 特に `^` `&` `|` `<<` `>>` を含む式の括弧。静的検証を通ってもブラウザで拒否されるコードが存在する (§38)
 
@@ -147,7 +147,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 //     mixing '*' and '^' requires parenthesis
 let h = a * 73856093u ^ b * 19349663u ^ c * 83492791u;
 
-// OK — 各乗算を括る (同一演算子の連鎖 A ^ B ^ C 自体は左結合で合法)
+// OK — 各乗算を括弧で囲む (同一演算子の連鎖 A ^ B ^ C は左結合で合法)
 let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
@@ -159,6 +159,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 ---
 
-調査: ltf_ahel (glm を使用して調査)
+調査: ltf_ahel (glm を用いて調査)
 
 [← 前の部](07-internals.md)・[マニュアルに戻る](README.md)

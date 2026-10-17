@@ -2,34 +2,34 @@
 
 # 第七部: 内部仕様の補足
 
-エンジン実装の解析で判明した追加仕様。いずれも現行本番ビルドの JavaScript から直接復元したものである。
+エンジンの実装を解析して明らかになった追加仕様である。これらはすべて、現行の本番ビルドにおける JavaScript から直接復元したものである。
 
 ## 24. 太陽と月の正体
 
-`bloxdSunDirection()` の供給源はスカイボックスの種類が変わったときだけ書き換えられる太陽方向バッファであり、判定基準は「空に太陽があるか」ではなく**「スカイボックスが earth 型か否か」**である。
+`bloxdSunDirection()` の供給元は、スカイボックスの種類が変更されたときにのみ更新される太陽方向バッファであり、判定基準は「空に太陽が存在するか」ではなく**「スカイボックスが earth 型かどうか」**である。
 
 | スカイボックス | `bloxdSunDirection()` |
 |---|---|
-| `default` (手続き空) | 非ゼロ (下記の既定値) |
+| `default` (プロシージャルスカイ) | 非ゼロ (後述の既定値) |
 | `gloomy` / `interstellar` / `space_*` (キューブテクスチャ) | **常に (0,0,0)** |
 
-**月は常に `-bloxdSunDirection()` にある** (エンジンが月の位置を太陽の正反対に計算するため)。夜の判定は太陽高度で行う — `bloxdSunDirection().y < 0` (太陽が地平線の下) のとき月が上にある。ただし既定ワールドでは太陽が静止しているため月も静止しており、動くのは昼夜サイクルを実装したワールドだけである。
+**月は常に `-bloxdSunDirection()` の位置にある** (エンジンが月の位置を太陽の真逆に計算するため)。夜の判定は太陽高度によって行われる — `bloxdSunDirection().y < 0` (太陽が地平線より下) の場合、月が上に存在する。ただし、既定ワールドでは太陽が静止しているため月も静止しており、動くのは昼夜サイクルを実装したワールドのみである。
 
-既定ワールドの太陽方向は約 `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 から計算される単位ベクトル、静止)。配布パックのテスト時にハイライトの方向を机上で予測できる基準値である。
+既定ワールドにおける太陽方向は約 `(-0.56, 0.81, -0.18)` (傾斜角 = −0.2 / 方位角 = 0.55 から算出される単位ベクトル、静止) であり、配布パックのテスト時にハイライトの向きを机上で予測するための基準値となる。
 
-昼夜サイクルはエンジンに組み込まれていない — inclination は静的な数値であり、昼夜が動くワールドはゲーム側が更新している。その更新のたびに `bloxdSunDirection()` も書き換わるため追従する。
+昼夜サイクルはエンジンに組み込まれていない — 傾斜角は静的な数値であり、昼夜が動くワールドはゲーム側が更新を行っている。その更新のたびに `bloxdSunDirection()` も更新されるため、それに追従する形となる。
 
 地形の方向光はシーン起動時に作られる 2 灯のみで**方向も強度も固定、昼夜で変化しない**。まとめると**地形の明るさを決める要素はどれも時間に依存しない。昼夜の「見た目」はスカイボックスと bloxdSunDirection() のみ**であり、夜に地形を暗くしたいパックは bloxdSunDirection() から自分で時間帯を推定する (§19 の `sunPresent` 手法)。
 
 ### R-A. 方向性月光 — moonDir = −bloxdSunDirection()
 
-月が上にある時間だけ、青白い Lambert と弱いスペキュラを加える。`moonUp` が 0 の世界 (既定の静止太陽ワールド) では何も起きないため、**昼夜サイクルのあるワールドだけで発動する安全な月光**になる。
+月が上にある時間に限り、青白いランバート反射と弱めのスペキュラが加算される。`moonUp` が 0 の世界 (既定の静止太陽ワールド) では何も発生しないため、**昼夜サイクルのあるワールドでのみ有効となる安全な月光**となる。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     #ifdef BLOXD_LIGHTING
-    // 月は常に太陽の正反対。昼の間は moonDir.y < 0 で自動的に消灯する
+    // 月はつねに太陽の正反対に位置する。昼間は moonDir.y < 0 となり、自動的に消灯する。
     let moonDir = -bloxdSunDirection();
     let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
     if (moonUp > 0.0) {
@@ -47,20 +47,20 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 25. フォグの内部仕様
 
-フォグ計算は常に LINEAR モード (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`、clamp 0..1) で、`fogStart = 32 × D`、`fogEnd = 32 × (D + 1)` (D = フォグ距離設定。D = 0 のときだけ fogEnd = 5 の特例) である。**フォグの傾斜帯はわずか 32 ブロック幅**であり、`l.fogVisibility` は「距離による霧」というより**「読み込み済みワールドの縁までの正規化距離」**の指標である。プレイヤーごとに読み込み距離が違うため、距離ベースの演出は自分で `distance(l.position, bloxdEyePosition())` を計算すべきである (レシピ R-B)。
+フォグ計算は常に LINEAR モード (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`、0〜1でクランプ) で行われ、`fogStart = 32 × D`、`fogEnd = 32 × (D + 1)` (D = フォグ距離設定。D = 0 の場合のみ fogEnd = 5 の例外) となる。**フォグの減衰域はわずか 32 ブロック幅**であり、`l.fogVisibility` は「距離に応じた霧の濃さ」というより、**「読み込まれたワールド境界までの正規化距離」**を示す指標である。プレイヤーごとに読み込み距離が異なるため、距離に基づく演出を実装する場合は、各自で `distance(l.position, bloxdEyePosition())` を計算する必要がある (レシピ R-B)。
 
 既定のフォグ色は `rgb(183, 191, 195)` (淡い青灰色)。ワールド作成者は `fogColourOverride` (hex) で変更できる。フォグモードが 0 (NONE) の状態では **fogColour は黒で届く** (`fogColour = select(vec3f(0.0), uniforms.vFogColor, ...)`)。`mix(l.fogColour, col, l.fogVisibility)` の標準形なら fogVisibility が 1 のとき霧色が使われないため安全。
 
-プレイヤー側の `showFog` を false にするとフォグは 3200〜3328 ブロックへ追いやられ実質無効化される (fogVisibility ≈ 1 が返り続ける)。
+プレイヤー側の `showFog` を false に設定すると、フォグは 3200〜3328 ブロックの範囲に追いやられ、実質的に無効化される (fogVisibility ≈ 1 が継続される)。
 
 ### R-B. 読み込み境界バンド — fogVisibility を「ワールドの縁」として使う
 
-読み込み境界の 32 ブロック帯だけを静かに冷色で締めて、ワールドの端を目立たなくする。距離を自分で計算しないため、プレイヤーの読み込み距離設定に自動追従するのが利点。
+読み込み境界付近の 32 ブロック帯を、静かな冷色で処理することで、ワールドの端を目立たなくしている。距離を個別に計算しないことにより、プレイヤーの読み込み距離設定に自動で追従するのが利点である。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
-    // fogVisibility: 1 = 内側 (境界まで余裕あり), 0 = 境界の外へ出る直前
+    // fogVisibility: 1 = 内側 (境界まで余裕あり)、0 = 境界の外へ出る直前
     let edge = 1.0 - l.fogVisibility;
     let band = smoothstep(0.0, 1.0, edge);
     out.colour = mix(out.colour, out.colour * vec3f(0.82, 0.86, 0.95), band * 0.5);
@@ -90,7 +90,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ```wgsl
 fn sp_bayer4(pos: vec2f) -> f32 {
-    // mod は予約語なので % 演算子を使う
+    // mod は予約語のため、% 演算子を使用する
     let p = floor(vec2f(pos.x % 4.0, pos.y % 4.0));
     if (p.y < 0.5) {
         if (p.x < 0.5) { return 1.0 / 16.0; }
@@ -118,7 +118,7 @@ fn sp_bayer4(pos: vec2f) -> f32 {
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
-    // y が低いブロックから順に溶ける。dissolve が高いほど残る
+    // y の値が小さいブロックから順に溶解する。dissolve の値が高いほど残りやすい
     let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(bloxdOriginOffset()).y);
     let thresh   = sp_bayer4(s.position.xz);
     out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
@@ -129,7 +129,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### R-D. 水のカメラ近接フェード — 液体の alpha で見通しを確保
 
-液体フックの `out.alpha` はブレンドに直結する。カメラ直下の水面だけを透かして、潜水・水上カメラの視界を確保するレシピ。
+液体フックの `out.alpha` はブレンドに直接関係する。カメラ直下の水面だけを透過させ、潜水・水上カメラの視界を確保するための手法。
 
 ```wgsl
 fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -144,7 +144,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 28. パックに見える値を変えるもの — テストチェックリスト
 
-同じパックでも**ワールドとプレイヤー設定で `l.*` の中身は変わる**。配布前には少なくとも次の 3 環境で見た目を確認する:
+同一のパックでも、**ワールドとプレイヤー設定により `l.*` の内容が変化する**。配布前に、少なくとも以下の 3 つの環境で見た目を確認すること。
 
 1. **通常ワールド** (default スカイボックス・オーバーライド無し) — bloxdSunDirection() あり・既定色
 2. **space 系スカイボックスのワールド** — bloxdSunDirection() = 0。`sunPresent` 分岐の見た目
@@ -155,17 +155,17 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ## 29. デバッグ手段
 
 - URL パラメータ `?renderer=lite` — Lite レンダラーを強制 (`?renderer=webgl2` / `babylon` も可)
-- URL パラメータ `?vconsole` — 画面内コンソール (VConsole) 起動。モバイル実機検証で重宝する
-- コンソールには `noa-engine v0.33.0` と `Renderer: lite from <ソース>` が出る — 描画パスの誤診断防止にまずこれを確認する
-- WebGPU レンダラーはパック適用中「強制 ON」でロックされる。「Disable Block Texture Atlas」設定もロックされ (アトラス ON を維持)、WebGPU 非対応環境ではそもそもパックが適用できない。配布ページに「WebGPU 対応ブラウザが必要」と書く根拠はここである
-- ゲーム参加毎にランタイム再検証 (`checkCompilation`) が走り、実在する全地形マテリアルで実コンパイルする (設定画面の静的検証より厳しい)。ここで落ちるとパックはそのゲームで除外される
+- URL パラメータ `?vconsole` — 画面内コンソール (VConsole) を起動。モバイル実機検証で重宝する
+- コンソールには `noa-engine v0.33.0` と `Renderer: lite from <ソース>` が表示される — 描画パスの誤診断防止のため、まずこれを確認する
+- WebGPU レンダラーはパック適用中「強制 ON」でロックされる。「Disable Block Texture Atlas」設定もロックされ (アトラス ON を維持)、WebGPU 非対応環境ではそもそもパックが適用できない。配布ページに「WebGPU 対応ブラウザが必要」と記載する根拠はここにある
+- ゲーム参加ごとにランタイム再検証 (`checkCompilation`) が実行され、実在する全地形マテリアルで実際にコンパイルする (設定画面の静的検証より厳しい)。ここで失敗すると、パックはそのゲームで除外される
 
 ## 30. ゲーム別の適用モード (`shaderPackPolicy`)
 
-§7 の「allow / strict」がタイトル単位の設定であることをここで確定する。ゲーム定義側の `shaderPackPolicy` が明示的に `"allow"` のタイトルのみ full モード (vertex フック・`discard`・地形 `alpha`) で動き、指定が無い (または allow 以外の) タイトルは strict となる — `BLOXD_STRICT` が定義され、ガード内コードは自動的に無効化される。この判定はパック側からは選べないため、どのタイトルで何が動くかを知っておくのが配布の前提になる。
+§7 の「allow / strict」がタイトル単位の設定であることがここで確定する。ゲーム定義側の `shaderPackPolicy` が明示的に `"allow"` のタイトルに限り full モード (vertex フック・`discard`・地形 `alpha`) で動作し、指定がない (または allow 以外の) タイトルは strict となる — `BLOXD_STRICT` が定義され、ガード内コードは自動的に無効化される。この判定はパック側からは選択できないため、どのタイトルで何が動作するかを把握しておくことが配布の前提となる。
 
 - 根拠ビルド: `szby6g.main.94a7596c.js` (2026-10-17 時点の本番デプロイ)。全 111 ゲーム定義を静的解析した結果、**allow 26 エントリ (12 タイトル) / strict 85 エントリ**。
-- allow は基底定義の直書き 8 箇所と基底変数 (`tb` / `kz` / `cb` / `Fb`) の 4 箇所の計 12 箇所で宣言され、バリエーションはスプレッド継承 (`{...tb,...}`) で受け継ぐ。バリエーション単位の個別上書き (親 allow・子 strict の逆パターン) は現状ゼロ。
+- allow は基底定義の直書き 8 箇所と基底変数 (`tb` / `kz` / `cb` / `Fb`) の 4 箇所の計 12 箇所で宣言され、バリエーションはスプレッド継承 (`{...tb,...}`) で受け継ぐ。バリエーション単位での個別上書き (親が allow・子が strict の逆パターン) は現状存在しない。
 
 allow の 12 タイトル (計 26 エントリ):
 
@@ -174,14 +174,14 @@ allow の 12 タイトル (計 26 エントリ):
 - **Rocket Obby** — 本体 + Sheep / January (計 3)
 - **単独タイトル (9)**: Creative (`classic_creative`) / Bloxd Hop / Fishing / Dress Up / Evil Tower / Plots / Test Mode (`schematicTester`) / Tsunami Steal Brainrots / Work at a Restaurant (`cooking`)
 
-strict 側で特に誤解しやすい点:
+strict 側で特に誤解しやすい点は以下の通りである。
 
 - **Superflat Creative (classic_creativeFlat) は strict**。「Creative」を名に含むが、classic 家族で allow なのは通常の Creative (`classic_creative`) のみ。Peaceful / Survival / SMP / Worlds / Anarchy / Survival with Guns 等も全件 strict
 - **Custom Games (customGames) は strict**。自作カスタムゲームでは vertex フック系の効果は発動しない。作業用の検証は Test Gym で行うのが確実
 - bedwars / skywars / skyblock / oneBlock / greenville / pirates / shooting (cubeWarfare) 系の主要 PvP・サーバー系タイトルはすべて strict
 
-なお strict タイトルでもパックの読み込みとコンパイル自体は行われ、surface / light 等のフラグメント側レシピは通常通り動く。制約を受けるのは vertex フック (`bloxdTerrainVertex` / `bloxdLiquidVertex`) と `discard`、および地形の `alpha` (液体は常に存在) である。
+なお strict タイトルでもパックの読み込みとコンパイル自体は行われ、surface / light 等のフラグメント側レシピは通常通り動作する。制約を受けるのは vertex フック (`bloxdTerrainVertex` / `bloxdLiquidVertex`) と `discard`、および地形の `alpha` (液体は常に存在) である。
 
-この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新で allow/strict の配分は変わり得る。新版が出たら再確認すること。
+この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新により allow/strict の配分は変更され得る。新版が公開された際は再確認されたい。
 
 [← 前の部](06-implementation.md)・[マニュアルに戻る](README.md)・[次の部 →](08-apiv2.md)
