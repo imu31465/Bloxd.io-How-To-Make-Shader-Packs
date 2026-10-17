@@ -1,7 +1,7 @@
 # Cómo crear paquetes de sombreadores (shader packs) para Bloxd.io (Guía completa)
 
 Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.io (solo renderizador WebGPU).
-Basada en la especificación de `apiVersion: 2`. La guía está dividida en un archivo por parte (este README es el índice; el recetario está en `recipes.md`). Los paquetes v1 no cargan en el juego actual (los valores v1 de `apiVersion` y los identificadores antiguos se rechazan). Para migrar desde v1, ver la Parte VIII (`apiv2.md`).
+Basada en la especificación de `apiVersion: 2`. La guía está dividida en un archivo por parte (este README es el índice; el recetario está en `3-recipes.md`). Los paquetes v1 no cargan en el juego actual (los valores v1 de `apiVersion` y los identificadores antiguos se rechazan). Para migrar desde v1, ver la Parte VIII (`8-apiv2.md`).
 
 > Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.  
 > Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.  
@@ -11,11 +11,11 @@ Basada en la especificación de `apiVersion: 2`. La guía está dividida en un a
 
 ## Índice
 
-- [Parte I: Crear paquetes](making.md)
-- [Parte II: Referencia de la API](api.md)
-- [Parte III: Recetario](recipes.md)
-- [Parte IV: Guía de realismo](realism.md)
-- [Parte V: Solución de problemas y notas](troubleshooting.md)
-- [Parte VI: Notas importantes de implementación](implementation.md)
-- [Parte VII: Suplemento de interioridades](internals.md)
-- [Parte VIII: Guía de migración a API Version 2](apiv2.md)
+- [Parte I: Crear paquetes](1-making.md)
+- [Parte II: Referencia de la API](2-api.md)
+- [Parte III: Recetario](3-recipes.md)
+- [Parte IV: Guía de realismo](4-realism.md)
+- [Parte V: Solución de problemas y notas](5-troubleshooting.md)
+- [Parte VI: Notas importantes de implementación](6-implementation.md)
+- [Parte VII: Suplemento de interioridades](7-internals.md)
+- [Parte VIII: Guía de migración a API Version 2](8-apiv2.md)

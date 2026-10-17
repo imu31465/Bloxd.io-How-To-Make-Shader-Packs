@@ -1,7 +1,7 @@
 # Bloxd.io 셰이더 팩 만드는 법 (완전판)
 
 자급자족형 Bloxd.io 셰이더 팩 (WebGPU 렌더러 전용) 제작·배포 가이드.
-`apiVersion: 2` 시점의 사양에 근거한다. 본 가이드는 부별 파일로 분할되어 있으며 (이 README는 목차), 레시피집은 `recipes.md` 에 담겨 있다. v1 팩은 현행 게임에서 읽히지 않는다 (v1 `apiVersion` 값·구 식별자는 거부된다). v1에서의 이전은 제8부 (`apiv2.md`) 를 참조.
+`apiVersion: 2` 시점의 사양에 근거한다. 본 가이드는 부별 파일로 분할되어 있으며 (이 README는 목차), 레시피집은 `3-recipes.md` 에 담겨 있다. v1 팩은 현행 게임에서 읽히지 않는다 (v1 `apiVersion` 값·구 식별자는 거부된다). v1에서의 이전은 제8부 (`8-apiv2.md`) 를 참조.
 
 > 본서는 비공식 가이드이며 개발사의 공식 입장이 아니다. API는 예고 없이 변경될 수 있다.  
 > 최종 리뷰: 2026-10-15 (포그 적용 순서·실포그 설정·수중 렌더링 구조를 렌더러 구현과 대조해 업데이트). 공개된 공식 WGSL API 레퍼런스를 확인하지 못했으므로 API 설명과 레시피는 로딩 화면·실기 컴파일로 계속 검증할 것.  
@@ -11,11 +11,11 @@
 
 ## 목차
 
-- [제1부: 팩 만들기](making.md)
-- [제2부: API 레퍼런스](api.md)
-- [제3부: 레시피집](recipes.md)
-- [제4부: 리얼화 가이드](realism.md)
-- [제5부: 트러블슈팅·주의](troubleshooting.md)
-- [제6부: 구현 시 중요한 보충](implementation.md)
-- [제7부: 내부 사양의 보충](internals.md)
-- [제8부: API Version 2 마이그레이션 가이드](apiv2.md)
+- [제1부: 팩 만들기](1-making.md)
+- [제2부: API 레퍼런스](2-api.md)
+- [제3부: 레시피집](3-recipes.md)
+- [제4부: 리얼화 가이드](4-realism.md)
+- [제5부: 트러블슈팅·주의](5-troubleshooting.md)
+- [제6부: 구현 시 중요한 보충](6-implementation.md)
+- [제7부: 내부 사양의 보충](7-internals.md)
+- [제8부: API Version 2 마이그레이션 가이드](8-apiv2.md)

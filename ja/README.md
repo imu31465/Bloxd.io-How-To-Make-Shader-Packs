@@ -1,7 +1,7 @@
 # Bloxd.io シェーダーパックの作り方 (完全版)
 
 Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・配布するための手順書。
-`apiVersion: 2` 時点の仕様に基づく。本ガイドは部ごとのファイルに分割され、この README は目次を兼ねる (レシピ集は `recipes.md`)。v1 パックは現行ゲームで読み込めない (v1 の `apiVersion` 値・旧識別子は拒否される)。v1 からの移行は第八部 (`apiv2.md`) を参照。
+`apiVersion: 2` 時点の仕様に基づく。本ガイドは部ごとのファイルに分割され、この README は目次を兼ねる (レシピ集は `3-recipes.md`)。v1 パックは現行ゲームで読み込めない (v1 の `apiVersion` 値・旧識別子は拒否される)。v1 からの移行は第八部 (`8-apiv2.md`) を参照。
 
 > 本書は非公式の手順書であり、開発元の公式見解ではない。API は予告なく変更されうる。  
 > 本書はAIの支援を受けて作成されており、内容の正確性は保証されない。実際のゲーム動作で確認すること。  
@@ -11,11 +11,11 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 
 ## 目次
 
-- [第一部: 作り方](making.md)
-- [第二部: API リファレンス](api.md)
-- [第三部: レシピ集](recipes.md)
-- [第四部: リアル化ガイド](realism.md)
-- [第五部: トラブルシューティング・注意](troubleshooting.md)
-- [第六部: 実装時の重要な補足](implementation.md)
-- [第七部: 内部仕様の補足](internals.md)
-- [第八部: API Version 2 移行ガイド](apiv2.md)
+- [第一部: 作り方](1-making.md)
+- [第二部: API リファレンス](2-api.md)
+- [第三部: レシピ集](3-recipes.md)
+- [第四部: リアル化ガイド](4-realism.md)
+- [第五部: トラブルシューティング・注意](5-troubleshooting.md)
+- [第六部: 実装時の重要な補足](6-implementation.md)
+- [第七部: 内部仕様の補足](7-internals.md)
+- [第八部: API Version 2 移行ガイド](8-apiv2.md)
