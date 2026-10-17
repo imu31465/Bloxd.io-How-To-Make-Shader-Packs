@@ -1,7 +1,7 @@
 # Bloxd.io 着色器包制作方法 (完整版)
 
 自包含的 Bloxd.io 着色器包 (仅 WebGPU 渲染器) 制作与分发指南。
-基于 `apiVersion: 2` 的规范。指南按部拆分为独立文件 (本 README 为目录，配方集在 `recipes.md`)。v1 包在现行游戏中无法加载 (v1 的 `apiVersion` 值与旧标识符会被拒绝)。v1 迁移见第八部分 (`apiv2.md`)。
+基于 `apiVersion: 2` 的规范。指南按部拆分为独立文件 (本 README 为目录，配方集在 `3-recipes.md`)。v1 包在现行游戏中无法加载 (v1 的 `apiVersion` 值与旧标识符会被拒绝)。v1 迁移见第八部分 (`8-apiv2.md`)。
 
 > 本书为非官方指南，不代表开发者的官方立场。API 可能随时变更。  
 > 最后检查: 2026-10-15 (雾应用顺序、实际雾设置、水中渲染构造对照渲染器实现更新)。未能找到公开的官方 WGSL API 参考，API 说明与配方请持续以加载界面与游戏内编译为准。  
@@ -11,11 +11,11 @@
 
 ## 目录
 
-- [第一部分: 制作包](making.md)
-- [第二部分: API 参考](api.md)
-- [第三部分: 配方集](recipes.md)
-- [第四部分: 写实化指南](realism.md)
-- [第五部分: 故障排除与注意事项](troubleshooting.md)
-- [第六部分: 重要的实现补充](implementation.md)
-- [第七部分: 内部规格的补充](internals.md)
-- [第八部分: API Version 2 迁移指南](apiv2.md)
+- [第一部分: 制作包](1-making.md)
+- [第二部分: API 参考](2-api.md)
+- [第三部分: 配方集](3-recipes.md)
+- [第四部分: 写实化指南](4-realism.md)
+- [第五部分: 故障排除与注意事项](5-troubleshooting.md)
+- [第六部分: 重要的实现补充](6-implementation.md)
+- [第七部分: 内部规格的补充](7-internals.md)
+- [第八部分: API Version 2 迁移指南](8-apiv2.md)
