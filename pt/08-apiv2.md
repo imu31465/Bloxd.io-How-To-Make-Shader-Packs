@@ -48,7 +48,9 @@ Na v1, `time` / `eyePosition` / `sunDirection` / `originOffset` eram campos de s
 
 ## 34. Novidade ①: `blockId` (sombreamento por bloco)
 
-Os três structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganham `blockId: u32`. É o **ID do bloco dono** (0–65535), uniforme em toda a face (passado com `@interpolate(flat)`). Use-o para identificar tipos de bloco sem depender da cor de textura. Mas a tabela ID-tipo vive dentro do motor e é invisível desde pacotes: **qual ID é qual bloco só pode ser medido no mundo**.
+Os três structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganham `blockId: u32`. É o **ID do bloco dono** (0–65535), uniforme em toda a face (passado com `@interpolate(flat)`). Use-o para identificar tipos de bloco sem depender da cor de textura. Mas a tabela ID-tipo vive dentro do motor e é invisível desde pacotes: **qual ID é qual bloco pode ser medido no mundo ou consultado na referência abaixo**.
+
+**Referência**: o autor publica uma lista de entradas do jogo em [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json`: tabela id ↔ nome do bloco; variantes de rotação/meta como `Furnace|meta|rot2` aparecem como IDs separados). As correspondências podem mudar com atualizações do jogo — confirme o definitivo no jogo real.
 
 ### R-F. Tinta por tipo de bloco via blockId
 

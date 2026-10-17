@@ -48,7 +48,9 @@ v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体�
 
 ## 34. 新機能 ①: `blockId` (ブロック固有シェーディング)
 
-`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` の3構造体すべてに `blockId: u32` が追加された。**面が属するブロックの ID** (0〜65535) で、同じ面の全域で一定 (`@interpolate(flat)` で渡される)。テクスチャの色に依存しないブロック種別の識別に使う。ただし ID とブロック種の対応表はエンジン内部にありパックからは参照できないため、**どの ID が何ブロックかはワールド内で実測する**しかない。
+`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` の3構造体すべてに `blockId: u32` が追加された。**面が属するブロックの ID** (0〜65535) で、同じ面の全域で一定 (`@interpolate(flat)` で渡される)。テクスチャの色に依存しないブロック種別の識別に使う。ただし ID とブロック種の対応表はエンジン内部にありパックからは参照できないため、**どの ID が何ブロックかは、ワールド内で実測するか、下記の参考データを用いて調べる**。
+
+**参考**: 作者がゲーム内エントリ一覧を [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) で公開している (`entries.json`: id ↔ ブロック名の対応表。`Furnace|meta|rot2` のような回転・meta の変種 ID も収録)。ゲームの更新で対応は変わる可能性があるため、最終的な確認は実機で行うこと。
 
 ### R-F. blockId によるブロック種別ティント
 

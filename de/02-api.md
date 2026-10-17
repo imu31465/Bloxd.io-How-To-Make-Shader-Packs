@@ -97,7 +97,7 @@ Kernpunkte:
 - **`skyLight` / `blockLight` / `heldLight` kommen nach einer „Lift-Kurve" an**. Das `tone-mapped` in den Header-Kommentaren meint dies: Die Engine wendet immer `y = 1-(1-x/(3-2x))³` (eine dunkle Bereiche anhebende S-Kurve) auf Fragmente an, bevor sie Pakete erreichen. Keine rohen Voxel-Werte (n/15); z. B. kommt unter einem Baum (roh 0,87) angehoben als **0,97** an
 - `skyLight` ist im Kern Voxel-Verdeckungsdaten für „ist von hier Himmel sichtbar" (= eine Schattenkarte), kein bloßer Helligkeitsparameter (siehe Abschnitt 15, „Die Wahrheit über Schatten")
 - **`litColour` als Ausgangspunkt nutzbar**: In v1 gab es nur das bereits gefoggte `engineColour`, sodass eigene Atmosphäre-Looks leicht zu Doppel-Fog führten. In v2 ab `litColour` (vor Fog, vor Emission) starten und Fog im eigenen Rhythmus per `bloxdApplyFog()` neu anwenden
-- **Blockarten per `blockId` unterscheiden**: Identifikation unabhängig von Texturfarbe. Die ID-Blockart-Tabelle ist aber engine-intern: Welche ID welcher Block ist, in der Welt vermessen (siehe [Teil VIII](08-apiv2.md))
+- **Blockarten per `blockId` unterscheiden**: Identifikation unabhängig von Texturfarbe. Die ID-Blockart-Tabelle ist aber engine-intern: Welche ID welcher Block ist, in der Welt vermessen; eine fertige Tabelle gibt es auf [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (siehe [Teil VIII](08-apiv2.md))
 - **Direkte Struct-Konstruktion verboten**: Konstruktoraufrufe wie `BloxdLight(...)` werden von der statischen Prüfung abgelehnt. Immer ab `bloxdDefault*` ändern oder die Eingabe kopieren
 
 ## 11. Variantentabelle

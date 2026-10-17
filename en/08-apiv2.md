@@ -48,7 +48,9 @@ In v1, `time` / `eyePosition` / `sunDirection` / `originOffset` were struct fiel
 
 ## 34. New feature 1: `blockId` (per-block shading)
 
-All three structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gained `blockId: u32`. It is the **owning block's ID** (0–65535), uniform across the face (passed with `@interpolate(flat)`). Use it for block-type identification independent of texture color. But the ID-to-block-type table lives inside the engine and is invisible from packs, so **which ID is which block can only be measured in-world**.
+All three structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gained `blockId: u32`. It is the **owning block's ID** (0–65535), uniform across the face (passed with `@interpolate(flat)`). Use it for block-type identification independent of texture color. But the ID-to-block-type table lives inside the engine and is invisible from packs, so **which ID is which block can be measured in-world, or looked up in the reference below**.
+
+**Reference**: the author publishes a game-entry listing at [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json`: an id ↔ block-name table; rotation/meta variants such as `Furnace|meta|rot2` are listed as separate IDs). Mappings can change with game updates — for anything final, confirm in a live game.
 
 ### R-F. Per-block-type tint via blockId
 

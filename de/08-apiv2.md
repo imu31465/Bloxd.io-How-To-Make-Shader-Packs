@@ -48,7 +48,9 @@ In v1 waren `time` / `eyePosition` / `sunDirection` / `originOffset` Struct-Feld
 
 ## 34. Neuerung ①: `blockId` (blockeigenes Shading)
 
-Alle 3 Structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` erhalten `blockId: u32`. Die **ID des Blocks, dem die Fläche gehört** (0–65535), über die ganze Fläche konstant (per `@interpolate(flat)` übergeben). Dient zur texturfarben-unabhängigen Blockart-Erkennung. Die ID-Blockart-Tabelle liegt aber engine-intern und ist aus Paketen nicht referenzierbar: **Welche ID welcher Block ist, lässt sich nur in der Welt vermessen**.
+Alle 3 Structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` erhalten `blockId: u32`. Die **ID des Blocks, dem die Fläche gehört** (0–65535), über die ganze Fläche konstant (per `@interpolate(flat)` übergeben). Dient zur texturfarben-unabhängigen Blockart-Erkennung. Die ID-Blockart-Tabelle liegt aber engine-intern und ist aus Paketen nicht referenzierbar: **Welche ID welcher Block ist, lässt sich in der Welt vermessen oder in der Referenz unten nachschlagen**.
+
+**Referenz**: Der Autor veröffentlicht eine Liste der Spiel-Einträge unter [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json`: Tabelle id ↔ Blockname; Rotations-/Meta-Varianten wie `Furnace|meta|rot2` stehen als eigene IDs drin). Zuordnungen können sich mit Spiel-Updates ändern — endgültige Werte im echten Spiel prüfen.
 
 ### R-F. Blockart-Tönung per blockId
 

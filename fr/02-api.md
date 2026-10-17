@@ -97,7 +97,7 @@ Points clés :
 - **`skyLight` / `blockLight` / `heldLight` arrivent après une "courbe de lift"**. Le `tone-mapped` des commentaires d'en-tête désigne ceci : le moteur applique toujours `y = 1-(1-x/(3-2x))³` (courbe S relevant les zones sombres) aux fragments avant de les remettre aux packs. Ni valeurs voxel brutes (n/15) : sous un arbre (brut 0,87) arrive relevé à **0,97**
 - `skyLight` est pour l'essentiel la donnée d'occlusion voxel de "le ciel est-il visible d'ici" (= une carte d'ombres), pas un simple paramètre de luminosité (voir section 15, « La vérité sur les ombres »)
 - **`litColour` comme point de départ** : en v1, seule `engineColour` (déjà brumée) existait, et les rendus d'atmosphère maison finissaient souvent en double brouillard. En v2, partez de `litColour` (avant brouillard, avant emission) et réappliquez le brouillard à votre rythme avec `bloxdApplyFog()`
-- **Distinguer les blocs avec `blockId`** : identification indépendante de la couleur de texture. Mais la table ID ↔ type de bloc est interne au moteur : mesurez en monde quel ID vaut quel bloc (voir [partie VIII](08-apiv2.md))
+- **Distinguer les blocs avec `blockId`** : identification indépendante de la couleur de texture. Mais la table ID ↔ type de bloc est interne au moteur : mesurez en monde quel ID vaut quel bloc ; une table toute prête est disponible sur [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (voir [partie VIII](08-apiv2.md))
 - **Construction directe de structs interdite** : les appels constructeurs comme `BloxdLight(...)` sont rejetés par la validation statique. Partez toujours de `bloxdDefault*` ou copiez l'entrée
 
 ## 11. Tableau des variantes

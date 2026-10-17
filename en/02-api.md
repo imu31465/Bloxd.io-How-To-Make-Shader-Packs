@@ -97,7 +97,7 @@ Key points:
 - **`skyLight` / `blockLight` / `heldLight` arrive after a "lift curve"**. The `tone-mapped` in the header comments refers to this: the engine always applies `y = 1-(1-x/(3-2x))³` (an S-curve lifting dark areas) to fragments before handing them to packs. Values are not raw voxel values (n/15); e.g. under a tree (raw 0.87) arrives lifted to **0.97**
 - `skyLight` is essentially voxel occlusion data of "whether sky is visible from here" (= a shadow map), not just a brightness parameter (see section 15, "The truth about shadows")
 - **`litColour` works as a starting point**: in v1 only fogged `engineColour` existed, so custom atmosphere tended to double-fog. In v2 start from pre-fog, pre-emission `litColour` and re-apply fog at your own pace with `bloxdApplyFog()`
-- **`blockId` tells block types apart**: identification independent of texture color. But the ID-to-block-type table lives inside the engine, so which ID is which block must be measured in-world (see [Part VIII](08-apiv2.md))
+- **`blockId` tells block types apart**: identification independent of texture color. But the ID-to-block-type table lives inside the engine, so which ID is which block is measured in-world, with a pre-built table in the author's [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (see [Part VIII](08-apiv2.md))
 - **Direct struct construction is prohibited**: constructor calls like `BloxdLight(...)` are rejected by static validation. Always modify from `bloxdDefault*`, or use a copy of the input
 
 ## 11. Variant table
