@@ -81,11 +81,11 @@ Esta receita **substitui** um `bloxdLiquidLight` existente. Não a cole junto à
 
 Sucesso de compilação e "boa aparência" são coisas distintas. Confira nesta ordem:
 
-1. **Carga:** `pack.json` na raiz do ZIP; configurações mostram `Ready to use`.
+1. **Carga:** `pack.json` na raiz do ZIP. Logo após a seleção aparece `Ready. Reload the page to use it.` e o pacote fica ativo **ao recarregar a página**; confirme `Ready to use` depois. Pacotes salvos são revalidados automaticamente no próximo carregamento da página: a cada atualização do cabeçalho de spec no motor, o conteúdo do cabeçalho é verificado por impressão digital (sucesso = permanece como está / falha = mostrado bloqueado), então um pacote antigo quebrado nunca fica silenciosamente ativo.
 2. **8 variantes:** sem omissões de guardas de tipos em strict / allow, iluminação on / off, terreno / líquido. Mesmo que um jogo só use algumas condições, pacotes de distribuição devem assumir as 8.
 3. **Dia:** cores sem estourar por material (grama, pedra, areia, madeira); salto claro/escuro natural entre topos e laterais.
 4. **Noite:** compare os mesmos materiais à plena luz passada, sombras e perto de tochas. Se só restam faces iluminadas, ajuste a atenuação de exposição; se tudo escurece, ajuste a proteção de luz local.
-5. **Água:** olhe de cima, ângulos rasantes, margens, debaixo d'água e de noite separadamente. O comportamento alpha e o visual submarino dependem da composição do jogo — nunca julgue de um só ponto de vista. Debaixo d'água o véu de definição líquida cobre na frente conforme acima: as diferenças do pacote aparecem sobretudo na superfície e no terreno através do véu.
+5. **Água:** olhe de cima, ângulos rasantes, margens, debaixo d'água e de noite separadamente. O comportamento alpha e o visual submarino dependem da composição do jogo — nunca julgue de um só ponto de vista. Debaixo d'água o véu de definição líquida cobre na frente (como descrito na [Parte VII](07-internals.md)): as diferenças do pacote aparecem sobretudo na superfície e no terreno através do véu.
 6. **Bordas e distância:** sem saltos de ondas/padrões em transições de chunk / origem; sem névoa dupla nem bruma branca longe.
 7. **Desempenho:** efeitos pesados em hash/trig/`pow` por fragmento no mínimo. Adicione detalhe aos poucos e compare FPS.
 
@@ -105,7 +105,7 @@ Como referência, distribuições comunitárias "cinematic shader" analisadas nu
 
 Na prática, **ajuste luz e cor com shaders e cubra materiais e céu com um pacote de recursos combinado**. Mas verifique co-uso e ordem de carga segundo a implementação e ajustes do jogo.
 
-Na prática, **ajuste luz e cor com shaders e cubra materiais e céu com um pacote de recursos combinado**. Mas verifique co-uso e ordem de carga segundo a implementação e ajustes do jogo.
+Os pacotes de texturas têm especificação própria (para referência): o limite de tamanho é 25MB medido como o comprimento da string JSON codificada em base64; codificar um PNG em base64 infla +33%, então o teto prático para imagens cruas é ~18–19MB. O CSS é processado por um analisador regex simples — evite aninhamento e comentários.
 
 ## 23. Realidade submarina com pacotes de shaders
 

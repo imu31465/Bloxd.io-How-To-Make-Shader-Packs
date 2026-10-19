@@ -11,8 +11,10 @@
 | `blockLight` reportado indefinido | Envolva em `#ifdef BLOXD_LIGHTING`. Envolva funções auxiliares compartilhadas **como funções inteiras** (na v2 o campo existe em todas as variantes: raramente ocorre. Mantenha as guardas usadas para detecção) |
 | `Packs can't construct BloxdSurface directly` | Comece de `bloxdDefaultSurface(s)` |
 | `BloxdVertex only exists when BLOXD_STRICT isn't defined` | Envolva em `#ifndef BLOXD_STRICT` |
-| Distância branca e leitosa | Suele ser névoa dupla. A cor terminada já leva névoa: mantenha sutil a bruma própria e prefira reduzir só saturação |
+| Distância branca e leitosa | Costuma ser névoa dupla. A cor terminada já leva névoa: mantenha sutil a bruma própria e prefira reduzir só saturação |
+| `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Aviso: a fila de sementes de luz transbordou em regiões de alta densidade de emissores ou através de fronteiras de regiões, e o cálculo de luz desse chunk foi encurtado. Sem origem "pacote", mas **os buracos de luz ao redor de concentrações de emissores vêm desse limite** — espalhar as fontes de luz pelo mundo evita isso |
 | Pacote excluído ao entrar no jogo | Falha a verificação ao vivo do jogo. Revise omissões de guardas |
+| A verificação ao vivo do jogo não termina nunca e o pacote cai com `This device couldn't check …` etc. | A verificação tem um prazo forçado de 60 segundos (o estouro conta como `skipped`). Frequente em dispositivos fracos / mundos pesados — alivie o trabalho pesado de vertex e os laços complexos, e tente de novo |
 | `pack.json needs "apiVersion": 2.` | Falta `apiVersion` ou não é `2`. Adicione o número `2` (a string `"2"` é rejeitada). Pacotes v1 são rejeitados com `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Sem `pack.json` na raiz do ZIP. Confira não ter compactado a pasta em si |
 | `bloxdTerrainVertex must be declared as: fn ...` | Assinatura distinta. Reescreva exatamente como mostrado |
@@ -25,10 +27,31 @@
 | `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` é rejeitado. Escreva `_ = f();` |
 | `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | Envolva as chamadas `bloxdOpaqueBehind()` em hooks de terreno com `#ifdef BLOXD_SCENE_DEPTH` |
 | `...only surface and light hooks can use.` | Remova `bloxdOpaqueBehind()` de hooks vertex (só surface / light) |
+| `Lite: …reads scene depth on a page that didn't turn it on` | Recarregue a página e reabra-a com o pacote que lê a profundidade ativado ([Parte VIII](08-apiv2.md) §35). A disponibilidade da textura de profundidade é fixada na geração da página |
 | `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | Não é erro mas autodesativação em jogos estritos (`shaderPack:offInStrict`). Envolva hooks vertex e `discard` com `#ifndef BLOXD_STRICT` |
 | `mixing '*' and '^' requires parenthesis (only in ...)` | Erro de segunda etapa (Tint do navegador). Ponha entre parênteses operandos de `^` `&` `\|` `<<` `>>` (§38) |
-| `loadDuplicateManifest` ao carregar zip | Dois `pack.json` (incluindo variantes de maiúsculas). Deixe um |
+| `loadDuplicateManifest` ao carregar zip | Dois `pack.json` (incluindo variantes de maiúsculas/minúsculas). Deixe um |
+| `needs the new WebGPU renderer, so remove the renderer override...` | Remova o parâmetro URL `?renderer=` e o `bloxdRenderer` do localStorage, e recarregue ([Parte VII](07-internals.md) §29) |
 | `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | Reescreva desde `bloxdDefaultSurface(s)`. Começar de uma cópia do primeiro parâmetro do hook light (`var out = s;`) também vale |
+
+### IDs de erro da fase de carregamento
+
+Os erros da tela de configurações carregam IDs `shaderPack:load*`. Como ajuda de memória para localizar uma mensagem:
+
+| ID | Significado |
+|---|---|
+| `loadZipTooBig` | zip acima de 32MB |
+| `loadTooManyZipEntries` | mais de 1024 entradas de zip |
+| `loadTooManyWgsl` | mais de 256 arquivos `.wgsl` |
+| `loadSourceTooBig` | total `.wgsl` acima de 256KB (verificação em fluxo, arquivo por arquivo) |
+| `loadManifestTooBig` | `pack.json` acima de 64KB |
+| `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` não é JSON / não é um objeto |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` ausente / ≠ `2` (pacotes v1 recusados) |
+| `loadNoName` / `loadAuthorNotString` | `name` ausente / `author` não é uma string |
+| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | compressão não suportada / zip64 / dividido / criptografado |
+| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | caminhos duplicados / não UTF-8 / falha de descompressão / zip danificado |
+
+`loadNoManifest` / `loadDuplicateManifest` (posição / duplicatas de `pack.json`) — veja as linhas correspondentes da tabela acima.
 
 ## 18. Direitos e notas
 

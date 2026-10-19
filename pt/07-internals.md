@@ -49,9 +49,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 O cômputo de névoa é sempre modo LINEAR (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), com `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = ajuste de névoa; só D = 0 é especial com fogEnd = 5). **A banda de gradiente é de só 32 blocos**, e `l.fogVisibility` é menos "bruma por distância" que **distância normalizada à borda do mundo carregado**. Varia por jogador com a distância de carga: efeitos por distância devem calcular `distance(l.position, bloxdEyePosition())` eles mesmos (receita R-B).
 
-Cor de névoa padrão `rgb(183, 191, 195)` (cinza azul pálido). Criadores de mundos a mudam via `fogColourOverride` (hex). Com modo névoa 0 (NONE), **fogColour chega preto**. A forma padrão `mix(l.fogColour, col, l.fogVisibility)` é segura pois a cor de névoa não se usa a fogVisibility 1.
+Cor de névoa padrão `rgb(181, 191, 195)` (cinza azul pálido). Criadores de mundos a mudam via `fogColourOverride` (hex). Com modo névoa 0 (NONE), **fogColour chega preto**. A forma padrão `mix(l.fogColour, col, l.fogVisibility)` é segura pois a cor de névoa não se usa a fogVisibility 1. A API de script oferece duas opções a mais, `fogChunkDistanceOverride` e `fogOnSkybox`: os Custom Games podem ajustar independentemente a distância de névoa (o valor D) e a aplicação da névoa ao skybox. Por padrão o skybox não é afetado pela névoa (só jogos que ativam `fogOnSkybox` tingem também o skybox com a cor de névoa).
 
-Ajustar `showFog` para false empurra a névoa a 3200–3328 blocos, desativando de fato (`fogVisibility ≈ 1` segue vindo).
+Ajustar `showFog` para false empurra a névoa a 3200–3232 blocos, desativando de fato (`fogVisibility ≈ 1` segue vindo).
 
 ### R-B. Banda de borda de carga — fogVisibility como "borda do mundo"
 
@@ -70,7 +70,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 26. Interioridades de blockLight / heldLight
 
+`blockLight` é uma **luz colorida** de três canais RGB. Cada bloco emissor define uma cor de emissão `[R, G, B]` (0–15 cada) levada como está como cor da luz (tocha normal = branco quente (14,14,12) / lava = laranja (14,8,2) / beacon = ciano (5,14,14) / tocha branca = (15,15,15), etc.). No estágio de vértice ela chega empacotada em 4 nibbles — r / g / b / sky — num atributo float. Tratar os três canais separadamente no hook light abre a iluminação local colorida — a receita de tocha quente (R9.1) é calibrada nesse comportamento.
+
 Ao decodificar `aPackedLightLevels`, o motor põe a cada canal um **piso de 35% do canal RGB mais brilhante**. Ex. uma "luz vermelha pura" eleva-se a (1.00, 0.35, 0) em vértices antes de interpolação e lift. O laranja de tocha parecendo "rosa esbranquiçado mais que vermelho" vem daqui — ajuste a saturação de receitas de tocha quente (R9.1) contra este default.
+
+A composição de luz não é aditiva. Internamente o motor toma o **max** entre a luz de bloco (após o piso de 35 %) e a luz de céu construída como `mix(cor ambiente, cor de céu, skyLight)`, e então toma de novo o max com a luz de mão (após boost de ambiente). Os valores de canal nessa composição são valores crus (pré-lift), distintos dos valores pós-lift que chegam às entradas dos hooks. Portanto `blockLight` e `skyLight` nunca se anulam — a contribuição do lado mais escuro é simplesmente descartada — enfraquecer a luz de céu quase não escurece as zonas dominadas por blockLight. Projete as receitas de exposição / atenuação em torno dessa estrutura (a proteção de luz local na [Parte VI](06-implementation.md) §19 existe para compensar isso).
 
 A luz de mão (`heldLight`) tem alcance segundo o canal mais brilhante (máx 15 blocos) com pré-processo `dist^0.75`, o mesmo piso 35%, e `l.heldLight` é o valor **pré**-boost ambiental. Objetos personalizados podem fixar `spotlightRange` e ângulo de cone — um modo "feixe enquanto segura" cujo cone segue a câmera. Pacotes não podem saber a direção do feixe.
 
@@ -80,8 +84,11 @@ Blocos personalizados podem levar `skyLightEmission` (0–15), que **injeta no p
 
 - **Os hooks surface correm "antes" de alphaTest**: `out.alpha` alimenta o teste de descarte diretamente. Materiais cutout (grama, folhas) permitem efeitos de dissolução tipo dither (receita R-C). Em líquidos (mistura) `out.alpha` é a transparência real (receita R-D). Sem efeito em terreno opaco normal — não confundir
 - **Conteúdo de `l.ambient`**: `material.ambient × sceneAmbient`, distinto por material. O lado cena ata ao ajuste gráfico "Ambient Lighting Intensity" (defeito 0.5) — nunca programe defeitos fixos
+- **As luzes direcionais da cena formam um rig de 2 luzes**: a soma de Lambert da luz principal (direção vinda da posição do sol ajustada no skybox, intensidade 1.0) e da luz de preenchimento (direção `[-0.5, -1, -1]`, intensidade 0.35) chega em `l.directional`. A luz de preenchimento aponta para baixo: não acrescenta nada às faces para cima e cobre as superfícies voltadas para baixo (tetos de cavernas etc.). O terreno só considera luzes adicionadas em `_initScene`; as adicionadas após o início são ignoradas pelo terreno e pelos modelos de blocos (uma mensagem de aviso oficial diz isso)
 - **`bloxdTime()` é realmente `performance.now()`**: o uptime do navegador enrolado a 1 hora. Sem relação com dia/noite do jogo nem tempo de mundo decorrido. Para animar sincronizado a um relógio de jogo, estime a hora desde o azimute `bloxdSunDirection()` em mundos com ciclo dia/noite
-- Os finos damieiros em bordas de chunk ao carregar são o fundido de chunk por dither Bayer 4×4 em espaço de tela do motor, não bugs do pacote
+- **As funções de cabeçalho leem um único uniform**: o motor coloca um uniform de 64 bytes em `@group(3) @binding(0)` (4 slots — time / originOffset / sunDirection / eyePosition, little-endian), e `bloxdTime()` / `bloxdOriginOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` correspondem à leitura desses slots. `originOffset` vale sempre `[0, 0, 0]` na build atual (slot reservado para coordenadas de mundo em ponto flutuante). Um pacote não pode escrever esse uniform, e como o WGSL do pacote e o do motor se fundem num único módulo, declarar o mesmo group/binding por conta própria também é impossível
+- **Os dados de vértice são construídos pelo mesher (Web Worker)**: o terreno de blocos é entrelaçado com 28 bytes por vértice (32 bytes quando o atlas está ativo) — posição = float32×3 / normal = inteiro com sinal de 8 bits×4 / cor = inteiro normalizado de 8 bits×4 (a substância de `s.colour` — tinta × AO é cozida em 8 bits na etapa do mesher, separá-la ou restaurá-la no lado do pacote é portanto impossível por princípio) / UV = float32×2 / atlasIndex = float32. Só os níveis de luz viajam num buffer de vértice separado de 4 bytes ([Parte VII](07-internals.md) §26, [Parte II](02-api.md) §11). Os vértices são desenhados por instanciação por chunk
+- Os finos damieiros em bordas de chunk ao carregar são o fundido de chunk por dither Bayer 4×4 em espaço de tela do motor, não bugs do pacote (desativável pelo ajuste gráfico `chunkFadeIn`)
 - **`mod` é palavra reservada**: rejeitado com `pack.wgsl:3 'mod' is a reserved word in WGSL.` Escreva restos com o operador `%`
 
 ### R-C. Dissolução por dither Bayer — out.alpha controla discard
@@ -146,18 +153,20 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 O mesmo pacote renderiza distinto segundo **mundo e ajustes de jogador**. Revise ao menos estes 3 ambientes antes de distribuir:
 
-1. **Mundo normal** (skybox default, sem overrides) — bloxdSunDirection() presente, cores padrão
+1. **Mundo normal** (skybox default, sem overrides) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`, cores padrão
 2. **Mundo com skybox espacial** — bloxdSunDirection() = 0. O look do ramo `sunPresent`
 3. **Mundo personalizado com `visionMinLightColour` / `skyLightColourOverride`** — escuros elevados e cores
 
-Fontes principais de variação: `lightingOverride` (iluminação forçada) / `skyLightColourOverride`, `ambientLightColourOverride` (trocas hex) / `visionMinLightColour` (piso "cor mais escura visível" sobre sky e ambient; Night Vision o usa — os pacotes "caverna às escuras" não escurecem o previsto) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (presença de bloxdSunDirection()). `uSkyLightColour` padrão = (1,1,1) branco, `uAmbientLightColour` padrão = (0.25,0.25,0.30). `l.ambient` lado cena = ajuste gráfico "Ambient Lighting Intensity" (defeito 0.5). `l.fogVisibility` segue os ajustes de névoa/distância de chunks do jogador.
+Fontes principais de variação: `lightingOverride` (iluminação forçada) / `skyLightColourOverride`, `ambientLightColourOverride` (trocas hex) / `visionMinLightColour` ("cor mais escura visível". Implementado como um max por componente contra `uSkyLightColour` e `uAmbientLightColour` ao mesmo tempo; Night Vision o usa — os pacotes "caverna às escuras" não escurecem o previsto, e a própria cor de céu é elevada) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (presença de bloxdSunDirection()). `uSkyLightColour` padrão = (1,1,1) branco, `uAmbientLightColour` padrão = (0.25,0.25,0.30). `l.ambient` lado cena = ajuste gráfico "Ambient Lighting Intensity" (padrão 0.5). `l.fogVisibility` segue os ajustes de névoa/distância de chunks do jogador. Também `cameraTint` (tinta RGBA sobre a tela toda) e `proximityFadeDistance` / `proximityFadeMinOpacity` (fade de proximidade da câmera para entidades) são fatores de variação por mundo — `cameraTint` em especial é uma passada final composta **por cima** da saída do pacote. Muitos desses ajustes também podem ser definidos pela API de script (`serverOption`) e atualizados durante a partida.
 
 ## 29. Meios de depuração
 
-- Parâmetro URL `?renderer=lite` — força o renderizador Lite (`?renderer=webgl2` / `babylon` também valem)
+- Parâmetro URL `?renderer=lite` — força o renderizador Lite (`?renderer=webgl2` / `babylon` também valem; `babylon` = nome antigo do webgl2). A prioridade: parâmetro URL > localStorage `bloxdRenderer` > tela de configurações > padrão (webgl2). Valores inválidos são ignorados com um aviso. Overrides remanescentes na URL ou no localStorage podem quebrar cenas que exigem WebGPU (lite) com `needs the new WebGPU renderer, so remove the renderer override...` ([Parte V](05-troubleshooting.md) §17)
 - Parâmetro URL `?vconsole` — consola em tela (VConsole). Útil em verificação móvel real
+- Parâmetro URL `?drawcalls=1` — adiciona um painel de depuração de estatísticas de draw. Selecione objetos de jogo na consola de depuração, ou use `drawCalls()` / `why()` / `configureDrawCallWatching()`, para inspecionar o overdraw de mecanismos grandes (do pacote ou não) e a aproximação do teto de ~65.000 vértices por draw — útil para isolar gargalos de desempenho
 - A consola mostra `noa-engine v0.33.0` e `Renderer: lite from <fonte>` — revise-os primeiro para não diagnosticar mal a via de render
 - O renderizador WebGPU bloqueia-se "forçado ON" com pacote aplicado. O ajuste "Disable Block Texture Atlas" também se bloqueia (o atlas fica ON), e em ambientes sem WebGPU o pacote nem aplica. Base para escrever "precisa navegador WebGPU" em páginas de distribuição
+- As texturas de blocos são uma textura de array 2D (`texture_2d_array`), e o sampler do terreno é nearest + repeat. O mesher também funde faces com material / AO / luz idênticos num retângulo (**greedy meshing**), então a UV de uma face fundida pode exceder a largura de um tile (bordas recuadas em 0.0015). O endereçamento repeat do hardware cuida do encaixe, então faces fundidas parecem sem costura. Note que um detalhe procedural atrelado à `vUV` pode quebrar nas fronteiras de fusão — prefira atrelá-lo à posição de mundo (`s.position` + `bloxdOriginOffset()`)
 - A revalidação runtime por partida (`checkCompilation`) compila materiais de terreno reais em WebGPU do navegador (mais estrita que a validação estática de ajustes). Os pacotes que falham aqui se excluem desse jogo
 
 ## 30. Modos de aplicação por jogo (`shaderPackPolicy`)
@@ -165,6 +174,7 @@ Fontes principais de variação: `lightingOverride` (iluminação forçada) / `s
 Aqui fica definido o que significam `allow / strict` no nível de título (cf. §7). Só os títulos cuja definição de jogo carrega explicitamente `shaderPackPolicy: "allow"` rodam em modo completo (hooks vertex, `discard`, `alpha` de terreno); títulos sem valor (ou com valor diferente de allow) são estritos: `BLOXD_STRICT` fica definido e o código amparado por guardas fica desativado automaticamente. O lado do pacote não escolhe isto, então saber que títulos rodam o quê é pré-requisito da distribuição.
 
 - Build de referência: `szby6g.main.94a7596c.js` (deploy em produção em 2026-10-17). Enumerando estaticamente as 111 definições de jogo: **26 entradas allow (12 títulos) / 85 entradas estritas**.
+- Acima de `shaderPackPolicy` existe um bloqueio de canal de distribuição (basicamente `canUseShaderPacks`): via portais externos (por exemplo, builds do Coolmath Games) o próprio sistema de pacotes de shaders pode ser desativado antes mesmo que `shaderPackPolicy` seja consultado. A análise allow/strict abaixo diz respeito à build web principal do bloxd.io.
 - allow é declarado em 12 lugares: 8 literais diretos em definições de jogo e 4 variáveis base (`tb` / `kz` / `cb` / `Fb`); as variantes herdam por spread (`{...tb,...}`). Hoje não existe sobreescrita por variante (nem o padrão inverso pai-allow / filho-estrito).
 
 Os 12 títulos allow (26 entradas no total):

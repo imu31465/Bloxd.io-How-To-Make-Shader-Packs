@@ -23,15 +23,15 @@
 
 - **Formato de distribuição**: um único `.zip`, ou uma pasta (carregar pasta é só em navegadores desktop)
 - **Conteúdo**: um `pack.json` (no nível superior do pacote; sem diferenciar maiúsculas) + 1–256 arquivos `.wgsl`
-- Múltiplos `.wgsl` são concatenados e tratados como um módulo, então dividir e usar subdiretórios é livre. Sem restrições de nomes. Arquivos não `.wgsl` (READMEs etc.) são ignorados
-- Dica de compactação: se um zip guarda tudo sob uma pasta raiz comum, esse prefixo é removido automaticamente (zips do "Comprimir" do macOS funcionam como estão). Mas arquivos extras na raiz quebram a detecção do nível superior; o mais seguro é entrar na pasta e compactar `pack.json` e os `.wgsl` diretamente (confira que `pack.json` fique na raiz do ZIP)
+- Múltiplos `.wgsl` são concatenados e tratados como um módulo, então dividir e usar subdiretórios é livre. Sem restrições de nomes. A concatenação acontece em **ordem alfabética pelo nome de entrada (caminho)** (declarações de escopo de módulo não dependem de ordem, então em geral sem efeito — isso só morde em código dependente da ordem de inicialização de `var`). Arquivos não `.wgsl` (READMEs etc.) são ignorados
+- Dica de compactação: se um zip guarda tudo sob uma pasta raiz comum, esse prefixo é removido automaticamente (zips do "Comprimir" do macOS funcionam como estão; sujeira de SO como `__MACOSX`, arquivos prefixados `._` e `.DS_Store` são excluídos automaticamente). Mas arquivos extras na raiz quebram a detecção do nível superior; o mais seguro é entrar na pasta e compactar `pack.json` e os `.wgsl` diretamente (confira que `pack.json` fique na raiz do ZIP)
 
 | Item | Limite |
 |---|---|
 | tamanho do zip / nº de entradas | 32MB / 1024 |
 | tamanho do pack.json | 64KB, UTF-8 |
 | tamanho total .wgsl | 256KB, UTF-8 |
-| formato zip | zip64, divididos e criptografados são rejeitados |
+| formato zip | zip64, divididos e criptografados são rejeitados. Compactação: apenas store / deflate. Caminhos duplicados proibidos |
 
 ## 4. pack.json
 
@@ -137,9 +137,9 @@ O carregamento executa estas verificações em ordem:
 Passos:
 
 1. Carregue o zip / pasta em configurações → Shader Pack
-2. Confira o status. Sucesso é "Ready to use". Com "Saved, but it won't run until you fix these errors...", corrija os erros listados (arquivo:linha + variante) e recarregue
+2. Confira o status. Logo após a seleção aparece "Ready. Reload the page to use it." — depois de recarregar a página, "Ready to use" significa o sucesso. Com "Saved, but it won't run until you fix these errors...", corrija os erros listados (arquivo:linha + variante) e recarregue
 3. Recarregue a página para ativar. Remova antes qualquer override de renderizador em parâmetros URL ou localStorage, ou o pacote se recusará a iniciar
 4. Teste primeiro em jogos permissivos e depois em jogos estritos (a maioria). Animação de vértices só funciona em jogos allow
-5. Para distribuir, compacte com `pack.json` no topo (dentro dos limites da seção 3). Recarregar a mesma tela substitui o pacote; Remove Pack o exclui. A revalidação após atualizações do jogo roda sozinha ao carregar a página
+5. Para distribuir, compacte com `pack.json` no topo (dentro dos limites da seção 3). O pacote pode ser substituído na mesma tela, mas só entra em vigor após recarregar a página (etapas 2–3). Remove Pack o exclui. A revalidação após atualizações do jogo roda sozinha ao carregar a página
 
 [Voltar ao manual](README.md)·[Parte seguinte →](02-api.md)
