@@ -24,11 +24,34 @@
 | `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` は不可。`_ = f();` と書く |
 | `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | 地形フック内の `bloxdOpaqueBehind()` 呼び出しを `#ifdef BLOXD_SCENE_DEPTH` で囲む |
 | `...only surface and light hooks can use.` | vertex フック内の `bloxdOpaqueBehind()` を消す (surface / light のみ可) |
+| `Lite: …reads scene depth on a page that didn't turn it on` | 深度読み取り ([第八部](08-apiv2.md) §35) をするパックが有効な状態でページを再読み込みして開き直す。深度テクスチャの用意はページ生成時に確定する |
 | `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | エラーではなく strict ゲームでの自動無効化 (`shaderPack:offInStrict`)。vertex フックと `discard` は `#ifndef BLOXD_STRICT` で囲む |
 | `mixing '*' and '^' requires parenthesis (only in ...)` | 第2段階 (ブラウザ Tint) のエラー。`^` `&` `\|` `<<` `>>` のオペランドは括る (§38) |
 | zip 読み込みで `loadDuplicateManifest` | `pack.json` が 2 つある (大文字小文字違いも含む)。1 つにする |
+| 「needs the new WebGPU renderer, so remove the renderer override...」 | URL の `?renderer=` と localStorage の `bloxdRenderer` を外して再読み込みする ([第七部](07-internals.md) §29) |
 | 遠景が白く濁る | フォグの二重掛けが原因のことが多い。完成色はフォグ済みなので、独自の霧色は控えめにし、彩度だけを落とす方式を検討するとよい |
+| `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | 発光ブロックが密度の高い領域・領域渡りで光のシードキューが溢れ、そのチャンクのライト計算が途中で打ち切られた警告。パック由来ではないが、**発光集中部のライト欠けはこの仕様**が原因であり、ワールド側で光源を分散させれば避けられる |
 | ゲーム参加時にパックが除外される | ゲーム開始時の実機チェックで失敗している。ガード漏れを見直す |
+| 実機チェックが終わらず `This device couldn't check …` 等でパックが外れる | チェックには 60 秒の強制タイムアウトがある (超過分は `skipped` 扱い)。低スペック端末・重いワールドで出やすいから、負荷の高い vertex 処理や複雑なループ構造を減らして再試行する |
+
+### ローダー段階のエラーID一覧
+
+設定画面のエラーには `shaderPack:load*` のIDが付く。文言検索の補助として:
+
+| ID | 意味 |
+|---|---|
+| `loadZipTooBig` | zip が 32MB 超 |
+| `loadTooManyZipEntries` | zip エントリが 1024 個超 |
+| `loadTooManyWgsl` | `.wgsl` が 256 個超 |
+| `loadSourceTooBig` | `.wgsl` 合計が 256KB 超 (ファイル単位のストリーミング検査) |
+| `loadManifestTooBig` | `pack.json` が 64KB 超 |
+| `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` が JSON でない / オブジェクト型でない |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 無し / `2` でない (v1 は拒否) |
+| `loadNoName` / `loadAuthorNotString` | `name` 無し / `author` が文字列以外 |
+| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 対応外圧縮方式 / zip64 / 分割 / 暗号化 |
+| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | パス重複 / UTF-8 以外 / 展開失敗 / zip 損傷 |
+
+`loadNoManifest` / `loadDuplicateManifest` (pack.json の位置・重複) は上の表の該当行を参照。
 
 ## 18. 権利・注意
 

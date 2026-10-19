@@ -18,8 +18,6 @@
 
 ## R1. 色のレシピ (surface)
 
-> **重要:** 以下のレシピは個別の例であり、上からすべて連結する用途ではない。同じフック名 (`bloxdTerrainLight` など) や同じヘルパー関数名を複数貼ると、同一モジュール内で定義が重複してコンパイルに失敗する。複数の効果を使う場合は、フックを各種類1つにまとめ、処理をその関数内へ統合する。
-
 ### 単色ティント (最も基本)
 
 ```wgsl
@@ -690,7 +688,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `l.fogVisibility` を `max(l.fogVisibility, 0.25)` のように下限を設けることで、「これ以上濃くしない」調整が可能になる。
 > (0.0 = エンジン準拠 / 0.3〜0.5 = 遠景クリア)。
 > なお、エンジンのフォグは地平線専用の線形フォグ (描画距離付近のみ) であり、中距離の霧はパック側で生成する必要がある。
-> 実際のフォグ設定 (実装照合済み): 線形固定 / `fogStart` = 描画チャンク距離 / `fogEnd` = +1 チャンク / フォグオフ時は 100〜101 チャンクで実質無効 / デフォルト色 RGB (183, 191, 195)。
+> 実際のフォグ設定 (実装照合済み): 線形固定 / `fogStart` = 描画チャンク距離 / `fogEnd` = +1 チャンク / フォグオフ時は 100〜101 チャンクで実質無効 / デフォルト色 RGB (181, 191, 195)。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -787,7 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > の 2 点シフトで決まる。夕方に影を広げたければ  
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を足す (長い夕方の影の近似。  
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
->
-> ⚠️ 「`pow(skyLight, γ)` でコントラストを深く」は**リフト後の値に gamma を掛けていた**ため  
 
 [← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
