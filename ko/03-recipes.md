@@ -589,9 +589,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### R9.6 대기 원근법 (거리로 채도가 떨어지는 「공기감」)
 
-> 포그 (색으로 교체) 와는 별개로 「거리로 디새추레이트」 를 얹으면  
-> 원경이 훨씬 리얼해진다.  
-> 주의: 공기감은 채도만 떨어뜨리는 것이 안전. 휘도는 건드리지 않는다.
+> 주의: 안개 색에 휘도를 들어올리는 처리 (`normalize` 등) 를 적용하면, 안개가 어두운 씬에서 「밝은 흰 안개」 가 떠 오르고,  
+> engineColour (포그 완료) 에 더해 안개색을 가산하면 이중 포그로 하얗게 된다. **공기감은 채도 저하만으로 표현**하는 것이 안전.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -689,7 +688,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `l.fogVisibility` 를 `max(l.fogVisibility, 0.25)` 처럼 하한과 함께 쓰면 「이 이상 짙어지지 않는다」 조정이 된다  
 > (0.0 = 엔진 준수 / 0.3~0.5 = 원경 클리어).  
 > 참고로 엔진 포그는 지평선 전용 linear 포그 (그리기 거리 부근만) 이며, 중거리 안개는 팩측에서 만들어야 한다.
-> 실포그 설정 (구현 대조 완료): linear 고정 / `fogStart` = 그리기 청크 거리 / `fogEnd` = +1 청크 / 포그 끄기에서는 100~101 청크로 사실상 무효 / 기본 포그색은 RGB(183, 191, 195).
+> 실포그 설정 (구현 대조 완료): linear 고정 / `fogStart` = 그리기 청크 거리 / `fogEnd` = +1 청크 / 포그 끄기에서는 100~101 청크로 사실상 무효 / 기본 포그색은 RGB (181, 191, 195).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -786,7 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 의 2점 시프트로 정해진다. 해 질 녘에 그림자를 넓히고 싶으면  
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` 를 더한다 (긴 해 질 녘 그림자의 근사.  
 > `sunDir` 은 `bloxdSunDirection() / length(bloxdSunDirection())`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.
->
-> ⚠️ 「`pow(skyLight, γ)` 로 콘트라스트를 깊게」 는**리프트 후의 값에 gamma 를 걸고 있었기** 때문에  
 
 [← 이전 부](02-api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](04-realism.md)

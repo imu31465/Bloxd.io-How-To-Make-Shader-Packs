@@ -86,15 +86,15 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 해석 포인트:
 
 - `bloxdTime()` 은 3600초에 감기는 경과 시간 (`bloxdTimeWrap`)이다. 게임 안의 낮밤 시계와 동기된다는 보장은 없다. bind group의 stage 가시성이 VERTEX|FRAGMENT이므로 **vertex 훅에서도 호출할 수 있다**
-- `bloxdSunDirection()` 은 태양이 있을 때의 단위 벡터이며, 태양 없는 하늘에서는 제로이다. **달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다 ([제7부](07-internals.md) 24절)
+- `bloxdSunDirection()` 은 태양이 있을 때의 단위 벡터이며, 태양 없는 하늘에서는 제로이다. **달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 현행 빌드에서는 낮밤 사이클의 구현이 없고, 태양·달·별은 게임 실행 중에 움직이지 않는다 (표시의 ON/OFF는 `dayNightSunOpacity` 등의 불투명도 설정뿐). 기본 지구 하늘에서는 태양이 거의 `(−0.56, 0.81, −0.18)` (고도 약 54°) 에 정지한다. **영벡터를 `normalize` 에 넘기지 말 것** — `dot(d, d) < 1e-8` 로 태양의 부재를 검사하고, 상수 방향으로 폴백하는 것이 안전 ([제7부](07-internals.md) §28 참조)
 - ※보충: 종래 「제로일 때 달의 방향으로 재사용할 수 없다」 고 썼지만, 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다. 외부 배포용 팩은 제로를 전제로 `sunPresent` 로 분기하는 쓰기가 안전하다 (파란 환경광 유사 표현은 R2, 방향성 달빛은 [제7부](07-internals.md) R-A 참조)
 - `emission` 은 조명 계산 후에 가산되고, **`fogVisibility` 로 감쇠된다** (defaultLight 구현 `engineColour + emission × fogVisibility`. 완전히 안개에 잠긴 원경에서는 발광도 사라진다)
 - **포그 적용 순서**: 프래그먼트 안의 처리 순서는 ① 조명·발광 합성 → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ light 훅 호출 → ⑤ return. 따라서 **engineColour 는 포그된 상태로 도착하며**, **light 훅 반환값이 그대로 최종색** (훅 뒤에 포그는 다시 걸리지 않는다)
 - **fogVisibility 의 정의원**: 뷰 공간 거리 (정점 단위로 계산·보간). linear 모드에서는 `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **fogMode == 0 일 때**: `fogColour` 에는 `vec3f(0.0)` (흑) 이 전달된다. fogColour 색감으로 시간대를 추정하는 코드는 주의
-- **현행 빌드의 실포그 설정**: **linear 고정**. `fogStart` = 그리기 청크 거리, `fogEnd` = +1 청크 (지평선만). 포그 끄기 설정에서는 100 / 101 청크로 설정되어 사실상 무효. 기본 포그색은 RGB(183, 191, 195)
+- **현행 빌드의 실포그 설정**: **linear 고정**. `fogStart` = 그리기 청크 거리, `fogEnd` = +1 청크 (지평선만). 포그 끄기 설정에서는 100 / 101 청크로 설정되어 사실상 무효. 기본 포그색은 RGB (181, 191, 195)
 - `bloxdPackInputs` uniform (`@group(3) @binding(0)`, 64B)은 **헤더 함수 경유로만 쓴다**. 팩에서 직접 참조하지 않는다. stage 가시성이 VERTEX|FRAGMENT이므로, 헤더 함수는 훅 밖의 모듈스코프 함수나 vertex 훅에서도 호출할 수 있다. 깊이 텍스처 (binding 1)는 FRAGMENT 전용이므로, `bloxdOpaqueBehind()` 는 surface / light 훅 한정이다
-- **`skyLight` / `blockLight` / `heldLight` 는 「리프트 곡선」 통과 후의 값**으로 도착한다. 헤더 주석의 `tone-mapped` 가 이것을 가리킨다: 엔진은 프래그먼트에 반드시 `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 걸고 나서 팩에 건넨다. 생 voxel 값 (n/15) 이 아니라, 예를 들어 나무 밑 (생값 0.87) 은 **0.97 로 들려서 도착한다**
+- **`skyLight` / `blockLight` / `heldLight` 는 「리프트 곡선」 통과 후의 값**으로 도착한다. 헤더 주석의 `tone-mapped` 가 이것을 가리킨다: 엔진은 프래그먼트에 반드시 `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 걸고 나서 팩에 건넨다. 생 voxel 값 (n/15) 이 아니라, 예를 들어 나무 밑 (생값 0.87) 은 **0.97 로 들려서 도착한다**. 부드러운 계조 용도라면 그대로 좋지만, **임계값으로 낮/그림자를 분리하고 싶을 때는 역변환 `c=(1-y)^(1/3); x=3(1-c)/(3-2c)` 로 생값을 복원하고부터 쓴다** (R9.12)
 - `skyLight` 의 실체는 「그 장소에서 하늘이 보이는가」 의 복셀 가림 데이터 (= 섀도맵) 이며, 단순한 밝기 파라미터가 아니다 (15장 「그림자의 진실」)
 - **`litColour` 를 기점으로 쓸 수 있다**: v1에서는 포그 완료된 `engineColour` 밖에 없었으므로, 독자 대기 표현에서 이중 포그가 되기 쉬웠다. v2에서는 포그 전·emission 전의 `litColour` 에서 시작해, `bloxdApplyFog()` 으로 자신의 페이스로 포그를 다시 걸 수 있다
 - **`blockId` 로 블록 종류를 가릴 수 있다**: 텍스처 색에 의존하지 않는 식별. 단 ID와 블록 종류의 대응표는 엔진 내부이므로, 어느 ID가 무슨 블록인지는 월드 안에서 실측하거나, [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data)의 목록을 참고한다 ([제8부](08-apiv2.md) 참조)
@@ -114,6 +114,8 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 | strict + 조명on + 액체 | ✓ | ✓ | ✓ |
 
 베리언트마다 헤더 구조체의 모양도 달라진다 (strict 에서는 `BloxdVertex` 자체가 없음, 조명off 에서는 `blockLight` 등이 없음, strict 지형에서는 `alpha` 가 없음).
+
+공식으로 정의되는 기호는 4 종이다 (위 표의 3 종 + `BLOXD_SCENE_DEPTH` — [제8부](08-apiv2.md) §35). 지형 / 액체의 차이는 기호가 아니라 **별 프로그램**이므로, `#ifdef BLOXD_TERRAIN` 식의 분기는 쓸 수 없다. 플래그명의 대조는 대소문자를 구별하지 않는다. `#ifdef` 에 잘못된 이름을 쓰면, 에러 문구가 4 종의 정식 일람을 표시한다. 훅 함수가 주입되는 것도 지형·액체의 2 프로그램뿐이며, 팩은 엔티티나 파티클 등의 다른 그리기에 영향을 줄 수 없다.
 
 ## 12. 골격 치트시트
 

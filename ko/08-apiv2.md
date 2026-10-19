@@ -48,9 +48,26 @@ v1에서는 `time` / `eyePosition` / `sunDirection` / `originOffset` 이 구조�
 
 ## 34. 새 기능 ①: `blockId` (블록 고유 셰이딩)
 
-`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` 3개 구조체 모두에 `blockId: u32` 가 추가됐다. **면이 속한 블록의 ID** (0~65535) 로, 같은 면 안에서는 일정 (`@interpolate(flat)` 으로 전달). 텍스처 색에 의존하지 않는 블록 종류 식별에 쓴다. 단 ID와 블록 종류의 대응표는 엔진 내부에 있어 팩에서는 참조할 수 없으므로, **어느 ID가 무슨 블록인지는 월드 안에서 실측하거나 아래의 참고 자료로 확인**한다.
+`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` 3개 구조체 모두에 `blockId: u32` 가 추가됐다. **면이 속한 블록의 ID** (0~65535) 로, 같은 면 안에서는 일정 (`@interpolate(flat)` 으로 전달). 텍스처 색에 의존하지 않는 블록 종류 식별에 쓴다. 단 ID와 블록 종류의 대응표는 엔진 내부에 있어 팩에서는 참조할 수 없으므로, **어느 ID가 무슨 블록인지는 월드 안에서 실측하거나 아래의 참고 자료로 확인**한다. 내부에서는 이 ID 는 정점색의 α (하위 8bit) 와 법선의 w (상위 8bit) 의 합계 16bit 에 각인되어 운반되며, 상한 65535 는 이 경로 폭에 유래한다. blockId 시스템 자체는 액티브한 셰이더 팩이 존재할 때에만 유효화된다 (팩 없이는 와이어의 목적지는 패딩인 채이지만, 제2부의 구조체 정의상 이 차이는 관측할 수 없다).
 
 **참고**: 필자가 게임 내 엔트리 목록을 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data)에 공개했다 (`entries.json`: id ↔ 블록 이름 대응표. `Furnace|meta|rot2` 같은 회전/meta 변종도 별개 ID로 수록). 대응은 게임 업데이트로 바뀔 수 있으므로 최종 확정은 실기기에서 확인할 것.
+
+자주 쓰는 블록의 예 (entries.json 에서, 2026-10-18 시점. id 가 낮은 지형계만 발췌):
+
+| ID | 블록 이름 | ID | 블록 이름 |
+|---|---|---|---|
+| 0 | Air | 15 | Maple Wood Planks |
+| 1 | Unloaded | 28 | Stone |
+| 2 | Dirt | 29 | Messy Stone |
+| 3 | Messy Dirt | 31 | Smooth Stone |
+| 4 | Grass Block | 126 | Water |
+| 5 | Sand | 128 | Bricks |
+| 6 | Clay | 139 | Ice |
+| 7 | Gravel | 147 | Bedrock |
+| 8 | Snow | 149 | Cactus |
+| 9 | Maple Log | 1491 | Lava |
+
+entries.json 에는 도구 등의 비블록 항목도 수록되어 있지만, 지형·액체의 훅에 닿는 것은 블록계 id 이다.
 
 ### R-F. blockId에 의한 블록 종류 틴트
 
@@ -67,6 +84,67 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return result;
 }
 ```
+
+### R-G. blockId 의 실측 — 비트 평면 표시 팩
+
+대응표에 실리지 않은 블록의 id 를 월드 안에서 조사하는 디버그 레시피. 선두의 `plane` 을 `0, 1, 2, …` 로 바꿔 가며, 조사하고 싶은 블록의 면 색을 읽는다.
+
+```wgsl
+const plane: u32 = 0u;
+
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let d = (s.blockId >> (plane * 3u)) & 7u;
+    var palette = array<vec3f, 8>(
+        vec3f(0.0, 0.0, 0.0), vec3f(1.0, 0.0, 0.0), vec3f(0.0, 1.0, 0.0), vec3f(1.0, 1.0, 0.0),
+        vec3f(0.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(0.0, 1.0, 1.0), vec3f(1.0, 1.0, 1.0));
+    out.colour = palette[d];
+    return out;
+}
+```
+
+면의 색은 blockId 의 3비트를 그대로 RGB 로 나타낸다 (흑 = 0 / 적 = 1 / 녹 = 2 / 황 = 3 / 청 = 4 / 마젠타 = 5 / 시안 = 6 / 백 = 7). 1회의 관찰로 8진수 1자리를 읽을 수 있다. p0 → p3 순으로 3, 2, 7, 2 로 읽혔다면, 위 자리부터 나열한 8진 2723 = 1491 이 id 가 된다 (Lava). id 가 낮은 지형계는 p0 과 p1 의 2회로 족하다. surface 훅만으로 구성되어 있으므로, strict 타이틀에서도 움직인다.
+
+### R-H. 잎만 흔들기 — blockId 에 의한 vertex 훅의 한정
+
+R7 의 바람 레시피 ([제3부](03-recipes.md)) 는 지형 전체를 물결치게 하지만, vertex 훅에서도 `blockId` 를 읽을 수 있으므로, 대상을 잎 블록만으로 한정할 수 있다. id 일람과 WGSL 용 배열은 다음과 같다 (2026-10-18 시점의 실측. Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / 과실 변종 / Autumn Aspen 의 22종):
+
+```wgsl
+const LEAF_IDS = array<u32, 22>(
+    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
+    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
+    2024u, 2025u, 2085u);
+
+// vertex 훅은 strict 타이틀에서 자동 무효 (§36 참조)
+#ifndef BLOXD_STRICT
+
+fn sp_isLeaf(id: u32) -> bool {
+    for (var i = 0u; i < 22u; i++) {
+        if (LEAF_IDS[i] == id) { return true; }
+    }
+    return false;
+}
+
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    if (sp_isLeaf(v.blockId)) {
+        let wp   = bloxdWorldPosition(v.position);
+        let t    = bloxdTime();
+        // 변위는 월드 위치의 매끄러운 함수로 한다. 월드 위의 같은 지점을 가리키는
+        // 공유 정점이 같은 값으로 움직이므로, 면이 뜯기지 않는다 ([제3부](03-recipes.md) R7 도 같은 원리)
+        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
+        out.position.x += sway * 0.045;
+        out.position.z += sway * 0.030;
+    }
+    return out;
+}
+
+#endif
+```
+
+- id 일람은 엔진의 갱신으로 늘어난다 (실측에서도 새 빌드로 50종의 블록이 추가됐다). 계속 쓰는 경우는 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 나 R-G 의 비트 평면 표시로 추가분을 조사해 배열에 더할 것
+- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) 는 지면에 까는 비고체의 깔개 잎이다. 흔들면 지면에서 뜨는 것처럼 보이므로, 배열에서 빼서 제외하는 것도 하나의 선택
+- strict 타이틀에서는 vertex 훅이 통째로 무효가 되지만, 위의 가드가 있으면 「흔들림이 멎을 뿐」 이고, 프래그먼트 측의 효과는 계속 산다
 
 ## 35. 새 기능 ②: `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` (본명)
 
@@ -102,7 +180,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-응용: 두께 기반 흡수·산란, `behind.position` 에서의 바닥 월드 좌표에 의한 물결·코스틱풍 무늬 투영, `found=false` 에서의 하늘과 가림 구별에 의한 수면의 하늘 반사, 깊이에 의한 거품과 탁함의 단계 부여. 참고로 깊이 복사 파이프라인 구축에 실패한 경우는 「안쪽에 아무것도 없음」 으로 안전하게 열화된다.
+응용: 두께 기반 흡수·산란, `behind.position` 에서의 바닥 월드 좌표에 의한 물결·코스틱풍 무늬 투영, `found=false` 에서의 하늘과 가림 구별에 의한 수면의 하늘 반사, 깊이에 의한 거품과 탁함의 단계 부여. 참고로 깊이 복사 파이프라인 구축에 실패한 경우는 「안쪽에 아무것도 없음」 으로 안전하게 열화된다. 깊이 텍스처는 페이지의 렌더러 생성시에 「액티브한 팩이 깊이를 읽는가」 로 준비가 확정되므로, **깊이를 읽는 팩을 쓸 때는 반드시 페이지 재읽기를 끼운다**. 팩을 유효화한 채 재읽지 않고 깊이가 요구된 경우, 콘솔에 `…reads scene depth on a page that didn't turn it on` 이라는 경고가 1회만 나오고, 깊이는 1×1 의 대체 텍스처로 바뀌므로 `bloxdOpaqueBehind()` 는 항상 `found = false` 를 반환한다.
 
 ## 36. 그 밖의 v2 변경점
 

@@ -23,15 +23,15 @@
 
 - **배포 형태**: `.zip` 1개, 또는 폴더 (폴더 읽기는 데스크톱판 브라우저만)
 - **내용**: `pack.json` 1개 (팩의 최상위에 배치. 대소문자 구별 없음) + `.wgsl` 파일 1~256개
-- 복수의 `.wgsl` 은 연결되어 1 모듈로 취급되므로 분할·디렉터리 나누기는 자유. 파일명에 제약은 없다. `.wgsl` 이외의 파일 (README 등) 은 무시된다
-- ZIP 묶기 요령: 전 파일이 공통된 1 계층의 루트 폴더에 들어 있으면 그 prefix 가 자동 제거된다 (macOS 「폴더를 압축」 으로 만든 zip 그대로 OK). 단 루트 계층에 여분의 파일이 섞이면 최상위 판정을 잃으므로, 확실한 건 폴더 안에 들어가서 `pack.json` 과 `.wgsl` 을 직접 지정해 굳히는 것 (`pack.json` 이 ZIP 직하에 오는 것을 확인할 것)
+- 복수의 `.wgsl` 은 연결되어 1 모듈로 취급되므로 분할·디렉터리 나누기는 자유. 파일명에 제약은 없다. 연결은 **경로명의 사전 순**으로 이루어진다 (모듈스코프의 선언은 순서 비의존이므로 보통은 무관하지만, `var` 의 초기화 순서에 의존하는 쓰기 방식을 취한 경우에만 효과가 있다). `.wgsl` 이외의 파일 (README 등) 은 무시된다
+- ZIP 묶기 요령: 전 파일이 공통된 1 계층의 루트 폴더에 들어 있으면 그 prefix 가 자동 제거된다 (macOS 「폴더를 압축」 으로 만든 zip 그대로 OK. `__MACOSX` / `._` 로 시작하는 파일 / `.DS_Store` 등의 OS 쓰레기는 자동으로 제외된다). 단 루트 계층에 여분의 파일이 섞이면 최상위 판정을 잃으므로, 확실한 건 폴더 안에 들어가서 `pack.json` 과 `.wgsl` 을 직접 지정해 굳히는 것 (`pack.json` 이 ZIP 직하에 오는 것을 확인할 것)
 
 | 항목 | 상한 |
 |---|---|
 | zip 크기 / 엔트리 수 | 32MB / 1024 |
 | pack.json 크기 | 64KB, UTF-8 |
 | .wgsl 합계 크기 | 256KB, UTF-8 |
-| zip 형식 | zip64·분할·암호화 zip 불가 |
+| zip 형식 | zip64·분할·암호화 불가. 압축은 store / deflate 만, 중복 경로는 불가 |
 
 ## 4. pack.json
 
@@ -112,9 +112,9 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - WGSL 의 내장 함수 (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select` 등 전부)
 - 자신의 `fn` / `struct` / `const` / `alias` / `var<private>`, 함수 안의 `let`·제어 구문 (if/for/while/switch 등)
-- `#ifdef` / `#ifndef` / `#else` / `#endif` / `#define` (플래그명만) — 행두라면 함수 안에서도 가능
 - 미분 (`dpdx` / `dpdy` / `fwidth`) 은 surface/light 훅 (프래그먼트단) 에서만 사용 가능. vertex 불가
-- `const` 배열·`ptr`·행렬도 사용 가능
+- `const` 배열 (컬러 팔레트 LUT 등), 포인터 (`ptr<function, T>`), 행렬 (`mat3x3f` 등) 도 사용 가능
+- 플래그 정의 `#define 이름` + `#ifdef` 에 의한 조건 분기
 
 금지·주의:
 
@@ -137,9 +137,9 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 순서:
 
 1. 설정 → Shader Pack 에서 zip / 폴더를 읽힌다
-2. 스테이터스를 확인한다. 「Ready to use」 가 되면 성공. 「Saved, but it won't run until you fix these errors...」 의 경우는 에러 일람 (file:줄 + 베리언트 표기) 을 고쳐서 재읽기
-3. 읽힌 후는 페이지를 새로고침해 유효화한다
+2. 스테이터스를 확인한다. 선택 직후는 「Ready. Reload the page to use it.」 이 표시되고, 페이지 재읽기 후 「Ready to use」 이면 성공. 「Saved, but it won't run until you fix these errors...」 의 경우는 에러 일람 (파일:줄 + 베리언트 표기) 을 고쳐서 재읽기
+3. 읽힌 후는 페이지의 재읽기로 유효화된다. URL 파라미터나 localStorage 에 렌더러 오버라이드가 남아 있으면 팩의 기동이 거부되므로, 그것들을 제거하고 나서 재읽는다
 4. 먼저 제한이 널널한 게임에서 확인하고, 다음에 strict 게임 (대다수는 이쪽) 에서 확인한다. 정점 이동을 쓰는 경우는 allow 게임에서만 동작한다
-5. 완성되면 `pack.json` 을 최상위로 굳혀서 zip 으로 배포한다 (3장의 상한 이내일 것)
+5. 배포할 때는 `pack.json` 을 루트에 둔 zip 으로 압축한다 (3장의 크기 상한 이내일 것). 팩의 교체는 같은 화면에서 다시 읽힐 수 있지만, 반영에는 페이지 재읽기가 필요하다 (순서 2-3). 삭제는 Remove Pack 으로 한다. 게임 갱신 후의 재검증은 페이지 읽기 때 자동으로 이루어진다
 
 [매뉴얼로 돌아가기](README.md)·[다음 부 →](02-api.md)
