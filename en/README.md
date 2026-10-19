@@ -1,7 +1,7 @@
 # How to Make Bloxd.io Shader Packs (Complete Guide)
 
 A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
-Based on the spec at `apiVersion: 2`. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). v1 packs cannot be loaded by the current game (v1 `apiVersion` values and old identifiers are rejected). For migrating from v1, see Part VIII (`08-apiv2.md`).
+Based on the spec at `apiVersion: 2`. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). v1 packs cannot be loaded by the current game (v1 `apiVersion` values and old identifiers are rejected). For migrating from v1, see Part VIII (`08-apiv2.md`). API version 3 exists only in the preprod deploy as of 2026-10-19; for migrating from v2 to v3, see Part IX (`09-apiv3.md`).
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
@@ -67,3 +67,13 @@ Based on the spec at `apiVersion: 2`. The guide is split into one file per part 
   - [37. v1 → v2 migration checklist](08-apiv2.md#37-v1--v2-migration-checklist)
   - [38. Second validation stage — the browser's WGSL compiler is stricter than the built-in parser](08-apiv2.md#38-second-validation-stage--the-browsers-wgsl-compiler-is-stricter-than-the-built-in-parser)
   - [39. On independently similar materials](08-apiv2.md#39-on-independently-similar-materials)
+- [Part IX: API version 3 (preprod) migration guide](09-apiv3.md)
+  - [40. Fate of v2 packs (conclusion first)](09-apiv3.md#40-fate-of-v2-packs-conclusion-first)
+  - [41. pack.json and the uniform buffer (what stays unchanged)](09-apiv3.md#41-packjson-and-the-uniform-buffer-what-stays-unchanged)
+  - [42. blockId becomes blockFlags: per-block materials as bit flags (the headline)](09-apiv3.md#42-blockid-becomes-blockflags-per-block-materials-as-bit-flags-the-headline)
+  - [43. Function renames and semantic changes](09-apiv3.md#43-function-renames-and-semantic-changes)
+  - [44. New header constants: bloxdPi and bloxdTau](09-apiv3.md#44-new-header-constants-bloxdpi-and-bloxdtau)
+  - [45. The six-hook template (liquid hooks officially shown)](09-apiv3.md#45-the-six-hook-template-liquid-hooks-officially-shown)
+  - [46. Variant matrix: the program axis and macro changes](09-apiv3.md#46-variant-matrix-the-program-axis-and-macro-changes)
+  - [47. v2 to v3 migration checklist](09-apiv3.md#47-v2-to-v3-migration-checklist)
+  - [48. Other v3 changes and notes](09-apiv3.md#48-other-v3-changes-and-notes)
