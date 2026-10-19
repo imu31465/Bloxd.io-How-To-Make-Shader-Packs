@@ -81,11 +81,11 @@ Esta receta **reemplaza** un `bloxdLiquidLight` existente. No la pegues junto a 
 
 El éxito de compilación y el "buen aspecto" son cosas distintas. Revisa en este orden:
 
-1. **Carga:** `pack.json` en la raíz del ZIP; los ajustes muestran `Ready to use`.
+1. **Carga:** `pack.json` en la raíz del ZIP. Justo tras seleccionar aparece `Ready. Reload the page to use it.` y el paquete se activa **al recargar la página**; confirma después `Ready to use`. Los paquetes guardados se revalidan automáticamente en la siguiente carga de página: desde la parte del motor se comprueba el fingerprint del contenido de la cabecera (pasa = se mantiene tal cual / falla = se marca como bloqueado), así que un paquete antiguo roto nunca queda activo en silencio.
 2. **8 variantes:** sin omisiones de guardias de tipos en strict / allow, iluminación on / off, terreno / líquido. Aunque un juego solo use algunas condiciones, los paquetes de distribución deben asumir las 8.
 3. **Día:** colores sin reventar por material (hierba, piedra, arena, madera); salto claro/oscuro natural entre caras altas y laterales.
 4. **Noche:** compara los mismos materiales a plena luz pasada, sombras y cercanía de antorchas. Si solo quedan caras iluminadas, ajusta la atenuación de exposición; si todo oscurece, ajusta la protección de luz local.
-5. **Agua:** mira desde arriba, ángulos rasantes, orillas, bajo el agua y de noche por separado. El comportamiento alpha y el aspecto submarino dependen del compaginado del juego — nunca juzgues desde un solo punto de vista. Bajo el agua el velo de definición líquida cubre delante según lo anterior: las diferencias del paquete se ven sobre todo en la superficie y el terreno tras el velo.
+5. **Agua:** mira desde arriba, ángulos rasantes, orillas, bajo el agua y de noche por separado. El comportamiento alpha y el aspecto submarino dependen del compaginado del juego — nunca juzgues desde un solo punto de vista. Bajo el agua el velo del color de definición líquida se aplica al frente tal como se describe en [Parte VII](07-internals.md): las diferencias del paquete se ven sobre todo en la superficie y el terreno tras el velo.
 6. **Bordes y distancia:** sin saltos de olas/patrones en transiciones de chunk / origen; sin doble niebla ni bruma blanca a lo lejos.
 7. **Rendimiento:** efectos pesados en hash/trig/`pow` por fragmento al mínimo. Añade detalle poco a poco y compara FPS.
 
@@ -105,7 +105,7 @@ Como referencia, distribuciones comunitarias "cinematic shader" analizadas en un
 
 En la práctica, **ajusta luz y color con sombreadores y cubre materiales y cielo con un paquete de recursos a juego**. Pero verifica el co-uso y el orden de carga según la implementación y ajustes del juego.
 
-En la práctica, **ajusta luz y color con sombreadores y cubre materiales y cielo con un paquete de recursos a juego**. Pero verifica el co-uso y el orden de carga según la implementación y ajustes del juego.
+Los paquetes de texturas tienen su propia especificación (a título de referencia): el límite de tamaño es 25MB medido como la longitud de la cadena JSON codificada en base64; y codificar un PNG en base64 infla un +33%, así que el techo práctico en imágenes crudas queda en ~18–19MB. El CSS lo procesa un parser simple basado en regex — evita anidamientos y comentarios.
 
 ## 23. Realidad submarina con paquetes de sombreadores
 
