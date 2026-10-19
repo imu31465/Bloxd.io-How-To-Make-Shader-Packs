@@ -688,7 +688,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Un plancher comme `max(l.fogVisibility, 0.25)` limite « pas plus dense que ceci »  
 > (0,0 = fidèle au moteur / 0,3–0,5 = lointain plus clair).  
 > Note : le brouillard moteur est linéaire d'horizon seul (près de la distance de dessin) ; la brume moyenne doit être construite côté pack.
-> Réglages réels du brouillard (vérifiés en implémentation) : linear fixe / `fogStart` = distance de chunks / `fogEnd` = +1 chunk / de fait désactivé à 100–101 chunks avec brouillard off / couleur par défaut RGB(183, 191, 195).
+> Réglages réels du brouillard (vérifiés en implémentation) : linear fixe / `fogStart` = distance de chunks / `fogEnd` = +1 chunk / de fait désactivé à 100–101 chunks avec brouillard off / couleur par défaut RGB(181, 191, 195).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

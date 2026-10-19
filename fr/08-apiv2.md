@@ -48,9 +48,26 @@ En v1, `time` / `eyePosition` / `sunDirection` / `originOffset` étaient des cha
 
 ## 34. Nouveauté ① : `blockId` (shading par bloc)
 
-Les 3 structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gagnent toutes `blockId: u32`. C'est l'**ID du bloc possédant la face** (0 à 65535), constant sur toute une face (passé en `@interpolate(flat)`). Il sert à identifier les types de blocs sans dépendre de la couleur de texture. Mais la table ID ↔ type de bloc est interne au moteur et invisible des packs : **on mesure en monde quel ID vaut quel bloc, ou l'on consulte la référence ci-dessous**.
+Les 3 structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gagnent toutes `blockId: u32`. C'est l'**ID du bloc possédant la face** (0 à 65535), constant sur toute une face (passé en `@interpolate(flat)`). Il sert à identifier les types de blocs sans dépendre de la couleur de texture. Mais la table ID ↔ type de bloc est interne au moteur et invisible des packs : **on mesure en monde quel ID vaut quel bloc, ou l'on consulte la référence ci-dessous**. En interne cet ID est cuit dans l'alpha de la couleur de sommet (8 bits bas) et le w de la normale (8 bits hauts) — 16 bits au total, d'où le plafond de 65535. Le système blockId lui-même ne s'active que tant qu'un pack de shaders actif existe (sans pack le câblage garde ses cibles de remplissage, mais dans les définitions de structs de la partie II cette différence est inobservable).
 
 **Référence** : l'auteur publie une liste des entrées du jeu sur [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json` : table id ↔ nom de bloc ; les variantes de rotation/meta comme `Furnace|meta|rot2` y figurent comme IDs séparés). Ces correspondances peuvent changer à chaque mise à jour du jeu — validez en jeu réel ce qui doit être définitif.
+
+Exemples de blocs courants (d'après entries.json au 2026-10-18 ; seules les familles de terrain à ID bas sont listées) :
+
+| ID | Nom de bloc | ID | Nom de bloc |
+|---|---|---|---|
+| 0 | Air | 15 | Maple Wood Planks |
+| 1 | Unloaded | 28 | Stone |
+| 2 | Dirt | 29 | Messy Stone |
+| 3 | Messy Dirt | 31 | Smooth Stone |
+| 4 | Grass Block | 126 | Water |
+| 5 | Sand | 128 | Bricks |
+| 6 | Clay | 139 | Ice |
+| 7 | Gravel | 147 | Bedrock |
+| 8 | Snow | 149 | Cactus |
+| 9 | Maple Log | 1491 | Lava |
+
+entries.json liste aussi des entrées non-bloc (outils etc.), mais seuls les IDs des familles de blocs atteignent les hooks terrain / liquide.
 
 ### R-F. Teinte par type de bloc avec blockId
 
@@ -67,6 +84,67 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return result;
 }
 ```
+
+### R-G. Mesurer blockId en monde — le pack d'affichage en plans de bits
+
+Recette de debug pour identifier en monde les IDs des blocs absents de la table de correspondance. Changez la valeur de la constante `plane` en tête (`0, 1, 2, …`) en lisant la couleur de la face du bloc à identifier.
+
+```wgsl
+const plane: u32 = 0u;
+
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let d = (s.blockId >> (plane * 3u)) & 7u;
+    var palette = array<vec3f, 8>(
+        vec3f(0.0, 0.0, 0.0), vec3f(1.0, 0.0, 0.0), vec3f(0.0, 1.0, 0.0), vec3f(1.0, 1.0, 0.0),
+        vec3f(0.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(0.0, 1.0, 1.0), vec3f(1.0, 1.0, 1.0));
+    out.colour = palette[d];
+    return out;
+}
+```
+
+La couleur de la face encode directement 3 bits de blockId en RVB (noir = 0 / rouge = 1 / vert = 2 / jaune = 3 / bleu = 4 / magenta = 5 / cyan = 6 / blanc = 7). Une observation lit un chiffre octal. Si p0 → p3 lisent successivement 3, 2, 7, 2, l'octal 2723 = 1491 lu sur le chiffre du haut est l'ID (Lava). Les familles de terrain à ID bas se contentent de 2 observations (p0, p1). Le pack n'utilise que le hook surface, donc tourne aussi en titres stricts.
+
+### R-H. Ne balancer que les feuilles — limiter le hook vertex par blockId
+
+La recette au vent R7 ([Partie III](03-recipes.md)) fait onduler tout le terrain, mais le hook vertex peut aussi lire `blockId` — on peut donc ne balancer que les feuilles. La liste d'IDs et le tableau WGSL (mesurés au 2026-10-18 ; 22 sortes — Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / variantes fruitières / Autumn Aspen) :
+
+```wgsl
+const LEAF_IDS = array<u32, 22>(
+    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
+    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
+    2024u, 2025u, 2085u);
+
+// les hooks vertex sont auto-désactivés en titres stricts (voir §36)
+#ifndef BLOXD_STRICT
+
+fn sp_isLeaf(id: u32) -> bool {
+    for (var i = 0u; i < 22u; i++) {
+        if (LEAF_IDS[i] == id) { return true; }
+    }
+    return false;
+}
+
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    if (sp_isLeaf(v.blockId)) {
+        let wp   = bloxdWorldPosition(v.position);
+        let t    = bloxdTime();
+        // le déplacement est une fonction lisse de la position monde. Les sommets partagés
+        // pointant vers le même point monde bougent identiquement, donc les faces ne se déchirent jamais ([Partie III](03-recipes.md) R7 suit le même principe)
+        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
+        out.position.x += sway * 0.045;
+        out.position.z += sway * 0.030;
+    }
+    return out;
+}
+
+#endif
+```
+
+- La liste d'IDs grandit avec les mises à jour du moteur (rien que pendant la mesure, 50 types de blocs ont été ajoutés dans un nouveau build). Pour continuer à l'utiliser, retrouvez les ajouts via [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) ou en mesurant avec l'affichage en plans de bits de R-G, puis étendez le tableau
+- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) sont des tapis de feuilles non solides au sol. Les balancer leur donne l'air de décoller du sol ; les exclure du tableau est une option
+- En titres stricts le hook vertex est désactivé en bloc, mais avec la garde ci-dessus le pack « cesse simplement de balancer » — les effets côté fragment continuent de fonctionner
 
 ## 35. Nouveauté ② : `BLOXD_SCENE_DEPTH` et `bloxdOpaqueBehind()` (la principale)
 
@@ -102,7 +180,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Applications : absorption/diffusion par épaisseur, projection de motifs façon rides/caustiques depuis les coordonnées monde du fond via `behind.position`, reflet du ciel en surface distinguant ciel et occlusion avec `found=false`, gradation d'écume et de trouble par profondeur. Si la construction du pipeline de copie de profondeur échoue, dégradation sûre vers « rien derrière ».
+Applications : absorption/diffusion par épaisseur, projection de motifs façon rides/caustiques depuis les coordonnées monde du fond via `behind.position`, reflet du ciel en surface distinguant ciel et occlusion avec `found=false`, gradation d'écume et de trouble par profondeur. Si la construction du pipeline de copie de profondeur échoue, dégradation sûre vers « rien derrière ». La disponibilité de la texture de profondeur est fixée une seule fois, à la génération du renderer de la page — le critère étant « le pack actif lit-il la profondeur ». **En utilisant un pack qui lit la profondeur, rechargez donc toujours la page**. Si la profondeur est demandée alors qu'un pack est actif mais que la page n'a pas été rechargée, la console affiche une seule fois un avertissement `…reads scene depth on a page that didn't turn it on`, et la texture de profondeur est remplacée par un repli 1×1, si bien que `bloxdOpaqueBehind()` renvoie toujours `found = false`.
 
 ## 36. Autres changements v2
 
@@ -111,7 +189,7 @@ Applications : absorption/diffusion par épaisseur, projection de motifs façon 
 - **Condition de définition de `BLOXD_ALPHA` changée** : défini en variantes terrain non strict et toutes variantes liquides, pas en strict × terrain. Gardez la garde pour écrire alpha en hooks terrain.
 - **Construction directe de structs interdite** : les appels constructeurs comme `BloxdLight(...)` sont rejetés par la validation statique. Partez toujours de `bloxdDefault*` ou copiez l'entrée.
 - **`let _ =` devient `_ =`** : l'affectation de rejet WGSL `_ = f();` est valide mais `let _ = f();` est rejeté.
-- **offInStrict** : définir un hook vertex, ou un `discard` atteignable depuis des hooks surface / light, ne fait pas erreur mais auto-désactive tout le pack en jeux stricts (l'UI de réglages affiche `shaderPack:offInStrict`, et ça marche en jeux allow). Entourez vertex et `discard` avec `#ifndef BLOXD_STRICT`.
+- **offInStrict** : définir un hook vertex, ou un `discard` atteignable depuis des hooks surface / light, ne fait pas erreur mais auto-désactive tout le pack en jeux stricts (l'UI de réglages affiche `shaderPack:offInStrict`, et ça marche en jeux allow). Entourez vertex et `discard` avec `#ifndef BLOXD_STRICT`. Notez que le message de l'UI de réglages lui-même demande d'englober ce qui reste avec `#ifndef BLOXD_STRICT` — c'est une recommandation officielle, pas une simple convention.
 - **Brouillard étendu** : trois modes LINEAR / EXP / EXP2 sont implémentés côté calcul, mais le réglage jeu restant toujours LINEAR comme avant, la spec de brouillard existante s'utilise telle quelle. Le sens de `fogColour` est aussi officialisé par écrit (noir seulement en scènes totalement sans brouillard).
 - **Inchangés** : courbe de lift, plancher 35 %, atténuation heldLight (`pow(lightDist, 0.75)`) et boost d'ambiant, spec de directions soleil/lune, couleur de brouillard par défaut, wrap de temps (3600 s), lumières directionnelles (4 max), Lite (WebGPU) seul, mécanisme de sauvegarde (IndexedDB), mot réservé `mod`.
 

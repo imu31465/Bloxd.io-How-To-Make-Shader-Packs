@@ -81,11 +81,11 @@ Cette recette **remplace** un `bloxdLiquidLight` existant. Ne la collez pas avec
 
 Succès de compilation et « bel aspect » sont deux choses différentes. Vérifiez dans cet ordre :
 
-1. **Chargement :** `pack.json` à la racine du ZIP ; les réglages affichent `Ready to use`.
+1. **Chargement :** `pack.json` à la racine du ZIP. Juste après la sélection s'affiche `Ready. Reload the page to use it.` et le pack devient actif **au rechargement de la page** ; confirmez `Ready to use` ensuite. Les packs sauvegardés sont revalidés automatiquement au prochain chargement de page : à chaque mise à jour de l'en-tête de spec côté moteur, le contenu de l'en-tête est vérifié par empreinte (succès = reste tel quel / échec = affiché bloqué), donc un ancien pack cassé ne reste jamais silencieusement actif.
 2. **8 variantes :** sans oublis de gardes de types en strict / allow, éclairage on / off, terrain / liquide. Même si un jeu n'use que de certaines conditions, les packs de distribution doivent assumer les 8.
 3. **Jour :** couleurs sans cramage par matériau (herbe, pierre, sable, bois) ; saut clair/sombre naturel entre dessus et côtés.
 4. **Nuit :** comparez les mêmes matériaux en pleine lumière passée, ombres et près des torches. Si seules restent des faces éclairées, réglez l'atténuation d'exposition ; si tout s'assombrit, réglez la protection de lumière locale.
-5. **Eau :** regardez depuis dessus, angles rasants, rives, sous l'eau et de nuit séparément. Comportement alpha et aspect sous-marin dépendent du compositing du jeu — ne jugez jamais d'un seul point de vue. Sous l'eau, le voile de définition liquide couvre devant selon ci-dessus : les différences du pack se voient surtout en surface et sur le terrain derrière le voile.
+5. **Eau :** regardez depuis dessus, angles rasants, rives, sous l'eau et de nuit séparément. Comportement alpha et aspect sous-marin dépendent du compositing du jeu — ne jugez jamais d'un seul point de vue. Sous l'eau, le voile de définition liquide couvre devant (comme décrit dans [Partie VII](07-internals.md)) : les différences du pack se voient surtout en surface et sur le terrain derrière le voile.
 6. **Bords et distance :** sans sauts de vagues/motifs aux transitions de chunk / origine ; sans double brouillard ni brume blanche au loin.
 7. **Performance :** effets lourds en hash/trig/`pow` par fragment au minimum. Ajoutez le détail peu à peu et comparez les FPS.
 
@@ -105,11 +105,11 @@ Pour référence, des distributions communautaires « cinematic shader » analys
 
 En pratique, **réglez lumière et couleur avec les shaders et couvrez matériaux et ciel avec un pack de ressources assorti**. Mais vérifiez co-usage et ordre de chargement selon l'implémentation et les réglages du jeu.
 
-En pratique, **réglez lumière et couleur avec les shaders et couvrez matériaux et ciel avec un pack de ressources assorti**. Mais vérifiez co-usage et ordre de chargement selon l'implémentation et les réglages du jeu.
+Les packs de textures ont leur propre spécification (pour référence) : la limite de taille est 25 Mo mesurée comme longueur de la chaîne JSON encodée en base64 ; encoder un PNG en base64 gonfle de +33 %, le plafond pratique pour les images brutes est donc ~18–19 Mo. Le CSS est traité par un simple analyseur regex — évitez l'imbrication et les commentaires.
 
 ## 23. La réalité sous-marine avec les packs de shaders
 
-Les looks sous-marins constent de 3 couches :
+Les looks sous-marins se composent de 3 couches :
 
 | Couche | Contenu | Opérable depuis les packs ? |
 |---|---|---|

@@ -23,15 +23,15 @@
 
 - **Format de distribution** : un seul `.zip`, ou un dossier (le chargement de dossier est réservé aux navigateurs de bureau)
 - **Contenu** : un `pack.json` (à la racine du pack ; insensible à la casse) + 1 à 256 fichiers `.wgsl`
-- Les `.wgsl` multiples sont concaténés et traités comme un module : découpage et sous-dossiers libres. Aucune contrainte de noms. Les fichiers non `.wgsl` (READMEs etc.) sont ignorés
-- Astuce de compression : si un zip range tout sous un dossier racine commun, ce préfixe est retiré automatiquement (les zips "Compresser" de macOS passent tels quels). Mais des fichiers parasites à la racine cassent la détection du niveau supérieur ; le plus sûr est d'entrer dans le dossier et de compresser `pack.json` et les `.wgsl` directement (vérifiez que `pack.json` est à la racine du ZIP)
+- Les `.wgsl` multiples sont concaténés et traités comme un module : découpage et sous-dossiers libres. Aucune contrainte de noms. La concaténation se fait en **ordre alphabétique par nom d'entrée (chemin)** (les déclarations de portée module ne dépendent pas de l'ordre, donc en général sans effet — cela ne mord que sur du code dépendant de l'ordre d'initialisation des `var`). Les fichiers non `.wgsl` (READMEs etc.) sont ignorés
+- Astuce de compression : si un zip range tout sous un dossier racine commun, ce préfixe est retiré automatiquement (les zips "Compresser" de macOS passent tels quels ; les déchets d'OS comme `__MACOSX`, les fichiers préfixés `._` et `.DS_Store` sont exclus automatiquement). Mais des fichiers parasites à la racine cassent la détection du niveau supérieur ; le plus sûr est d'entrer dans le dossier et de compresser `pack.json` et les `.wgsl` directement (vérifiez que `pack.json` est à la racine du ZIP)
 
 | Élément | Limite |
 |---|---|
 | taille du zip / nb d'entrées | 32 Mo / 1024 |
 | taille de pack.json | 64 Ko, UTF-8 |
 | taille totale .wgsl | 256 Ko, UTF-8 |
-| format zip | zip64, découpés et chiffrés refusés |
+| format zip | zip64, découpés et chiffrés refusés. Compression : store / deflate uniquement. Chemins dupliqués interdits |
 
 ## 4. pack.json
 
@@ -137,9 +137,9 @@ Le chargement exécute ces contrôles dans l'ordre :
 Étapes :
 
 1. Chargez le zip / dossier via réglages → Shader Pack
-2. Vérifiez le statut. Le succès, c'est "Ready to use". Face à "Saved, but it won't run until you fix these errors...", corrigez les erreurs listées (fichier:ligne + variante) et rechargez
+2. Vérifiez le statut. Juste après la sélection apparaît "Ready. Reload the page to use it." — après rechargement de la page, "Ready to use" signifie le succès. Face à "Saved, but it won't run until you fix these errors...", corrigez les erreurs listées (fichier:ligne + variante) et rechargez
 3. Rechargez la page pour activer. Supprimez avant tout forçage de moteur (renderer override) en paramètres URL ou localStorage, sinon le pack refusera de démarrer
 4. Testez d'abord en jeux permissifs puis en jeux stricts (la majorité). L'animation de sommets ne marche qu'en jeux allow
-5. Pour distribuer, zippez avec `pack.json` au sommet (dans les limites de la section 3). Recharger le même écran remplace le pack ; Remove Pack le supprime. La revalidation après mises à jour du jeu tourne seule au chargement de page
+5. Pour distribuer, zippez avec `pack.json` au sommet (dans les limites de la section 3). Le pack peut être remplacé sur le même écran, mais ne prend effet qu'après un rechargement de la page (étapes 2–3). Remove Pack le supprime. La revalidation après mises à jour du jeu tourne seule au chargement de page
 
 [Retour au manuel](README.md)·[Partie suivante →](02-api.md)
