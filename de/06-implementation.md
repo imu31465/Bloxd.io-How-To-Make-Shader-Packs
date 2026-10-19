@@ -81,11 +81,11 @@ Dieses Rezept **ersetzt** ein existierendes `bloxdLiquidLight`. Nicht neben die 
 
 Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihenfolge prüfen:
 
-1. **Laden:** `pack.json` im ZIP-Root; Einstellungen zeigen `Ready to use`.
+1. **Laden:** `pack.json` im ZIP-Root. Direkt nach der Auswahl erscheint `Ready. Reload the page to use it.` und das Paket wird **beim Neuladen der Seite** aktiv; danach `Ready to use` bestätigen. Gespeicherte Pakete werden beim nächsten Seitenladen automatisch revalidiert: Wann immer sich der engine-seitige Spec-Header aktualisiert, wird der Header-Inhalt per Fingerprint geprüft (bestanden = bleibt unverändert aktiv / fehlgeschlagen = wird als blockiert angezeigt) — ein defektes altes Paket bleibt also nie still aktiv.
 2. **8 Varianten:** keine Typ-Guard-Lücken in strict / allow, Licht an / aus, Terrain / Flüssigkeit. Auch wenn ein Spiel nur manche Bedingungen nutzt, sollten Vertriebspakete alle 8 annehmen.
 3. **Tag:** Farben pro Material nicht ausgebrannt (Gras, Stein, Sand, Holz); natürlicher Hell/Dunkel-Sprung zwischen Oben und Seiten.
 4. **Nacht:** dieselben Materialien im einstigen Tageslicht, Schatten und Fackelnähe vergleichen. Bleiben nur beleuchtete Flächen, Belichtungsdämpfung tunen; wird alles dunkel, lokalen Lichtschutz tunen.
-5. **Wasser:** von oben, streifende Winkel, Ufer, unter Wasser und nachts getrennt ansehen. Alpha-Verhalten und Unterwasser-Look hängen vom Spiel-Compositing ab — nie von einem Blickwinkel urteilen. Unter Wasser deckt der Flüssigkeitsdefinitions-Schleier vorne ab (siehe oben): Paket-Unterschiede zeigen sich vor allem an Oberfläche und Terrain hinterm Schleier.
+5. **Wasser:** von oben, streifende Winkel, Ufer, unter Wasser und nachts getrennt ansehen. Alpha-Verhalten und Unterwasser-Look hängen vom Spiel-Compositing ab — nie von einem Blickwinkel urteilen. Unter Wasser deckt der Flüssigkeitsdefinitions-Schleier vorne ab, wie in [Teil VII](07-internals.md) beschrieben: Paket-Unterschiede zeigen sich vor allem an Oberfläche und Terrain hinterm Schleier.
 6. **Ränder und Ferne:** keine Wellen-/Mustersprünge an Chunk-/Ursprungsübergängen; kein Doppel-Fog und kein weißer Dunst in der Ferne.
 7. **Performance:** fragment-schwere Hash/Trig/`pow`-Effekte minimal. Details schrittweise dazugeben und FPS vergleichen.
 
@@ -105,7 +105,7 @@ Als Referenz entpuppten sich in einem Fall analysierte Community-„Cinematic-Sh
 
 In der Praxis **Licht und Farbe per Shader tunen und Materialien plus Himmel per passendem Ressourcenpaket abdecken**. Aber Co-Nutzung und Ladereihenfolge gegen Spiel-Implementierung und -Einstellungen prüfen.
 
-In der Praxis **Licht und Farbe per Shader tunen und Materialien plus Himmel per passendem Ressourcenpaket abdecken**. Aber Co-Nutzung und Ladereihenfolge gegen Spiel-Implementierung und -Einstellungen prüfen.
+Texturpakete haben ihre eigene Spezifikation (als Referenz): Das Größenlimit liegt bei 25MB, gemessen als Länge des base64-kodierten JSON-Strings; Base64-Kodierung eines PNG bläht es um +33% auf, das praktische Limit für Rohbilder liegt also bei ~18–19MB. CSS wird von einem einfachen Regex-Parser verarbeitet — Verschachtelung und Kommentare vermeiden.
 
 ## 23. Unterwasser-Realität mit Shader-Paketen
 

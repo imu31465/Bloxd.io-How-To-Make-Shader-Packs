@@ -23,15 +23,15 @@
 
 - **Vertriebsform**: eine einzelne `.zip` oder ein Ordner (Ordnerladen nur in Desktop-Browsern)
 - **Inhalt**: eine `pack.json` (oberste Ebene des Pakets; Groß-/Kleinschreibung egal) + 1–256 `.wgsl`-Dateien
-- Mehrere `.wgsl` werden verkettet und als ein Modul behandelt, Aufteilen und Unterordner sind also frei. Keine Dateinamen-Einschränkungen. Nicht-`.wgsl`-Dateien (READMEs etc.) werden ignoriert
-- Zip-Tipp: Liegt alles unter einem gemeinsamen Wurzelordner, wird dieses Präfix automatisch abgestreift (macOS-„Komprimieren"-Zips funktionieren direkt). Fremddateien auf Root-Ebene brechen aber die Top-Level-Erkennung; am sichersten in den Ordner gehen und `pack.json` plus `.wgsl` direkt packen (prüfen, dass `pack.json` im ZIP-Root landet)
+- Mehrere `.wgsl` werden verkettet und als ein Modul behandelt, Aufteilen und Unterordner sind also frei. Keine Dateinamen-Einschränkungen. Die Verkettung erfolgt in **Wörterbuch-Reihenfolge nach Eintrags-(Pfad-)Namen** (Modul-Scope-Deklarationen sind reihenfolgeunabhängig, deshalb stört das normalerweise nicht — es beißt nur Code, der von der `var`-Initialisierungsreihenfolge abhängt). Nicht-`.wgsl`-Dateien (READMEs etc.) werden ignoriert
+- Zip-Tipp: Liegt alles unter einem gemeinsamen Wurzelordner, wird dieses Präfix automatisch abgestreift (macOS-„Komprimieren"-Zips funktionieren direkt; OS-Müll wie `__MACOSX`, `._`-Präfixe und `.DS_Store` wird automatisch ausgeschlossen). Fremddateien auf Root-Ebene brechen aber die Top-Level-Erkennung; am sichersten in den Ordner gehen und `pack.json` plus `.wgsl` direkt packen (prüfen, dass `pack.json` im ZIP-Root landet)
 
 | Punkt | Limit |
 |---|---|
 | Zip-Größe / Einträge | 32MB / 1024 |
 | pack.json-Größe | 64KB, UTF-8 |
 | .wgsl gesamt | 256KB, UTF-8 |
-| Zip-Format | zip64, geteilte und verschlüsselte Zips werden abgelehnt |
+| Zip-Format | zip64, geteilte und verschlüsselte Zips werden abgelehnt. Kompression: nur store / deflate. Doppelte Pfade nicht erlaubt |
 
 ## 4. pack.json
 
@@ -137,9 +137,9 @@ Beim Laden laufen diese Prüfungen der Reihe nach:
 Schritte:
 
 1. Zip / Ordner über Einstellungen → Shader Pack laden
-2. Status prüfen. Erfolg ist "Ready to use". Bei "Saved, but it won't run until you fix these errors..." die gelisteten Fehler (Datei:Zeile + Variante) beheben und neu laden
+2. Status prüfen. Direkt nach der Auswahl erscheint "Ready. Reload the page to use it." — nach dem Neuladen der Seite bedeutet "Ready to use" Erfolg. Bei "Saved, but it won't run until you fix these errors..." die gelisteten Fehler (Datei:Zeile + Variante) beheben und neu laden
 3. Seite neu laden zum Aktivieren. Renderer-Overrides in URL-Parametern oder localStorage vorher entfernen, sonst verweigert das Paket den Start
 4. Erst in permissiven Spielen testen, dann in strikten Spielen (die Mehrheit). Vertex-Animation geht nur in Allow-Spielen
-5. Zum Verteilen mit `pack.json` obenauf zippen (innerhalb der Abschnitt-3-Limits). Dieselbe Seite neu zu laden ersetzt das Paket; Remove Pack löscht es. Re-Validierung nach Spiel-Updates läuft beim Seitenladen automatisch
+5. Zum Verteilen mit `pack.json` obenauf zippen (innerhalb der Abschnitt-3-Limits). Das Paket lässt sich auf derselben Seite ersetzen, wirkt aber erst nach einem Seiten-Neuladen (Schritte 2–3); Remove Pack löscht es. Re-Validierung nach Spiel-Updates läuft beim Seitenladen automatisch
 
 [Zurück zum Handbuch](README.md)·[Nächster Teil →](02-api.md)

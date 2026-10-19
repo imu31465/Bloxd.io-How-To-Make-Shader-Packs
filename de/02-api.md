@@ -86,13 +86,13 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 Kernpunkte:
 
 - `bloxdTime()` ist verstrichene Zeit mit Wrap alle 3600 Sekunden (`bloxdTimeWrap`). Keine garantierte Synchronisation mit der Tag/Nacht-Uhr im Spiel. Da die Stage-Sichtbarkeit der Bind Group VERTEX|FRAGMENT ist, **auch aus Vertex-Hooks aufrufbar**
-- `bloxdSunDirection()` ist nur ein Einheitsvektor, solange eine Sonne existiert; null, wenn der Himmel keine Sonne hat. **Der Mond ist immer `-bloxdSunDirection()`** (die Engine berechnet die Mondposition als exaktes Gegenteil der Sonne). In Standardwelten ist die Sonne aber statisch, der Mond also auch — ein bewegter Mond zählt nur in Welten mit Tag/Nacht-Zyklus (siehe [Teil VII](07-internals.md), Abschnitt 24)
+- `bloxdSunDirection()` ist nur ein Einheitsvektor, solange eine Sonne existiert; null, wenn der Himmel keine Sonne hat. **Der Mond ist immer `-bloxdSunDirection()`** (die Engine berechnet die Mondposition als exaktes Gegenteil der Sonne). Aktuelle Builds haben keinen Tag/Nacht-Zyklus: Sonne, Mond und Sterne bewegen sich während des Spiels nie (nur Opacity-Schalter wie `dayNightSunOpacity`). Im standardmäßigen erdähnlichen Himmel steht die Sonne fix bei ≈ `(−0.56, 0.81, −0.18)` (Höhenwinkel ~54°). **Niemals einen Nullvektor an `normalize` geben** — Sonnenabwesenheit mit `dot(d, d) < 1e-8` testen und auf eine konstante Richtung ausweichen (siehe [Teil VII](07-internals.md) §28)
 - ※Hinweis: früher als „bei null nicht als Mondrichtung wiederverwendbar" formuliert. Die Richtung selbst ist via `-bloxdSunDirection()` verfügbar, aber Vertriebspakete sollten mit `sunPresent` auf Null-Prämisse verzweigen (zum blauen Umgebungs-Pseudo-Look siehe R2, zum gerichteten Mondlicht [Teil VII](07-internals.md) R-A)
 - `emission` wird nach der Lichtberechnung addiert, gedämpft mit **`fogVisibility`** (die defaultLight-Implementierung `engineColour + emission × fogVisibility`. Emission verschwindet auch in völlig vernebelter Ferne)
 - **Fog-Anwendungsreihenfolge**: Fragment-Verarbeitung läuft ① Licht/Emissions-Komposition → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ Light-Hook-Aufruf → ⑤ return. **engineColour kommt also gefoggt an**, und **der Light-Hook-Rückgabewert wird unverändert zur Endfarbe** (nach dem Hook wird kein Fog neu angewandt)
 - **fogVisibility-Herkunft**: View-Space-Distanz (pro Vertex berechnet, interpoliert). Im Linear-Modus `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **Bei fogMode == 0**: `fogColour` kommt als `vec3f(0.0)` (schwarz) an. Code, der Tageszeiten aus fogColour-Tönung schätzt, sei vorsichtig
-- **Echte Fog-Einstellungen aktueller Builds**: **linear fixiert**. `fogStart` = Chunk-Sichtweite, `fogEnd` = +1 Chunk (nur Horizont). Bei Fog-aus auf 100 / 101 Chunks gesetzt, faktisch deaktiviert. Standard-Fog-Farbe RGB(183, 191, 195)
+- **Echte Fog-Einstellungen aktueller Builds**: **linear fixiert**. `fogStart` = Chunk-Sichtweite, `fogEnd` = +1 Chunk (nur Horizont). Bei Fog-aus auf 100 / 101 Chunks gesetzt, faktisch deaktiviert. Standard-Fog-Farbe RGB(181, 191, 195)
 - Das Uniform `bloxdPackInputs` (`@group(3) @binding(0)`, 64 B) **nur über Header-Funktionen nutzen**. Nie direkt aus Paketen referenzieren. Da die Stage-Sichtbarkeit VERTEX|FRAGMENT ist, sind Header-Funktionen auch aus Modul-Scope-Funktionen außerhalb von Hooks und aus Vertex-Hooks aufrufbar. Da die Tiefentextur (Binding 1) FRAGMENT-exklusiv ist, ist `bloxdOpaqueBehind()` auf Surface-/Light-Hooks beschränkt
 - **`skyLight` / `blockLight` / `heldLight` kommen nach einer „Lift-Kurve" an**. Das `tone-mapped` in den Header-Kommentaren meint dies: Die Engine wendet immer `y = 1-(1-x/(3-2x))³` (eine dunkle Bereiche anhebende S-Kurve) auf Fragmente an, bevor sie Pakete erreichen. Keine rohen Voxel-Werte (n/15); z. B. kommt unter einem Baum (roh 0,87) angehoben als **0,97** an
 - `skyLight` ist im Kern Voxel-Verdeckungsdaten für „ist von hier Himmel sichtbar" (= eine Schattenkarte), kein bloßer Helligkeitsparameter (siehe Abschnitt 15, „Die Wahrheit über Schatten")
@@ -114,6 +114,8 @@ Kernpunkte:
 | strict + lit + Flüssigkeit | ✓ | ✓ | ✓ |
 
 Auch Header-Struct-Formen ändern sich je Variante (kein `BloxdVertex` in strict, kein `blockLight` etc. in unlit, kein `alpha` in strict-Terrain).
+
+Die offiziell definierten Symbole sind nur 4 (die 3 oben + `BLOXD_SCENE_DEPTH` — [Teil VIII](08-apiv2.md) §35). Terrain vs. Flüssigkeit ist kein Symbol, sondern ein **eigenes Programm** — Verzweigungen wie `#ifdef BLOXD_TERRAIN` sind daher unmöglich. Beim Flag-Namen wird Groß/Klein nicht unterschieden; ein falscher Name im `#ifdef` lässt die Fehlermeldung alle 4 gültigen auflisten. Hook-Funktionen werden nur in die Terrain- und Flüssigkeitsprogramme injiziert — Pakete können Entities, Partikel oder sonstiges Rendering nicht beeinflussen.
 
 ## 12. Skelett-Spickzettel
 
