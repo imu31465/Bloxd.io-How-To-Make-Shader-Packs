@@ -86,13 +86,13 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 要点解读：
 
 - `bloxdTime()` 每 3600 秒回绕，为流逝时间 (`bloxdTimeWrap`)。不保证与游戏内昼夜时钟同步。绑定组的阶段可见性为 VERTEX|FRAGMENT，因此**vertex 钩子也可调用**。
-- `bloxdSunDirection()` 仅在太阳存在时为单位向量，无太阳的天空为零。**月亮恒为 `-bloxdSunDirection()`** (引擎将月亮位置算作太阳的严格反方向)。但默认世界太阳静止，月亮也静止，只有实现昼夜循环的世界才看得到月动 (见[第七部分](07-internals.md) §24)
+- `bloxdSunDirection()` 仅在太阳存在时为单位向量，无太阳的天空为零。**月亮恒为 `-bloxdSunDirection()`** (引擎将月亮位置算作太阳的严格反方向)。现行构建没有昼夜循环：太阳、月亮、星星在游玩中一动不动 (仅 `dayNightSunOpacity` 之类的透明度切换)。默认 earth 型天空中太阳固定于 ≈ `(−0.56, 0.81, −0.18)` (仰角 ~54°)。**绝不要把零向量传给 `normalize`**——用 `dot(d, d) < 1e-8` 判无太阳并回退到常数方向 (见[第七部分](07-internals.md) §28)
 - ※注：此前写成「零时不可复用为月亮方向」。方向本身经 `-bloxdSunDirection()` 可得，但分发包应以零为前提用 `sunPresent` 分支 (蓝色环境光拟似见 R2，方向性月光见第七部 R-A)。
 - `emission` 在光照计算后叠加，以 **`fogVisibility` 衰减** (defaultLight 实现 `engineColour + emission × fogVisibility`。完全沉雾的远景发光也消失)
 - **雾应用顺序**：片元内处理顺序为 ① 光照·发光合成 → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ light 钩子调用 → ⑤ return。因此 **engineColour 以打雾态到达**，**light 钩子返回值原样成为最终颜色** (钩子后不再重打雾)
 - **fogVisibility 定义源**：视图空间距离 (按顶点计算、插值)。linear 模式 `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **fogMode == 0 时**：`fogColour` 以 `vec3f(0.0)` (黑) 到达。以 fogColour 色味推断时段的代码请注意
-- **现行构建实际雾设置**：**linear 固定**。`fogStart` = 绘制区块距离、`fogEnd` = +1 区块 (仅地平线)。雾关闭设置下为 100 / 101 区块，实际无效。默认雾色 RGB(183, 191, 195)
+- **现行构建实际雾设置**：**linear 固定**。`fogStart` = 绘制区块距离、`fogEnd` = +1 区块 (仅地平线)。雾关闭设置下为 100 / 101 区块，实际无效。默认雾色 RGB(181, 191, 195)
 - `bloxdPackInputs` uniform (`@group(3) @binding(0)`，64B) **仅经标头函数使用**。包不可直接引用。阶段可见性为 VERTEX|FRAGMENT，因此标头函数也可从钩子外的模块级函数与 vertex 钩子调用。深度纹理 (binding 1) 为 FRAGMENT 专用，因此 `bloxdOpaqueBehind()` 仅限 surface / light 钩子
 - **`litColour` 可作起点**：v1 只有打雾后的 `engineColour`，自制大气表现容易双重打雾。v2 从打雾前、emission 前的 `litColour` 出发，经 `bloxdApplyFog()` 按自己的节奏重打雾
 - **`blockId` 可区分方块种类**：不依赖纹理颜色的标识。但 ID 与方块种类的对应表在引擎内部，哪一 ID 对应何种方块可世界内实测，现成对应表见 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (见[第八部分](08-apiv2.md))
@@ -114,6 +114,8 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 | strict + 有光照 + 液体 | ✓ | ✓ | ✓ |
 
 头结构体形态也随变体变化 (strict 无 `BloxdVertex`、无光照无 `blockLight` 等、strict 地形无 `alpha`)。
+
+官方定义的符号只有 4 个 (上述 3 个 + `BLOXD_SCENE_DEPTH`——[第八部分](08-apiv2.md) §35)。地形 vs 液体不是符号，而是**独立程序**：`#ifdef BLOXD_TERRAIN` 之类的分支不可能实现。flag 名匹配不区分大小写；`#ifdef` 中名字写错时，错误消息会列出 4 个有效名字。钩子函数只注入地形与液体程序——包无法影响实体、粒子或其他任何渲染。
 
 ## 12. 骨架速查
 

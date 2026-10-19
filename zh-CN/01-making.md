@@ -23,15 +23,15 @@
 
 - **分发形态**: 单个 `.zip`，或文件夹 (文件夹加载仅桌面浏览器)
 - **内容**: 1 个 `pack.json` (位于包最顶层，大小写不敏感) + 1–256 个 `.wgsl` 文件
-- 多个 `.wgsl` 会拼接为一个模块处理，因此自由拆分与分子目录。文件名无限制。非 `.wgsl` 文件 (README 等) 会被忽略
-- 打包技巧: 若 zip 内所有文件位于同一公共根文件夹下，该前缀会被自动剥离 (macOS「压缩」生成的 zip 可直接使用)。但根层级混入多余文件会失去顶层判定，最稳妥的是进入文件夹内直接指定 `pack.json` 与 `.wgsl` 打包 (确认 `pack.json` 位于 ZIP 根目录)
+- 多个 `.wgsl` 会拼接为一个模块处理，因此自由拆分与分子目录。文件名无限制。拼接按**输入名 (路径) 的字典序**进行 (模块级声明不依赖顺序，通常无影响——只对依赖 `var` 初始化顺序的代码有影响)。非 `.wgsl` 文件 (README 等) 会被忽略
+- 打包技巧: 若 zip 内所有文件位于同一公共根文件夹下，该前缀会被自动剥离 (macOS「压缩」生成的 zip 可直接使用；`__MACOSX`、`._` 前缀文件与 `.DS_Store` 等系统垃圾会被自动排除)。但根层级混入多余文件会失去顶层判定，最稳妥的是进入文件夹内直接指定 `pack.json` 与 `.wgsl` 打包 (确认 `pack.json` 位于 ZIP 根目录)
 
 | 项目 | 上限 |
 |---|---|
 | zip 大小 / 条目数 | 32MB / 1024 |
 | pack.json 大小 | 64KB，UTF-8 |
 | .wgsl 合计大小 | 256KB，UTF-8 |
-| zip 格式 | 拒绝 zip64、分卷与加密 zip |
+| zip 格式 | 拒绝 zip64、分卷与加密 zip。压缩仅限 store / deflate，禁止重复路径 |
 
 ## 4. pack.json
 
@@ -137,9 +137,9 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 步骤：
 
 1. 从设置 → Shader Pack 加载 zip / 文件夹
-2. 确认状态。「Ready to use」即成功。出现「Saved, but it won't run until you fix these errors...」时，按错误列表 (文件:行 + 变体) 修复后重新加载
+2. 确认状态。选中后立即显示「Ready. Reload the page to use it.」——重新加载页面后「Ready to use」即成功。出现「Saved, but it won't run until you fix these errors...」时，按错误列表 (文件:行 + 变体) 修复后重新加载
 3. 重新加载页面以激活。URL 参数或 localStorage 中若残留渲染器覆盖会导致包拒绝启动，请先清除
 4. 先在限制宽松的游戏中确认，再到严格游戏 (占大多数) 确认。顶点动画仅 allow 游戏有效
-5. 分发时将 `pack.json` 置顶打包 (遵守第 3 章上限)。同一界面重新加载即替换包；Remove Pack 删除。游戏更新后的重验证在页面加载时自动执行
+5. 分发时将 `pack.json` 置顶打包 (遵守第 3 章上限)。包可在同一界面被替换，但重新加载页面后才生效 (步骤 2–3)。Remove Pack 删除。游戏更新后的重验证在页面加载时自动执行
 
 [返回手册](README.md)·[下一部分 →](02-api.md)

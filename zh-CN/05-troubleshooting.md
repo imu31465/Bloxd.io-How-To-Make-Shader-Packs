@@ -12,7 +12,9 @@
 | `Packs can't construct BloxdSurface directly` | 改从 `bloxdDefaultSurface(s)` 出发 |
 | `BloxdVertex only exists when BLOXD_STRICT isn't defined` | 用 `#ifndef BLOXD_STRICT` 包裹 |
 | 远景发白浑浊 | 多为双重雾。完成色已打雾，自制雾须克制，优先只降饱和 |
+| `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | 警告：在发光体密集区域或跨区域边界处光照种子队列溢出，该区块的光照计算被截断。非包所致，但**发光体聚集周围的光照空洞来自此规格**——将光源分散到世界各处即可避免 |
 | 进游戏时包被剔除 | 游戏开始时的实机检查失败。复查守卫遗漏 |
+| 实机检查永不结束，包以 `This device couldn't check …` 等脱落 | 检查有 60 秒强制期限 (超时计为 `skipped`)。在弱设备 / 重负载世界常见——减轻沉重的顶点运算与复杂循环后重试 |
 | `pack.json needs "apiVersion": 2.` | `apiVersion` 缺失或不是 `2`。填数字 `2` (字符串 `"2"` 不可)。v1 包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
 | `There's no pack.json at the top of the pack.` | ZIP 根无 `pack.json`。检查是否把文件夹整个打包了 |
 | `bloxdTerrainVertex must be declared as: fn ...` | 签名不符。按所示声明原样重写 |
@@ -23,12 +25,33 @@
 | `bloxdPackInputs isn't part of the bloxd_ header` | PackInputs uniform 包不可直接引用。经 `bloxdTime()` 等标头函数使用 |
 | `Packs can't declare bloxd_ names...` | 去掉自定标识符的 `bloxd_` 前缀。只许定义 6 个钩子名 |
 | `loadDuplicateManifest` (zip 加载时) | `pack.json` 有 2 个 (含大小写变体)。留 1 个 |
+| 「needs the new WebGPU renderer, so remove the renderer override...」 | 去掉 URL 参数 `?renderer=` 与 localStorage 的 `bloxdRenderer` 后重新加载 ([第七部分](07-internals.md) §29) |
 | `Packs can't construct BloxdLight directly, since header structs gain fields; ...` | 改从 `bloxdDefaultSurface(s)` 等出发。从 light 钩子第 1 参数的拷贝 (`var out = s;`) 起步亦可 |
 | `_ can only be the target of a phony assignment, as in _ = f();` | `let _ = f();` 不可。写成 `_ = f();` |
 | `...needs BLOXD_SCENE_DEPTH, but this hook also runs on terrain...` | 地形钩子内的 `bloxdOpaqueBehind()` 调用以 `#ifdef BLOXD_SCENE_DEPTH` 包裹 |
 | `...only surface and light hooks can use.` | 删除 vertex 钩子内的 `bloxdOpaqueBehind()` (仅 surface / light 可用) |
+| `Lite: …reads scene depth on a page that didn't turn it on` | 重新加载页面，并在启用读取深度的包 ([第八部分](08-apiv2.md) §35) 的状态下重新打开。深度纹理的可用性在页面生成时固定 |
 | `bloxdTerrainVertex moves terrain, which strict games don't allow.` / `discard makes terrain see-through, which strict games don't allow.` | 非报错，而是 strict 游戏中的自动禁用 (`shaderPack:offInStrict`)。vertex 钩子与 `discard` 以 `#ifndef BLOXD_STRICT` 包裹 |
 | `mixing '*' and '^' requires parenthesis (only in ...)` | 第 2 阶段 (浏览器 Tint) 的错误。`^` `&` `\|` `<<` `>>` 的操作数加括号 (§38) |
+
+### 加载阶段的错误 ID
+
+设置画面的错误带 `shaderPack:load*` ID。作为消息查找的备忘：
+
+| ID | 含义 |
+|---|---|
+| `loadZipTooBig` | zip 超过 32MB |
+| `loadTooManyZipEntries` | 条目超过 1024 个 |
+| `loadTooManyWgsl` | `.wgsl` 超过 256 个 |
+| `loadSourceTooBig` | 总量超过 256KB (流式检查、逐文件) |
+| `loadManifestTooBig` | `pack.json` 超过 64KB |
+| `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` 非 JSON / 非对象 |
+| `loadNoApiVersion` / `loadWrongApiVersion` | 无 `apiVersion` / 不为 `2` (v1 包被拒绝) |
+| `loadNoName` / `loadAuthorNotString` | 无 `name` / `author` 非字符串 |
+| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 不支持的压缩 / zip64 / 分卷 / 加密 |
+| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 重复路径 / 非 UTF-8 / 解压失败 / zip 损坏 |
+
+`loadNoManifest` / `loadDuplicateManifest` (pack.json 位置 / 重复) — 见上表对应行。
 
 ## 18. 权利与注意事项
 

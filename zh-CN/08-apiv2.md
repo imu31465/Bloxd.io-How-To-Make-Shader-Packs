@@ -48,9 +48,26 @@ v1 中 `time` / `eyePosition` / `sunDirection` / `originOffset` 为结构体字�
 
 ## 34. 新功能 ①: `blockId` (按方块着色)
 
-`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` 三个结构体均新增 `blockId: u32`。为面所属方块的 ID (0–65535)，同一面全域恒定 (以 `@interpolate(flat)` 传递)。用于不依赖纹理颜色的方块种类识别。但 ID 与方块种类的对应表在引擎内部，包无法引用，因此哪一 ID 对应何种方块，可在世界内实测，或查阅下述参考数据。
+`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` 三个结构体均新增 `blockId: u32`。为面所属方块的 ID (0–65535)，同一面全域恒定 (以 `@interpolate(flat)` 传递)。用于不依赖纹理颜色的方块种类识别。但 ID 与方块种类的对应表在引擎内部，包无法引用，因此哪一 ID 对应何种方块，可在世界内实测，或查阅下述参考数据。内部上该 ID 被烘焙进顶点颜色的 alpha (低 8 位) 与法线的 w (高 8 位)——合计 16 位，故上限为 65535。blockId 系统本身只在有着色器包激活期间启用 (无包时接线保留其填充目标，但在第二部分的结构体定义中该差异不可观测)。
 
 **参考**：作者在 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 公开了游戏内条目清单 (`entries.json`：id ↔ 方块名对应表，`Furnace|meta|rot2` 之类的旋转/meta 变种也作为独立 ID 收录)。对应关系可能随游戏更新变化，最终确认请在实机进行。
+
+常用方块示例 (据 2026-10-18 的 entries.json；仅列出低 ID 的地形家族)：
+
+| ID | 方块名 | ID | 方块名 |
+|---|---|---|---|
+| 0 | Air | 15 | Maple Wood Planks |
+| 1 | Unloaded | 28 | Stone |
+| 2 | Dirt | 29 | Messy Stone |
+| 3 | Messy Dirt | 31 | Smooth Stone |
+| 4 | Grass Block | 126 | Water |
+| 5 | Sand | 128 | Bricks |
+| 6 | Clay | 139 | Ice |
+| 7 | Gravel | 147 | Bedrock |
+| 8 | Snow | 149 | Cactus |
+| 9 | Maple Log | 1491 | Lava |
+
+entries.json 也收录非方块条目 (工具等)，但只有方块家族的 ID 能到达地形 / 液体钩子。
 
 ### R-F. 按方块种类着色 (blockId)
 
@@ -67,6 +84,67 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return result;
 }
 ```
+
+### R-G. 在世界内测量 blockId——位平面显示包
+
+用于在世界内识别「对应表未收录」的方块 ID 的调试配方。在读取想识别方块的面色时，同时改动顶部的 `plane` 常量 (`0, 1, 2, …`)。
+
+```wgsl
+const plane: u32 = 0u;
+
+fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(s);
+    let d = (s.blockId >> (plane * 3u)) & 7u;
+    var palette = array<vec3f, 8>(
+        vec3f(0.0, 0.0, 0.0), vec3f(1.0, 0.0, 0.0), vec3f(0.0, 1.0, 0.0), vec3f(1.0, 1.0, 0.0),
+        vec3f(0.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(0.0, 1.0, 1.0), vec3f(1.0, 1.0, 1.0));
+    out.colour = palette[d];
+    return out;
+}
+```
+
+面的颜色直接以 RGB 编码 blockId 的 3 位 (黑 = 0 / 红 = 1 / 绿 = 2 / 黄 = 3 / 蓝 = 4 / 品红 = 5 / 青 = 6 / 白 = 7)。一次观测读取一个八进制位。若 p0 → p3 依次读到 3, 2, 7, 2，则从最高位起读出的八进制 2723 = 1491 即该 ID (Lava)。低 ID 的地形家族用 2 次观测 (p0, p1) 就够了。本包只用 surface 钩子，因此在 strict 游戏中也运行。
+
+### R-H. 只摇摆树叶——按 blockId 限定 vertex 钩子
+
+R7 的风配方 ([第三部分](03-recipes.md)) 会让整个地形起伏，但 vertex 钩子也能读取 `blockId`——可以只让树叶摇摆。ID 列表与 WGSL 数组 (据 2026-10-18 实测；共 22 种——Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / 果实变种 / Autumn Aspen)：
+
+```wgsl
+const LEAF_IDS = array<u32, 22>(
+    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
+    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
+    2024u, 2025u, 2085u);
+
+// vertex 钩子在 strict 游戏中自动禁用 (见 §36)
+#ifndef BLOXD_STRICT
+
+fn sp_isLeaf(id: u32) -> bool {
+    for (var i = 0u; i < 22u; i++) {
+        if (LEAF_IDS[i] == id) { return true; }
+    }
+    return false;
+}
+
+fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
+    var out = bloxdDefaultVertex(v);
+    if (sp_isLeaf(v.blockId)) {
+        let wp   = bloxdWorldPosition(v.position);
+        let t    = bloxdTime();
+        // 位移是随世界坐标变化的平滑函数。指向同一世界点的共享顶点
+        // 移动相同，因此面永远不会撕裂 ([第三部分](03-recipes.md) R7 遵循同一原理)
+        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
+        out.position.x += sway * 0.045;
+        out.position.z += sway * 0.030;
+    }
+    return out;
+}
+
+#endif
+```
+
+- ID 列表随引擎更新增长 (仅在实测期间就有 50 种方块新增于新构建)。要继续使用，请经由 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 或 R-G 的位平面显示找出新增项，再扩展数组
+- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) 是地上的非固体落叶层。摆动它们会像从地面剥离；把它们从数组中排除也是一个选择
+- 在 strict 游戏中 vertex 钩子会被整体禁用，但有上面的守卫，包只是「停止摇摆」——片元侧效果继续工作
 
 ## 35. 新功能 ②: `BLOXD_SCENE_DEPTH` 与 `bloxdOpaqueBehind()` (核心)
 
@@ -102,7 +180,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-应用：基于厚度的吸收/散射、经 `behind.position` 的底面世界坐标做波纹/焦散风投影、以 `found=false` 区分天空与遮蔽做水面空反射、按深度分级加泡与浑浊。深度拷贝管线构建失败时会安全降级为「后方空无一物」。
+应用：基于厚度的吸收/散射、经 `behind.position` 的底面世界坐标做波纹/焦散风投影、以 `found=false` 区分天空与遮蔽做水面空反射、按深度分级加泡与浑浊。深度拷贝管线构建失败时会安全降级为「后方空无一物」。深度纹理的就绪状态只在页面渲染器生成时决定一次——标准是「当前激活的包是否读取深度」。**使用读取深度的包时，请务必重新加载页面**。在包激活状态下请求深度而页面未重新加载时，控制台会显示一次 `…reads scene depth on a page that didn't turn it on` 警告，深度纹理被替换为 1×1 回退，导致 `bloxdOpaqueBehind()` 恒返回 `found = false`。
 
 ## 36. 其他 v2 变更
 
@@ -111,7 +189,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **`BLOXD_ALPHA` 定义条件变化**：非 strict 地形变体与全液体变体有定义，strict × terrain 无定义。地形钩子写 alpha 时请保留守卫。
 - **禁止直接构造结构体**：`BloxdLight(...)` 等构造器调用会被静态检查拒绝。务必从 `bloxdDefault*` 改写，或使用输入的拷贝。
 - **`let _ =` 改为 `_ =`**：WGSL 的弃置赋值 `_ = f();` 有效，但 `let _ = f();` 会被拒绝。
-- **offInStrict**：定义 vertex 钩子，或 surface / light 钩子可达的 `discard`，不会报错而是整个包在 strict 游戏中自动禁用 (设置 UI 显示 `shaderPack:offInStrict`，allow 游戏仍可运行)。vertex 钩子与 `discard` 以 `#ifndef BLOXD_STRICT` 包裹。
+- **offInStrict**：定义 vertex 钩子，或 surface / light 钩子可达的 `discard`，不会报错而是整个包在 strict 游戏中自动禁用 (设置 UI 显示 `shaderPack:offInStrict`，allow 游戏仍可运行)。vertex 钩子与 `discard` 以 `#ifndef BLOXD_STRICT` 包裹。注意设置画面自身的警告也要求把剩余部分以 `#ifndef BLOXD_STRICT` 包裹——这是官方建议，而非单纯的惯例。
 - **雾的扩展**：雾计算实现了 LINEAR / EXP / EXP2 三种模式，但游戏侧设置恒为 LINEAR，既有雾规格可照用。`fogColour` 含义也正式明确 (仅在完全无雾的场景为黑)。
 - **未变之物**：提升曲线、35% 通道地板、heldLight 衰减 (`pow(lightDist, 0.75)`) 与环境光助推、太阳与月亮方向规格、默认雾色、time 回绕 (3600 秒)、方向光 (最多 4 盏)、Lite (WebGPU) 专用、保存机制 (IndexedDB)、`mod` 保留字。
 
