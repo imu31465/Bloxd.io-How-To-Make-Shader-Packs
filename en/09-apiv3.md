@@ -1,8 +1,8 @@
 [← Previous part](08-apiv2.md)·[Back to the manual](README.md)
 
-# Part IX: API version 3 (preprod) migration guide
+# Part IX: API version 3 migration guide
 
-Target build: `3ymzdd.main.fae4743f.js` (**preprod** deploy as of 2026-10-19). At this date production has not switched yet — the live game still runs API version 2, so packs with `"apiVersion": 3` load only on preprod. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
+Target build: `3ymzdd.main.fae4743f.js`. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
 
 Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [Part VIII](08-apiv2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but two changes actually alter behavior — the default light now attenuates emission with fog (§43), and `BLOXD_ALPHA` is no longer defined in liquid variants (§46) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.
 
@@ -174,7 +174,7 @@ Two things change for authors versus the v2 rules ([Part VIII](08-apiv2.md) §36
 7. **Audit `BLOXD_ALPHA` guards** — the flag is gone from liquid variants (§46); liquid-side alpha-gated code is dead there
 8. **Use `bloxdPi` / `bloxdTau`** where trig-related constants were hardcoded; remove pack-local re-declarations that now duplicate the header
 9. **Keep strict guards**: vertex hooks and `discard` stay wrapped in `#ifndef BLOXD_STRICT`; the template guards `bloxdLiquidVertex` the same way as terrain
-10. **Validate on preprod** — production still serves API version 2 as of 2026-10-19, so `apiVersion: 3` packs only load there
+10. **Validate in-game** — compile and test the pack in a game that supports shader packs
 
 ## 48. Other v3 changes and notes
 
