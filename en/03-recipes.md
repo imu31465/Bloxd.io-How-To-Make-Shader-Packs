@@ -688,7 +688,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Setting a floor like `max(l.fogVisibility, 0.25)` caps "no denser than this"
 > (0.0 = engine-accurate / 0.3–0.5 = clearer distance).
 > Note the engine fog is a horizon-only linear fog (near render distance only); mid-distance haze must be built pack-side.
-> Real fog settings (implementation-verified): linear fixed / `fogStart` = chunk render distance / `fogEnd` = +1 chunk / effectively disabled at 100–101 chunks when fog is off / default color RGB(183, 191, 195).
+> Real fog settings (implementation-verified): linear fixed / `fogStart` = chunk render distance / `fogEnd` = +1 chunk / effectively disabled at 100–101 chunks when fog is off / default color RGB(181, 191, 195).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

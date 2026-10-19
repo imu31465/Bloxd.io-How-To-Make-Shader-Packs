@@ -23,15 +23,15 @@
 
 - **Distribution format**: a single `.zip`, or a folder (folder loading is desktop browsers only)
 - **Contents**: one `pack.json` (placed at the top level of the pack; case-insensitive) + 1–256 `.wgsl` files
-- Multiple `.wgsl` files are concatenated and treated as one module, so splitting and subdirectories are free. No constraints on file names. Non-`.wgsl` files (READMEs etc.) are ignored
-- Zipping tip: if a zip stores everything under one common root folder, that prefix is stripped automatically (zips made with macOS "Compress" work as-is). But stray files at the root level break top-level detection, so the safest method is to go inside the folder and zip `pack.json` and the `.wgsl` files directly (verify `pack.json` ends up at the ZIP root)
+- Multiple `.wgsl` files are concatenated and treated as one module, so splitting and subdirectories are free. No constraints on file names. Concatenation happens in **dictionary order by entry (path) name** (module-scope declarations are order-independent so this normally doesn't matter — it only bites code depending on `var` initialization order). Non-`.wgsl` files (READMEs etc.) are ignored
+- Zipping tip: if a zip stores everything under one common root folder, that prefix is stripped automatically (zips made with macOS "Compress" work as-is; OS junk such as `__MACOSX`, `._`-prefixed files and `.DS_Store` is excluded automatically). But stray files at the root level break top-level detection, so the safest method is to go inside the folder and zip `pack.json` and the `.wgsl` files directly (verify `pack.json` ends up at the ZIP root)
 
 | Item | Limit |
 |---|---|
 | zip size / entry count | 32MB / 1024 |
 | pack.json size | 64KB, UTF-8 |
 | total .wgsl size | 256KB, UTF-8 |
-| zip format | zip64, split, and encrypted zips are rejected |
+| zip format | zip64, split, and encrypted zips are rejected. Compression: store / deflate only. Duplicate paths not allowed |
 
 ## 4. pack.json
 
@@ -137,9 +137,9 @@ Loading runs these checks in order:
 Steps:
 
 1. Load the zip / folder from settings → Shader Pack
-2. Check the status. Success is "Ready to use". For "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+2. Check the status. Right after selecting you'll see "Ready. Reload the page to use it." — after reloading the page, "Ready to use" means success. For "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
 3. Reload the page to activate. Remove any renderer overrides in URL parameters or localStorage first, or the pack will refuse to start
 4. Test in lenient games first, then in strict games (the majority). Vertex animation only works in allow games
-5. For distribution, zip with `pack.json` at the top (within section 3 caps). Re-loading the same screen replaces the pack; Remove Pack deletes it. Re-validation after game updates runs automatically on page load
+5. For distribution, zip with `pack.json` at the top (within section 3 caps). Replacing the pack can be done from the same screen, but takes effect only after a page reload (steps 2–3). Remove Pack deletes it. Re-validation after game updates runs automatically on page load
 
 [Back to the manual](README.md)·[Next part →](02-api.md)
