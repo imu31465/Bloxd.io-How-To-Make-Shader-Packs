@@ -1,11 +1,11 @@
 # Cómo crear paquetes de sombreadores (shader packs) para Bloxd.io (Guía completa)
 
 Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.io (solo renderizador WebGPU).
-Basada en la especificación de `apiVersion: 2`. La guía está dividida en un archivo por parte (este README es el índice; el recetario está en `03-recipes.md`). Los paquetes v1 no cargan en el juego actual (los valores v1 de `apiVersion` y los identificadores antiguos se rechazan). Para migrar desde v1, ver la Parte VIII (`08-apiv2.md`).
+**La API actual es `apiVersion: 3` y se lanzó oficialmente el 2026-10-19.** El juego actual rechaza los paquetes v1 y v2 al cargarlos (mensaje de versión de API incorrecta). Las partes I–VII de esta guía siguen escritas sobre la base v2 y siguen siendo válidas como fundamento conceptual. Léelas con la base v2 y, antes de distribuir, aplica los cambios de la Parte IX (`09-apiv3.md`). La guía está dividida en un archivo por parte (este README es el índice; el recetario está en `03-recipes.md`). La migración anterior de v1 a v2 está en la Parte VIII (`08-apiv2.md`). La Parte IX también cubre interioridades del motor restauradas del build de producción (§49–§54: invocación de hooks, función de niebla de cuatro modos, implementación de `bloxdOpaqueBehind()`, ruta de entrega de blockFlags y el pipeline de validación con el hash de cabecera medido).
 
 > Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.  
 > Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.  
-> Última revisión: 2026-10-15 (orden de aplicación de niebla, ajustes reales de niebla y renderizado submarino verificados contra la implementación del motor). Como no se encontró una referencia oficial pública de la API WGSL, sigue verificando las descripciones y recetas con la pantalla de carga y la compilación en el juego.  
+> Última revisión: 2026-10-20 (lanzamiento oficial de v3 confirmado contra el build de comparación; invocación de hooks, niebla, profundidad e interioridades de blockFlags restauradas del build de producción — Parte IX §49–§54). Como no se encontró una referencia oficial pública de la API WGSL, sigue verificando las descripciones y recetas con la pantalla de carga y la compilación en el juego.  
 > La función de paquetes de sombreadores es una función oficial accesible desde la interfaz del juego, y los paquetes son WGSL puro  
 > (sin ejecución de JS ni red), así que nada peligroso ocurre con código normal.
 
@@ -67,3 +67,19 @@ Basada en la especificación de `apiVersion: 2`. La guía está dividida en un a
   - [37. Lista de migración v1 → v2](08-apiv2.md#37-lista-de-migración-v1--v2)
   - [38. Segunda etapa de validación — el compilador WGSL del navegador es más estricto que el analizador interno](08-apiv2.md#38-segunda-etapa-de-validación--el-compilador-wgsl-del-navegador-es-más-estricto-que-el-analizador-interno)
   - [39. Sobre materiales independientemente similares](08-apiv2.md#39-sobre-materiales-independientemente-similares)
+- [Parte IX: Guía de migración a API Version 3](09-apiv3.md)
+  - [40. Destino de los paquetes v2 (conclusión primero)](09-apiv3.md#40-destino-de-los-paquetes-v2-conclusión-primero)
+  - [41. pack.json y el búfer uniform: lo que no cambia](09-apiv3.md#41-packjson-y-el-búfer-uniform-lo-que-no-cambia)
+  - [42. `blockId` pasa a `blockFlags`: materiales por bloque como bits (lo principal)](09-apiv3.md#42-blockid-pasa-a-blockflags-materiales-por-bloque-como-bits-lo-principal)
+  - [43. Renombrados de funciones y cambios semánticos](09-apiv3.md#43-renombrados-de-funciones-y-cambios-semánticos)
+  - [44. Nuevas constantes de cabecera: `BLOXD_PI` y `BLOXD_TAU`](09-apiv3.md#44-nuevas-constantes-de-cabecera-bloxdpi-y-bloxdtau)
+  - [45. La plantilla de seis hooks: hooks de líquido mostrados oficialmente](09-apiv3.md#45-la-plantilla-de-seis-hooks-hooks-de-líquido-mostrados-oficialmente)
+  - [46. Matriz de variantes: el eje de programa y los cambios de macros](09-apiv3.md#46-matriz-de-variantes-el-eje-de-programa-y-los-cambios-de-macros)
+  - [47. Lista de migración de v2 a v3](09-apiv3.md#47-lista-de-migración-de-v2-a-v3)
+  - [48. Otros cambios y notas de v3](09-apiv3.md#48-otros-cambios-y-notas-de-v3)
+  - [49. Interioridades del motor: cómo el renderizador Lite invoca tus hooks](09-apiv3.md#49-interioridades-del-motor-cómo-el-renderizador-lite-invoca-tus-hooks)
+  - [50. La función de niebla: cuatro modos, un campo](09-apiv3.md#50-la-función-de-niebla-cuatro-modos-un-campo)
+  - [51. `bloxdOpaqueBehind()`: la implementación exacta](09-apiv3.md#51-bloxdopaquebehind-la-implementación-exacta)
+  - [52. `blockFlags` de extremo a extremo: del registro a tu hook](09-apiv3.md#52-blockflags-de-extremo-a-extremo-del-registro-a-tu-hook)
+  - [53. Interioridades de la validación: `header_version`, firmas y nombres reservados](09-apiv3.md#53-interioridades-de-la-validación-header_version-firmas-y-nombres-reservados)
+  - [54. Constantes, límites y diseños confirmados](09-apiv3.md#54-constantes-límites-y-diseños-confirmados)
