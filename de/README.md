@@ -1,10 +1,10 @@
 # Bloxd.io-Shader-Pakete erstellen (Komplette Anleitung)
 
 Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Bloxd.io (nur WebGPU-Renderer).
-Basierend auf der Spezifikation von `apiVersion: 2`. Die Anleitung ist pro Teil in eine eigene Datei aufgeteilt (dieses README ist das Inhaltsverzeichnis; die Rezeptsammlung liegt in `03-recipes.md`). V1-Pakete laden im aktuellen Spiel nicht (der v1-`apiVersion`-Wert und alte Bezeichner werden abgelehnt). Zur Migration von v1 siehe Teil VIII (`08-apiv2.md`).
+**Die aktuelle API ist `apiVersion: 3` — sie ist am 2026-10-19 in Produktion gegangen**, und das aktuelle Spiel lehnt Pakete mit v1 und v2 beim Laden ab (Meldungen zur falschen API-Version). Die Teile I–VII unten sind weiterhin auf v2-Basis geschrieben und bleiben als konzeptionelle Grundlage gültig: Lies sie als v2 und wende vor der Verteilung die Änderungen aus Teil IX (`09-apiv3.md`) an. Die Anleitung ist pro Teil in eine eigene Datei aufgeteilt (dieses README ist das Inhaltsverzeichnis; die Rezeptsammlung liegt in `03-recipes.md`). Für den vorherigen Schritt v1 → v2 siehe Teil VIII (`08-apiv2.md`). Teil IX dokumentiert außerdem aus dem Produktions-Build restaurierte Engine-Interna (§49–§54: Aufruf der Hooks, Fog-Funktion mit vier Modi, Implementierung von `bloxdOpaqueBehind()`, Übertragungsweg von `blockFlags` und Validierungspipeline mit gemessenem Header-Hash).
 
 > Dies ist eine inoffizielle Anleitung und gibt nicht die Sicht der Entwickler wieder. Die API kann sich ohne Ankündigung ändern.  
-> Zuletzt geprüft: 2026-10-15 (Fog-Anwendungsreihenfolge, echte Fog-Einstellungen und Unterwasser-Rendering gegen die Implementierung verifiziert). Da keine öffentliche offizielle WGSL-API-Referenz gefunden werden konnte, prüfe Beschreibungen und Rezepte weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
+> Zuletzt geprüft: 2026-10-20 (v3-Produktionsrollout durch Bundle-Vergleich bestätigt; Hook-Aufruf, Fog, Tiefe und `blockFlags`-Interna aus dem Produktions-Build restauriert — Teil IX §49–§54). Da keine öffentliche offizielle WGSL-API-Referenz gefunden werden konnte, prüfe Beschreibungen und Rezepte weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
 > Die Shader-Paket-Funktion ist eine offizielle Funktion aus der Spieloberfläche, und Pakete sind reines WGSL  
 > (keine JS-Ausführung, kein Netzwerk) – mit normalem Code passiert also nichts Gefährliches.  
 > Dieser Leitfaden wurde mit KI-Unterstützung erstellt; Korrektheit ist nicht garantiert. Prüfe am tatsächlichen Spielverhalten.
@@ -67,3 +67,19 @@ Basierend auf der Spezifikation von `apiVersion: 2`. Die Anleitung ist pro Teil 
   - [37. v1 → v2-Migrationscheckliste](08-apiv2.md#37-v1--v2-migrationscheckliste)
   - [38. Zweite Prüfstufe — der Browser-WGSL-Compiler ist strenger als der eingebaute Parser](08-apiv2.md#38-zweite-prüfstufe--der-browser-wgsl-compiler-ist-strenger-als-der-eingebaute-parser)
   - [39. Über unabhängig ähnliche Materialien](08-apiv2.md#39-über-unabhängig-ähnliche-materialien)
+- [Teil IX: Migrationsleitfaden für API Version 3](09-apiv3.md)
+  - [40. Das Schicksal von v2-Paketen (erst das Fazit)](09-apiv3.md#40-das-schicksal-von-v2-paketen-erst-das-fazit)
+  - [41. pack.json und der Uniform-Buffer (was unverändert bleibt)](09-apiv3.md#41-packjson-und-der-uniform-buffer-was-unverändert-bleibt)
+  - [42. blockId wird blockFlags: Materialien pro Block als Bitflags (die Hauptänderung)](09-apiv3.md#42-blockid-wird-blockflags-materialien-pro-block-als-bitflags-die-hauptänderung)
+  - [43. Funktionsumbenennungen und semantische Änderungen](09-apiv3.md#43-funktionsumbenennungen-und-semantische-änderungen)
+  - [44. Neue Header-Konstanten: `bloxdPi` und `bloxdTau`](09-apiv3.md#44-neue-header-konstanten-bloxdpi-und-bloxdtau)
+  - [45. Das Sechs-Hook-Template (Flüssigkeits-Hooks offiziell gezeigt)](09-apiv3.md#45-das-sechs-hook-template-flüssigkeits-hooks-offiziell-gezeigt)
+  - [46. Variantenmatrix: die Programm-Achse und Makro-Änderungen](09-apiv3.md#46-variantenmatrix-die-programm-achse-und-makro-änderungen)
+  - [47. v2 → v3-Migrationscheckliste](09-apiv3.md#47-v2--v3-migrationscheckliste)
+  - [48. Weitere v3-Änderungen und Hinweise](09-apiv3.md#48-weitere-v3-änderungen-und-hinweise)
+  - [49. Engine-Interna: wie der Lite-Renderer deine Hooks aufruft](09-apiv3.md#49-engine-interna-wie-der-lite-renderer-deine-hooks-aufruft)
+  - [50. Die Fog-Funktion: vier Modi, ein Feld](09-apiv3.md#50-die-fog-funktion-vier-modi-ein-feld)
+  - [51. bloxdOpaqueBehind(): die exakte Implementierung](09-apiv3.md#51-bloxdopaquebehind-die-exakte-implementierung)
+  - [52. blockFlags von Ende zu Ende: von der Registrierung bis zu deinem Hook](09-apiv3.md#52-blockflags-von-ende-zu-ende-von-der-registrierung-bis-zu-deinem-hook)
+  - [53. Interna der Validierung: HEADER_VERSION, Signaturen, reservierte Namen](09-apiv3.md#53-interna-der-validierung-header_version-signaturen-reservierte-namen)
+  - [54. Bestätigte Konstanten, Limits und Layouts](09-apiv3.md#54-bestätigte-konstanten-limits-und-layouts)
