@@ -1,11 +1,11 @@
 # How to Make Bloxd.io Shader Packs (Complete Guide)
 
 A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
-Based on the spec at `apiVersion: 2`. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). v1 packs cannot be loaded by the current game (v1 `apiVersion` values and old identifiers are rejected). For migrating from v1, see Part VIII (`08-apiv2.md`). API version 3 exists only in the preprod deploy as of 2026-10-19; for migrating from v2 to v3, see Part IX (`09-apiv3.md`).
+**The live API is `apiVersion: 3` — it rolled out to production on 2026-10-19**, and the current game rejects v1 and v2 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`). Part IX also documents the engine internals restored from the production build (§49–§54: hook invocation, the four-mode fog function, the `bloxdOpaqueBehind()` implementation, the blockFlags delivery path, and the validation pipeline with its measured header hash).
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-10-15 (fog application order, real fog settings, and underwater rendering verified against renderer implementation). Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
+> Last reviewed: 2026-10-20 (v3 production rollout confirmed by bundle comparison; hook invocation, fog, depth and blockFlags internals restored from the production build — Part IX §49–§54). Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 
@@ -67,7 +67,7 @@ Based on the spec at `apiVersion: 2`. The guide is split into one file per part 
   - [37. v1 → v2 migration checklist](08-apiv2.md#37-v1--v2-migration-checklist)
   - [38. Second validation stage — the browser's WGSL compiler is stricter than the built-in parser](08-apiv2.md#38-second-validation-stage--the-browsers-wgsl-compiler-is-stricter-than-the-built-in-parser)
   - [39. On independently similar materials](08-apiv2.md#39-on-independently-similar-materials)
-- [Part IX: API version 3 (preprod) migration guide](09-apiv3.md)
+- [Part IX: API version 3 migration guide (live since 2026-10-19)](09-apiv3.md)
   - [40. Fate of v2 packs (conclusion first)](09-apiv3.md#40-fate-of-v2-packs-conclusion-first)
   - [41. pack.json and the uniform buffer (what stays unchanged)](09-apiv3.md#41-packjson-and-the-uniform-buffer-what-stays-unchanged)
   - [42. blockId becomes blockFlags: per-block materials as bit flags (the headline)](09-apiv3.md#42-blockid-becomes-blockflags-per-block-materials-as-bit-flags-the-headline)
@@ -77,3 +77,9 @@ Based on the spec at `apiVersion: 2`. The guide is split into one file per part 
   - [46. Variant matrix: the program axis and macro changes](09-apiv3.md#46-variant-matrix-the-program-axis-and-macro-changes)
   - [47. v2 to v3 migration checklist](09-apiv3.md#47-v2-to-v3-migration-checklist)
   - [48. Other v3 changes and notes](09-apiv3.md#48-other-v3-changes-and-notes)
+  - [49. Engine internals: how the Lite renderer invokes your hooks](09-apiv3.md#49-engine-internals-how-the-lite-renderer-invokes-your-hooks)
+  - [50. The fog function: four modes, one field](09-apiv3.md#50-the-fog-function-four-modes-one-field)
+  - [51. bloxdOpaqueBehind(): the exact implementation](09-apiv3.md#51-bloxdopaquebehind-the-exact-implementation)
+  - [52. blockFlags end-to-end: from registration to your hook](09-apiv3.md#52-blockflags-end-to-end-from-registration-to-your-hook)
+  - [53. Validation internals: HEADER_VERSION, signatures, reserved names](09-apiv3.md#53-validation-internals-header_version-signatures-reserved-names)
+  - [54. Confirmed constants, limits, and layouts](09-apiv3.md#54-confirmed-constants-limits-and-layouts)
