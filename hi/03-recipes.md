@@ -193,7 +193,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
     let level = clamp(sky * 0.7 + block, 0.0, 1.0);
     // engineColour (इंजन प्रकाश परिणाम) त्यागकर 「सामग्री रंग × स्वयं संगणित चमक」 रखें
-    out.colour = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
+    var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
+    col = mix(l.fogColour, col, l.fogVisibility);   // engineColour छोड़ा, अतः फ़ॉग पुनः लगाएँ (आवश्यक)
+    out.colour = col + s.emission * l.fogVisibility;   // emission भी स्वयं जोड़ें (आवश्यक)
     return out;
     #else
     return bloxdDefaultLight(s, l);
@@ -356,7 +358,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### ऊँचाई छद्म पारदर्शिता (सच्चा छिछला निर्णय नहीं)
 
-> v1 में दृश्य गहराई व जलतल स्थिति संदर्भ असंभव था, अतः इस API भर से वास्तविक जल गहराई परिकलित नहीं हो सकती थी। v2 में तरल सीमित `bloxdOpaqueBehind()` से पीछे अपारदर्शी फलक तक मोटाई मापी जा सकती है ([भाग VIII](08-apiv2.md) R-E)। नीचे इसका प्रयोग न करने वाला पुराना छद्म प्रदर्शन है, `s.position.y` स्थानीय निर्देशांक, अतः ज्यों का त्यों प्रयोग से खंड मूल विचलन से प्रभाव हटता है। नीचे केवल विश्व ऊँचाई से alpha बदलने का छद्म प्रदर्शन, तटरेखा व जलतल अनुरूप छिछला अभिव्यक्ति नहीं। `packWaterReferenceY` विश्व ऊँचाई अनुरूप समायोजित करें।
+> v1 में दृश्य गहराई व जलतल स्थिति संदर्भ असंभव था, अतः इस API भर से वास्तविक जल गहराई परिकलित नहीं हो सकती थी। v2 में तरल सीमित `bloxdOpaqueBehind()` से पीछे अपारदर्शी फलक तक मोटाई मापी जा सकती है ([भाग VIII](08-apiv2.md) R-E)। नीचे इसका प्रयोग न करने वाला पुराना छद्म प्रदर्शन है, `s.position.y` स्थानीय निर्देशांक, अतः ज्यों का त्यों प्रयोग से खंड मूल विचलन से प्रभाव हटता है। विश्व ऊँचाई प्रयोग करनी हो तो `bloxdWorldPosition()` से रूपांतरित करें। नीचे केवल विश्व ऊँचाई से alpha बदलने का छद्म प्रदर्शन, तटरेखा व जलतल अनुरूप छिछला अभिव्यक्ति नहीं। `packWaterReferenceY` विश्व ऊँचाई अनुरूप समायोजित करें।
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -502,7 +504,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     let torch   = mix(l.blockLight, blockInt * vec3f(1.00, 0.72, 0.42), 0.55);
     let sky     = mix(l.ambientLightColour, l.skyLightColour, l.skyLight) * vec3f(0.90, 0.95, 1.08);
     let voxel   = max(torch, sky);
-    out.colour = s.colour * voxel;
+    var col = clamp(s.colour * voxel, vec3f(0.0), vec3f(1.0));   // मध्यवर्ती clamp
+    col = mix(l.fogColour, col, l.fogVisibility);                    // फ़ॉग पुनः लगाएँ
+    out.colour = col + s.emission * l.fogVisibility;                 // emission पुनः जोड़ें
     #endif
     return out;
 }
@@ -560,7 +564,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     let skyH   = l.ambientLightColour * 0.30 + l.skyLightColour * 0.45 * l.skyLight; // ऊपर: आकाशप्रकाश
     let hemi = vec3f(0.25) + mix(ground, skyH, upness);
     let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
-    out.colour = s.colour * voxel * hemi;
+    var col = clamp(s.colour * voxel * hemi, vec3f(0.0), vec3f(1.0));   // मध्यवर्ती clamp
+    col = mix(l.fogColour, col, l.fogVisibility);                           // फ़ॉग पुनः लगाएँ
+    out.colour = col + s.emission * l.fogVisibility;                        // emission पुनः जोड़ें
     #endif
     return out;
 }
@@ -583,9 +589,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### R9.6 वायुमंडलीय परिप्रेक्ष्य (दूरी से संतृप्ति गिरने की 「हवा भावना」)
 
-> फ़ॉग (रंग प्रतिस्थापन) से अलग 「दूरी से विसंतृप्त」 चढ़ाने से  
-> दूर दृश्य कहीं यथार्थ बनता है।  
-> ध्यान: वायु भावना केवल संतृप्ति घटाने से सुरक्षित। चमक न छुएँ।
+> ध्यान: धुंध वर्ण पर चमक बढ़ाने वाली प्रक्रिया (`normalize` आदि) लगाने से गाढ़े दृश्य में "चमकीली श्वेत धुंध" तैरती है,  
+> और engineColour (फ़ॉग-युक्त) में फिर धुंध वर्ण जोड़ने से दोहरा फ़ॉग श्वेत कर देता है। **वायु भावना केवल संतृप्ति घटाकर** दिखाना सुरक्षित है।
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -769,7 +774,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
     // फ़ॉग पुनः लगाएँ (engineColour त्याग अंश)
     col = mix(l.fogColour, col, max(l.fogVisibility, 0.15));
-    out.colour = clamp(col, vec3f(0.0), vec3f(1.0));
+    out.colour = clamp(col + s.emission * l.fogVisibility, vec3f(0.0), vec3f(1.0));   // emission भी न भूलें (फ़ॉग-युक्त में जोड़ें)
     #endif
     return out;
 }
@@ -780,7 +785,5 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 2-बिंदु स्थानांतरण से तय होता है। संध्या में छाया फैलानी हो तो  
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें (लंबी संध्या छाया सन्निकटन।  
 > `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। छाया नीलापन हेतु `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
->
-> ⚠️ "`pow(skyLight, γ)` से कंट्रास्ट गहरा" **लिफ्ट बाद मानों पर gamma लगा रहा था** इसलिए  
 
 [← पिछला भाग](02-api.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](04-realism.md)
