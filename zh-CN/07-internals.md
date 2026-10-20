@@ -47,7 +47,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 25. 雾的内部规格
 
-雾计算恒为 LINEAR 模式 (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogVisibility` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**指标。随玩家加载距离变化，距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (配方 R-B)。
+雾计算恒为 LINEAR 模式 (`fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogVisibility` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**指标。随玩家加载距离变化，距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (配方 R-B)。(v3 注记: 渲染器的雾函数实际实现了 **off / exponential / exponential-squared / linear 四种模式**，正式发布的游戏驱动的是 linear；复原源码与稳健性讨论见[第九部分](09-apiv3.md) §50。)
 
 默认雾色 `rgb(181, 191, 195)` (淡青灰)。世界作者经 `fogColourOverride` (hex) 变更。雾模式 0 (NONE) 时 **fogColour 以黑到达**。标准形 `mix(l.fogColour, col, l.fogVisibility)` 安全，因为 fogVisibility 为 1 时不用雾色。脚本 API 还提供两个选项：`fogChunkDistanceOverride` 与 `fogOnSkybox`——Custom Game 可分别独立调整雾距 (D 值) 与雾对天空盒的应用。默认天空盒不受雾影响 (只有开启 `fogOnSkybox` 的游戏会让天空盒也染上雾色)。
 
@@ -86,7 +86,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 - **`l.ambient` 内容**为 `material.ambient × sceneAmbient`，按材质各异。场景侧直连图形设置「Ambient Lighting Intensity」(默认 0.5)，切勿写死默认值
 - **场景的方向光为 2 灯组合**：主光 (方向来自天空设置中的太阳位置，强度 1.0) 与补光 (方向 `[-0.5, -1, -1]`，强度 0.35) 的 Lambert 之和到达 `l.directional`。补光朝下，因此对朝上的面没有贡献，而会照到朝下的表面 (洞穴顶等)。地形只考虑 `_initScene` 中追加的光；启动后追加的光对地形与方块模型被忽略 (官方有一则此意的警告消息)
 - **`bloxdTime()` 正体为 `performance.now()`**：`time() { return performance.now() / 1e3 % 3600 }`，为浏览器启动流逝时间按 1 小时回绕。与游戏内昼夜及世界流逝时间无关。想做与游戏时钟同步的动画，在昼夜循环世界由 `bloxdSunDirection()` 方位角推定时间比较现实
-- **标头函数读取同一个 uniform**：引擎在 `@group(3) @binding(0)` 放置 64 字节 uniform (4 槽——time / originOffset / sunDirection / eyePosition，little-endian)，`bloxdTime()` / `bloxdOriginOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽。`originOffset` 在当前构建恒为 `[0, 0, 0]` (为浮点世界坐标预留的槽)。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同 group/binding 也不可能
+- **标头函数读取同一个 uniform**：引擎在 `@group(3) @binding(0)` 放置 64 字节 uniform (4 槽——time / originOffset / sunDirection / eyePosition，little-endian)，`bloxdTime()` / `bloxdOriginOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽。`originOffset` 在当前构建恒为 `[0, 0, 0]` (为浮点世界坐标预留的槽)。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同 group/binding 也不可能。(v3 中两个槽位改名——`seconds` / `renderOffset`，并作为 `bloxdSeconds()` / `bloxdRenderOffset()` 公开——另外 `@group(3) @binding(1)` 增加了场景深度纹理；见[第九部分](09-apiv3.md) §41 与 §51)
 - **顶点数据由 mesher (Web Worker) 构建**：方块地形以每顶点 28 字节交织 (开启 atlas 时 32 字节)——position = float32×3 / normal = 8 位有符号整数×4 / colour = 8 位归一化整数×4 (`s.colour` 的本体——tint × AO 在 mesher 阶段烘焙为 8 位，包侧分离或还原原理上不可能) / UV = float32×2 / atlasIndex = float32。只有光照等级走另外 4 字节的顶点缓冲 ([第七部分](07-internals.md) §26、[第二部分](02-api.md) §11)。顶点按区块实例化绘制
 - 加载时区块边界的细棋盘格为引擎屏幕空间 Bayer 4×4 抖动的区块淡入，非包 bug (可用图形设置 `chunkFadeIn` 关闭)
 - **`mod` 为保留字**：以 `pack.wgsl:3 'mod' is a reserved word in WGSL.` 拒绝。求余用 `%` 运算符书写
