@@ -4,7 +4,7 @@
 
 目标构建: `3ymzdd.main.fae4743f.js` — **自 2026-10-19 起的正式生产构建**。bloxd.io 在生产环境提供的 bundle 与本部分最初调查所用的预发布部署逐字节一致 (已核对 md5，主 bundle 与着色器包 chunk 均如此)，因此这里的内容原样适用于生产环境。包模型保持 v2 形态 (相同的 `pack.json` 字段、相同的加载器限制、相同的 uniform 布局)。
 
-本指南第一至第七部分仍以 v2 为基准撰写。本部分按与[第八部分](08-apiv2.md)相同的顺序，汇总 v2 → v3 的迁移点与 v3 新功能。转换大多是机械性的 (§47)，但有两项变更会实际改变行为——默认光照现在会让自发光随雾衰减 (§43)，且 `BLOXD_ALPHA` 不再在液体变体中定义 (§46)——另外 `blockId` 已整体替换为 `blockFlags` (§42)，因此分发前务必在游戏内编译验证。
+本指南第一至第七部分仍以 v2 为基准撰写。本部分按与[第八部分](08-apiv2.md)相同的顺序，汇总 v2 → v3 的迁移点与 v3 新功能。转换大多是机械性的 (§47)，但只有一项变更会实际改变行为——默认光照现在会让自发光随雾衰减 (§43)——另外 `blockId` 已整体替换为 `blockFlags` (§42)，因此分发前务必在游戏内编译验证。
 
 本修订新增: **§49–§54** 越出迁移本身，深入从生产构建复原的引擎内部——Lite 渲染器实际如何调用你的钩子、真实的四模式雾函数、`bloxdOpaqueBehind()` 的精确实现、blockFlags 从方块注册到钩子的完整传递路径，以及带实测标头哈希的验证管线。这些是迄今关于包系统最深入的公开记录事实，也解答了其他指南仍列为未决的若干问题。
 
@@ -26,7 +26,7 @@
 
 - 必需的 manifest 字段不变: `{ apiVersion, name, author }`。
 - 加载器限制不变: 32MB zip / 1024 个条目 / 256 个 `.wgsl` 文件 / 代码总量 256KB / manifest 64KB。
-- 引擎 uniform 块的形状不变: `@group(3) @binding(0)`，64 B，按声明顺序存放时间、渲染偏移、太阳方向与眼睛位置。有两个内部字段名改变: `time` → `seconds`，`originOffset` → `renderOffset`。**字节布局与 v2 完全相同**，而且包代码本来就不会受影响，因为包不能直接命名该 uniform (引擎标头将其标记为由引擎提供且只读，包无法命名它)；继续通过标头函数 `bloxdSeconds()` / `bloxdRenderOffset()` 使用即可。
+- 引擎 uniform 块的形状不变: `@group(3) @binding(0)`，64 B，按声明顺序存放时间、渲染偏移、太阳方向与眼睛位置。该布局以 `minBindingSize: 64` 注册，精确字段布局为 `seconds: f32` @ 字节 0、`renderOffset: vec3i` @ 16、`sunDirection: vec3f` @ 32、`eyePosition: vec3f` @ 48。有两个内部字段名改变: `time` → `seconds`，`originOffset` → `renderOffset`。**字节布局与 v2 完全相同**，而且包代码本来就不会受影响，因为包不能直接命名该 uniform (引擎标头将其标记为由引擎提供且只读，包无法命名它)；继续通过标头函数 `bloxdSeconds()` / `bloxdRenderOffset()` 使用即可。
 - 包的 group 3 增加了一个有文档记录的第二个占用者: `@group(3) @binding(1)` 是 `bloxdOpaqueBehind()` 读取的场景深度纹理 (完整实现见 §51)。64 B uniform 仍在 binding 0；包仍然不能命名任一 binding。
 
 ## 42. blockId 变成 blockFlags: 每方块材质以位标志表示 (核心)
@@ -58,6 +58,21 @@ const bloxdBlockFlagRock: u32 = 32;
 
 植被 / 泥土 / 沙 / 岩石标志由方块注册的**显示名**分配 (不透明 / 自发光则来自引擎自身的不透明度与发光数据): 以 `Leaves` 结尾或名为 `Grass Block` 的是植被；`Dirt` / `Soil` 名称 (以及所有 `Grass Block`) 是泥土；正好为 `Sand` 与 `Red Sand`，以及任何包含 `Sandstone` 的名称是沙；包含 `Stone` / `Andesite` / `Diorite` / `Granite` 的名称、任何 `Ore`，以及 Yellowstone、Gravel、Bedrock、Obsidian、Magma、Rocky Dirt (和砂岩) 是岩石。
 
+### 精确名称规则 (自行推导任意方块的标志)
+
+四个材质位来自对方块注册显示名的固定分类器。变体名 (`|` 之后的内容) 会先被剥离，因此变体继承基础方块的标志。然后:
+
+| 位 | 规则 (在剥离后的名称上求值) |
+|---|---|
+| 植被 | 名称**以** ` Leaves` **结尾**，或**以** ` Grass Block` **结尾** |
+| 泥土 | 名称**正好是** `Dirt`、**以** ` Dirt` 或 ` Soil` **结尾**，或**以** ` Grass Block` **结尾** |
+| 沙 | 名称**正好是** `Sand` 或 `Red Sand`，或**包含** `Sandstone` |
+| 岩石 | 名称**正好是** `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt` 之一、**包含** `Sandstone`、**以** ` Ore` **结尾**，或以独立单词形式包含 `Stone` / `Andesite` / `Diorite` / `Granite` |
+
+Yellowstone 被显式列出，因为 `Stone` 在 `Yellowstone` 中不是独立单词。不透明与自发光**不**来自名称——它们来自引擎自身的不透明度与方块光发射数据，因此无法用这些规则推导。
+
+来源: 引擎的名称分类器 (模块 28537，bundle `3ymzdd`)；已对照全部 7,861 个具名方块验证，2026-10-20。
+
 示例——按材质给每个方块着色:
 
 ```wgsl
@@ -87,7 +102,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
 ```
 
 已对照实时注册表验证 (2026-10-20，bundle `3ymzdd`):
-`vegetation && !dirt` 精确匹配 45 个树叶注册项 (22 个基础类型——正是 v2 R-H id 数组测得的 22 个)；`vegetation && dirt` 精确匹配 8 个草方块。两个方向都没有例外。可配合 `vertex.normal` (上/下) 选取面，例如只选草方块顶面。
+`vegetation && !dirt` 精确匹配 45 个树叶注册项 (22 个基础类型——正是 v2 R-H id 数组测得的 22 个)；`vegetation && dirt` 精确匹配 8 个草方块。两个方向都没有例外——注册表计数以该构建为准；新方块会增加数字，但不会改变规则。可配合 `vertex.normal` (上/下) 选取面，例如只选草方块顶面。
 
 ## 43. 函数改名与语义变化
 
@@ -177,12 +192,12 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 |---|---|
 | `BLOXD_STRICT` | 严格变体 (两种程序) |
 | `BLOXD_LIGHTING` | 开启光照的变体 (两种程序) |
-| `BLOXD_ALPHA` | 仅非严格**地形**变体 |
+| `BLOXD_ALPHA` | **所有液体变体**，外加非严格**地形**变体 |
 | `BLOXD_SCENE_DEPTH` | **所有液体变体** |
 
 与 v2 规则相比 ([第八部分](08-apiv2.md) §36)，作者侧有两项变化:
 
-- **`BLOXD_ALPHA` 不再在液体变体中定义。** v2 中它在所有液体变体里也定义；v3 中液体侧的 `#ifdef BLOXD_ALPHA` 代码根本不会编译进来——受 alpha 控制的逻辑需要放到地形钩子中，或依赖液体变体没有强制 alpha 的标志。
+- **`BLOXD_ALPHA` 与 v2 相同。** 变体生成器带有字面行 `"liquid"!==program&&strict||push("BLOXD_ALPHA")`——JS 运算符优先级使 *(地形 **且** 严格)* 成为唯一跳过 push 的情况，因此该宏在**所有液体变体 (严格或非严格) 与非严格地形**中定义；只有严格地形省略它。液体侧的 `#ifdef BLOXD_ALPHA` 代码编译情况与以往完全一致，§49 的 alpha 回写 (为液体程序或非严格变体拼接) 与这一集合精确吻合。
 - **`BLOXD_SCENE_DEPTH` 在液体变体中始终定义**，因此那里可以不加守卫地使用深度，与 v2 完全一致 (§35)；在地形钩子中仍需 `#ifdef BLOXD_SCENE_DEPTH` 包裹。
 
 ## 47. v2 → v3 迁移清单
@@ -193,7 +208,7 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **按 §43 的表把光照数学从 `engineColour` 重建为 `litColour` + 雾**；注意默认实现现在会让自发光随雾衰减
 6. **液体钩子**: 想让水得到不同处理时，显式定义 `bloxdLiquid*`；省略则回退到地形钩子
-7. **审查 `BLOXD_ALPHA` 守卫**——该标志已从液体变体移除 (§46)；液体侧的 alpha 控制代码在那里是死代码
+7. **无需审查 `BLOXD_ALPHA`**——其变体集合与 v2 相同: 所有液体变体与非严格地形都定义它，只有严格地形省略 (§46)
 8. **使用 `bloxdPi` / `bloxdTau`**，替代硬编码的三角相关常量；删除现在与标头重复的包内重声明
 9. **保留严格守卫**: vertex 钩子与 `discard` 仍包在 `#ifndef BLOXD_STRICT` 内；模板对 `bloxdLiquidVertex` 也采用与地形相同的守卫
 10. **在游戏内验证**——在支持着色器包的游戏里编译并测试
@@ -202,9 +217,10 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **验证仍为两阶段** ([第八部分](08-apiv2.md) §38): 先静态验证，再通过生成的桩片段调用你的钩子，交给浏览器真实 WebGPU 编译；错误会映射回源文件 / 行，诊断还会通过映射还原引擎侧标识符的原始名称。
 - **严格诊断会说明原因**: 移动地形的 vertex 钩子会报告 "… moves terrain, which strict games prevent."，surface / light 钩子中的 `discard` 会报告 "discard makes terrain see-through, which strict games prevent."；设置 UI 保留 "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." 的说明 (`offInStrict`)。
-- **加载器消息**: 错误类型与限制不变；"Zip64 archives aren't supported." 会作为 UI 消息显示 (`loadZip64`)。
-- **游戏内编辑器**: 着色器编辑器已改为基于 CodeMirror，支持 WGSL 感知高亮、括号匹配与诊断范围。
+- **加载器消息**: 错误类型与限制不变；"Zip64 archives aren't supported." 会作为 UI 消息显示 (`loadZip64`)。包 UI 的字符串清单共 57 个 `shaderPack:*` 键；在加载阶段错误中，`loadNoWgsl` (zip 中没有任何 `.wgsl` 文件) 与 `loadNotZip` (文件缺少 zip 归档结束签名) 补全了这一集合。
+- **包 UI 不附带游戏内 WGSL 编辑器。** 设置画面不提供着色器代码编辑器——包在游戏外以 zip 文件编写。(bundle 中确实存在 CodeMirror 编辑器，但那是 Custom Game 脚本 UI 的 JavaScript 编辑器；它不支持 WGSL，也与包系统毫无关联。)
 - **硬件门槛**: Lite 要求驱动支持 `shader-f16` WebGPU 功能；过旧的驱动会被拒绝，消息类似 "Intel driver too old for Lite (no shader-f16)"。
+- **光照变更会重新验证已保存的包**: 运行时光照设置改变时，引擎会重新运行包检查 (`changed → recheck`)；回放观看以 `changed: false` 调用同一钩子，并跳过重新检查。
 - **措辞**: 关于接受着色器包的游戏，文本现在写作 "in games that **support** them"。
 - **标题范围**: 包可运行的游戏集合与上一构建相同。
 
@@ -216,10 +232,10 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 | 阶段 | 引擎着色器中的锚点行 | 拼接内容 |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | 构建 `BloxdVertexIn`，调用你的 vertex 钩子，写回 `worldPos` |
+| vertex | 从 `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` 到 `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` 的四行代码块 | 构建 `BloxdVertexIn`，调用你的 vertex 钩子，写回 `worldPos`——拼接还会把 `let worldPos` 改写为 `var worldPos` |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | 构建 `BloxdSurfaceIn`，调用你的 surface 钩子，写回 `baseColor` / `alpha` |
 | lit colour | 就在 `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` 之前 | `let bloxdSpLitColour = color.rgb;`——捕获雾前颜色 |
-| light | 同一位置 | 构建 `BloxdLightIn`，调用你的 light 钩子，写回 `color` |
+| light | 片元着色器最后的 `return color;` 行 | 构建 `BloxdLightIn`，调用你的 light 钩子，写回 `color`——在雾混合之后 |
 
 拼接后的代码，从正式发布的 bundle 复原 (光照等级采样表达式在引擎自身格式过长处作了缩写):
 
@@ -266,11 +282,12 @@ alpha = bloxdSpSurface.alpha;   // 仅当程序为液体或变体为非严格时
 }
 ```
 
-从这次拼接可直接得出三条执行事实:
+从这次拼接可直接得出四条执行事实:
 
 - **严格地形会忽略 surface 钩子的 alpha 变更。** `alpha = bloxdSpSurface.alpha` 回写只会为液体程序或非严格变体拼接——这正是 §46 宏表背后的实现。(在严格地形中，你的 `#ifdef BLOXD_ALPHA` 代码本来就不会编译进来；现在也确认了未加守卫的 alpha 写入在那里会被丢弃。)
 - **仍声明 vertex 钩子的严格变体永远不会运行它**——引擎在构建时报告: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`。这就是官方模板 (§45) 为何把 `bloxdLiquidVertex` 与地形版本一样包在 `#ifndef BLOXD_STRICT` 中。
-- `bloxdSp*` 标识符 (`bloxdSpVertexIn`、`bloxdSpLitColour`、`bloxdSpSceneDepth`、`bloxdSpPixel`、…——共 16 个) 是引擎侧临时变量。你的代码永远不会看到它们，但它们会出现在诊断和任何人的逆向输出中，因此值得一眼认出。
+- `bloxdSp*` 标识符——**共 14 个**: `bloxdSpVertexIn`、`bloxdSpVertex`、`bloxdSpSurfaceIn`、`bloxdSpSurface`、`bloxdSpLightIn`、`bloxdSpLight`、`bloxdSpLitColour`、`bloxdSpSceneDepth`、`bloxdSpPixel`、`bloxdSpPositionW`、`bloxdSpZ`、`bloxdSpEye`、`bloxdSpScale`、`bloxdSpBehind`——是引擎侧临时变量。你的代码永远不会看到它们，但它们会出现在诊断和任何人的逆向输出中，因此值得一眼认出。
+- **默认 surface 捷径。** 当变体的 surface 钩子字面就是 `bloxdDefaultSurface` 时，引擎完全跳过拼接 `baseColor` / `alpha` 回写行——默认实现已经产生这些值，赋值只会是死代码。未修改的钩子链不付出任何代价。
 
 **`BloxdLightIn` 实际由什么填充**——逐字段，来自拼接代码:
 
@@ -339,6 +356,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **深度纹理位于 `@group(3) @binding(1)`**——group 3 是包自己的组: binding 0 是 64 B 的 `bloxdPackInputs` uniform (§41)，binding 1 是这个深度纹理。两者都由引擎提供，包侧无法命名。
+- **深度纹理是不可过滤浮点 (unfilterable-float)、仅片元的资源。** bind group 布局将其注册为 `texture: { sampleType: "unfilterable-float" }`，可见性仅为 `GPUShaderStage.FRAGMENT`——这正是 `bloxdOpaqueBehind()` 建立在 `textureLoad` (显式 texel 坐标，mip 级别 0) 而非 `textureSample` 上的原因: 硬件过滤在这张纹理上根本不可用。
 - `z ≤ 0` 表示深度采样没有命中任何东西 (远平面 / 天空): `found = false`，而 `position` / `distance` 无意义——永远先检查 `found`。
 - 返回的位置是**射线缩放交点**: 不透明表面放在 `eye + (fragment − eye) × max(z / viewDepth, 1)`。`distance` 从眼睛量到该点——对水面包来说，这实际上就是「射线在撞到实体前穿过了多少水」，这也正是深度着色水面配方无需第二个深度缓冲就能工作的原因。
 
@@ -446,13 +464,14 @@ v3 (3ymzdd):  6.5bc26a63   ← 从正式生产 bundle 实测
 | `@group(3) @binding(0)` | `bloxdPackInputs`——包 uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth`——深度纹理 (§51) |
 
-- **方向光硬上限为四盏。** 场景尝试注册更多时，渲染器会以 `Terrain supports 4 directional lights, not ${n}` 报错。`l.directional` 是实际存在数量的 Lambert 之和 (0–4；Bloxd 自家场景使用 2 盏——[第七部分](07-internals.md) §27)。
-- **地形程序命名**: 管线缓存键为 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`——包以 `-sp{variant}` 后缀出现，每个 §46 变体对应一个程序。
+- **方向光硬上限为四盏。** 场景尝试注册更多时，渲染器会以 `Terrain supports 4 directional lights, not ${n}` 报错。`l.directional` 是实际存在数量的 Lambert 之和 (0–4；Bloxd 自家场景使用 2 盏——[第七部分](07-internals.md) §27)。地形还会对其无法满足的光源发出警告，原文如下: 延迟加入的光源——`Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`；带色调的光源——`Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`；以及过滤网格的光源——`Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **地形程序命名**: 管线缓存键为 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`——包以 `-sp{variant}` 后缀出现，每个 §46 变体对应一个程序。监视器 (`watchPipelineFailures`) 将活动管线名与 `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` 匹配，并在管线编译失败时重新检查对应的包变体；GPU 设备丢失 (`device.lost`) 会跳过该检查。
 - **`BLOXD_TERRAIN_DIRECTIONAL` 是引擎内部宏** (dirLightCount > 0 时定义)。它*不是* prelude 四个宏之一，也永远不会到达包代码——但它会出现在引擎自身着色器的 WGSL dump 中，认得它可以避免混淆。
 - **光照等级解码**: `aPackedLightLevels` 顶点属性是一个 f32，打包四个 nibble，各除以 15: rgb = 彩色方块光，a = 天空 / 手持通道。顶点阶段将其解码到 `vLightLevels` varying；`blockLight` 读取 `.rgb`，天空 / 手持通道读取 `.w`。引擎在插值前会把 rgb 通道抬到最亮通道的 35% 下限——这是[第七部分](07-internals.md) §26 从玩法侧记录的提升在引擎侧的锚点。
 - **`vTerrainLambert`** (`directional` 的来源，§49) 由活动方向光求和生成: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`，受 `BLOXD_TERRAIN_DIRECTIONAL` 守卫。
+- **索引缓冲在首个大网格处转为 32 位。** Lite 渲染器只在所有索引值 ≤ 65,534 时选用 `Uint16Array` 索引——一旦任何索引达到 65,535，缓冲区就变为 `Uint32Array` (以 `is32Bits` 标志逐缓冲跟踪)。实际影响: 顶点数至多 65,535 的区块网格可用 16 位索引；恰好 65,536 个顶点的网格必然产生 65,535 的索引，并让整个缓冲区切换到 32 位。
 - **Manifest 加载细节**: `__MACOSX/` 下的 zip 条目、以 `._` 开头的文件与 `.DS_Store` 会被过滤 (macOS 归档噪声)；`pack.json` 通过小写路径比较定位——零个匹配 → `loadNoManifest`，两个或更多 → `loadDuplicateManifest`；manifest 读取上限为 65,536 字节。
-- **以上内容的验证方式**: 生产 bundle 的模块被复原 (165 个 chunk，4,951 个模块)，并在 Node.js 下于兼容 webpack 的 harness 中执行。实测的 `HEADER_VERSION` (§53)、渲染出的 5,637 字节标头、变体表的标准顺序与特殊函数映射都来自*运行随附代码*，而不是读取字符串。同一 harness 很适合作为社区 `pack_check` v6 的核心——对包执行引擎自己的验证器可精确复现其判定。
+- **以上内容的验证方式**: 生产 bundle 的模块被复原 (165 个 chunk；webpack 注册表在此 bundle 中计得 4,951 个模块——模块数会因是否包含异步子依赖而浮动几个，因此请把确切数字视为该 bundle 专有)，并在 Node.js 下于兼容 webpack 的 harness 中执行。实测的 `HEADER_VERSION` (§53)、渲染出的 5,637 字节标头、变体表的标准顺序与特殊函数映射都来自*运行随附代码*，而不是读取字符串。同一 harness 很适合作为社区 `pack_check` v6 的核心——对包执行引擎自己的验证器可精确复现其判定。
 
 ---
 

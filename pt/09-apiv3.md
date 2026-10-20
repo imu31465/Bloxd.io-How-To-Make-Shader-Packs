@@ -4,7 +4,7 @@
 
 Build alvo: `3ymzdd.main.fae4743f.js` — **a build de produção em execução desde 2026-10-19**. O bundle que o bloxd.io serve em produção é idêntico byte a byte (conferido por md5, tanto o bundle principal quanto os chunks de pacotes de shaders) à implantação de pré-produção contra a qual esta parte foi originalmente pesquisada, então tudo aqui se aplica diretamente à produção. O modelo de pacote mantém a forma da v2 (mesmos campos de `pack.json`, mesmos limites do carregador, mesmo layout de uniform).
 
-As Partes I–VII deste guia ainda estão escritas sobre a base v2. Esta parte reúne, na mesma ordem da [Parte VIII](08-apiv2.md), os pontos de migração v2 → v3 e os novos recursos da v3. A conversão é majoritariamente mecânica (§47), mas duas mudanças realmente alteram o comportamento — a luz padrão agora atenua a emissão com a névoa (§43), e `BLOXD_ALPHA` não é mais definido nas variantes liquid (§46) — e `blockId` é substituído por completo por `blockFlags` (§42), então sempre verifique com uma compilação no jogo antes de distribuir.
+As Partes I–VII deste guia ainda estão escritas sobre a base v2. Esta parte reúne, na mesma ordem da [Parte VIII](08-apiv2.md), os pontos de migração v2 → v3 e os novos recursos da v3. A conversão é majoritariamente mecânica (§47), mas apenas uma mudança realmente altera o comportamento — a luz padrão agora atenua a emissão com a névoa (§43) — e `blockId` é substituído por completo por `blockFlags` (§42), então sempre verifique com uma compilação no jogo antes de distribuir.
 
 Novo nesta revisão: as seções **§49–§54** vão além da própria migração, para interioridades do motor restauradas da build de produção — como o renderizador Lite realmente invoca seus hooks, a função de névoa real de quatro modos, a implementação exata de `bloxdOpaqueBehind()`, o caminho completo de entrega de blockFlags desde o registro do bloco até seu hook, e o pipeline de validação com seu hash de cabeçalho medido. Estes são os fatos publicamente documentados mais profundos sobre o sistema de pacotes até hoje, e resolvem várias questões que outros guias ainda listam como abertas.
 
@@ -26,7 +26,7 @@ Pacotes salvos mantêm o ciclo de vida da v2 ([Parte VIII](08-apiv2.md) §31): c
 
 - Os campos obrigatórios do manifesto não mudam: `{ apiVersion, name, author }`.
 - Os limites do carregador não mudam: zip de 32MB / 1024 entradas / 256 arquivos `.wgsl` / 256KB de código no total / manifesto de 64KB.
-- O bloco de uniform do motor não muda de forma: `@group(3) @binding(0)`, 64 B, contendo — na ordem de declaração — o tempo, o offset de render, a direção do sol e a posição dos olhos. Dois nomes internos de campo mudaram: `time` → `seconds`, `originOffset` → `renderOffset`. O **layout de bytes é idêntico ao da v2**, e nada muda para o código do pacote de qualquer forma, porque pacotes não podem nomear o uniform diretamente (o cabeçalho do motor o marca como fornecido pelo motor e somente leitura, "which packs can't name"); continue usando as funções de cabeçalho `bloxdSeconds()` / `bloxdRenderOffset()`.
+- O bloco de uniform do motor não muda de forma: `@group(3) @binding(0)`, 64 B, contendo — na ordem de declaração — o tempo, o offset de render, a direção do sol e a posição dos olhos. O layout é registrado com `minBindingSize: 64`, e o layout exato dos campos é `seconds: f32` @ byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48. Dois nomes internos de campo mudaram: `time` → `seconds`, `originOffset` → `renderOffset`. O **layout de bytes é idêntico ao da v2**, e nada muda para o código do pacote de qualquer forma, porque pacotes não podem nomear o uniform diretamente (o cabeçalho do motor o marca como fornecido pelo motor e somente leitura, "which packs can't name"); continue usando as funções de cabeçalho `bloxdSeconds()` / `bloxdRenderOffset()`.
 - O group 3 do pacote ganhou um segundo ocupante documentado: `@group(3) @binding(1)` é a textura de profundidade de cena que `bloxdOpaqueBehind()` lê (implementação completa na §51). O uniform de 64 B permanece no binding 0; pacotes continuam sem poder nomear nenhum dos bindings.
 
 ## 42. blockId vira blockFlags: materiais por bloco como bits (o principal)
@@ -57,6 +57,21 @@ const bloxdBlockFlagRock: u32 = 32;
 Um bloco feito de vários materiais carrega **cada** flag correspondente (o próprio exemplo do motor: arenito é areia e rocha, então recebe as duas). Folhas são vegetação mas não terra; blocos de grama são vegetação e terra ao mesmo tempo.
 
 As flags de vegetação / terra / areia / rocha são atribuídas a partir do **nome de exibição** registrado do bloco (opaco / emissivo vêm em vez disso dos próprios dados de opacidade e emissão do motor): nomes terminados em `Leaves`, ou `Grass Block`, são vegetação; nomes `Dirt` / `Soil` (e todo `Grass Block`) são terra; exatamente `Sand` e `Red Sand`, mais qualquer nome contendo `Sandstone`, são areia; nomes contendo `Stone` / `Andesite` / `Diorite` / `Granite`, qualquer `Ore`, além de Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (e arenito) são rocha.
+
+### As regras exatas de nomes (derive você mesmo as flags de qualquer bloco)
+
+Os quatro bits de material vêm de um classificador fixo sobre o nome de exibição registrado do bloco. Nomes de variante (qualquer coisa depois de `|`) são removidos primeiro, então as variantes herdam as flags do bloco base. Depois:
+
+| Bit | Regra (avaliada sobre o nome sem a variante) |
+|---|---|
+| vegetation | o nome **termina em** ` Leaves`, ou **termina em** ` Grass Block` |
+| dirt | o nome **é exatamente** `Dirt`, **termina em** ` Dirt` ou ` Soil`, ou **termina em** ` Grass Block` |
+| sand | o nome **é exatamente** `Sand` ou `Red Sand`, ou **contém** `Sandstone` |
+| rock | o nome **é exatamente** um de `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt`, **contém** `Sandstone`, **termina em** ` Ore`, ou contém `Stone` / `Andesite` / `Diorite` / `Granite` como palavra isolada |
+
+Yellowstone aparece listado explicitamente porque `Stone` não é uma palavra isolada dentro de `Yellowstone`. Opaco e emissivo **não** vêm do nome — vêm dos próprios dados de opacidade e de emissão de luz de bloco do motor, então não podem ser derivados com estas regras.
+
+Fonte: o classificador de nomes do motor (módulo 28537, bundle `3ymzdd`); verificado contra todos os 7.861 blocos nomeados, 2026-10-20.
 
 Exemplo — tint por bloco conforme o material:
 
@@ -91,7 +106,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
 Verificado contra o registro em execução (2026-10-20, bundle `3ymzdd`):
 `vegetation && !dirt` corresponde exatamente aos 45 registros de folhas (22 tipos base —
 os mesmos 22 que o array de IDs da R-H da v2 mediu); `vegetation && dirt` corresponde exatamente
-aos 8 blocos de grama. Nenhuma exceção em nenhuma das direções. Combine com `vertex.normal`
+aos 8 blocos de grama. Nenhuma exceção em nenhuma das direções — contagens do registro naquela build; novos blocos aumentam os números sem mudar a regra. Combine com `vertex.normal`
 (cima/baixo) para escolher faces, por exemplo só os topos de blocos de grama.
 
 ## 43. Renomeações de funções e mudanças semânticas
@@ -182,12 +197,12 @@ As variantes são geradas sobre uma matriz de **strict × lighting × program** 
 |---|---|
 | `BLOXD_STRICT` | variantes strict (ambos os programas) |
 | `BLOXD_LIGHTING` | variantes com iluminação ligada (ambos os programas) |
-| `BLOXD_ALPHA` | somente variantes **terrain** não strict |
+| `BLOXD_ALPHA` | **todas as variantes liquid** mais variantes **terrain** não strict |
 | `BLOXD_SCENE_DEPTH` | **todas as variantes liquid** |
 
 Duas coisas mudam para autores em relação às regras da v2 ([Parte VIII](08-apiv2.md) §36):
 
-- **`BLOXD_ALPHA` não é mais definido em variantes liquid.** Na v2 ele era definido também em todas as variantes liquid; na v3, código `#ifdef BLOXD_ALPHA` do lado liquid simplesmente nunca compila — a lógica condicionada por alpha precisa ficar nos hooks de terreno, ou contar com o fato de as variantes liquid não terem uma flag que force alpha.
+- **`BLOXD_ALPHA` está inalterado em relação à v2.** O gerador de variantes carrega a linha literal `"liquid"!==program&&strict||push("BLOXD_ALPHA")` — a precedência de operadores de JS faz de *(terrain **e** strict)* o único caso que pula o push, então a macro fica definida em **todas as variantes liquid (strict ou não strict) e em terrain não strict**; só terrain strict a omite. Código `#ifdef BLOXD_ALPHA` do lado liquid compila exatamente como sempre compilou, e a gravação de volta de alpha da §49 (injetada para programas liquid ou variantes não strict) corresponde precisamente a este conjunto.
 - **`BLOXD_SCENE_DEPTH` é sempre definido em variantes liquid**, então o uso de profundidade continua OK sem guarda ali, exatamente como na v2 (§35); em hooks de terreno ele continua exigindo o envelope `#ifdef BLOXD_SCENE_DEPTH`.
 
 ## 47. Lista de migração v2 → v3
@@ -198,7 +213,7 @@ Duas coisas mudam para autores em relação às regras da v2 ([Parte VIII](08-ap
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **Reconstrua a matemática de luz de `engineColour` para `litColour` + névoa** conforme a tabela da §43; note que o padrão agora atenua a emissão com a névoa
 6. **Hooks liquid**: defina `bloxdLiquid*` explicitamente quando quiser que a água seja tratada de forma diferente; omita-os para cair de volta nos hooks de terreno
-7. **Audite as guardas de `BLOXD_ALPHA`** — a flag sumiu das variantes liquid (§46); código do lado liquid condicionado por alpha está morto ali
+7. **Nenhuma auditoria de `BLOXD_ALPHA` é necessária** — seu conjunto de variantes está inalterado em relação à v2: todas as variantes liquid mais terrain não strict a definem, só terrain strict a omite (§46)
 8. **Use `bloxdPi` / `bloxdTau`** onde constantes de trigonometria eram codificadas à mão; remova redeclarações locais do pacote que agora duplicam o cabeçalho
 9. **Mantenha as guardas strict**: hooks vertex e `discard` continuam dentro de `#ifndef BLOXD_STRICT`; o template guarda `bloxdLiquidVertex` da mesma forma que o terreno
 10. **Valide no jogo** — compile e teste o pacote em um jogo que suporte pacotes de shaders
@@ -207,9 +222,10 @@ Duas coisas mudam para autores em relação às regras da v2 ([Parte VIII](08-ap
 
 - **A validação continua em duas etapas** ([Parte VIII](08-apiv2.md) §38): primeiro a validação estática, depois a compilação WebGPU real do navegador por meio de trechos stub gerados que chamam seus hooks, com erros mapeados de volta para arquivos / linhas de origem, e diagnósticos que restauram os nomes originais dos identificadores do lado do motor por meio de um mapeamento.
 - **Diagnósticos strict nomeiam o motivo**: um hook vertex que move o terreno reporta "… moves terrain, which strict games prevent." e `discard` em hooks surface / light reporta "discard makes terrain see-through, which strict games prevent."; a interface de configurações mantém a orientação "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." (`offInStrict`).
-- **Mensagens do carregador**: os tipos de erro e limites não mudam; "Zip64 archives aren't supported." é exibido como mensagem de interface (`loadZip64`).
-- **Editor no jogo**: o editor de shaders foi reformulado para um editor baseado em CodeMirror, com realce ciente de WGSL, correspondência de colchetes e intervalos de diagnóstico.
+- **Mensagens do carregador**: os tipos de erro e limites não mudam; "Zip64 archives aren't supported." é exibido como mensagem de interface (`loadZip64`). O inventário de strings da interface de pacotes totaliza 57 chaves `shaderPack:*`; entre os erros da etapa de carga, `loadNoWgsl` (um zip sem nenhum arquivo `.wgsl`) e `loadNotZip` (um arquivo sem assinatura de fim de arquivo zip) completam o conjunto.
+- **Nenhum editor WGSL no jogo acompanha a interface de pacotes.** A tela de configurações não oferece editor de código de shader — pacotes são escritos como arquivos zip fora do jogo. (Um editor CodeMirror existe no bundle, mas é o editor JavaScript da interface de script dos Custom Games; não tem suporte a WGSL nem conexão com o sistema de pacotes.)
 - **Requisito de hardware**: o Lite exige um driver que suporte o recurso WebGPU `shader-f16`; drivers antigos demais são rejeitados com uma mensagem como "Intel driver too old for Lite (no shader-f16)".
+- **Mudanças de iluminação revalidam os pacotes salvos**: quando o ajuste de iluminação muda em tempo de execução, o motor refaz a verificação do pacote (`changed → recheck`); a visualização de replay chama o mesmo hook com `changed: false` e pula a reverificação.
 - **Redação**: o texto sobre jogos que aceitam pacotes de shaders agora diz "in games that **support** them".
 - **Escopo dos títulos**: o conjunto de jogos em que os pacotes rodam não muda em relação à build anterior.
 
@@ -221,10 +237,10 @@ O renderizador não "chama" seus hooks a partir de JavaScript. Quando um pacote 
 
 | Estágio | Linha de âncora no shader do motor | O que é injetado |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | constrói `BloxdVertexIn`, chama seu hook vertex, grava `worldPos` de volta |
+| vertex | um bloco de quatro linhas, de `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` até `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` | constrói `BloxdVertexIn`, chama seu hook vertex, grava `worldPos` de volta — a injeção também reescreve `let worldPos` como `var worldPos` |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | constrói `BloxdSurfaceIn`, chama seu hook surface, grava `baseColor` / `alpha` de volta |
 | cor iluminada | logo antes de `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` | `let bloxdSpLitColour = color.rgb;` — captura a cor antes da névoa |
-| light | mesmo ponto | constrói `BloxdLightIn`, chama seu hook light, grava `color` de volta |
+| light | a linha final `return color;` do fragment shader | constrói `BloxdLightIn`, chama seu hook light, grava `color` de volta — depois da mistura de névoa |
 
 O código injetado, restaurado do bundle distribuído (expressões de amostra de nível de luz abreviadas onde a formatação do próprio motor se alonga):
 
@@ -271,11 +287,12 @@ alpha = bloxdSpSurface.alpha;   // injetado só quando o programa é liquid ou a
 }
 ```
 
-Três fatos sobre a aplicação das regras decorrem diretamente dessa injeção:
+Quatro fatos sobre a aplicação das regras decorrem diretamente dessa injeção:
 
 - **Terreno strict ignora mudanças de alpha do hook surface.** A gravação de volta `alpha = bloxdSpSurface.alpha` só é injetada para programas liquid ou variantes não strict — a implementação por trás da tabela de macros da §46. (Em terreno strict, seu código `#ifdef BLOXD_ALPHA` não compila de qualquer forma; agora também está confirmado que gravações de alpha sem guarda são descartadas ali.)
 - **Uma variante strict que ainda declara um hook vertex nunca o executa** — o motor reporta isso no momento da build: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. É por isso que o template oficial (§45) envolve `bloxdLiquidVertex` na mesma guarda `#ifndef BLOXD_STRICT` que sua contraparte de terreno.
-- Os identificadores `bloxdSp*` (`bloxdSpVertexIn`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, … — 16 no total) são temporários do lado do motor. Seu código nunca os vê, mas eles aparecem em diagnósticos e na saída de engenharia reversa de qualquer pessoa, então vale reconhecê-los à primeira vista.
+- Os identificadores `bloxdSp*` — **14 no total**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — são temporários do lado do motor. Seu código nunca os vê, mas eles aparecem em diagnósticos e na saída de engenharia reversa de qualquer pessoa, então vale reconhecê-los à primeira vista.
+- **O atalho de surface padrão.** Quando o hook surface de uma variante é literalmente `bloxdDefaultSurface`, o motor pula completamente a injeção das linhas de gravação de volta de `baseColor` / `alpha` — o padrão já produz esses valores, então a atribuição seria código morto. Cadeias de hooks sem modificação não custam nada.
 
 **O que realmente alimenta `BloxdLightIn`** — campo por campo, a partir do código injetado:
 
@@ -344,6 +361,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **A textura de profundidade fica em `@group(3) @binding(1)`** — o group 3 é o próprio group do pacote: o binding 0 é o uniform de 64 B `bloxdPackInputs` (§41), o binding 1 é esta textura de profundidade. Ambos são fornecidos pelo motor e não nomeáveis do seu lado.
+- **A textura de profundidade é um recurso unfilterable-float, só de fragmento.** O layout do bind group a registra como `texture: { sampleType: "unfilterable-float" }` com visibilidade apenas `GPUShaderStage.FRAGMENT` — que é exatamente por que `bloxdOpaqueBehind()` é construída sobre `textureLoad` (coordenadas de texel explícitas, nível de mip 0) em vez de `textureSample`: a filtragem por hardware simplesmente não está disponível nesta textura.
 - `z ≤ 0` significa que a amostra de profundidade não atingiu nada (plano distante / céu): `found = false`, e `position` / `distance` não têm significado — verifique `found` primeiro, sempre.
 - A posição retornada é uma **interseção por escala de raio**: a superfície opaca é colocada em `eye + (fragment − eye) × max(z / viewDepth, 1)`. `distance` é medida do olho até esse ponto — para pacotes de superfície de água, isso é efetivamente "quanta água o raio atravessou antes de atingir algo sólido", o que faz receitas de água tingida por profundidade funcionarem sem um segundo buffer de profundidade.
 
@@ -451,13 +469,14 @@ O layout completo de recursos do programa de terreno, direto do renderizador Lit
 | `@group(3) @binding(0)` | `bloxdPackInputs` — o uniform do pacote (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — a textura de profundidade (§51) |
 
-- **As luzes direcionais têm limite rígido de quatro.** O renderizador gera erro com `Terrain supports 4 directional lights, not ${n}` se uma cena tentar registrar mais do que isso. `l.directional` é a soma de Lambert sobre quantas existirem (0–4; as próprias cenas da Bloxd usam 2 — [Parte VII](07-internals.md) §27).
-- **Nomes do programa de terreno**: as chaves de cache de pipeline são `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — um pacote aparece como o sufixo `-sp{variant}`, um programa por variante da §46.
+- **As luzes direcionais têm limite rígido de quatro.** O renderizador gera erro com `Terrain supports 4 directional lights, not ${n}` se uma cena tentar registrar mais do que isso. `l.directional` é a soma de Lambert sobre quantas existirem (0–4; as próprias cenas da Bloxd usam 2 — [Parte VII](07-internals.md) §27). O terreno também avisa sobre luzes que não consegue honrar, literalmente: uma luz adicionada tarde — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; uma luz tingida — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; e uma luz que filtra malhas — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **Nomes do programa de terreno**: as chaves de cache de pipeline são `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — um pacote aparece como o sufixo `-sp{variant}`, um programa por variante da §46. Um watcher (`watchPipelineFailures`) compara nomes de pipeline em execução com `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` e reverifica a variante de pacote correspondente quando uma compilação de pipeline falha; perda do dispositivo GPU (`device.lost`) pula a verificação.
 - **`BLOXD_TERRAIN_DIRECTIONAL` é uma macro interna do motor** (definida quando dirLightCount > 0). Ela *não* é uma das quatro do prelúdio e nunca chega ao código do pacote — mas aparece em dumps WGSL dos próprios shaders do motor, então reconhecê-la evita confusão.
 - **Decodificação de nível de luz**: o atributo de vértice `aPackedLightLevels` é um f32 que empacota quatro nibbles, cada um dividido por 15: rgb = a luz de bloco colorida, a = o canal céu/na mão. O estágio de vértice o decodifica no varying `vLightLevels`; `blockLight` lê `.rgb`, o canal céu/na mão lê `.w`. O motor aplica piso de 35% do canal mais brilhante aos canais rgb antes da interpolação — a âncora do lado do motor para a elevação que a [Parte VII](07-internals.md) §26 documenta a partir do jogo.
 - **`vTerrainLambert`** (a fonte de `directional`, §49) é gerada como uma soma sobre as luzes direcionais ativas: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, protegida por `BLOXD_TERRAIN_DIRECTIONAL`.
+- **Buffers de índice passam a 32 bits na primeira malha grande.** O renderizador Lite só escolhe índices `Uint16Array` enquanto todo valor de índice permanece ≤ 65.534 — assim que qualquer índice atinge 65.535, o buffer se torna um `Uint32Array` (rastreado por buffer com uma flag `is32Bits`). Na prática: uma malha de chunk com no máximo 65.535 vértices cabe em índices de 16 bits; uma com exatamente 65.536 vértices necessariamente emite um índice 65.535 e troca o buffer inteiro para 32 bits.
 - **Detalhes do carregamento de manifesto**: entradas zip sob `__MACOSX/`, arquivos com prefixo `._` e `.DS_Store` são filtrados (ruído de arquivo do macOS); `pack.json` é localizado por comparação de caminho em minúsculas — zero correspondências → `loadNoManifest`, duas ou mais → `loadDuplicateManifest`; a leitura do manifesto é limitada a 65.536 bytes.
-- **Como tudo isso foi verificado**: os módulos do bundle de produção foram restaurados (165 chunks, 4.951 módulos) e executados em um harness compatível com webpack sob Node.js. O `HEADER_VERSION` medido (§53), o cabeçalho renderizado de 5.637 bytes, a ordem canônica da tabela de variantes e o mapa de funções especiais vêm todos de *executar o código distribuído*, não de ler strings. O mesmo harness é o núcleo natural para um `pack_check` v6 da comunidade — executar o próprio validador do motor contra um pacote reproduz seus veredictos exatamente.
+- **Como tudo isso foi verificado**: os módulos do bundle de produção foram restaurados (165 chunks; o registro webpack conta 4.951 módulos neste bundle — a contagem de módulos varia em algumas unidades conforme dependências filhas assíncronas sejam incluídas, então trate o número exato como específico do bundle) e executados em um harness compatível com webpack sob Node.js. O `HEADER_VERSION` medido (§53), o cabeçalho renderizado de 5.637 bytes, a ordem canônica da tabela de variantes e o mapa de funções especiais vêm todos de *executar o código distribuído*, não de ler strings. O mesmo harness é o núcleo natural para um `pack_check` v6 da comunidade — executar o próprio validador do motor contra um pacote reproduz seus veredictos exatamente.
 
 ---
 

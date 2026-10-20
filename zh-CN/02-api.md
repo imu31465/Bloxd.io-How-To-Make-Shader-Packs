@@ -92,7 +92,7 @@ fn bloxdDefaultLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight;
 - **雾应用顺序**：片元内处理顺序为 ① 光照·发光合成 → ② `color = max(color.rgb, 0)` → ③ `color = mix(vFogColor, color.rgb, fogVisibility)` → ④ light 钩子调用 → ⑤ return。因此 **engineColour 以打雾态到达**，**light 钩子返回值原样成为最终颜色** (钩子后不再重打雾)
 - **fogVisibility 定义源**：视图空间距离 (按顶点计算、插值)。linear 模式 `fogVisibility = (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1)
 - **fogMode == 0 时**：`fogColour` 以 `vec3f(0.0)` (黑) 到达。以 fogColour 色味推断时段的代码请注意
-- **现行构建实际雾设置**：**linear 固定**。`fogStart` = 绘制区块距离、`fogEnd` = +1 区块 (仅地平线)。雾关闭设置下为 100 / 101 区块，实际无效。默认雾色 RGB(181, 191, 195)
+- **现行构建实际雾设置**：**linear 固定**。`fogStart` = 绘制区块距离、`fogEnd` = +1 区块 (仅地平线)。雾关闭设置下为 100 / 101 区块，实际无效。默认雾色 RGB(183, 191, 195)
 - `bloxdPackInputs` uniform (`@group(3) @binding(0)`，64B) **仅经标头函数使用**。包不可直接引用。阶段可见性为 VERTEX|FRAGMENT，因此标头函数也可从钩子外的模块级函数与 vertex 钩子调用。深度纹理 (binding 1) 为 FRAGMENT 专用，因此 `bloxdOpaqueBehind()` 仅限 surface / light 钩子
 - **`litColour` 可作起点**：v1 只有打雾后的 `engineColour`，自制大气表现容易双重打雾。v2 从打雾前、emission 前的 `litColour` 出发，经 `bloxdApplyFog()` 按自己的节奏重打雾
 - **`blockId` 可区分方块种类**：不依赖纹理颜色的标识。但 ID 与方块种类的对应表在引擎内部，哪一 ID 对应何种方块可世界内实测，现成对应表见 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (见[第八部分](08-apiv2.md))

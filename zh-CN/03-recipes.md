@@ -688,7 +688,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `l.fogVisibility` 加 `max(l.fogVisibility, 0.25)` 式下限可实现「不再更浓」  
 > (0.0 = 引擎一致 / 0.3–0.5 = 远景更透)。
 > 注意引擎雾为地平线专用线性雾 (仅绘制距离附近)，中距离霾需包内自制。
-> 实际雾设置 (实现已对照)：linear 固定 / `fogStart` = 绘制区块距离 / `fogEnd` = +1 区块 / 雾关闭时 100–101 区块实际无效 / 默认色 RGB(181, 191, 195)。
+> 实际雾设置 (实现已对照)：linear 固定 / `fogStart` = 绘制区块距离 / `fogEnd` = +1 区块 / 雾关闭时 100–101 区块实际无效 / 默认色 RGB(183, 191, 195)。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

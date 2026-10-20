@@ -4,7 +4,7 @@
 
 लक्ष्य बिल्ड: `3ymzdd.main.fae4743f.js` — **2026-10-19 से लाइव प्रोडक्शन बिल्ड**। bloxd.io जो बंडल प्रोडक्शन में परोसता है, वह उस प्री-प्रोडक्शन डिप्लॉय से बाइट-दर-बाइट समान है (md5 से जाँचा गया — मुख्य बंडल और शेडर-पैक चंक दोनों), जिस पर यह भाग मूल रूप से शोध किया गया था; इसलिए यहाँ सब कुछ उत्पादन पर जैसा है वैसा ही लागू होता है। पैक मॉडल अपना v2 स्वरूप बनाए रखता है (वही `pack.json` फ़ील्ड, वही लोडर सीमाएँ, वही uniform लेआउट)।
 
-इस गाइड के भाग I–VII अभी भी v2 आधार पर लिखे गए हैं। यह भाग [भाग VIII](08-apiv2.md) के उसी क्रम में v2 → v3 प्रवासन बिंदु और नई v3 सुविधाएँ एकत्र करता है। रूपांतरण अधिकतर यांत्रिक है (§47), पर दो परिवर्तन वास्तव में व्यवहार बदलते हैं — डिफ़ॉल्ट प्रकाश अब फ़ॉग से emission को क्षीण करता है (§43), और `BLOXD_ALPHA` अब liquid वेरिएंट में परिभाषित नहीं है (§46) — तथा `blockId` को पूरी तरह `blockFlags` से बदल दिया गया है (§42), इसलिए वितरण से पहले हमेशा इन-गेम कंपाइल से सत्यापित करें।
+इस गाइड के भाग I–VII अभी भी v2 आधार पर लिखे गए हैं। यह भाग [भाग VIII](08-apiv2.md) के उसी क्रम में v2 → v3 प्रवासन बिंदु और नई v3 सुविधाएँ एकत्र करता है। रूपांतरण अधिकतर यांत्रिक है (§47), पर केवल एक परिवर्तन वास्तव में व्यवहार बदलता है — डिफ़ॉल्ट प्रकाश अब फ़ॉग से emission को क्षीण करता है (§43) — तथा `blockId` को पूरी तरह `blockFlags` से बदल दिया गया है (§42), इसलिए वितरण से पहले हमेशा इन-गेम कंपाइल से सत्यापित करें।
 
 इस संस्करण में नया: अनुभाग **§49–§54** प्रवासन से आगे बढ़कर प्रोडक्शन बिल्ड से पुनः प्राप्त इंजन आंतरिक विवरण देते हैं — Lite रेंडरर वास्तव में आपके हुक कैसे बुलाता है, असली चार-मोड फ़ॉग फ़ंक्शन, `bloxdOpaqueBehind()` का सटीक कार्यान्वयन, ब्लॉक पंजीकरण से आपके हुक तक blockFlags की पूरी डिलीवरी पथ, और मापे गए हेडर हैश सहित सत्यापन पाइपलाइन। ये पैक सिस्टम के बारे में अब तक के सबसे गहरे सार्वजनिक रूप से प्रलेखित तथ्य हैं, और ये कई ऐसे प्रश्नों का समाधान करते हैं जिन्हें अन्य गाइड अभी भी खुले के रूप में सूचीबद्ध करते हैं।
 
@@ -26,7 +26,7 @@
 
 - आवश्यक मैनिफ़ेस्ट फ़ील्ड अपरिवर्तित हैं: `{ apiVersion, name, author }`।
 - लोडर सीमाएँ अपरिवर्तित हैं: 32MB zip / 1024 प्रविष्टियाँ / 256 `.wgsl` फ़ाइलें / कुल 256KB कोड / 64KB मैनिफ़ेस्ट।
-- इंजन uniform ब्लॉक का आकार अपरिवर्तित है: `@group(3) @binding(0)`, 64 B, जिसमें घोषणा क्रम में समय, render offset, सूर्य दिशा और eye position रखे हैं। दो आंतरिक फ़ील्ड नाम बदले: `time` → `seconds`, `originOffset` → `renderOffset`। **बाइट लेआउट v2 जैसा ही है**, और पैक कोड के लिए वैसे भी कुछ नहीं बदलता, क्योंकि पैक uniform को सीधे नाम नहीं दे सकते (इंजन हेडर इसे engine-provided और read-only चिह्नित करता है, "which packs can't name"); हेडर फ़ंक्शन `bloxdSeconds()` / `bloxdRenderOffset()` से ही काम करते रहें।
+- इंजन uniform ब्लॉक का आकार अपरिवर्तित है: `@group(3) @binding(0)`, 64 B, जिसमें घोषणा क्रम में समय, render offset, सूर्य दिशा और eye position रखे हैं। लेआउट `minBindingSize: 64` के साथ पंजीकृत है, और सटीक फ़ील्ड लेआउट है `seconds: f32` @ byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48। दो आंतरिक फ़ील्ड नाम बदले: `time` → `seconds`, `originOffset` → `renderOffset`। **बाइट लेआउट v2 जैसा ही है**, और पैक कोड के लिए वैसे भी कुछ नहीं बदलता, क्योंकि पैक uniform को सीधे नाम नहीं दे सकते (इंजन हेडर इसे engine-provided और read-only चिह्नित करता है, "which packs can't name"); हेडर फ़ंक्शन `bloxdSeconds()` / `bloxdRenderOffset()` से ही काम करते रहें।
 - पैक के group 3 में एक प्रलेखित दूसरा स्थान जुड़ा: `@group(3) @binding(1)` वह scene-depth texture है जिसे `bloxdOpaqueBehind()` पढ़ता है (पूरा कार्यान्वयन §51 में)। 64 B का uniform binding 0 पर ही रहता है; पैक अभी भी दोनों binding को नाम नहीं दे सकते।
 
 ## 42. blockId से blockFlags: प्रति-ब्लॉक सामग्री बिट फ़्लैग के रूप में (मुख्य)
@@ -58,6 +58,22 @@ const bloxdBlockFlagRock: u32 = 32;
 
 vegetation / dirt / sand / rock flags ब्लॉक के पंजीकृत **प्रदर्शित नाम (display name)** से असाइन होते हैं (opaque / emissive इसके बजाय इंजन के अपने opacity और emission डेटा से आते हैं): `Leaves` पर समाप्त होने वाले नाम, या `Grass Block`, vegetation हैं; `Dirt` / `Soil` नाम (और हर `Grass Block`) dirt हैं; ठीक `Sand` और `Red Sand`, साथ ही `Sandstone` वाला कोई भी नाम sand हैं; `Stone` / `Andesite` / `Diorite` / `Granite` वाले नाम, कोई भी `Ore`, साथ ही Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (और sandstone) rock हैं।
 
+
+### सटीक नाम-नियम (किसी भी ब्लॉक के flags स्वयं निकालें)
+
+चार सामग्री बिट ब्लॉक के पंजीकृत प्रदर्शित नाम पर एक निश्चित वर्गीकरणकर्ता से आते हैं। पहले वेरिएंट नाम (`|` के बाद का सब कुछ) हटा दिए जाते हैं, इसलिए वेरिएंट आधार ब्लॉक के flags विरासत में लेते हैं। फिर:
+
+| बिट | नियम (छीनें गए नाम पर लागू) |
+|---|---|
+| vegetation | नाम **` Leaves` पर समाप्त** होता है, या **` Grass Block` पर समाप्त** होता है |
+| dirt | नाम **ठीक `Dirt` है**, **` Dirt` या ` Soil` पर समाप्त** होता है, या **` Grass Block` पर समाप्त** होता है |
+| sand | नाम **ठीक `Sand` या `Red Sand` है**, या **`Sandstone` शामिल** है |
+| rock | नाम **ठीक इनमें से एक है** `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt`, **`Sandstone` शामिल** है, **` Ore` पर समाप्त** होता है, या `Stone` / `Andesite` / `Diorite` / `Granite` को अलग शब्द के रूप में शामिल करता है |
+
+Yellowstone स्पष्ट रूप से सूचीबद्ध है क्योंकि `Yellowstone` के भीतर `Stone` अलग शब्द नहीं है। Opaque और emissive नाम से **नहीं** आते — वे इंजन के अपने opacity और block-light-emission डेटा से आते हैं, इसलिए इन नियमों से उन्हें निकाला नहीं जा सकता।
+
+स्रोत: इंजन का नाम वर्गीकरणकर्ता (module 28537, बंडल `3ymzdd`); सभी 7,861 नामित ब्लॉकों के विरुद्ध सत्यापित, 2026-10-20।
+
 उदाहरण — सामग्री के अनुसार प्रति-ब्लॉक टिंट:
 
 ```wgsl
@@ -86,7 +102,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
 
-लाइव रजिस्ट्री के विरुद्ध सत्यापित (2026-10-20, बंडल `3ymzdd`): `vegetation && !dirt` ठीक 45 leaf registrations से मेल खाता है (22 आधार प्रकार — वही 22 जो v2 R-H id सरणी ने मापे थे); `vegetation && dirt` ठीक 8 grass blocks से मेल खाता है। किसी भी दिशा में कोई अपवाद नहीं। फलक चुनने के लिए `vertex.normal` (up/down) के साथ जोड़ें, जैसे केवल घास-ब्लॉक के ऊपरी फलक।
+लाइव रजिस्ट्री के विरुद्ध सत्यापित (2026-10-20, बंडल `3ymzdd`): `vegetation && !dirt` ठीक 45 leaf registrations से मेल खाता है (22 आधार प्रकार — वही 22 जो v2 R-H id सरणी ने मापे थे); `vegetation && dirt` ठीक 8 grass blocks से मेल खाता है। किसी भी दिशा में कोई अपवाद नहीं — रजिस्ट्री गणनाएँ उस बिल्ड के अनुसार; नए ब्लॉक संख्याएँ बढ़ाते हैं, नियम नहीं बदलते। फलक चुनने के लिए `vertex.normal` (up/down) के साथ जोड़ें, जैसे केवल घास-ब्लॉक के ऊपरी फलक।
 
 ## 43. फ़ंक्शन पुनर्नामकरण और अर्थगत परिवर्तन
 
@@ -176,12 +192,12 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 |---|---|
 | `BLOXD_STRICT` | strict वेरिएंट (दोनों प्रोग्राम) |
 | `BLOXD_LIGHTING` | lighting-on वेरिएंट (दोनों प्रोग्राम) |
-| `BLOXD_ALPHA` | केवल non-strict **terrain** वेरिएंट |
+| `BLOXD_ALPHA` | **सभी liquid वेरिएंट** तथा non-strict **terrain** वेरिएंट |
 | `BLOXD_SCENE_DEPTH` | **सभी liquid वेरिएंट** |
 
 लेखकों के लिए v2 नियमों की तुलना में दो बातें बदलती हैं ([भाग VIII](08-apiv2.md) §36):
 
-- **`BLOXD_ALPHA` अब liquid वेरिएंट में परिभाषित नहीं है।** v2 में यह सभी liquid वेरिएंट में भी परिभाषित था; v3 में liquid-side `#ifdef BLOXD_ALPHA` कोड बस कभी संकलित नहीं होता — alpha-गेटेड तर्क terrain हुक में रखें, या इस पर निर्भर रहें कि liquid वेरिएंट में alpha-बाध्यकारी flag नहीं है।
+- **`BLOXD_ALPHA` v2 से अपरिवर्तित है।** वेरिएंट जनरेटर में शाब्दिक पंक्ति `"liquid"!==program&&strict||push("BLOXD_ALPHA")` है — JS ऑपरेटर प्राथमिकता के कारण *(terrain **और** strict)* ही एकमात्र ऐसा मामला है जो push छोड़ता है, इसलिए मैक्रो **हर liquid वेरिएंट (strict या non-strict) और non-strict terrain** में परिभाषित है; केवल strict terrain इसे छोड़ता है। Liquid-side `#ifdef BLOXD_ALPHA` कोड ठीक वैसे ही संकलित होता है जैसे हमेशा होता था, और §49 का alpha write-back (liquid प्रोग्राम या non-strict वेरिएंट के लिए splice) इस सेट से ठीक मेल खाता है।
 - **`BLOXD_SCENE_DEPTH` liquid वेरिएंट में हमेशा परिभाषित है**, इसलिए वहाँ depth उपयोग बिना guard ठीक है, ठीक v2 (§35) की तरह; terrain हुक में इसे अभी भी `#ifdef BLOXD_SCENE_DEPTH` में लपेटना होगा।
 
 ## 47. v2 से v3 प्रवासन जाँच सूची
@@ -192,7 +208,7 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **प्रकाश गणित को `engineColour` से `litColour` + फ़ॉग पर पुनर्निर्मित करें** §43 की तालिका के अनुसार; ध्यान दें कि डिफ़ॉल्ट अब emission को फ़ॉग से क्षीण करता है
 6. **Liquid हुक**: जब आप पानी को अलग तरह से संभालना चाहें तब `bloxdLiquid*` स्पष्ट रूप से परिभाषित करें; छोड़ने पर आपके terrain हुक पर fallback होता है
-7. **`BLOXD_ALPHA` guards का audit करें** — liquid वेरिएंट से flag हट गया है (§46); liquid-side alpha-गेटेड कोड वहाँ मृत है
+7. **`BLOXD_ALPHA` audit की आवश्यकता नहीं** — इसका वेरिएंट सेट v2 से अपरिवर्तित है: सभी liquid वेरिएंट तथा non-strict terrain इसे परिभाषित करते हैं, केवल strict terrain इसे छोड़ता है (§46)
 8. **`bloxdPi` / `bloxdTau` का उपयोग करें** जहाँ त्रिकोणमिति-संबंधी स्थिरांक हार्डकोड थे; अब हेडर की नकल करने वाली पैक-लोकल पुनःघोषणाएँ हटाएँ
 9. **Strict guards रखें**: vertex हुक और `discard` `#ifndef BLOXD_STRICT` में लिपटे रहें; टेम्पलेट `bloxdLiquidVertex` को terrain की तरह ही guard करता है
 10. **इन-गेम सत्यापित करें** — जिस खेल में शेडर पैक समर्थित हों उसमें पैक को कंपाइल और परखें
@@ -201,9 +217,10 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **सत्यापन दो-चरणीय रहता है** ([भाग VIII](08-apiv2.md) §38): पहले स्थिर सत्यापन, फिर ब्राउज़र का असली WebGPU कंपाइल, जो आपके हुक बुलाने वाले उत्पन्न स्टब स्निपेट के ज़रिए होता है; त्रुटियाँ स्रोत फ़ाइलों / पंक्तियों पर मैप होती हैं, और डायग्नोस्टिक्स मैपिंग के ज़रिए इंजन-पक्ष के पहचानकर्ताओं के मूल नाम बहाल करते हैं।
 - **Strict डायग्नोस्टिक्स कारण बताते हैं**: terrain हिलाने वाला vertex हुक रिपोर्ट करता है "… moves terrain, which strict games prevent." और surface / light हुक में `discard` रिपोर्ट करता है "discard makes terrain see-through, which strict games prevent."; सेटिंग्स UI मार्गदर्शन "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." (`offInStrict`) बनाए रखता है।
-- **लोडर संदेश**: त्रुटि प्रकार और सीमाएँ अपरिवर्तित; "Zip64 archives aren't supported." UI संदेश (`loadZip64`) के रूप में सामने आता है।
-- **इन-गेम संपादक**: शेडर संपादक को CodeMirror-आधारित संपादक में बदला गया है, जिसमें WGSL-जागरूक highlighting, bracket matching और diagnostic spans हैं।
+- **लोडर संदेश**: त्रुटि प्रकार और सीमाएँ अपरिवर्तित; "Zip64 archives aren't supported." UI संदेश (`loadZip64`) के रूप में सामने आता है। पैक-UI स्ट्रिंग सूची में कुल 57 `shaderPack:*` कुंजियाँ हैं; load-चरण त्रुटियों में `loadNoWgsl` (शून्य `.wgsl` फ़ाइलों वाला zip) और `loadNotZip` (zip end-of-archive signature के बिना फ़ाइल) सेट पूरा करते हैं।
+- **पैक UI के साथ कोई इन-गेम WGSL संपादक नहीं आता।** सेटिंग्स स्क्रीन कोई शेडर कोड संपादक नहीं देती — पैक खेल के बाहर zip फ़ाइलों के रूप में लिखे जाते हैं। (बंडल में CodeMirror संपादक मौजूद है, पर वह कस्टम-गेम स्क्रिप्टिंग UI का JavaScript संपादक है; उसमें WGSL समर्थन नहीं है और पैक सिस्टम से कोई संबंध नहीं।)
 - **हार्डवेयर गेट**: Lite के लिए `shader-f16` WebGPU सुविधा समर्थित ड्राइवर चाहिए; बहुत पुराने ड्राइवर "Intel driver too old for Lite (no shader-f16)" जैसे संदेश से अस्वीकृत होते हैं।
+- **प्रकाश सेटिंग बदलने पर सहेजे पैक पुनः सत्यापित होते हैं**: रन टाइम पर lighting सेटिंग बदलने पर इंजन पैक जाँच पुनः चलाता है (`changed → recheck`); replay देखना उसी हुक को `changed: false` के साथ बुलाता है और पुनः-जाँच छोड़ देता है।
 - **शब्दावली**: शेडर पैक स्वीकार करने वाले खेलों के बारे में टेक्स्ट अब "in games that **support** them" पढ़ता है।
 - **टाइटल का दायरा**: जिन खेलों में पैक चलते हैं, उनका सेट पिछले बिल्ड से अपरिवर्तित है।
 
@@ -215,10 +232,10 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 | चरण | इंजन shader में anchor पंक्ति | क्या splice होता है |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | `BloxdVertexIn` बनाएँ, आपका vertex हुक बुलाएँ, `worldPos` वापस लिखें |
+| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` से `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` तक का चार-पंक्ति ब्लॉक | `BloxdVertexIn` बनाएँ, आपका vertex हुक बुलाएँ, `worldPos` वापस लिखें — splice `let worldPos` को `var worldPos` में भी बदलता है |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | `BloxdSurfaceIn` बनाएँ, आपका surface हुक बुलाएँ, `baseColor` / `alpha` वापस लिखें |
 | lit colour | `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` से ठीक पहले | `let bloxdSpLitColour = color.rgb;` — फ़ॉग-पूर्व रंग कैप्चर करता है |
-| light | वही स्थान | `BloxdLightIn` बनाएँ, आपका light हुक बुलाएँ, `color` वापस लिखें |
+| light | fragment shader की अंतिम `return color;` पंक्ति | `BloxdLightIn` बनाएँ, आपका light हुक बुलाएँ, `color` वापस लिखें — फ़ॉग mix के बाद |
 
 splice किया गया कोड, भेजे गए बंडल से बहाल (light-level sample expressions संक्षिप्त जहाँ इंजन की अपनी formatting लंबी चलती है):
 
@@ -265,11 +282,12 @@ alpha = bloxdSpSurface.alpha;   // केवल तब splice होता ह�
 }
 ```
 
-इस splicing से तीन प्रवर्तन-तथ्य सीधे निकलते हैं:
+इस splicing से चार प्रवर्तन-तथ्य सीधे निकलते हैं:
 
 - **Strict terrain surface-हुक alpha परिवर्तनों को अनदेखा करता है।** `alpha = bloxdSpSurface.alpha` write-back केवल liquid प्रोग्राम या non-strict वेरिएंट के लिए splice होता है — यही §46 की मैक्रो तालिका के पीछे का कार्यान्वयन है। (strict terrain में आपका `#ifdef BLOXD_ALPHA` कोड वैसे भी संकलित नहीं होता; अब यह भी पुष्ट है कि बिना guard वाले alpha writes वहाँ गिरा दिए जाते हैं।)
 - **जो strict वेरिएंट अभी भी vertex हुक घोषित करता है, उसे कभी नहीं चलाया जाता** — इंजन build time पर रिपोर्ट करता है: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. इसीलिए आधिकारिक टेम्पलेट (§45) `bloxdLiquidVertex` को उसके terrain जुड़वाँ की तरह उसी `#ifndef BLOXD_STRICT` में लपेटता है।
-- `bloxdSp*` पहचानकर्ता (`bloxdSpVertexIn`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, … — कुल 16) इंजन-पक्ष temporaries हैं। आपका कोड उन्हें कभी नहीं देखता, पर वे diagnostics और किसी के भी reverse-engineering output में सामने आते हैं, इसलिए उन्हें देखते ही पहचानना उपयोगी है।
+- `bloxdSp*` पहचानकर्ता — **कुल 14**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — इंजन-पक्ष temporaries हैं। आपका कोड उन्हें कभी नहीं देखता, पर वे diagnostics और किसी के भी reverse-engineering output में सामने आते हैं, इसलिए उन्हें देखते ही पहचानना उपयोगी है।
+- **डिफ़ॉल्ट-surface शॉर्टकट।** जब किसी वेरिएंट का surface हुक शाब्दिक रूप से `bloxdDefaultSurface` हो, तो इंजन `baseColor` / `alpha` write-back पंक्तियाँ splice करना पूरी तरह छोड़ देता है — डिफ़ॉल्ट वे मान पहले ही पैदा करता है, इसलिए assignment मृत कोड होता। असंशोधित हुक शृंखलाओं पर कोई लागत नहीं।
 
 **`BloxdLightIn` को वास्तव में क्या भेजता है** — splice किए गए कोड से, फ़ील्ड दर फ़ील्ड:
 
@@ -338,6 +356,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **Depth texture `@group(3) @binding(1)` पर रहती है** — group 3 पैक का अपना group है: binding 0 64 B का `bloxdPackInputs` uniform है (§41), binding 1 यह depth texture है। दोनों इंजन-प्रदत्त हैं और आपकी ओर से अनाम हैं।
+- **Depth texture एक unfilterable-float, केवल-fragment संसाधन है।** bind-group लेआउट इसे `texture: { sampleType: "unfilterable-float" }` के रूप में केवल `GPUShaderStage.FRAGMENT` दृश्यता के साथ पंजीकृत करता है — इसीलिए `bloxdOpaqueBehind()` `textureSample` के बजाय `textureLoad` (स्पष्ट texel निर्देशांक, mip level 0) पर बना है: इस texture पर हार्डवेयर फ़िल्टरिंग उपलब्ध ही नहीं है।
 - `z ≤ 0` का अर्थ है depth सैंपल को कुछ नहीं मिला (far plane / आकाश): `found = false`, और `position` / `distance` का कोई अर्थ नहीं — हमेशा पहले `found` जाँचें।
 - लौटाई गई स्थिति एक **ray-scale प्रतिच्छेद** है: अपारदर्शी सतह `eye + (fragment − eye) × max(z / viewDepth, 1)` पर रखी जाती है। `distance` आँख से उस बिंदु तक मापी जाती है — पानी-सतह पैकों के लिए यह व्यावहारिक रूप से "किरण ठोस चीज़ से टकराने से पहले कितना पानी पार कर चुकी है" है, और यही गहराई-रंग वाली पानी रेसिपी को बिना दूसरे depth buffer के काम करने देता है।
 
@@ -445,16 +464,17 @@ terrain प्रोग्राम का पूरा संसाधन ल�
 | `@group(3) @binding(0)` | `bloxdPackInputs` — पैक uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — depth texture (§51) |
 
-- **दिशात्मक प्रकाश अधिकतम चार तक सीमित हैं।** अगर कोई scene अधिक पंजीकृत करने की कोशिश करता है तो रेंडरर `Terrain supports 4 directional lights, not ${n}` के साथ त्रुटि देता है। `l.directional` जितने भी मौजूद हों (0–4; Bloxd के अपने scene 2 उपयोग करते हैं — [भाग VII](07-internals.md) §27) उन सब पर योग किया गया Lambert है।
-- **Terrain प्रोग्राम नामकरण**: पाइपलाइन कैश कुंजियाँ `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` पढ़ती हैं — पैक `-sp{variant}` प्रत्यय के रूप में दिखता है, §46 के प्रति वेरिएंट एक प्रोग्राम।
+- **दिशात्मक प्रकाश अधिकतम चार तक सीमित हैं।** अगर कोई scene अधिक पंजीकृत करने की कोशिश करता है तो रेंडरर `Terrain supports 4 directional lights, not ${n}` के साथ त्रुटि देता है। `l.directional` जितने भी मौजूद हों (0–4; Bloxd के अपने scene 2 उपयोग करते हैं — [भाग VII](07-internals.md) §27) उन सब पर योग किया गया Lambert है। Terrain उन प्रकाशों के बारे में भी चेतावनी देता है जिन्हें वह मान नहीं सकता, शब्दशः: देर से जोड़ा गया प्रकाश — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; रंगा हुआ प्रकाश — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; और mesh-फ़िल्टर करने वाला — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **Terrain प्रोग्राम नामकरण**: पाइपलाइन कैश कुंजियाँ `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` पढ़ती हैं — पैक `-sp{variant}` प्रत्यय के रूप में दिखता है, §46 के प्रति वेरिएंट एक प्रोग्राम। एक watcher (`watchPipelineFailures`) live pipeline नामों को `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` से मिलाता है और pipeline compilation विफल होने पर मेल खाते पैक वेरिएंट को पुनः जाँचता है; GPU device loss (`device.lost`) जाँच छोड़ देता है।
 - **`BLOXD_TERRAIN_DIRECTIONAL` एक इंजन-आंतरिक मैक्रो है** (dirLightCount > 0 होने पर परिभाषित)। यह प्रील्यूड के चार में से *नहीं* है और कभी पैक कोड तक नहीं पहुँचता — पर यह इंजन के अपने shaders के WGSL dumps में दिखता है, इसलिए इसे पहचानना भ्रम बचाता है।
 - **Light-level decode**: `aPackedLightLevels` vertex attribute एक f32 है जो चार निबल पैक करता है, प्रत्येक 15 से विभाजित: rgb = रंगीन ब्लॉक प्रकाश, a = sky/held चैनल। Vertex चरण इसे `vLightLevels` varying में decode करता है; `blockLight` `.rgb` पढ़ता है, sky/held चैनल `.w` पढ़ता है। इंजन इंटरपोलेशन से पहले rgb चैनलों को सबसे चमकीले चैनल के 35% पर floor करता है — [भाग VII](07-internals.md) §26 जिस lift को गेमप्ले से प्रलेखित करता है उसका इंजन-पक्ष anchor यही है।
 - **`vTerrainLambert`** (`directional` का स्रोत, §49) सक्रिय दिशात्मक प्रकाशों पर योग के रूप में बनता है: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, जो `BLOXD_TERRAIN_DIRECTIONAL` से guard है।
+- **सबसे बड़े पहले mesh पर index buffers 32-बिट हो जाते हैं।** Lite रेंडरर `Uint16Array` indices तभी चुनता है जब तक हर index मान ≤ 65,534 रहे — जैसे ही कोई index 65,535 तक पहुँचता है, buffer `Uint32Array` बन जाता है (प्रति buffer `is32Bits` flag से ट्रैक)। व्यवहार में: अधिकतम 65,535 vertices वाला chunk mesh 16-बिट indices में फ़िट होता है; ठीक 65,536 vertices वाला अनिवार्य रूप से 65,535 index निकालता है और पूरा buffer 32-बिट पर स्विच कर देता है।
 - **मैनिफ़ेस्ट लोडिंग विवरण**: `__MACOSX/` के नीचे zip entries, `._` उपसर्ग वाली फ़ाइलें, और `.DS_Store` फ़िल्टर हो जाते हैं (macOS संग्रह शोर); `pack.json` path की lowercased तुलना से पाया जाता है — शून्य मैच → `loadNoManifest`, दो या अधिक → `loadDuplicateManifest`; मैनिफ़ेस्ट पठन 65,536 बाइट तक सीमित है।
-- **यह सब कैसे सत्यापित हुआ**: प्रोडक्शन बंडल के modules बहाल किए गए (165 चंक, 4,951 modules) और Node.js के नीचे webpack-संगत हार्नेस में चलाए गए। मापा गया `HEADER_VERSION` (§53), रेंडर किया गया 5,637-बाइट हेडर, वेरिएंट तालिका का canonical क्रम, और विशेष-फ़ंक्शन मैप सब *भेजे गए कोड को चलाने* से आते हैं, strings पढ़ने से नहीं। वही हार्नेस सामुदायिक `pack_check` v6 का स्वाभाविक कोर है — पैक के विरुद्ध इंजन के अपने validator को चलाने से उसके निर्णय ठीक वैसे ही पुनरुत्पन्न होते हैं।
+- **यह सब कैसे सत्यापित हुआ**: प्रोडक्शन बंडल के modules बहाल किए गए (165 चंक; इस बंडल में webpack registry 4,951 modules गिनता है — async child dependencies शामिल हैं या नहीं, इसके अनुसार module गिनती कुछ इकाइयों से बदलती है, इसलिए सटीक संख्या को bundle-specific मानें) और Node.js के नीचे webpack-संगत हार्नेस में चलाए गए। मापा गया `HEADER_VERSION` (§53), रेंडर किया गया 5,637-बाइट हेडर, वेरिएंट तालिका का canonical क्रम, और विशेष-फ़ंक्शन मैप सब *भेजे गए कोड को चलाने* से आते हैं, strings पढ़ने से नहीं। वही हार्नेस सामुदायिक `pack_check` v6 का स्वाभाविक कोर है — पैक के विरुद्ध इंजन के अपने validator को चलाने से उसके निर्णय ठीक वैसे ही पुनरुत्पन्न होते हैं।
 
 ---
 
-Researched by ltf_ahel (researched with glm)
+शोध: ltf_ahel (glm के साथ शोध)
 
 [← पिछला भाग](08-apiv2.md)·[मैनुअल पर वापस जाएं](README.md)

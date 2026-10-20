@@ -4,7 +4,7 @@
 
 Ziel-Build: `3ymzdd.main.fae4743f.js` — **der seit 2026-10-19 live ausgelieferte Produktions-Build**. Das Bundle, das bloxd.io in Produktion ausliefert, ist byte-identisch (per md5 geprüft, Haupt-Bundle und Shader-Pack-Chunks gleichermaßen) mit dem Preprod-Deploy, gegen das dieser Teil ursprünglich untersucht wurde; alles hier gilt also unverändert für die Produktion. Das Paketmodell behält seine v2-Form (gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches Uniform-Layout).
 
-Die Teile I–VII dieser Anleitung sind weiterhin auf v2-Basis geschrieben. Dieser Teil sammelt in derselben Reihenfolge wie [Teil VIII](08-apiv2.md) die Migrationspunkte v2 → v3 und die Neuerungen von v3. Die Umstellung ist größtenteils mechanisch (§47), aber zwei Änderungen verändern tatsächlich das Verhalten — das Standardlicht dämpft Emission jetzt durch Fog (§43), und `BLOXD_ALPHA` ist in Flüssigkeitsvarianten nicht mehr definiert (§46) — und `blockId` wird vollständig durch `blockFlags` ersetzt (§42); vor der Verteilung daher immer per In-Game-Kompilierung prüfen.
+Die Teile I–VII dieser Anleitung sind weiterhin auf v2-Basis geschrieben. Dieser Teil sammelt in derselben Reihenfolge wie [Teil VIII](08-apiv2.md) die Migrationspunkte v2 → v3 und die Neuerungen von v3. Die Umstellung ist größtenteils mechanisch (§47), aber nur eine Änderung verändert tatsächlich das Verhalten — das Standardlicht dämpft Emission jetzt durch Fog (§43) — und `blockId` wird vollständig durch `blockFlags` ersetzt (§42); vor der Verteilung daher immer per In-Game-Kompilierung prüfen.
 
 Neu in dieser Revision: Die Abschnitte **§49–§54** gehen über die Migration hinaus in Engine-Interna, die aus dem Produktions-Build restauriert wurden — wie der Lite-Renderer deine Hooks tatsächlich aufruft, die echte Fog-Funktion mit vier Modi, die exakte Implementierung von `bloxdOpaqueBehind()`, den vollständigen blockFlags-Übertragungsweg von der Blockregistrierung bis zu deinem Hook und die Validierungspipeline mit ihrem gemessenen Header-Hash. Das sind die detailliertesten bislang öffentlich dokumentierten Fakten über das Paketsystem, und sie beantworten mehrere Fragen, die andere Anleitungen noch als offen führen.
 
@@ -26,7 +26,7 @@ Gespeicherte Pakete behalten den v2-Lebenszyklus ([Teil VIII](08-apiv2.md) §31)
 
 - Die Pflichtfelder im Manifest sind unverändert: `{ apiVersion, name, author }`.
 - Die Loader-Limits sind unverändert: 32 MB Zip / 1024 Einträge / 256 `.wgsl`-Dateien / 256 KB Code gesamt / 64 KB Manifest.
-- Das Uniform der Engine ist in seiner Form unverändert: `@group(3) @binding(0)`, 64 B, mit — in Deklarationsreihenfolge — Zeit, Render-Offset, Sonnenrichtung und Augenposition. Zwei interne Feldnamen haben sich geändert: `time` → `seconds`, `originOffset` → `renderOffset`. Die **Byte-Anordnung ist identisch mit v2**, und für Paketcode ändert sich ohnehin nichts, weil Pakete das Uniform nicht direkt benennen dürfen (der Engine-Header markiert es als engine-provided und read-only, „which packs can't name“); weiter über die Header-Funktionen `bloxdSeconds()` / `bloxdRenderOffset()` gehen.
+- Das Uniform der Engine ist in seiner Form unverändert: `@group(3) @binding(0)`, 64 B, mit — in Deklarationsreihenfolge — Zeit, Render-Offset, Sonnenrichtung und Augenposition. Das Layout ist mit `minBindingSize: 64` registriert, und die exakte Feldanordnung ist `seconds: f32` @ Byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48. Zwei interne Feldnamen haben sich geändert: `time` → `seconds`, `originOffset` → `renderOffset`. Die **Byte-Anordnung ist identisch mit v2**, und für Paketcode ändert sich ohnehin nichts, weil Pakete das Uniform nicht direkt benennen dürfen (der Engine-Header markiert es als engine-provided und read-only, „which packs can't name“); weiter über die Header-Funktionen `bloxdSeconds()` / `bloxdRenderOffset()` gehen.
 - In Gruppe 3 des Pakets ist jetzt ein zweiter Platz dokumentiert: `@group(3) @binding(1)` ist die Szenentiefe-Textur, die `bloxdOpaqueBehind()` liest (vollständige Implementierung in §51). Das 64-Byte-Uniform bleibt bei Binding 0; Pakete können weiterhin keines der beiden Bindings benennen.
 
 ## 42. blockId wird blockFlags: Materialien pro Block als Bitflags (die Hauptänderung)
@@ -57,6 +57,21 @@ const bloxdBlockFlagRock: u32 = 32;
 Ein Block aus mehreren Materialien trägt **jedes** passende Flag (das Engine-Beispiel selbst: Sandstein ist Sand und Gestein, bekommt also beide). Blätter sind Vegetation, aber kein Dirt; Grasblöcke sind gleichzeitig Vegetation und Dirt.
 
 Die Flags vegetation / dirt / sand / rock werden anhand des registrierten **Anzeigenamens** des Blocks vergeben (opaque / emissive stammen stattdessen aus den Opazitäts- und Emissionsdaten der Engine): Namen, die auf `Leaves` enden, sowie `Grass Block` sind Vegetation; Namen wie `Dirt` / `Soil` (und jeder `Grass Block`) sind Dirt; genau `Sand` und `Red Sand` sowie jeder Name, der `Sandstone` enthält, sind Sand; Namen mit `Stone` / `Andesite` / `Diorite` / `Granite`, jedes `Ore`, außerdem Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (und Sandstein) sind Gestein.
+
+### Die exakten Namensregeln (die Flags jedes Blocks selbst ableiten)
+
+Die vier Material-Bits stammen aus einem festen Klassifikator über den registrierten Anzeigenamen des Blocks. Varianten-Namen (alles nach `|`) werden zuerst entfernt, sodass Varianten die Flags des Basisblocks erben. Dann gilt:
+
+| Bit | Regel (auf dem bereinigten Namen ausgewertet) |
+|---|---|
+| vegetation | der Name **endet auf** ` Leaves` oder **endet auf** ` Grass Block` |
+| dirt | der Name **ist exakt** `Dirt`, **endet auf** ` Dirt` oder ` Soil`, oder **endet auf** ` Grass Block` |
+| sand | der Name **ist exakt** `Sand` oder `Red Sand`, oder **enthält** `Sandstone` |
+| rock | der Name **ist exakt** einer von `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt`, **enthält** `Sandstone`, **endet auf** ` Ore`, oder enthält `Stone` / `Andesite` / `Diorite` / `Granite` als eigenständiges Wort |
+
+Yellowstone ist ausdrücklich aufgeführt, weil `Stone` in `Yellowstone` kein eigenständiges Wort ist. Opaque und Emissive kommen **nicht** aus dem Namen — sie stammen aus den Opazitäts- und Blocklicht-Emissionsdaten der Engine, lassen sich mit diesen Regeln also nicht ableiten.
+
+Quelle: der Namensklassifikator der Engine (Modul 28537, Bundle `3ymzdd`); gegen alle 7.861 benannten Blöcke verifiziert, 2026-10-20.
 
 Beispiel — Tönung pro Block nach Material:
 
@@ -91,7 +106,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
 Gegen die Live-Registry verifiziert (2026-10-20, Bundle `3ymzdd`):
 `vegetation && !dirt` trifft exakt die 45 Blattregistrierungen (22 Basistypen —
 dieselben 22, die das v2-R-H-ID-Array gemessen hat); `vegetation && dirt` trifft exakt
-die 8 Grasblöcke. Keine Ausnahmen in beide Richtungen. Mit `vertex.normal`
+die 8 Grasblöcke. Keine Ausnahmen in beide Richtungen — Registry-Zahlen zum Stand jenes Builds; neue Blöcke erhöhen die Zahlen, ohne die Regel zu ändern. Mit `vertex.normal`
 (oben/unten) kombinieren, um Flächen auszuwählen, z. B. nur Grasblock-Oberseiten.
 
 ## 43. Funktionsumbenennungen und semantische Änderungen
@@ -182,12 +197,12 @@ Varianten werden über eine Matrix aus **strict × lighting × program** erzeugt
 |---|---|
 | `BLOXD_STRICT` | Strict-Varianten (beide Programme) |
 | `BLOXD_LIGHTING` | Varianten mit Lighting an (beide Programme) |
-| `BLOXD_ALPHA` | nur Nicht-Strict-**Terrain**-Varianten |
+| `BLOXD_ALPHA` | **alle Flüssigkeitsvarianten** plus Nicht-Strict-**Terrain**-Varianten |
 | `BLOXD_SCENE_DEPTH` | **alle Flüssigkeitsvarianten** |
 
 Zwei Dinge ändern sich für Autoren gegenüber den v2-Regeln ([Teil VIII](08-apiv2.md) §36):
 
-- **`BLOXD_ALPHA` ist in Flüssigkeitsvarianten nicht mehr definiert.** In v2 war es auch in allen Flüssigkeitsvarianten definiert; in v3 wird flüssigkeitsseitiger `#ifdef BLOXD_ALPHA`-Code einfach nie hineinkompiliert — alpha-gesteuerte Logik muss in Terrain-Hooks leben oder sich darauf verlassen, dass Flüssigkeitsvarianten kein Flag zum Erzwingen von Alpha besitzen.
+- **`BLOXD_ALPHA` ist gegenüber v2 unverändert.** Der Variantengenerator enthält die Literalzeile `"liquid"!==program&&strict||push("BLOXD_ALPHA")` — die JS-Operatorpriorität macht *(Terrain **und** strict)* zum einzigen Fall, der den push überspringt, sodass das Makro in **jeder Flüssigkeitsvariante (strict oder nicht strict) und in Nicht-Strict-Terrain** definiert ist; nur Strict-Terrain lässt es weg. Flüssigkeitsseitiger `#ifdef BLOXD_ALPHA`-Code wird genau wie immer hineinkompiliert, und das Alpha-Zurückschreiben aus §49 (eingefügt für Flüssigkeitsprogramme oder Nicht-Strict-Varianten) deckt sich exakt mit dieser Menge.
 - **`BLOXD_SCENE_DEPTH` ist in Flüssigkeitsvarianten immer definiert**, daher bleibt die Tiefennutzung dort ohne Guard in Ordnung, genau wie in v2 (§35); in Terrain-Hooks braucht sie weiterhin den `#ifdef BLOXD_SCENE_DEPTH`-Wrap.
 
 ## 47. v2 → v3-Migrationscheckliste
@@ -198,7 +213,7 @@ Zwei Dinge ändern sich für Autoren gegenüber den v2-Regeln ([Teil VIII](08-ap
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **Lichtmathematik von `engineColour` auf `litColour` + Fog umbauen** gemäß der Tabelle in §43; beachten, dass der Standard Emission jetzt durch Fog dämpft
 6. **Flüssigkeits-Hooks**: `bloxdLiquid*` explizit definieren, wenn Wasser anders behandelt werden soll; weglassen, um auf die Terrain-Hooks zurückzufallen
-7. **`BLOXD_ALPHA`-Guards prüfen** — das Flag ist aus Flüssigkeitsvarianten verschwunden (§46); flüssigkeitsseitiger alpha-gesteuerter Code ist dort tot
+7. **Keine `BLOXD_ALPHA`-Prüfung nötig** — die Variantenmenge ist gegenüber v2 unverändert: alle Flüssigkeitsvarianten plus Nicht-Strict-Terrain definieren es, nur Strict-Terrain lässt es weg (§46)
 8. **`bloxdPi` / `bloxdTau` verwenden**, wo trigonometrienahe Konstanten hartcodiert waren; paketlokale Neudeklarationen entfernen, die jetzt den Header duplizieren
 9. **Strict-Guards behalten**: Vertex-Hooks und `discard` bleiben in `#ifndef BLOXD_STRICT` gewrappt; das Template schützt `bloxdLiquidVertex` genauso wie Terrain
 10. **Im Spiel validieren** — das Paket in einem Spiel kompilieren und testen, das Shader-Pakete unterstützt
@@ -207,9 +222,10 @@ Zwei Dinge ändern sich für Autoren gegenüber den v2-Regeln ([Teil VIII](08-ap
 
 - **Die Validierung bleibt zweistufig** ([Teil VIII](08-apiv2.md) §38): zuerst statische Validierung, dann die echte WebGPU-Kompilierung des Browsers über generierte Stub-Schnipsel, die deine Hooks aufrufen, mit Fehlern, die auf Quelldateien / -zeilen zurückgeführt werden, und Diagnosen, die die ursprünglichen Namen engine-seitiger Bezeichner über ein Mapping wiederherstellen.
 - **Strict-Diagnosen nennen den Grund**: Ein Vertex-Hook, der Terrain verschiebt, meldet „… moves terrain, which strict games prevent.“, und `discard` in Surface-/Light-Hooks meldet „discard makes terrain see-through, which strict games prevent.“; die Einstellungsoberfläche behält den Hinweis „wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`.“ (`offInStrict`).
-- **Loader-Meldungen**: Fehlerarten und Limits sind unverändert; "Zip64 archives aren't supported." wird als UI-Meldung angezeigt (`loadZip64`).
-- **In-Game-Editor**: Der Shader-Editor wurde zu einem CodeMirror-basierten Editor mit WGSL-bewusstem Highlighting, Klammerabgleich und Diagnose-Spans überarbeitet.
+- **Loader-Meldungen**: Fehlerarten und Limits sind unverändert; "Zip64 archives aren't supported." wird als UI-Meldung angezeigt (`loadZip64`). Das Inventar der Paket-UI-Strings umfasst 57 `shaderPack:*`-Keys; unter den Ladephase-Fehlern vervollständigen `loadNoWgsl` (ein Zip mit null `.wgsl`-Dateien) und `loadNotZip` (eine Datei ohne Zip-End-of-Archive-Signatur) die Menge.
+- **Mit der Paket-UI wird kein WGSL-Editor im Spiel ausgeliefert.** Der Einstellungsbildschirm bietet keinen Shader-Code-Editor — Pakete werden außerhalb des Spiels als Zip-Dateien erstellt. (Ein CodeMirror-Editor existiert zwar im Bundle, ist aber der JavaScript-Editor der Custom-Game-Scripting-UI; er hat keine WGSL-Unterstützung und keine Verbindung zum Paketsystem.)
 - **Hardware-Gate**: Lite benötigt einen Treiber, der das WebGPU-Feature `shader-f16` unterstützt; zu alte Treiber werden mit einer Meldung wie "Intel driver too old for Lite (no shader-f16)" abgelehnt.
+- **Lichtänderungen validieren gespeicherte Pakete neu**: Wenn die Lighting-Einstellung zur Laufzeit geändert wird, führt die Engine die Paketprüfung erneut aus (`changed → recheck`); die Replay-Ansicht ruft denselben Hook mit `changed: false` auf und überspringt die erneute Prüfung.
 - **Formulierung**: Text über Spiele, die Shader-Pakete akzeptieren, lautet jetzt „in games that **support** them“.
 - **Geltungsbereich der Titel**: Die Menge der Spiele, in denen Pakete laufen, ist gegenüber dem vorherigen Build unverändert.
 
@@ -221,10 +237,10 @@ Der Renderer „ruft“ deine Hooks nicht aus JavaScript auf. Wenn ein Paket die
 
 | Stufe | Ankerzeile im Engine-Shader | Was eingefügt wird |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | `BloxdVertexIn` bauen, deinen Vertex-Hook aufrufen, `worldPos` zurückschreiben |
+| vertex | ein vierzeiliger Block von `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` bis `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` | `BloxdVertexIn` bauen, deinen Vertex-Hook aufrufen, `worldPos` zurückschreiben — das Einfügen schreibt außerdem `let worldPos` in `var worldPos` um |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | `BloxdSurfaceIn` bauen, deinen Surface-Hook aufrufen, `baseColor` / `alpha` zurückschreiben |
 | lit colour | kurz vor `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` | `let bloxdSpLitColour = color.rgb;` — fängt die Farbe vor dem Fog ein |
-| light | an derselben Stelle | `BloxdLightIn` bauen, deinen Light-Hook aufrufen, `color` zurückschreiben |
+| light | der abschließende `return color;` des Fragment-Shaders | `BloxdLightIn` bauen, deinen Light-Hook aufrufen, `color` zurückschreiben — nach dem Fog-Mix |
 
 Der eingefügte Code, restauriert aus dem ausgelieferten Bundle (Ausdrücke für Lichtlevel-Proben gekürzt, wo die Engine-Formatierung lang läuft):
 
@@ -271,11 +287,12 @@ alpha = bloxdSpSurface.alpha;   // nur eingefügt, wenn das Programm Flüssigkei
 }
 ```
 
-Drei Fakten zur Durchsetzung ergeben sich direkt aus diesem Einfügen:
+Vier Fakten zur Durchsetzung ergeben sich direkt aus diesem Einfügen:
 
 - **Strict-Terrain ignoriert Alpha-Änderungen des Surface-Hooks.** Das Zurückschreiben von `alpha = bloxdSpSurface.alpha` wird nur für Flüssigkeitsprogramme oder Nicht-Strict-Varianten eingefügt — die Implementierung hinter der Makrotabelle aus §46. (In Strict-Terrain wird dein `#ifdef BLOXD_ALPHA`-Code ohnehin nicht hineinkompiliert; jetzt ist außerdem bestätigt, dass ungeschützte Alpha-Schreibzugriffe dort verworfen werden.)
 - **Eine Strict-Variante, die trotzdem einen Vertex-Hook deklariert, führt ihn nie aus** — die Engine meldet das zur Build-Zeit: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. Deshalb umschließt das offizielle Template (§45) `bloxdLiquidVertex` mit demselben `#ifndef BLOXD_STRICT` wie sein Terrain-Gegenstück.
-- Die `bloxdSp*`-Bezeichner (`bloxdSpVertexIn`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, … — 16 insgesamt) sind engine-seitige Temporaries. Dein Code sieht sie nie, aber sie tauchen in Diagnosen und in jeder Reverse-Engineering-Ausgabe auf, daher lohnt es sich, sie auf Anhieb zu erkennen.
+- Die `bloxdSp*`-Bezeichner — **14 insgesamt**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — sind engine-seitige Temporaries. Dein Code sieht sie nie, aber sie tauchen in Diagnosen und in jeder Reverse-Engineering-Ausgabe auf, daher lohnt es sich, sie auf Anhieb zu erkennen.
+- **Die Abkürzung für die Standard-Surface.** Wenn der Surface-Hook einer Variante buchstäblich `bloxdDefaultSurface` ist, überspringt die Engine das Einfügen der Zurückschreibzeilen für `baseColor` / `alpha` vollständig — der Standard erzeugt diese Werte bereits, die Zuweisung wäre also toter Code. Unveränderte Hook-Ketten kosten nichts.
 
 **Was `BloxdLightIn` tatsächlich speist** — Feld für Feld, aus dem eingefügten Code:
 
@@ -344,6 +361,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **Die Tiefentextur liegt bei `@group(3) @binding(1)`** — Gruppe 3 ist die eigene Gruppe des Pakets: Binding 0 ist das 64-Byte-Uniform `bloxdPackInputs` (§41), Binding 1 ist diese Tiefentextur. Beide werden von der Engine bereitgestellt und können von deiner Seite nicht benannt werden.
+- **Die Tiefentextur ist eine unfilterable-float-Ressource nur für Fragments.** Das Bind-Group-Layout registriert sie als `texture: { sampleType: "unfilterable-float" }` allein mit `GPUShaderStage.FRAGMENT`-Sichtbarkeit — genau deshalb baut `bloxdOpaqueBehind()` auf `textureLoad` (explizite Texel-Koordinaten, Mip-Level 0) statt auf `textureSample`: Hardware-Filterung ist bei dieser Textur schlicht nicht verfügbar.
 - `z ≤ 0` bedeutet, dass die Tiefenprobe nichts getroffen hat (ferne Ebene / Himmel): `found = false`, und `position` / `distance` sind bedeutungslos — prüfe immer zuerst `found`.
 - Die zurückgegebene Position ist ein **skalierter Strahlschnittpunkt**: Die opake Oberfläche wird bei `eye + (fragment − eye) × max(z / viewDepth, 1)` platziert. `distance` wird vom Auge zu diesem Punkt gemessen — für Wasseroberflächen-Pakete ist das effektiv „wie viel Wasser der Strahl durchquert hat, bevor er auf etwas Festes traf“, was tiefengetönte Wasserrezepte ohne zweiten Tiefenpuffer möglich macht.
 
@@ -451,13 +469,14 @@ Das vollständige Ressourcenlayout des Terrain-Programms, direkt aus dem Produkt
 | `@group(3) @binding(0)` | `bloxdPackInputs` — das Paket-Uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — die Tiefentextur (§51) |
 
-- **Richtlichter sind hart auf vier begrenzt.** Der Renderer bricht mit `Terrain supports 4 directional lights, not ${n}` ab, wenn eine Szene mehr registrieren will. `l.directional` ist die summierte Lambert-Beleuchtung über alle vorhandenen (0–4; Bloxds eigene Szenen nutzen 2 — [Teil VII](07-internals.md) §27).
-- **Benennung des Terrain-Programms**: Pipeline-Cache-Keys lauten `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — ein Paket erscheint als Suffix `-sp{variant}`, ein Programm pro Variante aus §46.
+- **Richtlichter sind hart auf vier begrenzt.** Der Renderer bricht mit `Terrain supports 4 directional lights, not ${n}` ab, wenn eine Szene mehr registrieren will. `l.directional` ist die summierte Lambert-Beleuchtung über alle vorhandenen (0–4; Bloxds eigene Szenen nutzen 2 — [Teil VII](07-internals.md) §27). Terrain warnt außerdem über Lichter, die es nicht berücksichtigen kann, wortlautgetreu: ein nachträglich hinzugefügtes Licht — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; ein getöntes — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; und ein mesh-filterndes — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **Benennung des Terrain-Programms**: Pipeline-Cache-Keys lauten `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — ein Paket erscheint als Suffix `-sp{variant}`, ein Programm pro Variante aus §46. Ein Watcher (`watchPipelineFailures`) gleicht Live-Pipeline-Namen gegen `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` ab und prüft die passende Paketvariante erneut, wenn eine Pipeline-Kompilierung fehlschlägt; bei GPU-Device-Verlust (`device.lost`) wird die Prüfung übersprungen.
 - **`BLOXD_TERRAIN_DIRECTIONAL` ist ein engine-internes Makro** (definiert, wenn dirLightCount > 0). Es ist *nicht* eines der vier aus dem Präludium und erreicht nie Paketcode — aber es erscheint in WGSL-Dumps der Engine-eigenen Shader, daher spart das Erkennen Verwirrung.
 - **Dekodierung des Lichtlevels**: Das Vertex-Attribut `aPackedLightLevels` ist ein f32, das vier Nibbles packt, jeweils durch 15 geteilt: rgb = das farbige Blocklicht, a = der Himmel-/Handlicht-Kanal. Die Vertex-Stufe dekodiert es in das Varying `vLightLevels`; `blockLight` liest `.rgb`, der Himmel-/Handlicht-Kanal liest `.w`. Die Engine legt die rgb-Kanäle vor der Interpolation auf mindestens 35 % des hellsten Kanals — der engine-seitige Anker des Lifts, den [Teil VII](07-internals.md) §26 aus dem Gameplay dokumentiert.
 - **`vTerrainLambert`** (die Quelle von `directional`, §49) wird als Summe über die aktiven Richtlichter erzeugt: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, geschützt durch `BLOXD_TERRAIN_DIRECTIONAL`.
+- **Indexpuffer werden beim ersten großen Mesh 32 Bit breit.** Der Lite-Renderer wählt `Uint16Array`-Indizes nur, solange jeder Indexwert ≤ 65.534 bleibt — sobald ein Index 65.535 erreicht, wird der Puffer ein `Uint32Array` (pro Puffer über ein `is32Bits`-Flag verfolgt). Praktisch: Ein Chunk-Mesh mit höchstens 65.535 Vertices passt in 16-Bit-Indizes; eines mit genau 65.536 Vertices erzeugt zwangsläufig einen Index von 65.535 und schaltet den ganzen Puffer auf 32 Bit.
 - **Details des Manifest-Ladens**: Zip-Einträge unter `__MACOSX/`, Dateien mit Präfix `._` und `.DS_Store` werden herausgefiltert (macOS-Archivrauschen); `pack.json` wird per kleingeschriebenem Pfadvergleich gefunden — null Treffer → `loadNoManifest`, zwei oder mehr → `loadDuplicateManifest`; das Lesen des Manifests ist auf 65.536 Bytes begrenzt.
-- **Wie all das verifiziert wurde**: Die Module des Produktions-Bundles wurden restauriert (165 Chunks, 4.951 Module) und in einem webpack-kompatiblen Harness unter Node.js ausgeführt. Der gemessene `HEADER_VERSION` (§53), der gerenderte 5.637-Byte-Header, die kanonische Reihenfolge der Variantentabelle und die Tabelle der Spezialfunktionen stammen alle aus *der Ausführung des ausgelieferten Codes*, nicht aus dem Lesen von Zeichenketten. Derselbe Harness ist der natürliche Kern für ein Community-`pack_check` v6 — den Validator der Engine selbst gegen ein Paket auszuführen reproduziert exakt seine Ergebnisse.
+- **Wie all das verifiziert wurde**: Die Module des Produktions-Bundles wurden restauriert (165 Chunks; die webpack-Registry zählt in diesem Bundle 4.951 Module — die Modulzahl verschiebt sich um einige, je nachdem ob asynchrone Kind-Abhängigkeiten mitgezählt werden, daher die exakte Zahl als bundle-spezifisch behandeln) und in einem webpack-kompatiblen Harness unter Node.js ausgeführt. Der gemessene `HEADER_VERSION` (§53), der gerenderte 5.637-Byte-Header, die kanonische Reihenfolge der Variantentabelle und die Tabelle der Spezialfunktionen stammen alle aus *der Ausführung des ausgelieferten Codes*, nicht aus dem Lesen von Zeichenketten. Derselbe Harness ist der natürliche Kern für ein Community-`pack_check` v6 — den Validator der Engine selbst gegen ein Paket auszuführen reproduziert exakt seine Ergebnisse.
 
 ---
 

@@ -4,7 +4,7 @@
 
 대상 빌드: `3ymzdd.main.fae4743f.js` — **2026-10-19부터 정식 프로덕션 빌드**. bloxd.io가 프로덕션에서 제공하는 번들은 이 부를 처음 조사할 때 사용한 프리프로드 배포와 바이트 단위로 동일하다 (md5로 확인했으며, 메인 번들과 셰이더 팩 청크 모두 그러하다). 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 팩 모델은 v2 형태를 유지한다 (`pack.json` 필드, 로더 제한, uniform 레이아웃이 모두 같다).
 
-이 가이드의 제1부~제7부는 여전히 v2 기준으로 작성되어 있다. 이 부는 [제8부](08-apiv2.md)와 같은 순서로 v2 → v3 이전 포인트와 v3의 새 기능을 모은다. 변환은 대부분 기계적이지만 (§47), 두 변경은 실제 동작을 바꾼다. 기본 light는 이제 emission을 포그로 감쇠시키고 (§43), `BLOXD_ALPHA`는 액체 베리언트에서 더 이상 정의되지 않는다 (§46). 또한 `blockId`가 `blockFlags`로 전면 교체되었으므로 (§42), 배포 전에는 반드시 게임 내 컴파일로 확인할 것.
+이 가이드의 제1부~제7부는 여전히 v2 기준으로 작성되어 있다. 이 부는 [제8부](08-apiv2.md)와 같은 순서로 v2 → v3 이전 포인트와 v3의 새 기능을 모은다. 변환은 대부분 기계적이지만 (§47), 실제 동작을 바꾸는 변경은 하나뿐이다 — 기본 light가 이제 emission을 포그로 감쇠시킨다 (§43) — 그리고 `blockId`가 `blockFlags`로 전면 교체되었으므로 (§42), 배포 전에는 반드시 게임 내 컴파일로 확인할 것.
 
 이번 개정에서 새로 추가된 **§49–§54**는 이전 자체를 넘어 프로덕션 빌드에서 복원한 엔진 내부로 들어간다 — Lite 렌더러가 실제로 훅을 호출하는 방식, 실제 4모드 포그 함수, `bloxdOpaqueBehind()`의 정확한 구현, 블록 등록에서 훅까지 이어지는 blockFlags의 완전한 전달 경로, 그리고 실측 헤더 해시가 포함된 검증 파이프라인이다. 이는 현재까지 팩 시스템에 관해 공개된 가장 깊은 사실이며, 다른 가이드가 아직 미해결로 남겨 둔 여러 질문에 답한다.
 
@@ -26,7 +26,7 @@
 
 - 필수 manifest 필드는 그대로다: `{ apiVersion, name, author }`.
 - 로더 제한도 그대로다: 32MB zip / 1024개 항목 / `.wgsl` 파일 256개 / 코드 총량 256KB / manifest 64KB.
-- 엔진 uniform 블록의 형태는 그대로다: `@group(3) @binding(0)`, 64 B, 선언 순서대로 시간, 렌더 오프셋, 태양 방향, 눈 위치를 담는다. 내부 필드 이름 두 개가 바뀌었다: `time` → `seconds`, `originOffset` → `renderOffset`. **바이트 레이아웃은 v2와 동일**하며, 팩 코드에는 어차피 영향이 없다. 팩은 이 uniform을 직접 이름 붙일 수 없기 때문이다 (엔진 헤더가 엔진 제공·읽기 전용으로 표시하며, 「팩은 이름을 붙일 수 없다」). 계속 헤더 함수 `bloxdSeconds()` / `bloxdRenderOffset()`을 사용할 것.
+- 엔진 uniform 블록의 형태는 그대로다: `@group(3) @binding(0)`, 64 B, 선언 순서대로 시간, 렌더 오프셋, 태양 방향, 눈 위치를 담는다. 레이아웃은 `minBindingSize: 64`로 등록되며, 정확한 필드 배치는 `seconds: f32` @ 바이트 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48이다. 내부 필드 이름 두 개가 바뀌었다: `time` → `seconds`, `originOffset` → `renderOffset`. **바이트 레이아웃은 v2와 동일**하며, 팩 코드에는 어차피 영향이 없다. 팩은 이 uniform을 직접 이름 붙일 수 없기 때문이다 (엔진 헤더가 엔진 제공·읽기 전용으로 표시하며, 「팩은 이름을 붙일 수 없다」). 계속 헤더 함수 `bloxdSeconds()` / `bloxdRenderOffset()`을 사용할 것.
 - 팩의 group 3에는 문서화된 두 번째 점유자가 생겼다: `@group(3) @binding(1)`은 `bloxdOpaqueBehind()`가 읽는 씬 깊이 텍스처다 (전체 구현은 §51). 64 B uniform은 binding 0에 그대로 있으며, 팩은 여전히 어느 binding도 이름 붙일 수 없다.
 
 ## 42. blockId가 blockFlags로: 블록별 머티리얼을 비트 플래그로 (핵심)
@@ -57,6 +57,22 @@ const bloxdBlockFlagRock: u32 = 32;
 여러 머티리얼로 이루어진 블록은 **각각** 일치하는 플래그를 모두 가진다 (엔진 자신의 예: 사암은 모래이자 암석이므로 둘 다 가진다). 나뭇잎은 vegetation이지만 dirt는 아니고, 잔디 블록은 vegetation과 dirt를 동시에 가진다.
 
 vegetation / dirt / sand / rock 플래그는 블록의 등록된 **표시명**으로부터 부여된다 (opaque / emissive는 대신 엔진 자체의 불투명도·발광 데이터에서 온다): 이름이 `Leaves`로 끝나거나 `Grass Block`인 것은 vegetation; `Dirt` / `Soil` 이름 (그리고 모든 `Grass Block`)은 dirt; 정확히 `Sand`와 `Red Sand`, 그리고 `Sandstone`을 포함하는 모든 이름은 sand; `Stone` / `Andesite` / `Diorite` / `Granite`를 포함하는 이름, 모든 `Ore`, 그리고 Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (와 사암)는 rock이다.
+
+
+### 정확한 이름 규칙 (모든 블록의 플래그를 직접 도출하기)
+
+네 머티리얼 비트는 블록의 등록된 표시명에 대한 고정 분류기에서 나온다. 베리언트 이름(`|` 뒤의 모든 것)은 먼저 잘라내므로, 베리언트는 기본 블록의 플래그를 물려받는다. 그다음:
+
+| 비트 | 규칙 (잘라낸 이름에 대해 평가) |
+|---|---|
+| vegetation | 이름이 ` Leaves`로 **끝나거나**, ` Grass Block`으로 **끝난다** |
+| dirt | 이름이 정확히 `Dirt`이거나, ` Dirt` 또는 ` Soil`로 **끝나거나**, ` Grass Block`으로 **끝난다** |
+| sand | 이름이 정확히 `Sand` 또는 `Red Sand`이거나, `Sandstone`을 **포함한다** |
+| rock | 이름이 정확히 `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt` 중 하나이거나, `Sandstone`을 **포함하거나**, ` Ore`로 **끝나거나**, `Stone` / `Andesite` / `Diorite` / `Granite`를 독립 단어로 포함한다 |
+
+Yellowstone이 명시된 이유는 `Stone`이 `Yellowstone` 안에서 독립 단어가 아니기 때문이다. Opaque와 emissive는 이름에서 오지 **않는다** — 엔진 자체의 불투명도와 블록 광 방출 데이터에서 오므로, 이 규칙으로는 도출할 수 없다.
+
+출처: 엔진의 이름 분류기 (모듈 28537, 번들 `3ymzdd`); 이름이 있는 7,861개 블록 전체에 대해 검증했다, 2026-10-20.
 
 예 — 머티리얼별로 블록에 색을 입힌다:
 
@@ -89,7 +105,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
 실제 레지스트리로 확인했다 (2026-10-20, 번들 `3ymzdd`):
 `vegetation && !dirt`는 정확히 45개의 나뭇잎 등록 (22개 기본 타입 —
 v2 R-H id 배열이 측정한 것과 같은 22개)과 일치하고, `vegetation && dirt`는 정확히
-8개의 잔디 블록과 일치한다. 어느 방향으로도 예외는 없다. `vertex.normal`
+8개의 잔디 블록과 일치한다. 어느 방향으로도 예외는 없다 — 레지스트리 집계는 해당 빌드 시점 기준이며, 새 블록이 추가되면 규칙은 그대로인 채 숫자만 늘어난다. `vertex.normal`
 (위/아래)과 조합하면 면을 고를 수 있다. 예를 들어 잔디 블록의 윗면만 고른다.
 
 ## 43. 함수 이름 변경과 의미 변화
@@ -180,12 +196,12 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 |---|---|
 | `BLOXD_STRICT` | strict 베리언트 (두 프로그램 모두) |
 | `BLOXD_LIGHTING` | lighting-on 베리언트 (두 프로그램 모두) |
-| `BLOXD_ALPHA` | non-strict **terrain** 베리언트에만 |
+| `BLOXD_ALPHA` | **모든 액체 베리언트**에 더해 non-strict **terrain** 베리언트 |
 | `BLOXD_SCENE_DEPTH` | **모든 액체 베리언트** |
 
 v2 규칙 ([제8부](08-apiv2.md) §36)과 비교해 작성자에게 바뀌는 점은 두 가지다:
 
-- **`BLOXD_ALPHA`는 액체 베리언트에서 더 이상 정의되지 않는다.** v2에서는 모든 액체 베리언트에도 정의되었다. v3에서 액체 쪽 `#ifdef BLOXD_ALPHA` 코드는 그냥 컴파일 대상에서 빠지므로, alpha로 제어하는 로직은 terrain 훅에 두거나, 액체 베리언트에는 alpha를 강제하는 플래그가 없다는 점에 의존해야 한다.
+- **`BLOXD_ALPHA`는 v2에서 그대로다.** 베리언트 생성기는 `"liquid"!==program&&strict||push("BLOXD_ALPHA")`라는 줄을 그대로 담고 있다 — JS 연산자 우선순위상 push를 건너뛰는 경우는 *(terrain **이면서** strict)* 하나뿐이므로, 매크로는 **모든 액체 베리언트 (strict든 non-strict든)와 non-strict terrain**에 정의되고, strict terrain만 이를 생략한다. 액체 쪽 `#ifdef BLOXD_ALPHA` 코드는 예전과 똑같이 컴파일되며, §49의 alpha 되쓰기 (liquid 프로그램이나 non-strict 베리언트에 이어 붙는다)가 이 집합과 정확히 일치한다.
 - **`BLOXD_SCENE_DEPTH`는 액체 베리언트에서 항상 정의된다.** 따라서 깊이 사용은 v2와 똑같이 액체 쪽에서 가드 없이 괜찮고 (§35), terrain 훅에서는 계속 `#ifdef BLOXD_SCENE_DEPTH`로 감싸야 한다.
 
 ## 47. v2 → v3 마이그레이션 체크리스트
@@ -196,7 +212,7 @@ v2 규칙 ([제8부](08-apiv2.md) §36)과 비교해 작성자에게 바뀌는 �
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **light 계산을 `engineColour`에서 `litColour` + 포그로 재구성한다**: §43 표에 따라. 기본값이 이제 emission을 포그로 감쇠시킨다는 점에 주의.
 6. **액체 훅**: 물을 다르게 처리하려면 `bloxdLiquid*`를 명시적으로 정의한다. 생략하면 terrain 훅으로 폴백한다.
-7. **`BLOXD_ALPHA` 가드 점검**: 이 플래그는 액체 베리언트에서 사라졌다 (§46). 액체 쪽 alpha 게이트 코드는 거기서 죽은 코드가 된다.
+7. **`BLOXD_ALPHA` 점검은 필요 없다** — 베리언트 집합은 v2와 그대로다: 모든 액체 베리언트와 non-strict terrain에 정의되고, strict terrain만 생략한다 (§46)
 8. **`bloxdPi` / `bloxdTau` 사용**: 삼각함수 관련 상수를 하드코딩하던 곳에서 사용하고, 이제 헤더와 중복되는 팩 로컬 재선언은 삭제한다.
 9. **strict 가드 유지**: vertex 훅과 `discard`는 계속 `#ifndef BLOXD_STRICT`로 감싼다. 템플릿은 `bloxdLiquidVertex`도 terrain 쪽과 같은 방식으로 가드한다.
 10. **게임 내 검증**: 셰이더 팩을 지원하는 게임에서 팩을 컴파일하고 테스트한다.
@@ -205,9 +221,10 @@ v2 규칙 ([제8부](08-apiv2.md) §36)과 비교해 작성자에게 바뀌는 �
 
 - **검증은 여전히 2단계**다 ([제8부](08-apiv2.md) §38): 먼저 정적 검증, 그 다음 훅을 호출하는 생성 스텁 스니펫을 통한 브라우저의 실제 WebGPU 컴파일. 오류는 원본 파일 / 줄로 매핑되고, 진단은 매핑을 통해 엔진 쪽 식별자의 원래 이름을 복원한다.
 - **strict 진단은 이유를 말한다**: 지형을 움직이는 vertex 훅은 「… moves terrain, which strict games prevent.」를 보고하고, surface / light 훅의 `discard`는 「discard makes terrain see-through, which strict games prevent.」를 보고한다. 설정 UI는 「wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`.」 안내를 유지한다 (`offInStrict`).
-- **로더 메시지**: 오류 종류와 제한은 그대로다. "Zip64 archives aren't supported."는 UI 메시지로 표시된다 (`loadZip64`).
-- **게임 내 에디터**: 셰이더 에디터가 CodeMirror 기반으로 개편되어 WGSL 인식 하이라이트, 괄호 매칭, 진단 범위 표시를 지원한다.
+- **로더 메시지**: 오류 종류와 제한은 그대로다. "Zip64 archives aren't supported."는 UI 메시지로 표시된다 (`loadZip64`). 팩 UI 문자열 인벤토리는 총 57개의 `shaderPack:*` 키다. 로드 단계 오류로는 `.wgsl` 파일이 하나도 없는 zip을 뜻하는 `loadNoWgsl`과 zip 종료 시그니처가 없는 파일을 뜻하는 `loadNotZip`이 이 집합을 마무리한다.
+- **게임 내 WGSL 에디터는 팩 UI에 포함되지 않는다.** 설정 화면에는 셰이더 코드 에디터가 없다 — 팩은 게임 밖에서 zip 파일로 작성한다. (번들 안에 CodeMirror 에디터가 존재하기는 하지만, 그것은 커스텀 게임 스크립팅 UI의 JavaScript 에디터이며 WGSL 지원도, 팩 시스템과의 연결도 없다.)
 - **하드웨어 게이트**: Lite는 `shader-f16` WebGPU 기능을 지원하는 드라이버를 요구한다. 너무 오래된 드라이버는 "Intel driver too old for Lite (no shader-f16)" 같은 메시지로 거부된다.
+- **lighting 변경은 저장된 팩을 재검증한다**: 실행 중 lighting 설정이 바뀌면 엔진은 팩 검사를 다시 실행한다 (`changed → recheck`); 리플레이 시청은 같은 훅을 `changed: false`로 호출하고 재검사를 건너뛴다.
 - **문구**: 셰이더 팩을 받아들이는 게임에 대한 문장이 이제 「in games that **support** them」으로 표기된다.
 - **적용 범위**: 팩이 동작하는 게임의 범위는 이전 빌드와 같다.
 
@@ -219,10 +236,10 @@ v2 규칙 ([제8부](08-apiv2.md) §36)과 비교해 작성자에게 바뀌는 �
 
 | 단계 | 엔진 셰이더의 앵커 줄 | 이어 붙는 내용 |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | `BloxdVertexIn`을 만들고 vertex 훅을 호출한 뒤 `worldPos`를 다시 쓴다 |
+| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);`부터 `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);`까지의 네 줄 블록 | `BloxdVertexIn`을 만들고 vertex 훅을 호출한 뒤 `worldPos`를 다시 쓴다 — 이어 붙이기는 `let worldPos`를 `var worldPos`로도 바꾼다 |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | `BloxdSurfaceIn`을 만들고 surface 훅을 호출한 뒤 `baseColor` / `alpha`를 다시 쓴다 |
 | lit colour | `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` 바로 앞 | `let bloxdSpLitColour = color.rgb;` — 포그 전 색을 캡처한다 |
-| light | 같은 지점 | `BloxdLightIn`을 만들고 light 훅을 호출한 뒤 `color`를 다시 쓴다 |
+| light | fragment 셰이더의 마지막 `return color;` 줄 | `BloxdLightIn`을 만들고 light 훅을 호출한 뒤 `color`를 다시 쓴다 — 포그 블렌드 이후 |
 
 출하된 번들에서 복원한, 훅을 이어 붙이는 코드 (엔진 자체 서식이 길어지는 light-level 샘플 식은 축약):
 
@@ -269,11 +286,12 @@ alpha = bloxdSpSurface.alpha;   // 프로그램이 liquid이거나 베리언트�
 }
 ```
 
-이 이어 붙이는 코드에서 곧바로 나오는 세 가지 강제 사실:
+이 이어 붙이는 코드에서 곧바로 나오는 네 가지 강제 사실:
 
 - **strict terrain은 surface 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되쓰기는 liquid 프로그램이나 non-strict 베리언트에만 이어 붙는다 — §46 매크로 표의 구현이다. (strict terrain에서는 `#ifdef BLOXD_ALPHA` 코드가 어차피 컴파일 대상에서 빠지며, 이제 가드 없는 alpha 쓰기도 거기서 버려진다는 점이 확인되었다.)
 - **vertex 훅을 선언한 strict 베리언트는 그 훅을 절대 실행하지 않는다** — 엔진은 빌드 시점에 `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`를 보고한다. 공식 템플릿 (§45)이 `bloxdLiquidVertex`를 terrain 쪽과 같은 `#ifndef BLOXD_STRICT`로 감싸는 이유다.
-- `bloxdSp*` 식별자 (`bloxdSpVertexIn`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, … 총 16개)는 엔진 쪽 임시 변수다. 작성하는 코드에는 보이지 않지만 진단과 누군가의 리버스 엔지니어링 출력에 나타나므로, 보는 즉시 알아볼 가치가 있다.
+- `bloxdSp*` 식별자 — **총 14개**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — 는 엔진 쪽 임시 변수다. 작성하는 코드에는 보이지 않지만 진단과 누군가의 리버스 엔지니어링 출력에 나타나므로, 보는 즉시 알아볼 가치가 있다.
+- **기본 surface 지름길.** 베리언트의 surface 훅이 문자 그대로 `bloxdDefaultSurface`이면, 엔진은 `baseColor` / `alpha` 되쓰기 줄을 아예 이어 붙이지 않는다 — 기본값이 이미 그 값들을 만들어 내므로 대입은 죽은 코드가 된다. 수정하지 않은 훅 체인은 비용이 들지 않는다.
 
 **`BloxdLightIn`에 실제로 들어가는 값** — 이어 붙는 코드 기준, 필드별:
 
@@ -342,6 +360,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **깊이 텍스처는 `@group(3) @binding(1)`에 있다** — group 3은 팩 자신의 그룹이다: binding 0은 64 B `bloxdPackInputs` uniform (§41), binding 1은 이 깊이 텍스처다. 둘 다 엔진이 제공하며 팩 쪽에서는 이름을 붙일 수 없다.
+- **깊이 텍스처는 unfilterable-float, fragment 전용 리소스다.** 바인드 그룹 레이아웃은 이를 `texture: { sampleType: "unfilterable-float" }`로 등록하며 가시성은 `GPUShaderStage.FRAGMENT`뿐이다 — `bloxdOpaqueBehind()`가 `textureSample` 대신 `textureLoad` (명시적 텍셀 좌표, 밉 레벨 0)로 구현된 이유가 바로 이것이다: 이 텍스처에는 하드웨어 필터링이 아예 없다.
 - `z ≤ 0`은 깊이 샘플이 아무것도 맞히지 못했다는 뜻이다 (원거리 평면 / 하늘): `found = false`이며 `position` / `distance`는 의미가 없다 — 항상 `found`를 먼저 확인할 것.
 - 반환되는 위치는 **광선 스케일 교차점**이다: 불투명 표면은 `eye + (fragment − eye) × max(z / viewDepth, 1)`에 놓인다. `distance`는 눈에서 그 점까지의 거리다 — 물 표면 팩에서는 「광선이 단단한 표면에 닿기 전에 물을 얼마나 통과했는가」가 되며, 이것이 두 번째 깊이 버퍼 없이 깊이 틴트 물 레시피를 가능하게 한다.
 
@@ -449,13 +468,14 @@ FNV-1a-32 해시이며 (`6.` 접두사), 다섯 입력을 해시한다: 베리�
 | `@group(3) @binding(0)` | `bloxdPackInputs` — 팩 uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — 깊이 텍스처 (§51) |
 
-- **방향광은 최대 네 개로 하드 캡된다.** 씬이 더 등록하려 하면 렌더러는 `Terrain supports 4 directional lights, not ${n}`으로 오류를 낸다. `l.directional`은 존재하는 만큼 (0–4개, Bloxd 자체 씬은 2개 사용 — [제7부](07-internals.md) §27)의 Lambert 합이다.
-- **terrain 프로그램 이름**: 파이프라인 캐시 키는 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`로 읽힌다 — 팩은 `-sp{variant}` 접미사로 나타나며, §46 베리언트마다 프로그램 하나다.
+- **방향광은 최대 네 개로 하드 캡된다.** 씬이 더 등록하려 하면 렌더러는 `Terrain supports 4 directional lights, not ${n}`으로 오류를 낸다. `l.directional`은 존재하는 만큼 (0–4개, Bloxd 자체 씬은 2개 사용 — [제7부](07-internals.md) §27)의 Lambert 합이다. terrain은 또한 처리할 수 없는 light에 대해 다음과 같이 경고한다, 그대로 옮기면: 늦게 추가된 light — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; 색이 입혀진 light — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; 메시 필터링 light — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **terrain 프로그램 이름**: 파이프라인 캐시 키는 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`로 읽힌다 — 팩은 `-sp{variant}` 접미사로 나타나며, §46 베리언트마다 프로그램 하나다. 감시자 (`watchPipelineFailures`)는 살아 있는 파이프라인 이름을 `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/`와 대조해 파이프라인 컴파일이 실패하면 일치하는 팩 베리언트를 다시 검사한다; GPU 장치 손실 (`device.lost`)은 검사를 건너뛴다.
 - **`BLOXD_TERRAIN_DIRECTIONAL`은 엔진 내부 매크로**다 (dirLightCount > 0일 때 정의). 프렐류드의 네 매크로 중 하나가 아니며 팩 코드에 절대 도달하지 않지만, 엔진 자체 셰이더의 WGSL 덤프에는 나타나므로 알아 두면 혼동을 줄일 수 있다.
 - **light-level 디코드**: `aPackedLightLevels` 정점 속성은 니블 네 개를 담은 f32 하나이며, 각각 15로 나뉜다: rgb = 유색 블록 광, a = 스카이 / held 채널. vertex 단계는 이를 `vLightLevels` varying으로 디코드하고, `blockLight`는 `.rgb`를, 스카이 / held 채널은 `.w`를 읽는다. 엔진은 보간 전에 rgb 채널을 가장 밝은 채널의 35%로 바닥 처리한다 — [제7부](07-internals.md) §26이 게임플레이에서 기록한 리프트의 엔진 쪽 기준점이다.
 - **`vTerrainLambert`** (`directional`의 공급원, §49)는 활성 방향광에 대한 합으로 생성된다: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, `BLOXD_TERRAIN_DIRECTIONAL`로 가드된다.
+- **인덱스 버퍼는 첫 대형 메시에서 32비트가 된다.** Lite 렌더러는 모든 인덱스 값이 65,534 이하로 유지되는 동안만 `Uint16Array` 인덱스를 고른다 — 어떤 인덱스든 65,535에 도달하는 순간 버퍼는 `Uint32Array`가 된다 (버퍼마다 `is32Bits` 플래그로 추적한다). 실제로는: 정점이 최대 65,535개인 청크 메시는 16비트 인덱스에 들어가고, 정확히 65,536개인 메시는 반드시 인덱스 65,535를 내보내 버퍼 전체가 32비트로 전환된다.
 - **manifest 로딩 세부**: `__MACOSX/` 아래 zip 항목, `._` 접두사 파일, `.DS_Store`는 필터링된다 (macOS 아카이브 노이즈). `pack.json`은 소문자 경로 비교로 찾는다 — 0개 일치 → `loadNoManifest`, 2개 이상 → `loadDuplicateManifest`; manifest 읽기는 65,536바이트로 제한된다.
-- **이 모든 것을 어떻게 검증했는가**: 프로덕션 번들의 모듈을 복원하고 (165개 청크, 4,951개 모듈) Node.js의 webpack 호환 하네스에서 실행했다. 측정된 `HEADER_VERSION` (§53), 렌더링된 5,637바이트 헤더, 베리언트 표의 정규 순서, 특수 함수 맵은 모두 문자열을 읽은 것이 아니라 *출하된 코드를 실행*해 얻은 것이다. 같은 하네스는 커뮤니티 `pack_check` v6의 자연스러운 핵심이다 — 엔진 자체 검증기를 팩에 대해 실행하면 판정을 정확히 재현한다.
+- **이 모든 것을 어떻게 검증했는가**: 프로덕션 번들의 모듈을 복원하고 (165개 청크; 이 번들의 webpack 레지스트리는 4,951개 모듈을 세지만 — 비동기 자식 의존성을 포함하는지에 따라 모듈 수는 몇 개씩 달라지므로 정확한 숫자는 번들별로 다루는 것이 좋다) Node.js의 webpack 호환 하네스에서 실행했다. 측정된 `HEADER_VERSION` (§53), 렌더링된 5,637바이트 헤더, 베리언트 표의 정규 순서, 특수 함수 맵은 모두 문자열을 읽은 것이 아니라 *출하된 코드를 실행*해 얻은 것이다. 같은 하네스는 커뮤니티 `pack_check` v6의 자연스러운 핵심이다 — 엔진 자체 검증기를 팩에 대해 실행하면 판정을 정확히 재현한다.
 
 ---
 
