@@ -4,7 +4,7 @@
 
 Target build: `3ymzdd.main.fae4743f.js` — **the live production build since 2026-10-19**. The bundle bloxd.io serves in production is byte-identical (md5-checked, main bundle and shader-pack chunks alike) to the preprod deploy this part was originally researched against, so everything here applies to production as-is. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
 
-Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [Part VIII](08-apiv2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but two changes actually alter behavior — the default light now attenuates emission with fog (§43), and `BLOXD_ALPHA` is no longer defined in liquid variants (§46) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.
+Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [Part VIII](08-apiv2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but only one change actually alters behavior — the default light now attenuates emission with fog (§43) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.
 
 New in this revision: sections **§49–§54** go past the migration itself into engine internals restored from the production build — how the Lite renderer actually invokes your hooks, the real four-mode fog function, the exact `bloxdOpaqueBehind()` implementation, the complete blockFlags delivery path from block registration to your hook, and the validation pipeline with its measured header hash. These are the deepest publicly documented facts about the pack system to date, and they settle several questions other guides still list as open.
 
@@ -26,7 +26,7 @@ Saved packs keep the v2 lifecycle ([Part VIII](08-apiv2.md) §31): every build h
 
 - Required manifest fields are unchanged: `{ apiVersion, name, author }`.
 - Loader limits are unchanged: 32MB zip / 1024 entries / 256 `.wgsl` files / 256KB total code / 64KB manifest.
-- The engine uniform block is unchanged in shape: `@group(3) @binding(0)`, 64 B, holding — in declaration order — the time, the render offset, the sun direction, and the eye position. Two internal field names changed: `time` → `seconds`, `originOffset` → `renderOffset`. The **byte layout is identical to v2**, and nothing changes for pack code anyway, because packs are not allowed to name the uniform directly (the engine header marks it engine-provided and read-only, "which packs can't name"); keep going through the header functions `bloxdSeconds()` / `bloxdRenderOffset()`.
+- The engine uniform block is unchanged in shape: `@group(3) @binding(0)`, 64 B, holding — in declaration order — the time, the render offset, the sun direction, and the eye position. The layout is registered with `minBindingSize: 64`, and the exact field layout is `seconds: f32` @ byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48. Two internal field names changed: `time` → `seconds`, `originOffset` → `renderOffset`. The **byte layout is identical to v2**, and nothing changes for pack code anyway, because packs are not allowed to name the uniform directly (the engine header marks it engine-provided and read-only, "which packs can't name"); keep going through the header functions `bloxdSeconds()` / `bloxdRenderOffset()`.
 - The pack's group 3 gained a documented second occupant: `@group(3) @binding(1)` is the scene-depth texture that `bloxdOpaqueBehind()` reads (full implementation in §51). The 64 B uniform stays at binding 0; packs still cannot name either binding.
 
 ## 42. blockId becomes blockFlags: per-block materials as bit flags (the headline)
@@ -57,6 +57,22 @@ const bloxdBlockFlagRock: u32 = 32;
 A block made of several materials carries **each** matching flag (the engine's own example: sandstone is sand and rock, so it gets both). Leaves are vegetation but not dirt; grass blocks are vegetation and dirt at once.
 
 The vegetation / dirt / sand / rock flags are assigned from the block's registered **display name** (opaque / emissive come from the engine's own opacity and emission data instead): names ending in `Leaves`, or `Grass Block`, are vegetation; `Dirt` / `Soil` names (and every `Grass Block`) are dirt; exactly `Sand` and `Red Sand`, plus any name containing `Sandstone`, are sand; names containing `Stone` / `Andesite` / `Diorite` / `Granite`, any `Ore`, plus Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (and sandstone) are rock.
+
+
+### The exact name rules (derive any block's flags yourself)
+
+The four material bits come from a fixed classifier over the block's registered display name. Variant names (anything after `|`) are stripped first, so variants inherit the base block's flags. Then:
+
+| Bit | Rule (evaluated on the stripped name) |
+|---|---|
+| vegetation | the name **ends with** ` Leaves`, or **ends with** ` Grass Block` |
+| dirt | the name **is exactly** `Dirt`, **ends with** ` Dirt` or ` Soil`, or **ends with** ` Grass Block` |
+| sand | the name **is exactly** `Sand` or `Red Sand`, or **contains** `Sandstone` |
+| rock | the name **is exactly** one of `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt`, **contains** `Sandstone`, **ends with** ` Ore`, or contains `Stone` / `Andesite` / `Diorite` / `Granite` as a standalone word |
+
+Yellowstone is listed explicitly because `Stone` is not a standalone word inside `Yellowstone`. Opaque and emissive do **not** come from the name — they come from the engine's own opacity and block-light-emission data, so they cannot be derived with these rules.
+
+Source: the engine's name classifier (module 28537, bundle `3ymzdd`); verified against all 7,861 named blocks, 2026-10-20.
 
 Example — per-block tint by material:
 
@@ -91,7 +107,7 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
 Verified against the live registry (2026-10-20, bundle `3ymzdd`):
 `vegetation && !dirt` matches exactly the 45 leaf registrations (22 base types —
 the same 22 the v2 R-H id array measured); `vegetation && dirt` matches exactly
-the 8 grass blocks. No exceptions in either direction. Pair with `vertex.normal`
+the 8 grass blocks. No exceptions in either direction — registry counts as of that build; new blocks grow the numbers without changing the rule. Pair with `vertex.normal`
 (up/down) to pick faces, e.g. grass-block tops only.
 
 ## 43. Function renames and semantic changes
@@ -182,12 +198,12 @@ Variants are generated over a matrix of **strict × lighting × program** — th
 |---|---|
 | `BLOXD_STRICT` | strict variants (both programs) |
 | `BLOXD_LIGHTING` | lighting-on variants (both programs) |
-| `BLOXD_ALPHA` | non-strict **terrain** variants only |
+| `BLOXD_ALPHA` | **all liquid variants** plus non-strict **terrain** variants |
 | `BLOXD_SCENE_DEPTH` | **all liquid variants** |
 
 Two things change for authors versus the v2 rules ([Part VIII](08-apiv2.md) §36):
 
-- **`BLOXD_ALPHA` is no longer defined in liquid variants.** In v2 it was defined in all liquid variants too; in v3 liquid-side `#ifdef BLOXD_ALPHA` code simply never compiles in — alpha-gated logic needs to live in terrain hooks, or rely on liquid variants not having an alpha-forcing flag.
+- **`BLOXD_ALPHA` is unchanged from v2.** The variant generator carries the literal line `"liquid"!==program&&strict||push("BLOXD_ALPHA")` — JS operator precedence makes *(terrain **and** strict)* the only case that skips the push, so the macro is defined in **every liquid variant (strict or non-strict) and in non-strict terrain**; only strict terrain omits it. Liquid-side `#ifdef BLOXD_ALPHA` code compiles in exactly as it always did, and §49's alpha write-back (spliced for liquid programs or non-strict variants) matches this set precisely.
 - **`BLOXD_SCENE_DEPTH` is always defined in liquid variants**, so depth use stays unguarded-OK there, exactly as in v2 (§35); in terrain hooks it keeps needing the `#ifdef BLOXD_SCENE_DEPTH` wrap.
 
 ## 47. v2 to v3 migration checklist
@@ -198,7 +214,7 @@ Two things change for authors versus the v2 rules ([Part VIII](08-apiv2.md) §36
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
 5. **Rebuild light math from `engineColour` onto `litColour` + fog** per the §43 table; note the default now attenuates emission with fog
 6. **Liquid hooks**: define `bloxdLiquid*` explicitly when you want water handled differently; omit them to fall back to your terrain hooks
-7. **Audit `BLOXD_ALPHA` guards** — the flag is gone from liquid variants (§46); liquid-side alpha-gated code is dead there
+7. **No `BLOXD_ALPHA` audit needed** — its variant set is unchanged from v2: all liquid variants plus non-strict terrain define it, only strict terrain omits it (§46)
 8. **Use `bloxdPi` / `bloxdTau`** where trig-related constants were hardcoded; remove pack-local re-declarations that now duplicate the header
 9. **Keep strict guards**: vertex hooks and `discard` stay wrapped in `#ifndef BLOXD_STRICT`; the template guards `bloxdLiquidVertex` the same way as terrain
 10. **Validate in-game** — compile and test the pack in a game that supports shader packs
@@ -207,9 +223,10 @@ Two things change for authors versus the v2 rules ([Part VIII](08-apiv2.md) §36
 
 - **Validation stays two-stage** ([Part VIII](08-apiv2.md) §38): static validation first, then the browser's real WebGPU compilation through generated stub snippets that call your hooks, with errors mapped back to source files / lines, and diagnostics restore the original names of engine-side identifiers through a mapping.
 - **Strict diagnostics name the reason**: a vertex hook moving terrain reports "… moves terrain, which strict games prevent." and `discard` in surface / light hooks reports "discard makes terrain see-through, which strict games prevent."; the settings UI keeps the "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." guidance (`offInStrict`).
-- **Loader messages**: error kinds and limits are unchanged; "Zip64 archives aren't supported." is surfaced as a UI message (`loadZip64`).
-- **In-game editor**: the shader editor was overhauled to a CodeMirror-based editor with WGSL-aware highlighting, bracket matching, and diagnostics spans.
+- **Loader messages**: error kinds and limits are unchanged; "Zip64 archives aren't supported." is surfaced as a UI message (`loadZip64`). The pack-UI string inventory totals 57 `shaderPack:*` keys; among load-stage errors, `loadNoWgsl` (a zip containing zero `.wgsl` files) and `loadNotZip` (a file without a zip end-of-archive signature) round out the set.
+- **No in-game WGSL editor ships with the pack UI.** The settings screen offers no shader code editor — packs are authored as zip files outside the game. (A CodeMirror editor does exist in the bundle, but it is the JavaScript editor of the custom-game scripting UI; it has no WGSL support and no connection to the pack system.)
 - **Hardware gate**: Lite requires a driver supporting the `shader-f16` WebGPU feature; too-old drivers are rejected with a message like "Intel driver too old for Lite (no shader-f16)".
+- **Lighting changes re-validate saved packs**: when the lighting setting changes at run time, the engine re-runs the pack check (`changed → recheck`); replay viewing calls the same hook with `changed: false` and skips the re-check.
 - **Wording**: text about games that accept shader packs now reads "in games that **support** them".
 - **Scope of titles**: the set of games where packs run is unchanged from the previous build.
 
@@ -221,10 +238,10 @@ The renderer does not "call" your hooks from JavaScript. When a pack passes vali
 
 | Stage | Anchor line in the engine shader | What gets spliced in |
 |---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` | build `BloxdVertexIn`, call your vertex hook, write `worldPos` back |
+| vertex | a four-line block from `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` through `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` | build `BloxdVertexIn`, call your vertex hook, write `worldPos` back — the splice also rewrites `let worldPos` to `var worldPos` |
 | surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | build `BloxdSurfaceIn`, call your surface hook, write `baseColor` / `alpha` back |
 | lit colour | just before `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` | `let bloxdSpLitColour = color.rgb;` — captures the pre-fog colour |
-| light | same spot | build `BloxdLightIn`, call your light hook, write `color` back |
+| light | the fragment shader's final `return color;` line | build `BloxdLightIn`, call your light hook, write `color` back — after the fog mix |
 
 The spliced code, restored from the shipped bundle (light-level sample expressions abbreviated where the engine's own formatting runs long):
 
@@ -275,7 +292,8 @@ Three enforcement facts come straight out of this splicing:
 
 - **Strict terrain ignores surface-hook alpha changes.** The `alpha = bloxdSpSurface.alpha` write-back is spliced only for liquid programs or non-strict variants — the implementation behind §46's macro table. (In strict terrain your `#ifdef BLOXD_ALPHA` code doesn't compile in anyway; now it is also confirmed that unguarded alpha writes are dropped there.)
 - **A strict variant that still declares a vertex hook never runs it** — the engine reports it at build time: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. That is why the official template (§45) wraps `bloxdLiquidVertex` in the same `#ifndef BLOXD_STRICT` as its terrain twin.
-- The `bloxdSp*` identifiers (`bloxdSpVertexIn`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, … — 16 in total) are engine-side temporaries. Your code never sees them, but they surface in diagnostics and in anyone's reverse-engineering output, so they are worth recognizing on sight.
+- The `bloxdSp*` identifiers — **14 in total**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — are engine-side temporaries. Your code never sees them, but they surface in diagnostics and in anyone's reverse-engineering output, so they are worth recognizing on sight.
+- **The default-surface shortcut.** When a variant's surface hook is literally `bloxdDefaultSurface`, the engine skips splicing the `baseColor` / `alpha` write-back lines entirely — the default already produces those values, so the assignment would be dead code. Unmodified hook chains cost nothing.
 
 **What actually feeds `BloxdLightIn`** — field by field, from the spliced code:
 
@@ -344,6 +362,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 ```
 
 - **The depth texture lives at `@group(3) @binding(1)`** — group 3 is the pack's own group: binding 0 is the 64 B `bloxdPackInputs` uniform (§41), binding 1 is this depth texture. Both are engine-provided and unnamed from your side.
+- **The depth texture is an unfilterable-float, fragment-only resource.** The bind-group layout registers it as `texture: { sampleType: "unfilterable-float" }` with `GPUShaderStage.FRAGMENT` visibility alone — which is exactly why `bloxdOpaqueBehind()` is built on `textureLoad` (explicit texel coordinates, mip level 0) instead of `textureSample`: hardware filtering is simply unavailable on this texture.
 - `z ≤ 0` means the depth sample hit nothing (far plane / sky): `found = false`, and `position` / `distance` are meaningless — check `found` first, always.
 - The returned position is a **ray-scale intersection**: the opaque surface is placed at `eye + (fragment − eye) × max(z / viewDepth, 1)`. `distance` is measured from the eye to that point — for water-surface packs this is effectively "how much water the ray crossed before hitting something solid", which is what makes depth-tinted water recipes work without a second depth buffer.
 
@@ -451,13 +470,14 @@ The terrain program's complete resource layout, straight from the production Lit
 | `@group(3) @binding(0)` | `bloxdPackInputs` — the pack uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — the depth texture (§51) |
 
-- **Directional lights are hard-capped at four.** The renderer errors out with `Terrain supports 4 directional lights, not ${n}` if a scene tries to register more. `l.directional` is the summed Lambert over however many exist (0–4; Bloxd's own scenes use 2 — [Part VII](07-internals.md) §27).
-- **Terrain program naming**: pipeline cache keys read `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — a pack shows up as the `-sp{variant}` suffix, one program per §46 variant.
+- **Directional lights are hard-capped at four.** The renderer errors out with `Terrain supports 4 directional lights, not ${n}` if a scene tries to register more. `l.directional` is the summed Lambert over however many exist (0–4; Bloxd's own scenes use 2 — [Part VII](07-internals.md) §27). Terrain also warns about lights it cannot honour, verbatim: a late-added light — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; a tinted one — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; and a mesh-filtering one — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **Terrain program naming**: pipeline cache keys read `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — a pack shows up as the `-sp{variant}` suffix, one program per §46 variant. A watcher (`watchPipelineFailures`) matches live pipeline names against `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` and re-checks the matching pack variant when a pipeline compilation fails; GPU device loss (`device.lost`) skips the check.
 - **`BLOXD_TERRAIN_DIRECTIONAL` is an engine-internal macro** (defined when dirLightCount > 0). It is *not* one of the prelude's four and never reaches pack code — but it appears in WGSL dumps of the engine's own shaders, so recognizing it saves confusion.
 - **Light-level decode**: the `aPackedLightLevels` vertex attribute is one f32 packing four nibbles, each divided by 15: rgb = the colored block light, a = the sky/held channel. The vertex stage decodes it into the `vLightLevels` varying; `blockLight` reads `.rgb`, the sky/held channel reads `.w`. The engine floors the rgb channels at 35% of the brightest channel before interpolation — the engine-side anchor of the lift [Part VII](07-internals.md) §26 documents from gameplay.
 - **`vTerrainLambert`** (the `directional` source, §49) is generated as a sum over the active directional lights: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, guarded by `BLOXD_TERRAIN_DIRECTIONAL`.
+- **Index buffers go 32-bit at the first large mesh.** The Lite renderer picks `Uint16Array` indices only while every index value stays ≤ 65,534 — as soon as any index reaches 65,535 the buffer becomes a `Uint32Array` (tracked per buffer with an `is32Bits` flag). In practice: a chunk mesh with at most 65,535 vertices fits in 16-bit indices; one with exactly 65,536 vertices necessarily emits an index of 65,535 and switches the whole buffer to 32-bit.
 - **Manifest loading details**: zip entries under `__MACOSX/`, files prefixed `._`, and `.DS_Store` are filtered out (macOS archive noise); `pack.json` is located by lowercased path comparison — zero matches → `loadNoManifest`, two or more → `loadDuplicateManifest`; the manifest read is capped at 65,536 bytes.
-- **How all of this was verified**: the production bundle's modules were restored (165 chunks, 4,951 modules) and executed in a webpack-compatible harness under Node.js. The measured `HEADER_VERSION` (§53), the rendered 5,637-byte header, the variant table's canonical order, and the special-function map all come from *running the shipped code*, not from reading strings. The same harness is the natural core for a community `pack_check` v6 — executing the engine's own validator against a pack reproduces its verdicts exactly.
+- **How all of this was verified**: the production bundle's modules were restored (165 chunks; the webpack registry counts 4,951 modules in this bundle — module counts shift by a few depending on whether async child dependencies are included, so treat the exact number as bundle-specific) and executed in a webpack-compatible harness under Node.js. The measured `HEADER_VERSION` (§53), the rendered 5,637-byte header, the variant table's canonical order, and the special-function map all come from *running the shipped code*, not from reading strings. The same harness is the natural core for a community `pack_check` v6 — executing the engine's own validator against a pack reproduces its verdicts exactly.
 
 ---
 
