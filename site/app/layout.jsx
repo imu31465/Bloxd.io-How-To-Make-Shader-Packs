@@ -1,6 +1,7 @@
 import { Head } from 'nextra/components'
 import { siteUrl } from '../lib/paths.mjs'
 import 'nextra-theme-docs/style.css'
+import './custom.css'
 
 export const metadata = {
   metadataBase: new URL(siteUrl),

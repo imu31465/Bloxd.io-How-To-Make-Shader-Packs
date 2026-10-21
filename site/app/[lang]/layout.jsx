@@ -1,4 +1,4 @@
-import { Layout, LocaleSwitch, Navbar } from 'nextra-theme-docs'
+import { Layout, LocaleSwitch, Navbar, ThemeSwitch } from 'nextra-theme-docs'
 import { getPageMap } from 'nextra/page-map'
 import { LOCALES } from '../../lib/langs.mjs'
 import { repoUrl } from '../../lib/paths.mjs'
@@ -21,6 +21,7 @@ export default async function LangLayout({ children, params }) {
           projectLink={repoUrl}
         >
           <LocaleSwitch lite />
+          <ThemeSwitch />
         </Navbar>
       }
       footer={null}

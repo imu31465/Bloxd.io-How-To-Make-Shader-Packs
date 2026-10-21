@@ -1,0 +1,21 @@
+/*
+  nextra-theme-docs tweaks (desktop left sidebar):
+  1. hide LocaleSwitch/ThemeSwitch at the bottom of the left sidebar
+     (language + theme now live in the top-right navbar only)
+  2. keep the Collapse sidebar button and move it to the top-left
+     (footer block is flex-ordered above the menu, un-stuck from the bottom)
+*/
+aside.nextra-sidebar > .nextra-sidebar-footer {
+  order: -1;
+  position: static;
+  bottom: auto;
+  border-top-width: 0;
+  border-bottom: 1px solid var(--x-color-gray-200);
+}
+:where(.dark) aside.nextra-sidebar > .nextra-sidebar-footer {
+  border-bottom-color: var(--x-color-neutral-800);
+}
+aside.nextra-sidebar > .nextra-sidebar-footer > :nth-child(1),
+aside.nextra-sidebar > .nextra-sidebar-footer > :nth-child(2) {
+  display: none;
+}
