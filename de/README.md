@@ -11,6 +11,7 @@ Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Blo
 
 ## Inhalt
 
+- [Komplette Anleitung in einer Datei](00-full.md)
 - [Teil I: Pakete erstellen](01-making.md)
   - [1. Überblick und Voraussetzungen](01-making.md#1-überblick-und-voraussetzungen)
   - [2. Schnellstart](01-making.md#2-schnellstart)

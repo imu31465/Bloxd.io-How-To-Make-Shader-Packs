@@ -11,6 +11,7 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 
 ## Contents
 
+- [Full guide in one file](00-full.md)
 - [Part I: Making packs](01-making.md)
   - [1. Overview and prerequisites](01-making.md#1-overview-and-prerequisites)
   - [2. Quick start](01-making.md#2-quick-start)

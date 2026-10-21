@@ -11,6 +11,7 @@ Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.
 
 ## Índice
 
+- [Guía completa en un solo archivo](00-full.md)
 - [Parte I: Crear paquetes](01-making.md)
   - [1. Resumen y requisitos](01-making.md#1-resumen-y-requisitos)
   - [2. Inicio rápido](01-making.md#2-inicio-rápido)

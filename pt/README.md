@@ -11,6 +11,7 @@ Guia autocontido para criar e distribuir pacotes de shaders para Bloxd.io (somen
 
 ## Índice
 
+- [Guia completo em um único arquivo](00-full.md)
 - [Parte I: Criar pacotes](01-making.md)
   - [1. Visão geral e pré-requisitos](01-making.md#1-visão-geral-e-pré-requisitos)
   - [2. Início rápido](01-making.md#2-início-rápido)

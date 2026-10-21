@@ -11,6 +11,7 @@ Guide autonome pour créer et distribuer des packs de shaders pour Bloxd.io (mot
 
 ## Sommaire
 
+- [Guide complet dans un seul fichier](00-full.md)
 - [Partie I : Créer des packs](01-making.md)
   - [1. Aperçu et prérequis](01-making.md#1-aperçu-et-prérequis)
   - [2. Démarrage rapide](01-making.md#2-démarrage-rapide)
