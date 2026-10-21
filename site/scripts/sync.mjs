@@ -10,6 +10,10 @@ const contentRoot = path.join(siteRoot, 'content')
 
 const EXCLUDED = new Set(['00-full.md'])
 
+// 部ファイル先頭・末尾のパンくず (md リンクだけの行: 「← 前の部」「マニュアルに戻る」「次の部 →」等) は
+// テーマ内蔵の prev/next ページネーションが担うため、サイト掲載時は剥がす
+const NAV_LINE = /^ *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\)(?: *[·・] *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\))* *$/
+
 function titleOf(src, fallback) {
   const match = src.match(/^#\s+(.+)$/m)
   return match ? match[1].trim() : fallback
@@ -47,13 +51,29 @@ function escapeLine(line) {
 function transform(src) {
   const lines = src.replace(/\r\n/g, '\n').split('\n')
   let inFence = false
-  const out = lines.map(line => {
+  let prevBlank = false
+  const out = []
+  for (const line of lines) {
     if (/^\s*(```|~~~)/.test(line)) {
       inFence = !inFence
-      return line
+      prevBlank = false
+      out.push(line)
+      continue
     }
-    return inFence ? line : escapeLine(line)
-  })
+    if (!inFence && NAV_LINE.test(line)) continue
+    if (!inFence) {
+      if (line === '') {
+        if (prevBlank) continue
+        prevBlank = true
+        out.push(line)
+        continue
+      }
+      prevBlank = false
+      out.push(escapeLine(line))
+      continue
+    }
+    out.push(line)
+  }
   return out.join('\n')
 }
 
@@ -76,7 +96,8 @@ for (const { code } of LOCALES) {
     const title = titleOf(src, file)
     const base = file === 'README.md' ? 'index' : file.replace(/\.[^.]+$/, '')
     const outName = file === 'README.md' ? 'index.md' : file
-    const text = withFrontmatter(transform(rewriteLinks(src, code)), title)
+    // transform を先に: NAV_LINE は生の md テキスト ([← 前の部](01-making.md) 形式) にのみマッチする
+    const text = withFrontmatter(rewriteLinks(transform(src), code), title)
     fs.mkdirSync(outDir, { recursive: true })
     fs.writeFileSync(path.join(outDir, outName), text)
     meta[base] =

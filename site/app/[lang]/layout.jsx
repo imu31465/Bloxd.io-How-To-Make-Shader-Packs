@@ -1,11 +1,13 @@
-import { Footer, Layout, LocaleSwitch, Navbar } from 'nextra-theme-docs'
+import { Layout, LocaleSwitch, Navbar } from 'nextra-theme-docs'
 import { getPageMap } from 'nextra/page-map'
 import { LOCALES } from '../../lib/langs.mjs'
 import { repoUrl } from '../../lib/paths.mjs'
 
 export default async function LangLayout({ children, params }) {
   const { lang } = await params
-  const pageMap = await getPageMap(`/${lang}`)
+  // getPageMap はルート形の pageMap ([index, {ja: children…}, …]) を返すので、
+  // 自分の言語の children を unwrap して sidebar に渡す
+  const pageMap = (await getPageMap(`/${lang}`)).find(item => item.name === lang)?.children ?? []
   return (
     <Layout
       pageMap={pageMap}
@@ -21,11 +23,7 @@ export default async function LangLayout({ children, params }) {
           <LocaleSwitch lite />
         </Navbar>
       }
-      footer={
-        <Footer>
-          <a href={repoUrl}>GitHub</a>
-        </Footer>
-      }
+      footer={null}
     >
       {children}
     </Layout>
