@@ -1,0 +1,26 @@
+{
+  "name": "bloxd-shader-docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next --turbopack",
+    "predev": "npm run sync",
+    "build": "next build --webpack",
+    "prebuild": "npm run sync",
+    "postbuild": "node scripts/fix-html-lang.mjs .next/server/app && node scripts/flatten-rsc.mjs out && node scripts/fix-html-lang.mjs out && pagefind --site .next/server/app --output-path out/_pagefind",
+    "start": "next start",
+    "sync": "node scripts/sync.mjs"
+  },
+  "dependencies": {
+    "next": "^16.0.7",
+    "nextra": "^4",
+    "nextra-theme-docs": "^4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "pagefind": "^1.3.0"
+  }
+}
