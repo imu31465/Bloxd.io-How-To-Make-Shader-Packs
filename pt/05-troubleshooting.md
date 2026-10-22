@@ -2,6 +2,8 @@
 
 # Parte V: Solução de problemas e notas
 
+> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 17. Erros comuns e soluções
 
 | Sintoma | Solução |
@@ -15,7 +17,7 @@
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Aviso: a fila de sementes de luz transbordou em regiões de alta densidade de emissores ou através de fronteiras de regiões, e o cálculo de luz desse chunk foi encurtado. Sem origem "pacote", mas **os buracos de luz ao redor de concentrações de emissores vêm desse limite** — espalhar as fontes de luz pelo mundo evita isso |
 | Pacote excluído ao entrar no jogo | Falha a verificação ao vivo do jogo. Revise omissões de guardas |
 | A verificação ao vivo do jogo não termina nunca e o pacote cai com `This device couldn't check …` etc. | A verificação tem um prazo forçado de 60 segundos (o estouro conta como `skipped`). Frequente em dispositivos fracos / mundos pesados — alivie o trabalho pesado de vertex e os laços complexos, e tente de novo |
-| `pack.json needs "apiVersion": 2.` | Falta `apiVersion` ou não é `2`. Adicione o número `2` (a string `"2"` é rejeitada). Pacotes v1 são rejeitados com `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | Falta `apiVersion` ou não é `3`. Adicione o número `3` (a string `"3"` é rejeitada). Pacotes v1/v2 são rejeitados com `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Sem `pack.json` na raiz do ZIP. Confira não ter compactado a pasta em si |
 | `bloxdTerrainVertex must be declared as: fn ...` | Assinatura distinta. Reescreva exatamente como mostrado |
 | `bloxdTerrainVertex can't run in strict games...` | Envolva o hook vertex em `#ifndef BLOXD_STRICT` |
@@ -46,7 +48,7 @@ Os erros da tela de configurações carregam IDs `shaderPack:load*`. Como ajuda 
 | `loadSourceTooBig` | total `.wgsl` acima de 256KB (verificação em fluxo, arquivo por arquivo) |
 | `loadManifestTooBig` | `pack.json` acima de 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` não é JSON / não é um objeto |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` ausente / ≠ `2` (pacotes v1 recusados) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` ausente / ≠ `3` (pacotes v1/v2 recusados) |
 | `loadNoName` / `loadAuthorNotString` | `name` ausente / `author` não é uma string |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | compressão não suportada / zip64 / dividido / criptografado |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | caminhos duplicados / não UTF-8 / falha de descompressão / zip danificado |

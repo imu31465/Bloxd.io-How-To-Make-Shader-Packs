@@ -2,6 +2,8 @@
 
 # Parte II: Referência da API
 
+> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 10. Cabeçalho do motor (anteposto automaticamente ao código do pacote)
 
 O motor insere automaticamente o código abaixo antes do código do pacote (pacotes não podem redeclarar). Trechos em `#ifdef` variam por variante.

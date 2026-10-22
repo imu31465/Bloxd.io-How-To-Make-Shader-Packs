@@ -2,6 +2,8 @@
 
 # 제1부: 팩 만들기
 
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+
 ## 1. 개요와 전제
 
 - 셰이더 팩은 **WebGPU 렌더러 전용**이다. 팩을 도입한 동안 설정의 WebGPU 렌더러가 강제 온이 된다
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `apiVersion` | 필수 | `2` 와 완전 일치시킬 것. `1` 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
+| `apiVersion` | 필수 | `3` 와 완전 일치시킬 것. `1`/`2` 팩은 로드 시 `shaderPack:loadWrongApiVersion` 으로 거부된다 — 마이그레이션은 [제9부](09-apiv3.md) 참조 |
 | `name` | 필수 | 빈 문자열 불가. 설정 UI 에 표시된다 |
 | `author` | 임의 | 생략 가능. 문자열 이외 (수치 등) 는 에러 |
 

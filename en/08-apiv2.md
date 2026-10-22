@@ -2,6 +2,8 @@
 
 # Part VIII: API Version 2 migration guide
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 Target build: `6qxffk.main.5912a15f.js` (production deploy as of 2026-10-16). Parts I–VII of this guide are already rewritten to the v2 baseline; this Part VIII collects the migration points from v1 and the new v2 features. New-feature code examples pass 8/8 variant validation on the v2 compiler and browser WGSL compiler (Tint) validation (§38), but v2 conversion of existing recipes is mechanical identifier substitution — always verify with an in-game compile before distribution.
 
 ## 31. Fate of v1 packs (conclusion first)

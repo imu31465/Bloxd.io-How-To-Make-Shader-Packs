@@ -2,6 +2,8 @@
 
 # Parte VIII: Guía de migración a API Version 2
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 Build objetivo: `6qxffk.main.5912a15f.js` (despliegue en producción a 2026-10-16). Las Partes I–VII de esta guía ya están reescritas a la base v2; esta Parte VIII recoge los puntos de migración desde v1 y las novedades de v2. Los ejemplos de código de novedades pasan la validación de 8/8 variantes en el compilador v2 y la validación del compilador WGSL del navegador (Tint) (§38), pero la conversión v2 de recetas existentes es sustitución mecánica de identificadores — verifica siempre con compilación en juego antes de distribuir.
 
 ## 31. Destino de los paquetes v1 (conclusión primero)

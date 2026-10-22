@@ -2,6 +2,8 @@
 
 # Teil V: Fehlersuche & Hinweise
 
+> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+
 ## 17. Häufige Fehler und Fixes
 
 | Symptom | Fix |
@@ -15,7 +17,7 @@
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Warnung, dass die Licht-Seed-Queue in Regionen hoher Emitterdichte oder über Regionsgrenzen hinweg übergelaufen ist; die Lichtberechnung dieses Chunks wurde abgeschnitten. Nicht paketbedingt, aber **Lichtlücken um Emitter-Konzentrationen stammen aus dieser Spezifikation** — verteilte Lichtquellen in der Welt vermeiden sie |
 | Paket beim Spielbeitritt ausgeschlossen | Live-Check im Spiel schlägt fehl. Guard-Lücken prüfen |
 | Der Live-Check terminiert nie und das Paket fliegt mit `This device couldn't check ...` etc. | Der Check hat ein erzwungenes 60-Sekunden-Timeout (Überschreitung zählt als `skipped`). Häufig auf schwachen Geräten / schweren Welten — schweres Vertex-Arbeiten und komplexe Loops reduzieren und erneut versuchen |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` fehlt oder ist nicht `2`. Zahl `2` eintragen (String `"2"` wird abgelehnt). V1-Pakete werden mit `shaderPack:loadWrongApiVersion` abgelehnt |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` fehlt oder ist nicht `3`. Zahl `3` eintragen (String `"3"` wird abgelehnt). v1/v2-Pakete werden mit `shaderPack:loadWrongApiVersion` abgelehnt |
 | `There's no pack.json at the top of the pack.` | Kein `pack.json` im ZIP-Root. Prüfen, ob nicht der Ordner selbst gezippt wurde |
 | `bloxdTerrainVertex must be declared as: fn ...` | Signatur weicht ab. Exakt wie angezeigt umschreiben |
 | `bloxdTerrainVertex can't run in strict games...` | Vertex-Hook in `#ifndef BLOXD_STRICT` packen |
@@ -46,7 +48,7 @@ Fehler vom Einstellungs-Bildschirm tragen `shaderPack:load*`-IDs. Als Nachschlag
 | `loadSourceTooBig` | `.wgsl` gesamt über 256KB (Streaming-Prüfung pro Datei) |
 | `loadManifestTooBig` | `pack.json` über 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` ist kein JSON / kein Objekt |
-| `loadNoApiVersion` / `loadWrongApiVersion` | kein `apiVersion` / nicht `2` (v1-Pakete abgelehnt) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | kein `apiVersion` / nicht `3` (v1/v2-Pakete abgelehnt) |
 | `loadNoName` / `loadAuthorNotString` | kein `name` / `author` ist kein String |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | nicht unterstützte Kompression / zip64 / geteilt / verschlüsselt |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | doppelte Pfade / kein UTF-8 / Dekomprimierung fehlgeschlagen / zip beschädigt |

@@ -12,6 +12,8 @@
 
 # 제1부: 팩 만들기
 
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+
 ## 1. 개요와 전제
 
 - 셰이더 팩은 **WebGPU 렌더러 전용**이다. 팩을 도입한 동안 설정의 WebGPU 렌더러가 강제 온이 된다
@@ -47,7 +49,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `apiVersion` | 필수 | `2` 와 완전 일치시킬 것. `1` 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
+| `apiVersion` | 필수 | `3` 와 완전 일치시킬 것. `1`/`2` 팩은 로드 시 `shaderPack:loadWrongApiVersion` 으로 거부된다 — 마이그레이션은 [제9부](09-apiv3.md) 참조 |
 | `name` | 필수 | 빈 문자열 불가. 설정 UI 에 표시된다 |
 | `author` | 임의 | 생략 가능. 문자열 이외 (수치 등) 는 에러 |
 
@@ -157,6 +159,8 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 [← 이전 부](01-making.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](03-recipes.md)
 
 # 제2부: API 레퍼런스
+
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
 
 ## 10. 엔진 헤더 (팩 코드 선두에 자동 부여되는 코드)
 
@@ -309,6 +313,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 [← 이전 부](02-api.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](04-realism.md)
 
 # 제3부: 레시피집
+
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
 
 - [R1. 색 레시피 (surface)](#r1-색-레시피-surface)
 - [R2. 조명 레시피 (light)](#r2-조명-레시피-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제4부: 리얼화 가이드
 
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+
 ## 13. 엔진 기존 조명과 리얼화의 여지
 
 엔진 기존의 조명은 곱셈뿐이며, 스페큘러·프레넬·난색-냉색 분리·반구 환경광은 존재하지 않는다. 아래가 재구축 가능한 범위이다:
@@ -1191,6 +1199,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제5부: 트러블슈팅·주의
 
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+
 ## 17. 자주 나오는 에러와 고치기
 
 | 증상 | 고치기 |
@@ -1199,7 +1209,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `.alpha` 가 미정의라고 나온다 | `#ifdef BLOXD_ALPHA` 로 감싼다 |
 | `blockLight` 가 미정의라고 나온다 | `#ifdef BLOXD_LIGHTING` 로 감싼다. 공용 헬퍼 함수는**함수째** 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다. 판정용 가드는 남긴다) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` 를 기점으로 고친다 |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` 이 없거나 `2` 가 아니다. 수치 `2` 를 넣는다 (문자열 `"2"` 는 불가). v1 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` 이 없거나 `3` 가 아니다. 수치 `3` 를 넣는다 (문자열 `"3"` 는 불가). v1/v2 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
 | `There's no pack.json at the top of the pack.` | ZIP 최상위에 `pack.json` 이 없다. 폴더째 굳히지 않았는지 확인한다 |
 | `bloxdTerrainVertex must be declared as: fn ...` | 시그니처 불일치. 표시된 선언대로 다시 쓴다 |
 | `bloxdTerrainVertex can't run in strict games...` | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
@@ -1235,7 +1245,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `loadSourceTooBig` | `.wgsl` 합계가 256KB 초과 (파일 단위의 스트리밍 검사) |
 | `loadManifestTooBig` | `pack.json` 이 64KB 초과 |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` 이 JSON 이 아니다 / 오브젝트형이 아니다 |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 없음 / `2` 가 아니다 (v1 은 거부) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 없음 / `3` 가 아니다 (v1/v2 는 거부) |
 | `loadNoName` / `loadAuthorNotString` | `name` 없음 / `author` 가 문자열 이외 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 대응 외 압축 방식 / zip64 / 분할 / 암호화 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 경로 중복 / UTF-8 이외 / 전개 실패 / zip 손상 |
@@ -1253,6 +1263,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 이전 부](05-troubleshooting.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](07-internals.md)
 
 # 제6부: 구현 시 중요한 보충
+
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
 
 ## 19. 야간에 「그림자는 어두운데 표면만 밝다」 를 고친다
 
@@ -1376,6 +1388,8 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 이전 부](06-implementation.md)·[매뉴얼로 돌아가기](README.md)·[다음 부 →](08-apiv2.md)
 
 # 제7부: 내부 사양의 보충
+
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
 
 엔진 구현 해석으로 밝혀진 추가 사양. 모두 현행 정식 빌드의 JavaScript 에서 직접 복원한 것이다.
 
@@ -1574,6 +1588,8 @@ strict 측에서 특히 오해하기 쉬운 점:
 [← 이전 부](07-internals.md)·[매뉴얼로 돌아가기](README.md)
 
 # 제8부: API Version 2 마이그레이션 가이드
+
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
 
 대상 빌드: `6qxffk.main.5912a15f.js` (2026-10-16 시점의 정식 배포). 이 책의 제1부~제7부는 v2 기준으로 다시 쓴 상태이며, 이 제8부는 v1에서의 이전 포인트와 v2의 새로운 기능을 모은 것이다. 새 기능의 코드 예제는 v2 컴파일러에 의한 8/8 베리언트 검증과 브라우저 WGSL 컴파일러 (Tint) 검증 (§38)을 통과한 것이며, 기존 레시피의 v2 변환은 기계적인 식별자 교체이므로, 배포 전에는 반드시 실기 컴파일로 확인할 것.
 

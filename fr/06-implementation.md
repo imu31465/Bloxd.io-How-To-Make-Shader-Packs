@@ -2,6 +2,8 @@
 
 # Partie VI : Notes d'implémentation importantes
 
+> Le jeu actuel exige `apiVersion: 3` depuis le 2026-10-19 et refuse les packs v1/v2 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) pour migrer avant de distribuer.
+
 ## 19. Corriger « ombres sombres mais surfaces brillantes » la nuit
 
 Assombrir seules les ombres laisse la couleur terminée (`engineColour`) brillante sans soleil, et l'écart face/ombre devient contre-nature. Atténuez toute la couleur terminée.

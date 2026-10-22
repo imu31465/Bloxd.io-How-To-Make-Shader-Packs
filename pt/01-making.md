@@ -2,6 +2,8 @@
 
 # Parte I: Criar pacotes
 
+> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 1. Visão geral e pré-requisitos
 
 - Pacotes de shaders são **somente para o renderizador WebGPU**. Enquanto um pacote está instalado, o renderizador WebGPU é ativado à força nas configurações
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | Campo | Obrigatório | Descrição |
 |---|---|---|
-| `apiVersion` | obrigatório | Deve coincidir exatamente com `2`. Pacotes com `1` são rejeitados com `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | obrigatório | Deve coincidir exatamente com `3`. Pacotes com `1`/`2` são rejeitados ao carregar com `shaderPack:loadWrongApiVersion` — veja [Parte IX](09-apiv3.md) para migrar |
 | `name` | obrigatório | Não pode estar vazio. Exibido na interface de configurações |
 | `author` | opcional | Pode omitir. Valores não-string (números etc.) são erros |
 

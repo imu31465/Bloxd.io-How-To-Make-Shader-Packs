@@ -2,6 +2,8 @@
 
 # Part V: Troubleshooting & notes
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 ## 17. Common errors and fixes
 
 | Symptom | Fix |
@@ -15,7 +17,7 @@
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Warning that the light seed queue overflowed in high-density emitter regions or across region boundaries, so that chunk's light computation was cut short. Not pack-derived, but **light gaps around emitter concentrations come from this spec** — spreading light sources in the world avoids it |
 | Pack excluded when joining a game | Failing the in-game live compile check. Re-check guard omissions |
 | The live check never terminates and the pack drops with `This device couldn't check …` etc. | The check has a forced 60-second timeout (excess counts as `skipped`). Common on weak devices / heavy worlds — reduce heavy vertex work and complex loops and retry |
-| `pack.json needs "apiVersion": 2.` | Missing `apiVersion` or not `2`. Use numeric `2` (string `"2"` is rejected). v1 packs are rejected with `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | Missing `apiVersion` or not `3`. Use numeric `3` (string `"3"` is rejected). v1/v2 packs are rejected with `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | No `pack.json` at the ZIP root. Check you didn't zip the folder itself |
 | `bloxdTerrainVertex must be declared as: fn ...` | Signature mismatch. Rewrite exactly as shown |
 | `bloxdTerrainVertex can't run in strict games...` | Wrap the vertex hook in `#ifndef BLOXD_STRICT` |
@@ -46,7 +48,7 @@ Errors from the settings screen carry `shaderPack:load*` IDs. As a message-looku
 | `loadSourceTooBig` | total `.wgsl` over 256KB (streaming check per file) |
 | `loadManifestTooBig` | `pack.json` over 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` is not JSON / not an object |
-| `loadNoApiVersion` / `loadWrongApiVersion` | no `apiVersion` / not `2` (v1 packs rejected) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | no `apiVersion` / not `3` (v1/v2 packs rejected) |
 | `loadNoName` / `loadAuthorNotString` | no `name` / `author` is not a string |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | unsupported compression / zip64 / split / encrypted |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | duplicate paths / non-UTF-8 / decompression failure / zip damaged |

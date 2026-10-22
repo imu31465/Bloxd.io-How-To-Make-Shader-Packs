@@ -2,6 +2,8 @@
 
 # Partie VII : Supplément d'intérieurs
 
+> Le jeu actuel exige `apiVersion: 3` depuis le 2026-10-19 et refuse les packs v1/v2 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) pour migrer avant de distribuer.
+
 Spécifications extra trouvées par analyse d'implémentation du moteur. Tout restauré directement du JavaScript du build de production actuel.
 
 ## 24. Identité du soleil et de la lune

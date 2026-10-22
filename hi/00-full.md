@@ -12,6 +12,8 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 
 # भाग I: पैक बनाना
 
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
+
 ## 1. अवलोकन और पूर्वापेक्षाएँ
 
 - शेडर पैक **केवल WebGPU रेंडरर** के लिए हैं। पैक इंस्टॉल रहने तक सेटिंग्स में WebGPU रेंडरर ज़बरन चालू रहता है
@@ -47,7 +49,7 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@ Bloxd.io शेडर पैक (केवल WebGPU रेंडरर) बन�
 
 | फ़ील्ड | आवश्यक | विवरण |
 |---|---|---|
-| `apiVersion` | आवश्यक | ठीक-ठीक `2` से मेल खाना चाहिए। `1` वाले पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
+| `apiVersion` | आवश्यक | ठीक-ठीक `3` से मेल खाना चाहिए। `1`/`2` वाले पैक लोड पर `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं — माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें |
 | `name` | आवश्यक | खाली नहीं। सेटिंग्स UI में दिखता है |
 | `author` | वैकल्पिक | छोड़ा जा सकता है। गैर-स्ट्रिंग मान (संख्या आदि) त्रुटि हैं |
 
@@ -157,6 +159,8 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 [← पिछला भाग](01-making.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](03-recipes.md)
 
 # भाग II: API संदर्भ
+
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
 
 ## 10. इंजन शीर्षक (पैक कोड के आगे स्वतः जुड़ने वाला कोड)
 
@@ -309,6 +313,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 [← पिछला भाग](02-api.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](04-realism.md)
 
 # भाग III: रेसिपी संग्रह
+
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
 
 - [R1. रंग रेसिपी (surface)](#r1-रंग-रेसिपी-surface)
 - [R2. प्रकाश रेसिपी (light)](#r2-प्रकाश-रेसिपी-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # भाग IV: यथार्थवाद गाइड
 
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
+
 ## 13. इंजन डिफ़ॉल्ट प्रकाश व यथार्थ गुंजाइश
 
 इंजन डिफ़ॉल्ट प्रकाश केवल "गुणन" है, स्पेक्युलर, फ्रेनेल, उष्ण-शीत पृथक्करण, अर्धगोल परिवेश मौजूद नहीं। पुनर्निर्माण योग्य सीमा:
@@ -1191,6 +1199,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # भाग V: समस्या-निवारण व टिप्पणियाँ
 
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
+
 ## 17. सामान्य त्रुटि व सुधार
 
 | लक्षण | सुधार |
@@ -1199,7 +1209,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `.alpha` अपरिभाषित कथित | `#ifdef BLOXD_ALPHA` में लपेटें |
 | `blockLight` अपरिभाषित कथित | `#ifdef BLOXD_LIGHTING` में लपेटें। साझा सहायक फ़ंक्शन **समग्र फ़ंक्शन** लपेटें (v2 में फ़ील्ड सर्वदा होने से सामान्यतः नहीं होता। निर्णय प्रयोजन रक्षक रखें) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` से आरंभ बदलें |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` अभाव या `2` नहीं। अंक `2` पूरें (स्ट्रिंग `"2"` अस्वीकृत)। v1 पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` अभाव या `3` नहीं। अंक `3` पूरें (स्ट्रिंग `"3"` अस्वीकृत)। v1/v2 पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
 | `There's no pack.json at the top of the pack.` | ZIP मूल में `pack.json` नहीं। फ़ोल्डर समग्र संवेष्टित जाँचें |
 | `bloxdTerrainVertex must be declared as: fn ...` | हस्ताक्षर भिन्न। दर्शित घोषणा अक्षरशः पुनः लिखें |
 | `bloxdTerrainVertex can't run in strict games...` | vertex हुक `#ifndef BLOXD_STRICT` में लपेटें |
@@ -1235,7 +1245,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `loadSourceTooBig` | `.wgsl` कुल 256KB से अधिक (प्रति-फ़ाइल स्ट्रीमिंग जाँच) |
 | `loadManifestTooBig` | `pack.json` 64KB से अधिक |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` JSON नहीं / ऑब्जेक्ट प्रकार नहीं |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` नहीं / `2` नहीं (v1 अस्वीकृत) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` नहीं / `3` नहीं (v1/v2 अस्वीकृत) |
 | `loadNoName` / `loadAuthorNotString` | `name` नहीं / `author` स्ट्रिंग नहीं |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | असमर्थित संपीड़न / zip64 / विभाजित / एन्क्रिप्टेड |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | पथ द्वैत / UTF-8 नहीं / विस्तार विफल / zip क्षति |
@@ -1253,6 +1263,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← पिछला भाग](05-troubleshooting.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](07-internals.md)
 
 # भाग VI: महत्वपूर्ण कार्यान्वयन पूरक
+
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
 
 ## 19. रात्रि "छाया काली फलक उजला" सुधारें
 
@@ -1376,6 +1388,8 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← पिछला भाग](06-implementation.md)·[मैनुअल पर वापस जाएं](README.md)·[अगला भाग →](08-apiv2.md)
 
 # भाग VII: आंतरिक पूरक
+
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
 
 इंजन कार्यान्वयन विश्लेषण से ज्ञात अतिरिक्त विनिर्देश। सब वर्तमान उत्पादन बिल्ड JavaScript से सीधे पुनः प्राप्त।
 
@@ -1574,6 +1588,8 @@ strict पक्ष में विशेष रूप से भ्राम�
 [← पिछला भाग](07-internals.md)·[मैनुअल पर वापस जाएं](README.md)
 
 # भाग VIII: API Version 2 माइग्रेशन गाइड
+
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
 
 लक्ष्य बिल्ड: `6qxffk.main.5912a15f.js` (2026-10-16 का उत्पादन परिनियोजन)। इस पुस्तक के भाग I–VII v2 आधार पर पुनः लिखे जा चुके हैं; यह भाग VIII v1 से प्रवासन बिंदु व v2 नई सुविधाएँ समेटता है। नई सुविधा कोड उदाहरण v2 कंपाइलर द्वारा 8/8 वेरिएंट सत्यापन व ब्राउज़र WGSL कंपाइलर (Tint) सत्यापन (§38) उत्तीर्ण हैं, पर विद्यमान रेसिपी v2 रूपांतरण यांत्रिक पहचानकर्ता प्रतिस्थापन है, अतः वितरण पूर्व वास्तविक-मशीन कंपाइल से अवश्य सत्यापित करें।
 

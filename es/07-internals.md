@@ -2,6 +2,8 @@
 
 # Parte VII: Suplemento de interioridades
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 Especificaciones extra halladas por análisis de implementación del motor. Todo restaurado directamente del JavaScript del build de producción actual.
 
 ## 24. Identidad del sol y la luna

@@ -2,6 +2,8 @@
 
 # Part I: Making packs
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 ## 1. Overview and prerequisites
 
 - Shader packs are **WebGPU renderer only**. While a pack is installed, the WebGPU renderer is force-enabled in settings
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | Field | Required | Description |
 |---|---|---|
-| `apiVersion` | required | Must match `2` exactly. Packs with `1` are rejected with `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | required | Must match `3` exactly. Packs with `1`/`2` are rejected at load with `shaderPack:loadWrongApiVersion` — see [Part IX](09-apiv3.md) for migration |
 | `name` | required | Must not be empty. Shown in the settings UI |
 | `author` | optional | May be omitted. Non-string values (numbers etc.) are errors |
 

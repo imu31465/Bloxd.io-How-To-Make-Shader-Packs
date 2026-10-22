@@ -2,6 +2,8 @@
 
 # भाग V: समस्या-निवारण व टिप्पणियाँ
 
+> वर्तमान खेल 2026-10-19 से `apiVersion: 3` चाहता है और लोड पर v1/v2 पैक अस्वीकृत करता है — नीचे की सामग्री v2 विनिर्देश पर लिखी गई है। वितरण से पहले माइग्रेशन के लिए [भाग IX](09-apiv3.md) देखें।
+
 ## 17. सामान्य त्रुटि व सुधार
 
 | लक्षण | सुधार |
@@ -10,7 +12,7 @@
 | `.alpha` अपरिभाषित कथित | `#ifdef BLOXD_ALPHA` में लपेटें |
 | `blockLight` अपरिभाषित कथित | `#ifdef BLOXD_LIGHTING` में लपेटें। साझा सहायक फ़ंक्शन **समग्र फ़ंक्शन** लपेटें (v2 में फ़ील्ड सर्वदा होने से सामान्यतः नहीं होता। निर्णय प्रयोजन रक्षक रखें) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` से आरंभ बदलें |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` अभाव या `2` नहीं। अंक `2` पूरें (स्ट्रिंग `"2"` अस्वीकृत)। v1 पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` अभाव या `3` नहीं। अंक `3` पूरें (स्ट्रिंग `"3"` अस्वीकृत)। v1/v2 पैक `shaderPack:loadWrongApiVersion` से अस्वीकृत होते हैं |
 | `There's no pack.json at the top of the pack.` | ZIP मूल में `pack.json` नहीं। फ़ोल्डर समग्र संवेष्टित जाँचें |
 | `bloxdTerrainVertex must be declared as: fn ...` | हस्ताक्षर भिन्न। दर्शित घोषणा अक्षरशः पुनः लिखें |
 | `bloxdTerrainVertex can't run in strict games...` | vertex हुक `#ifndef BLOXD_STRICT` में लपेटें |
@@ -46,7 +48,7 @@
 | `loadSourceTooBig` | `.wgsl` कुल 256KB से अधिक (प्रति-फ़ाइल स्ट्रीमिंग जाँच) |
 | `loadManifestTooBig` | `pack.json` 64KB से अधिक |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` JSON नहीं / ऑब्जेक्ट प्रकार नहीं |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` नहीं / `2` नहीं (v1 अस्वीकृत) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` नहीं / `3` नहीं (v1/v2 अस्वीकृत) |
 | `loadNoName` / `loadAuthorNotString` | `name` नहीं / `author` स्ट्रिंग नहीं |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | असमर्थित संपीड़न / zip64 / विभाजित / एन्क्रिप्टेड |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | पथ द्वैत / UTF-8 नहीं / विस्तार विफल / zip क्षति |

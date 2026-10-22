@@ -2,6 +2,8 @@
 
 # Часть V: Решение проблем и замечания
 
+> Текущая игра требует `apiVersion: 3` с 2026-10-19 и отклоняет паки v1/v2 при загрузке — приведённое ниже написано по спецификации v2. Перед распространением см. [часть IX](09-apiv3.md) для миграции.
+
 ## 17. Частые ошибки и фиксы
 
 | Симптом | Фикс |
@@ -10,7 +12,7 @@
 | `.alpha` заявлен как неопределённый | Оберните в `#ifdef BLOXD_ALPHA` |
 | `blockLight` заявлен как неопределённый | Оберните в `#ifdef BLOXD_LIGHTING`. Общие helper-функции оборачивайте **целыми функциями** (в v2 поля есть всегда, так что обычно не случается. Guard'ы для детектирования оставляйте) |
 | `Packs can't construct BloxdSurface directly` | Начинайте с `bloxdDefaultSurface(s)` |
-| `pack.json needs "apiVersion": 2.` | Нет `apiVersion` или не `2`. Впишите число `2` (строка `"2"` отклоняется). Паки v1 отклоняются с `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | Нет `apiVersion` или не `3`. Впишите число `3` (строка `"3"` отклоняется). Паки v1/v2 отклоняются с `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Нет `pack.json` в корне ZIP. Проверьте, не упаковали ли саму папку |
 | `bloxdTerrainVertex must be declared as: fn ...` | Сигнатура отличается. Перепишите в точности как показано |
 | `bloxdTerrainVertex can't run in strict games...` | Оберните vertex-хук в `#ifndef BLOXD_STRICT` |
@@ -46,7 +48,7 @@
 | `loadSourceTooBig` | суммарный объём `.wgsl` больше 256KB (потоковая проверка пофайлово) |
 | `loadManifestTooBig` | `pack.json` больше 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` — не JSON / не объект |
-| `loadNoApiVersion` / `loadWrongApiVersion` | нет `apiVersion` / не `2` (v1 отклоняется) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | нет `apiVersion` / не `3` (v1/v2 отклоняется) |
 | `loadNoName` / `loadAuthorNotString` | нет `name` / `author` не строка |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | неподдерживаемое сжатие / zip64 / многотомный / шифрованный |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | дубликат пути / не UTF-8 / ошибка распаковки / zip повреждён |

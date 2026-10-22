@@ -2,6 +2,8 @@
 
 # Parte III: Recetario
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 - [R1. Recetas de color (surface)](#r1-recetas-de-color-surface)
 - [R2. Recetas de iluminación (light)](#r2-recetas-de-iluminación-light)
 - [R3. Recetas de emisión](#r3-recetas-de-emisión)

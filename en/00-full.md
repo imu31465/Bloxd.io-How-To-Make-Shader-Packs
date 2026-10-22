@@ -12,6 +12,8 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 
 # Part I: Making packs
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 ## 1. Overview and prerequisites
 
 - Shader packs are **WebGPU renderer only**. While a pack is installed, the WebGPU renderer is force-enabled in settings
@@ -47,7 +49,7 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 
 | Field | Required | Description |
 |---|---|---|
-| `apiVersion` | required | Must match `2` exactly. Packs with `1` are rejected with `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | required | Must match `3` exactly. Packs with `1`/`2` are rejected at load with `shaderPack:loadWrongApiVersion` — see [Part IX](09-apiv3.md) for migration |
 | `name` | required | Must not be empty. Shown in the settings UI |
 | `author` | optional | May be omitted. Non-string values (numbers etc.) are errors |
 
@@ -157,6 +159,8 @@ Steps:
 [← Previous part](01-making.md)·[Back to the manual](README.md)·[Next part →](03-recipes.md)
 
 # Part II: API reference
+
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
 
 ## 10. Engine header (automatically prepended to pack code)
 
@@ -309,6 +313,8 @@ Five things to always keep in mind: compile clean in all 8 variants / strict gam
 [← Previous part](02-api.md)·[Back to the manual](README.md)·[Next part →](04-realism.md)
 
 # Part III: Recipe collection
+
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
 
 - [R1. Color recipes (surface)](#r1-color-recipes-surface)
 - [R2. Lighting recipes (light)](#r2-lighting-recipes-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # Part IV: Realism guide
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 ## 13. Engine default lighting and headroom for realism
 
 Engine default lighting is "multiplication only" — no specular, fresnel, warm/cool separation, or hemisphere ambient exists. The following can be rebuilt:
@@ -1191,6 +1199,8 @@ Practical points: packs keep working underwater / the veil cannot be removed / u
 
 # Part V: Troubleshooting & notes
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 ## 17. Common errors and fixes
 
 | Symptom | Fix |
@@ -1204,7 +1214,7 @@ Practical points: packs keep working underwater / the veil cannot be removed / u
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Warning that the light seed queue overflowed in high-density emitter regions or across region boundaries, so that chunk's light computation was cut short. Not pack-derived, but **light gaps around emitter concentrations come from this spec** — spreading light sources in the world avoids it |
 | Pack excluded when joining a game | Failing the in-game live compile check. Re-check guard omissions |
 | The live check never terminates and the pack drops with `This device couldn't check …` etc. | The check has a forced 60-second timeout (excess counts as `skipped`). Common on weak devices / heavy worlds — reduce heavy vertex work and complex loops and retry |
-| `pack.json needs "apiVersion": 2.` | Missing `apiVersion` or not `2`. Use numeric `2` (string `"2"` is rejected). v1 packs are rejected with `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | Missing `apiVersion` or not `3`. Use numeric `3` (string `"3"` is rejected). v1/v2 packs are rejected with `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | No `pack.json` at the ZIP root. Check you didn't zip the folder itself |
 | `bloxdTerrainVertex must be declared as: fn ...` | Signature mismatch. Rewrite exactly as shown |
 | `bloxdTerrainVertex can't run in strict games...` | Wrap the vertex hook in `#ifndef BLOXD_STRICT` |
@@ -1235,7 +1245,7 @@ Errors from the settings screen carry `shaderPack:load*` IDs. As a message-looku
 | `loadSourceTooBig` | total `.wgsl` over 256KB (streaming check per file) |
 | `loadManifestTooBig` | `pack.json` over 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` is not JSON / not an object |
-| `loadNoApiVersion` / `loadWrongApiVersion` | no `apiVersion` / not `2` (v1 packs rejected) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | no `apiVersion` / not `3` (v1/v2 packs rejected) |
 | `loadNoName` / `loadAuthorNotString` | no `name` / `author` is not a string |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | unsupported compression / zip64 / split / encrypted |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | duplicate paths / non-UTF-8 / decompression failure / zip damaged |
@@ -1253,6 +1263,8 @@ Errors from the settings screen carry `shaderPack:load*` IDs. As a message-looku
 [← Previous part](05-troubleshooting.md)·[Back to the manual](README.md)·[Next part →](07-internals.md)
 
 # Part VI: Important implementation notes
+
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
 
 ## 19. Fixing "shadows dark but surfaces bright" at night
 
@@ -1376,6 +1388,8 @@ Practical points: packs keep working underwater / the veil cannot be removed / u
 [← Previous part](06-implementation.md)·[Back to the manual](README.md)·[Next part →](08-apiv2.md)
 
 # Part VII: Internals supplement
+
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
 
 Extra specs found by engine-implementation analysis. All restored directly from current production-build JavaScript.
 
@@ -1574,6 +1588,8 @@ This list reflects the static analysis of the build above; engine updates can ch
 [← Previous part](07-internals.md)·[Back to the manual](README.md)
 
 # Part VIII: API Version 2 migration guide
+
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
 
 Target build: `6qxffk.main.5912a15f.js` (production deploy as of 2026-10-16). Parts I–VII of this guide are already rewritten to the v2 baseline; this Part VIII collects the migration points from v1 and the new v2 features. New-feature code examples pass 8/8 variant validation on the v2 compiler and browser WGSL compiler (Tint) validation (§38), but v2 conversion of existing recipes is mechanical identifier substitution — always verify with an in-game compile before distribution.
 

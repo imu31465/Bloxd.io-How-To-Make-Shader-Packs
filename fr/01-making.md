@@ -2,6 +2,8 @@
 
 # Partie I : Créer des packs
 
+> Le jeu actuel exige `apiVersion: 3` depuis le 2026-10-19 et refuse les packs v1/v2 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) pour migrer avant de distribuer.
+
 ## 1. Aperçu et prérequis
 
 - Les packs de shaders sont **réservés au moteur WebGPU**. Tant qu'un pack est installé, le moteur WebGPU est activé de force dans les réglages
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | Champ | Requis | Description |
 |---|---|---|
-| `apiVersion` | requis | Doit correspondre exactement à `2`. Les packs `1` sont refusés avec `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | requis | Doit correspondre exactement à `3`. Les packs `1`/`2` sont refusés au chargement avec `shaderPack:loadWrongApiVersion` — voir la [partie IX](09-apiv3.md) pour migrer |
 | `name` | requis | Non vide. Affiché dans l'interface des réglages |
 | `author` | optionnel | Omissible. Les valeurs non-chaînes (nombres etc.) sont des erreurs |
 

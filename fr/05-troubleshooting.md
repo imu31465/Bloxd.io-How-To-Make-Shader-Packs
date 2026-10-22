@@ -2,6 +2,8 @@
 
 # Partie V : Dépannage et notes
 
+> Le jeu actuel exige `apiVersion: 3` depuis le 2026-10-19 et refuse les packs v1/v2 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) pour migrer avant de distribuer.
+
 ## 17. Erreurs courantes et solutions
 
 | Symptôme | Solution |
@@ -15,7 +17,7 @@
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Avertissement : la file de graines de lumière a débordé dans les régions à forte densité d'émetteurs ou à travers les frontières de régions, et le calcul de lumière de ce chunk a été écourté. Pas d'origine « pack », mais **les trous de lumière autour des concentrations d'émetteurs viennent de cette limite** — disperser les sources de lumière dans le monde l'évite |
 | Pack exclu en rejoignant le jeu | Échec du contrôle en direct du jeu. Revoyez les oublis de gardes |
 | Le contrôle en direct ne se termine jamais et le pack tombe avec `This device couldn't check …` etc. | Le contrôle a un délai forcé de 60 secondes (le dépassement compte comme `skipped`). Fréquent sur appareils faibles / mondes lourds — allégez le travail vertex lourd et les boucles complexes, puis réessayez |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` manquant ou différent de `2`. Mettez le nombre `2` (la chaîne `"2"` est rejetée). Les packs v1 sont refusés avec `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` manquant ou différent de `3`. Mettez le nombre `3` (la chaîne `"3"` est rejetée). Les packs v1/v2 sont refusés avec `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Pas de `pack.json` à la racine du ZIP. Vérifiez de ne pas avoir zippé le dossier lui-même |
 | `bloxdTerrainVertex must be declared as: fn ...` | Signature différente. Réécrivez exactement comme affiché |
 | `bloxdTerrainVertex can't run in strict games...` | Entourez le hook vertex de `#ifndef BLOXD_STRICT` |
@@ -46,7 +48,7 @@ Les erreurs de l'écran de réglages portent des IDs `shaderPack:load*`. Comme a
 | `loadSourceTooBig` | total `.wgsl` au-delà de 256 Ko (contrôle en flux fichier par fichier) |
 | `loadManifestTooBig` | `pack.json` au-delà de 64 Ko |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` n'est pas du JSON / pas un objet |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` absent / ≠ `2` (packs v1 refusés) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` absent / ≠ `3` (packs v1/v2 refusés) |
 | `loadNoName` / `loadAuthorNotString` | `name` absent / `author` n'est pas une chaîne |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | compression non prise en charge / zip64 / découpé / chiffré |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | chemins dupliqués / non-UTF-8 / échec de décompression / zip endommagé |

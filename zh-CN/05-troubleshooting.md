@@ -2,6 +2,8 @@
 
 # 第五部分: 故障排除与注意事项
 
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+
 ## 17. 常见错误与修复
 
 | 症状 | 修复 |
@@ -15,7 +17,7 @@
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | 警告：在发光体密集区域或跨区域边界处光照种子队列溢出，该区块的光照计算被截断。非包所致，但**发光体聚集周围的光照空洞来自此规格**——将光源分散到世界各处即可避免 |
 | 进游戏时包被剔除 | 游戏开始时的实机检查失败。复查守卫遗漏 |
 | 实机检查永不结束，包以 `This device couldn't check …` 等脱落 | 检查有 60 秒强制期限 (超时计为 `skipped`)。在弱设备 / 重负载世界常见——减轻沉重的顶点运算与复杂循环后重试 |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` 缺失或不是 `2`。填数字 `2` (字符串 `"2"` 不可)。v1 包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` 缺失或不是 `3`。填数字 `3` (字符串 `"3"` 不可)。v1/v2 包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
 | `There's no pack.json at the top of the pack.` | ZIP 根无 `pack.json`。检查是否把文件夹整个打包了 |
 | `bloxdTerrainVertex must be declared as: fn ...` | 签名不符。按所示声明原样重写 |
 | `bloxdTerrainVertex can't run in strict games...` | vertex 钩子用 `#ifndef BLOXD_STRICT` 包裹 |
@@ -46,7 +48,7 @@
 | `loadSourceTooBig` | 总量超过 256KB (流式检查、逐文件) |
 | `loadManifestTooBig` | `pack.json` 超过 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` 非 JSON / 非对象 |
-| `loadNoApiVersion` / `loadWrongApiVersion` | 无 `apiVersion` / 不为 `2` (v1 包被拒绝) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | 无 `apiVersion` / 不为 `3` (v1/v2 包被拒绝) |
 | `loadNoName` / `loadAuthorNotString` | 无 `name` / `author` 非字符串 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 不支持的压缩 / zip64 / 分卷 / 加密 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 重复路径 / 非 UTF-8 / 解压失败 / zip 损坏 |

@@ -12,6 +12,8 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 
 # 第一部: 作り方
 
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
+
 ## 1. 概要と前提
 
 - シェーダーパックは **WebGPU レンダラー専用**。パック導入中は設定の WebGPU レンダラーが強制的にオンになる
@@ -47,7 +49,7 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@ Bloxd.io のシェーダーパック (WebGPU レンダラー専用) を自作・
 
 | フィールド | 必須 | 説明 |
 |---|---|---|
-| `apiVersion` | 必須 | `2` と完全一致させる。`1` のパックは `shaderPack:loadWrongApiVersion` で拒否される |
+| `apiVersion` | 必須 | `3` と完全一致させる。`1`/`2` のパックは読み込み時に `shaderPack:loadWrongApiVersion` で拒否される — 移行は [第九部](09-apiv3.md) を参照 |
 | `name` | 必須 | 空文字不可。設定画面に表示される |
 | `author` | 任意 | 省略可。文字列以外 (数値等) はエラー |
 
@@ -157,6 +159,8 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 [← 前の部](01-making.md)・[マニュアルに戻る](README.md)・[次の部 →](03-recipes.md)
 
 # 第二部: API リファレンス
+
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
 
 ## 10. エンジンヘッダ (パックコードの先頭に自動付与される)
 
@@ -309,6 +313,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 [← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
 
 # 第三部: レシピ集
+
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
 
 - [R1. 色のレシピ (surface)](#r1-色のレシピ-surface)
 - [R2. 照明のレシピ (light)](#r2-照明のレシピ-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第四部: リアル化ガイド
 
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
+
 ## 13. エンジン既定ライティングとリアル化の余地
 
 エンジンのデフォルト照明は「乗算のみ」であり、スペキュラ・フレネル・暖色/冷色の分離・半球環境光には対応していない。以下に、再構築可能な範囲を示す。
@@ -1191,6 +1199,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第五部: トラブルシューティング・注意
 
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
+
 ## 17. よくあるエラーと直し方
 
 | 症状 | 直し方 |
@@ -1199,7 +1209,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `.alpha` が未定義と言われる | `#ifdef BLOXD_ALPHA` で囲む |
 | `blockLight` が未定義と言われる | `#ifdef BLOXD_LIGHTING` で囲む。共用ヘルパー関数は**関数ごと**囲む (v2 ではフィールド常在のため通常は起きない。判定用途のガードは残す) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` を起点に書き換える |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` が無いか `2` でない。数値の `2` を入れる (文字列の `"2"` は不可)。v1 パックは `shaderPack:loadWrongApiVersion` で拒否される |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` が無いか `3` でない。数値の `3` を入れる (文字列の `"3"` は不可)。v1/v2 パックは `shaderPack:loadWrongApiVersion` で拒否される |
 | `There's no pack.json at the top of the pack.` | ZIP直下に `pack.json` が無い。フォルダごと固めていないか確認する |
 | `bloxdTerrainVertex must be declared as: fn ...` | シグネチャ不一致。表示された宣言どおりに書き直す |
 | `bloxdTerrainVertex can't run in strict games...` | vertex フックを `#ifndef BLOXD_STRICT` で囲む |
@@ -1235,7 +1245,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `loadSourceTooBig` | `.wgsl` 合計が 256KB 超 (ファイル単位のストリーミング検査) |
 | `loadManifestTooBig` | `pack.json` が 64KB 超 |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` が JSON でない / オブジェクト型でない |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 無し / `2` でない (v1 は拒否) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 無し / `3` でない (v1/v2 は拒否) |
 | `loadNoName` / `loadAuthorNotString` | `name` 無し / `author` が文字列以外 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 対応外圧縮方式 / zip64 / 分割 / 暗号化 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | パス重複 / UTF-8 以外 / 展開失敗 / zip 損傷 |
@@ -1253,6 +1263,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 前の部](05-troubleshooting.md)・[マニュアルに戻る](README.md)・[次の部 →](07-internals.md)
 
 # 第六部: 実装時の重要な補足
+
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
 
 ## 19. 夜間に「影は暗いのに表面だけ明るい」を直す
 
@@ -1376,6 +1388,8 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 前の部](06-implementation.md)・[マニュアルに戻る](README.md)・[次の部 →](08-apiv2.md)
 
 # 第七部: 内部仕様の補足
+
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
 
 エンジンの実装を解析して明らかになった追加仕様である。これらはすべて、現行の本番ビルドにおける JavaScript から直接復元したものである。
 
@@ -1574,6 +1588,8 @@ strict 側で特に誤解しやすい点は以下の通りである。
 [← 前の部](07-internals.md)・[マニュアルに戻る](README.md)
 
 # 第八部: API Version 2 移行ガイド
+
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
 
 対象ビルド: `6qxffk.main.5912a15f.js` (2026-10-16 時点の本番デプロイ)。本書の第一部〜第七部は v2 基準に書き換え済みであり、この第八部は v1 からの移行点と v2 の新機能をまとめたものである。新機能のコード例は v2 コンパイラによる 8/8 バリアント検証とブラウザ WGSL コンパイラ (Tint) 検証 (§38) を通過したもので、既存レシピの v2 変換は機械的な識別子置換であるため、配布前には必ず実機コンパイルで確認すること。
 

@@ -2,6 +2,8 @@
 
 # Parte I: Crear paquetes
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 1. Resumen y requisitos
 
 - Los paquetes de sombreadores son **solo para el renderizador WebGPU**. Mientras un paquete está instalado, el renderizador WebGPU se activa forzosamente en los ajustes
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | Campo | Requerido | Descripción |
 |---|---|---|
-| `apiVersion` | requerido | Debe coincidir exactamente con `2`. Los paquetes con `1` se rechazan con `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | requerido | Debe coincidir exactamente con `3`. Los paquetes con `1`/`2` se rechazan al cargar con `shaderPack:loadWrongApiVersion` — véase [Parte IX](09-apiv3.md) para migrar |
 | `name` | requerido | No debe estar vacío. Se muestra en la interfaz de ajustes |
 | `author` | opcional | Puede omitirse. Valores no cadena (números etc.) son errores |
 

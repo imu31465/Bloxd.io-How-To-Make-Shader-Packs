@@ -2,6 +2,8 @@
 
 # 제5부: 트러블슈팅·주의
 
+> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+
 ## 17. 자주 나오는 에러와 고치기
 
 | 증상 | 고치기 |
@@ -10,7 +12,7 @@
 | `.alpha` 가 미정의라고 나온다 | `#ifdef BLOXD_ALPHA` 로 감싼다 |
 | `blockLight` 가 미정의라고 나온다 | `#ifdef BLOXD_LIGHTING` 로 감싼다. 공용 헬퍼 함수는**함수째** 감싼다 (v2에서는 필드가 항상 존재하므로 보통 일어나지 않는다. 판정용 가드는 남긴다) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` 를 기점으로 고친다 |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` 이 없거나 `2` 가 아니다. 수치 `2` 를 넣는다 (문자열 `"2"` 는 불가). v1 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` 이 없거나 `3` 가 아니다. 수치 `3` 를 넣는다 (문자열 `"3"` 는 불가). v1/v2 팩은 `shaderPack:loadWrongApiVersion` 으로 거부된다 |
 | `There's no pack.json at the top of the pack.` | ZIP 최상위에 `pack.json` 이 없다. 폴더째 굳히지 않았는지 확인한다 |
 | `bloxdTerrainVertex must be declared as: fn ...` | 시그니처 불일치. 표시된 선언대로 다시 쓴다 |
 | `bloxdTerrainVertex can't run in strict games...` | vertex 훅을 `#ifndef BLOXD_STRICT` 로 감싼다 |
@@ -46,7 +48,7 @@
 | `loadSourceTooBig` | `.wgsl` 합계가 256KB 초과 (파일 단위의 스트리밍 검사) |
 | `loadManifestTooBig` | `pack.json` 이 64KB 초과 |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` 이 JSON 이 아니다 / 오브젝트형이 아니다 |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 없음 / `2` 가 아니다 (v1 은 거부) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 없음 / `3` 가 아니다 (v1/v2 는 거부) |
 | `loadNoName` / `loadAuthorNotString` | `name` 없음 / `author` 가 문자열 이외 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 대응 외 압축 방식 / zip64 / 분할 / 암호화 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 경로 중복 / UTF-8 이외 / 전개 실패 / zip 손상 |

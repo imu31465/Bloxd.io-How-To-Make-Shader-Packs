@@ -12,6 +12,8 @@ Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.
 
 # Parte I: Crear paquetes
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 1. Resumen y requisitos
 
 - Los paquetes de sombreadores son **solo para el renderizador WebGPU**. Mientras un paquete está instalado, el renderizador WebGPU se activa forzosamente en los ajustes
@@ -47,7 +49,7 @@ Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@ Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.
 
 | Campo | Requerido | Descripción |
 |---|---|---|
-| `apiVersion` | requerido | Debe coincidir exactamente con `2`. Los paquetes con `1` se rechazan con `shaderPack:loadWrongApiVersion` |
+| `apiVersion` | requerido | Debe coincidir exactamente con `3`. Los paquetes con `1`/`2` se rechazan al cargar con `shaderPack:loadWrongApiVersion` — véase [Parte IX](09-apiv3.md) para migrar |
 | `name` | requerido | No debe estar vacío. Se muestra en la interfaz de ajustes |
 | `author` | opcional | Puede omitirse. Valores no cadena (números etc.) son errores |
 
@@ -157,6 +159,8 @@ Pasos:
 [← Parte anterior](01-making.md)·[Volver al manual](README.md)·[Parte siguiente →](03-recipes.md)
 
 # Parte II: Referencia de la API
+
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
 
 ## 10. Cabecera del motor (antepuesta automáticamente al código del paquete)
 
@@ -309,6 +313,8 @@ Cinco cosas a tener siempre presentes: compilar limpio en las 8 variantes / los 
 [← Parte anterior](02-api.md)·[Volver al manual](README.md)·[Parte siguiente →](04-realism.md)
 
 # Parte III: Recetario
+
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
 
 - [R1. Recetas de color (surface)](#r1-recetas-de-color-surface)
 - [R2. Recetas de iluminación (light)](#r2-recetas-de-iluminación-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # Parte IV: Guía de realismo
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 13. Iluminación por defecto del motor y margen para el realismo
 
 La iluminación por defecto del motor es "solo multiplicación" — no existen especular, fresnel, separación cálido/frío ni ambiente hemisférico. Lo siguiente se puede reconstruir:
@@ -1191,6 +1199,8 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 
 # Parte V: Solución de problemas y notas
 
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+
 ## 17. Errores comunes y soluciones
 
 | Síntoma | Solución |
@@ -1204,7 +1214,7 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | Aviso de que la cola de semillas de luz se desbordó en zonas de alta densidad de emisores o entre regiones, y el cálculo de luz de ese chunk se quedó a medias. No proviene del paquete, pero **los huecos de luz junto a concentraciones de emisores se deben a esta especificación** — reparte las fuentes de luz por el mundo para evitarlo |
 | Paquete excluido al unirse al juego | Falla la comprobación en vivo del juego. Revisa omisiones de guardias |
 | La comprobación en vivo no termina nunca y el paquete cae con `This device couldn't check …` etc. | La comprobación tiene un límite forzado de 60 segundos (el exceso cuenta como `skipped`). Suele pasar en dispositivos lentos o mundos pesados; reduce trabajo de vértices intenso y bucles complejos, y reintenta |
-| `pack.json needs "apiVersion": 2.` | Falta `apiVersion` o no es `2`. Añade el número `2` (la cadena `"2"` se rechaza). Los paquetes v1 se rechazan con `shaderPack:loadWrongApiVersion` |
+| `pack.json needs "apiVersion": 3.` | Falta `apiVersion` o no es `3`. Añade el número `3` (la cadena `"3"` se rechaza). Los paquetes v1/v2 se rechazan con `shaderPack:loadWrongApiVersion` |
 | `There's no pack.json at the top of the pack.` | Sin `pack.json` en la raíz del ZIP. Revisa no haber comprimido la carpeta misma |
 | `bloxdTerrainVertex must be declared as: fn ...` | Firma distinta. Reescribe exactamente como se muestra |
 | `bloxdTerrainVertex can't run in strict games...` | Envuelve el hook vertex en `#ifndef BLOXD_STRICT` |
@@ -1235,7 +1245,7 @@ Los errores de la pantalla de ajustes llevan IDs `shaderPack:load*`. Como ayuda 
 | `loadSourceTooBig` | `.wgsl` total de más de 256KB (comprobación en streaming por archivo) |
 | `loadManifestTooBig` | `pack.json` de más de 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` no es JSON / no es objeto |
-| `loadNoApiVersion` / `loadWrongApiVersion` | sin `apiVersion` / no es `2` (paquetes v1 rechazados) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | sin `apiVersion` / no es `3` (paquetes v1/v2 rechazados) |
 | `loadNoName` / `loadAuthorNotString` | sin `name` / `author` no es cadena |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | compresión no soportada / zip64 / dividido / cifrado |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | rutas duplicadas / no UTF-8 / fallo de descompresión / zip dañado |
@@ -1253,6 +1263,8 @@ Los errores de la pantalla de ajustes llevan IDs `shaderPack:load*`. Como ayuda 
 [← Parte anterior](05-troubleshooting.md)·[Volver al manual](README.md)·[Parte siguiente →](07-internals.md)
 
 # Parte VI: Notas importantes de implementación
+
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
 
 ## 19. Corregir "sombras oscuras pero superficies brillantes" de noche
 
@@ -1376,6 +1388,8 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 [← Parte anterior](06-implementation.md)·[Volver al manual](README.md)·[Parte siguiente →](08-apiv2.md)
 
 # Parte VII: Suplemento de interioridades
+
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
 
 Especificaciones extra halladas por análisis de implementación del motor. Todo restaurado directamente del JavaScript del build de producción actual.
 
@@ -1574,6 +1588,8 @@ Esta lista refleja el análisis estático del build indicado; las actualizacione
 [← Parte anterior](07-internals.md)·[Volver al manual](README.md)
 
 # Parte VIII: Guía de migración a API Version 2
+
+> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
 
 Build objetivo: `6qxffk.main.5912a15f.js` (despliegue en producción a 2026-10-16). Las Partes I–VII de esta guía ya están reescritas a la base v2; esta Parte VIII recoge los puntos de migración desde v1 y las novedades de v2. Los ejemplos de código de novedades pasan la validación de 8/8 variantes en el compilador v2 y la validación del compilador WGSL del navegador (Tint) (§38), pero la conversión v2 de recetas existentes es sustitución mecánica de identificadores — verifica siempre con compilación en juego antes de distribuir.
 

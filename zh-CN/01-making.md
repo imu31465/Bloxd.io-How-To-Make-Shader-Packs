@@ -2,6 +2,8 @@
 
 # 第一部分: 制作包
 
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+
 ## 1. 概述与前提
 
 - 着色器包**仅用于 WebGPU 渲染器**。安装包期间，设置中的 WebGPU 渲染器会被强制开启
@@ -37,7 +39,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -45,7 +47,7 @@
 
 | 字段 | 必需 | 说明 |
 |---|---|---|
-| `apiVersion` | 必需 | 必须与 `2` 完全一致。含 `1` 的包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
+| `apiVersion` | 必需 | 必须与 `3` 完全一致。含 `1`/`2` 的包会在加载时被 `shaderPack:loadWrongApiVersion` 拒绝 — 迁移见 [第九部分](09-apiv3.md) |
 | `name` | 必需 | 不可为空。显示在设置界面 |
 | `author` | 可选 | 可省略。非字符串值 (数字等) 会报错 |
 

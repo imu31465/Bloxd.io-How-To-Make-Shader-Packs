@@ -12,6 +12,8 @@
 
 # 第一部分: 制作包
 
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+
 ## 1. 概述与前提
 
 - 着色器包**仅用于 WebGPU 渲染器**。安装包期间，设置中的 WebGPU 渲染器会被强制开启
@@ -47,7 +49,7 @@
 
 ```json
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "My Pack",
   "author": "your name"
 }
@@ -55,7 +57,7 @@
 
 | 字段 | 必需 | 说明 |
 |---|---|---|
-| `apiVersion` | 必需 | 必须与 `2` 完全一致。含 `1` 的包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
+| `apiVersion` | 必需 | 必须与 `3` 完全一致。含 `1`/`2` 的包会在加载时被 `shaderPack:loadWrongApiVersion` 拒绝 — 迁移见 [第九部分](09-apiv3.md) |
 | `name` | 必需 | 不可为空。显示在设置界面 |
 | `author` | 可选 | 可省略。非字符串值 (数字等) 会报错 |
 
@@ -157,6 +159,8 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 [← 上一部分](01-making.md)·[返回手册](README.md)·[下一部分 →](03-recipes.md)
 
 # 第二部分: API 参考
+
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
 
 ## 10. 引擎头 (自动前置于包代码)
 
@@ -309,6 +313,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 [← 上一部分](02-api.md)·[返回手册](README.md)·[下一部分 →](04-realism.md)
 
 # 第三部分: 配方集
+
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
 
 - [R1. 颜色配方 (surface)](#r1-颜色配方-surface)
 - [R2. 光照配方 (light)](#r2-光照配方-light)
@@ -1100,6 +1106,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第四部分: 写实化指南
 
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+
 ## 13. 引擎默认光照与写实余地
 
 引擎默认光照只有「乘法」，不存在高光、菲涅尔、暖冷分离、半球环境光。以下为可重建范围：
@@ -1191,6 +1199,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第五部分: 故障排除与注意事项
 
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+
 ## 17. 常见错误与修复
 
 | 症状 | 修复 |
@@ -1204,7 +1214,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk` | 警告：在发光体密集区域或跨区域边界处光照种子队列溢出，该区块的光照计算被截断。非包所致，但**发光体聚集周围的光照空洞来自此规格**——将光源分散到世界各处即可避免 |
 | 进游戏时包被剔除 | 游戏开始时的实机检查失败。复查守卫遗漏 |
 | 实机检查永不结束，包以 `This device couldn't check …` 等脱落 | 检查有 60 秒强制期限 (超时计为 `skipped`)。在弱设备 / 重负载世界常见——减轻沉重的顶点运算与复杂循环后重试 |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` 缺失或不是 `2`。填数字 `2` (字符串 `"2"` 不可)。v1 包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` 缺失或不是 `3`。填数字 `3` (字符串 `"3"` 不可)。v1/v2 包会被 `shaderPack:loadWrongApiVersion` 拒绝 |
 | `There's no pack.json at the top of the pack.` | ZIP 根无 `pack.json`。检查是否把文件夹整个打包了 |
 | `bloxdTerrainVertex must be declared as: fn ...` | 签名不符。按所示声明原样重写 |
 | `bloxdTerrainVertex can't run in strict games...` | vertex 钩子用 `#ifndef BLOXD_STRICT` 包裹 |
@@ -1235,7 +1245,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `loadSourceTooBig` | 总量超过 256KB (流式检查、逐文件) |
 | `loadManifestTooBig` | `pack.json` 超过 64KB |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` 非 JSON / 非对象 |
-| `loadNoApiVersion` / `loadWrongApiVersion` | 无 `apiVersion` / 不为 `2` (v1 包被拒绝) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | 无 `apiVersion` / 不为 `3` (v1/v2 包被拒绝) |
 | `loadNoName` / `loadAuthorNotString` | 无 `name` / `author` 非字符串 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 不支持的压缩 / zip64 / 分卷 / 加密 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 重复路径 / 非 UTF-8 / 解压失败 / zip 损坏 |
@@ -1253,6 +1263,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 上一部分](05-troubleshooting.md)·[返回手册](README.md)·[下一部分 →](07-internals.md)
 
 # 第六部分: 重要的实现补充
+
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
 
 ## 19. 修复夜间「影黑了面却亮」
 
@@ -1376,6 +1388,8 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 [← 上一部分](06-implementation.md)·[返回手册](README.md)·[下一部分 →](08-apiv2.md)
 
 # 第七部分: 内部规格的补充
+
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
 
 引擎实现解析发现的追加规格。全部由现行正式构建的 JavaScript 直接复原。
 
@@ -1574,6 +1588,8 @@ strict 侧特别容易误解的点:
 [← 上一部分](07-internals.md)·[返回手册](README.md)
 
 # 第八部分: API Version 2 迁移指南
+
+> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
 
 目标构建：`6qxffk.main.5912a15f.js` (2026-10-16 时点的正式部署)。本书第一至第七部分已按 v2 基准改写完毕，本第八部分汇总 v1 迁移点与 v2 新功能。新功能代码例已通过 v2 编译器的 8/8 变体检验证与浏览器 WGSL 编译器 (Tint) 验证 (§38)，既有配方的 v2 转换为机械的标识符替换，分发前务必以实机编译确认。
 

@@ -2,6 +2,8 @@
 
 # Part VII: Internals supplement
 
+> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+
 Extra specs found by engine-implementation analysis. All restored directly from current production-build JavaScript.
 
 ## 24. Sun and moon identity

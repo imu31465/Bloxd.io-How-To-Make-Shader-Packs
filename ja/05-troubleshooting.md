@@ -2,6 +2,8 @@
 
 # 第五部: トラブルシューティング・注意
 
+> 現行ビルドは 2026-10-19 以降 `apiVersion: 3` を要求し、v1/v2 パックは読み込み時に拒否される。以下の内容は v2 仕様に基づく記述である — 配布前に [第九部](09-apiv3.md) の変更を確認すること。
+
 ## 17. よくあるエラーと直し方
 
 | 症状 | 直し方 |
@@ -10,7 +12,7 @@
 | `.alpha` が未定義と言われる | `#ifdef BLOXD_ALPHA` で囲む |
 | `blockLight` が未定義と言われる | `#ifdef BLOXD_LIGHTING` で囲む。共用ヘルパー関数は**関数ごと**囲む (v2 ではフィールド常在のため通常は起きない。判定用途のガードは残す) |
 | `Packs can't construct BloxdSurface directly` | `bloxdDefaultSurface(s)` を起点に書き換える |
-| `pack.json needs "apiVersion": 2.` | `apiVersion` が無いか `2` でない。数値の `2` を入れる (文字列の `"2"` は不可)。v1 パックは `shaderPack:loadWrongApiVersion` で拒否される |
+| `pack.json needs "apiVersion": 3.` | `apiVersion` が無いか `3` でない。数値の `3` を入れる (文字列の `"3"` は不可)。v1/v2 パックは `shaderPack:loadWrongApiVersion` で拒否される |
 | `There's no pack.json at the top of the pack.` | ZIP直下に `pack.json` が無い。フォルダごと固めていないか確認する |
 | `bloxdTerrainVertex must be declared as: fn ...` | シグネチャ不一致。表示された宣言どおりに書き直す |
 | `bloxdTerrainVertex can't run in strict games...` | vertex フックを `#ifndef BLOXD_STRICT` で囲む |
@@ -46,7 +48,7 @@
 | `loadSourceTooBig` | `.wgsl` 合計が 256KB 超 (ファイル単位のストリーミング検査) |
 | `loadManifestTooBig` | `pack.json` が 64KB 超 |
 | `loadManifestNotJson` / `loadManifestNotObject` | `pack.json` が JSON でない / オブジェクト型でない |
-| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 無し / `2` でない (v1 は拒否) |
+| `loadNoApiVersion` / `loadWrongApiVersion` | `apiVersion` 無し / `3` でない (v1/v2 は拒否) |
 | `loadNoName` / `loadAuthorNotString` | `name` 無し / `author` が文字列以外 |
 | `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | 対応外圧縮方式 / zip64 / 分割 / 暗号化 |
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | パス重複 / UTF-8 以外 / 展開失敗 / zip 損傷 |
