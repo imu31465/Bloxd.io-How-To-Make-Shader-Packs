@@ -2,14 +2,14 @@
 
 # Teil I: Pakete erstellen
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 1. Überblick und Voraussetzungen
 
 - Shader-Pakete sind **nur für den WebGPU-Renderer**. Solange ein Paket installiert ist, wird der WebGPU-Renderer in den Einstellungen zwangsweise aktiviert
 - Pakete werden in einer **eingeschränkten WGSL-Untermenge** geschrieben. Sie betreffen nur das Aussehen von **Terrain und Flüssigkeiten**
 - Möglich: Farben, Transparenz und Emission ändern; Beleuchtung neu aufbauen; projektionsartige Schatten (R9.12); Vertex-Animation (nur in bestimmten Spielen)
-- Nicht möglich: Texturen hinzufügen/sampeln, Post-Processing (Bloom etc.), pixelgenaue mit der Sonne rotierende Schatten (Shadowmaps) oder echte Reflexionen (SSR), Himmel oder Entities beeinflussen
+- Nicht möglich: eigene Texturen hinzufügen, Post-Processing (Bloom etc.), pixelgenaue mit der Sonne rotierende Schatten (Shadowmaps) oder echte Reflexionen (SSR), Himmel oder Entities beeinflussen (Sampling des bestehenden Block-Textur-Atlas ist **seit v4 möglich** — `bloxdTexel`, [Teil X](10-apiv4.md) §57)
 - Möglich (wird aber leicht übersehen): **projektionsartige Schatten mit `skyLight` (Voxel-Himmelsverdeckung)** — Bereiche unter Bäumen und Dächern deutlich abdunkeln (R9.12). Blöcke zu zerstören lässt die LightEngine sofort neu berechnen, Schatten folgen also in Echtzeit
 - **Die meisten Spiele laufen im Strict-Modus** (keine Vertex-Animation, kein `discard`). Pakete für die allgemeine Verteilung bitte strict-tauglich gestalten
 

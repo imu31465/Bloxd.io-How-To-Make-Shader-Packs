@@ -3,7 +3,7 @@
 Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Bloxd.io (nur WebGPU-Renderer).
 
 > Dies ist eine inoffizielle Anleitung und gibt nicht die Sicht der Entwickler wieder. Die API kann sich ohne Ankündigung ändern.  
-> Zuletzt geprüft: 2026-10-20 (v3-Produktionsrollout durch Bundle-Vergleich bestätigt; Hook-Aufruf, Fog, Tiefe und `blockFlags`-Interna aus dem Produktions-Build restauriert — Teil IX §49–§54). Da keine öffentliche offizielle WGSL-API-Referenz gefunden werden konnte, prüfe Beschreibungen und Rezepte weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
+> Zuletzt geprüft: 2026-10-27 (v4-Produktionsrollout bestätigt — Build `cnty9`, Produktion und Preprod identisch; siehe Teil X. v3-Produktionsrollout durch Bundle-Vergleich bestätigt; Hook-Aufruf, Fog, Tiefe und `blockFlags`-Interna aus dem Produktions-Build restauriert — Teil IX §49–§54). Offizielle Referenzen existieren inzwischen (`bloxd-api.wgsl` und `BLOCK_TEXTURES.md`, offizieller Discord) und wurden mit diesem Leitfaden abgeglichen — prüfe Rezepte trotzdem weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
 > Die Shader-Paket-Funktion ist eine offizielle Funktion aus der Spieloberfläche, und Pakete sind reines WGSL  
 > (keine JS-Ausführung, kein Netzwerk) – mit normalem Code passiert also nichts Gefährliches.  
 > Dieser Leitfaden wurde mit KI-Unterstützung erstellt; Korrektheit ist nicht garantiert. Prüfe am tatsächlichen Spielverhalten.
@@ -12,14 +12,14 @@ Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Blo
 
 # Teil I: Pakete erstellen
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 1. Überblick und Voraussetzungen
 
 - Shader-Pakete sind **nur für den WebGPU-Renderer**. Solange ein Paket installiert ist, wird der WebGPU-Renderer in den Einstellungen zwangsweise aktiviert
 - Pakete werden in einer **eingeschränkten WGSL-Untermenge** geschrieben. Sie betreffen nur das Aussehen von **Terrain und Flüssigkeiten**
 - Möglich: Farben, Transparenz und Emission ändern; Beleuchtung neu aufbauen; projektionsartige Schatten (R9.12); Vertex-Animation (nur in bestimmten Spielen)
-- Nicht möglich: Texturen hinzufügen/sampeln, Post-Processing (Bloom etc.), pixelgenaue mit der Sonne rotierende Schatten (Shadowmaps) oder echte Reflexionen (SSR), Himmel oder Entities beeinflussen
+- Nicht möglich: eigene Texturen hinzufügen, Post-Processing (Bloom etc.), pixelgenaue mit der Sonne rotierende Schatten (Shadowmaps) oder echte Reflexionen (SSR), Himmel oder Entities beeinflussen (Sampling des bestehenden Block-Textur-Atlas ist **seit v4 möglich** — `bloxdTexel`, [Teil X](10-apiv4.md) §57)
 - Möglich (wird aber leicht übersehen): **projektionsartige Schatten mit `skyLight` (Voxel-Himmelsverdeckung)** — Bereiche unter Bäumen und Dächern deutlich abdunkeln (R9.12). Blöcke zu zerstören lässt die LightEngine sofort neu berechnen, Schatten folgen also in Echtzeit
 - **Die meisten Spiele laufen im Strict-Modus** (keine Vertex-Animation, kein `discard`). Pakete für die allgemeine Verteilung bitte strict-tauglich gestalten
 
@@ -160,7 +160,7 @@ Schritte:
 
 # Teil II: API-Referenz
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 10. Engine-Header (wird automatisch vor Paket-Code gesetzt)
 
@@ -314,7 +314,7 @@ Fünf Dinge immer im Kopf: in allen 8 Varianten sauber kompilieren / strikte Spi
 
 # Teil III: Rezeptsammlung
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 - [R1. Farbrezepte (Surface)](#r1-farbrezepte-surface)
 - [R2. Lichtrezepte (Light)](#r2-lichtrezepte-light)
@@ -1106,7 +1106,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # Teil IV: Realismus-Leitfaden
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 13. Engine-Standardlicht und Realismus-Spielraum
 
@@ -1199,7 +1199,7 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 
 # Teil V: Fehlersuche & Hinweise
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 17. Häufige Fehler und Fixes
 
@@ -1264,7 +1264,7 @@ Fehler vom Einstellungs-Bildschirm tragen `shaderPack:load*`-IDs. Als Nachschlag
 
 # Teil VI: Wichtige Umsetzungshinweise
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 ## 19. „Dunkle Schatten, aber helle Flächen" nachts beheben
 
@@ -1389,7 +1389,7 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 
 # Teil VII: Interna-Ergänzung
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 Extra-Spezifikationen aus Engine-Implementierungsanalyse. Alles direkt aus dem JavaScript des aktuellen Produktions-Builds restauriert.
 
@@ -1589,7 +1589,7 @@ Diese Liste spiegelt die statische Analyse des genannten Builds wider; Engine-Up
 
 # Teil VIII: Migrationsleitfaden für API Version 2
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-19 `apiVersion: 3` und lehnt v1/v2-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
 
 Ziel-Build: `6qxffk.main.5912a15f.js` (Produktions-Deployment mit Stand 2026-10-16). Teile I bis VII dieses Leitfadens sind bereits auf v2-Standard umgeschrieben; dieser Teil VIII fasst die Migrationspunkte von v1 und die v2-Neuerungen zusammen. Die Code-Beispiele der Neuerungen haben die 8/8-Variantenprüfung des v2-Compilers und die Browser-WGSL-Compiler-Prüfung (Tint) (§38) bestanden, und die v2-Konvertierung bestehender Rezepte ist rein mechanischer Bezeichnerersatz: vor Verteilung unbedingt per In-Game-Kompilierung prüfen.
 
@@ -1833,6 +1833,8 @@ Recherchiert von ltf_ahel (recherchiert mit glm)
 [← Vorheriger Teil](08-apiv2.md)·[Zurück zum Handbuch](README.md)
 
 # Teil IX: Migrationsleitfaden für API Version 3
+
+> **Seit 2026-10-26 ersetzt: die aktuelle API ist Version 4** — v3-Pakete werden beim Laden genau so abgelehnt, wie es hier für v2 beschrieben ist. Diesen Teil *und danach* [Teil X](10-apiv4.md) anwenden (v3 → v4: Textur-API, `fogAlpha`-Umbenennung, `bloxdFragmentBlockPosition`, `hit`).
 
 Ziel-Build: `3ymzdd.main.fae4743f.js` — **der seit 2026-10-19 live ausgelieferte Produktions-Build**. Das Bundle, das bloxd.io in Produktion ausliefert, ist byte-identisch (per md5 geprüft, Haupt-Bundle und Shader-Pack-Chunks gleichermaßen) mit dem Preprod-Deploy, gegen das dieser Teil ursprünglich untersucht wurde; alles hier gilt also unverändert für die Produktion. Das Paketmodell behält seine v2-Form (gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches Uniform-Layout).
 
@@ -2312,7 +2314,32 @@ Das vollständige Ressourcenlayout des Terrain-Programms, direkt aus dem Produkt
 
 ---
 
-Recherchiert von ltf_ahel (recherchiert mit glm)
+# Teil X: Migrationsleitfaden für API Version 4 (2026-10-26, Zusammenfassung)
 
-[← Vorheriger Teil](08-apiv2.md)·[Zurück zum Handbuch](README.md)
+> Dieser Text ist die kurze Zusammenfassung für diese Sprache. Die vollständige Fassung mit allen Details, Beispielrezepten und restaurierten Engine-Interna (§55–§66) gibt es auf [Englisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) und [Japanisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md).
 
+Ziel-Build: `cnty9.main.669f8081.js` — **seit 2026-10-26 gleichzeitig in Produktion und Preprod live** (beide byte-identisch). Das Pack-Modell behält seine Form: gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches 64-B-Uniform, dieselben 6 Hooks.
+
+## Was sich ändert
+
+- `pack.json` verlangt `"apiVersion": 4` (strikt `===`, Zahl) — v3-Pakete werden beim Laden abgelehnt.
+- **Neue Textur-API (das Highlight):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` sampelt den Block-Textur-Atlas genau wie die Engine selbst (id 0 = weiß; animierte Texturen liefern automatisch den aktuellen Frame), `bloxdTextureSize(mipLevel) -> vec2u`, und benannte Konstanten `bloxdTextureId*` (CamelCase aus dem Dateinamen, z. B. `grass_top` → `bloxdTextureIdGrassTop`; die offizielle Namensliste ist `BLOCK_TEXTURES.md`).
+- **Vier neue Eingabefelder** in `BloxdSurfaceIn` *und* `BloxdLightIn`: `textureId`, `textureRotation` (Vierteldrehungen im Uhrzeigersinn, die `bloxdTexel` anwendet), `uv` (in Blöcken; `fract(uv)` wird gezeichnet), `mipLevel`.
+- **Umbenennungen mit Bedeutungswechsel:** `fogVisibility` → `fogAlpha` mit **invertierter** Bedeutung (`0 = kein Nebel, 1 = nur fogColour`; Port: `l.fogVisibility` → `1.0 - l.fogAlpha`); `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (identischer Körper); `BloxdOpaqueBehind.found` → `hit`.
+- **Strict Games werden jetzt vom eingebauten Validator durchgesetzt:** ein ungeschützter Vertex-Hook oder ein erreichbares `discard` meldet `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` und deaktiviert **alle** Hooks in Strict-Spielen. Mit `#ifndef BLOXD_STRICT`-Wrappern laufen Surface/Light weiter.
+- Alles andere bleibt eingefroren: 6 Hooks, `blockFlags`-Bits (1/2/4/8/16/32), Uniform-Layout, Loader-Limits, Varianten-Matrix, die 12 Allow-Titel (auf `cnty9` am 2026-10-27 unverändert bestätigt).
+
+## Migration in Kürze
+
+| v3 | v4 |
+|---|---|
+| `"apiVersion": 3` | `"apiVersion": 4` (Zahl) |
+| `l.fogVisibility` | `1.0 - l.fogAlpha` |
+| `mix(l.fogColour, col, VIS)` | `mix(col, l.fogColour, ALPHA)` bzw. `bloxdApplyFog(col, l)` |
+| `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` |
+| `behind.found` | `behind.hit` |
+| Vertex-Hooks ungeschützt | `#ifndef BLOXD_STRICT ... #endif` |
+
+Offizielle Referenzen existieren jetzt (`bloxd-api.wgsl` und `BLOCK_TEXTURES.md`, offizieller Discord). Die vollständigen Details — Rotations-Feinheit von `bloxdTexel`, das restaurierte Sampling-`WGSL`, die Namens-Registry mit ≈900 nutzbaren Konstanten, die neue `HEADER_VERSION`-Struktur mit Registry-Hash — stehen in der englischen und japanischen Vollfassung.
+
+[← Vorheriger Teil](09-apiv3.md)·[Zurück zum Handbuch](README.md)

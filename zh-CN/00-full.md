@@ -4,7 +4,7 @@
 
 > 本书为非官方指南，不代表开发者的官方立场。API 可能随时变更。  
 > 本指南在 AI 协助下创建，不保证准确性。请以实际游戏表现为准。  
-> 最后检查: 2026-10-20 (通过对比构建确认 v3 已正式上线；钩子调用、雾、深度与 blockFlags 内部实现均从生产构建复原——第九部分 §49–§54)。未能找到公开的官方 WGSL API 参考，API 说明与配方请持续以加载界面与游戏内编译为准。  
+> 最后检查: 2026-10-27 (已确认 v4 上线 —— 构建 `cnty9`，生产与预发布一致；见第十部分。 通过对比构建确认 v3 已正式上线；钩子调用、雾、深度与 blockFlags 内部实现均从生产构建复原——第九部分 §49–§54)。官方参考资料现已存在 (`bloxd-api.wgsl` 与 `BLOCK_TEXTURES.md`，官方 Discord)，并已与本指南相互校验——API 说明与配方仍请持续以加载界面与游戏内编译为准。  
 > 着色器包功能本身是游戏内 UI 可加载的官方功能，包为纯 WGSL  
 > (无 JS 执行、无网络通信)，正常代码不会发生危险。
 
@@ -12,14 +12,14 @@
 
 # 第一部分: 制作包
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 ## 1. 概述与前提
 
 - 着色器包**仅用于 WebGPU 渲染器**。安装包期间，设置中的 WebGPU 渲染器会被强制开启
 - 包使用 **受限 WGSL 子集**编写。仅影响**地形 (terrain) 与液体 (liquid)** 的外观
 - 能做的事: 修改颜色、透明度与自发光；重建光照；投影风格阴影 (R9.12)；顶点动画 (仅部分游戏)
-- 不能做的事: 添加/采样纹理、后处理 (泛光等)、随太阳旋转的像素级阴影 (阴影贴图) 与真实反射 (SSR)、影响天空与实体
+- 不能做的事: 添加自定义纹理、后处理 (泛光等)、随太阳旋转的像素级阴影 (阴影贴图) 与真实反射 (SSR)、影响天空与实体 (采样现有方块纹理图集**自 v4 起已可行** —— `bloxdTexel`，[第十部分](10-apiv4.md) §57)
 - 能做 (但容易被忽视) 的事: **使用 `skyLight` (体素天空遮蔽) 的投影风格阴影** — 可明显压暗树下与屋檐下 (R9.12)。破坏方块会使 LightEngine 立即重算，阴影实时跟随
 - **大多数游戏为严格 (strict) 模式** (无顶点动画、无 `discard`)。面向公开发布的包应按严格模式设计
 
@@ -160,7 +160,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 # 第二部分: API 参考
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 ## 10. 引擎头 (自动前置于包代码)
 
@@ -314,7 +314,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 # 第三部分: 配方集
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 - [R1. 颜色配方 (surface)](#r1-颜色配方-surface)
 - [R2. 光照配方 (light)](#r2-光照配方-light)
@@ -1106,7 +1106,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第四部分: 写实化指南
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 ## 13. 引擎默认光照与写实余地
 
@@ -1199,7 +1199,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第五部分: 故障排除与注意事项
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 ## 17. 常见错误与修复
 
@@ -1264,7 +1264,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第六部分: 重要的实现补充
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 ## 19. 修复夜间「影黑了面却亮」
 
@@ -1389,7 +1389,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 第七部分: 内部规格的补充
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 引擎实现解析发现的追加规格。全部由现行正式构建的 JavaScript 直接复原。
 
@@ -1589,7 +1589,7 @@ strict 侧特别容易误解的点:
 
 # 第八部分: API Version 2 迁移指南
 
-> 现行游戏自 2026-10-19 起要求 `apiVersion: 3`，加载时会拒绝 v1/v2 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 以便迁移。
+> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
 
 目标构建：`6qxffk.main.5912a15f.js` (2026-10-16 时点的正式部署)。本书第一至第七部分已按 v2 基准改写完毕，本第八部分汇总 v1 迁移点与 v2 新功能。新功能代码例已通过 v2 编译器的 8/8 变体检验证与浏览器 WGSL 编译器 (Tint) 验证 (§38)，既有配方的 v2 转换为机械的标识符替换，分发前务必以实机编译确认。
 
@@ -1833,6 +1833,8 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 [← 上一部分](08-apiv2.md)·[返回手册](README.md)
 
 # 第九部分: API Version 3 迁移指南
+
+> **已于 2026-10-26 被取代: 现行 API 为版本 4** —— v3 包在加载时被拒绝，方式与本文对 v2 的描述完全相同。请先应用本部分，*再*应用 [第十部分](10-apiv4.md) (v3 → v4: 纹理 API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`)。
 
 目标构建: `3ymzdd.main.fae4743f.js` — **自 2026-10-19 起的正式生产构建**。bloxd.io 在生产环境提供的 bundle 与本部分最初调查所用的预发布部署逐字节一致 (已核对 md5，主 bundle 与着色器包 chunk 均如此)，因此这里的内容原样适用于生产环境。包模型保持 v2 形态 (相同的 `pack.json` 字段、相同的加载器限制、相同的 uniform 布局)。
 
@@ -2307,7 +2309,32 @@ v3 (3ymzdd):  6.5bc26a63   ← 从正式生产 bundle 实测
 
 ---
 
-调查：ltf_ahel (使用 glm 调查)
+# 第十部分: API Version 4 迁移指南 (2026-10-26, 摘要)
 
-[← 上一部分](08-apiv2.md)·[返回手册](README.md)
+> 本文是该语言的简短摘要。包含全部细节、示例配方与复原的引擎内部实现 (§55–§66) 的完整版位于[英文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md)与[日文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md)。
 
+目标构建: `cnty9.main.669f8081.js` —— **自 2026-10-26 起同时在生产与预发布环境上线** (两者逐字节一致)。包模型保持形态: 相同的 `pack.json` 字段、相同的加载器限制、相同的 64 B uniform、相同的 6 个钩子。
+
+## 变更内容
+
+- `pack.json` 要求 `"apiVersion": 4` (严格 `===`，数字) —— v3 包在加载时被拒绝。
+- **全新纹理 API (本次亮点):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` 以与引擎本身完全相同的方式采样方块纹理图集 (id 0 = 白色；动画纹理自动返回当前帧)，`bloxdTextureSize(mipLevel) -> vec2u`，以及命名常量 `bloxdTextureId*` (由文件名转 CamelCase，如 `grass_top` → `bloxdTextureIdGrassTop`；官方名录为 `BLOCK_TEXTURES.md`)。
+- `BloxdSurfaceIn` *与* `BloxdLightIn` 新增 **4 个输入字段**: `textureId`、`textureRotation` (顺时针四分之一转，由 `bloxdTexel` 应用)、`uv` (以方块为单位；绘制 `fract(uv)`)、`mipLevel`。
+- **伴随含义变化的改名:** `fogVisibility` → `fogAlpha`，含义**反转** (`0 = 无雾，1 = 仅有 fogColour`；移植: `l.fogVisibility` → `1.0 - l.fogAlpha`)；`bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (函数体一致)；`BloxdOpaqueBehind.found` → `hit`。
+- **严格游戏现在由内置验证器强制执行:** 未加保护的顶点钩子或可达的 `discard` 会报 `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...`，并在严格游戏中禁用**全部**钩子。使用 `#ifndef BLOXD_STRICT` 包裹后 surface/light 仍可运行。
+- 其余全部冻结: 6 个钩子、`blockFlags` 位 (1/2/4/8/16/32)、uniform 布局、加载器限制、变体矩阵、12 个 allow 标题 (2026-10-27 在 `cnty9` 上复确认不变)。
+
+## 快速迁移
+
+| v3 | v4 |
+|---|---|
+| `"apiVersion": 3` | `"apiVersion": 4` (数字) |
+| `l.fogVisibility` | `1.0 - l.fogAlpha` |
+| `mix(l.fogColour, col, VIS)` | `mix(col, l.fogColour, ALPHA)` 或 `bloxdApplyFog(col, l)` |
+| `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` |
+| `behind.found` | `behind.hit` |
+| 未保护的顶点钩子 | `#ifndef BLOXD_STRICT ... #endif` |
+
+官方参考资料现已存在 (`bloxd-api.wgsl` 与 `BLOCK_TEXTURES.md`，官方 Discord)。完整细节 —— `bloxdTexel` 的旋转细节、复原的采样 WGSL、约 900 个可用常量的名称注册表、带注册表哈希的新 `HEADER_VERSION` 结构 —— 见英文与日文完整版。
+
+[← 上一部分](09-apiv3.md)·[返回手册](README.md)

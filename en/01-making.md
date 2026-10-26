@@ -2,14 +2,14 @@
 
 # Part I: Making packs
 
-> The live game has required `apiVersion: 3` since 2026-10-19 and rejects v1/v2 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) for migration before you distribute anything.
+> The live game has required `apiVersion: 4` since 2026-10-26 and rejects v1/v2/v3 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) and [Part X](10-apiv4.md) for migration before you distribute anything.
 
 ## 1. Overview and prerequisites
 
 - Shader packs are **WebGPU renderer only**. While a pack is installed, the WebGPU renderer is force-enabled in settings
 - Packs are written in a **restricted subset of WGSL**. They affect only the look of **terrain and liquids**
 - What you can do: change colors, transparency, and emission; rebuild lighting; projected-style shadows (R9.12); vertex animation (only in certain games)
-- What you cannot do: add/sample textures, post-processing (bloom etc.), pixel-accurate shadows that rotate with the sun (shadow maps) or real reflections (SSR), or affect the sky and entities
+- What you cannot do: add textures of your own, post-processing (bloom etc.), pixel-accurate shadows that rotate with the sun (shadow maps) or real reflections (SSR), or affect the sky and entities. (Sampling the existing block-texture atlas **became possible in v4** — `bloxdTexel`, [Part X](10-apiv4.md) §57; adding textures is still the texture-pack system's job)
 - What you can do (but is easy to miss): **projected-style shadows using `skyLight` (voxel sky occlusion)** — you can clearly darken areas under trees and roofs (R9.12). Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
 - **Most games run in strict mode** (no vertex animation, no `discard`). Design packs for general distribution to work in strict mode
 

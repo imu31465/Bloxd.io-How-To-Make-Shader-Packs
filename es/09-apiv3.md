@@ -2,6 +2,8 @@
 
 # Parte IX: Guía de migración a API Version 3
 
+> **Sustituida el 2026-10-26: la API actual es la versión 4** — los paquetes v3 se rechazan al cargar tal como se describe aquí para v2. Aplica esta parte *y después* la [Parte X](10-apiv4.md) (v3 → v4: API de texturas, cambio de nombre a `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`).
+
 Build objetivo: `3ymzdd.main.fae4743f.js` — **el build de producción activo desde el 2026-10-19**. El bundle que bloxd.io sirve en producción es idéntico byte a byte (verificado con md5, tanto el bundle principal como los chunks de paquetes de sombreadores) al despliegue de preproducción contra el que se investigó originalmente esta parte, así que todo lo que sigue se aplica a producción tal cual. El modelo de paquetes conserva su forma de v2 (mismos campos de `pack.json`, mismos límites del cargador, mismo diseño de uniform).
 
 Las partes I–VII de esta guía siguen escritas sobre la base v2. Esta parte reúne, en el mismo orden que la [Parte VIII](08-apiv2.md), los puntos de migración de v2 → v3 y las nuevas funciones de v3. La conversión es en su mayoría mecánica (§47), pero solo un cambio altera realmente el comportamiento — la luz predeterminada ahora atenúa la emisión con la niebla (§43) — y `blockId` se sustituye por completo por `blockFlags` (§42), así que verifica siempre con una compilación en el juego antes de distribuir.

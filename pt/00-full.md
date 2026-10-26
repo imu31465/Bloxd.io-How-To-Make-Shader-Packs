@@ -4,7 +4,7 @@ Guia autocontido para criar e distribuir pacotes de shaders para Bloxd.io (somen
 
 > Este é um guia não oficial e não representa a posição dos desenvolvedores. A API pode mudar sem aviso.  
 > Este guia foi criado com assistência de IA; a precisão não é garantida. Verifique com o comportamento real no jogo.  
-> Última revisão: 2026-10-20 (implantação da v3 em produção confirmada por comparação de bundles; invocação de hooks, névoa, profundidade e interioridades do `blockFlags` restauradas do build de produção — Parte IX §49–§54). Como não foi encontrada uma referência pública oficial da API WGSL, continue verificando as descrições da API e as receitas na tela de carregamento e na compilação no jogo.  
+> Última revisão: 2026-10-27 (implantação da v4 confirmada — build `cnty9`, produção e pré-produção idênticas; ver Parte X. implantação da v3 em produção confirmada por comparação de bundles; invocação de hooks, névoa, profundidade e interioridades do `blockFlags` restauradas do build de produção — Parte IX §49–§54). Referências oficiais agora existem (`bloxd-api.wgsl` e `BLOCK_TEXTURES.md`, Discord oficial) e foram cotejadas com este guia — continue verificando as receitas na tela de carregamento e na compilação no jogo.  
 > O recurso de pacotes de shaders é um recurso oficial acessível pela interface do jogo, e os pacotes são WGSL puro  
 > (sem execução de JS nem rede), então nada perigoso acontece com código normal.
 
@@ -12,14 +12,14 @@ Guia autocontido para criar e distribuir pacotes de shaders para Bloxd.io (somen
 
 # Parte I: Criar pacotes
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 1. Visão geral e pré-requisitos
 
 - Pacotes de shaders são **somente para o renderizador WebGPU**. Enquanto um pacote está instalado, o renderizador WebGPU é ativado à força nas configurações
 - Pacotes são escritos em um **subconjunto restrito de WGSL**. Afetam apenas a aparência do **terreno (terrain) e líquidos (liquid)**
 - O que você pode fazer: mudar cores, transparência e emissão; reconstruir a iluminação; sombras estilo projeção (R9.12); animação de vértices (só em certos jogos)
-- O que você não pode fazer: adicionar/amostrar texturas, pós-processamento (bloom etc.), sombras pixeladas que giram com o sol (mapas de sombra) nem reflexos reais (SSR), nem afetar céu ou entidades
+- O que você não pode fazer: adicionar texturas próprias, pós-processamento (bloom etc.), sombras pixeladas que giram com o sol (mapas de sombra) nem reflexos reais (SSR), nem afetar céu ou entidades (amostrar o atlas de texturas de blocos existente **é possível desde a v4** — `bloxdTexel`, [Parte X](10-apiv4.md) §57)
 - O que dá para fazer (mas passa despercebido): **sombras estilo projeção com `skyLight` (oclusão de céu por voxels)** — dá para escurecer claramente sob árvores e telhados (R9.12). Quebrar blocos faz o LightEngine recalcular na hora, então as sombras acompanham em tempo real
 - **A maioria dos jogos usa o modo estrito** (sem animação de vértices, sem `discard`). Projete pacotes de distribuição geral para funcionar no modo estrito
 
@@ -160,7 +160,7 @@ Passos:
 
 # Parte II: Referência da API
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 10. Cabeçalho do motor (anteposto automaticamente ao código do pacote)
 
@@ -314,7 +314,7 @@ Cinco coisas para ter sempre em mente: compilar limpo nas 8 variantes / jogos es
 
 # Parte III: Receituário
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 - [R1. Receitas de cor (surface)](#r1-receitas-de-cor-surface)
 - [R2. Receitas de iluminação (light)](#r2-receitas-de-iluminação-light)
@@ -1106,7 +1106,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # Parte IV: Guia de realismo
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 13. Iluminação padrão do motor e margem para realismo
 
@@ -1199,7 +1199,7 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 
 # Parte V: Solução de problemas e notas
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 17. Erros comuns e soluções
 
@@ -1264,7 +1264,7 @@ Os erros da tela de configurações carregam IDs `shaderPack:load*`. Como ajuda 
 
 # Parte VI: Notas importantes de implementação
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 19. Corrigindo "sombras escuras mas superfícies brilhantes" de noite
 
@@ -1389,7 +1389,7 @@ Pontos práticos: os pacotes seguem funcionando debaixo d'água / o véu não se
 
 # Parte VII: Suplemento de interioridades
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 Especificações extra achadas por análise de implementação do motor. Tudo restaurado diretamente do JavaScript do build de produção atual.
 
@@ -1589,7 +1589,7 @@ Esta lista reflete a análise estática do build indicado; atualizações do mot
 
 # Parte VIII: Guia de migração para API Version 2
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 Build alvo: `6qxffk.main.5912a15f.js` (deploy em produção em 2026-10-16). As Partes I–VII deste guia já estão reescritas à base v2; esta Parte VIII recolhe os pontos de migração desde a v1 e as novidades da v2. Os exemplos de código das novidades passam a validação de 8/8 variantes no compilador v2 e a validação do compilador WGSL do navegador (Tint) (§38), mas a conversão v2 de receitas existentes é substituição mecânica de identificadores — verifique sempre com compilação em jogo antes de distribuir.
 
@@ -1832,7 +1832,9 @@ Pesquisado por ltf_ahel (pesquisado com glm)
 
 [← Parte anterior](08-apiv2.md)·[Voltar ao manual](README.md)
 
-# Parte IX: Guia de migração para API Version 3
+# Parte IX: Guía de migração para API Version 3
+
+> **Substituída em 2026-10-26: a API atual é a versão 4** — pacotes v3 são rejeitados ao carregar exatamente como descrito aqui para a v2. Aplique esta parte *e depois* a [Parte X](10-apiv4.md) (v3 → v4: API de texturas, renomeação para `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`).
 
 Build alvo: `3ymzdd.main.fae4743f.js` — **a build de produção em execução desde 2026-10-19**. O bundle que o bloxd.io serve em produção é idêntico byte a byte (conferido por md5, tanto o bundle principal quanto os chunks de pacotes de shaders) à implantação de pré-produção contra a qual esta parte foi originalmente pesquisada, então tudo aqui se aplica diretamente à produção. O modelo de pacote mantém a forma da v2 (mesmos campos de `pack.json`, mesmos limites do carregador, mesmo layout de uniform).
 
@@ -2312,7 +2314,32 @@ O layout completo de recursos do programa de terreno, direto do renderizador Lit
 
 ---
 
-Pesquisa de ltf_ahel (realizada com glm)
+# Parte X: Guia de migração para API Version 4 (2026-10-26, resumo)
 
-[← Parte anterior](08-apiv2.md)·[Voltar ao manual](README.md)
+> Este texto é o resumo curto neste idioma. A versão completa com todos os detalhes, receitas de exemplo e internos do motor restaurados (§55–§66) está em [inglês](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) e [japonês](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md).
 
+Build alvo: `cnty9.main.669f8081.js` — **em produção e pré-produção simultaneamente desde 2026-10-26** (ambas idênticas byte a byte). O modelo de pacote mantém a forma: mesmos campos de `pack.json`, mesmos limites do carregador, mesmo uniform de 64 B, os mesmos 6 hooks.
+
+## O que muda
+
+- `pack.json` exige `"apiVersion": 4` (igualdade `===` estrita, número) — pacotes v3 são rejeitados ao carregar.
+- **Nova API de texturas (o destaque):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` amostra o atlas de texturas de blocos exatamente como a própria engine (id 0 = branco; texturas animadas devolvem automaticamente o quadro atual), `bloxdTextureSize(mipLevel) -> vec2u`, e constantes nomeadas `bloxdTextureId*` (CamelCase a partir do nome do arquivo, ex.: `grass_top` → `bloxdTextureIdGrassTop`; o catálogo oficial é `BLOCK_TEXTURES.md`).
+- **Quatro novos campos de entrada** em `BloxdSurfaceIn` *e* `BloxdLightIn`: `textureId`, `textureRotation` (quartos de volta horários, que `bloxdTexel` aplica), `uv` (em blocos; `fract(uv)` é desenhado), `mipLevel`.
+- **Renomeações com mudança de significado:** `fogVisibility` → `fogAlpha` com significado **invertido** (`0 = sem névoa, 1 = só fogColour`; porte: `l.fogVisibility` → `1.0 - l.fogAlpha`); `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (corpo idêntico); `BloxdOpaqueBehind.found` → `hit`.
+- **Jogos estritos agora são impostos pelo validador embutido:** um hook de vértice sem guarda ou um `discard` alcançável reporta `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` e desativa **todos** os hooks em jogos estritos. Com envolvências `#ifndef BLOXD_STRICT`, surface/light continuam rodando.
+- Todo o resto segue congelado: 6 hooks, bits de `blockFlags` (1/2/4/8/16/32), layout do uniform, limites do carregador, matriz de variantes, os 12 títulos allow (reconfirmados inalterados em `cnty9` em 2026-10-27).
+
+## Migração rápida
+
+| v3 | v4 |
+|---|---|
+| `"apiVersion": 3` | `"apiVersion": 4` (número) |
+| `l.fogVisibility` | `1.0 - l.fogAlpha` |
+| `mix(l.fogColour, col, VIS)` | `mix(col, l.fogColour, ALPHA)` ou `bloxdApplyFog(col, l)` |
+| `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` |
+| `behind.found` | `behind.hit` |
+| Hooks de vértice sem guarda | `#ifndef BLOXD_STRICT ... #endif` |
+
+Referências oficiais agora existem (`bloxd-api.wgsl` e `BLOCK_TEXTURES.md`, Discord oficial). Os detalhes completos — a sutileza de rotação do `bloxdTexel`, o WGSL de amostragem restaurado, o registro de nomes com ≈900 constantes utilizáveis, a nova estrutura de `HEADER_VERSION` com hash do registro — estão na versão completa em inglês e japonês.
+
+[← Parte anterior](09-apiv3.md)·[Voltar ao manual](README.md)

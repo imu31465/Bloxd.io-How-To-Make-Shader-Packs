@@ -4,7 +4,7 @@
 
 > 본서는 비공식 가이드이며 개발사의 공식 입장이 아니다. API는 예고 없이 변경될 수 있다.  
 > 본 가이드는 AI의 도움을 받아 작성되었으며 내용의 정확성은 보장되지 않는다. 실제 게임 동작으로 확인할 것.  
-> 최종 리뷰: 2026-10-20 (비교 빌드로 v3 정식 출시를 확인했으며, 훅 호출·포그·깊이·blockFlags 내부 구현을 프로덕션 빌드에서 복원 — 제9부 §49–§54). 공개된 공식 WGSL API 레퍼런스를 확인하지 못했으므로 API 설명과 레시피는 로딩 화면·실기 컴파일로 계속 검증할 것.  
+> 최종 리뷰: 2026-10-27 (v4 정식 출시 확인 — 빌드 `cnty9`, 프로덕션과 프리프로드 동일; 제10부 참고. 비교 빌드로 v3 정식 출시를 확인했으며, 훅 호출·포그·깊이·blockFlags 내부 구현을 프로덕션 빌드에서 복원 — 제9부 §49–§54). 이제 공식 레퍼런스가 존재한다 (`bloxd-api.wgsl` 와 `BLOCK_TEXTURES.md`, 공식 Discord) — 본 가이드와 상호 검증했다. 그래도 레시피는 로딩 화면·실기 컴파일로 계속 검증할 것.  
 > 셰이더 팩 기능 자체는 게임 내 UI에서 불러올 수 있는 공식 기능이며, 팩은 순수 WGSL  
 > (JS 실행·통신 불가)이므로 일반적인 코드로는 위험한 일이 일어나지 않는다.
 
@@ -12,14 +12,14 @@
 
 # 제1부: 팩 만들기
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 ## 1. 개요와 전제
 
 - 셰이더 팩은 **WebGPU 렌더러 전용**이다. 팩을 도입한 동안 설정의 WebGPU 렌더러가 강제 온이 된다
 - 팩은 **WGSL의 제한된 서브셋**으로 기술한다. 대상은 **지형 (terrain) 과 액체 (liquid)** 의 겉모습뿐이다
 - 할 수 있는 것: 색·투명도·발광 변경, 조명 재구축, 투영풍의 그림자 (R9.12), (일부 게임 한정으로) 정점 이동
-- 할 수 없는 것: 텍스처 추가·샘플링, 포스트프로세스 (블룸 등), 태양과 함께 도는 픽셀 정밀도의 그림자 (섀도맵) 와 진짜 반사 (SSR) 의 신설, 하늘이나 엔티티에 적용
+- 할 수 없는 것: 자체 텍스처 추가, 포스트프로세스 (블룸 등), 태양과 함께 도는 픽셀 정밀도의 그림자 (섀도맵) 와 진짜 반사 (SSR) 의 신설, 하늘이나 엔티티에 적용 (기존 블록 텍스처 아틀라스의 **샘플링은 v4부터 가능** — `bloxdTexel`, [제10부](10-apiv4.md) §57)
 - 할 수 있는데 (간과하기 쉬운) 것: **`skyLight` (복셀 하늘 가림) 를 사용한 투영풍의 그림자** — 나무 밑·지붕 밑을 명확히 어둡게 할 수 있다 (R9.12). 블록을 부수면 LightEngine 이 즉시 재계산하므로 그림자도 실시간으로 따라간다
 - **대다수의 게임은 strict 모드** (정점 이동·`discard` 금지) 이다. 일반 배포용 팩은 strict 로 동작하게 만들 것
 
@@ -160,7 +160,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 # 제2부: API 레퍼런스
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 ## 10. 엔진 헤더 (팩 코드 선두에 자동 부여되는 코드)
 
@@ -314,7 +314,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 # 제3부: 레시피집
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 - [R1. 색 레시피 (surface)](#r1-색-레시피-surface)
 - [R2. 조명 레시피 (light)](#r2-조명-레시피-light)
@@ -1106,7 +1106,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제4부: 리얼화 가이드
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 ## 13. 엔진 기존 조명과 리얼화의 여지
 
@@ -1199,7 +1199,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제5부: 트러블슈팅·주의
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 ## 17. 자주 나오는 에러와 고치기
 
@@ -1264,7 +1264,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제6부: 구현 시 중요한 보충
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 ## 19. 야간에 「그림자는 어두운데 표면만 밝다」 를 고친다
 
@@ -1389,7 +1389,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 # 제7부: 내부 사양의 보충
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 엔진 구현 해석으로 밝혀진 추가 사양. 모두 현행 정식 빌드의 JavaScript 에서 직접 복원한 것이다.
 
@@ -1589,7 +1589,7 @@ strict 측에서 특히 오해하기 쉬운 점:
 
 # 제8부: API Version 2 마이그레이션 가이드
 
-> 현행 게임은 2026-10-19부터 `apiVersion: 3` 을 요구하며 로드 시 v1/v2 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
 
 대상 빌드: `6qxffk.main.5912a15f.js` (2026-10-16 시점의 정식 배포). 이 책의 제1부~제7부는 v2 기준으로 다시 쓴 상태이며, 이 제8부는 v1에서의 이전 포인트와 v2의 새로운 기능을 모은 것이다. 새 기능의 코드 예제는 v2 컴파일러에 의한 8/8 베리언트 검증과 브라우저 WGSL 컴파일러 (Tint) 검증 (§38)을 통과한 것이며, 기존 레시피의 v2 변환은 기계적인 식별자 교체이므로, 배포 전에는 반드시 실기 컴파일로 확인할 것.
 
@@ -1833,6 +1833,8 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 [← 이전 부](08-apiv2.md)·[매뉴얼로 돌아가기](README.md)
 
 # 제9부: API Version 3 마이그레이션 가이드
+
+> **2026-10-26 대체됨: 현행 API는 버전 4** — v3 팩은 여기서 v2에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 부를 적용한 뒤 [제10부](10-apiv4.md) (v3 → v4: 텍스처 API, `fogAlpha` 개명, `bloxdFragmentBlockPosition`, `hit`) 를 적용할 것.
 
 대상 빌드: `3ymzdd.main.fae4743f.js` — **2026-10-19부터 정식 프로덕션 빌드**. bloxd.io가 프로덕션에서 제공하는 번들은 이 부를 처음 조사할 때 사용한 프리프로드 배포와 바이트 단위로 동일하다 (md5로 확인했으며, 메인 번들과 셰이더 팩 청크 모두 그러하다). 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 팩 모델은 v2 형태를 유지한다 (`pack.json` 필드, 로더 제한, uniform 레이아웃이 모두 같다).
 
@@ -2311,7 +2313,32 @@ FNV-1a-32 해시이며 (`6.` 접두사), 다섯 입력을 해시한다: 베리�
 
 ---
 
-조사: ltf_ahel (glm 을 사용해 조사)
+# 제10부: API Version 4 마이그레이션 가이드 (2026-10-26, 요약)
 
-[← 이전 부](08-apiv2.md)·[매뉴얼로 돌아가기](README.md)
+> 이 문서는 이 언어용 간략 요약이다. 모든 세부사항·예제 레시피·복원된 엔진 내부 (§55–§66)를 담은 완전판은 [영어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) 와 [일본어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md) 판에 있다.
 
+대상 빌드: `cnty9.main.669f8081.js` — **2026-10-26부터 프로덕션과 프리프로드에 동시 적용** (양쪽 모두 바이트 동일). 팩 모델은 형태를 유지한다: 같은 `pack.json` 필드, 같은 로더 제한, 같은 64 B uniform, 같은 6개 훅.
+
+## 바뀌는 것
+
+- `pack.json`은 `"apiVersion": 4` 를 요구 (엄격 `===`, 숫자) — v3 팩은 로드 시 거부.
+- **새 텍스처 API (핵심):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` 는 블록 텍스처 아틀라스를 엔진 자신과 정확히 같은 방식으로 샘플링한다 (id 0 = 흰색; 애니메이션 텍스처는 자동으로 현재 프레임 반환), `bloxdTextureSize(mipLevel) -> vec2u`, 그리고 명명 상수 `bloxdTextureId*` (파일명의 CamelCase, 예: `grass_top` → `bloxdTextureIdGrassTop`; 공식 목록은 `BLOCK_TEXTURES.md`).
+- `BloxdSurfaceIn` *과* `BloxdLightIn` 에 **4개的新 입력 필드**: `textureId`, `textureRotation` (시계방향 4분회전, `bloxdTexel` 이 적용), `uv` (블록 단위; `fract(uv)` 가 그려짐), `mipLevel`.
+- **의미가 바뀌는 개명:** `fogVisibility` → `fogAlpha`, 의미 **반전** (`0 = 포그 없음, 1 = fogColour 만`; 포팅: `l.fogVisibility` → `1.0 - l.fogAlpha`); `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (본체 동일); `BloxdOpaqueBehind.found` → `hit`.
+- **strict 게임이 번들 내장 검증기로 강제됨:** 가드 없는 버텍스 훅이나 도달 가능한 `discard` 는 `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` 를 내고 strict 게임에서 **모든** 훅을 비활성화한다. `#ifndef BLOXD_STRICT` 랩을 쓰면 surface/light 는 계속 동작.
+- 나머지는 동결: 6 훅, `blockFlags` 비트 (1/2/4/8/16/32), uniform 레이아웃, 로더 제한, 배리언트 행렬, 12개 allow 타이틀 (`cnty9` 에서 2026-10-27 불변 재확인).
+
+## 간단 마이그레이션
+
+| v3 | v4 |
+|---|---|
+| `"apiVersion": 3` | `"apiVersion": 4` (숫자) |
+| `l.fogVisibility` | `1.0 - l.fogAlpha` |
+| `mix(l.fogColour, col, VIS)` | `mix(col, l.fogColour, ALPHA)` 또는 `bloxdApplyFog(col, l)` |
+| `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` |
+| `behind.found` | `behind.hit` |
+| 가드 없는 버텍스 훅 | `#ifndef BLOXD_STRICT ... #endif` |
+
+공식 레퍼런스가 등장했다 (`bloxd-api.wgsl` 와 `BLOCK_TEXTURES.md`, 공식 Discord). 전체 세부사항 — `bloxdTexel` 의 회전 미묘함, 복원된 샘플링 WGSL, 약 900개 사용 가능 상수의 이름 레지스트리, 레지스트리 해시를 포함한 새 `HEADER_VERSION` 구조 — 는 영어·일본어 완전판에 있다.
+
+[← 이전 부](09-apiv3.md)·[매뉴얼로 돌아가기](README.md)

@@ -1,11 +1,11 @@
 # How to Make Bloxd.io Shader Packs (Complete Guide)
 
 A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
-**The live API is `apiVersion: 3` — it rolled out to production on 2026-10-19**, and the current game rejects v1 and v2 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`). Part IX also documents the engine internals restored from the production build (§49–§54: hook invocation, the four-mode fog function, the `bloxdOpaqueBehind()` implementation, the blockFlags delivery path, and the validation pipeline with its measured header hash).
+**The live API is `apiVersion: 4` — it rolled out to production on 2026-10-26**, and the current game rejects v1, v2 and v3 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) and Part X (`10-apiv4.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`); for v2 → v3, Part IX. Part X covers the v4 texture API (`bloxdTexel`, `bloxdTextureId*`), the fog rename, and the strict-games contract, plus the engine internals restored from the production build (§63–§65: the exact `bloxdTexel` sampling code, the texture name registry, and the validation pipeline with its new registry hash).
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-10-20 (v3 production rollout confirmed by bundle comparison; hook invocation, fog, depth and blockFlags internals restored from the production build — Part IX §49–§54). Since no public official WGSL API reference could be found, keep verifying API descriptions and recipes against the loader screen and in-game compilation.  
+> Last reviewed: 2026-10-27 (v4 production rollout confirmed by bundle comparison — build `cnty9`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). Official references now exist (`bloxd-api.wgsl` and `BLOCK_TEXTURES.md`, distributed via the official Discord) and this guide is cross-checked against them; still verify recipes against the loader screen and in-game compilation.  
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 
@@ -84,3 +84,16 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
   - [52. blockFlags end-to-end: from registration to your hook](09-apiv3.md#52-blockflags-end-to-end-from-registration-to-your-hook)
   - [53. Validation internals: HEADER_VERSION, signatures, reserved names](09-apiv3.md#53-validation-internals-header_version-signatures-reserved-names)
   - [54. Confirmed constants, limits, and layouts](09-apiv3.md#54-confirmed-constants-limits-and-layouts)
+- [Part X: API version 4 migration guide (live since 2026-10-26)](10-apiv4.md)
+  - [55. Fate of v3 packs (conclusion first)](10-apiv4.md#55-fate-of-v3-packs-conclusion-first)
+  - [56. pack.json and the uniform buffer (what stays unchanged)](10-apiv4.md#56-packjson-and-the-uniform-buffer-what-stays-unchanged)
+  - [57. The texture API: `bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` (the headline)](10-apiv4.md#57-the-texture-api-bloxdtexel-bloxdtexturesize-bloxdtextureid-the-headline)
+  - [58. The four new input fields](10-apiv4.md#58-the-four-new-input-fields)
+  - [59. Renames and semantic changes](10-apiv4.md#59-renames-and-semantic-changes)
+  - [60. The strict-games contract: vertex hooks, `discard`, and X-ray](10-apiv4.md#60-the-strict-games-contract-vertex-hooks-discard-and-x-ray)
+  - [61. v3 to v4 migration checklist](10-apiv4.md#61-v3-to-v4-migration-checklist)
+  - [62. Other v4 changes and notes](10-apiv4.md#62-other-v4-changes-and-notes)
+  - [63. Engine internals: how `bloxdTexel` actually samples](10-apiv4.md#63-engine-internals-how-bloxdtexel-actually-samples)
+  - [64. The texture name registry](10-apiv4.md#64-the-texture-name-registry)
+  - [65. Validation internals v4: HEADER_VERSION, the registry hash, special functions](10-apiv4.md#65-validation-internals-v4-header_version-the-registry-hash-special-functions)
+  - [66. Confirmed constants, limits, and layouts (v4)](10-apiv4.md#66-confirmed-constants-limits-and-layouts-v4)

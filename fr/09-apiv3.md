@@ -2,6 +2,8 @@
 
 # Partie IX : Guide de migration vers API Version 3
 
+> **Remplacée le 2026-10-26 : l'API actuelle est la version 4** — les packs v3 sont refusés au chargement exactement comme décrit ici pour la v2. Appliquez cette partie *puis* la [partie X](10-apiv4.md) (v3 → v4 : API de textures, renommage `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`).
+
 Build visé : `3ymzdd.main.fae4743f.js` — **le build de production en ligne depuis le 2026-10-19**. Le bundle servi par bloxd.io en production est identique octet pour octet (vérifié par md5, bundle principal et chunks de packs de shaders compris) au déploiement de préprod sur lequel cette partie a été étudiée à l'origine ; tout ce qui suit s'applique donc tel quel à la production. Le modèle de pack conserve sa forme v2 (mêmes champs `pack.json`, mêmes limites du chargeur, même disposition des uniforms).
 
 Les parties I à VII de ce guide restent écrites sur la base v2. Cette partie rassemble, dans le même ordre que la [partie VIII](08-apiv2.md), les points de migration v2 → v3 et les nouveautés v3. La conversion est surtout mécanique (§47), mais un seul changement modifie réellement le comportement — la lumière par défaut atténue désormais l'émission avec le brouillard (§43) — et `blockId` est entièrement remplacé par `blockFlags` (§42) : vérifiez donc toujours par une compilation en jeu avant distribution.

@@ -2,14 +2,14 @@
 
 # Partie I : Créer des packs
 
-> Le jeu actuel exige `apiVersion: 3` depuis le 2026-10-19 et refuse les packs v1/v2 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) pour migrer avant de distribuer.
+> Le jeu actuel exige `apiVersion: 4` depuis le 2026-10-26 et refuse les packs v1/v2/v3 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) et la [partie X](10-apiv4.md) pour migrer avant de distribuer.
 
 ## 1. Aperçu et prérequis
 
 - Les packs de shaders sont **réservés au moteur WebGPU**. Tant qu'un pack est installé, le moteur WebGPU est activé de force dans les réglages
 - Les packs s'écrivent dans un **sous-ensemble restreint de WGSL**. Ils n'affectent que l'aspect du **terrain et des liquides**
 - Ce que vous pouvez faire : changer couleurs, transparence et émission ; reconstruire l'éclairage ; ombres façon projection (R9.12) ; animation de sommets (certains jeux seulement)
-- Ce que vous ne pouvez pas faire : ajouter/échantillonner des textures, post-traitement (bloom etc.), ombres pixellisées tournant avec le soleil (shadow maps) ni reflets réels (SSR), ni toucher le ciel ou les entités
+- Ce que vous ne pouvez pas faire : ajouter vos propres textures, post-traitement (bloom etc.), ombres pixellisées tournant avec le soleil (shadow maps) ni reflets réels (SSR), ni toucher le ciel ou les entités (échantillonner l’atlas de textures de blocs existant **est possible depuis la v4** — `bloxdTexel`, [partie X](10-apiv4.md) §57)
 - Ce que vous pouvez faire (mais souvent oublié) : **ombres façon projection avec `skyLight` (occlusion du ciel par voxels)** — assombrir nettement sous les arbres et les toits (R9.12). Casser des blocs fait recalculer LightEngine aussitôt : les ombres suivent en temps réel
 - **La plupart des jeux sont en mode strict** (ni animation de sommets, ni `discard`). Concevez les packs grand public pour le mode strict
 

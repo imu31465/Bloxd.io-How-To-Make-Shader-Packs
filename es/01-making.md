@@ -2,14 +2,14 @@
 
 # Parte I: Crear paquetes
 
-> El juego actual exige `apiVersion: 3` desde el 2026-10-19 y rechaza los paquetes v1/v2 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> El juego actual exige `apiVersion: 4` desde el 2026-10-26 y rechaza los paquetes v1/v2/v3 al cargar — el contenido siguiente está escrito sobre la especificación v2. Consulta [Parte IX](09-apiv3.md) y [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 1. Resumen y requisitos
 
 - Los paquetes de sombreadores son **solo para el renderizador WebGPU**. Mientras un paquete está instalado, el renderizador WebGPU se activa forzosamente en los ajustes
 - Los paquetes se escriben en un **subconjunto restringido de WGSL**. Solo afectan el aspecto del **terreno (terrain) y los líquidos (liquid)**
 - Lo que puedes hacer: cambiar colores, transparencia y emisión; reconstruir la iluminación; sombras estilo proyección (R9.12); animación de vértices (solo en ciertos juegos)
-- Lo que no puedes hacer: añadir/muestrear texturas, posprocesado (bloom etc.), sombras pixeladas que roten con el sol (mapas de sombras) ni reflejos reales (SSR), ni afectar el cielo o las entidades
+- Lo que no puedes hacer: añadir texturas propias, posprocesado (bloom etc.), sombras pixeladas que roten con el sol (mapas de sombras) ni reflejos reales (SSR), ni afectar el cielo o las entidades (muestrear el atlas de texturas de bloques existente **es posible desde v4** — `bloxdTexel`, [Parte X](10-apiv4.md) §57)
 - Lo que sí puedes hacer (pero se suele pasar por alto): **sombras estilo proyección con `skyLight` (oclusión de cielo por vóxeles)** — puedes oscurecer claramente bajo árboles y techos (R9.12). Romper bloques hace que LightEngine recalcule al instante, así que las sombras siguen en tiempo real
 - **La mayoría de los juegos usan el modo estricto** (sin animación de vértices, sin `discard`). Diseña los paquetes de distribución general para que funcionen en modo estricto
 

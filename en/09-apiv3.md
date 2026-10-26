@@ -2,6 +2,8 @@
 
 # Part IX: API version 3 migration guide
 
+> **Superseded 2026-10-26: the live API is now version 4** — v3 packs are rejected at load exactly as described here for v2. Apply this part *and then* [Part X](10-apiv4.md) (v3 → v4: the texture API, the `fogAlpha` rename, `bloxdFragmentBlockPosition`, `hit`). This part's internals (§49–§54) remain accurate for the v3 build they were measured on.
+
 Target build: `3ymzdd.main.fae4743f.js` — **the live production build since 2026-10-19**. The bundle bloxd.io serves in production is byte-identical (md5-checked, main bundle and shader-pack chunks alike) to the preprod deploy this part was originally researched against, so everything here applies to production as-is. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
 
 Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [Part VIII](08-apiv2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but only one change actually alters behavior — the default light now attenuates emission with fog (§43) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.

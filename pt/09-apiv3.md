@@ -1,6 +1,8 @@
 [← Parte anterior](08-apiv2.md)·[Voltar ao manual](README.md)
 
-# Parte IX: Guia de migração para API Version 3
+# Parte IX: Guía de migração para API Version 3
+
+> **Substituída em 2026-10-26: a API atual é a versão 4** — pacotes v3 são rejeitados ao carregar exatamente como descrito aqui para a v2. Aplique esta parte *e depois* a [Parte X](10-apiv4.md) (v3 → v4: API de texturas, renomeação para `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`).
 
 Build alvo: `3ymzdd.main.fae4743f.js` — **a build de produção em execução desde 2026-10-19**. O bundle que o bloxd.io serve em produção é idêntico byte a byte (conferido por md5, tanto o bundle principal quanto os chunks de pacotes de shaders) à implantação de pré-produção contra a qual esta parte foi originalmente pesquisada, então tudo aqui se aplica diretamente à produção. O modelo de pacote mantém a forma da v2 (mesmos campos de `pack.json`, mesmos limites do carregador, mesmo layout de uniform).
 

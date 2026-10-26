@@ -2,14 +2,14 @@
 
 # Parte I: Criar pacotes
 
-> O jogo atual exige `apiVersion: 3` desde 2026-10-19 e rejeita pacotes v1/v2 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
 
 ## 1. Visão geral e pré-requisitos
 
 - Pacotes de shaders são **somente para o renderizador WebGPU**. Enquanto um pacote está instalado, o renderizador WebGPU é ativado à força nas configurações
 - Pacotes são escritos em um **subconjunto restrito de WGSL**. Afetam apenas a aparência do **terreno (terrain) e líquidos (liquid)**
 - O que você pode fazer: mudar cores, transparência e emissão; reconstruir a iluminação; sombras estilo projeção (R9.12); animação de vértices (só em certos jogos)
-- O que você não pode fazer: adicionar/amostrar texturas, pós-processamento (bloom etc.), sombras pixeladas que giram com o sol (mapas de sombra) nem reflexos reais (SSR), nem afetar céu ou entidades
+- O que você não pode fazer: adicionar texturas próprias, pós-processamento (bloom etc.), sombras pixeladas que giram com o sol (mapas de sombra) nem reflexos reais (SSR), nem afetar céu ou entidades (amostrar o atlas de texturas de blocos existente **é possível desde a v4** — `bloxdTexel`, [Parte X](10-apiv4.md) §57)
 - O que dá para fazer (mas passa despercebido): **sombras estilo projeção com `skyLight` (oclusão de céu por voxels)** — dá para escurecer claramente sob árvores e telhados (R9.12). Quebrar blocos faz o LightEngine recalcular na hora, então as sombras acompanham em tempo real
 - **A maioria dos jogos usa o modo estrito** (sem animação de vértices, sem `discard`). Projete pacotes de distribuição geral para funcionar no modo estrito
 
