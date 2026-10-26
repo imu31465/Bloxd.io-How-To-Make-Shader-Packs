@@ -19,3 +19,9 @@ aside.nextra-sidebar > .nextra-sidebar-footer > :nth-child(1),
 aside.nextra-sidebar > .nextra-sidebar-footer > :nth-child(2) {
   display: none;
 }
+
+/* Hide duplicate language and theme controls in the mobile navigation.
+   The same controls remain available in the top navbar. */
+.nextra-mobile-nav > .nextra-sidebar-footer {
+  display: none;
+}
