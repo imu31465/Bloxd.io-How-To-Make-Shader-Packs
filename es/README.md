@@ -5,7 +5,7 @@ Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.
 
 > Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.  
 > Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.  
-> Última revisión: 2026-10-27 (despliegue de v4 confirmado — build `cnty9`, producción y preprod idénticas; ver Parte X. lanzamiento oficial de v3 confirmado contra el build de comparación; invocación de hooks, niebla, profundidad e interioridades de blockFlags restauradas del build de producción — Parte IX §49–§54). Ya existen referencias oficiales (`bloxd-api.wgsl` y `BLOCK_TEXTURES.md`, Discord oficial) y se han cotejado con esta guía — sigue verificando las recetas con la pantalla de carga y la compilación en el juego.  
+> Última revisión: 2026-10-27 (despliegue de v4 confirmado — build `cnty9`, producción y preprod idénticas; ver Parte X. lanzamiento oficial de v3 confirmado contra el build de comparación; invocación de hooks, niebla, profundidad e interioridades de blockFlags restauradas del build de producción — Parte IX §49–§54). El material de referencia completo está incrustado como Parte XI (`11-reference.md`) — la cabecera del motor restaurada verbatim y el catálogo medido completo de los 905 nombres de textura utilizables; sigue verificando las recetas con la pantalla de carga y la compilación en el juego.  
 > La función de paquetes de sombreadores es una función oficial accesible desde la interfaz del juego, y los paquetes son WGSL puro  
 > (sin ejecución de JS ni red), así que nada peligroso ocurre con código normal.
 

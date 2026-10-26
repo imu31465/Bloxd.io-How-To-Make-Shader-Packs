@@ -26,6 +26,6 @@
 | `behind.found` | `behind.hit` |
 | 가드 없는 버텍스 훅 | `#ifndef BLOXD_STRICT ... #endif` |
 
-공식 레퍼런스가 등장했다 (`bloxd-api.wgsl` 와 `BLOCK_TEXTURES.md`, 공식 Discord). 전체 세부사항 — `bloxdTexel` 의 회전 미묘함, 복원된 샘플링 WGSL, 약 900개 사용 가능 상수의 이름 레지스트리, 레지스트리 해시를 포함한 새 `HEADER_VERSION` 구조 — 는 영어·일본어 완전판에 있다.
+완전한 레퍼런스 자료가 이제 가이드의 일부다: 그대로 복원된 엔진 헤더와 905개 사용 가능 이름 전체를 담은 텍스처 카탈로그가 제11부 (`11-reference.md`)에 있다. 전체 세부사항 — `bloxdTexel` 의 회전 미묘함, 복원된 샘플링 WGSL, 이름 레지스트리, 레지스트리 해시를 포함한 새 `HEADER_VERSION` 구조 — 는 영어·일본어 완전판에 있다.
 
 [← 이전 부](09-apiv3.md)·[매뉴얼로 돌아가기](README.md)

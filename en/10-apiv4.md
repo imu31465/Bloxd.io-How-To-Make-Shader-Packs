@@ -4,7 +4,7 @@
 
 Target build: `cnty9.main.669f8081.js` — **live on production and preprod simultaneously since 2026-10-26**. Unlike the v3 rollout (a preprod build promoted to production), v4 flipped both environments to the same new bundle in one move, and the two bundles are byte-identical (main and every shader-pack chunk md5-checked), so everything here applies to production as-is. The bundle was also reorganised around this release — the main bundle shrank from 4.73 MB to 3.03 MB (-36%), the chunk count grew from 169 to 193, and the whole shader-pack pipeline (loader, validator, code generator, WebGPU compiler) now lives in a contiguous c49–c54 cluster. The pack model itself keeps its shape: same `pack.json` fields, same loader limits, same 64 B uniform, same six hooks.
 
-One thing changed around this release that is *not* in the bundle: **official documentation now exists.** The engine team publishes `bloxd-api.wgsl` (the annotated engine header, 8.09 KB) and `BLOCK_TEXTURES.md` (the complete texture-name list, 108.52 KB) in the official Discord's `code-showcase` channel ("The way to use Shaders (tutorial)"). Until v3, this guide's bundle-restored header text was the only public reference; from v4 on, the engine quotes those files in its own error messages (`...BLOCK_TEXTURES.md lists them.`). Every pack-facing fact in this part was restored from the production bundle and cross-checked against that official pair.
+One thing changed around this release that is *not* in the bundle: **the engine now cites reference files by name.** Its own error messages point at `bloxd-api.wgsl` (the annotated engine header) and `BLOCK_TEXTURES.md` (the complete texture-name list) — `...BLOCK_TEXTURES.md lists them.` This guide carries the content of both instead of pointing you elsewhere: the complete header, restored verbatim from the live build, and the complete catalogue of all 905 usable texture names are embedded as Part XI (`11-reference.md`). Every pack-facing fact in this part was restored from the production bundle.
 
 The v4 change set in one screen:
 
@@ -154,7 +154,7 @@ The spelling rule, restored from the validator: split the name on every non-alph
 >
 > **Not found, no suggestion:** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
-That last message is the engine pointing at its own published list. **`BLOCK_TEXTURES.md` is the authoritative catalogue** (108.52 KB, distributed in the official Discord's `code-showcase` channel); the measured registry behind it is ~1,200 atlas entries folding down to roughly 900 usable names (§64 has the measurement and the folding rules).
+That last message points at a file this guide embeds instead: the complete measured catalogue — every one of the 905 usable names with its current id, plus the turned and animated family tables — is §68 (Part XI, `11-reference.md`); §64 has the registry measurement and the folding rules behind it.
 
 ### 57.4 The rotation subtlety — and the neutral-sampling helper
 
@@ -428,10 +428,10 @@ Both hooks are surface/light-only, so this pack needs no `#ifndef BLOXD_STRICT` 
 ## 62. Other v4 changes and notes
 
 - **The bundle reorg** (numbers in the intro) moved the shader pipeline into chunks c49 (loader/persistence), c50–c51 (loader UI + zip), c53 (validator + header + registry builder), c54 (WGSL code generator + Lite renderer). For anyone re-researching the bundle after a v3-era guide: the anchors all moved, the code didn't.
-- **The header text was rewritten for clarity** — every doc comment re-worded (terser, second person), no semantic change beyond §59. Size 5,637 → 6,021 bytes, 128 → 151 lines; the first line is now `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
+- **The header text was rewritten for clarity** — every doc comment re-worded (terser, second person), no semantic change beyond §59. Size 5,637 → 6,021 bytes, 128 → 150 lines; the first line is now `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **Emission ordering is now documented in-header**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3's §43 finding, now official wording.
 - **i18n surface** for the shader-pack feature is 58 keys (v4 build); the loader family (`load*`) is quoted across §55–§56, the status family (`status*`) in §55, the variant labels in §60.1.
-- **Official docs exist** (intro): `bloxd-api.wgsl` + `BLOCK_TEXTURES.md`, Discord `code-showcase`. Cross-checked against this part's bundle restoration: identifiers, struct fields, and the four-field quartet agree.
+- **Reference material, embedded** (intro): the engine's error messages cite `bloxd-api.wgsl` and `BLOCK_TEXTURES.md`; this guide ships their content instead of citing them — the complete restored header (§67) and the complete measured catalogue (§68) — so nothing external is needed to author or debug a pack.
 - **Auto-recheck now also fires on texture-registry changes** (§65.1) — a consequence of the registry hash joining HEADER_VERSION. A saved pack can flip to "needs re-check" after an engine update that merely *adds textures*, even when the header text didn't change. This is by design: your `bloxdTextureId*` constants are baked at validation time.
 - **`bloxdSp*` reservation expanded to 27 symbols** (§63.4) — the engine-private namespace inside generated shaders. The pack-level reservation rule is unchanged and broader: anything matching `/^bloxd/i` (case-insensitive) is reserved.
 
@@ -594,12 +594,12 @@ for each (name, index) in textureNameToIndex:           # e.g. ("lava0", 0), ("r
 
 The rules that matter to an author, deduplicated:
 
-1. **Usable names are canonical names**: animation bases drop their frame suffix (`lava0` → `lava`), turned families fold to their root (`radar_screen0[rot[1..4]` → `radar_screen0`), and every other file name is itself. The constant spelling then CamelCases the canonical name (§57.3).
+1. **Usable names are canonical names**: animation bases drop their frame suffix (`lava0` → `lava`), turned families fold to their root (`chest_top[rot[1..4]` → `chest_top`), and the two folds compose (`radar_screen0[rot[1..4]` → `radar_screen`, because that family is animated as well). Every other file name is itself. The constant spelling then CamelCases the canonical name (§57.3).
 2. **Frame and turned aliases are known and error-explained** — using one isn't a "did you mean" guess, it gets the specific frame/turned message (§57.3). This is deliberate API shaping: `bloxdTexel` handles both animation and turning for you, so addressing a frame or a turned copy directly is always the wrong move.
-3. **Ambiguity kills the name**: two names that fold to the same case/underscore-insensitive key are both unusable (`could name X and Y ... it can't be used`). Rare, but real — if a name you expect isn't in `BLOCK_TEXTURES.md`, this is one reason.
+3. **Ambiguity kills the name**: two names that fold to the same case/underscore-insensitive key are both unusable (`could name X and Y ... it can't be used`). Rare, but real — if a name you expect isn't in the §68 catalogue, this is one reason.
 4. **The id is 1-based and equals "atlas layer + 1"**; the no-texture id 0 is reserved as white.
 
-Measured on the last full registry dump (build `sjr0p7`, 2026-10-17 — the registry itself is content, not engine, so it drifts with block updates): **1,200 atlas entries**, folding **40 turned families (160 entries)** and ~42 animated families (~132 frame aliases), leaving **≈ 900 usable named constants** — which is also the honest size of `BLOCK_TEXTURES.md`'s catalogue. The registry-hash mechanism in §65.1 is what keeps baked `bloxdTextureId*` values from silently going stale as that number drifts.
+Measured on the live registry (build `cnty9`, 2026-10-27, by running the engine's own builder module on the shipped data): **1,219 atlas entries**, folding **57 turned families** (228 turned spellings) and **42 animated families** (188 frame spellings), leaving **905 usable named constants** — the complete list, with per-name ids and both family tables, is embedded as §68 (Part XI). The registry-hash mechanism in §65.1 is what keeps baked `bloxdTextureId*` values from silently going stale as those numbers drift.
 
 ## 65. Validation internals v4: HEADER_VERSION, the registry hash, special functions
 
@@ -650,7 +650,7 @@ The v4 row of the guide's measurement ledger — everything here measured on `cn
 | Item | Value |
 |---|---|
 | `apiVersion` | `4` (strict `===`, number) |
-| Engine header | 6,021 B / 151 lines; first line `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` |
+| Engine header | 6,021 B / 150 lines; first line `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` — full text embedded in §67 |
 | Hooks | 6 (terrain/liquid × vertex/surface/light); template comment-polished only |
 | Variants | 8 (strict × lighting × program); names `strict\|allow.lit\|unlit.terrain\|liquid` |
 | Macros | `BLOXD_STRICT` (strict) · `BLOXD_LIGHTING` (lit) · `BLOXD_ALPHA` (all liquid + non-strict terrain) · `BLOXD_SCENE_DEPTH` (all liquid) |
@@ -658,7 +658,7 @@ The v4 row of the guide's measurement ledger — everything here measured on `cn
 | Pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
 | blockFlags bits | opaque 1 · emissive 2 · vegetation 4 · dirt 8 · sand 16 · rock 32 (unchanged; §42 name rules carry over) |
 | Loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 zip entries; UTF-8; one manifest; unique paths |
-| Texture registry | ~1,200 entries (measured 2026-10-17) → ≈900 usable names; official list: `BLOCK_TEXTURES.md` |
+| Texture registry | 1,219 entries (measured 2026-10-27, build `cnty9`) → 905 usable names; complete catalogue: §68 (Part XI) |
 | Light curve | 0–15 levels → 0–1 on the ease-out curve (`6 → 0.45`, `12 → 0.92`) — in-header, unchanged |
 | Lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged, now in chunk c8 |
 | Directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged, now in chunk c8 |

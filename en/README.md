@@ -5,7 +5,7 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-10-27 (v4 production rollout confirmed by bundle comparison — build `cnty9`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). Official references now exist (`bloxd-api.wgsl` and `BLOCK_TEXTURES.md`, distributed via the official Discord) and this guide is cross-checked against them; still verify recipes against the loader screen and in-game compilation.  
+> Last reviewed: 2026-10-27 (v4 production rollout confirmed by bundle comparison — build `cnty9`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). The complete reference material is embedded as Part XI (`11-reference.md`): the engine header restored verbatim and the full measured catalogue of all 905 usable texture names; still verify recipes against the loader screen and in-game compilation.  
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 

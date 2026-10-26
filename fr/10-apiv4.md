@@ -26,6 +26,6 @@ Build visé : `cnty9.main.669f8081.js` — **en production et en préprod simult
 | `behind.found` | `behind.hit` |
 | Hooks de sommet non protégés | `#ifndef BLOXD_STRICT ... #endif` |
 
-Des références officielles existent désormais (`bloxd-api.wgsl` et `BLOCK_TEXTURES.md`, Discord officiel). Les détails complets — subtilité de rotation de `bloxdTexel`, WGSL d’échantillonnage restauré, registre des noms avec ≈900 constantes utilisables, nouvelle structure de `HEADER_VERSION` avec hash du registre — sont dans la version complète en anglais et en japonais.
+Le matériel de référence complet fait désormais partie du guide : l'en-tête du moteur restauré intégralement et le catalogue complet des textures avec les 905 noms utilisables sont dans la Partie XI (`11-reference.md`). Les détails complets — subtilité de rotation de `bloxdTexel`, WGSL d'échantillonnage restauré, registre des noms, nouvelle structure de `HEADER_VERSION` avec hash du registre — sont dans la version complète en anglais et en japonais.
 
 [← Partie précédente](09-apiv3.md)·[Retour au manuel](README.md)

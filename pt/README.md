@@ -5,7 +5,7 @@ Guia autocontido para criar e distribuir pacotes de shaders para Bloxd.io (somen
 
 > Este é um guia não oficial e não representa a posição dos desenvolvedores. A API pode mudar sem aviso.  
 > Este guia foi criado com assistência de IA; a precisão não é garantida. Verifique com o comportamento real no jogo.  
-> Última revisão: 2026-10-27 (implantação da v4 confirmada — build `cnty9`, produção e pré-produção idênticas; ver Parte X. implantação da v3 em produção confirmada por comparação de bundles; invocação de hooks, névoa, profundidade e interioridades do `blockFlags` restauradas do build de produção — Parte IX §49–§54). Referências oficiais agora existem (`bloxd-api.wgsl` e `BLOCK_TEXTURES.md`, Discord oficial) e foram cotejadas com este guia — continue verificando as receitas na tela de carregamento e na compilação no jogo.  
+> Última revisão: 2026-10-27 (implantação da v4 confirmada — build `cnty9`, produção e pré-produção idênticas; ver Parte X. implantação da v3 em produção confirmada por comparação de bundles; invocação de hooks, névoa, profundidade e interioridades do `blockFlags` restauradas do build de produção — Parte IX §49–§54). O material de referência completo está embutido como Parte XI (`11-reference.md`) — o cabeçalho do motor restaurado verbatim e o catálogo medido completo dos 905 nomes de textura utilizáveis; continue verificando as receitas na tela de carregamento e na compilação no jogo.  
 > O recurso de pacotes de shaders é um recurso oficial acessível pela interface do jogo, e os pacotes são WGSL puro  
 > (sem execução de JS nem rede), então nada perigoso acontece com código normal.
 

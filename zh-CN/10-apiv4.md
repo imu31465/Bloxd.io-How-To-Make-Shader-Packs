@@ -26,6 +26,6 @@
 | `behind.found` | `behind.hit` |
 | 未保护的顶点钩子 | `#ifndef BLOXD_STRICT ... #endif` |
 
-官方参考资料现已存在 (`bloxd-api.wgsl` 与 `BLOCK_TEXTURES.md`，官方 Discord)。完整细节 —— `bloxdTexel` 的旋转细节、复原的采样 WGSL、约 900 个可用常量的名称注册表、带注册表哈希的新 `HEADER_VERSION` 结构 —— 见英文与日文完整版。
+完整参考材料现在已是本指南的一部分：完整复原的引擎头文件与含全部 905 个可用名称的完整纹理目录见第十一部分 (`11-reference.md`)。完整细节 —— `bloxdTexel` 的旋转细节、复原的采样 WGSL、名称注册表、带注册表哈希的新 `HEADER_VERSION` 结构 —— 见英文与日文完整版。
 
 [← 上一部分](09-apiv3.md)·[返回手册](README.md)
