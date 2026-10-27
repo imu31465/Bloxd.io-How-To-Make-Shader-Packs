@@ -552,7 +552,7 @@ let bloxdSpMipLevel = clamp(bloxdSpLod, 0.0,
     let bloxdSpLayer = u32(round(bloxdSpFrame));
 ```
 
-`animDataPerTex` (group 2、`array<f32>`) はアニメーションテクスチャ毎に `{mask, startLayer, interval}` の三つ組を運ぶ。フレーム数は**2 の冪が要求**される (JS 側のビルドチェックが 2 冪でないフレーム数を `<block> has N animation states, which is not a power of 2` で拒否する)。静的センチネル設計により、非アニメーションの番号も同じ数式で分岐なしに解決される。パック向けの要約をもう一度: *id は安定、フレームは自動。*
+`animDataPerTex` (group 2、`array<f32>`) はアニメーションテクスチャ毎に `{mask, startLayer, interval}` の三つ組を運ぶ。フレーム数は**2 の冪が要求**される (JS 側のビルドチェックが 2 冪でないフレーム数を `<block> has N animation states, which is not a power of 2` で拒否する)。静的センチネル設計により、非アニメーションの番号も同じ数式で分岐なしに解決される。パック向けの要約をもう一度: *id は安定、フレームは自動。* 間隔はエンジン側のコンテンツであり、`cnty9` 実測では 3 値のみである — 200 ms (`lava`・`toxic_waste`・`radar_screen`)、250 ms (`smoke`・`homestead_core_mid`・機械の `*_running` 族)、300 ms (17 ポータルと `toxic_waste_barrel_top`)。族ごとの値は §68.4 の列にある。
 
 ### 63.4 `bloxdSp*` 名前空間 — 27 シンボルの全容
 

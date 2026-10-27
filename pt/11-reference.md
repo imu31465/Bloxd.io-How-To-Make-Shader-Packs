@@ -1154,50 +1154,52 @@ Essas texturas existem apenas como cópias pré-giradas (`name[rot[1..4`); o reg
 
 Amostrar esses nomes retorna automaticamente o frame de animação atual (§63.3) — sufixos de frame são erro.
 
-| Nome | Frames | Base do registro |
-|---|---|---|
-| `lava` | 8 | `lava0` |
-| `toxic_waste` | 8 | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | `auto_bench_side_running0` |
-| `black_portal` | 4 | `black_portal0` |
-| `blue_portal` | 4 | `blue_portal0` |
-| `brown_portal` | 4 | `brown_portal0` |
-| `burner_drill_side_running` | 4 | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | `generator_side_running0` |
-| `gray_portal` | 4 | `gray_portal0` |
-| `green_portal` | 4 | `green_portal0` |
-| `grey_portal` | 4 | `grey_portal0` |
-| `homestead_core_mid` | 4 | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | `lightblue_portal0` |
-| `lightgray_portal` | 4 | `lightgray_portal0` |
-| `lime_portal` | 4 | `lime_portal0` |
-| `magenta_portal` | 4 | `magenta_portal0` |
-| `orange_portal` | 4 | `orange_portal0` |
-| `pink_portal` | 4 | `pink_portal0` |
-| `press_side_running` | 4 | `press_side_running0` |
-| `purple_portal` | 4 | `purple_portal0` |
-| `radar_screen` | 4 | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | `recycler_side_running0` |
-| `red_portal` | 4 | `red_portal0` |
-| `shatter_mill_side_running` | 4 | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | `smelter_side_running0` |
-| `smoke` | 4 | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | `volt_engine_side_running0` |
-| `white_portal` | 4 | `white_portal0` |
-| `wire_mill_side_running` | 4 | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | `yellow_portal0` |
+O intervalo é fixo por família e foi medido no `cnty9` — apenas três valores: **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, todas as famílias `*_running` de máquinas), **300 ms** (os dezessete portais e `toxic_waste_barrel_top`); veja a coluna «Intervalo». O atlas, aliás, guarda 45 raízes animadas, não 42: as quatro cópias pré-rotacionadas de `radar_screen` carregam cada uma sua própria escada de 4 quadros.
+
+| Nome | Frames | Intervalo | Base do registro |
+|---|---|---|---|
+| `lava` | 8 | 200 ms | `lava0` |
+| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
+| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
+| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
+| `black_portal` | 4 | 300 ms | `black_portal0` |
+| `blue_portal` | 4 | 300 ms | `blue_portal0` |
+| `brown_portal` | 4 | 300 ms | `brown_portal0` |
+| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
+| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
+| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
+| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
+| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
+| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
+| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
+| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
+| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
+| `gray_portal` | 4 | 300 ms | `gray_portal0` |
+| `green_portal` | 4 | 300 ms | `green_portal0` |
+| `grey_portal` | 4 | 300 ms | `grey_portal0` |
+| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
+| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
+| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
+| `lime_portal` | 4 | 300 ms | `lime_portal0` |
+| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
+| `orange_portal` | 4 | 300 ms | `orange_portal0` |
+| `pink_portal` | 4 | 300 ms | `pink_portal0` |
+| `press_side_running` | 4 | 250 ms | `press_side_running0` |
+| `purple_portal` | 4 | 300 ms | `purple_portal0` |
+| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
+| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
+| `red_portal` | 4 | 300 ms | `red_portal0` |
+| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
+| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
+| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
+| `smoke` | 4 | 250 ms | `smoke0` |
+| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
+| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
+| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
+| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
+| `white_portal` | 4 | 300 ms | `white_portal0` |
+| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
+| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
 
 ### 68.5 Deriva do registro, medida (sjr0p7 → cnty9)
 
@@ -1209,5 +1211,59 @@ Dois builds medidos em outubro, a dez dias de distância:
 - The usable-name count moved 900 → 905, and the registry hash in `HEADER_VERSION` (§65.1) re-invalidated every saved pack that had baked ids
 
 Write `bloxdTextureIdLava`, not `19` — a name-constant survives every one of those bullets unchanged.
+
+### 68.6 As listas de deriva, completas (98 adicionados, 79 removidos)
+
+Os números de §68.5, escritos nome por nome — porque quem atualiza um texture pack de outubro precisa saber exatamente quais nomes de arquivo deixaram de corresponder. Compara-se a camada das *grafias* (os nomes de arquivo que texture packs usam); as regras de dobragem de §64 transformam essas grafias nas constantes utilizáveis de §68.2.
+
+**Migração para fam giradas dobradas — 17 topos de máquina (68 grafias fora, 68 slots dentro).** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top` moveram-se de grafias variantes `_rot1..4` para slots pré-rotacionados `[rot[1..4`; a raiz dobrada é o nome utilizável, então um texture pack agora inclui um `X_top.png` em vez de quatro arquivos `X_top_rotN.png`.
+
+**Topos de baú dobrados — 3 famílias (6 grafias fora, 12 slots dentro).** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top`: as grafias de duas variantes viraram slots pré-rotacionados sob a raiz — renomeie os PNGs em consequência.
+
+**Texturas novas — 17 nomes.** O baú duplo (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), a família darkstone (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore` e `forge_hopper_top`.
+
+**Uma dobra simples.** `ghost_chest_top_1`/`ghost_chest_top_2` colapsaram num único `ghost_chest_top`.
+
+**Removidas por completo — 3 nomes.** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top` não têm grafia sucessora no novo registro — o conteúdo saiu do jogo com este build. `forge_hopper_top` é uma textura genuinamente nova, não um renome verificado.
+
+O diff bruto de grafias, para verificação:
+
+```text
++ 98 added (cnty9):
+alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
+auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
+belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
+burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
+chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
+chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
+crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
+crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
+darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
+electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
+iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
+moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
+pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
+shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
+sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
+tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
+wire_mill_top[rot[3, wire_mill_top[rot[4
+
+- 79 removed (sjr0p7):
+alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
+auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
+belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
+burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
+crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
+crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
+deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
+ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
+press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
+recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
+shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
+smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
+tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
+wire_mill_top_rot4
+```
+
 
 [← Previous part](10-apiv4.md)·[Back to the manual](README.md)

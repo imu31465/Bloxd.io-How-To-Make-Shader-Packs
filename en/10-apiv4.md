@@ -552,7 +552,7 @@ For animated textures the layer assignment grows a frame computation (this is th
     let bloxdSpLayer = u32(round(bloxdSpFrame));
 ```
 
-`animDataPerTex` (group 2, `array<f32>`) carries one `{mask, startLayer, interval}` triplet per animated texture, frames are **power-of-two counted** (a JS-side build check rejects non-power-of-2 frame counts with `<block> has N animation states, which is not a power of 2`), and the static-sentinel design means non-animated indices resolve through the same arithmetic without a branch. Pack-facing summary, once more: *the id is stable, the frame is automatic.*
+`animDataPerTex` (group 2, `array<f32>`) carries one `{mask, startLayer, interval}` triplet per animated texture, frames are **power-of-two counted** (a JS-side build check rejects non-power-of-2 frame counts with `<block> has N animation states, which is not a power of 2`), and the static-sentinel design means non-animated indices resolve through the same arithmetic without a branch. Pack-facing summary, once more: *the id is stable, the frame is automatic.* The intervals are engine content, and measured on `cnty9` they take exactly three values — 200 ms (`lava`, `toxic_waste`, `radar_screen`), 250 ms (`smoke`, `homestead_core_mid`, the machine `*_running` families), 300 ms (the seventeen portals, `toxic_waste_barrel_top`) — the per-family column is §68.4.
 
 ### 63.4 The `bloxdSp*` namespace — all 27 symbols
 

@@ -1155,52 +1155,54 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 68.4 アニメ族 (42 名)
 
-これらの名前をサンプルすると現在のアニメーションフレームが自動的に返る (§63.3 のフレームラダー)。エンジンがテクスチャごとに独自の間隔でフレームを進めるため、パック側がフレーム接尾辞を書くことはない (`lava0` はエラー、`lava` が名前)。
+これらの名前をサンプルすると現在のアニメーションフレームが自動的に返る (§63.3 のフレームラダー)。エンジンは族ごとに固定された間隔でフレームを進める — `cnty9` 実測では 3 値のみ: **200 ms** (`lava`・`toxic_waste`・`radar_screen`)、**250 ms** (`smoke`・`homestead_core_mid`・各機械の `*_running` 族)、**300 ms** (17 ポータルと `toxic_waste_barrel_top`)。間隔の列を参照。パック側がフレーム接尾辞を書くことはない (`lava0` はエラー、`lava` が名前)。
 
-| 名前 | フレーム数 | レジストリ上のベース |
-|---|---|---|
-| `lava` | 8 | `lava0` |
-| `toxic_waste` | 8 | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | `auto_bench_side_running0` |
-| `black_portal` | 4 | `black_portal0` |
-| `blue_portal` | 4 | `blue_portal0` |
-| `brown_portal` | 4 | `brown_portal0` |
-| `burner_drill_side_running` | 4 | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | `generator_side_running0` |
-| `gray_portal` | 4 | `gray_portal0` |
-| `green_portal` | 4 | `green_portal0` |
-| `grey_portal` | 4 | `grey_portal0` |
-| `homestead_core_mid` | 4 | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | `lightblue_portal0` |
-| `lightgray_portal` | 4 | `lightgray_portal0` |
-| `lime_portal` | 4 | `lime_portal0` |
-| `magenta_portal` | 4 | `magenta_portal0` |
-| `orange_portal` | 4 | `orange_portal0` |
-| `pink_portal` | 4 | `pink_portal0` |
-| `press_side_running` | 4 | `press_side_running0` |
-| `purple_portal` | 4 | `purple_portal0` |
-| `radar_screen` | 4 | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | `recycler_side_running0` |
-| `red_portal` | 4 | `red_portal0` |
-| `shatter_mill_side_running` | 4 | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | `smelter_side_running0` |
-| `smoke` | 4 | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | `volt_engine_side_running0` |
-| `white_portal` | 4 | `white_portal0` |
-| `wire_mill_side_running` | 4 | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | `yellow_portal0` |
+| 名前 | フレーム数 | 間隔 | レジストリ上のベース |
+|---|---|---|---|
+| `lava` | 8 | 200 ms | `lava0` |
+| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
+| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
+| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
+| `black_portal` | 4 | 300 ms | `black_portal0` |
+| `blue_portal` | 4 | 300 ms | `blue_portal0` |
+| `brown_portal` | 4 | 300 ms | `brown_portal0` |
+| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
+| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
+| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
+| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
+| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
+| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
+| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
+| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
+| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
+| `gray_portal` | 4 | 300 ms | `gray_portal0` |
+| `green_portal` | 4 | 300 ms | `green_portal0` |
+| `grey_portal` | 4 | 300 ms | `grey_portal0` |
+| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
+| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
+| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
+| `lime_portal` | 4 | 300 ms | `lime_portal0` |
+| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
+| `orange_portal` | 4 | 300 ms | `orange_portal0` |
+| `pink_portal` | 4 | 300 ms | `pink_portal0` |
+| `press_side_running` | 4 | 250 ms | `press_side_running0` |
+| `purple_portal` | 4 | 300 ms | `purple_portal0` |
+| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
+| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
+| `red_portal` | 4 | 300 ms | `red_portal0` |
+| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
+| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
+| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
+| `smoke` | 4 | 250 ms | `smoke0` |
+| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
+| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
+| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
+| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
+| `white_portal` | 4 | 300 ms | `white_portal0` |
+| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
+| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
+
+なお生データから見える構造上の注記: アトラスが保持するアニメーションルートは 42 ではなく 45 個である — `radar_screen` の 4 つの先行回転コピーがそれぞれ独自の 4 フレームラダーを持つためであり、`radar_screen` が両方の族注記を担う唯一の名前である理由でもある。
 
 ### 68.5 レジストリの drift 実測 (sjr0p7 → cnty9)
 
@@ -1212,5 +1214,59 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - 使用可能名は 900 → 905 へ移動し、`HEADER_VERSION` のレジストリハッシュ (§65.1) が id を焼き込んだ全保存パックを再無効化した
 
 最後の点が運用上の教訓である: **`19` ではなく `bloxdTextureIdLava` と書く** — 名前定数は上記の全弾を変わらず生き延びる。ローダが読み込み時に生レジストリへ再解決するからである。
+
+### 68.6 ドリフト全リスト (98 追加・79 削除)
+
+§68.5 の要約数値を名前単位で書き下したものである — 10月に作ったテクスチャパックを更新する作者は、どのファイル名が一致しなくなったかを正確に知る必要があるためだ。ここで比較するのは*綴り*層 (テクスチャパックが使うファイル名) であり、§64 の畳み込み規則がその綴りを §68.2 の利用可能な定数へと変換する。
+
+**回転畳み込み移行 — 機械系トップ 17 種 (綴り 68 削除・スロット 68 追加)。** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top` は `_rot1..4` 変異綴りから `[rot[1..4` 先行回転スロットへ移行した。畳み込み先のルートが利用可能な名前であり、テクスチャパックは 4 つの `X_top_rotN.png` ではなく 1 つの `X_top.png` を同梱すればよくなった。
+
+**チェストトップの畳み込み — 3 族 (綴り 6 削除・スロット 12 追加)。** `chest_top_1`/`chest_top_2` → `chest_top`、`iron_chest_top_1`/`_2` → `iron_chest_top`、`moonstone_chest_top_1`/`_2` → `moonstone_chest_top`。2 変異綴りがルート配下の先行回転スロットになった — PNG ファイル名もこれに合わせて改名すること。
+
+**新テクスチャ — 17 名。** ダブルチェスト (`chest_double_back_hi`/`_lo`、`chest_double_front_hi`/`_lo`、`chest_double_top_1_hi`/`_lo`、`chest_double_top_2_hi`/`_lo`)、ダークストーン族 (`darkstone`、`darkstone_bricks`、`darkstone_bricks_cracked`、`darkstone_bricks_lava`、`darkstone_engraved`、`darkstone_smooth`)、`pure_copper_ore`、`pure_voltite_ore`、そして `forge_hopper_top`。
+
+**単純な畳み込み 1 件。** `ghost_chest_top_1`/`ghost_chest_top_2` が単一の `ghost_chest_top` に畳まれた。
+
+**完全削除 — 3 名。** `shaft_hopper_top`、`sun_panel_side`、`sun_panel_top` には新レジストリ上の後継綴りが存在しない — このビルドでコンテンツ自体がゲームから去った。`forge_hopper_top` は新規テクスチャであり、改名であることは検証されていない。
+
+検証用の生綴り差分:
+
+```text
++ 98 added (cnty9):
+alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
+auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
+belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
+burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
+chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
+chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
+crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
+crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
+darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
+electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
+iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
+moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
+pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
+shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
+sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
+tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
+wire_mill_top[rot[3, wire_mill_top[rot[4
+
+- 79 removed (sjr0p7):
+alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
+auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
+belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
+burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
+crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
+crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
+deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
+ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
+press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
+recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
+shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
+smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
+tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
+wire_mill_top_rot4
+```
+
 
 [← 前の部](10-apiv4.md)・[マニュアルに戻る](README.md)

@@ -2282,7 +2282,7 @@ La correspondance se fait **token par token** : les noms de types des paramètre
 >
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — par exemple un `bloxdOpaqueBehind()` côté terrain sans enveloppe `#ifdef BLOXD_SCENE_DEPTH`.
 
-**L'en-tête du moteur (prélude), figé.** L'en-tête v3 est une chaîne de 5 637 octets commençant par `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` Il porte des directives `#if` / `#ifdef` que le préprocesseur WGSL du moteur évalue lui-même par variante — le moteur exécute réellement l'évaluation d'expressions `#if`, et une expression mal formée échoue avec `Cannot evaluate #if ...`. Chaque structure, signature de fonction et commentaire cité dans ce guide vient de ce texte rendu, donc le guide et l'en-tête distribué ne peuvent pas diverger.
+**L'en-tête du moteur (prélude), figé.** L'en-tête v3 est une chaîne de 5 637 octets commençant par `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` Il porte des directives `#if` / `#ifdef` que le préprocesseur WGSL du moteur évalue lui-même par variante — le moteur exécute réellement l'évaluation d'expressions `#if`, et une expression mal formée échoue avec `Cannot evaluate #if ...`. Chaque structure, signature de fonction et commentaire cité dans ce guide vient de ce texte rendu, donc le guide et l'en-tête distribué ne peuvent pas diverger. Le texte complet suit, verbatim, à la fin de §54.
 
 **Notes d'analyseur pour les auteurs.**
 
@@ -2311,6 +2311,139 @@ La disposition complète des ressources du programme terrain, directement depuis
 - **Les index passent en 32 bits au premier grand maillage.** Le rendu Lite ne choisit des indices `Uint16Array` que tant que chaque valeur d'index reste ≤ 65 534 ; dès qu'un index atteint 65 535, le buffer devient un `Uint32Array` (suivi par buffer avec un flag `is32Bits`). En pratique : un maillage de chunk avec au plus 65 535 sommets tient dans des indices 16 bits ; un maillage avec exactement 65 536 sommets émet nécessairement un index 65 535 et bascule tout le buffer en 32 bits.
 - **Détails du chargement du manifeste** : les entrées zip sous `__MACOSX/`, les fichiers préfixés `._` et `.DS_Store` sont filtrés (bruit d'archive macOS) ; `pack.json` est localisé par comparaison de chemins en minuscules — zéro correspondance → `loadNoManifest`, deux ou plus → `loadDuplicateManifest` ; la lecture du manifeste est plafonnée à 65 536 octets.
 - **Comment tout cela a été vérifié** : les modules du bundle de production ont été restaurés (165 chunks ; le registre webpack de ce bundle compte 4 951 modules — le nombre varie de quelques unités selon que les dépendances enfants asynchrones sont incluses ou non, donc traitez cette valeur comme propre à ce bundle) et exécutés dans un harness compatible webpack sous Node.js. Le `HEADER_VERSION` mesuré (§53), l'en-tête rendu de 5 637 octets, l'ordre canonique de la table des variantes et la table des fonctions spéciales viennent tous de *l'exécution du code distribué*, pas de la lecture de chaînes. Le même harness est le noyau naturel d'un `pack_check` v6 communautaire — exécuter le validateur du moteur lui-même contre un pack reproduit exactement ses verdicts.
+### L’en-tête du moteur v3, verbatim
+
+Le texte figé de 5 637 octets (127 lignes) lui-même — l’artefact que §53 ci-dessus décrit — restauré verbatim du build `3ymzdd`, le build de production v3 visé par cette partie. C’est le pendant v3 de l’en-tête v4 de la [Partie XI](11-reference.md) §67, intégré en entier pour la même raison : un pack v3 peut être débogué contre exactement ce que le moteur lui préfixait, et chaque différence v3 → v4 ([Partie X](10-apiv4.md) §58–§59) se lit directement en mettant les deux textes côte à côte.
+
+```wgsl
+
+// Engine-provided and read-only, prepended to all packs. apiVersion 3.
+
+// Half a turn and a full turn, in radians.
+const bloxdPi: f32 = 3.1415926535898;
+const bloxdTau: f32 = 6.2831853071796;
+
+// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
+// uniforms, which packs can't name. Any function can call them, not only a hook.
+
+// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
+// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
+fn bloxdSeconds() -> f32 {
+    return bloxdPackInputs.seconds;
+}
+
+// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
+// stay close to the player, and so precise.
+fn bloxdRenderOffset() -> vec3i {
+    return bloxdPackInputs.renderOffset;
+}
+
+// The camera's render position.
+fn bloxdEyePosition() -> vec3f {
+    return bloxdPackInputs.eyePosition;
+}
+
+// Unit, towards the sun, in world orientation; zero when the sky has no sun.
+fn bloxdSunDirection() -> vec3f {
+    return bloxdPackInputs.sunDirection;
+}
+
+// A render position's world position. In f32, so it loses fine detail far from the world's origin.
+fn bloxdWorldPosition(position: vec3f) -> vec3f {
+    return position + vec3f(bloxdRenderOffset());
+}
+
+// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
+    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
+}
+
+// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
+// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
+// (blockFlags & bloxdBlockFlagRock) != 0.
+const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
+const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
+const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
+const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
+const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
+const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
+
+struct BloxdVertexIn {
+    position: vec3f,     // A render position: world minus bloxdRenderOffset().
+    normal: vec3f,
+    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
+}
+
+struct BloxdVertex {
+    position: vec3f,     // A render position.
+}
+
+struct BloxdSurfaceIn {
+    colour: vec3f,       // Texture * vertex colour (tint * AO).
+    alpha: f32,
+    normal: vec3f,
+    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdSurface {
+    colour: vec3f,
+#ifdef BLOXD_ALPHA
+    alpha: f32,
+#endif
+    emission: vec3f,     // Added after lighting, then fogged.
+}
+
+struct BloxdLightIn {
+    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
+    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
+    ambient: vec3f,      // Ambient light, added to directional.
+    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
+    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
+    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
+    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
+    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
+                         // or without BLOXD_LIGHTING.
+    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
+                         // turns it off; black only in a scene with no fog at all.
+    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
+    position: vec3f,     // As in BloxdSurfaceIn.
+    normal: vec3f,
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdLight {
+    colour: vec3f,
+}
+
+// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
+struct BloxdOpaqueBehind {
+    found: bool,         // False where nothing opaque is behind (sky).
+    position: vec3f,     // A render position; meaningless when !found.
+    distance: f32,       // From the eye; meaningless when !found.
+}
+
+fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return BloxdVertex(vertex.position);
+}
+
+fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+#ifdef BLOXD_ALPHA
+    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
+#else
+    return BloxdSurface(surface.colour, vec3f(0.0));
+#endif
+}
+
+// Fogs colour as the engine fogs this fragment.
+fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
+    return mix(light.fogColour, colour, light.fogVisibility);
+}
+
+fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
+}
+```
 
 ---
 
@@ -2323,7 +2456,7 @@ Build visé : `cnty9.main.669f8081.js` — **en production et en préprod simult
 ## Ce qui change
 
 - `pack.json` exige `"apiVersion": 4` (égalité `===` stricte, nombre) — les packs v3 sont refusés au chargement.
-- **Nouvelle API de textures (la vedette) :** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` échantillonne l’atlas de textures de blocs exactement comme le moteur lui-même (id 0 = blanc ; les textures animées renvoient automatiquement l’image courante), `bloxdTextureSize(mipLevel) -> vec2u`, et des constantes nommées `bloxdTextureId*` (CamelCase à partir du nom de fichier, p. ex. `grass_top` → `bloxdTextureIdGrassTop` ; le catalogue officiel est `BLOCK_TEXTURES.md`).
+- **Nouvelle API de textures (la vedette) :** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` échantillonne l’atlas de textures de blocs exactement comme le moteur lui-même (id 0 = blanc ; les textures animées renvoient automatiquement l’image courante), `bloxdTextureSize(mipLevel) -> vec2u`, et des constantes nommées `bloxdTextureId*` (CamelCase à partir du nom de fichier, p. ex. `grass_top` → `bloxdTextureIdGrassTop` ; le catalogue complet des 905 noms utilisables est intégré en §68 de la Partie XI (`11-reference.md`)).
 - **Quatre nouveaux champs d’entrée** dans `BloxdSurfaceIn` *et* `BloxdLightIn` : `textureId`, `textureRotation` (quarts de tour horaires, appliqués par `bloxdTexel`), `uv` (en blocs ; `fract(uv)` est dessiné), `mipLevel`.
 - **Renommages avec changement de sens :** `fogVisibility` → `fogAlpha` au sens **inversé** (`0 = pas de brouillard, 1 = seulement fogColour` ; portage : `l.fogVisibility` → `1.0 - l.fogAlpha`) ; `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (corps identique) ; `BloxdOpaqueBehind.found` → `hit`.
 - **Les jeux stricts sont désormais imposés par le validateur embarqué :** un hook de sommet non protégé ou un `discard` atteignable produit `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` et désactive **tous** les hooks dans les jeux stricts. Avec les gardes `#ifndef BLOXD_STRICT`, surface/light continuent de fonctionner.
@@ -3500,50 +3633,52 @@ Ces textures n'existent que comme copies pré-pivotées (`name[rot[1..4`) ; le r
 
 Échantillonner ces noms renvoie automatiquement la frame d'animation courante (§63.3) — les suffixes de frame sont des erreurs.
 
-| Nom | Frames | Base du registre |
-|---|---|---|
-| `lava` | 8 | `lava0` |
-| `toxic_waste` | 8 | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | `auto_bench_side_running0` |
-| `black_portal` | 4 | `black_portal0` |
-| `blue_portal` | 4 | `blue_portal0` |
-| `brown_portal` | 4 | `brown_portal0` |
-| `burner_drill_side_running` | 4 | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | `generator_side_running0` |
-| `gray_portal` | 4 | `gray_portal0` |
-| `green_portal` | 4 | `green_portal0` |
-| `grey_portal` | 4 | `grey_portal0` |
-| `homestead_core_mid` | 4 | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | `lightblue_portal0` |
-| `lightgray_portal` | 4 | `lightgray_portal0` |
-| `lime_portal` | 4 | `lime_portal0` |
-| `magenta_portal` | 4 | `magenta_portal0` |
-| `orange_portal` | 4 | `orange_portal0` |
-| `pink_portal` | 4 | `pink_portal0` |
-| `press_side_running` | 4 | `press_side_running0` |
-| `purple_portal` | 4 | `purple_portal0` |
-| `radar_screen` | 4 | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | `recycler_side_running0` |
-| `red_portal` | 4 | `red_portal0` |
-| `shatter_mill_side_running` | 4 | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | `smelter_side_running0` |
-| `smoke` | 4 | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | `volt_engine_side_running0` |
-| `white_portal` | 4 | `white_portal0` |
-| `wire_mill_side_running` | 4 | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | `yellow_portal0` |
+L’intervalle est fixe par famille et a été mesuré sur `cnty9` — trois valeurs seulement : **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, toutes les familles `*_running` de machines), **300 ms** (les dix-sept portails et `toxic_waste_barrel_top`) ; voir la colonne « Intervalle ». L’atlas porte d’ailleurs 45 racines animées, et non 42 : les quatre copies pré-rotées de `radar_screen` mènent chacune leur propre échelle de 4 images.
+
+| Nom | Frames | Intervalle | Base du registre |
+|---|---|---|---|
+| `lava` | 8 | 200 ms | `lava0` |
+| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
+| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
+| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
+| `black_portal` | 4 | 300 ms | `black_portal0` |
+| `blue_portal` | 4 | 300 ms | `blue_portal0` |
+| `brown_portal` | 4 | 300 ms | `brown_portal0` |
+| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
+| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
+| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
+| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
+| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
+| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
+| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
+| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
+| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
+| `gray_portal` | 4 | 300 ms | `gray_portal0` |
+| `green_portal` | 4 | 300 ms | `green_portal0` |
+| `grey_portal` | 4 | 300 ms | `grey_portal0` |
+| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
+| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
+| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
+| `lime_portal` | 4 | 300 ms | `lime_portal0` |
+| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
+| `orange_portal` | 4 | 300 ms | `orange_portal0` |
+| `pink_portal` | 4 | 300 ms | `pink_portal0` |
+| `press_side_running` | 4 | 250 ms | `press_side_running0` |
+| `purple_portal` | 4 | 300 ms | `purple_portal0` |
+| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
+| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
+| `red_portal` | 4 | 300 ms | `red_portal0` |
+| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
+| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
+| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
+| `smoke` | 4 | 250 ms | `smoke0` |
+| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
+| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
+| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
+| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
+| `white_portal` | 4 | 300 ms | `white_portal0` |
+| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
+| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
 
 ### 68.5 Dérive du registre, mesurée (sjr0p7 → cnty9)
 
@@ -3555,5 +3690,59 @@ Deux builds mesurés en octobre, à dix jours d'écart :
 - The usable-name count moved 900 → 905, and the registry hash in `HEADER_VERSION` (§65.1) re-invalidated every saved pack that had baked ids
 
 Write `bloxdTextureIdLava`, not `19` — a name-constant survives every one of those bullets unchanged.
+
+### 68.6 Les listes de dérive, intégrales (98 ajoutés, 79 supprimés)
+
+Les chiffres de §68.5, épelés nom par nom — car l’auteur qui met à jour un texture pack d’octobre doit savoir exactement quels noms de fichiers ne correspondent plus. On compare la couche des *orthographes* (les noms de fichiers qu’utilisent les texture packs) ; les règles de pliage de §64 transforment ces orthographes en constantes utilisables de §68.2.
+
+**Migration vers familles tournées pliées — 17 dessus de machines (68 orthographes sorties, 68 emplacements entrés).** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top` sont passés d’orthographes variantes `_rot1..4` aux emplacements pré-rotés `[rot[1..4` ; la racine pliée est le nom utilisable, donc un texture pack livre désormais un `X_top.png` au lieu de quatre fichiers `X_top_rotN.png`.
+
+**Dessus de coffres pliés — 3 familles (6 orthographes sorties, 12 emplacements entrés).** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top` : les orthographes à deux variantes sont devenues des emplacements pré-rotés sous la racine — renommez les fichiers PNG en conséquence.
+
+**Nouvelles textures — 17 noms.** Le double coffre (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), la famille darkstone (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore` et `forge_hopper_top`.
+
+**Un pliage simple.** `ghost_chest_top_1`/`ghost_chest_top_2` se sont repliés en un seul `ghost_chest_top`.
+
+**Supprimées carrément — 3 noms.** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top` n’ont pas d’orthographe successive dans le nouveau registre — le contenu a quitté le jeu avec ce build. `forge_hopper_top` est une texture réellement nouvelle, pas un renommage vérifié.
+
+Le diff brut des orthographes, pour vérification :
+
+```text
++ 98 added (cnty9):
+alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
+auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
+belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
+burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
+chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
+chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
+crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
+crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
+darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
+electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
+iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
+moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
+pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
+shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
+sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
+tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
+wire_mill_top[rot[3, wire_mill_top[rot[4
+
+- 79 removed (sjr0p7):
+alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
+auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
+belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
+burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
+crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
+crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
+deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
+ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
+press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
+recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
+shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
+smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
+tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
+wire_mill_top_rot4
+```
+
 
 [← Previous part](10-apiv4.md)·[Back to the manual](README.md)

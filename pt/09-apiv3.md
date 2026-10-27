@@ -450,7 +450,7 @@ A correspondência é **token por token**: nomes de tipo dos parâmetros precisa
 >
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — por exemplo `bloxdOpaqueBehind()` do lado do terreno sem um envelope `#ifdef BLOXD_SCENE_DEPTH`.
 
-**O cabeçalho do motor (prelúdio), fixado.** O cabeçalho da v3 é uma string de 5.637 bytes começando com `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` Ele carrega diretivas `#if` / `#ifdef` que o pré-processador WGSL do próprio motor avalia por variante — o motor realmente executa avaliação de expressões `#if`, e uma expressão malformada gera erro com `Cannot evaluate #if ...`. Toda struct, assinatura de função e comentário citado neste guia vem deste texto renderizado, então o guia e o cabeçalho distribuído não podem divergir.
+**O cabeçalho do motor (prelúdio), fixado.** O cabeçalho da v3 é uma string de 5.637 bytes começando com `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` Ele carrega diretivas `#if` / `#ifdef` que o pré-processador WGSL do próprio motor avalia por variante — o motor realmente executa avaliação de expressões `#if`, e uma expressão malformada gera erro com `Cannot evaluate #if ...`. Toda struct, assinatura de função e comentário citado neste guia vem deste texto renderizado, então o guia e o cabeçalho distribuído não podem divergir. O texto completo segue, verbatim, no final de §54.
 
 **Notas do analisador para autores.**
 
@@ -479,6 +479,139 @@ O layout completo de recursos do programa de terreno, direto do renderizador Lit
 - **Buffers de índice passam a 32 bits na primeira malha grande.** O renderizador Lite só escolhe índices `Uint16Array` enquanto todo valor de índice permanece ≤ 65.534 — assim que qualquer índice atinge 65.535, o buffer se torna um `Uint32Array` (rastreado por buffer com uma flag `is32Bits`). Na prática: uma malha de chunk com no máximo 65.535 vértices cabe em índices de 16 bits; uma com exatamente 65.536 vértices necessariamente emite um índice 65.535 e troca o buffer inteiro para 32 bits.
 - **Detalhes do carregamento de manifesto**: entradas zip sob `__MACOSX/`, arquivos com prefixo `._` e `.DS_Store` são filtrados (ruído de arquivo do macOS); `pack.json` é localizado por comparação de caminho em minúsculas — zero correspondências → `loadNoManifest`, duas ou mais → `loadDuplicateManifest`; a leitura do manifesto é limitada a 65.536 bytes.
 - **Como tudo isso foi verificado**: os módulos do bundle de produção foram restaurados (165 chunks; o registro webpack conta 4.951 módulos neste bundle — a contagem de módulos varia em algumas unidades conforme dependências filhas assíncronas sejam incluídas, então trate o número exato como específico do bundle) e executados em um harness compatível com webpack sob Node.js. O `HEADER_VERSION` medido (§53), o cabeçalho renderizado de 5.637 bytes, a ordem canônica da tabela de variantes e o mapa de funções especiais vêm todos de *executar o código distribuído*, não de ler strings. O mesmo harness é o núcleo natural para um `pack_check` v6 da comunidade — executar o próprio validador do motor contra um pacote reproduz seus veredictos exatamente.
+### O cabeçalho do motor v3, verbatim
+
+A própria string fixa de 5.637 bytes (127 linhas) — o artefato que §53 acima descreve — restaurada verbatim do build `3ymzdd`, o build de produção v3 desta parte. É a contraparte v3 da cabecera v4 da [Parte XI](11-reference.md) §67, embutida por inteiro pelo mesmo motivo: um pack v3 pode ser depurado contra exatamente o que a engine anteponha, e cada diferença v3 → v4 ([Parte X](10-apiv4.md) §58–§59) pode ser lida dos dois textos lado a lado.
+
+```wgsl
+
+// Engine-provided and read-only, prepended to all packs. apiVersion 3.
+
+// Half a turn and a full turn, in radians.
+const bloxdPi: f32 = 3.1415926535898;
+const bloxdTau: f32 = 6.2831853071796;
+
+// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
+// uniforms, which packs can't name. Any function can call them, not only a hook.
+
+// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
+// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
+fn bloxdSeconds() -> f32 {
+    return bloxdPackInputs.seconds;
+}
+
+// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
+// stay close to the player, and so precise.
+fn bloxdRenderOffset() -> vec3i {
+    return bloxdPackInputs.renderOffset;
+}
+
+// The camera's render position.
+fn bloxdEyePosition() -> vec3f {
+    return bloxdPackInputs.eyePosition;
+}
+
+// Unit, towards the sun, in world orientation; zero when the sky has no sun.
+fn bloxdSunDirection() -> vec3f {
+    return bloxdPackInputs.sunDirection;
+}
+
+// A render position's world position. In f32, so it loses fine detail far from the world's origin.
+fn bloxdWorldPosition(position: vec3f) -> vec3f {
+    return position + vec3f(bloxdRenderOffset());
+}
+
+// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
+    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
+}
+
+// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
+// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
+// (blockFlags & bloxdBlockFlagRock) != 0.
+const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
+const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
+const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
+const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
+const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
+const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
+
+struct BloxdVertexIn {
+    position: vec3f,     // A render position: world minus bloxdRenderOffset().
+    normal: vec3f,
+    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
+}
+
+struct BloxdVertex {
+    position: vec3f,     // A render position.
+}
+
+struct BloxdSurfaceIn {
+    colour: vec3f,       // Texture * vertex colour (tint * AO).
+    alpha: f32,
+    normal: vec3f,
+    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdSurface {
+    colour: vec3f,
+#ifdef BLOXD_ALPHA
+    alpha: f32,
+#endif
+    emission: vec3f,     // Added after lighting, then fogged.
+}
+
+struct BloxdLightIn {
+    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
+    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
+    ambient: vec3f,      // Ambient light, added to directional.
+    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
+    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
+    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
+    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
+    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
+                         // or without BLOXD_LIGHTING.
+    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
+                         // turns it off; black only in a scene with no fog at all.
+    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
+    position: vec3f,     // As in BloxdSurfaceIn.
+    normal: vec3f,
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdLight {
+    colour: vec3f,
+}
+
+// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
+struct BloxdOpaqueBehind {
+    found: bool,         // False where nothing opaque is behind (sky).
+    position: vec3f,     // A render position; meaningless when !found.
+    distance: f32,       // From the eye; meaningless when !found.
+}
+
+fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return BloxdVertex(vertex.position);
+}
+
+fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+#ifdef BLOXD_ALPHA
+    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
+#else
+    return BloxdSurface(surface.colour, vec3f(0.0));
+#endif
+}
+
+// Fogs colour as the engine fogs this fragment.
+fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
+    return mix(light.fogColour, colour, light.fogVisibility);
+}
+
+fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
+}
+```
 
 ---
 

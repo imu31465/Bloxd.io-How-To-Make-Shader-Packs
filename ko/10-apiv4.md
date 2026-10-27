@@ -9,7 +9,7 @@
 ## 바뀌는 것
 
 - `pack.json`은 `"apiVersion": 4` 를 요구 (엄격 `===`, 숫자) — v3 팩은 로드 시 거부.
-- **새 텍스처 API (핵심):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` 는 블록 텍스처 아틀라스를 엔진 자신과 정확히 같은 방식으로 샘플링한다 (id 0 = 흰색; 애니메이션 텍스처는 자동으로 현재 프레임 반환), `bloxdTextureSize(mipLevel) -> vec2u`, 그리고 명명 상수 `bloxdTextureId*` (파일명의 CamelCase, 예: `grass_top` → `bloxdTextureIdGrassTop`; 공식 목록은 `BLOCK_TEXTURES.md`).
+- **새 텍스처 API (핵심):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` 는 블록 텍스처 아틀라스를 엔진 자신과 정확히 같은 방식으로 샘플링한다 (id 0 = 흰색; 애니메이션 텍스처는 자동으로 현재 프레임 반환), `bloxdTextureSize(mipLevel) -> vec2u`, 그리고 명명 상수 `bloxdTextureId*` (파일명의 CamelCase, 예: `grass_top` → `bloxdTextureIdGrassTop`; 905개 사용 가능 이름 전체의 카탈로그가 제11부 (`11-reference.md`) §68에 내장되어 있다).
 - `BloxdSurfaceIn` *과* `BloxdLightIn` 에 **4개的新 입력 필드**: `textureId`, `textureRotation` (시계방향 4분회전, `bloxdTexel` 이 적용), `uv` (블록 단위; `fract(uv)` 가 그려짐), `mipLevel`.
 - **의미가 바뀌는 개명:** `fogVisibility` → `fogAlpha`, 의미 **반전** (`0 = 포그 없음, 1 = fogColour 만`; 포팅: `l.fogVisibility` → `1.0 - l.fogAlpha`); `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (본체 동일); `BloxdOpaqueBehind.found` → `hit`.
 - **strict 게임이 번들 내장 검증기로 강제됨:** 가드 없는 버텍스 훅이나 도달 가능한 `discard` 는 `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` 를 내고 strict 게임에서 **모든** 훅을 비활성화한다. `#ifndef BLOXD_STRICT` 랩을 쓰면 surface/light 는 계속 동작.

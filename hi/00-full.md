@@ -2277,7 +2277,7 @@ v3 (3ymzdd):  6.5bc26a63   ← लाइव प्रोडक्शन बं�
 >
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — उदाहरण के लिए `#ifdef BLOXD_SCENE_DEPTH` में लिपेटे बिना terrain-side `bloxdOpaqueBehind()`।
 
-**इंजन हेडर (प्रील्यूड), स्थिर।** v3 हेडर 5,637 बाइट का स्ट्रिंग है जो `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` से शुरू होता है। इसमें `#if` / `#ifdef` directives हैं जिन्हें इंजन का अपना WGSL प्रीप्रोसेसर प्रति वेरिएंट मूल्यांकित करता है — इंजन वास्तव में `#if` अभिव्यक्ति मूल्यांकन चलाता है, और खराब अभिव्यक्ति `Cannot evaluate #if ...` के साथ त्रुटि देती है। इस गाइड की हर संरचना, फ़ंक्शन हस्ताक्षर और उद्धृत टिप्पणी इसी रेंडर किए गए टेक्स्ट से आती है, इसलिए गाइड और भेजा गया हेडर एक-दूसरे से अलग नहीं हो सकते।
+**इंजन हेडर (प्रील्यूड), स्थिर।** v3 हेडर 5,637 बाइट का स्ट्रिंग है जो `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` से शुरू होता है। इसमें `#if` / `#ifdef` directives हैं जिन्हें इंजन का अपना WGSL प्रीप्रोसेसर प्रति वेरिएंट मूल्यांकित करता है — इंजन वास्तव में `#if` अभिव्यक्ति मूल्यांकन चलाता है, और खराब अभिव्यक्ति `Cannot evaluate #if ...` के साथ त्रुटि देती है। इस गाइड की हर संरचना, फ़ंक्शन हस्ताक्षर और उद्धृत टिप्पणी इसी रेंडर किए गए टेक्स्ट से आती है, इसलिए गाइड और भेजा गया हेडर एक-दूसरे से अलग नहीं हो सकते। पूरा पाठ §54 के अंत में शब्दशः दिया गया है।
 
 **लेखकों के लिए पार्सर नोट्स।**
 
@@ -2306,6 +2306,139 @@ terrain प्रोग्राम का पूरा संसाधन ल�
 - **सबसे बड़े पहले mesh पर index buffers 32-बिट हो जाते हैं।** Lite रेंडरर `Uint16Array` indices तभी चुनता है जब तक हर index मान ≤ 65,534 रहे — जैसे ही कोई index 65,535 तक पहुँचता है, buffer `Uint32Array` बन जाता है (प्रति buffer `is32Bits` flag से ट्रैक)। व्यवहार में: अधिकतम 65,535 vertices वाला chunk mesh 16-बिट indices में फ़िट होता है; ठीक 65,536 vertices वाला अनिवार्य रूप से 65,535 index निकालता है और पूरा buffer 32-बिट पर स्विच कर देता है।
 - **मैनिफ़ेस्ट लोडिंग विवरण**: `__MACOSX/` के नीचे zip entries, `._` उपसर्ग वाली फ़ाइलें, और `.DS_Store` फ़िल्टर हो जाते हैं (macOS संग्रह शोर); `pack.json` path की lowercased तुलना से पाया जाता है — शून्य मैच → `loadNoManifest`, दो या अधिक → `loadDuplicateManifest`; मैनिफ़ेस्ट पठन 65,536 बाइट तक सीमित है।
 - **यह सब कैसे सत्यापित हुआ**: प्रोडक्शन बंडल के modules बहाल किए गए (165 चंक; इस बंडल में webpack registry 4,951 modules गिनता है — async child dependencies शामिल हैं या नहीं, इसके अनुसार module गिनती कुछ इकाइयों से बदलती है, इसलिए सटीक संख्या को bundle-specific मानें) और Node.js के नीचे webpack-संगत हार्नेस में चलाए गए। मापा गया `HEADER_VERSION` (§53), रेंडर किया गया 5,637-बाइट हेडर, वेरिएंट तालिका का canonical क्रम, और विशेष-फ़ंक्शन मैप सब *भेजे गए कोड को चलाने* से आते हैं, strings पढ़ने से नहीं। वही हार्नेस सामुदायिक `pack_check` v6 का स्वाभाविक कोर है — पैक के विरुद्ध इंजन के अपने validator को चलाने से उसके निर्णय ठीक वैसे ही पुनरुत्पन्न होते हैं।
+### v3 इंजन हेडर, शब्दशः
+
+स्थिर 5,637-बाइट (127-पंक्ति) पाठ स्वयं — वही अनुशंसित टुकड़ा जिसका वर्णन ऊपर §53 करता है — बिल्ड `3ymzdd` (इस भाग का v3 प्रोडक्शन बिल्ड) से शब्दशः पुनर्स्थापित। यह [भाग XI](11-reference.md) §67 के v4 हेडर का v3 समकक्ष है और उसी कारण पूरा अंतर्निहित है: v3 पैक को इंजन द्वारा अग्रयोजित ठीक उसी पाठ के विरुद्ध डिबग किया जा सके, और हर v3 → v4 अंतर ([भाग X](10-apiv4.md) §58–§59) दोनों पाठों को साथ रखकर सीधे पढ़ा जा सके।
+
+```wgsl
+
+// Engine-provided and read-only, prepended to all packs. apiVersion 3.
+
+// Half a turn and a full turn, in radians.
+const bloxdPi: f32 = 3.1415926535898;
+const bloxdTau: f32 = 6.2831853071796;
+
+// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
+// uniforms, which packs can't name. Any function can call them, not only a hook.
+
+// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
+// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
+fn bloxdSeconds() -> f32 {
+    return bloxdPackInputs.seconds;
+}
+
+// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
+// stay close to the player, and so precise.
+fn bloxdRenderOffset() -> vec3i {
+    return bloxdPackInputs.renderOffset;
+}
+
+// The camera's render position.
+fn bloxdEyePosition() -> vec3f {
+    return bloxdPackInputs.eyePosition;
+}
+
+// Unit, towards the sun, in world orientation; zero when the sky has no sun.
+fn bloxdSunDirection() -> vec3f {
+    return bloxdPackInputs.sunDirection;
+}
+
+// A render position's world position. In f32, so it loses fine detail far from the world's origin.
+fn bloxdWorldPosition(position: vec3f) -> vec3f {
+    return position + vec3f(bloxdRenderOffset());
+}
+
+// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
+fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
+    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
+}
+
+// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
+// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
+// (blockFlags & bloxdBlockFlagRock) != 0.
+const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
+const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
+const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
+const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
+const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
+const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
+
+struct BloxdVertexIn {
+    position: vec3f,     // A render position: world minus bloxdRenderOffset().
+    normal: vec3f,
+    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
+}
+
+struct BloxdVertex {
+    position: vec3f,     // A render position.
+}
+
+struct BloxdSurfaceIn {
+    colour: vec3f,       // Texture * vertex colour (tint * AO).
+    alpha: f32,
+    normal: vec3f,
+    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdSurface {
+    colour: vec3f,
+#ifdef BLOXD_ALPHA
+    alpha: f32,
+#endif
+    emission: vec3f,     // Added after lighting, then fogged.
+}
+
+struct BloxdLightIn {
+    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
+    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
+    ambient: vec3f,      // Ambient light, added to directional.
+    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
+    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
+    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
+    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
+    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
+                         // or without BLOXD_LIGHTING.
+    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
+                         // turns it off; black only in a scene with no fog at all.
+    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
+    position: vec3f,     // As in BloxdSurfaceIn.
+    normal: vec3f,
+    blockFlags: u32,     // As in BloxdVertexIn.
+}
+
+struct BloxdLight {
+    colour: vec3f,
+}
+
+// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
+struct BloxdOpaqueBehind {
+    found: bool,         // False where nothing opaque is behind (sky).
+    position: vec3f,     // A render position; meaningless when !found.
+    distance: f32,       // From the eye; meaningless when !found.
+}
+
+fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return BloxdVertex(vertex.position);
+}
+
+fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+#ifdef BLOXD_ALPHA
+    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
+#else
+    return BloxdSurface(surface.colour, vec3f(0.0));
+#endif
+}
+
+// Fogs colour as the engine fogs this fragment.
+fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
+    return mix(light.fogColour, colour, light.fogVisibility);
+}
+
+fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
+}
+```
 
 ---
 
@@ -2318,7 +2451,7 @@ terrain प्रोग्राम का पूरा संसाधन ल�
 ## क्या बदलता है
 
 - `pack.json` में `"apiVersion": 4` चाहिए (सख़्त `===`, संख्या) — v3 पैक लोड पर अस्वीकृत।
-- **नया टेक्सचर API (मुख्य आकर्षण):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` ब्लॉक-टेक्सचर एटलस को ठीक वैसे ही सैंपल करता है जैसे इंजन स्वयं करता है (id 0 = सफ़ेद; एनिमेटेड टेक्सचर स्वतः वर्तमान फ़्रेम देते हैं), `bloxdTextureSize(mipLevel) -> vec2u`, और नामित स्थिरांक `bloxdTextureId*` (फ़ाइल-नाम से CamelCase, जैसे `grass_top` → `bloxdTextureIdGrassTop`; आधिकारिक सूची `BLOCK_TEXTURES.md` है)।
+- **नया टेक्सचर API (मुख्य आकर्षण):** `bloxdTexel(textureId, uv, mipLevel) -> vec4f` ब्लॉक-टेक्सचर एटलस को ठीक वैसे ही सैंपल करता है जैसे इंजन स्वयं करता है (id 0 = सफ़ेद; एनिमेटेड टेक्सचर स्वतः वर्तमान फ़्रेम देते हैं), `bloxdTextureSize(mipLevel) -> vec2u`, और नामित स्थिरांक `bloxdTextureId*` (फ़ाइल-नाम से CamelCase, जैसे `grass_top` → `bloxdTextureIdGrassTop`; सभी 905 प्रयोज्य नामों का पूर्ण कैटलॉग भाग XI (`11-reference.md`) के §68 में अंतर्निहित है)।
 - `BloxdSurfaceIn` *और* `BloxdLightIn` में **चार नए इनपुट फ़ील्ड**: `textureId`, `textureRotation` (दक्षिणावर्त चौथाई घुमाव, जिसे `bloxdTexel` लागू करता है), `uv` (ब्लॉक में; `fract(uv)` अंकित होता है), `mipLevel`।
 - **अर्थ-बदलाव के साथ पुनर्नामकरण:** `fogVisibility` → `fogAlpha` **उलटे** अर्थ के साथ (`0 = कोई फ़ॉग नहीं, 1 = केवल fogColour`; पोर्ट: `l.fogVisibility` → `1.0 - l.fogAlpha`); `bloxdFaceBlock()` → `bloxdFragmentBlockPosition()` (काय समान); `BloxdOpaqueBehind.found` → `hit`।
 - **strict गेम अब बंडल के वैलिडेटर से लागू होते हैं:** असुरक्षित वर्टेक्स हुक या पहुँच-योग्य `discard` पर `... moves terrain, which strict games prevent.` / `... makes terrain see-through, ...` संदेश आता है और strict गेमों में **सभी** हुक निष्क्रिय हो जाते हैं। `#ifndef BLOXD_STRICT` रैपर से surface/light चलते रहते हैं।
@@ -3495,50 +3628,52 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 इन नामों को सैंपल करने पर वर्तमान एनिमेशन फ़्रेम स्वतः मिलता है (§63.3) — फ़्रेम-प्रत्यय त्रुटि हैं।
 
-| नाम | फ़्रेम | रजिस्ट्री आधार |
-|---|---|---|
-| `lava` | 8 | `lava0` |
-| `toxic_waste` | 8 | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | `auto_bench_side_running0` |
-| `black_portal` | 4 | `black_portal0` |
-| `blue_portal` | 4 | `blue_portal0` |
-| `brown_portal` | 4 | `brown_portal0` |
-| `burner_drill_side_running` | 4 | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | `generator_side_running0` |
-| `gray_portal` | 4 | `gray_portal0` |
-| `green_portal` | 4 | `green_portal0` |
-| `grey_portal` | 4 | `grey_portal0` |
-| `homestead_core_mid` | 4 | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | `lightblue_portal0` |
-| `lightgray_portal` | 4 | `lightgray_portal0` |
-| `lime_portal` | 4 | `lime_portal0` |
-| `magenta_portal` | 4 | `magenta_portal0` |
-| `orange_portal` | 4 | `orange_portal0` |
-| `pink_portal` | 4 | `pink_portal0` |
-| `press_side_running` | 4 | `press_side_running0` |
-| `purple_portal` | 4 | `purple_portal0` |
-| `radar_screen` | 4 | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | `recycler_side_running0` |
-| `red_portal` | 4 | `red_portal0` |
-| `shatter_mill_side_running` | 4 | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | `smelter_side_running0` |
-| `smoke` | 4 | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | `volt_engine_side_running0` |
-| `white_portal` | 4 | `white_portal0` |
-| `wire_mill_side_running` | 4 | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | `yellow_portal0` |
+अंतराल प्रति परिवार निश्चित है और `cnty9` पर मापा गया — केवल तीन मान: **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, सभी मशीन `*_running` परिवार), **300 ms** (सत्रह पोर्टल और `toxic_waste_barrel_top`); «अंतराल» कॉलम देखें। वैसे एटलस में 42 नहीं बल्कि 45 एनिमेटेड रूट हैं: `radar_screen` की चार पूर्व-घूमी प्रतियाँ प्रत्येक अपनी 4-फ़्रेम सीढ़ी चलाती हैं।
+
+| नाम | फ़्रेम | अंतराल | रजिस्ट्री आधार |
+|---|---|---|---|
+| `lava` | 8 | 200 ms | `lava0` |
+| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
+| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
+| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
+| `black_portal` | 4 | 300 ms | `black_portal0` |
+| `blue_portal` | 4 | 300 ms | `blue_portal0` |
+| `brown_portal` | 4 | 300 ms | `brown_portal0` |
+| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
+| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
+| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
+| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
+| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
+| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
+| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
+| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
+| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
+| `gray_portal` | 4 | 300 ms | `gray_portal0` |
+| `green_portal` | 4 | 300 ms | `green_portal0` |
+| `grey_portal` | 4 | 300 ms | `grey_portal0` |
+| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
+| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
+| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
+| `lime_portal` | 4 | 300 ms | `lime_portal0` |
+| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
+| `orange_portal` | 4 | 300 ms | `orange_portal0` |
+| `pink_portal` | 4 | 300 ms | `pink_portal0` |
+| `press_side_running` | 4 | 250 ms | `press_side_running0` |
+| `purple_portal` | 4 | 300 ms | `purple_portal0` |
+| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
+| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
+| `red_portal` | 4 | 300 ms | `red_portal0` |
+| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
+| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
+| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
+| `smoke` | 4 | 250 ms | `smoke0` |
+| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
+| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
+| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
+| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
+| `white_portal` | 4 | 300 ms | `white_portal0` |
+| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
+| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
 
 ### 68.5 रजिस्ट्री-ड्रिफ्ट, मापा गया (sjr0p7 → cnty9)
 
@@ -3550,5 +3685,59 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - The usable-name count moved 900 → 905, and the registry hash in `HEADER_VERSION` (§65.1) re-invalidated every saved pack that had baked ids
 
 Write `bloxdTextureIdLava`, not `19` — a name-constant survives every one of those bullets unchanged.
+
+### 68.6 ड्रिफ्ट सूचियाँ, संपूर्ण (98 जोड़े गए, 79 हटाए गए)
+
+§68.5 के आँकड़े, नाम-दर-नाम लिखे गए — क्योंकि अक्टूबर का टेक्सचर पैक अपडेट करने वाले को ठीक यह जानना ज़रूरी है कि कौन से फ़ाइल-नाम अब मेल नहीं खाते। तुलना *वर्तनी* स्तर की है (टेक्सचर पैक जो फ़ाइल-नाम उपयोग करते हैं); §64 की फोल्डिंग नियम उन वर्तनियों को §68.2 के प्रयोज्य स्थिरांकों में बदलते हैं।
+
+**घुमाव-वाले परिवारों में स्थानांतरण — 17 मशीन टॉप (68 वर्तनियाँ बाहर, 68 स्लॉट अंदर)।** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top` `_rot1..4` वर्तनी से `[rot[1..4` पूर्व-घूमे स्लॉट में चले गए; फोल्ड की गई रूट ही प्रयोज्य नाम है, इसलिए टेक्सचर पैक अब चार `X_top_rotN.png` फ़ाइलों की जगह एक `X_top.png` भेजता है।
+
+**संदूक टॉप फोल्ड — 3 परिवार (6 वर्तनियाँ बाहर, 12 स्लॉट अंदर)।** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top`: दो-वेरिएंट वर्तनियाँ रूट के अंतर्गत पूर्व-घूमे स्लॉट बन गईं — PNG फ़ाइलों का नाम उसी तरह बदलें।
+
+**नई टेक्सचर — 17 नाम।** डबल संदूक (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), डार्कस्टोन परिवार (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore` और `forge_hopper_top`।
+
+**एक सादा फोल्ड।** `ghost_chest_top_1`/`ghost_chest_top_2` एक अकेले `ghost_chest_top` में सिमट गए।
+
+**पूरी तरह हटाए गए — 3 नाम।** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top` का नए रजिस्ट्री में कोई उत्तराधिकारी वर्तनी नहीं है — यह कंटेंट इस बिल्ड के साथ खेल से चला गया। `forge_hopper_top` वास्तव में नई टेक्सचर है, सत्यापित पुनर्नामकरण नहीं।
+
+सत्यापन के लिए कच्चा वर्तनी-डिफ:
+
+```text
++ 98 added (cnty9):
+alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
+auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
+belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
+burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
+chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
+chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
+crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
+crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
+darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
+electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
+iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
+moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
+pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
+shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
+sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
+tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
+wire_mill_top[rot[3, wire_mill_top[rot[4
+
+- 79 removed (sjr0p7):
+alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
+auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
+belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
+burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
+crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
+crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
+deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
+ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
+press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
+recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
+shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
+smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
+tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
+wire_mill_top_rot4
+```
+
 
 [← Previous part](10-apiv4.md)·[Back to the manual](README.md)
