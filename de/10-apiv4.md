@@ -6,6 +6,8 @@
 
 Ziel-Build: `cnty9.main.669f8081.js` — **seit 2026-10-26 gleichzeitig in Produktion und Preprod live** (beide byte-identisch). Das Pack-Modell behält seine Form: gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches 64-B-Uniform, dieselben 6 Hooks.
 
+Erneut am `tcwczu.main.357faec1.js` verifiziert (2026-10-30, Produktion und Preprod wieder byte-identisch): **die gesamte v4-API ist unverändert** — Header, Standard-Pack-Vorlage, die 27 `bloxdSp*`-Symbole, Loader-Limits und die 12 Allow-Titel sind byte-identisch mit der hier dokumentierten `cnty9`-Basis. Das Bundle-Layout wurde erneut umgebaut (Cluster jetzt u. a. c51–c56), für Packs ändert sich nichts; die Texturnamen-Registry wurde nicht neu vermessen (Namen bleiben die stabile API).
+
 ## Was sich ändert
 
 - `pack.json` verlangt `"apiVersion": 4` (strikt `===`, Zahl) — v3-Pakete werden beim Laden abgelehnt.

@@ -6,6 +6,8 @@
 
 Build visé : `cnty9.main.669f8081.js` — **en production et en préprod simultanément depuis le 2026-10-26** (les deux identiques octet pour octet). Le modèle de pack garde sa forme : mêmes champs `pack.json`, mêmes limites du chargeur, même uniform de 64 o, mêmes 6 hooks.
 
+Revérifié sur `tcwczu.main.357faec1.js` (2026-10-30, production et preprod à nouveau identiques octet par octet) : **toute l'API v4 est inchangée** — en-tête, gabarit du pack par défaut, les 27 symboles `bloxdSp*`, limites du chargeur et les 12 titres autorisés sont identiques octet par octet à la base `cnty9` documentée ici. La disposition du bundle a encore changé (p. ex. le cluster est désormais en c51–c56), mais rien de tout cela n'est visible pour un pack ; le registre des noms de textures n'a pas été remesuré (les noms restent l'API stable).
+
 ## Ce qui change
 
 - `pack.json` exige `"apiVersion": 4` (égalité `===` stricte, nombre) — les packs v3 sont refusés au chargement.
