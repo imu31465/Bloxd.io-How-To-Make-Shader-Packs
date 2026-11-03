@@ -1,26 +1,28 @@
-# Version History
+# Historial de versiones
 
-Changes, migration steps and removed APIs for v1 through v5. For migrating legacy packs and for the preserved per-era specifications.
+> Estado: Historical — registros versión por versión; cada guía indica su propio build objetivo
 
-## Timeline
+Cambios, pasos de migración y API eliminadas de v1 a v5. Para migrar paquetes antiguos y para las especificaciones conservadas de cada época.
 
-| Version | Live since | Guide | Highlights |
+## Cronología
+
+| Versión | En producción desde | Guía | Lo esencial |
 |---|---|---|---|
-| v1 | (initial) | [v1](v1.md) | first shader-pack API. 6 hooks (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` vocabulary |
-| v2 | — | [v2](v2.md) | full identifier rename, `blockId`, `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` bit flags, `bloxdPi` / `bloxdTau`, official liquid hooks, hook-invocation internals |
-| v4 | 2026-10-26 | [v4](v4.md) | texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), the strict contract, engine header & registry analysis |
-| **v5** | **2026-11-03** | [v5](v5.md) | **current** — `BloxdFlags` struct (14 bools), Model hooks (9 total), the `bloxdLit()` / `bloxdLitColour()` lighting API, `localPosition`, enchant/overlay inputs & outputs, 6 variants |
+| v1 | (inicial) | [v1](v1.md) | primera API de shader packs. 6 hooks (terrain/liquid × vertex/surface); vocabulario `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
+| v2 | — | [v2](v2.md) | renombrado total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` |
+| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` (bits), `bloxdPi` / `bloxdTau`, hooks de líquido oficiales, interioridades de la invocación de hooks |
+| v4 | 2026-10-26 | [v4](v4.md) | API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), el contrato strict, análisis de cabecera y registro del motor |
+| **v5** | **2026-11-03** | [v5](v5.md) | **actual** — estructura `BloxdFlags` (14 bools), hooks de Model (9 en total), la API de iluminación `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entradas y salidas de encantamiento/superposición, 6 variantes |
 
-## The shared preface
+## El prefacio común
 
-The current game accepts only `apiVersion: 5` and **old-version packs fail at the instant of load** (saved packs are silently deactivated — [Compatibility](../api/compatibility.md)). Each guide covers "previous → next". Crossing several versions? Apply them oldest-first.
+El juego actual solo acepta `apiVersion: 5` y **los paquetes de versiones antiguas fallan en el instante mismo de la carga** (los guardados quedan inactivos en silencio — [Compatibilidad](../api/compatibility.md)). Cada guía cubre «anterior → siguiente». ¿Cruzas varias versiones? Aplícalas de la más antigua a la más nueva.
 
-## Fast path to a checklist
+## Camino rápido a una lista de comprobación
 
-- v4 pack → [v5 guide](v5.md) §77 (mostly mechanical)
-- v3 pack → [v4](v4.md) §61 → [v5](v5.md) §77
-- v2 pack → [v3](v3.md) §47 → v4 → v5
-- v1 pack → start at [v2](v2.md) §37
+- paquete v4 → [guía de v5](v5.md) §77 (casi todo mecánico)
+- paquete v3 → [v4](v4.md) §61 → [v5](v5.md) §77
+- paquete v2 → [v3](v3.md) §47 → v4 → v5
+- paquete v1 → empieza por [v2](v2.md) §37
 
-> For the current spec itself see [API Reference](../api/); for current-build internals see [Engine Internals](../internals/).
+> Para la especificación vigente en sí ver [Referencia de la API](../api/); para las interioridades del build vigente ver [Interior del motor](../internals/).

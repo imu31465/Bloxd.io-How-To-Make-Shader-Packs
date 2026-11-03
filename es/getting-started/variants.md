@@ -1,36 +1,36 @@
-# Variants and guards
+# Variantes y guardas
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed
 
-## 6 variants
+## 6 variantes
 
-You write one body of code, but it must compile in all **6 variants**: `{strict, allow} × {terrain, liquid, model}`. The loader validates all six at load time.
+Escribes un único cuerpo de código, pero debe compilar en las **6 variantes**: `{strict, allow} × {terrain, liquid, model}`. El cargador valida las seis en el momento de la carga.
 
-The v4-and-earlier "lighting on/off" axis is gone (v4 had 8 variants). Lighting state is now a runtime question for [`bloxdLit()`](../api/lighting.md), not a compile-time branch.
+El eje «iluminación sí/no» de v4 y anteriores ha desaparecido (v4 tenía 8 variantes). El estado de iluminación es ahora una pregunta en tiempo de ejecución para [`bloxdLit()`](../api/lighting.md), no una ramificación de compilación.
 
-| Variant | Example | Macros defined |
+| Variante | Ejemplo | Macros definidas |
 |---|---|---|
-| `allow.terrain` | terrain in an allow game | `BLOXD_ALPHA` |
-| `allow.liquid` | water in an allow game | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
-| `allow.model` | models in an allow game | `BLOXD_ALPHA` |
-| `strict.terrain` | terrain in a strict game | — |
-| `strict.liquid` | water in a strict game | `BLOXD_SCENE_DEPTH` |
-| `strict.model` | models in a strict game | — |
+| `allow.terrain` | terreno en un juego allow | `BLOXD_ALPHA` |
+| `allow.liquid` | agua en un juego allow | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
+| `allow.model` | modelos en un juego allow | `BLOXD_ALPHA` |
+| `strict.terrain` | terreno en un juego strict | — |
+| `strict.liquid` | agua en un juego strict | `BLOXD_SCENE_DEPTH` |
+| `strict.model` | modelos en un juego strict | — |
 
-## Conditionals
+## Condicionales
 
-Only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif` are available. The `#` goes at the start of a line (inside functions is fine).
+Solo están disponibles `#define NAME` (sin valor) / `#ifdef` / `#ifndef` / `#else` / `#endif`. La `#` va al inicio de línea (dentro de funciones está bien).
 
-| Guard | Meaning | Typical use |
+| Guarda | Significado | Uso típico |
 |---|---|---|
-| `#ifndef BLOXD_STRICT` | non-strict (allow) variants only | wrap whole vertex hooks, wrap `discard` |
-| `#ifdef BLOXD_ALPHA` | variants where `alpha` exists (all liquid + non-strict terrain/model) | wrap alpha-touching code |
-| `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `#ifndef BLOXD_STRICT` | solo variantes no strict (allow) | envolver hooks de vértice enteros, envolver `discard` |
+| `#ifdef BLOXD_ALPHA` | variantes donde existe `alpha` (todo líquido + terreno/modelo no strict) | envolver el código que toca alpha |
+| `#ifdef BLOXD_SCENE_DEPTH` | todas las variantes de líquido | envolver las llamadas a `bloxdOpaqueBehind()` |
 
-`BLOXD_LIGHTING` was **removed in v5**. Using it fails validation with: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+`BLOXD_LIGHTING` fue **eliminada en v5**. Usarla falla la validación con: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## The strict-games contract
+## El contrato de los juegos strict
 
-Most games are strict (no vertex animation, no `discard`). An unguarded vertex hook reports `<hook> moves terrain, which strict games prevent.` and a reachable `discard` reports `discard makes terrain see-through, which strict games prevent.` — both disable **all hooks** in that strict game. Always wrap vertex hooks in `#ifndef BLOXD_STRICT`.
+La mayoría de los juegos son strict (sin animación de vértices, sin `discard`). Un hook de vértice sin guarda informa `<hook> moves terrain, which strict games prevent.` y un `discard` alcanzable informa `discard makes terrain see-through, which strict games prevent.` — ambos desactivan **todos los hooks** en ese juego strict. Envuelve siempre los hooks de vértice en `#ifndef BLOXD_STRICT`.
 
-For per-game policy internals, see [Engine Internals: policy](../internals/policy.md).
+Para las interioridades de la política por juego, ver [Interior del motor: política](../internals/policy.md).

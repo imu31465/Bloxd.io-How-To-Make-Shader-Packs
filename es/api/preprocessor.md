@@ -1,20 +1,20 @@
-# Preprocessor
+# Preprocesador
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado del validador en vivo)
 
-Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif`. The `#` goes at the start of a line (inside functions is fine). Flag-name matching is case-insensitive; a wrong `#ifdef` name makes the error message list the official set.
+La compilación condicional solo soporta `#define NAME` (sin valor) / `#ifdef` / `#ifndef` / `#else` / `#endif`. La `#` va al inicio de línea (dentro de funciones está bien). La coincidencia de nombres de flag no distingue mayúsculas; un nombre erróneo en `#ifdef` hace que el mensaje de error liste el conjunto oficial.
 
-## Defined macros (3)
+## Macros definidas (3)
 
-| Macro | Defined in | Typical use |
+| Macro | Definida en | Uso típico |
 |---|---|---|
-| `BLOXD_STRICT` | strict-game variants (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` around whole vertex hooks and `discard` |
-| `BLOXD_ALPHA` | variants where `BloxdSurface.alpha` exists — all liquid + non-strict terrain/model | wrap alpha-touching code |
-| `BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `BLOXD_STRICT` | variantes de juego strict (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` alrededor de hooks de vértice enteros y de `discard` |
+| `BLOXD_ALPHA` | variantes donde existe `BloxdSurface.alpha` — todo líquido + terreno/modelo no strict | envolver el código que toca alpha |
+| `BLOXD_SCENE_DEPTH` | todas las variantes de líquido | envolver las llamadas a `bloxdOpaqueBehind()` |
 
-## Macro × variant matrix
+## Matriz de macros × variantes
 
-| Variant | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
+| Variante | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
 |---|---|---|---|
 | `allow.terrain` | – | ✓ | – |
 | `allow.liquid` | – | ✓ | ✓ |
@@ -23,15 +23,15 @@ Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#i
 | `strict.liquid` | ✓ | ✓ | ✓ |
 | `strict.model` | ✓ | – | – |
 
-Terrain / liquid / model differences are **separate programs, not macros** — `#ifdef BLOXD_TERRAIN` does not exist.
+Las diferencias terreno / líquido / modelo son **programas separados, no macros** — `#ifdef BLOXD_TERRAIN` no existe.
 
-## Removed macros
+## Macros eliminadas
 
-- **`BLOXD_LIGHTING`** — removed in v5. Lighting state is a runtime question for [`bloxdLit()`](lighting.md#bloxdlit--the-gate), not a compile branch. Using it fails validation with:
+- **`BLOXD_LIGHTING`** — eliminada en v5. El estado de iluminación es una pregunta en tiempo de ejecución para [`bloxdLit()`](lighting.md#bloxdlit--la-compuerta), no una ramificación de compilación. Usarla falla la validación con:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-v4 migration pattern:
+Patrón de migración de v4:
 
 ```wgsl
 // v4 (fails validation on v5)
@@ -46,7 +46,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Example
+## Ejemplo
 
 ```wgsl
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -67,13 +67,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Macros shape the structs
+## Las macros moldean las estructuras
 
-- `BloxdSurface.alpha` exists only inside `#ifdef BLOXD_ALPHA`
-- `bloxdOpaqueBehind()` is callable only inside `#ifdef BLOXD_SCENE_DEPTH`
+- `BloxdSurface.alpha` existe solo dentro de `#ifdef BLOXD_ALPHA`
+- `bloxdOpaqueBehind()` es llamable solo dentro de `#ifdef BLOXD_SCENE_DEPTH`
 
-See [Structures](structures.md#conditional-fields--macros).
+Ver [Estructuras](structures.md#campos-condicionales--macros).
 
-## Related
+## Relacionado
 
-- [Getting Started: Variants](../getting-started/variants.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [Primeros pasos: variantes](../getting-started/variants.md) · [Interior del motor: validación de sombreadores](../internals/shader-validation.md)

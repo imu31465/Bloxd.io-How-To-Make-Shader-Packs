@@ -1,6 +1,6 @@
-# Recetas de iluminación (light)
+# Iluminación
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ## Curva S de contraste
 
@@ -57,7 +57,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## Azul nocturno ambiental (pseudo look sin dirección lunar)
 
-> En esta API, `bloxdSunDirection()` es cero cuando el cielo no tiene sol. Lo siguiente no es luz lunar direccional, solo un tenue ambiente azul cuando el cielo está oscuro. La dirección lunar en sí está disponible vía `-bloxdSunDirection()` (solo mundos con ciclo día/noche. [Parte VII](../internals/) R-A).
+> En esta API, `bloxdSunDirection()` es cero cuando el cielo no tiene sol. Lo siguiente no es luz lunar direccional, solo un tenue ambiente azul cuando el cielo está oscuro. La dirección lunar en sí está disponible vía `-bloxdSunDirection()` (solo mundos con ciclo día/noche — [El sol y la luna](../internals/sun-and-moon.md)).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

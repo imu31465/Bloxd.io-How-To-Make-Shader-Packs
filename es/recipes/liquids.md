@@ -1,6 +1,6 @@
-# Recetas de líquidos
+# Líquidos
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ## Superficie rizada (parpadeo de color)
 
@@ -18,9 +18,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Transparencia pseudo por altura (no es una prueba real de bajío)
+## Transparencia pseudo por profundidad según altura (no es una prueba real de bajío)
 
-> En v1, la profundidad de escena y la posición del fondo no se podían consultar: la profundidad real no se calculaba solo con aquella API. En v2, `bloxdOpaqueBehind()` limitado a líquidos mide el grosor hasta la cara opaca trasera ([Parte VIII](../history/v2.md) R-E). Lo que sigue es el viejo pseudo efecto sin ello: `s.position.y` es coordenada local y usarla cruda desplaza el efecto con el origen del chunk. Para altura de mundo convierte con `bloxdWorldPosition()`. El trecho solo varía alpha por altura de mundo — pseudo efecto, no bajío por costa/fondo. Ajusta `packWaterReferenceY` a tu altura de mundo.
+> La verdadera profundidad del agua necesita el `bloxdOpaqueBehind()` exclusivo de líquidos, que mide el grosor hasta la cara opaca trasera (la receta completa: [Hacer que el agua parezca natural](../guides/water.md)). Lo que sigue es un estilizado pseudo más simple sin él: `s.position.y` es una coordenada local y usarla cruda desplaza el efecto al cambiar el origen del chunk. Convierte con `bloxdWorldPosition()` para la altura de mundo. Lo siguiente solo varía el alpha según la altura de mundo — un pseudo efecto, no un bajío consciente de costa/fondo. Ajusta `packWaterReferenceY` a tu altura de mundo.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;

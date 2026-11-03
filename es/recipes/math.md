@@ -1,6 +1,6 @@
 # Trucos matemáticos
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ```wgsl
 // cuantización suave de 0..1 (n pasos)

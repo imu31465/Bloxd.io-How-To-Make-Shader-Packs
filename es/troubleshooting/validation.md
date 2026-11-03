@@ -1,58 +1,58 @@
-# Validation errors
+# Errores de validación
 
-> Target API: 5 · Status: Verified (messages recorded verbatim from the live validator)
+> API objetivo: 5 · Estado: Verified (mensajes registrados literalmente del validador en vivo)
 
-Static-validation (analyzer, stage 1) errors — mostly reserved names, the strict contract, and cross-hook call restrictions.
+Errores de la validación estática (analizador, etapa 1) — en su mayoría nombres reservados, el contrato strict y las restricciones de llamada entre hooks.
 
 ## "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
 
-- **Cause**: calling constructors like `BloxdSurface(...)`
-- **Fix**: start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` and mutate fields (`var out = s;` works in light hooks)
+- **Causa**: llamar a constructores como `BloxdSurface(...)`
+- **Corrección**: parte de `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` y muta campos (`var out = s;` funciona en hooks de light)
 
 ## "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
 
-- **Cause**: an identifier starting with `bloxd` (case-insensitive)
-- **Fix**: rename (e.g. `packTint`). Only the 9 hook names are allowed
-- **Prevention**: prefix your own names with `pack` / `my` etc.
+- **Causa**: un identificador que empieza por `bloxd` (sin distinguir mayúsculas)
+- **Corrección**: renómbralo (p. ej. `packTint`). Solo los 9 nombres de hooks están permitidos
+- **Prevención**: antepón a tus nombres `pack` / `my` etc.
 
 ## "bloxdPackInputs isn't part of the bloxd_ header"
 
-- **Cause**: referencing the uniform directly
-- **Fix**: use it via the header functions ([Pack format](../api/pack-format.md#per-frame-uniform-bloxdpackinputs))
+- **Causa**: referenciar el uniform directamente
+- **Corrección**: úsalo a través de las funciones de cabecera ([Formato del paquete](../api/pack-format.md#uniform-por-fotograma-bloxdpackinputs))
 
 ## "... reaches bloxdTexel, which only surface and light hooks can use."
 
-- **Cause**: called from a vertex hook (or a function reachable from one) — "reaches" means **the call path**
-- **Fix**: move the call to a surface / light hook
+- **Causa**: llamada desde un hook de vértice (o desde una función alcanzable desde uno) — «reaches» significa **la ruta de llamada**
+- **Corrección**: mueve la llamada a un hook surface / light
 
 ## "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
 
-- **Cause**: `bloxdOpaqueBehind()` needs `BLOXD_SCENE_DEPTH`, defined only in all-liquid variants; sharing the call from terrain/model-hook code creates uncompilable variants
-- **Fix**: wrap the call in `#ifdef BLOXD_SCENE_DEPTH`
-- **Prevention**: isolate depth reads as liquid-only processing
+- **Causa**: `bloxdOpaqueBehind()` necesita `BLOXD_SCENE_DEPTH`, definida solo en todas las variantes de líquido; compartir la llamada desde código de hooks de terreno/modelo crea variantes no compilables
+- **Corrección**: envuelve la llamada en `#ifdef BLOXD_SCENE_DEPTH`
+- **Prevención**: aísla las lecturas de profundidad como procesamiento solo-líquido
 
-## The strict contract
+## El contrato strict
 
-| Message | Meaning |
+| Mensaje | Significado |
 |---|---|
-| `<hook> moves terrain, which strict games prevent.` | unguarded vertex hook |
-| `discard makes terrain see-through, which strict games prevent.` | reachable `discard` |
+| `<hook> moves terrain, which strict games prevent.` | hook de vértice sin guarda |
+| `discard makes terrain see-through, which strict games prevent.` | `discard` alcanzable |
 
-- **Important**: these are not compile errors — strict games **auto-disable the whole pack** (`shaderPack:offInStrict`)
-- **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT` ([Variants](../getting-started/variants.md))
+- **Importante**: no son errores de compilación — los juegos strict **desactivan automáticamente el paquete entero** (`shaderPack:offInStrict`)
+- **Corrección**: envuelve los hooks de vértice y el `discard` en `#ifndef BLOXD_STRICT` ([Variantes](../getting-started/variants.md))
 
-## v5 additions/changes
+## Mensajes de la versión actual
 
-| Message | Action |
+| Mensaje | Acción |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | migrate `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([Lighting](../api/lighting.md#bloxdlit--the-gate)) |
-| `bloxdBlockFlagRock isn't part of the shader pack API...` | leftover bit constant → `flags.rock` ([Flags](../api/flags.md)) |
-| `bloxdSpLitColour isn't part of the shader pack API...` | v4 internal symbol → use the public `bloxdLitColour()` |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | migra `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([Iluminación](../api/lighting.md#bloxdlit--la-compuerta)) |
+| `bloxdBlockFlagRock isn't part of the shader pack API...` | constante de bits restante → `flags.rock` ([Flags](../api/flags.md)) |
+| `bloxdSpLitColour isn't part of the shader pack API...` | símbolo interno de v4 → usa la pública `bloxdLitColour()` |
 
-v5's analyzer gives **dedicated messages** to packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING`, so nothing misbehaves silently ([v5 migration](../history/v5.md)).
+El analizador da **mensajes dedicados** a los paquetes que sigan leyendo `blockFlags` o envolviendo hooks de luz en `#ifdef BLOXD_LIGHTING`, así que nada se comporta mal en silencio (los pasos de migración: [migración a v5](../history/v5.md)).
 
-Texture-name resolution errors (spelling suggestions, frame/rotation spellings) live in [Texture issues](textures.md).
+Los errores de resolución de nombres de textura (sugerencias de grafía, grafías de fotograma/rotación) viven en [Problemas de texturas](textures.md).
 
-## Related
+## Relacionado
 
-- [Restrictions & reserved names](../api/restrictions.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md) · [Variant-specific issues](variants.md)
+- [Restricciones y nombres reservados](../api/restrictions.md) · [Interior del motor: validación de sombreadores](../internals/shader-validation.md) · [Problemas específicos de variantes](variants.md)

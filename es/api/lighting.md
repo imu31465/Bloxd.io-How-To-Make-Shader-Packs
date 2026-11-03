@@ -1,62 +1,62 @@
-# Lighting
+# Iluminación
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
-v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
+v5 publicó la API de iluminación. Lo que el motor hacía internamente (construir `litColour`) ahora es llamable desde los paquetes. Esta página cubre las entradas, las funciones y el orden de procesamiento de la iluminación como un sistema.
 
-## The full pipeline
+## El pipeline completo
 
-The complete color chain, as the default light-stage implementation (`bloxdDefaultLight`) shows it:
+La cadena de color completa, tal como la muestra la implementación por defecto de la etapa light (`bloxdDefaultLight`):
 
 ```
 surface.colour
-    │  mix with overlayColour (mix(colour, overlay.rgb, overlay.a))
+    │  mezcla con overlayColour (mix(colour, overlay.rgb, overlay.a))
     ▼
 overlaid
-    │  multiply by bloxdShading(light) — material & angle response
+    │  multiplicación por bloxdShading(light) — respuesta de material y ángulo
     ▼
 shaded
-    │  mix with enchantColour (mix(shaded, enchant.rgb, enchant.a))
+    │  mezcla con enchantColour (mix(shaded, enchant.rgb, enchant.a))
     ▼
 enchanted
-    │  multiply by bloxdWorldLight(light) — world light (brightest of block/sky/held)
+    │  multiplicación por bloxdWorldLight(light) — luz del mundo (la más brillante de bloque/cielo/en mano)
     ▼
-lit = bloxdLitColour(surface, light)   ← the color "before emission and fog"
-    │  + surface.emission               ← emission added after lighting
+lit = bloxdLitColour(surface, light)   ← el color «antes de emisión y niebla»
+    │  + surface.emission               ← la emisión se añade tras la iluminación
     ▼
     │  bloxdApplyFog(colour, light)      ← mix(colour, fogColour, fogAlpha)
     ▼
-BloxdLight.colour (final color)
+BloxdLight.colour (color final)
 ```
 
-`bloxdLitColour()` order (header summary: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
+Orden de `bloxdLitColour()` (resumen de la cabecera: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
 
-1. apply `overlayColour`
-2. shade with `bloxdShading()`
-3. apply `enchantColour`
-4. apply world light with `bloxdWorldLight()`
+1. aplica `overlayColour`
+2. sombrea con `bloxdShading()`
+3. aplica `enchantColour`
+4. aplica la luz del mundo con `bloxdWorldLight()`
 
-Emission and fog order: **emission is added after lighting and before fog**, and fog sinks emission too (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
+Orden de emisión y niebla: **la emisión se añade después de la iluminación y antes de la niebla**, y la niebla también hunde la emisión (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
 
-## Functions
+## Funciones
 
-### bloxdLit() — the gate
+### bloxdLit() — la compuerta
 
 ```wgsl
 fn bloxdLit() -> bool
 ```
 
-Whether block & sky lighting is on. **Guarantees when off**:
+Si la iluminación de bloque y cielo está activada. **Garantías cuando está desactivada**:
 
-| Field | Value when off |
+| Campo | Valor cuando está desactivada |
 |---|---|
 | `blockLight` / `heldLight` | `0` |
 | `skyLight` | `1` |
-| `ambientLightColour` / `skyLightColour` | `1` (white) |
+| `ambientLightColour` / `skyLightColour` | `1` (blanco) |
 
-v4's `#ifdef BLOXD_LIGHTING` is gone. Replace with `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
+El `#ifdef BLOXD_LIGHTING` de v4 ha desaparecido. Sustitúyelo por `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
 
-### bloxdShading() — material & angle response
+### bloxdShading() — respuesta de material y ángulo
 
 ```wgsl
 fn bloxdShading(light: BloxdLightIn) -> vec3f {
@@ -65,10 +65,10 @@ fn bloxdShading(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- multiplies `directional` (summed Lambert) by `diffuse` (material RGB response), adds `emissive` (material glow) and `ambient` (RGB ambient), clamps to 0–1
-- **the new v5 inputs `diffuse` / `emissive`** let you swap just the Lambert term while keeping the engine's material response
+- multiplica `directional` (Lambert sumado) por `diffuse` (respuesta RGB del material), suma `emissive` (brillo del material) y `ambient` (ambiente RGB), y acota a 0–1
+- **las nuevas entradas de v5 `diffuse` / `emissive`** te permiten sustituir solo el término Lambert conservando la respuesta de material del motor
 
-### bloxdWorldLight() — the world's light
+### bloxdWorldLight() — la luz del mundo
 
 ```wgsl
 fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
@@ -80,10 +80,10 @@ fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- shapes each of the three channels (block / sky / held) with `ambientLightColour` as the floor, then takes the **brightest**
-- `skyLight` interpolates from `ambientLightColour` toward `skyLightColour` by the sky-light amount
+- moldea cada uno de los tres canales (bloque / cielo / en mano) con `ambientLightColour` como suelo, y luego toma el **más brillante**
+- `skyLight` interpola desde `ambientLightColour` hacia `skyLightColour` según la cantidad de luz de cielo
 
-### bloxdLitColour() — the engine recipe
+### bloxdLitColour() — la receta del motor
 
 ```wgsl
 fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
@@ -96,7 +96,7 @@ fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-### bloxdApplyFog() — fog
+### bloxdApplyFog() — niebla
 
 ```wgsl
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -104,10 +104,10 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- `fogAlpha`: **0 = no fog, 1 = only fogColour** (inverted from v4's `fogVisibility`)
-- `fogColour` is the game's fog RGB; **`vec3f(0.0)` when the game has no fog**
+- `fogAlpha`: **0 = sin niebla, 1 = solo fogColour** (invertido respecto al `fogVisibility` de v4)
+- `fogColour` es el RGB de niebla del juego; **`vec3f(0.0)` cuando el juego no tiene niebla**
 
-### bloxdDefaultLight() — the whole default
+### bloxdDefaultLight() — el conjunto por defecto
 
 ```wgsl
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -116,34 +116,34 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Input fields (BloxdLightIn)
+## Campos de entrada (BloxdLightIn)
 
-| Field | Type | Meaning | Note |
+| Campo | Tipo | Significado | Nota |
 |---|---|---|---|
-| `litColour` | `vec3f` | lit & enchanted RGB (before emission and fog) | a result value, not a source |
-| `directional` | `f32` | summed Lambert from directional lights | 0 when no directional lights |
-| `diffuse` | `vec3f` | material RGB response to directional light | new in v5 |
-| `emissive` | `vec3f` | material RGB glow (added to directional) | new in v5 |
-| `ambient` | `vec3f` | RGB ambient (added to directional) | |
-| `blockLight` | `vec3f` | RGB block light | 0 when `!bloxdLit()` |
-| `skyLight` | `f32` | sky light | 1 when `!bloxdLit()` |
-| `ambientLightColour` | `vec3f` | minimum RGB light (floor) | 1 when `!bloxdLit()` |
-| `skyLightColour` | `vec3f` | RGB color of skyLight | 1 when `!bloxdLit()` |
-| `heldLight` | `vec3f` | RGB held light | 0 when `!bloxdLit()` or nothing held |
-| `fogColour` | `vec3f` | game fog RGB | 0 with no fog |
-| `fogAlpha` | `f32` | 0 = no fog, 1 = only fogColour | inverted from v4 `fogVisibility` |
+| `litColour` | `vec3f` | RGB iluminado y encantado (antes de emisión y niebla) | valor resultado, no fuente |
+| `directional` | `f32` | Lambert sumado de las luces direccionales | 0 cuando no hay luces direccionales |
+| `diffuse` | `vec3f` | respuesta RGB del material a la luz direccional | permite a `bloxdShading()` reconstruir la respuesta del material |
+| `emissive` | `vec3f` | brillo RGB del material (sumado a la direccional) | |
+| `ambient` | `vec3f` | ambiente RGB (sumado a la direccional) | |
+| `blockLight` | `vec3f` | luz de bloque RGB | 0 cuando `!bloxdLit()` |
+| `skyLight` | `f32` | luz de cielo | 1 cuando `!bloxdLit()` |
+| `ambientLightColour` | `vec3f` | luz RGB mínima (suelo) | 1 cuando `!bloxdLit()` |
+| `skyLightColour` | `vec3f` | color RGB de skyLight | 1 cuando `!bloxdLit()` |
+| `heldLight` | `vec3f` | luz RGB de lo sostenido | 0 cuando `!bloxdLit()` o nada en mano |
+| `fogColour` | `vec3f` | RGB de la niebla del juego | 0 sin niebla |
+| `fogAlpha` | `f32` | 0 = sin niebla, 1 = solo fogColour | invertido respecto al `fogVisibility` de v4 |
 
-## Light-level physics (background, skippable)
+## Física de los niveles de luz (trasfondo, saltable)
 
-- **`blockLight` / `skyLight` / `heldLight` arrive mapped to 0–1**: the 0–15 levels through an ease-out curve (e.g. `6 → 0.45`, `12 → 0.92`). All exclude `ambientLightColour`
-- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](../guides/realism.md))
-- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](../internals/fog-internals.md))
+- **`blockLight` / `skyLight` / `heldLight` llegan ya mapeados a 0–1**: los niveles 0–15 a través de una curva ease-out (p. ej. `6 → 0.45`, `12 → 0.92`). Todos excluyen `ambientLightColour`
+- **Curva de realce**: `skyLight` es en realidad «¿puede esta posición ver el cielo?» — datos de oclusión por vóxeles, es decir, un mapa de sombras. La separación sol/sombra por umbral puede necesitar la transformación inversa (ver la [guía de realismo](../guides/realism.md))
+- **Interioridades de la niebla**: en modo lineal `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (acotado 0..1), calculado por vértice en espacio de vista. El build actual es solo lineal (detalles en [Interior del motor: interioridades de la niebla](../internals/fog-internals.md))
 
-## Recipes
+## Recetas
 
-### Custom shading + the engine's world light
+### Sombreado propio + la luz del mundo del motor
 
-What v4 authors approximated by scaling `litColour` can now be written exactly:
+Lo que los autores de v4 aproximaban escalando `litColour` ahora se puede escribir exacto:
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -155,7 +155,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Keep the engine's world light, boost emission only
+### Conserva la luz del mundo del motor, refuerza solo la emisión
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -164,7 +164,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Night blue shift (skyLight-driven)
+### Desplazamiento azul nocturno (dirigido por skyLight)
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -176,6 +176,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## Relacionado
 
-- [Functions](functions.md) · [Guides: lighting](../guides/lighting.md) · [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [Funciones](functions.md) · [Guías: iluminación](../guides/lighting.md) · [Interior del motor: interioridades de la iluminación](../internals/lighting-internals.md)

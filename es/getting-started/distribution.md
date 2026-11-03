@@ -1,23 +1,23 @@
-# Distribution
+# Distribución
 
-> Target API: 5 · Status: Verified
+> API objetivo: 5 · Estado: Verified
 
-## Release format
+## Formato de publicación
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. Zip con `pack.json` en la raíz, dentro de los límites de tamaño ([Estructura del paquete](pack-structure.md))
+2. Verifica que `pack.json` quede en la raíz del zip (una única carpeta raíz común se elimina automáticamente)
+3. Pule `name` / `author` para la publicación
 
-## Pre-release checklist
+## Lista de comprobación previa a la publicación
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (número, no string)
+- [ ] Las 6 variantes pasan la validación (lista de errores vacía en la pantalla del cargador)
+- [ ] Verificado visualmente tanto en un juego allow como en uno strict
+- [ ] Los paquetes con animación de vértices / `discard` claramente marcados como solo-allow
+- [ ] Juegos probados y fecha anotados en las notas de publicación (los builds cambian)
 
-## After release
+## Tras la publicación
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- Los paquetes guardados por los jugadores se revalidan automáticamente cuando la cabecera del motor o el registro de texturas cambian con una actualización del juego
+- **Los paquetes distribuidos como v1–v4 quedan inactivos en silencio** en v5 (ver [pack.json](manifest.md)) — los jugadores solo ven la línea de estado, así que publica y anuncia una versión actualizada
+- Cuando la API se actualice, sigue los pasos de migración del [Historial de versiones](../history/), sube la versión y vuelve a publicar

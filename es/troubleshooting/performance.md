@@ -1,34 +1,34 @@
-# Performance
+# Rendimiento
 
-> Target API: 5 · Status: Verified
+> API objetivo: 5 · Estado: Verified
 
-Speed problems and their fixes.
+Problemas de velocidad y sus soluciones.
 
-## The on-device check never finishes and drops the pack
+## La comprobación en el dispositivo nunca termina y descarta el paquete
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **Causa**: la comprobación tiene un **tiempo límite forzado de 60 segundos** (el exceso se trata como `skipped`) — común en dispositivos de gama baja y mundos pesados
+- **Corrección**: reduce el trabajo pesado de vértices y los bucles complejos, y reintenta
+- **Prevención**: sigue la [guía de rendimiento](../guides/performance.md)
 
-## Frame rate drops
+## Caída de la tasa de fotogramas
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **Comprobación**: compara los FPS con y sin el paquete; mide por separado escenas cargadas de terreno y agua
+- **Causas típicas**: efectos pesados en cada cara incondicionalmente (sin selección por flags/distancia); ruido por hash de alta frecuencia; exponentes `pow` grandes
+- **Correcciones** ([la guía](../guides/performance.md)):
+  - limita los efectos a las caras que los necesitan vía `flags`
+  - salida anticipada por distancia (`distance(surface.position, bloxdEyePosition())`)
+  - muestrea un mip más arriba para lecturas `bloxdTexel` más baratas
+- **Prevención**: añade detalle de forma incremental y compara FPS ([pruebas](../guides/testing.md))
 
-## Slow only on mobile
+## Lento solo en el móvil
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **Causa**: los paquetes corren sobre el renderizador WebGPU; las GPU móviles pueden ser decenas de veces más lentas que las de escritorio
+- **Corrección**: reduce la fuerza/frecuencia de los efectos, refuerza el recorte por distancia — o marca claramente el móvil como no soportado ([Requisitos](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## Acercándose al límite de 256 KB del paquete
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **Corrección**: recorta comentarios, factoriza el código compartido en funciones, suelta las recetas sin usar ([Estructura del paquete](../getting-started/pack-structure.md))
 
-## Related
+## Relacionado
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [Guía de rendimiento](../guides/performance.md) · [Pruebas](../guides/testing.md)

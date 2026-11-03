@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
+  "getting-started": "Primeros pasos",
+  "api": "Referencia de la API",
   "guides": "Guías",
   "recipes": "Recetas",
   "troubleshooting": "Solución de problemas",
-  "internals": "Engine Internals & Research",
+  "internals": "Interior del motor e investigación",
   "history": "Historial de versiones"
 }

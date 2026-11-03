@@ -1,26 +1,26 @@
-# Pack structure
+# Estructura del paquete
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Verified
 
-## Distribution format
+## Formato de distribución
 
-- **Format**: a single `.zip`, or a folder (folder loading is desktop browsers only)
-- **Contents**: one `pack.json` (at the top level of the pack; case-insensitive) + 1–256 `.wgsl` files
-- Multiple `.wgsl` files are concatenated into one module, so splitting and subdirectories are free. No constraints on file names. Concatenation happens in **dictionary order by path name** (module-scope declarations are order-independent, so this only matters for code depending on `var` initialization order). Non-`.wgsl` files (READMEs etc.) are ignored
+- **Formato**: un único `.zip`, o una carpeta (la carga por carpeta es solo para navegadores de escritorio)
+- **Contenido**: un `pack.json` (en el nivel superior del paquete; sin distinguir mayúsculas) + 1–256 archivos `.wgsl`
+- Los múltiples archivos `.wgsl` se concatenan en un solo módulo, así que dividir y usar subdirectorios es gratis. Sin restricciones en los nombres de archivo. La concatenación ocurre en **orden de diccionario por nombre de ruta** (las declaraciones de ámbito de módulo son independientes del orden, así que esto solo importa para código que dependa del orden de inicialización de `var`). Los archivos que no son `.wgsl` (READMEs etc.) se ignoran
 
-## Size and format limits
+## Límites de tamaño y formato
 
-| Item | Limit | Message when exceeded |
+| Elemento | Límite | Mensaje al superarlo |
 |---|---|---|
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| `pack.json` size | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
-| `.wgsl` file count | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
-| zip shape | no zip64 / split / encrypted; store or deflate; no duplicate paths | each rejected with its own message |
+| tamaño del zip | 32 MB | `The zip is over 32 MB.` |
+| entradas del zip | 1.024 | `The zip has more than 1024 entries.` |
+| tamaño de `pack.json` | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
+| número de archivos `.wgsl` | 256 | `The pack has more than 256 .wgsl files.` |
+| fuente `.wgsl` total | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
+| forma del zip | sin zip64 / dividido / cifrado; store o deflate; sin rutas duplicadas | cada uno rechazado con su propio mensaje |
 
-All files must be valid UTF-8.
+Todos los archivos deben ser UTF-8 válidos.
 
-## Zipping tips
+## Consejos de comprimido
 
-A zip that stores everything under one common root folder has that prefix stripped automatically (macOS "Compress" works as-is; `__MACOSX`, `._`-prefixed files and `.DS_Store` are excluded automatically). Stray files at the root level break top-level detection, so the safest method is to zip `pack.json` and the `.wgsl` files directly (verify `pack.json` ends up at the zip root).
+Un zip que guarda todo bajo una carpeta raíz común ve ese prefijo eliminado automáticamente (el «Comprimir» de macOS funciona tal cual; los archivos con prefijo `__MACOSX`, `._` y `.DS_Store` se excluyen automáticamente). Los archivos sueltos en el nivel raíz rompen la detección del nivel superior, así que el método más seguro es comprimir `pack.json` y los archivos `.wgsl` directamente (verifica que `pack.json` quede en la raíz del zip).

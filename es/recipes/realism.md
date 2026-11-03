@@ -1,6 +1,6 @@
-# Recetas realistas
+# Realismo
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > Recetas físicas para "reconstruir el aspecto vainilla desde los materiales". Lee estas premisas primero:
 >

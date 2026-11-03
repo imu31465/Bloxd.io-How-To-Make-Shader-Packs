@@ -1,12 +1,12 @@
-# Enchant effects
+# Efectos de encantamiento
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live header)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (restaurado de la cabecera en vivo)
 
-v5 opened the enchant pipeline on both inputs and outputs. Recipes for controlling the glint of enchanted items and armour while preserving the engine's math.
+v5 abrió el pipeline de encantamiento tanto en entradas como en salidas. Recetas para controlar el brillo de los ítems y armaduras encantados conservando la matemática del motor.
 
-## Inputs & outputs
+## Entradas y salidas
 
-**Inputs** (`BloxdSurfaceIn` / `BloxdLightIn` — enchanted items and armour only, all 0 otherwise):
+**Entradas** (`BloxdSurfaceIn` / `BloxdLightIn` — solo ítems y armaduras encantados, todo 0 en el resto):
 
 ```wgsl
 enchantTier: u32,     // 1-5 for Tier 1-5.
@@ -14,21 +14,21 @@ enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
 enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
 ```
 
-**Output** (`BloxdSurface`):
+**Salida** (`BloxdSurface`):
 
 ```wgsl
 enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
 ```
 
-The engine mixes it inside [`bloxdLitColour()`](../api/lighting.md) — right after shading, before world light. `bloxdDefaultSurface` passes the input through unchanged, so **the default look matches v4's engine-internal behavior**.
+El motor la mezcla dentro de [`bloxdLitColour()`](../api/lighting.md) — justo tras el sombreado, antes de la luz del mundo. `bloxdDefaultSurface` pasa la entrada sin cambios, así que **el aspecto por defecto coincide con el comportamiento interno del motor de v4**.
 
-## Understanding the defaults
+## Entendiendo los valores por defecto
 
-Input `enchantColour.a` is an **animated** alpha — the engine animates the glint sweep, so reading `.a` per fragment yields a moving pattern for free. `enchantTier` and `enchantSpeed` are consistent by construction («faster at higher tiers»).
+La entrada `enchantColour.a` es un alfa **animado** — el motor anima el barrido del brillo, así que leer `.a` por fragmento da un patrón en movimiento gratis. `enchantTier` y `enchantSpeed` son coherentes por construcción («faster at higher tiers»).
 
-Unenchanted faces carry `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0`.
+Las caras no encantadas llevan `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0`.
 
-## Recipe 1: no-glint realism (two lines)
+## Receta 1: realismo sin brillo (dos líneas)
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -38,9 +38,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 2: stronger glint by tier
+## Receta 2: brillo más fuerte por nivel
 
-`enchantTier` gives the classic "tier-scaled glint" without parsing colors:
+`enchantTier` da el clásico «brillo escalado por nivel» sin analizar colores:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -54,7 +54,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 3: recoloring the glint
+## Receta 3: recolorear el brillo
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -69,9 +69,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 4: enchantSpeed-driven sweep
+## Receta 4: barrido dirigido por enchantSpeed
 
-Turn `enchantSpeed` into a phase for a custom sweep:
+Convierte `enchantSpeed` en una fase para un barrido propio:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -87,9 +87,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 5: amplifying the hurt flash (overlayColour)
+## Receta 5: amplificar el destello de daño (overlayColour)
 
-`overlayColour` (players/mobs only; hurt flash etc.) mixes before lighting in `bloxdLitColour`:
+`overlayColour` (solo jugadores/mobs; destello de daño etc.) se mezcla antes de la iluminación en `bloxdLitColour`:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -99,11 +99,11 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Harmless on non-entities (`overlayColour` is 0 there).
+Inofensivo en no entidades (`overlayColour` vale 0 ahí).
 
-## Combining with custom lighting
+## Combinar con iluminación propia
 
-Using `bloxdLitColour()` keeps the enchant/overlay mixing automatic:
+Usar `bloxdLitColour()` mantiene automática la mezcla de encantamiento/superposición:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -113,12 +113,12 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Notes
+## Notas
 
-- Enchant inputs arrive **only on enchanted items and armour** — all 0 on terrain, water and unenchanted faces
-- Changing the `enchantColour` output never touches `colour` directly — mixing happens in `bloxdLitColour` / `bloxdDefaultLight`
-- Outside the model pipeline the enchant inputs are always 0
+- Las entradas de encantamiento llegan **solo en ítems y armaduras encantados** — todo 0 en terreno, agua y caras no encantadas
+- Cambiar la salida `enchantColour` nunca toca `colour` directamente — la mezcla ocurre en `bloxdLitColour` / `bloxdDefaultLight`
+- Fuera del pipeline de modelo las entradas de encantamiento son siempre 0
 
-## Related
+## Relacionado
 
-- [Lighting](../api/lighting.md) · [Structures](../api/structures.md) · [Model shader recipes](model-shaders.md)
+- [Iluminación](../api/lighting.md) · [Estructuras](../api/structures.md) · [Recetas de sombreadores de modelo](model-shaders.md)

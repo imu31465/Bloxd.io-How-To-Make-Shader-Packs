@@ -1,55 +1,55 @@
-# Visual issues
+# Problemas visuales
 
-> Target API: 5 · Status: Verified
+> API objetivo: 5 · Estado: Verified
 
-Compiles fine but looks wrong.
+Compila bien pero se ve mal.
 
-## Distance turns white/hazy
+## La distancia se vuelve blanca/brumosa
 
-- **Cause**: double fog. The default light-hook output is **already fogged** (`bloxdApplyFog(lit + emission, light)`), so mixing more fog color on top doubles it
-- **Fix**: keep custom fog subtle; consider saturation-only aerial perspective ([realism recipes](../recipes/realism.md))
-- **Prevention**: understand `fogAlpha` semantics (0 = no fog, 1 = only fogColour) and the [pipeline](../api/lighting.md#the-full-pipeline) before writing fog
+- **Causa**: niebla doble. La salida por defecto del hook de light **ya lleva niebla** (`bloxdApplyFog(lit + emission, light)`), así que mezclar más color de niebla encima la duplica
+- **Corrección**: mantén la niebla propia sutil; considera la perspectiva aérea solo por saturación ([recetas de realismo](../recipes/realism.md))
+- **Prevención**: entiende la semántica de `fogAlpha` (0 = sin niebla, 1 = solo fogColour) y el [pipeline](../api/lighting.md#el-pipeline-completo) antes de escribir niebla
 
-## pow(l.skyLight, γ) never darkens shadows
+## pow(l.skyLight, γ) nunca oscurece las sombras
 
-- **Cause**: `skyLight` arrives post-lift-curve (raw 0.87 arrives as 0.97); gamma mathematically cannot compete
-- **Fix**: switch to lift inversion + threshold ([Shadows](../guides/shadows.md))
+- **Causa**: `skyLight` llega tras la curva de realce (un crudo 0.87 llega como 0.97); la gamma no puede competir matemáticamente
+- **Corrección**: pasa a la inversión del realce + umbral ([Sombras](../guides/shadows.md))
 
-## Blocks turn almost pure white
+## Los bloques se vuelven casi blanco puro
 
-- **Cause**: the light-hook output exceeds 1.0 (no clamp exists past the output)
-- **Fix**: append `clamp(col, vec3f(0.0), vec3f(1.0))`
+- **Causa**: la salida del hook de light supera 1.0 (no hay clamp más allá de la salida)
+- **Corrección**: añade `clamp(col, vec3f(0.0), vec3f(1.0))`
 
-## White without additions
+## Blanco sin sumas
 
-- **Cause**: un-fog inversion by division
-- **Fix**: drop the un-fog; rebuild from `s.colour` and apply fog exactly once at the end (or via `bloxdApplyFog`)
+- **Causa**: inversión de la niebla por división
+- **Corrección**: suelta la inversión; reconstruye desde `s.colour` y aplica la niebla exactamente una vez al final (o vía `bloxdApplyFog`)
 
-## Glowing blocks don't glow (rebuilding packs)
+## Los bloques brillantes no brillan (paquetes reconstruidos)
 
-- **Cause**: missing emission re-add — dropping the default output means adding emission yourself
-- **Fix**: add `+ s.emission * (1.0 - l.fogAlpha)`; on v5 the `bloxdLitColour()` + emission + `bloxdApplyFog` composition is safest ([Lighting](../api/lighting.md))
+- **Causa**: falta la re-adición de la emisión — tirar la salida por defecto significa añadir la emisión tú mismo
+- **Corrección**: añade `+ s.emission * (1.0 - l.fogAlpha)`; en v5 la composición `bloxdLitColour()` + emisión + `bloxdApplyFog` es lo más seguro ([Iluminación](../api/lighting.md))
 
-## Waves/patterns cut off at chunk or origin switches
+## Ondas/patrones cortados en cambios de chunk u origen
 
-- **Cause**: using render-space positions directly — the origin moves with the player
-- **Fix**: use `bloxdWorldPosition(position)` for world-dependent effects ([Coordinates](../recipes/coordinates.md)); note f32 precision limits far from origin
+- **Causa**: usar posiciones de espacio de render directamente — el origen se mueve con el jugador
+- **Corrección**: usa `bloxdWorldPosition(position)` para los efectos dependientes del mundo ([Coordenadas](../recipes/coordinates.md)); nota los límites de precisión de f32 lejos del origen
 
-## Water-surface patterns misalign on rotated faces
+## Los patrones en la superficie del agua se desalinean en caras giradas
 
-- **Cause**: `bloxdTexel` applies the fragment's own `textureRotation` to your uv ([the rotation subtlety](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
-- **Fix**: pre-rotate with the `texelNeutral` helper
+- **Causa**: `bloxdTexel` aplica la `textureRotation` propia del fragmento a tu uv ([la sutileza de la rotación](../api/texture-api.md#la-sutileza-de-la-rotación--un-sampler-neutral))
+- **Corrección**: prerrota con el ayudante `texelNeutral`
 
-## Enchant glint / hurt flash disappeared
+## El brillo de encantamiento / el destello de daño desaparecieron
 
-- **Cause**: custom lighting rebuilt without passing `enchantColour` / `overlayColour` through
-- **Fix**: pass them through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
-- **v5**: `bloxdDefaultSurface` passes both through unchanged, so defaults never lose them
+- **Causa**: iluminación propia reconstruida sin pasar `enchantColour` / `overlayColour`
+- **Corrección**: pásalos o usa `bloxdLitColour()` ([Efectos de encantamiento](../recipes/enchant-effects.md))
+- **v5**: `bloxdDefaultSurface` pasa ambos sin cambios, así que los valores por defecto nunca los pierden
 
-## Sky, clouds or the sun disc unaffected
+## Cielo, nubes o el disco solar sin efecto
 
-- **By design**: hooks cover terrain / liquid / model only ([Unreachable effects](../guides/constraints.md))
+- **Es de diseño**: los hooks cubren solo terreno / líquido / modelo ([Looks inalcanzables](../guides/constraints.md))
 
-## Related
+## Relacionado
 
-- [Lighting issues](lighting.md) · [Debugging tips](../guides/debugging.md) · [Fog Internals](../internals/fog-internals.md)
+- [Problemas de iluminación](lighting.md) · [Consejos de depuración](../guides/debugging.md) · [Internas de niebla](../internals/fog-internals.md)

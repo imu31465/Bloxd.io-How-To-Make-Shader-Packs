@@ -1,18 +1,18 @@
 {
   "index": {
-    "title": "API Reference",
+    "title": "Referencia de la API",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "pack-format": "Pack format",
-  "hooks": "Shader hooks",
+  "pack-format": "Formato del paquete",
+  "hooks": "Hooks de sombreado",
   "flags": "Flags (BloxdFlags)",
-  "structures": "Input & output structures",
-  "functions": "Functions",
-  "lighting": "Lighting",
-  "texture-api": "Texture API",
-  "constants": "Constants",
-  "preprocessor": "Preprocessor",
-  "restrictions": "Restrictions & reserved names",
-  "compatibility": "Compatibility",
-  "texture-catalog": "Texture catalog"
+  "structures": "Estructuras de entrada y salida",
+  "functions": "Funciones",
+  "lighting": "Iluminación",
+  "texture-api": "API de texturas",
+  "constants": "Constantes",
+  "preprocessor": "Preprocesador",
+  "restrictions": "Restricciones y nombres reservados",
+  "compatibility": "Compatibilidad",
+  "texture-catalog": "Catálogo de texturas"
 }

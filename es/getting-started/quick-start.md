@@ -1,12 +1,12 @@
-# Quick start
+# Inicio rápido
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified
 
-Your first pack in five minutes.
+Tu primer paquete en cinco minutos.
 
-## 1. Create the files
+## 1. Crea los archivos
 
-Make a folder with `pack.json` and `pack.wgsl`:
+Crea una carpeta con `pack.json` y `pack.wgsl`:
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@ Make a folder with `pack.json` and `pack.wgsl`:
 }
 ```
 
-**`pack.wgsl`** — a minimal warm-tint pack:
+**`pack.wgsl`** — un paquete mínimo de tinte cálido:
 
 ```wgsl
 const packWarmth = 0.18;
@@ -31,26 +31,26 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> The engine header (constants, structures, functions) is prepended to every pack automatically at load — you never write it yourself. The full header is reproduced in [Engine Internals](../internals/engine-header.md).
+> La cabecera del motor (constantes, estructuras, funciones) se antepone automáticamente a cada paquete en la carga — nunca la escribes tú. La cabecera completa está reproducida en [Interior del motor](../internals/engine-header.md).
 
-## 2. Load it in the game
+## 2. Cárgalo en el juego
 
-1. Open settings → Shader Pack and load the zip or folder (folder loading is desktop browsers only)
-2. Check the status: right after selecting it you'll see "Ready. Reload the page to use it." — after a **page reload**, "Ready to use" means success
-3. If you see "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+1. Abre ajustes → Shader Pack y carga el zip o la carpeta (la carga por carpeta es solo para navegadores de escritorio)
+2. Comprueba el estado: justo tras seleccionarlo verás "Ready. Reload the page to use it." — tras una **recarga de página**, "Ready to use" significa éxito
+3. Si ves "Saved, but it won't run until you fix these errors...", corrige los errores listados (archivo:línea + variante) y recarga
 
-## 3. Verify
+## 3. Verifica
 
-1. Test in a permissive game first
-2. Then in a strict-mode game (most games are strict)
-3. Vertex animation only works in games marked allow
+1. Prueba primero en un juego permisivo
+2. Luego en un juego en modo strict (la mayoría de los juegos son strict)
+3. La animación de vértices solo funciona en juegos marcados allow
 
-## 4. Distribute
+## 4. Distribuye
 
-Zip it up — see [Distribution](distribution.md).
+Comprímelo en zip — ver [Distribución](distribution.md).
 
-## Stuck?
+## ¿Atascado?
 
-- What errors mean → [Troubleshooting](../troubleshooting/)
-- How to write hooks → [Shader hooks](hooks.md)
-- The full 9-hook template is in the next page, [Shader hooks](hooks.md)
+- Qué significan los errores → [Solución de problemas](../troubleshooting/)
+- Cómo escribir hooks → [Hooks de sombreado](hooks.md)
+- La plantilla completa de 9 hooks está en la página siguiente, [Hooks de sombreado](hooks.md)

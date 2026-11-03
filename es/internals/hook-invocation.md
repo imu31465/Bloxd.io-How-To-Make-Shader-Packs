@@ -1,53 +1,53 @@
-# Hook invocation internals
+# Internas de la invocación de hooks
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the production bundle — the Lite renderer; the integrated source file `lite/terrainShaderPack.ts` survives in error strings)
+> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado del bundle de producción — el renderizador Lite; el archivo fuente integrado `lite/terrainShaderPack.ts` sobrevive en las cadenas de error)
 
-How the engine calls hooks at runtime. This changes nothing about the code you write, but removes the guesswork about what hooks receive.
+Cómo llama el motor a los hooks en tiempo de ejecución. Esto no cambia nada del código que escribes, pero elimina las conjeturas sobre qué reciben los hooks.
 
-## The splice architecture
+## La arquitectura de empalme
 
-The renderer does not "call" hooks from JavaScript. Once a pack passes validation, the engine **grafts your hook invocations into its terrain WGSL by replacing fixed anchor lines in the shader text**. Each anchor must match exactly once — zero or multiple matches abort with `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`.
+El renderizador no «llama» a los hooks desde JavaScript. Una vez que un paquete pasa la validación, el motor **injerta tus invocaciones de hooks en su WGSL de terreno reemplazando líneas de anclaje fijas en el texto del sombreador**. Cada anclaje debe coincidir exactamente una vez — cero o varias coincidencias abortan con `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`.
 
-| Stage | Anchor in the engine shader | What is grafted |
+| Etapa | Anclaje en el sombreador del motor | Qué se injerta |
 |---|---|---|
-| vertex | the `let worldPos = …` through `vertexOutputs.vNormalW = …` block | build `BloxdVertexIn`, call the vertex hook, write `worldPos` back (also rewriting `let worldPos` to `var worldPos`) |
-| surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | build `BloxdSurfaceIn`, call the surface hook, write `baseColor` / `alpha` back |
-| lit color | just before the fog mix | captures the pre-fog color (v3 used the `bloxdSpLitColour` temporary — v5 promotes this role into the public `bloxdLitColour()` header function) |
-| light | the `return color;` at the fragment shader's end | build `BloxdLightIn`, call the light hook, write `color` back — after the fog mix |
+| vertex | el bloque `let worldPos = …` hasta `vertexOutputs.vNormalW = …` | construir `BloxdVertexIn`, llamar al hook de vértice, escribir `worldPos` de vuelta (reescribiendo también `let worldPos` a `var worldPos`) |
+| surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | construir `BloxdSurfaceIn`, llamar al hook de surface, escribir `baseColor` / `alpha` de vuelta |
+| color iluminado | justo antes de la mezcla de niebla | captura el color pre-niebla (v3 usaba la temporal `bloxdSpLitColour` — v5 promueve ese papel a la función de cabecera pública `bloxdLitColour()`) |
+| light | el `return color;` al final del sombreador de fragmento | construir `BloxdLightIn`, llamar al hook de light, escribir `color` de vuelta — tras la mezcla de niebla |
 
-## What the splice forces
+## Lo que el empalme fuerza
 
-- **strict terrain ignores surface-hook alpha changes.** The `alpha = bloxdSpSurface.alpha` write-back is grafted only for the liquid program or non-strict variants — the implementation behind the macro table ([Preprocessor](../api/preprocessor.md))
-- **A strict variant that declares a vertex hook never runs it.** The engine reports at build time: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. Hence the template's `#ifndef BLOXD_STRICT`
-- **`bloxdSp*` identifiers** are engine temporaries — invisible to your code but present in diagnostics and reverse-engineering output ([Reserved identifiers](reserved-identifiers.md) — 46 in v5)
-- **The default-surface shortcut.** If a variant's surface hook is literally `bloxdDefaultSurface`, the engine omits the `baseColor` / `alpha` write-back graft entirely — the default already produces those values, so the assignments are dead code. **Unmodified hook chains cost nothing**
+- **El terreno strict ignora los cambios de alpha del hook de surface.** La reescritura `alpha = bloxdSpSurface.alpha` se injerta solo para el programa de líquido o las variantes no strict — la implementación detrás de la tabla de macros ([Preprocesador](../api/preprocessor.md))
+- **Una variante strict que declara un hook de vértice nunca lo ejecuta.** El motor informa en tiempo de construcción: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. De ahí el `#ifndef BLOXD_STRICT` de la plantilla
+- **Los identificadores `bloxdSp*`** son temporales del motor — invisibles para tu código pero presentes en diagnósticos y en la salida de ingeniería inversa ([Identificadores reservados](reserved-identifiers.md) — 46 en v5)
+- **El atajo de surface por defecto.** Si el hook de surface de una variante es literalmente `bloxdDefaultSurface`, el motor omite por completo el injerto de reescritura de `baseColor` / `alpha` — el valor por defecto ya produce esos valores, así que las asignaciones son código muerto. **Las cadenas de hooks sin modificar no cuestan nada**
 
-## What changed in v5
+## Qué cambió en v5
 
-The splice architecture existed in the v2 renderer and stayed stable across v2 → v3 (v3 only changed `vBlockId` → `vBlockFlags` and added the liquid variant). v5's changes:
+La arquitectura de empalme existía en el renderizador de v2 y se mantuvo estable de v2 a v3 (v3 solo cambió `vBlockId` → `vBlockFlags` y añadió la variante de líquido). Los cambios de v5:
 
-- `vBlockFlags` (bits) → the **`BloxdFlags` struct** (delivered via `bloxdSpFlags`)
-- the `litColour` capture went from engine-internal to **public API** (`bloxdLitColour()` — v4's `bloxdSpLitColour` promoted)
-- `BloxdLightIn` gained `diffuse` / `emissive`, and `bloxdShading()` rebuilds the material response ([Lighting](../api/lighting.md))
-- delivery of `localPosition` (`bloxdSpItemLocalPosition`), enchant inputs (`bloxdSpEnchant`) and `overlayColour` ([Model rendering](model-rendering.md))
-- `fogVisibility` → **`fogAlpha`** (inverted)
-- the Model program joined the variant matrix (3 programs × 2 modes = 6 variants)
+- `vBlockFlags` (bits) → la **estructura `BloxdFlags`** (entregada vía `bloxdSpFlags`)
+- la captura de `litColour` pasó de interna del motor a **API pública** (`bloxdLitColour()` — el `bloxdSpLitColour` de v4 promovido)
+- `BloxdLightIn` ganó `diffuse` / `emissive`, y `bloxdShading()` reconstruye la respuesta del material ([Iluminación](../api/lighting.md))
+- la entrega de `localPosition` (`bloxdSpItemLocalPosition`), las entradas de encantamiento (`bloxdSpEnchant`) y `overlayColour` ([Renderizado de modelos](model-rendering.md))
+- `fogVisibility` → **`fogAlpha`** (invertido)
+- el programa Model se unió a la matriz de variantes (3 programas × 2 modos = 6 variantes)
 
-## What feeds BloxdLightIn (per field)
+## Qué alimenta BloxdLightIn (por campo)
 
-| Field | Engine-side source |
+| Campo | Fuente en el lado del motor |
 |---|---|
-| `litColour` | the fragment color captured just before the fog mix — "before emission and fog" in header terms |
-| `directional` | the vertex-interpolated sum of per-directional-light Lambert (2-light setup in [Rendering pipeline](rendering-pipeline.md)) |
-| `diffuse` / `emissive` | the material's directional RGB response / RGB glow (new in v5) |
-| `ambient` | `material.ambient × sceneAmbient` — per material, per frame |
-| `blockLight` / `skyLight` | the decoded light-level varyings ([Lighting internals](lighting-internals.md)) |
-| `ambientLightColour` / `skyLightColour` | the corresponding uniforms |
-| `heldLight` | built from the light-level varying and held-light uniforms (cone falloff in [Lighting internals](lighting-internals.md)) |
-| `fogColour` | black only in entirely fog-less scenes (mode 0) |
-| `fogAlpha` | the clamped fog factor ([Fog internals](fog-internals.md)) |
-| `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings and flat-interpolated values (same as `BloxdSurfaceIn` — post-vertex-hook values) |
+| `litColour` | el color del fragmento capturado justo antes de la mezcla de niebla — «antes de emisión y niebla» en términos de la cabecera |
+| `directional` | la suma interpolada por vértice del Lambert de cada luz direccional (montaje de 2 luces en [Canalización de renderizado](rendering-pipeline.md)) |
+| `diffuse` / `emissive` | la respuesta RGB direccional del material / el brillo RGB |
+| `ambient` | `material.ambient × sceneAmbient` — por material, por fotograma |
+| `blockLight` / `skyLight` | los varyings de niveles de luz decodificados ([Internas de iluminación](lighting-internals.md)) |
+| `ambientLightColour` / `skyLightColour` | los uniforms correspondientes |
+| `heldLight` | construido a partir del varying de nivel de luz y los uniforms de luz en mano (cono de atenuación en [Internas de iluminación](lighting-internals.md)) |
+| `fogColour` | negro solo en escenas completamente sin niebla (modo 0) |
+| `fogAlpha` | el factor de niebla acotado ([Internas de niebla](fog-internals.md)) |
+| `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings y valores de interpolación plana (igual que `BloxdSurfaceIn` — valores posteriores al hook de vértice) |
 
-## Related
+## Relacionado
 
-- [Shader hooks](../api/hooks.md) · [Rendering pipeline](rendering-pipeline.md) · [Reserved identifiers](reserved-identifiers.md) · [Version History: v3](../history/v3.md)
+- [Hooks de sombreado](../api/hooks.md) · [Canalización de renderizado](rendering-pipeline.md) · [Identificadores reservados](reserved-identifiers.md) · [Historial de versiones: v3](../history/v3.md)

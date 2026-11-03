@@ -1,6 +1,6 @@
-# Qué cambia los valores visibles del paquete — lista de pruebas
+# Qué cambia los valores visibles para los paquetes
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
 
 El mismo paquete renderiza distinto según **mundo y ajustes de jugador**. Revisa al menos estos 3 entornos antes de distribuir:
 

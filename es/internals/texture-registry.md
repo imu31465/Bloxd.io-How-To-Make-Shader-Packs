@@ -1,47 +1,47 @@
-# Texture registry internals
+# Internas del registro de texturas
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+La maquinaria de resolución nombre→id y la deriva medida del registro. El catálogo orientado al usuario: [Catálogo de texturas](../api/texture-catalog.md).
 
-## Methodology
+## Metodología
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+Ejecutamos el módulo constructor de registro del propio motor (29833 en este build, coordinando los módulos 1371 / 1391 / 1384 / 219) contra los datos de textura del registro de bloques distribuido dentro de un mini arnés de webpack y registramos su salida — estos números son **el cómputo del propio bundle de producción**, no una reimplementación.
 
-## Output structure
+## Estructura de salida
 
-| Output | v5 measured | Meaning |
+| Salida | v5 medida | Significado |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | nombres referenciables como `bloxdTextureId<Name>` |
+| `aliases` | 416 | grafías plegadas — 188 alias de fotograma (`lava0`…) y 228 alias de rotación (`chest_top[rot[1`…) |
+| `layers` | 228 | la tabla de capas — incluidas 171 ranuras prerrotadas (57 raíces × 4 rotaciones) |
 
-## Folding rules
+## Reglas de plegado
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **familias de animación** (42): las grafías de fotograma (`lava0`–`lava7`) se pliegan al nombre base (`lava`); `bloxdTexel` devuelve el fotograma actual en el momento del muestreo
+- **familias de rotación** (57): las ranuras giradas (`[rot[1..4`) se pliegan al nombre raíz; `bloxdTexel` reaplica la `textureRotation` por cara
+- `radar_screen` es el único nombre en ambas familias (sus cuatro copias prerrotadas llevan cada una su propia escalera de 4 fotogramas — de ahí 45 raíces de animación en el atlas, no 42)
 
-## Drift (cnty9 → ab90qa)
+## Deriva (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| Medición | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| entradas del atlas | 1.219 | **1.210** |
+| familias de rotación (grafías giradas) | 57 (228) | **57 (228) — sin cambios** |
+| familias de animación (grafías de fotograma) | 42 (188) | **42 (188) — sin cambios** |
+| constantes con nombre utilizables | 905 | **896** |
+| cambios de id entre nombres supervivientes | — | **334 de 905** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+La deriva completa (11 nombres): añadido (1) `scorpion_eggs`; eliminados (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (el cofre doble salió de los datos del juego; los generadores conservan `mob_spawner_block_top`).
 
-## Effect on HEADER_VERSION
+## Efecto sobre HEADER_VERSION
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+El sufijo de hash del registro hornea los ids, así que esta deriva marca **cada paquete guardado como «necesita revisión»** (revalidado automáticamente al cargar la página). Los paquetes escritos con nombres sobreviven a la re-resolución; los de ids crudos se rompen ([Compatibilidad](../api/compatibility.md)).
 
-## Past drift records
+## Registros de deriva pasados
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+La comparación de dos builds de octubre (sjr0p7 → cnty9, 10 días): entradas 1200 → 1219 (98 añadidas, 79 eliminadas); 779 de 1121 nombres con grafía sin cambios cambiaron de id (69 %); una migración de convención de nombres (sufijos `_rot1..4` → ranuras `[rot[1..4`); la aparición del cofre doble. El registro completo vive en [Historial de versiones: v4](../history/v4.md).
 
-## Related
+## Relacionado
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [Catálogo de texturas](../api/texture-catalog.md) · [Validación de sombreadores](shader-validation.md) · [Registro de investigación](research-log.md)

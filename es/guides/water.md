@@ -1,8 +1,8 @@
-# Receta integrada para agua de aspecto natural
+# Hacer que el agua parezca natural
 
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
-
-Esta API no puede muestrear color de escena: es **estilizado pseudo con mezcla de color fresnel e iluminaciones solares, no reflejo/refracción reales** (el cálculo de profundidad llegó en v2 con `bloxdOpaqueBehind()`, separado en [Parte VIII](../history/v2.md) R-E). La muestra conserva el color base, mezcla un poco hacia un color cielo en ángulos rasantes y añade un pequeño destello solo con sol.
+Esta API no puede muestrear color de escena, así que esto es **estilizado pseudo con mezcla de color fresnel e iluminaciones solares, no reflejo/refracción reales** (el cálculo de profundidad usa el `bloxdOpaqueBehind()` exclusivo de líquidos — la receta de absorción por grosor está más abajo en esta página). La muestra conserva el color base, mezcla un poco hacia un color cielo en ángulos rasantes y añade un pequeño destello solo cuando existe el sol.
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -44,7 +44,7 @@ Pistas de ajuste:
 - Agua blanca/lavada: baja `0.38` en `fresnel * 0.38` y el destello `0.55`.
 - Agua muy oscura: mezcla algo más de `fakeSkyReflection`. En exceso parece plástico.
 - Líneas o rayas regulares en el agua: baja frecuencias de ola y fuerza de destello. Este código no desplaza vértices de malla.
-- Reflejos reales del paisaje: las entradas de esta API no tienen color de pantalla: mezclar colores jamás es reflejo real (profundidad solo limitada a líquidos. [Parte VIII](../history/v2.md) R-E).
+- Reflejos reales del paisaje: las entradas de esta API no tienen color de pantalla: mezclar colores jamás es reflejo real (la profundidad es exclusiva de líquidos — ver [Funciones: bloxdOpaqueBehind](../api/functions.md)).
 
 Esta receta **reemplaza** un `bloxdLiquidLight` existente. No la pegues junto a la función de ola homónima de R9.7 ni otros hooks homónimos.
 
@@ -61,4 +61,4 @@ Los looks submarinos constan de 3 capas:
 | ② Velo de definición líquida | Quad emissive de pantalla completa del color/alpha de definición del bloque líquido de la cámara, dibujado delante del todo. El ajuste `cameraTint` gana si existe | No (ni color ni densidad cambiables) |
 | ③ cameraTint | Ajuste del juego | No |
 
-Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se puede quitar / bajo el agua no se puede ramificar (fogStart / fogEnd / fogColour no cambian bajo el agua: fogVisibility tampoco lo detecta).
+Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se puede quitar / bajo el agua no se puede ramificar (fogStart / fogEnd / fogColour no cambian bajo el agua: fogAlpha tampoco puede detectarlo).

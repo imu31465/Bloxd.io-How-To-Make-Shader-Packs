@@ -1,47 +1,47 @@
-# Variant-specific issues
+# Problemas específicos de variantes
 
-> Target API: 5 · Status: Verified
+> API objetivo: 5 · Estado: Verified
 
-Problems that occur in only some of the 6 variants (`strict|allow` × `terrain|liquid|model`). v5 removed the lighting axis (the old `BLOXD_LIGHTING`) and the loader validates **all 6 variants at once** on load.
+Problemas que ocurren solo en algunas de las 6 variantes (`strict|allow` × `terrain|liquid|model`). v5 eliminó el eje de iluminación (la vieja `BLOXD_LIGHTING`) y el cargador valida **las 6 variantes a la vez** en la carga.
 
-## Loads only in non-strict games / dropped in strict
+## Carga solo en juegos no strict / descartado en strict
 
-- **Cause**: an unguarded vertex hook or a reachable `discard`; strict games forbid both and violate = **whole-pack auto-disable** (`shaderPack:offInStrict`)
-- **Check**: the loader screen shows `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
-- **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT`
-- **Prevention**: always start vertex hooks from the guarded template ([Variants](../getting-started/variants.md))
+- **Causa**: un hook de vértice sin guarda o un `discard` alcanzable; los juegos strict prohíben ambos y la infracción = **desactivación automática del paquete entero** (`shaderPack:offInStrict`)
+- **Comprobación**: la pantalla del cargador muestra `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
+- **Corrección**: envuelve los hooks de vértice y el `discard` en `#ifndef BLOXD_STRICT`
+- **Prevención**: parte siempre de la plantilla con guarda para los hooks de vértice ([Variantes](../getting-started/variants.md))
 
 ## ".alpha is undefined"
 
-- **Cause**: `alpha` exists only behind `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model)
-- **Fix**: wrap alpha-touching code in `#ifdef BLOXD_ALPHA` ([Preprocessor](../api/preprocessor.md#macro--variant-matrix))
+- **Causa**: `alpha` existe solo tras `#ifdef BLOXD_ALPHA` (todo líquido + terreno/modelo no strict)
+- **Corrección**: envuelve el código que toca alpha en `#ifdef BLOXD_ALPHA` ([Preprocesador](../api/preprocessor.md#matriz-de-macros--variantes))
 
 ## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
-- **Cause**: strict variants have no vertex hooks at all, so no `BloxdVertex` either; vertex code is reachable from strict variants
-- **Fix**: guard the vertex hook
+- **Causa**: las variantes strict no tienen hooks de vértice en absoluto, así que tampoco `BloxdVertex`; el código de vértice es alcanzable desde variantes strict
+- **Corrección**: guarda el hook de vértice
 
-## bloxdOpaqueBehind fails in only some variants
+## bloxdOpaqueBehind falla solo en algunas variantes
 
-- **Cause**: `BLOXD_SCENE_DEPTH` is defined only in all-liquid variants
-- **Fix**: `#ifdef BLOXD_SCENE_DEPTH` ([Validation errors](validation.md))
+- **Causa**: `BLOXD_SCENE_DEPTH` está definida solo en todas las variantes de líquido
+- **Corrección**: `#ifdef BLOXD_SCENE_DEPTH` ([Errores de validación](validation.md))
 
-## Water ignores the pack (Liquid)
+## El agua ignora el paquete (Liquid)
 
-- **Symptom**: terrain hooks written, water unchanged
-- **Cause**: **in v5, if a pack defines no Liquid hook, no Terrain hook runs on water either** (the pre-v4 "liquid falls back to terrain" behavior is gone)
-- **Fix**: write Liquid hooks ([hook split](../api/hooks.md#what-each-program-draws))
+- **Síntoma**: hooks de terreno escritos, agua sin cambios
+- **Causa**: **en v5, si un paquete no define ningún hook de Liquid, tampoco corre ningún hook de Terrain sobre el agua** (el comportamiento pre-v4 de «el líquido cae en el terreno» ha desaparecido)
+- **Corrección**: escribe hooks de Liquid ([reparto de hooks](../api/hooks.md#qué-dibuja-cada-programa))
 
-## Models (entities, block models) unaffected
+## Modelos (entidades, modelos de bloque) sin efecto
 
-- **Cause**: out of scope before v5; now requires `bloxdModel*` hooks
-- **Fix**: define `bloxdModelSurface` / `bloxdModelLight` ([Models guide](../guides/models.md))
+- **Causa**: fuera de alcance antes de v5; ahora requiere hooks `bloxdModel*`
+- **Corrección**: define `bloxdModelSurface` / `bloxdModelLight` ([Guía de modelos](../guides/models.md))
 
-## About the 6-variant validation
+## Sobre la validación de 6 variantes
 
-The loader validates **all 6 variants at once** at load (the lighting axis is no longer compiled separately). Even if a game uses only some conditions, distributed packs must anticipate all six.
+El cargador valida **las 6 variantes a la vez** en la carga (el eje de iluminación ya no se compila aparte). Aunque un juego use solo algunas condiciones, los paquetes distribuidos deben anticipar las seis.
 
-| Variant | Macros defined |
+| Variante | Macros definidas |
 |---|---|
 | `allow.terrain` | `BLOXD_ALPHA` |
 | `allow.liquid` | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
@@ -50,6 +50,6 @@ The loader validates **all 6 variants at once** at load (the lighting axis is no
 | `strict.liquid` | `BLOXD_SCENE_DEPTH` |
 | `strict.model` | — |
 
-## Related
+## Relacionado
 
-- [Variants](../getting-started/variants.md) · [Preprocessor](../api/preprocessor.md) · [Policy](../internals/policy.md)
+- [Variantes](../getting-started/variants.md) · [Preprocesador](../api/preprocessor.md) · [Política](../internals/policy.md)

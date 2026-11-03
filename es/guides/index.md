@@ -1,21 +1,21 @@
-# Guides
+# Guías
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+Material de «mecanismo y mentalidad». Qué es posible en primer lugar está en [Qué pueden y no pueden hacer los shader packs](constraints.md); los ejemplos de código orientados a objetivo viven en [Recetas](../recipes/).
 
-## Map
+## Mapa
 
-| Page | Contents |
+| Página | Contenido |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [Cómo funciona la iluminación](lighting.md) | qué hace la iluminación por defecto del motor, y hasta dónde puedes reconstruirla |
+| [Sombras](shadows.md) | skyLight como mapa de sombras por vóxeles; la inversión del realce |
+| [Hacer que el agua parezca natural](water.md) | la receta integrada de agua y la realidad submarina de 3 capas |
+| [Diseñar looks nocturnos](night.md) | el problema de «sombras oscuras pero superficies brillantes» |
+| [Modelos y texturas](models.md) | qué dibuja y qué lee el programa Model |
+| [Realismo: dos escuelas](realism.md) | las escuelas aditiva y de reiluminación total |
+| [Qué pueden y no pueden hacer los shader packs](constraints.md) | el mapa de capacidades: alcanzable, inalcanzable, condicional, y el porqué |
+| [Rendimiento](performance.md) | tabla de costes y guía práctica |
+| [Lista de comprobación de pruebas en juego](testing.md) | la lista de comprobación previa a la publicación |
+| [Combinación con texture packs](combinations.md) | emparejamiento con paquetes de texturas |
+| [Consejos de depuración](debugging.md) | diagnóstico de síntoma → causa |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción)

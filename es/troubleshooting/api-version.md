@@ -1,49 +1,49 @@
-# API version errors
+# Errores de versión de API
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (verbatim from the live i18n dictionary)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (literal del diccionario i18n en vivo)
 
-Errors around `apiVersion`. The current game accepts **only `5`**.
+Errores en torno a `apiVersion`. El juego actual acepta **solo `5`**.
 
 ## "pack.json needs "apiVersion": {{version}}."
 
-- **Symptom**: this message right after load (`loadNoApiVersion`)
-- **Cause**: the `apiVersion` key is missing entirely
-- **Fix**: add `"apiVersion": 5` — a **number** (the string `"5"` fails)
-- **Prevention**: start from the [pack.json](../getting-started/manifest.md) template
+- **Síntoma**: este mensaje justo tras la carga (`loadNoApiVersion`)
+- **Causa**: falta la clave `apiVersion` por completo
+- **Corrección**: añade `"apiVersion": 5` — un **número** (el string `"5"` falla)
+- **Prevención**: parte de la plantilla de [pack.json](../getting-started/manifest.md)
 
 ## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
 
-- **Symptom**: `loadWrongApiVersion`
-- **Cause**: `apiVersion` exists but isn't 5 (a v1–v4 pack)
-- **Fix**: apply the matching migration ([Version History](../history/)):
-  - v4 → v5: [the v5 guide](../history/v5.md) — mostly mechanical (flags · `bloxdLit()` · removing `bloxdFragmentBlockPosition`)
-  - v3 → v5: apply [v4](../history/v4.md) first
-  - v2 or earlier → v5: step through v3 → v4 → v5
-- **Prevention**: after any API update, check [Compatibility](../api/compatibility.md) and the matching migration guide
+- **Síntoma**: `loadWrongApiVersion`
+- **Causa**: `apiVersion` existe pero no es 5 (un paquete v1–v4)
+- **Corrección**: aplica la migración que corresponda ([Historial de versiones](../history/)):
+  - v4 → v5: [la guía de v5](../history/v5.md) — casi todo mecánico (flags · `bloxdLit()` · la advertencia de `bloxdFragmentBlockPosition`)
+  - v3 → v5: aplica primero [v4](../history/v4.md)
+  - v2 o anterior → v5: recorre v3 → v4 → v5
+- **Prevención**: tras cualquier actualización de la API, consulta [Compatibilidad](../api/compatibility.md) y la guía de migración correspondiente
 
-## The string "5" is rejected
+## El string "5" se rechaza
 
-- **Cause**: the loader compares `manifest.apiVersion !== 5` **strictly** (`===`); a JSON string `"5"` is not the number 5
-- **Fix**: `"apiVersion": 5` (unquoted)
+- **Causa**: el cargador compara `manifest.apiVersion !== 5` **estrictamente** (`===`); un string JSON `"5"` no es el número 5
+- **Corrección**: `"apiVersion": 5` (sin comillas)
 
-## A saved old pack silently stopped working
+## Un paquete antiguo guardado dejó de funcionar en silencio
 
-- **Symptom**: a previously-working v1–v4 pack is unresponsive, with no exception
-- **Cause**: saved packs resolve to `{kind: "none", reason: "otherApiVersion"}` and become **silently inactive**
-- **Check**: the settings-tab status line: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-- **Fix**: load a migrated replacement from the same screen
-- **Prevention**: after API updates, re-release a bumped version and announce it ([Distribution](../getting-started/distribution.md))
+- **Síntoma**: un paquete v1–v4 que antes funcionaba no responde, sin excepción alguna
+- **Causa**: los paquetes guardados se resuelven a `{kind: "none", reason: "otherApiVersion"}` y quedan **inactivos en silencio**
+- **Comprobación**: la línea de estado de la pestaña de ajustes: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+- **Corrección**: carga un reemplazo migrado desde la misma pantalla
+- **Prevención**: tras las actualizaciones de la API, vuelve a publicar una versión con el número subido y anúnciala ([Distribución](../getting-started/distribution.md))
 
-## A migrated v4 pack fails validation
+## Un paquete v4 migrado falla la validación
 
-The three typical patterns (full steps in the [v5 migration guide](../history/v5.md)):
+Los tres patrones típicos (pasos completos en la [guía de migración a v5](../history/v5.md)):
 
-| Validation message | Cause | Fix |
+| Mensaje de validación | Causa | Corrección |
 |---|---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` usage | rewrite as `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` |
-| `bloxdBlockFlagRock isn't part of the shader pack API...` (reserved-name diagnostic) | leftover bit-constant references | use `surface.flags.rock` etc. (1:1 table in [Flags](../api/flags.md)) |
-| `bloxdFragmentBlockPosition` missing | removed in v5 | delete call sites (no replacement — use `flags`) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | uso de `#ifdef BLOXD_LIGHTING` | reescríbelo como `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdBlockFlagRock isn't part of the shader pack API...` (diagnóstico de nombre reservado) | referencias restantes a constantes de bits | usa `surface.flags.rock` etc. (tabla 1:1 en [Flags](../api/flags.md)) |
+| falta `bloxdFragmentBlockPosition` | fuera de la cabecera documentada desde v5 (aún inyectada y aceptada — ver [Funciones](../api/functions.md)) | no es un error que corregir: compila; prefiere `flags` / `bloxdWorldPosition()` en código nuevo |
 
-## Related
+## Relacionado
 
-- [Compatibility](../api/compatibility.md) · [Version History](../history/) · [pack.json](../getting-started/manifest.md)
+- [Compatibilidad](../api/compatibility.md) · [Historial de versiones](../history/) · [pack.json](../getting-started/manifest.md)

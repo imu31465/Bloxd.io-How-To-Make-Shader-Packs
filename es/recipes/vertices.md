@@ -1,9 +1,9 @@
-# Recetas de vértices (solo allow)
+# Vértices (solo allow)
 
-
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > Envuelve todo en `#ifndef BLOXD_STRICT`.
-> Para las condiciones exactas (lista de títulos allow; Custom Games es estricto) ver §30: [§30 Modos de aplicación por juego](../internals/)
+> Para las condiciones exactas (la lista de títulos allow; Custom Games es estricto) ver [Política de shader packs por juego](../internals/policy.md)
 
 ## Hierba al viento (mueve solo las puntas)
 

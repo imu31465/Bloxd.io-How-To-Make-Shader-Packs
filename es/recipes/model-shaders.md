@@ -1,12 +1,12 @@
-# Model shader recipes
+# Sombreadores de modelo
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (escrito contra la especificación de cabecera v5)
 
-Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
+Recetas con los hooks de Model de v5 y los nuevos flags para selecciones de **«qué estoy mirando» que eran imposibles antes de v5**. Lo básico: [Modelos y texturas](../guides/models.md).
 
-## Held-item glow
+## Brillo del ítem en mano
 
-What first-person shader authors wanted since v1, in two lines:
+Lo que los autores de sombreadores en primera persona querían desde v1, en dos líneas:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -18,7 +18,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Splitting the world from the hand
+## Separar el mundo de la mano
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -33,9 +33,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Glowing blade tips (localPosition)
+## Puntas de hoja brillantes (localPosition)
 
-`localPosition` rotates with the model — "where on the model am I" without world-space guesswork:
+`localPosition` gira con el modelo — «en qué parte del modelo estoy» sin conjeturas en espacio de mundo:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -48,9 +48,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Note: actual `localPosition` ranges vary per model — verify on-device and `clamp` defensively.
+Nota: los rangos reales de `localPosition` varían por modelo — verifica en el dispositivo y `clamp` a la defensiva.
 
-## Highlighting dropped items
+## Resaltar los ítems caídos
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -64,9 +64,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Cool rim on player skins (lifeform)
+## Borde frío en pieles de jugador (lifeform)
 
-Most models use `textureId: 0` (skins); `surface.colour` already has skin × tint:
+La mayoría de los modelos usan `textureId: 0` (pieles); `surface.colour` ya lleva piel × tinte:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -80,9 +80,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Swaying plants in the wind (allow only)
+## Plantas que se mecen con el viento (solo allow)
 
-Plants (`flags.flat`) are drawn as models — sway via the vertex hook:
+Las plantas (`flags.flat`) se dibujan como modelos — vaivén vía el hook de vértice:
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -99,11 +99,11 @@ fn bloxdModelVertex(vertex: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-(Vegetation is also `flags.vegetation`: `flat` = "drawn as a crossed plane", `vegetation` = "is a plant" — grass and flowers are both.)
+(La vegetación es también `flags.vegetation`: `flat` = «dibujada como plano cruzado», `vegetation` = «es una planta» — la hierba y las flores son ambas cosas.)
 
-## Atlas-textured model faces only
+## Solo caras de modelo con textura de atlas
 
-Block-model faces (slabs, stairs…) carry atlas `textureId`s; select with `textureId != 0u`:
+Las caras de modelos de bloque (losas, escaleras…) llevan `textureId` del atlas; selecciona con `textureId != 0u`:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -116,15 +116,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` faces (skins) sample as white — no error ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+Las caras `textureId: 0` (pieles) muestrean como blanco — sin error ([texturas propias del modelo](../api/texture-api.md#texturas-propias-del-modelo-textureid-0)).
 
-## Armour vs the rest
+## Armadura frente al resto
 
-`flags.lifeform` includes armour and cosmetics ([Flags](../api/flags.md)). No finer-grained input exists; combine `localPosition` (placement) or `overlayColour` presence as practical approximations.
+`flags.lifeform` incluye armaduras y cosmética ([Flags](../api/flags.md)). No existe una entrada más granular; combina `localPosition` (colocación) o la presencia de `overlayColour` como aproximaciones prácticas.
 
-## Sharing with terrain
+## Compartir con el terreno
 
-Uniform grading across full blocks and block models:
+Gradación uniforme entre bloques completos y modelos de bloque:
 
 ```wgsl
 fn applyGrade(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -142,8 +142,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-The shared-function pattern is what the default pack template itself recommends ([hooks](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+El patrón de función compartida es el que la propia plantilla de paquete por defecto recomienda ([hooks](../getting-started/hooks.md#fallbacks-y-compartición-de-código)).
 
-## Related
+## Relacionado
 
-- [Models and textures](../guides/models.md) · [Enchant effects](enchant-effects.md) · [Flags](../api/flags.md) · [Structures](../api/structures.md)
+- [Modelos y texturas](../guides/models.md) · [Efectos de encantamiento](enchant-effects.md) · [Flags](../api/flags.md) · [Estructuras](../api/structures.md)

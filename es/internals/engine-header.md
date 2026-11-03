@@ -1,18 +1,17 @@
-# The engine header (v5, verbatim)
+# Cabecera del motor (literal)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
 
-The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere.
+El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto.
 
-Reading guide:
-- Field-by-field explanations → [Structures](../api/structures.md)
-- Function-by-function → [Functions](../api/functions.md) / [Lighting](../api/lighting.md)
+Guía de lectura:
+- Explicaciones campo por campo → [Estructuras](../api/structures.md)
+- Función por función → [Funciones](../api/functions.md) / [Iluminación](../api/lighting.md)
 - Flags (BloxdFlags) → [Flags](../api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](../api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](../api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](../history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](shader-validation.md)
-
+- El bloque `bloxdTextureId*` **no** está en esta cabecera — se genera por paquete a partir de los nombres referenciados ([API de texturas](../api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` marca campos condicionales ([Preprocesador](../api/preprocessor.md))
+- Diferencias con la cabecera de v4 (6.021 B) → [Historial de versiones: v5](../history/v5.md)
+- Cómo se valida la cabecera (HEADER_VERSION) → [Validación de sombreadores](shader-validation.md)
 ```wgsl
 
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -223,8 +222,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## Relacionado
 
-- [API Reference](../api/) — the annotated version of this header
-- [Shader Validation](shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](engine-data.md) — the measurement ledger
+- [Referencia de la API](../api/) — la versión anotada de esta cabecera
+- [Validación de sombreadores](shader-validation.md) — HEADER_VERSION y la revalidación de paquetes guardados
+- [Datos del motor](engine-data.md) — el ledger de mediciones
