@@ -1,10 +1,6 @@
 # 液体
 
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
-
-Liquid フックで水を演出するレシピ。**v5 では、パックに Liquid Hook がない場合、水には Terrain Hook も実行されません** ([フックの分担](../api/hooks.md))。
-
-
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Verified (現在のAPIに移植済み — 実機での再確認を推奨)
 ## 水面のさざ波 (色の明滅)
 
 ```wgsl
@@ -21,9 +17,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 高度を使った透明度の疑似変化 (本当の浅瀬判定ではない)
+## 高度による透明度の疑似変化 (本当の浅瀬判定ではない)
 
-> 液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れます (`#ifdef BLOXD_SCENE_DEPTH` ガード付き、[APIリファレンス](../api/functions.md#bloxdopaquebehind))。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
+> 本当の水深には液体限定の `bloxdOpaqueBehind()` が必要で、これは背後の不透明面までの厚みを測ります (完全なレシピ: [水を自然に見せる方法](../guides/water.md))。以下はそれを使わない、より単純な疑似スタイリングです: `s.position.y` はローカル座標なので、そのまま使うとチャンク原点の変化で効果がずれます。ワールド高度には `bloxdWorldPosition()` で変換します。以下はワールド高度でアルファを変えるだけの疑似効果であり、海岸線・水底を考慮した浅瀬ではありません。`packWaterReferenceY` はワールドの高度に合わせて調整してください。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -34,7 +30,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     let worldY = s.position.y + f32(bloxdRenderOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
-    // 低高度では薄く、高高度では元のアルファ値に近づける。ゲーム内で向きを確認する必要がある。
+    // 低高度では薄く、高高度では元のアルファに近づける。向きはゲーム内で確認すること
     out.alpha = mix(0.45, 0.9, heightFactor) * s.alpha;
     #endif
     return out;
@@ -57,6 +53,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ```wgsl
 // terrain_* フックは一切記述しない。これにより:
-//  - terrain バリアント = フック無し = 地形はエンジンの既定設定のまま
+//  - terrain バリアント = フック無し = 地形はエンジンの既定のまま
 //  - liquid バリアント  = liquid_* フックのみ有効
 ```

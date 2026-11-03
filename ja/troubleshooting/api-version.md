@@ -1,53 +1,49 @@
 # APIバージョンエラー
 
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (ライブ i18n 辞書から逐語)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番検証済み) · 検証状況: Verified (ライブ i18n 辞書から逐語)
 
 `apiVersion` まわりのエラーです。現行ゲームは **`5` のみ**を受け付けます。
 
 ## 「pack.json needs "apiVersion": {{version}}.」
 
-- **症状**: 読み込み直後にこのメッセージ (`loadNoApiVersion`)
-- **原因**: `pack.json` に `apiVersion` キー自体が無い
-- **確認方法**: `pack.json` を開く
-- **解決方法**: `"apiVersion": 5` を追加する (**数値**。文字列 `"5"` は失敗する)
+- **症状**: 読み込み直後にこのメッセージが出る (`loadNoApiVersion`)
+- **原因**: `apiVersion` キー自体が存在しない
+- **解決方法**: `"apiVersion": 5` を追加する — **数値**として (文字列 `"5"` は失敗する)
 - **再発防止**: [pack.json](../getting-started/manifest.md) のテンプレートから作り始める
 
 ## 「This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.」
 
 - **症状**: `loadWrongApiVersion`
-- **原因**: `apiVersion` はあるが `5` に等しくない (v1〜v4 のパック)
-- **解決方法**: 対象バージョンに応じた移行手順を適用する ([バージョン履歴](../history/)):
-  - v4 → v5: [v5 移行ガイド](../history/v5.md) — ほぼ機械的 (flags・`bloxdLit()`・`bloxdFragmentBlockPosition` の注意点)
-  - v3 → v5: v4 の変更 ([v4](../history/v4.md)) を経由
-  - v2 以前 → v5: v3 ([v3](../history/v3.md)) → v4 → v5 と段階適用
-- **再発防止**: API が更新されたらドキュメントの [互換性](../api/compatibility.md) と該当バージョンの移行ガイドを確認する
+- **原因**: `apiVersion` はあるが 5 ではない (v1〜v4 のパック)
+- **解決方法**: 対応する移行を適用する ([バージョン履歴](../history/)):
+  - v4 → v5: [v5 移行ガイド](../history/v5.md) — ほぼ機械的 (flags · `bloxdLit()` · `bloxdFragmentBlockPosition` の注意点)
+  - v3 → v5: まず [v4](../history/v4.md) を適用
+  - v2 以前 → v5: v3 → v4 → v5 の順に段階適用
+- **再発防止**: API 更新の後は、[互換性](../api/compatibility.md) と対応する移行ガイドを確認する
 
-## 文字列 `"5"` を入れたのに弾かれる
+## 文字列 "5" は弾かれる
 
-- **原因**: ローダは `manifest.apiVersion !== 5` を**厳密比較** (`===`) する。JSON の文字列 `"5"` は数値 `5` と等しくない
-- **確認方法**: `pack.json` で `"apiVersion"` の値がクォートに入っていないか
-- **解決方法**: `"apiVersion": 5` (クォートなし) にする。失敗時は JSON 上の表記つきで報告される
+- **原因**: ローダーは `manifest.apiVersion !== 5` を**厳密に** (`===`) 比較する。JSON 文字列 `"5"` は数値 5 ではない
+- **解決方法**: `"apiVersion": 5` (クォートなし) にする
 
-## 保存してあった旧パックが例外も出さずに効かなくなった
+## 保存してあった旧パックが黙って動かなくなった
 
-- **症状**: 以前動いていた v1〜v4 パックが無反応。例外は出ない
-- **原因**: 保存パックの結果は `{kind: "none", reason: "otherApiVersion"}` に解決し、**暗黙に不活性化**する
-- **確認方法**: シェーダーパック設定タブのステータス行: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-- **解決方法**: 移行した新版を同じ画面から読み込んで置き換える
-- **再発防止**: 配布者は API 更新後にバージョンを上げた新版を再配布し、プレイヤーに案内する ([配布](../getting-started/distribution.md))
+- **症状**: 以前は動いていた v1〜v4 パックが無反応になる。例外は出ない
+- **原因**: 保存パックは `{kind: "none", reason: "otherApiVersion"}` に解決され、**黙って不活性化**する
+- **確認方法**: 設定タブのステータス行: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+- **解決方法**: 同じ画面から移行済みの置き換えパックを読み込む
+- **再発防止**: API 更新の後は、バージョン番号を上げた新版を再リリースして告知する ([配布](../getting-started/distribution.md))
 
-## v4 パックを v5 に移植したら検証に落ちる
+## 移行した v4 パックが検証に落ちる
 
-典型的な3パターン ([v5 移行ガイド](../history/v5.md) に全手順):
+典型的な3パターンです (全手順は [v5 移行ガイド](../history/v5.md) を参照):
 
 | 検証メッセージ | 原因 | 直し方 |
 |---|---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` の使用 | `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` に書き換え |
-| `bloxdBlockFlagRock isn't part of the shader pack API...` (予約名診断) | 旧ビット定数の残存参照 | `surface.flags.rock` 等へ (1対1対応表は [フラグ](../api/flags.md)) |
-| `bloxdFragmentBlockPosition` が無い | v5 からはドキュメントされたヘッダーにない (注入と受け入れは継続 — [関数](../api/functions.md) 参照) | 修正不要: コンパイルは通る。新規コードには `flags` / `bloxdWorldPosition()` を推奨 |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` の使用 | `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` に書き換える |
+| `bloxdBlockFlagRock isn't part of the shader pack API...` (予約名診断) | ビット定数への残存参照 | `surface.flags.rock` 等を使用 (1対1対応表は [フラグ](../api/flags.md)) |
+| `bloxdFragmentBlockPosition` がない | v5 からはドキュメントされたヘッダーにない (注入と受け入れは継続 — [関数](../api/functions.md) 参照) | 修正すべきエラーではない: コンパイルは通る。新規コードでは `flags` / `bloxdWorldPosition()` を推奨 |
 
 ## 関連
 
-- [互換性](../api/compatibility.md) — バージョン間運用の全体
-- [バージョン履歴](../history/) — v1〜v5 の移行ガイド
-- [pack.json](../getting-started/manifest.md) — マニフェストの全フィールド
+- [互換性](../api/compatibility.md) · [バージョン履歴](../history/) · [pack.json](../getting-started/manifest.md)

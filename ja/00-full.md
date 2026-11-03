@@ -557,12 +557,6 @@ group 3 のバインディングは:
 
 複数の `.wgsl` は連結されて1モジュールとして扱われます。連結は**パス名の辞書順**。モジュールスコープの宣言は順序非依存のため通常は無関係ですが、`var` の初期化順序に依存する書き方をした場合のみ効きます。`.wgsl` 以外のファイルは無視されます。
 
-### 関連
-
-- 読み込み時の検証パイプライン → [Getting Started: 検証](getting-started/validation.md)
-- uniform の内部 → [エンジン内部: Engine Data](internals/engine-data.md)
-- 旧バージョンの uniform (v2〜v4) → [バージョン履歴](history/)
-
 
 ---
 
@@ -1580,8 +1574,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
 ヘッダーが提供する定数は3つです (テクスチャ名定数 `bloxdTextureId*` は [テクスチャAPI](api/texture-api.md) を参照)。
-
-### 一覧
 
 ```wgsl
 const bloxdPi: f32 = 3.1415926535898;
@@ -2959,109 +2951,92 @@ v4 からの変換は**ほぼ機械的**です ([移行チェックリスト](hi
 ---
 
 ## ライティングの仕組み
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Verified (現在のAPIに移植済み — 実機での再確認を推奨)
+エンジンのデフォルトライティングは「乗算のみ」です。スペキュラ、フレネル、暖色/冷色の分離、半球環境光はいずれも存在しません。以下の機能は再構築できます。
 
-エンジン既定の照明が何をしているか、パックでどこまで再構築できるかの全体地図。
-
-
-エンジンのデフォルト照明は `bloxdShading()` (directional × diffuse + emissive + ambient のクランプ) と `bloxdWorldLight()` (block/sky/held の最明値) の乗算構成であり、スペキュラ・フレネル・暖色/冷色の分離・半球環境光には対応していない。v5 ではこのレシピが [`bloxdLitColour()`](api/lighting.md) としてそのまま呼べる。以下に、再構築可能な範囲を示す。
-
-| 機能 | デフォルト | パックで対応可能? |
+| 機能 | デフォルト | パックで再構築可能? |
 |---|---|---|
-| 拡散 (Lambert) | `bloxdShading()`: directional × diffuse + emissive + ambient | ◎ `bloxdSunDirection()` や `light.diffuse` を用いて自前実装 (ラップ光源など) |
-| スペキュラ (鏡面反射) | 非対応 | ◎ Blinn-Phong ([スペキュラ](recipes/realism.md)) |
-| フレネル | 非対応 | ◎ Schlick 近似 ([フレネル](recipes/realism.md)) |
-| 暖色トーチ / 冷色空光の分離 | 無色のまま | ◎ ([暖色トーチ×冷色空光](recipes/realism.md)) |
-| 半球環境光 | 方向性なし | ◎ 上=空色 / 下=地面色 ([半球環境光](recipes/realism.md)) |
-| トーンマップ | なし (クランプのみ) | ◎ ACES フィルミック ([ACES](recipes/realism.md)) |
-| 大気遠近法 | フォグ (色置換) のみ | ◎ 距離に応じた彩度低下 ([大気遠近法](recipes/realism.md)) |
-| 表面ディテール | テクスチャ解像度に依存 | △ ハッシュノイズによるマイクロバンプ ([マイクロバンプ](recipes/realism.md)) |
-| 頂点波 (水面) | なし (平面) | ◎ allow 限定 ([頂点のレシピ](recipes/vertices.md)) |
-| 波法線 / 太陽グリント | 非対応 | ◎ ([波法線+グリント](recipes/realism.md)) |
-| 影 (スカイ遮蔽シャドウ) | `mix(環境色, 空色, skyLight)` で緩やかに混合 | ◎ リフト逆変換 + しきい値カット + 太陽ゲート ([投影風シャドウ](recipes/realism.md))。木陰や屋根下が明確に反応し、ブロック編集にリアルタイム追従 |
-| 夜の月光処理 | 空色が暗くなるだけ | △ 月の方向は入力にないため、方向性を持つ月光は不可。青い環境光や彩度低下による擬似表現のみ ([夜の青い環境光](recipes/lighting.md) / [シネマgrade](recipes/realism.md)) |
-
-### 関連
-
-- [ライティングAPI](api/lighting.md) — 公開されている照明関数
-- [リアル系レシピ](recipes/realism.md) — 実装例
-- [エンジン内部: Lighting Internals](internals/lighting-internals.md)
+| 拡散 (Lambert) | 方向光のスカラー和のみ | ◎ `bloxdSunDirection()` による自前実装 (ラップドフォールオフなど) |
+| スペキュラ | なし | ◎ Blinn-Phong (R9.2) |
+| フレネル | なし | ◎ Schlick 近似 (R9.3) |
+| 暖色トーチ / 冷色空光の分離 | 無色 | ◎ (R9.1) |
+| 半球環境光 | 無方向のみ | ◎ 上は空色 / 下は地面色 (R9.4) |
+| トーンマッピング | なし (クランプのみ) | ◎ ACES フィルミック (R9.5) |
+| 大気遠近感 | フォグ (色の置き換え) のみ | ◎ 距離に応じた彩度低下 (R9.6) |
+| 表面ディテール | テクスチャ解像度のみ | △ 手続き型ハッシュノイズによるマイクロバンプ (R9.8) |
+| 頂点波 (水) | なし (平坦) | ◎ allow のみ (R7) |
+| 波の法線 / 太陽グリント | なし | ◎ (R9.7) |
+| 夜間の月光 | 空色が暗くなるだけ | △ 月方向の入力がないため、擬似的な見た目のみ (R2 の青い環境光 / R9.11 の彩度低下) |
+| 影 (空光遮蔽) | `mix(ambient, sky, skyLight)` による緩やかなブレンドのみ | ◎ リフトの反転 + しきい値カット + 太陽ゲート (R9.12)。木陰や屋根の下は明確に落ち、ブロック編集にリアルタイムで追従 |
 
 
 ---
 
 ## 影の表現
-> 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Verified (v4 実測の LightEngine 仕様は v5 でも同一構成)
+> 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Verified (LightEngine の挙動は v4 実測時から不変)
 
-シェーダーパックで「影」を作る3つの方法と、その限界を整理します。
+シェーダーパックで「影」を作る3つの方法と、その限界。
 
 ### できること・できないこと
 
 | 表現 | 可能? | 方法 |
 |---|---|---|
 | 木の下・屋根の下を明確に暗く (投影風) | ◎ | `skyLight` のリフト逆変換 + しきい値カット (下記) |
-| 影がブロック編集にリアルタイム追従 | ◎ | LightEngine が即座に再計算するため自動 |
-| 影を「寒色」に、日向を「暖色」に彩色 | ◎ | 2 色シフト |
-| 影が太陽とともに回転する (シャドウマップ) | ✕ | 深度テクスチャは液体専用、光の視線遮蔽は入力されない |
-| ペナンブラ (半影) の物理表現 | ✕ | ボクセル解像度の BFS 広がりが上限 |
-| リアルタイム AO (SSAO) | ✕ | AO は頂点カラーにベイク済みのもののみ |
+| 影がブロック編集にリアルタイム追従 | ◎ | LightEngine が即座に再計算 — 自動 |
+| 影を寒色に・日向を暖色に彩色 | ◎ | 2色シフト |
+| 影が太陽とともに回転する (シャドウマップ) | ✕ | 深度は液体専用、光線遮蔽は入力にない |
+| 物理的なペナンブラ (半影) | ✕ | ボクセル解像度の BFS 拡散が上限 |
+| リアルタイム AO (SSAO) | ✕ | 頂点カラーにベイク済みの AO のみ |
 
-### skyLight の正体 — ボクセル影マップ
+### skyLight はボクセル影マップ
 
-`l.skyLight` は単なる明るさパラメータではありません。メッシュ生成側の LightEngine が Minecraft 型のアルゴリズムで計算する**「その位置から空が見えるか」を示すボクセル解像度の遮蔽データ = 影マップ**です:
+`l.skyLight` は単なる明るさパラメータではありません。メッシュ生成側の LightEngine が Minecraft 型の**「この位置から空が見えるか」を示すボクセル遮蔽データ = 影マップ**を計算します:
 
-1. **縦列スキャン**: 各 (x,z) 列を上から下へ走査。空からの光は 15 で開始し、不透明ブロックで 0 となり、`lightFilter` (空気 1 / 水 3 / 不透明 15) で減衰しながら下降する
-2. **BFS フラッドフィル**: 6 近傍へ横方向に拡散 (1 ブロックで -1) — これが影のエッジをソフトにする要因。半径 r の遮蔽物の下での生値は (15-r)/15
-3. blockLight (トーチ等) は RGB 3 チャンネル (4bit パック) の別 BFS
+1. **縦列スキャン**: 各 (x,z) 列を上から下へ。空光は 15 から始まり、不透明ブロックで 0 になり、`lightFilter` (空気 1 / 水 3 / 不透明 15) で減衰する
+2. **BFS フラッドフィル**: 6 近傍へ横方向に拡散 (1 ブロックにつき -1) — これが影のエッジをソフトにする。半径 r の遮蔽物の下では生値が (15-r)/15 になる
+3. blockLight (トーチ等) は RGB 3 チャンネル (4bit パック) の別個の BFS
 
-木の下・屋根の下・建物内部はすでに数値が低く、頂点補間により滑らかに伝達されます。ブロックを設置・破壊すれば LightEngine が即座に再計算します = **リアルタイムに追従する影**です。
+木の下・屋根の下・建物内部では値がすでに低く、頂点ごとに滑らかに補間されます。ブロックを設置・破壊すると即座に再計算されます — **リアルタイムに追従する影**です。
 
 ### リフト曲線という罠
 
-`l.skyLight` は生のボクセル値 (n/15) ではなく、エンジンが「リフト曲線」`y = 1-(1-x/(3-2x))³` (暗部を持ち上げる S 字カーブ) を適用した後の値です:
+`l.skyLight` は**リフト曲線の適用後**の値として届きます (`y = 1-(1-x/(3-2x))³`、暗部を持ち上げる S 字カーブ):
 
 | 場所 | ボクセル生値 | リフト後 (= l.skyLight) | pow(·, 5.0) |
 |---|---|---|---|
 | 開けた空 | 1.00 | 1.00 | 1.00 |
-| 木の下 (半径2) | 0.87 | **0.97** | **0.86** ← ほぼ維持 |
-| 半径3 | 0.80 | **0.92** | 0.66 |
-| 半径5 | 0.67 | 0.78 | 0.29 |
+| 木の下 (半径 2) | 0.87 | **0.97** | **0.86** ← ほぼ維持 |
+| 半径 3 | 0.80 | **0.92** | 0.66 |
+| 半径 5 | 0.67 | 0.78 | 0.29 |
 
-**これが「ガンマを上げても影が濃くならない」根本原因**です (数値で証明済み)。`pow(skyLight, γ)` では γ=5 でも木の下 (0.97) を 0.86 までしか下げられません。
+**これが「ガンマでは影が暗くならない」ことの実証済みの根本原因**です — γ=5 でも木の下の 0.97 を 0.86 までしか下げられません。
 
-### 正解: リフト逆変換 + しきい値カット
+### 解決策: リフト逆変換 + しきい値カット
 
-曲線は単調なので代数的に厳密に逆変換できます: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`。生値を復元した後は **しきい値 `smoothstep` で二値化**します。LightEngine の BFS 横拡散は「隣接 1 ブロック = -1」のため、しきい値 `th = 1 - r/15` はそのまま「r ブロック以上の遮蔽を影とする」ダイヤルになります。
+曲線は単調で、厳密に逆変換できます: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`。生値を復元した後、**`smoothstep` のしきい値**で二値化します。LightEngine の BFS 拡散は「隣接 1 ブロックにつき -1」なので、`th = 1 - r/15` がそのまま「影とみなす遮蔽半径」のダイヤルになります。
 
-完全な実装 (太陽ゲート + 暖色/寒色分離 + blockLight 貫通つき) は [リアル系レシピ: 投影風シャドウ](recipes/realism.md) にあります。要点:
+完全な実装 (太陽ゲート + 暖色/寒色分離 + blockLight パススルー) は [リアル系レシピ](recipes/realism.md) にあります。主要なステップ:
 
 ```wgsl
-// ① 生値の復元 (これを飛ばすと永久に影にならない)
+// 1. 生値を復元する (これを飛ばすと影が永遠に出ない)
 let skyRaw = sh_unlift(l.skyLight);
-// ② しきい値でカット — 日向は1、影は0と確実に分離
+// 2. しきい値でカット — 日向は 1 / 影は 0
 let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
-// ★投影の正体: 太陽の直接光は「空が見える場所」にしか届かない
+// 投影の本質: 太陽の直接光が届くのは、空が見える場所だけ
 let lit = sunL * sky;
 ```
 
-調整ダイヤル:
-
-- **影の面積** = しきい値 `shTh` のみ (`0.93`=半径1.5 / `0.87`=半径2 / `0.80`=半径3 / `0.67`=半径5)
-- **影の縁の硬さ** = `shSoft` (0.02=硬い / 0.08=ソフト)
-- **影の芯の暗さ** = 最低環境光と空散乱光の 2 点シフト
-- **夕方の長い影の近似** = `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))`
+ダイヤル: **面積** = `shTh` (0.93→半径 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **エッジの柔らかさ** = `shSoft`; **芯の暗さ** = 最低環境光と空散乱光の 2 点シフト; 夕方の長い影 ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`。
 
 ### 正直な限界
 
-- この影は「上方向の空」を基準とするため、**太陽が時間とともに動いても影は回転しない** (解像度はブロック単位、ソフトエッジは BFS の広がりによるもの)
-- エンジンの照明テンプレートには `var shadow: f32 = 1.;` というシャドウマップ用の未使用変数が残っており (常に 1.0 = 無効)、ピクセル精度の回転する影は「将来の実装予定」の痕跡と解釈される
-- ピクセル精度の回転する影が必要な場合、それは現行 API の範囲外です ([到達できない表現](guides/constraints.md))
+- 影は**上方向の空**を参照するため、**太陽とともに回転することはない** (ボクセル解像度であり、ソフトなエッジは BFS の拡散によるもの)
+- エンジンの照明テンプレートには未使用の `var shadow: f32 = 1.;` が残っています (常に 1.0 = 無効) — ピクセル精度の回転する影に対する「将来の実装予定」の痕跡とみるのが妥当です
+- ピクセル精度の回転する影は現行 API の範囲外です ([到達できない表現](guides/constraints.md))
 
 ### 関連
 
-- [リアル系レシピ](recipes/realism.md) — 投影風シャドウの完全実装 (R9.12)
-- [エンジン内部: Lighting Internals](internals/lighting-internals.md) — blockLight / skyLight の内部構造
-- [デバッグのコツ](guides/debugging.md) — 「影が濃くならない」系の問題の診断
+- [リアル系レシピ](recipes/realism.md) (投影風シャドウの完全なレシピ) · [ライティングの内部](internals/lighting-internals.md) · [デバッグのコツ](guides/debugging.md)
 
 
 ---
@@ -3132,12 +3107,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 [← 前の部](troubleshooting/)・[マニュアルに戻る](./)・[次の部 →](internals/)
 
-### 関連
-
-- [液体のレシピ](recipes/liquids.md)
-- [頂点のレシピ](recipes/vertices.md) — 液面の波
-- [エンジン内部: Fog Internals](internals/fog-internals.md)
-
 
 ---
 
@@ -3171,12 +3140,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ```
 
 **この処理の限界:** `bloxdSunDirection()` の仕様が「太陽あり=単位方向、太陽なし=ゼロ」の二値であるなら、昼と夜の区別はできても、夕焼けや薄明を連続的に推定することはできない。また、完成色を減衰させるため、エンジン側の昼光・環境光をまとめて弱める方式であり、時間帯を完全に再現するものではない。液体にも同じ処理を適用したい場合は、液体フックのフォールバック関係を確認すること。
-
-### 関連
-
-- [照明のレシピ](recipes/lighting.md) — 夜の青シフト
-- [ライティングAPI](api/lighting.md)
-- [リアル系レシピ](recipes/realism.md)
 
 
 ---
@@ -3259,25 +3222,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## リアル化の2つの流派
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Verified (現在のAPIに移植済み — 実機での再確認を推奨)
+**流派 A: 加算修正 (defaultLight 起点)** — `engineColour` (完成色) をベースに使い、暖色グローやリムを足します。手軽で安全ですが、照明モデルはデフォルトのままです。
 
-加算修正 (既定出力起点) と完全リライティング (アルベド起点) の使い分け。
+**流派 B: 完全リライティング (s.colour 起点)** — `l.engineColour` を捨てて、`s.colour` (アルベド) と LightIn の生のマテリアルから照明を作り直します。リアル化の本命の道です。4つのルール:
 
-
-**流派 A: 加算修正 (defaultLight 起点)** — 既定の出力 (`bloxdDefaultLight` の完成色) を素地に、暖色グローや rim を足す。手軽で安全だが照明モデル自体は既定のまま。
-
-**流派 B: 完全リライティング (s.colour 起点)** — `out.colour` を放棄し、`s.colour` (アルベド) と LightIn の生データから照明を再計算する。リアル化の本命。以下の4点を遵守すること。
-
-1. **フォグをかけ直す**: light フックは最終段 (フォグの後) なので `bloxdApplyFog(col, l)` (または `mix(l.fogColour, col, 1.0 - l.fogAlpha)`) を自分で適用する (R9.10)。霧が濃すぎるときは `min(l.fogAlpha, 0.70)` のように下限を敷く。逆に既定出力起点のパックで更に霧色を混ぜると二重フォグで白濁する
-2. **ライティング無効時のフォールバック**: `if (!bloxdLit()) { return bloxdDefaultLight(s, l); }` で既定に流す (v5 ではコンパイル時分岐ではなく実行時判定)
-3. **共用関数の扱い**: v5 では `BLOXD_LIGHTING` マクロが無いため、共用関数をガードする必要はない。ライティング有無で値が変わる入力 (`blockLight` は無効時 0 など) の仕様は [ライティングAPI](api/lighting.md#bloxdlit--ライティングのゲート) を参照
-4. **太陽方向が無いとき**: `bloxdSunDirection()` がゼロなら方向性スペキュラは計算しない。`l.directional` は光量のスカラーで方向ベクトルではないため、ハイライトの方向を復元する用途には使えない。必要なら方向性のない弱い環境光に切り替える。なお月の方向は `-bloxdSunDirection()` で得られる (昼夜サイクルのあるワールドでのみ動く。[エンジン内部: 太陽と月の正体](internals/sun-and-moon.md))
-
-### 関連
-
-- [リアル系レシピ](recipes/realism.md)
-- [ライティングの仕組み](guides/lighting.md)
-- [パフォーマンス](guides/performance.md)
+1. **フォグをかけ直す**: light フックはフォグの後で走るため、`mix(l.fogColour, col, (1.0 - l.fogAlpha))` を自分で適用します (R9.10)。フォグが濃すぎるときは `min(l.fogAlpha, 0.70)` で下限を敷きます。逆に、engineColour 起点のパックにさらにフォグ色を混ぜると、二重フォグで遠景が白濁します
+2. **ライティング無効時のフォールバック**: `#ifdef BLOXD_LIGHTING` の外では `defaultLight` にそのまま流す
+3. **共用関数は関数全体をガードする**: `BloxdLightIn` を取る共用関数は、関数全体として `#ifdef BLOXD_LIGHTING` で囲む (呼び出し箇所だけのガードでは不十分)
+4. **太陽方向がないとき**: `bloxdSunDirection()` がゼロなら方向性スペキュラを計算しません。`l.directional` は光量のスカラーであって方向ベクトルではないため、ハイライトの方向を復元できません。必要に応じて方向性のない弱い環境光へ切り替えます。月の方向は `-bloxdSunDirection()` で取得できます (昼夜サイクルのあるワールドでのみ動く — [太陽と月](internals/sun-and-moon.md))
 
 
 ---
@@ -3428,34 +3381,24 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 実機テストのチェックリスト
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Verified (現在のAPIに移植済み — 実機での再確認を推奨)
+コンパイルの成功と「見た目の良さ」は別物です。次の順で確認します:
 
-コンパイルの成功と「見た目の良さ」は別。配布前に通すチェックリスト。
+1. **読み込み:** `pack.json` が ZIP のルートにあること。選択直後に `Ready. Reload the page to use it.` と表示され、パックは**ページ再読み込みで**有効化されます。その後 `Ready to use` になることを確認します。保存済みのパックは次回のページ読み込み時に自動で再検証されます。エンジン側の仕様ヘッダーが更新されるたびにヘッダー内容のフィンガープリント照合が行われ (合格 = そのまま維持 / 不合格 = blocked 表示)、壊れた古いパックが黙って有効であり続けることはありません。
+2. **6バリアント:** strict / allow、ライティング on / off、テレイン / 液体のすべてで型ガードの漏れがないこと。ゲームが一部の条件しか使用しない場合でも、配布用パックは8通りすべてを想定すべきです。
+3. **日中:** 素材 (草・石・砂・木材) ごとに色飛びがないこと。上面と側面の明暗差が自然であること。
+4. **夜間:** 同じ素材を、かつての日光下・影の中・松明の近くで比較します。明るい面だけが残る場合は露出減衰を、全体が暗くなる場合は局所光保護を調整します。
+5. **水:** 真上・浅い視線角度・岸辺・水中・夜をそれぞれ別々に確認します。アルファの挙動と水中の見た目はゲーム側の合成処理に依存するため、ひとつの視点だけで判断してはいけません。水中では液体定義のヴェールが最前面を覆うため ([シェーダーパックにできること・できないこと](guides/constraints.md#水中の正体) 参照)、パックの差は主に水面とヴェール越しのテレインに現れます。
+6. **境界と距離:** チャンク / 原点の切り替わりで波や模様がポッピングしないこと。遠景で二重フォグや白い霞が出ないこと。
+7. **性能:** フラグメントごとのハッシュ・三角関数・`pow` 呼び出しが重い効果は最小限に。ディテールを少しずつ追加し、FPS を比較します。
 
+### 既知の制約を前提とする
 
-コンパイルの成功と「見た目の良さ」は別であるため、以下の順で確認する。
-
-1. **読み込み:** `pack.json` が ZIP 直下にあること。選択直後は `Ready. Reload the page to use it.` と表示され、**ページ再読み込みで有効化**される。再読み込み後に `Ready to use` になることを確認する。なお一度保存したパックは、エンジン側の仕様ヘッダが更新されるとヘッダ内容の指紋照合により次回ページ読み込み時に自動で再検証される (合格ならそのまま有効 / 不合格なら blocked 表示)。古いパックが壊れたまま黙って有効であり続けることはない。
-2. **6バリアント:** strict / allow × terrain / liquid / model の各条件において、型ガードの漏れがないことを確認する。ゲームが一部の条件しか使用しない場合でも、配布用パックは6通りすべてを想定する必要がある。
-3. **日中:** 草・石・砂・木材など素材ごとに色が不自然に飛んでいないか、上面と側面の明暗差が不自然でないかを確認する。
-4. **夜間:** 日向だった場所と同じ素材、影、松明の近くを比較する。明るい面だけが残る場合は露出減衰、全体が暗くなる場合は局所光保護を調整する。
-5. **水:** 真上・浅い視線角度・岸辺・水中・夜を別々に見る。アルファの挙動と水中の見え方はゲーム側の合成方法に依存するため、ひとつの視点だけで判断しない。水中は[エンジン内部と研究](internals/fog-internals.md)のとおり液体定義色のヴェールが最前面に掛かるため、パック有無の差は主に水面とヴェール越しの地形で確認する。
-6. **境界と距離:** チャンク / 原点の切り替わり時に波や模様が途切れないか、遠景で二重フォグや白い霞が発生しないかを確認する。
-7. **性能:** ハッシュ・三角関数・`pow` を多用する効果は必要最小限に抑える。ディテールを少しずつ追加し、FPSを比較する。
-
-#### 既知の制約を前提にする
-
-- shader pack は terrain / liquid / model のフックに限定されており、空・UIを同じコードで処理する仕組みではない (エンティティは v5 のモデルフックで扱える)。
-- 影マップ、画面空間反射、屈折、ブルームなどを追加するための入力はこのAPIにない (シーン深度は液体限定の `bloxdOpaqueBehind()` — [関数](api/functions.md) 参照)。
-- `bloxdSeconds()` はアニメーション用の時間であり、ゲーム内の昼夜と連動する保証はない。
-- `bloxdSunDirection()` がゼロなら真の月方向ではなく、青い環境光を加える処理は雰囲気を作る近似。方向性のある月光は `-bloxdSunDirection()` で作れる (昼夜サイクルワールド限定。[エンジン内部: 太陽と月の正体](internals/sun-and-moon.md))。
-- `s.position` / `l.position` はローカル座標であるため、ワールド位置に依存する効果では `bloxdRenderOffset()` を加える。ブロック内ローカルの模様を作成する場合は、意図的にローカル座標を使用することもある。
-
-### 関連
-
-- [検証と動作確認](getting-started/validation.md)
-- [到達できない表現](guides/constraints.md)
-- [エンジン内部: パックに見える値を変えるもの](internals/testing-factors.md)
+- シェーダーパックはテレイン / 液体フックに限定されており、空・エンティティ・UI を同じコードで処理することはできません。
+- シャドウマップ、スクリーン空間反射、屈折、ブルームなどを追加する入力は存在しません (シーン深度は液体限定で `bloxdOpaqueBehind()` としてアンロック — [関数](api/functions.md) を参照)。
+- `bloxdSeconds()` はアニメーション用の時間であり、ゲーム内の昼夜との連動保証はありません。
+- `bloxdSunDirection()` がゼロの場合、真の月方向は不明であり、「月光の物理」ではなく雰囲気の近似です。方向性のある月光は `-bloxdSunDirection()` から構築できます (昼夜サイクルのあるワールドのみ — [太陽と月](internals/sun-and-moon.md))。
+- `s.position` / `l.position` はローカル座標なので、ワールドに依存する効果には `bloxdRenderOffset()` を加えます。ブロック内ローカルの模様には、ローカル座標が意図されたツールです。
 
 
 ---
@@ -3473,12 +3416,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 現実的には、**シェーダーで光と色を調整し、対応する別のリソースパックで素材や空を補う**方針が望ましい。ただし、別パックとの同時利用の可否や読み込み順については、ゲーム側の実装や設定で確認する必要がある。
 
 テクスチャパック側にも仕様がある (参考): サイズ上限は base64 変換後の JSON 文字列長で 25MB であり、PNG の base64 化は +33% 膨張するため、生画像の合計は ~18-19MB が実質上限になる。CSS は正規表現による簡易解析で処理されるため、ネストやコメントは書かないこと。
-
-### 関連
-
-- [テクスチャAPI](api/texture-api.md)
-- [テクスチャカタログ](api/texture-catalog.md)
-- [到達できない表現](guides/constraints.md)
 
 
 ---
@@ -3502,12 +3439,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - 発光ブロックが光らない → 再構築系で emission の再加算漏れ。`+ s.emission * (1.0 - l.fogAlpha)` を追加する
 
 [← 前の部](recipes/)・[マニュアルに戻る](./)・[次の部 →](troubleshooting/)
-
-### 関連
-
-- [トラブルシューティング](troubleshooting/) — 検証・コンパイルエラー
-- [実機テストのチェックリスト](guides/testing.md)
-- [エンジン内部: デバッグ手段](internals/debugging.md)
 
 
 ---
@@ -3616,12 +3547,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
     return clamp(floor(c * steps + vec3f(0.5)) / steps, vec3f(0.0), vec3f(1.0));
 }
 ```
-
-### 関連
-
-- [ライティングのレシピ](recipes/lighting.md) — light フック側の色調整
-- [数式小技集](recipes/math.md) — 彩度・色温度の計算部品
-- [APIリファレンス: 入出力構造体](api/structures.md)
 
 
 ---
@@ -3740,12 +3665,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### 関連
-
-- [ライティングAPI](api/lighting.md) — エンジンの照明レシピ
-- [リアル系レシピ](recipes/realism.md) — 物理ベースの再照明
-- [夜間表現の設計](guides/night.md)
-
 
 ---
 
@@ -3800,11 +3719,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
-### 関連
-
-- [ライティングAPI](api/lighting.md) — emission とフォグの順序
-- [リアル系レシピ](recipes/realism.md)
 
 
 ---
@@ -3864,11 +3778,6 @@ let facing = clamp(dot(viewDir, s.normal), 0.0, 1.0);   // 真上から 1 / 浅�
 let fresnel = pow(1.0 - facing, 3.0);
 ```
 
-### 関連
-
-- [関数](api/functions.md) — `bloxdWorldPosition` / `bloxdRenderOffset`
-- [数式小技集](recipes/math.md)
-
 
 ---
 
@@ -3912,20 +3821,11 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 }
 ```
 
-### 関連
-
-- [関数](api/functions.md) — `bloxdSeconds`
-- [定数](api/constants.md) — `bloxdTau`
-
 
 ---
 
 ## 液体
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
-
-Liquid フックで水を演出するレシピ。**v5 では、パックに Liquid Hook がない場合、水には Terrain Hook も実行されません** ([フックの分担](api/hooks.md))。
-
-
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Verified (現在のAPIに移植済み — 実機での再確認を推奨)
 ### 水面のさざ波 (色の明滅)
 
 ```wgsl
@@ -3942,9 +3842,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### 高度を使った透明度の疑似変化 (本当の浅瀬判定ではない)
+### 高度による透明度の疑似変化 (本当の浅瀬判定ではない)
 
-> 液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れます (`#ifdef BLOXD_SCENE_DEPTH` ガード付き、[APIリファレンス](api/functions.md#bloxdopaquebehind))。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
+> 本当の水深には液体限定の `bloxdOpaqueBehind()` が必要で、これは背後の不透明面までの厚みを測ります (完全なレシピ: [水を自然に見せる方法](guides/water.md))。以下はそれを使わない、より単純な疑似スタイリングです: `s.position.y` はローカル座標なので、そのまま使うとチャンク原点の変化で効果がずれます。ワールド高度には `bloxdWorldPosition()` で変換します。以下はワールド高度でアルファを変えるだけの疑似効果であり、海岸線・水底を考慮した浅瀬ではありません。`packWaterReferenceY` はワールドの高度に合わせて調整してください。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -3955,7 +3855,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     let worldY = s.position.y + f32(bloxdRenderOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
-    // 低高度では薄く、高高度では元のアルファ値に近づける。ゲーム内で向きを確認する必要がある。
+    // 低高度では薄く、高高度では元のアルファに近づける。向きはゲーム内で確認すること
     out.alpha = mix(0.45, 0.9, heightFactor) * s.alpha;
     #endif
     return out;
@@ -3978,15 +3878,9 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ```wgsl
 // terrain_* フックは一切記述しない。これにより:
-//  - terrain バリアント = フック無し = 地形はエンジンの既定設定のまま
+//  - terrain バリアント = フック無し = 地形はエンジンの既定のまま
 //  - liquid バリアント  = liquid_* フックのみ有効
 ```
-
-### 関連
-
-- [水を自然に見せる方法](guides/water.md) — 統合レシピ
-- [頂点のレシピ](recipes/vertices.md) — 液面の波 (allow 限定)
-- [APIリファレンス: シェーダーフック](api/hooks.md)
 
 
 ---
@@ -4057,11 +3951,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-### 関連
-
-- [バリアントとガード](getting-started/variants.md)
-- [エンジン内部: ゲーム別の適用モード](internals/policy.md)
-
 
 ---
 
@@ -4095,11 +3984,6 @@ fn pack_triangle(x: f32) -> f32 { return abs(fract(x) * 2.0 - 1.0); }
 // 秒 → 「ゆっくりな位相」に変換
 let phase = t * 0.15;
 ```
-
-### 関連
-
-- [色のレシピ](recipes/colors.md)
-- [時間とアニメーションのレシピ](recipes/animation.md)
 
 
 ---
@@ -4410,12 +4294,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
 [← 前の部](api/)・[マニュアルに戻る](./)・[次の部 →](guides/realism.md)
-
-### 関連
-
-- [リアル化ガイド](guides/realism.md) — 考え方と2つの流派
-- [影の表現](guides/shadows.md) — R9.12 の背景
-- [ライティングAPI](api/lighting.md)
 
 
 ---
@@ -4824,57 +4702,53 @@ zip・`pack.json` など、**ローダー段階** (最初の門) で弾かれる
 ---
 
 ## APIバージョンエラー
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (ライブ i18n 辞書から逐語)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番検証済み) · 検証状況: Verified (ライブ i18n 辞書から逐語)
 
 `apiVersion` まわりのエラーです。現行ゲームは **`5` のみ**を受け付けます。
 
 ### 「pack.json needs "apiVersion": {{version}}.」
 
-- **症状**: 読み込み直後にこのメッセージ (`loadNoApiVersion`)
-- **原因**: `pack.json` に `apiVersion` キー自体が無い
-- **確認方法**: `pack.json` を開く
-- **解決方法**: `"apiVersion": 5` を追加する (**数値**。文字列 `"5"` は失敗する)
+- **症状**: 読み込み直後にこのメッセージが出る (`loadNoApiVersion`)
+- **原因**: `apiVersion` キー自体が存在しない
+- **解決方法**: `"apiVersion": 5` を追加する — **数値**として (文字列 `"5"` は失敗する)
 - **再発防止**: [pack.json](getting-started/manifest.md) のテンプレートから作り始める
 
 ### 「This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.」
 
 - **症状**: `loadWrongApiVersion`
-- **原因**: `apiVersion` はあるが `5` に等しくない (v1〜v4 のパック)
-- **解決方法**: 対象バージョンに応じた移行手順を適用する ([バージョン履歴](history/)):
-  - v4 → v5: [v5 移行ガイド](history/v5.md) — ほぼ機械的 (flags・`bloxdLit()`・`bloxdFragmentBlockPosition` の注意点)
-  - v3 → v5: v4 の変更 ([v4](history/v4.md)) を経由
-  - v2 以前 → v5: v3 ([v3](history/v3.md)) → v4 → v5 と段階適用
-- **再発防止**: API が更新されたらドキュメントの [互換性](api/compatibility.md) と該当バージョンの移行ガイドを確認する
+- **原因**: `apiVersion` はあるが 5 ではない (v1〜v4 のパック)
+- **解決方法**: 対応する移行を適用する ([バージョン履歴](history/)):
+  - v4 → v5: [v5 移行ガイド](history/v5.md) — ほぼ機械的 (flags · `bloxdLit()` · `bloxdFragmentBlockPosition` の注意点)
+  - v3 → v5: まず [v4](history/v4.md) を適用
+  - v2 以前 → v5: v3 → v4 → v5 の順に段階適用
+- **再発防止**: API 更新の後は、[互換性](api/compatibility.md) と対応する移行ガイドを確認する
 
-### 文字列 `"5"` を入れたのに弾かれる
+### 文字列 "5" は弾かれる
 
-- **原因**: ローダは `manifest.apiVersion !== 5` を**厳密比較** (`===`) する。JSON の文字列 `"5"` は数値 `5` と等しくない
-- **確認方法**: `pack.json` で `"apiVersion"` の値がクォートに入っていないか
-- **解決方法**: `"apiVersion": 5` (クォートなし) にする。失敗時は JSON 上の表記つきで報告される
+- **原因**: ローダーは `manifest.apiVersion !== 5` を**厳密に** (`===`) 比較する。JSON 文字列 `"5"` は数値 5 ではない
+- **解決方法**: `"apiVersion": 5` (クォートなし) にする
 
-### 保存してあった旧パックが例外も出さずに効かなくなった
+### 保存してあった旧パックが黙って動かなくなった
 
-- **症状**: 以前動いていた v1〜v4 パックが無反応。例外は出ない
-- **原因**: 保存パックの結果は `{kind: "none", reason: "otherApiVersion"}` に解決し、**暗黙に不活性化**する
-- **確認方法**: シェーダーパック設定タブのステータス行: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-- **解決方法**: 移行した新版を同じ画面から読み込んで置き換える
-- **再発防止**: 配布者は API 更新後にバージョンを上げた新版を再配布し、プレイヤーに案内する ([配布](getting-started/distribution.md))
+- **症状**: 以前は動いていた v1〜v4 パックが無反応になる。例外は出ない
+- **原因**: 保存パックは `{kind: "none", reason: "otherApiVersion"}` に解決され、**黙って不活性化**する
+- **確認方法**: 設定タブのステータス行: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+- **解決方法**: 同じ画面から移行済みの置き換えパックを読み込む
+- **再発防止**: API 更新の後は、バージョン番号を上げた新版を再リリースして告知する ([配布](getting-started/distribution.md))
 
-### v4 パックを v5 に移植したら検証に落ちる
+### 移行した v4 パックが検証に落ちる
 
-典型的な3パターン ([v5 移行ガイド](history/v5.md) に全手順):
+典型的な3パターンです (全手順は [v5 移行ガイド](history/v5.md) を参照):
 
 | 検証メッセージ | 原因 | 直し方 |
 |---|---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` の使用 | `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` に書き換え |
-| `bloxdBlockFlagRock isn't part of the shader pack API...` (予約名診断) | 旧ビット定数の残存参照 | `surface.flags.rock` 等へ (1対1対応表は [フラグ](api/flags.md)) |
-| `bloxdFragmentBlockPosition` が無い | v5 からはドキュメントされたヘッダーにない (注入と受け入れは継続 — [関数](api/functions.md) 参照) | 修正不要: コンパイルは通る。新規コードには `flags` / `bloxdWorldPosition()` を推奨 |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` の使用 | `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` に書き換える |
+| `bloxdBlockFlagRock isn't part of the shader pack API...` (予約名診断) | ビット定数への残存参照 | `surface.flags.rock` 等を使用 (1対1対応表は [フラグ](api/flags.md)) |
+| `bloxdFragmentBlockPosition` がない | v5 からはドキュメントされたヘッダーにない (注入と受け入れは継続 — [関数](api/functions.md) 参照) | 修正すべきエラーではない: コンパイルは通る。新規コードでは `flags` / `bloxdWorldPosition()` を推奨 |
 
 ### 関連
 
-- [互換性](api/compatibility.md) — バージョン間運用の全体
-- [バージョン履歴](history/) — v1〜v5 の移行ガイド
-- [pack.json](getting-started/manifest.md) — マニフェストの全フィールド
+- [互換性](api/compatibility.md) · [バージョン履歴](history/) · [pack.json](getting-started/manifest.md)
 
 
 ---
@@ -4995,8 +4869,6 @@ zip・`pack.json` など、**ローダー段階** (最初の門) で弾かれる
 
 v5 のアナライザは `blockFlags` を読み続けるパックや light フックを `#ifdef BLOXD_LIGHTING` で括るパックに**固有のメッセージ**を出すようになったため、暗黙に誤動作することはありません ([v5 移行](history/v5.md))。
 
-### テクスチャ名の検証メッセージ
-
 `bloxdTextureId*` の名前解決エラー (スペル補正・フレーム綴り・回転綴り) は [テクスチャの問題](troubleshooting/textures.md) に分けています。
 
 ### 関連
@@ -5077,62 +4949,57 @@ v5 のアナライザは `blockFlags` を読み続けるパックや light フ�
 ## 視覚の問題
 > 対象API: 5 · 検証状況: Verified
 
-コンパイルは通るが見た目がおかしい系です。
+コンパイルは通るのに見た目がおかしいケースです。
 
 ### 遠景が白く濁る
 
-- **原因**: フォグの二重掛け。既定の light フック出力は**フォグ適用済み** (`bloxdApplyFog(lit + emission, light)`) なので、その上に独自の霧色を `mix` すると二重になる
-- **確認方法**: 独自フォグを外したときに白濁が消えるか確認
-- **解決方法**: 独自の霧は控えめにし、彩度だけを落とす方式 (大気遠近法) を検討 ([リアル系レシピ](recipes/realism.md))
-- **再発防止**: フォグの意味論 (0 = no fog, 1 = only fogColour) と適用位置 ([処理フロー](api/lighting.md#全体の処理フロー)) を確認してから書く
+- **原因**: フォグの二重掛け。既定の light フック出力は**フォグ適用済み** (`bloxdApplyFog(lit + emission, light)`) なので、上にさらにフォグ色を混ぜると二重になります
+- **解決方法**: 独自フォグは控えめにし、彩度だけを落とす大気遠近法を検討する ([リアル系レシピ](recipes/realism.md))
+- **再発防止**: フォグを書く前に、`fogAlpha` の意味 (0 = no fog、1 = only fogColour) と[パイプライン](api/lighting.md#全体の処理フロー)を理解する
 
-### `pow(l.skyLight, γ)` をいくら上げても影が濃くならない
+### pow(l.skyLight, γ) をいくら上げても影が濃くならない
 
-- **原因**: `skyLight` はエンジンのリフト曲線通過後の値 (生値 0.87 が 0.97 で届く)。ガンマ方式は数学的に対抗できない
-- **解決方法**: リフト逆変換 + しきい値カットに切り替える ([影の表現](guides/shadows.md) — 数値で証明済み)
+- **原因**: `skyLight` はリフト曲線通過後の値として届く (生値 0.87 が 0.97 で届く)。ガンマでは数学的に対抗できません
+- **解決方法**: リフト逆変換 + しきい値カットに切り替える ([影の表現](guides/shadows.md))
 
 ### ブロックがほとんど真っ白になる
 
-- **原因**: light フック出力の合計が 1.0 を超過している (出力の先にクランプは存在しない)
-- **解決方法**: 最後に `clamp(col, vec3f(0.0), vec3f(1.0))` を挿入する
+- **原因**: light フックの出力が 1.0 を超えている (出力の先にクランプは存在しない)
+- **解決方法**: 末尾に `clamp(col, vec3f(0.0), vec3f(1.0))` を追加する
 
-### 加算が無いのに白い
+### 加算していないのに白い
 
-- **原因**: フォグの除算による un-fog 逆算
-- **解決方法**: un-fog を外す。再構築する場合は `s.colour` を起点とし、フォグは最後に一度だけ `mix` (または `bloxdApplyFog`) で適用
+- **原因**: 除算による un-fog の逆算
+- **解決方法**: un-fog をやめる。`s.colour` から再構築し、フォグは最後に一度だけ (または `bloxdApplyFog` で) 適用する
 
 ### 発光ブロックが光らない (再構築系パック)
 
-- **原因**: emission の再加算漏れ。`engineColour` を捨てて再構築した場合、emission は自分で足す必要がある
-- **解決方法**: `+ s.emission * (1.0 - l.fogAlpha)` を追加する (フォグ通しで加算)。v5 なら `bloxdLitColour()` + emission + `bloxdApplyFog` の構成が安全 ([ライティングAPI](api/lighting.md))
-- **再発防止**: 再構築系の定石は [フォグをかけ直す定石](recipes/realism.md) を参照
+- **原因**: emission の再加算漏れ — 既定出力を捨てるということは、emission を自分で足す必要があるということです
+- **解決方法**: `+ s.emission * (1.0 - l.fogAlpha)` を追加する。v5 では `bloxdLitColour()` + emission + `bloxdApplyFog` の構成が最も安全です ([ライティング](api/lighting.md))
 
 ### チャンク / 原点の切り替わりで波や模様が途切れる
 
-- **原因**: レンダー座標 (カメラ近傍原点) をそのまま使っている。プレイヤーの移動で原点が動く
-- **解決方法**: ワールド依存の効果は `bloxdWorldPosition(position)` を使う ([座標のレシピ](recipes/coordinates.md))
-- **注意**: ワールド座標は f32 精度の限界があるため、極端に遠い座標では誤差が出うる
+- **原因**: レンダー空間の座標をそのまま使っている — 原点はプレイヤーとともに移動します
+- **解決方法**: ワールド依存の効果には `bloxdWorldPosition(position)` を使う ([座標](recipes/coordinates.md))。原点から遠い場所での f32 の精度限界にも注意
 
 ### 水面の模様が回転した面でずれる
 
-- **原因**: `bloxdTexel` は渡した uv に現在のフラグメントの `textureRotation` を適用する ([回転の繊細さ](api/texture-api.md#回転の繊細さ--中立サンプリングヘルパー))
-- **解決方法**: 別テクスチャを回転中立にサンプルするなら `texelNeutral` ヘルパーで uv を事前回転する
+- **原因**: `bloxdTexel` はフラグメント自身の `textureRotation` を渡した uv に適用する ([回転の繊細さ](api/texture-api.md#回転の繊細さ--中立サンプリングヘルパー))
+- **解決方法**: `texelNeutral` ヘルパーで事前回転する
 
-### エンチャントのきらめきが消えた / 被弾フラッシュが消えた
+### エンチャントのきらめき / 被弾フラッシュが消えた
 
-- **原因**: カスタムライティングで `enchantColour` / `overlayColour` 出力を含めずに再構築した
-- **解決方法**: `out.enchantColour = surface.enchantColour;` のパススルーを入れるか、`bloxdLitColour()` を使う ([エンチャント効果](recipes/enchant-effects.md))
-- **v5 の仕様**: `bloxdDefaultSurface` は両方を無変更で通すため、デフォルト経由なら勝手に消えることはない
+- **原因**: カスタムライティングで `enchantColour` / `overlayColour` を通さずに再構築した
+- **解決方法**: これらをパススルーするか、`bloxdLitColour()` を使う ([エンチャント効果](recipes/enchant-effects.md))
+- **v5**: `bloxdDefaultSurface` は両方を変更せずに通すため、デフォルト経由では失われることはありません
 
-### 空や雲・太陽円盤に効かない
+### 空・雲・太陽円盤に効かない
 
-- **原因**: **仕様** — フックの対象は terrain / liquid / model のみ。空はどのプログラムにも入らない ([到達できない表現](guides/constraints.md))
+- **仕様です**: フックが対象とするのはテレイン / 液体 / モデルのみ ([到達できない表現](guides/constraints.md))
 
 ### 関連
 
-- [ライティングの問題](troubleshooting/lighting.md) — 明るさ系の診断
-- [デバッグのコツ](guides/debugging.md) — 症状→原因の一覧
-- [フォグの内部](internals/fog-internals.md)
+- [ライティングの問題](troubleshooting/lighting.md) · [デバッグのコツ](guides/debugging.md) · [フォグの内部](internals/fog-internals.md)
 
 
 ---
@@ -5459,23 +5326,19 @@ WebGPU 対応が限定される環境では動きません ([動作環境](getti
 ---
 
 ## レンダリングパイプライン
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Analyzed (本番バンドルの JavaScript 解析)
+- **surface フックは alphaTest の「手前」で動く**: `out.alpha` が discard 判定に直接渡されます。カットアウトマテリアル (草・葉) ではディザ式の溶解エフェクトが作れます (レシピ R-C)。液体 (ブレンド描画) では `out.alpha` が実際の透明度になります (レシピ R-D)。通常の不透明テレインには影響しません — 誤解しないこと
+- **`l.ambient` の中身**は `material.ambient × sceneAmbient` で、マテリアルごとに異なります。シーン側はグラフィック設定「Ambient Lighting Intensity」(既定 0.5) に直結しているため、既定値を決め打ちしないこと
+- **シーンの方位光は 2 灯構成**: 主光 (方向はスカイ設定の太陽位置に由来、強度 1.0) とフィル光 (方向 `[-0.5, -1, -1]`、強度 0.35) の Lambert 和が `l.directional` に届きます。フィル光は下向きのため天面には寄与せず、下向きの面 (洞窟の天井など) を拾います。テレインが考慮するのは `_initScene` で追加された光のみで、起動後にシーンへ追加された光はテレインとブロックモデルから無視されます (公式の警告メッセージがそう述べています)
+- **`bloxdSeconds()` の正体は `performance.now()`**: ブラウザの稼働時間を 1 時間で折り返したものです。ゲーム内の昼夜やワールドの経過時間とは無関係です。ゲームの時計に同期したアニメーションを作るには、昼夜サイクルのあるワールドで `bloxdSunDirection()` の方位角から時刻を推定します
+- **ヘッダー関数は 1 つの uniform を読む**: エンジンは 64 バイトの uniform `bloxdPackInputs` を `@group(3) @binding(0)` に置いており (5 スロット — seconds / lit / renderOffset / sunDirection / eyePosition、little-endian)、`bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` はこれらのスロットの読み出しに相当します ([パック形式: フレームごとの uniform](api/pack-format.md#per-frame-uniform-bloxdpackinputs))。パックからこの uniform を書き込むことはできず、パックとエンジンの WGSL は単一モジュールに合成されるため、同じ group/binding を自分で宣言することも不可能です。`@group(3) @binding(1)` には液体用の scene-depth テクスチャ、`@binding(2)` には `bloxdSpTextureLayers` ストレージバッファが来ます
+- **頂点データはメッシャー (Web Worker) が構築する**: ブロックのテレインは 1 頂点 28 バイト (アトラス有効時は 32 バイト) のインターリーブで並べられます — position = float32×3 / normal = 符号付き 8bit 整数×4 / colour = 正規化 8bit 整数×4 (`s.colour` の実体 — tint × AO がメッシャー段階で 8bit に焼き込まれるため、パック側で分離・復元するのは原理的に不可能です) / UV = float32×2 / atlasIndex = float32。ライトレベルだけは別個の 4 バイト頂点バッファで運ばれます (実測値: [エンジンデータ台帳](internals/engine-data.md))。頂点はチャンク単位の instancing で描かれます
+- ロード時のチャンク境界に見える細かい市松模様は、エンジンの画面空間 Bayer 4×4 ディザによるチャンクフェードであり、パックのバグではありません (グラフィック設定 `chunkFadeIn` で無効化できます)
+- **`mod` は予約語**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` で拒否されます。剰余は `%` 演算子で書いてください
 
-alphaTest の位置、方位光 2 灯構成、uniform の実体、greedy meshing と頂点フォーマット。
+### R-C. Bayer ディザ溶解 — out.alpha が discard を制御する
 
-
-- **surface フックは alphaTest の「手前」で動く**: `out.alpha` がそのまま discard 判定に使われる。カットアウトマテリアル (草・葉など) ではディザパターンで溶けるようなエフェクトが作れる (レシピ R-C)。液体 (ブレンド描画) では `out.alpha` が実際の透明度になる (レシピ R-D)。通常の不透明地形では alpha は最終的に無視される
-- **`l.ambient` の中身**は `material.ambient × sceneAmbient` でマテリアルごとに異なる値である。シーン側はグラフィック設定「Ambient Lighting Intensity」(既定 0.5) に直結しているため、既定値の決め打ちをしないこと
-- **シーンの方位光は 2 灯構成**: 主光 (方向はスカイ設定の太陽位置に由来・強度 1.0) とフィル光 (方向 `[-0.5, -1, -1]`・強度 0.35) の Lambert 和が `l.directional` に届く。フィル光は方向が下向きのため天面には寄与せず、下向きの面 (洞窟の天井など) を拾う。地形が考慮するのは `_initScene` で追加された灯のみで、起動後にシーンへ追加した灯は地形・ブロックモデルから無視される (公式の警告文言がある)
-- **`bloxdSeconds()` の正体はページ読み込みからの経過秒** (v2 では `performance.now() / 1e3 % 3600` と1時間で折り返していたが、v3 以降の `seconds` uniform スロットは折り返さない)。ゲーム内昼夜ともワールドの経過時間とも無関係。ゲーム内時計と同期したアニメーションを作りたい場合は、昼夜サイクル実装ワールドの `bloxdSunDirection()` 方位角から推定するのが現実的である
-- **ヘッダ関数の実体は 1 本の uniform**: エンジンは `@group(3) @binding(0)` に 64 バイトの uniform `bloxdPackInputs` (v5 では seconds / **lit (u32、新設)** / renderOffset / sunDirection / eyePosition の 5 スロット・little-endian) を置いており、`bloxdSeconds()`・`bloxdLit()`・`bloxdRenderOffset()`・`bloxdSunDirection()`・`bloxdEyePosition()` は各スロットの読み出しに相当する ([パック形式](api/pack-format.md#per-frame-uniform-bloxdpackinputs))。パックからこの uniform を書き換えることはできず、パックとエンジンの WGSL は同一モジュールに合成されるため、同じ group/binding を自分で宣言することもできない。`@group(3) @binding(1)` には liquid 用の scene-depth テクスチャ、`@binding(2)` には `bloxdSpTextureLayers` ストレージバッファが来る
-- **頂点データはメッシャー (Web Worker) が作る**: ブロックの地形を 1 頂点 28 バイト (アトラスありは 32 バイト) のインターリーブで整え、位置 = float32×3 / 法線 = 8bit 信号整数×4 / 色 = 8bit 準整数×4 (`s.colour` の実体 — tint × AO がメッシャーの時点で 8bit に焼き込まれ、パックから分離・復元は原理的に不可) / UV = float32×2 / atlasIndex = float32。ライトレベルだけは独立した 4 バイト頂点バッファで運ばれる ([blockLight の内部構造](internals/lighting-internals.md))。頂点はチャンク単位の instancing で描かれる
-- チャンク読み込み時の「細かい市松模様」はエンジンの画面空間 Bayer 4×4 ディザによるチャンクフェードであり、パック由来のバグではない (グラフィック設定の `chunkFadeIn` をオフにすると無効化できる)
-- **`mod` は予約語**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` で拒否される。剰余は `%` 演算子で書く
-
-### Bayer ディザ溶解 — out.alpha が discard を制御する — out.alpha が discard を制御する
-
-エンジンがチャンクフェードに使っているのと**同じ Bayer 4×4 テーブル**を再現し、低いブロックから順にディザで「溶ける」cutout を作る。alphaTest マテリアル (草・葉など) では discard が走り、液体ではブレンドの透明度になる。
+エンジンがチャンクフェードに使っているのと**同じ Bayer 4×4 テーブル**を再現し、低いブロックから上へ向かって cutout を溶かします。alphaTest マテリアル (草・葉) では discard が発生し、液体ではブレンドの透明度になります。
 
 ```wgsl
 fn sp_bayer4(pos: vec2f) -> f32 {
@@ -5507,7 +5370,7 @@ fn sp_bayer4(pos: vec2f) -> f32 {
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     #ifdef BLOXD_ALPHA
-    // y の値が小さいブロックから順に溶解する。dissolve の値が高いほど残りやすい
+    // 低いブロックから順に溶解する。dissolve が高いほど残る
     let dissolve = smoothstep(-8.0, 24.0, s.position.y + vec3f(bloxdRenderOffset()).y);
     let thresh   = sp_bayer4(s.position.xz);
     out.alpha    = select(0.0, out.alpha, dissolve >= thresh);
@@ -5516,9 +5379,9 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### 水のカメラ近接フェード — 液体の alpha で見通しを確保する — 液体の alpha で見通しを確保
+### R-D. カメラ近傍の水フェード — 液体 alpha で視界を確保
 
-液体フックの `out.alpha` はブレンドに直接関係する。カメラ直下の水面だけを透過させ、潜水・水上カメラの視界を確保するための手法。
+液体フックの `out.alpha` はブレンドに直接反映されます。カメラ直下の水面だけをフェードさせ、潜水時・水上カメラの視界を確保します。
 
 ```wgsl
 fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -5530,12 +5393,6 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
-### 関連
-
-- [パック形式](api/pack-format.md)
-- [エンジンデータ台帳](internals/engine-data.md)
-- [シェーダー検証の内部](internals/shader-validation.md)
 
 
 ---
@@ -6031,12 +5888,6 @@ v4 の 27 から **46 シンボル**へ増えました (20 追加、1 引退 —
 
 `skyLightEmission` (0〜15) を持つカスタムブロックは、**blockLight の BFS とは別に skyLight チャンネルそのものを注入できる**。[投影風シャドウ](recipes/realism.md) のような「skyLight のしきい値で日向/影を判別する」パックは、人工光源で skyLight が持ち上げられているワールドでは誤判定になりうる。配布パックでは blockLight との組み合わせで判定する方が頑健である。
 
-### 関連
-
-- [影の表現](guides/shadows.md) — skyLight = ボクセル影マップ
-- [ライティングAPI](api/lighting.md)
-- [エンジンデータ台帳](internals/engine-data.md)
-
 
 ---
 
@@ -6066,12 +5917,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
-### 関連
-
-- [水を自然に見せる方法](guides/water.md)
-- [視覚の問題](troubleshooting/visual.md)
-- [エンジンデータ台帳](internals/engine-data.md)
 
 
 ---
@@ -6144,60 +5989,51 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## テクスチャレジストリの内部
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (エンジンのレジストリ構築器を再現実行して抽出)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番検証済み) · 検証状況: Verified (エンジン自身のレジストリ構築器を再実行して抽出)
 
 名前→id の解決機構と、レジストリのドリフトの実測です。利用者向けのカタログは [テクスチャカタログ](api/texture-catalog.md) を参照。
 
 ### 計測手法
 
-出荷ブロックレジストリのテクスチャデータに対して、エンジン自身のレジストリ構築モジュール (このビルドでは 29833、協調する module 1371 / 1391 / 1384 / 219) をミニ webpack ハーネスで実行し、その出力を記録しました。つまりこのページの数値は「解析者が似せて作った再実装」ではなく、**本番バンドル自身が計算した結果そのもの**です。
+出荷ブロックレジストリのテクスチャデータに対して、エンジン自身のレジストリ構築モジュール (このビルドでは 29833、協調する module 1371 / 1391 / 1384 / 219) をミニ webpack ハーネスで実行し、その出力を記録しました — この数値は**本番バンドル自身の計算結果**であり、再実装ではありません。
 
 ### 出力の構造
 
-レジストリ構築器は3種類の出力を持ちます:
-
 | 出力 | v5 実測 | 意味 |
 |---|---|---|
-| `named` | **896** | `bloxdTextureId<Name>` として参照可能な名前 (CamelCase 化の元) |
-| `aliases` | 416 | 畳み込み対象の綴り — フレームエイリアス 188 (`lava0` 等) と回転エイリアス 228 (`chest_top[rot[1` 等) |
-| `layers` | 228 | レイヤー表 — 事前回転 171 スロットを含む (57 ルート × 4 回転) |
+| `named` | **896** | `bloxdTextureId<Name>` として参照可能な名前 |
+| `aliases` | 416 | 畳み込み綴り — フレームエイリアス 188 (`lava0` 等) と回転エイリアス 228 (`chest_top[rot[1` 等) |
+| `layers` | 228 | レイヤー表 — 事前回転スロット 171 を含む (57 ルート × 4 回転) |
 
 ### 畳み込み規則
 
-- **アニメーション族** (42族): フレーム綴り (`lava0`〜`lava7`) は基底名 (`lava`) に畳み込まれる。`bloxdTexel` がサンプル時に現在フレームを返す
-- **回転族** (57族): 回転スロット (`[rot[1..4`) は root 名に畳み込まれる。`bloxdTexel` が面の `textureRotation` に従って再適用する
-- `radar_screen` は唯一両方の族に属します (4 つの先行回転コピーがそれぞれ独自の 4 フレームラダーを持つため、アトラス上のアニメーションルートは 42 ではなく 45 個)
+- **アニメーション族** (42): フレーム綴り (`lava0`–`lava7`) は基底名 (`lava`) に畳み込まれる。`bloxdTexel` はサンプル時に現在のフレームを返す
+- **回転族** (57): 回転スロット (`[rot[1..4`) はルート名に畳み込まれる。`bloxdTexel` は面ごとの `textureRotation` を再適用する
+- `radar_screen` は両方の族に属する唯一の名前です (先行回転された 4 つのコピーがそれぞれ独自の 4 フレームラダーを持つため、アトラス上のアニメーションルートは 42 ではなく 45 個になります)
 
 ### ドリフト (cnty9 → ab90qa)
-
-レジストリはビルド同梱のコンテンツであり、ブロック更新のたびに動きます:
 
 | 計測 | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
 | アトラスエントリ | 1,219 | **1,210** |
-| 回転ファミリ (回転綴り) | 57 (228) | **57 (228) — 不変** |
-| アニメファミリ (フレーム綴り) | 42 (188) | **42 (188) — 不変** |
+| 回転族 (回転綴り) | 57 (228) | **57 (228) — 不変** |
+| アニメーション族 (フレーム綴り) | 42 (188) | **42 (188) — 不変** |
 | 利用可能な名前付き定数 | 905 | **896** |
-| 生存名の id 変動 | — | **905 名中 334 名が異なる id に** |
+| 生存名の id 変動 | — | **905 名中 334 名** |
 
-ドリフトの全体 (11 名):
-
-- **追加 (1):** `scorpion_eggs`
-- **削除 (10):** 8 個のダブルチェストテクスチャ (`chest_double_front` / `_hi` / `_lo`、`chest_double_back` / `_hi` / `_lo`、`chest_double_top_1_hi` / `_lo`、`chest_double_top_2_hi` / `_lo`) と `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — ダブルチェストがゲームデータから消え、スポナーは `mob_spawner_block_top` を維持
+ドリフトの全体 (11 名): 追加 (1) `scorpion_eggs`。削除 (10) ダブルチェストの 8 テクスチャと `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (ダブルチェストがゲームデータから消え、スポナーは `mob_spawner_block_top` を維持)。
 
 ### HEADER_VERSION への影響
 
-`HEADER_VERSION` のレジストリハッシュ接尾辞は id を焼き込むため、上記のドリフトは**全保存パックを「要再チェック」にします** (ページ読み込み時に自動再検証)。名前で書いたパックは解決し直されるため生き延び、生 id で書いたパックは壊れます ([互換性](api/compatibility.md))。
+レジストリハッシュの接尾辞は id を焼き込むため、このドリフトは**保存済みの全パックを「要再チェック」にします** (ページ読み込み時に自動再検証)。名前で書いたパックは再解決を生き延び、生 id で書いたパックは壊れます ([互換性](api/compatibility.md))。
 
 ### 過去のドリフト記録
 
-10月の2ビルド比較 (sjr0p7 → cnty9、10日間): エントリ 1200 → 1219 (98 追加・79 削除)、改名されなかった 1121 名中 **779 名が id を変更** (69%)、命名規約の移行 (`_rot1..4` 接尾辞 → `[rot[1..4` スロット)、ダブルチェストの登場。詳細な経緯は [バージョン履歴: v4](history/v4.md) に当時の記録があります。
+10月の2ビルド比較 (sjr0p7 → cnty9、10日間): エントリ 1200 → 1219 (98 追加・79 削除)。綴りの変わらなかった 1121 名中 779 名が id を変更 (69%)。命名規約の移行 (`_rot1..4` 接尾辞 → `[rot[1..4` スロット)。ダブルチェストの登場。完全な記録は [バージョン履歴: v4](history/v4.md) にあります。
 
 ### 関連
 
-- [テクスチャカタログ](api/texture-catalog.md) — 896名の一覧
-- [シェーダー検証の内部](internals/shader-validation.md) — HEADER_VERSION
-- [リサーチログ](internals/research-log.md) — 計測手法の記録
+- [テクスチャカタログ](api/texture-catalog.md) · [シェーダー検証](internals/shader-validation.md) · [リサーチログ](internals/research-log.md)
 
 
 ---
@@ -6299,24 +6135,14 @@ Model プログラムはバリアント行列の1軸を構成します: `strict.
 ---
 
 ## パックに見える値を変えるもの
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03, 本番) · 検証状況: Analyzed (本番バンドルの JavaScript 解析)
+同じパックでも**ワールドとプレイヤー設定によって**見え方が変わります。配布前に少なくとも次の 3 つの環境で確認してください:
 
-同一のパックでもワールドとプレイヤー設定により `l.*` の内容は変化する。配布前の環境マトリクス。
+1. **通常ワールド** (デフォルトスカイボックス、オーバーライドなし) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`、既定色
+2. **space スカイボックスのワールド** — bloxdSunDirection() = 0。`sunPresent` 分岐の見た目
+3. **`visionMinLightColour` / `skyLightColourOverride` を設定したカスタムワールド** — 暗部と色が持ち上がる
 
-
-同一のパックでも、**ワールドとプレイヤー設定により `l.*` の内容が変化する**。配布前に、少なくとも以下の 3 つの環境で見た目を確認すること。
-
-1. **通常ワールド** (default スカイボックス・オーバーライド無し) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`・既定色
-2. **space 系スカイボックスのワールド** — bloxdSunDirection() = 0。`sunPresent` 分岐の見た目
-3. **`visionMinLightColour`・`skyLightColourOverride` を設定したカスタムワールド** — 暗部と色が持ち上がるケース
-
-主な変動源: `lightingOverride` (照明強制) / `skyLightColourOverride`・`ambientLightColourOverride` (hex 差し替え) / `visionMinLightColour` (視認最暗色。実装は `uSkyLightColour` と `uAmbientLightColour` 双方への成分毎 max であり、Night Vision が使用。「洞窟を真っ暗に」系は想定より暗くならず、空の色自体も底上げされる) / `heldLightColourOverride`・`Range`・`ConeAngle` / `fogChunkDistanceOverride`・`fogColourOverride`・`fogOnSkybox` / `skyBox` (bloxdSunDirection() の有無)。`uSkyLightColour` 既定 = (1,1,1) 白、`uAmbientLightColour` 既定 = (0.25,0.25,0.30)。`l.ambient` のシーン成分 = グラフィック設定「Ambient Lighting Intensity」(既定 0.5)。`(1.0 - l.fogAlpha)` はプレイヤーのフォグ/チャンク距離設定に追従。ほかに `cameraTint` (画面全体への RGBA ティント) と `proximityFadeDistance`・`proximityFadeMinOpacity` (エンティティのカメラ近接フェード) もワールド設定由来の変動要因で、特に `cameraTint` はパック出力の上に乗る最終処理である。これらの多くはスクリプト API (`serverOption`) 経由でも設定でき、ゲーム実行中にも更新され得る。
-
-### 関連
-
-- [実機テストのチェックリスト](guides/testing.md)
-- [エンジンデータ台帳](internals/engine-data.md)
-- [デバッグ手段](internals/debugging.md)
+主な変動源: `lightingOverride` (照明の強制) / `skyLightColourOverride`、`ambientLightColourOverride` (hex 差し替え) / `visionMinLightColour` (「視認可能な最暗色」。実装は `uSkyLightColour` と `uAmbientLightColour` の両方に対する成分ごとの max であり、Night Vision が使用します — 「真っ暗な洞窟」系のパックは意図したほど暗くならず、空の色自体も持ち上がります) / `heldLightColourOverride`、`Range`、`ConeAngle` / `fogChunkDistanceOverride`、`fogColourOverride`、`fogOnSkybox` / `skyBox` (bloxdSunDirection() の有無)。`uSkyLightColour` の既定値 = (1,1,1) 白、`uAmbientLightColour` の既定値 = (0.25,0.25,0.30)。`l.ambient` のシーン成分 = グラフィック設定「Ambient Lighting Intensity」(既定 0.5)。`(1.0 - l.fogAlpha)` はプレイヤーのフォグ/チャンク距離設定に追従します。さらに `cameraTint` (画面全体への RGBA ティント) と `proximityFadeDistance` / `proximityFadeMinOpacity` (エンティティのカメラ近接フェード) もワールド設定由来の変動要因です — 特に `cameraTint` はパック出力の**上に**重なる最終パスです。これらの多くはスクリプト API (`serverOption`) 経由でも設定でき、ゲーム実行中に更新されることもあります。
 
 
 ---
@@ -6351,12 +6177,6 @@ strict 側で特に誤解しやすい点は以下の通りである。
 この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新により allow/strict の配分は変更され得る。新版が公開された際は再確認されたい。
 
 [← 前の部](guides/)・[マニュアルに戻る](./)・[次の部 →](history/v2.md)
-
-### 関連
-
-- [バリアントとガード](getting-started/variants.md)
-- [バリアント固有の問題](troubleshooting/variants.md)
-- [リサーチログ](internals/research-log.md)
 
 
 ---
@@ -6406,12 +6226,6 @@ if (bloxdLit()) {
 }
 ```
 
-### 関連
-
-- [関数](api/functions.md) — `bloxdSunDirection`
-- [夜の青い環境光](recipes/lighting.md) — 擬似月光表現
-- [エンジンデータ台帳](internals/engine-data.md)
-
 
 ---
 
@@ -6428,11 +6242,6 @@ URL パラメータ・コンソール・drawcalls 統計など、解析と診断
 - WebGPU レンダラーはパック適用中「強制 ON」でロックされる。「Disable Block Texture Atlas」設定もロックされ (アトラス ON を維持)、WebGPU 非対応環境ではそもそもパックが適用できない。配布ページに「WebGPU 対応ブラウザが必要」と記載する根拠はここにある
 - ブロックテクスチャの実体は 2D 配列テクスチャ (`texture_2d_array`) で、地形のサンプラは nearest かつ repeat に設定されている。さらにメッシャーは材質・AO・ライトが一致する面を 1 つの矩形にまとめる (**greedy meshing**) ため、頂点の UV はマージ面上ではタイル幅を超えうる (縁に 0.0015 のインセット)。繰り返し側はハードの repeat アドレッシングが担うので、マージ面はシームなしに見える。ただし `vUV` を基準に手続き的ディテールを重ねると、マージ面の境界で不連続になり得るため、ワールド位置 (`s.position` + `bloxdRenderOffset()`) を基準に設計するのが安全である
 - ゲーム参加ごとにランタイム再検証 (`checkCompilation`) が実行され、実在する全地形マテリアルで実際にコンパイルする (設定画面の静的検証より厳しい)。ここで失敗すると、パックはそのゲームで除外される
-
-### 関連
-
-- [デバッグのコツ](guides/debugging.md) — 見た目の問題の診断
-- [実機テストのチェックリスト](guides/testing.md)
 
 
 ---
@@ -6579,9 +6388,7 @@ v1 はシェーダーパック機構の最初期の API です。v2 で識別子
 
 ---
 
-## v2
 ## API v2 移行ガイド
-
 > 検証状況: **Historical** — API v2 の移行ガイド (当時の記録)。対象ビルド時点の仕様を保存する資料です。現行仕様は [API Reference](api/) を参照。
 
 
@@ -6826,40 +6633,38 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ---
 
 ## API v3 移行ガイド
-> 検証状況: **Historical** — API v3 の移行ガイド (対象ビルド `3ymzdd`、2026-10-19 稼働開始時の記録)。§49〜§54 の内部解析は当時の観測です。現行仕様は [API Reference](api/) を、最新の内部解析は [Engine Internals](internals/) を参照。
+> バージョン: 3 · 検証状況: Historical (当時の移行ガイド。対象ビルドは本文中に記載)
+> **2026-10-26 に置き換えられた: 現行 API はバージョン 5** — v3 パックは、ここで v2 について述べているのとまったく同じ形で読み込み時に拒否される。この部を適用し、*その上で*[v4 移行ガイド](history/v4.md) (v3 → v4: テクスチャ API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`) を適用すること。この部の内部仕様 (§49〜§54) は、計測対象だった v3 ビルドに対しては引き続き正確である。続けて [v5 移行ガイド](history/v5.md) (v4 → v5) も適用すること。
 
-> **2026-10-26 に置き換えられた: 現行 API はバージョン 5** — v3 パックはここで v2 について述べているのと同じ形で読み込み時に拒否される。本ガイドを適用した上で[v4 移行ガイド](history/v4.md) (v3 → v4: テクスチャ API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`) を適用すること。本ガイドの内部仕様 (§49〜§54) は計測対象だった v3 ビルドに対しては引き続き正確である。 さらに [v5 移行ガイド](history/v5.md) (v4 → v5) も適用すること。
+対象ビルド: `3ymzdd.main.fae4743f.js` — **2026-10-19 から本番稼働しているビルド**。bloxd.io が本番で配信するバンドルは、この部の当初の調査対象だった preprod デプロイとバイト単位で同一である (メインバンドルとシェーダーパックのチャンクの両方を md5 検証済み)。したがって本稿の内容はそのまま本番に当てはまる。パックモデルは v2 の形を保つ (`pack.json` のフィールド、ローダーの制限、uniform レイアウトはいずれも同じ)。
 
-対象ビルド: `3ymzdd.main.fae4743f.js` — **2026-10-19 から本番稼働しているビルド**。bloxd.io が本番で配信するバンドルは、この部の当初の調査対象だった preprod デプロイとバイト単位で同一である (メインバンドルとシェーダーパックのチャンクの両方を md5 検証済み)。したがって本稿の内容はそのまま本番に当てはまる。パックモデルは v2 の形を保つ (`pack.json` のフィールド、ローダの制限、uniform レイアウトはいずれも同じ)。
+本ガイドの第 I 部〜第 VII 部は、依然として v2 基準で書かれている。この部では[v2 移行ガイド](history/v2.md)と同じ順序で、v2 → v3 の移行点と v3 の新機能をまとめる。変換はほぼ機械的 (§47) だが、実際に挙動を変える変更は1つだけ — 既定ライトが emission をフォグで減衰させるようになった (§43) — うえに、`blockId` は `blockFlags` に全面置換される (§42)。配布前には必ず実機コンパイルで確認すること。
 
-当時の入門〜内部の各部は引き続き v2 基準で書かれていた。本ガイドでは[v2 移行ガイド](history/v2.md)と同じ順序で、v2 → v3 の移行点と v3 の新機能をまとめる。変換はほぼ機械的 (§47) だが、挙動が実際に変わる変更は1つだけであり — 既定ライトが emission をフォグで減衰させるようになり (§43) — さらに `blockId` は `blockFlags` に全面置換される (§42)。配布前には必ず実機コンパイルで確認すること。
-
-今回の改訂で追加: **§49–§54** では移行そのものを超え、本番ビルドから復元したエンジン内部仕様を扱う — Lite レンダラがフックを実際にどう呼び出すか、実際の4モードのフォグ関数、`bloxdOpaqueBehind()` の正確な実装、ブロック登録からフックまでの blockFlags の完全な配送経路、実測ヘッダハッシュを含む検証パイプライン。これらは現在までに公開文書化されたパックシステムの最も深い事実であり、他のガイドが未解決としている疑問のいくつかを決着させる。
+今回の改訂での追加: **§49〜§54** は移行そのものを超え、本番ビルドから復元したエンジン内部仕様に踏み込む — Lite レンダラがフックを実際にどう呼び出すか、実際の4モードフォグ関数、`bloxdOpaqueBehind()` の正確な実装、ブロック登録からフックまでの blockFlags の完全な配送経路、実測ヘッダーハッシュを含む検証パイプライン。これらは現在までに公開文書化されたパックシステムに関する最も深い事実であり、他のガイドがいまだ未解決として挙げている疑問のいくつかを決着させる。
 
 ### 40. v2 パックの運命 (先に結論)
 
-**2026-10-19 追記: v3 は preprod を離れ、現在ライブサイトが配信する版になった。** ロールアウト前に保存されたすべての v2 パック（v2 として配布された全パックを含む）は、本番で以下に述べるとおり失敗する。したがって今日パックを配布する者にとって、§47 の移行はもはや任意ではない。
+**2026-10-19 追記: v3 は preprod を離れ、現在ライブサイトが配信している版になった。** ロールアウト前に保存されたすべての v2 パック — v2 として配布されたすべてのパックを含む — は、本番で以下に述べるとおり失敗する。したがって今日パックを配布する者にとって、§47 の移行はもはや任意ではない。
 
-このビルドは manifest の `apiVersion` が **3 と厳密一致すること**を要求し、**v2/v3 の並行サポートは存在しない**。v2 パックは読み込み時に「API バージョン不一致」のメッセージ（i18n キー、プレースホルダ表記）で拒否される:
+このビルドは manifest の `apiVersion` が **3 と厳密一致すること**を要求し、**v2/v3 の並行サポートは存在しない**。v2 パックは読み込み時に「API バージョン不一致」メッセージ (i18n キー、プレースホルダ表記) で拒否される:
 
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
 >
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
 >
-> `loadNoApiVersion`: "pack.json needs \"apiVersion\": {{version}}."
 
-保存済みパックのライフサイクルは v2 のまま（[v2 移行ガイド](history/v2.md) §31）: 各ビルドはエンジンヘッダをハッシュ化し、エンジン更新時に保存パックを自動で「要再チェック」にし、`apiVersion` が現行以外の保存パックはエラーではなく「実行不可」と表示する（上記ステータスメッセージが置換用パックを指す）。
+保存済みパックのライフサイクルは v2 のまま ([v2 移行ガイド](history/v2.md) §31): 各ビルドはエンジンヘッダーをハッシュ化し、エンジン更新は保存パックを自動で「要再チェック」にし、`apiVersion` が現行以外のバージョンである保存パックはエラーではなく「実行不可」としてフラグされる (上記のステータスメッセージが置換用パックを指す)。
 
 ### 41. pack.json と uniform バッファ (変わらないもの)
 
 - 必須 manifest フィールドは不変: `{ apiVersion, name, author }`。
-- ローダの制限は不変: 32MB zip / 1024 エントリ / 256 `.wgsl` ファイル / 合計コード 256KB / manifest 64KB。
-- エンジンの uniform ブロックは形も不変: `@group(3) @binding(0)`、64 B で、宣言順に time、render offset、sun direction、eye position を格納する。レイアウトは `minBindingSize: 64` で登録され、正確なフィールド配置は `seconds: f32` @ バイト 0、`renderOffset: vec3i` @ 16、`sunDirection: vec3f` @ 32、`eyePosition: vec3f` @ 48 である。内部フィールド名が2つ変わった: `time` → `seconds`、`originOffset` → `renderOffset`。**バイトレイアウトは v2 と同一**であり、パックコード側に変化はない。パックは uniform を直接名指しできない（エンジンヘッダが engine-provided かつ read-only とし、「which packs can't name」と記す）ため、引き続きヘッダ関数 `bloxdSeconds()` / `bloxdRenderOffset()` を使う。
-- パックの group 3 には文書化された2つ目の占有者が加わった: `@group(3) @binding(1)` は `bloxdOpaqueBehind()` が読む scene-depth テクスチャである（完全な実装は §51）。64 B の uniform は binding 0 のままで、パックはどちらの binding も名指しできない。
+- ローダーの制限は不変: 32MB zip / 1024 エントリ / 256 `.wgsl` ファイル / 合計コード 256KB / manifest 64KB。
+- エンジンの uniform ブロックは形が不変: `@group(3) @binding(0)`、64 B で、宣言順に time、render offset、sun direction、eye position を格納する。レイアウトは `minBindingSize: 64` で登録され、正確なフィールド配置は `seconds: f32` @ バイト 0、`renderOffset: vec3i` @ 16、`sunDirection: vec3f` @ 32、`eyePosition: vec3f` @ 48 である。内部フィールド名が2つ変わった: `time` → `seconds`、`originOffset` → `renderOffset`。**バイトレイアウトは v2 と同一**であり、そもそもパックコードには何も変わらない — パックはこの uniform を直接名指しすることが許されていないためである (エンジンヘッダーは engine-provided かつ read-only と記し、"which packs can't name")。引き続きヘッダー関数 `bloxdSeconds()` / `bloxdRenderOffset()` を使うこと。
+- パックの group 3 には、文書化された2つ目の占有者が加わった: `@group(3) @binding(1)` は `bloxdOpaqueBehind()` が読む scene-depth テクスチャである (完全な実装は §51)。64 B の uniform は binding 0 のまま。パックはどちらの binding も引き続き名指しできない。
 
 ### 42. blockId から blockFlags へ: ブロック別マテリアルをビットフラグで表す (本命)
 
-3つのフック入力構造体（`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn`）すべてで、v2 のフィールド `blockId: u32` は `blockFlags: u32` に**置換**された。エンジン側の説明: *「この面がどの種類のブロックか: `bloxdBlockFlag*` ビット。面内で同一。」* エンジンがマテリアルデータ自体を渡すようになったため、数値 ID の範囲からマテリアルを推測したり、ワールド内に ID 表を維持したりする v2 の方法（[v2 移行ガイド](history/v2.md) §34）は不要になった。
+3つのフック入力構造体 (`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn`) すべてで、v2 のフィールド `blockId: u32` は `blockFlags: u32` に**置換**された。フィールドについてのエンジン側テキスト: *"What kind of block this face is: `bloxdBlockFlag*` bits, the same across the face."* エンジン自身がマテリアルデータを渡すようになったため、数値 ID の範囲からマテリアルを推測したり、ワールド内に ID 表を維持したりする v2 の方法 ([v2 移行ガイド](history/v2.md) §34) は不要になった。
 
 ビットは名前付き定数として公開されている:
 
@@ -6874,30 +6679,31 @@ const bloxdBlockFlagRock: u32 = 32;
 ```
 
 | 値 | 定数 | 意味 (エンジン側の注記を要約) |
-|---|---|---|
+|---|---|
 | 1 | `bloxdBlockFlagOpaque` | 完全に不透明 — 葉や氷も含む。ガラス、水、溶岩、スポナー、ゴースト／不可視ブロックは含まない。 |
-| 2 | `bloxdBlockFlagEmissive` | ブロック光を放つ。ネオン、ポータル、ランプ、溶岩、ビーコンのように。光る鉱石はどんなに弱くても該当。 |
+| 2 | `bloxdBlockFlagEmissive` | ブロック光を放つ。ネオン、ポータル、ランプ、溶岩、ビーコンのように。光る鉱石はどんなに弱くても該当する。 |
 | 4 | `bloxdBlockFlagVegetation` | 葉と、草ブロックの草 — 草ブロックは dirt でもある。サボテン、キノコブロック、干し草は含まない。 |
 | 8 | `bloxdBlockFlagDirt` | 土と土壌。草ブロックを含む。Rocky Dirt は rock でもある。 |
 | 16 | `bloxdBlockFlagSand` | 砂、赤砂、すべての砂岩 — 砂岩は rock でもある。 |
 | 32 | `bloxdBlockFlagRock` | 石とその種類、安山岩、閃緑岩、花崗岩、砂利、鉱石、砂岩、Rocky Dirt、岩盤、黒曜石、マグマ。 |
 
-複数のマテリアルからなるブロックは該当するフラグを**すべて**持つ（エンジン自身の例: 砂岩は sand かつ rock なので両方）。葉は vegetation だが dirt ではない。草ブロックは vegetation かつ dirt である。
+複数のマテリアルからなるブロックは、該当するフラグを**すべて**持つ (エンジン自身の例: 砂岩は sand かつ rock なので両方を持つ)。葉は vegetation だが dirt ではない。草ブロックは vegetation かつ dirt である。
 
-vegetation / dirt / sand / rock フラグは、ブロックの登録**表示名**から割り当てられる（opaque / emissive は代わりにエンジン自身の不透明度・発光データから来る）: `Leaves` で終わる名前、または `Grass Block` は vegetation。`Dirt` / `Soil` を含む名前（およびすべての `Grass Block`）は dirt。完全に `Sand` と `Red Sand`、および `Sandstone` を含む名前は sand。`Stone` / `Andesite` / `Diorite` / `Granite` を含む名前、任意の `Ore`、さらに Yellowstone、Gravel、Bedrock、Obsidian、Magma、Rocky Dirt（および砂岩）は rock。
+vegetation / dirt / sand / rock の各フラグは、ブロックの登録**表示名**から割り当てられる (opaque / emissive は代わりにエンジン自身の不透明度データと発光データから来る): `Leaves` で終わる名前、または `Grass Block` は vegetation。`Dirt` / `Soil` の名前 (およびすべての `Grass Block`) は dirt。ちょうど `Sand` と `Red Sand`、さらに `Sandstone` を含む任意の名前は sand。`Stone` / `Andesite` / `Diorite` / `Granite` を含む名前、任意の `Ore`、さらに Yellowstone、Gravel、Bedrock、Obsidian、Magma、Rocky Dirt (および砂岩) は rock。
+
 
 #### 名前規則の正確な仕様 (任意のブロックのフラグを自分で導出する)
 
-4つのマテリアルビットは、ブロックの登録表示名に対する固定の分類器から来る。バリアント名 (`|` より後) は先に取り除かれるため、バリアントは基底ブロックのフラグを継承する。次に:
+4つのマテリアルビットは、ブロックの登録表示名に対する固定の分類器から来る。バリアント名 (`|` より後の部分) は先に取り除かれるため、バリアントは基底ブロックのフラグを継承する。その上で:
 
 | ビット | 規則 (取り除いた後の名前に対して評価) |
 |---|---|
 | vegetation | 名前が ` Leaves` で**終わる**、または ` Grass Block` で**終わる** |
-| dirt | 名前が完全に `Dirt`、` Dirt` もしくは ` Soil` で**終わる**、または ` Grass Block` で**終わる** |
-| sand | 名前が完全に `Sand` または `Red Sand`、または `Sandstone` を**含む** |
-| rock | 名前が `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt` のいずれかと完全一致、`Sandstone` を**含む**、` Ore` で**終わる**、または `Stone` / `Andesite` / `Diorite` / `Granite` を独立した単語として含む |
+| dirt | 名前が `Dirt` と**完全一致**する、` Dirt` または ` Soil` で**終わる**、または ` Grass Block` で**終わる** |
+| sand | 名前が `Sand` または `Red Sand` と**完全一致**する、または `Sandstone` を**含む** |
+| rock | 名前が `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt` のいずれかと**完全一致**する、`Sandstone` を**含む**、` Ore` で**終わる**、または `Stone` / `Andesite` / `Diorite` / `Granite` を独立した単語として含む |
 
-Yellowstone が明示されているのは、`Yellowstone` の中で `Stone` が独立した単語にならないためである。opaque と emissive は名前からは**来ない** — エンジン自身の不透明度とブロック光発光データから来るため、これらの規則では導出できない。
+Yellowstone が明示されているのは、`Yellowstone` の中では `Stone` が独立した単語にならないためである。opaque と emissive は名前からは**来ない** — エンジン自身の不透明度データとブロック光発光データから来るため、これらの規則では導出できない。
 
 出典: エンジンの名前分類器 (モジュール 28537、バンドル `3ymzdd`)。全 7,861 の名前付きブロックに対して検証済み (2026-10-20)。
 
@@ -6913,51 +6719,51 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-v2 レシピへの影響: R-H の22要素の葉 ID 配列（[v2 移行ガイド](history/v2.md) §34）は `(blockFlags & bloxdBlockFlagVegetation) != 0` に縮約できる。ID ↔ ブロック名の対応表 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) はシェーダ以外の用途では引き続き有用だが、マテリアル表現のためにワールド内で参照する必要はなくなった。
+v2 レシピへの影響: R-H の22要素の葉 ID 配列 ([v2 移行ガイド](history/v2.md) §34) は `(blockFlags & bloxdBlockFlagVegetation) != 0` に縮約できる。ID ↔ ブロック名の対応表 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) はシェーダー以外の用途では引き続き有用だが、マテリアル表現のためにワールド内で参照する必要はもうない。
 
 #### 草を除いて葉だけを選ぶ (よくある質問)
 
-`vegetation` だけでは葉**と**草ブロックの草の両方に一致する。草ブロックは `dirt` も持つ。dirt を除外すれば葉だけになる — エンジン自身のフィールド説明が示す判別法である:
+`vegetation` だけでは葉**と**草ブロックの草の両方に一致する — 草ブロックは `dirt` も持つ。dirt を除外すれば葉だけが揺れる — エンジン自身のフィールド注記が明示する判別法である:
 
 ```wgsl
 // 葉のみ: dirt のない vegetation。草ブロックは vegetation かつ dirt。
 let isLeaf = (blockFlags & bloxdBlockFlagVegetation) != 0u
            && (blockFlags & bloxdBlockFlagDirt) == 0u;
 
-// 草ブロックのみ (地形サーフェスの草の面):
+// 草ブロックのみ (テレインサーフェスの草の面):
 let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
 
-ライブレジストリで検証済み（2026-10-20、バンドル `3ymzdd`）: `vegetation && !dirt` は45件の葉登録（22の基本型 — v2 R-H の ID 配列が測ったのと同じ22）に正確に一致し、`vegetation && dirt` は8件の草ブロックに正確に一致する。どちらの方向にも例外はない — レジストリ件数はそのビルド時点のものであり、新しいブロックが増えても規則は変わらない。面を選ぶには `vertex.normal`（上／下）と組み合わせる。たとえば草ブロックの上面だけ、など。
+ライブレジストリに対して検証済み (2026-10-20、バンドル `3ymzdd`): `vegetation && !dirt` は45件の葉登録 (22の基本型 — v2 の R-H ID 配列が計測したのと同じ22) に正確に一致し、`vegetation && dirt` は8件の草ブロックに正確に一致する。どちらの方向にも例外はない — レジストリ件数はそのビルド時点のものであり、新しいブロックが数を増やしても規則は変わらない。面を選ぶには `vertex.normal` (上/下) と組み合わせる。たとえば草ブロックの上面だけ、など。
 
 ### 43. 関数名の変更と意味の変更
 
 | v2 | v3 | 備考 |
 |---|---|---|
-| `bloxdTime()` | `bloxdSeconds()` | ページ読み込みからの秒数（下記の f32 精度の注意） |
+| `bloxdTime()` | `bloxdSeconds()` | ページ読み込みからの経過秒数 (下記の f32 精度の注意) |
 | `bloxdOriginOffset()` | `bloxdRenderOffset()` | 同じ量: レンダー位置 + これ = ワールド座標 |
 | `const bloxdTimeWrap: f32 = 3600` | **削除** | 周期はパック側で自分で定義する |
-| `engineColour` (`BloxdLightIn` 内) | **削除**（14 → 13 フィールド） | `litColour` + フォグから再構築する |
-| フック引数 `v` / `s` / `l` | `vertex` / `surface` / `light` | テンプレートの表記。シグネチャは不変 |
+| `engineColour` (`BloxdLightIn` 内) | **削除** (14 → 13 フィールド) | `litColour` + フォグから再構築する |
+| フック引数 `v` / `s` / `l` | `vertex` / `surface` / `light` | テンプレートでの表記。シグネチャは不変 |
 
-- **`bloxdSeconds()`** — ページ読み込みからの秒数。f32 では最初の4.5時間は1 ms未満刻み、9〜18時間では約4 ms刻みで進む。ヘッダは `bloxdSeconds() % period` という書き方を推奨している。0 から `period` まで数えて再び0に戻るため、削除された wrap 定数のきれいな代替になる。
-- **`bloxdRenderOffset()`** — ブロック単位: 「レンダー位置 + これ = ワールド座標」。プレイヤーの移動に応じて変わるため、レンダー位置はプレイヤーの近くに保たれ、精度も保たれる。本ガイド全体で、v2 文書が noa ローカルオフセットと呼んでいたものは、今後一貫して**レンダー位置** / レンダーオフセットと呼ぶ。`bloxdOriginOffset()` が返していたのと同じ量である。
-- **`bloxdTimeWrap` 削除** — 3600 秒でラップしていたパックは、自分で定数を宣言する。例: `const timeWrap: f32 = 3600.0;` として `% timeWrap`。
-- **既定ライトの意味** — v2 の既定は `engineColour + emission × fogVisibility` だった。v3 の既定は `bloxdApplyFog(litColour + emission, light)` として合成する。**既定処理の内部で emission がフォグにより減衰する**ため、合成後の出力がフォグブレンドを一緒に通る。移植表:
+- **`bloxdSeconds()`** — ページ読み込みからの経過秒数。f32 では、最初の4.5時間は 1 ms 未満の刻みで、9〜18時間では約 4 ms の刻みで進む。ヘッダーが推奨する書き方は `bloxdSeconds() % period` である — 0 から `period` まで数えて再び 0 に戻るもので、削除された wrap 定数のきれいな代替になる。
+- **`bloxdRenderOffset()`** — ブロック単位: "a render position plus this is a world position." プレイヤーの移動に応じて変わるため、レンダー位置はプレイヤーの近くに保たれ、それゆえ精度も保たれる。ガイド全体を通じて、v2 の文書が noa ローカルオフセットと呼んでいたものは、今後一貫して**レンダー位置** / レンダーオフセットと呼ぶ。`bloxdOriginOffset()` が返していたのと同じ量である。
+- **`bloxdTimeWrap` 削除** — 3600 秒で時刻をラップしていたパックは、自分で定数を宣言する。例: `const timeWrap: f32 = 3600.0;` として `% timeWrap`。
+- **既定ライトの意味** — v2 の既定は `engineColour + emission × fogVisibility` だった。v3 の既定はこれを `bloxdApplyFog(litColour + emission, light)` として合成する — **既定処理の内部で emission がフォグにより減衰する**ようになったため、合成後の出力はフォグブレンドをまとめて通る。移植表:
 
-  | v2 の式 | v3 の移植先 |
+  | v2 の式 | v3 への移植 |
   |---|---|
   | `l.engineColour` | `bloxdApplyFog(l.litColour, l)` |
   | `l.engineColour + s.emission * l.fogVisibility` | `bloxdApplyFog(l.litColour + s.emission, l)` |
 
   ```wgsl
-  // v2 の式 `l.engineColour + s.emission * l.fogVisibility` の v3 移植:
+  // v2 の読み取り `l.engineColour + s.emission * l.fogVisibility` の v3 移植:
   out.colour = bloxdApplyFog(light.litColour + surface.emission, light);
   ```
 - **名前も意味も不変**: `bloxdEyePosition()`、`bloxdSunDirection()`、`bloxdFaceBlock()`、`bloxdApplyFog()`、`bloxdWorldPosition()`。
 
-### 44. 新しいヘッダ定数: `bloxdPi` と `bloxdTau`
+### 44. 新しいヘッダー定数: `bloxdPi` と `bloxdTau`
 
 ```wgsl
 // 半回転と一回転 (ラジアン)。
@@ -6965,18 +6771,18 @@ const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;
 ```
 
-三角関数の小技に便利で、パックが π をハードコードする必要もなくなった。名前の再利用に注意: 同名のパックローカル定数はヘッダの重複識別子チェックに衝突するので、コード内の `bloxdPi` / `bloxdTau` 再宣言を削除するか改名すること。
+三角関数の小技に便利であると同時に、パックが π をハードコードする必要がなくなったことにも役立つ。名前の再利用に注意: 同名のパックローカル定数は、ヘッダーの重複識別子チェックに衝突するようになった — コード内の `bloxdPi` / `bloxdTau` 再宣言は削除するか改名すること。
 
 ### 45. 6フックのテンプレート (液体フックが公式に表示される)
 
-ビルドに同梱される既定のパックテキストは、地形／液体 × vertex／surface／light の**6フックすべて**を含み、各フックはエンジン既定値を返す。エンジンのコメントはこう紹介している: *「すべてのフックはエンジン既定値を返す。フックをコピーして出力を変えれば、シェーダーパックを作り始められる。」*
+ビルドとともに公開される既定のパックテキストは、テレイン / 液体 × vertex / surface / light の**6フックすべて**を含むようになり、各フックはエンジン既定値を返す。エンジンのコメントはこう紹介している: *"Every hook returns its engine default. Copy a hook and change its output to start a shader pack."*
 
 ```wgsl
-// すべてのフックはエンジン既定値を返す。フックをコピーして
-// 出力を変えれば、シェーダーパックを作り始められる。
+// Every hook returns its engine default. Copy a hook and change its
+// output to start a shader pack.
 
-// strict ゲームでは地形をその場に保つ。ガードがないと、このフックが
-// そこでシェーダーパック全体を無効にしてしまう。
+// Strict games keep terrain where it is: unguarded, this hook would turn
+// the whole shader pack off there.
 #ifndef BLOXD_STRICT
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
@@ -6991,7 +6797,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 
-// 水はこれらを使う。削除すると、水は地形フックを使う。
+// Water uses these. If deleted, water uses your terrain hooks instead.
 #ifndef BLOXD_STRICT
 fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
@@ -7007,55 +6813,55 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-- フックのコメントは液体の規則を直接述べている: **水には3点セットが必要で、削除すると水は地形フックを再利用する**（v2 で知られていたフォールバック挙動、[v2 移行ガイド](history/v2.md) §36。今はテンプレート自体に書かれている）。
-- `bloxdLiquidVertex` は `bloxdTerrainVertex` と同じ `#ifndef BLOXD_STRICT` ガードの内側にある — ガードなしでは、地形側の vertex 効果と同様、strict ゲームでパック全体を無効にしてしまう。
-- テンプレートの表記は完全なパラメータ名 `vertex` / `surface` / `light` になった（v2 のテンプレートは短い `v` / `s` / `l` だった）。自分のコードのパラメータ名は自由で、重要なのはシグネチャだけである。
+- フックのコメントは液体の規則を直接述べている: **水には3点セットが必要で、削除すると水はテレインフックを再利用する** (v2 で知られていたフォールバック挙動、[v2 移行ガイド](history/v2.md) §36。今はテンプレート自体に書き込まれている)。
+- `bloxdLiquidVertex` は `bloxdTerrainVertex` と同じ `#ifndef BLOXD_STRICT` ガードの内側にある — ガードなしでは、テレイン側の vertex 効果と同じように、strict ゲームでパック全体を無効にしてしまう。
+- テンプレートの表記は完全なパラメータ名 `vertex` / `surface` / `light` になった (v2 のテンプレートは短い `v` / `s` / `l` を使っていた)。自分のコードのパラメータ名は自由である — 重要なのはシグネチャだけだ。
 
 ### 46. バリアント行列: プログラム軸とマクロの変更
 
-バリアントは **strict × lighting × program** の行列で生成される — v2 と同じ8通りだが、terrain / liquid が明示的な軸になった。バリアント名は `allow|strict · unlit|lit · terrain|liquid` と綴られ、UI では `terrain` / `liquid`、`strict` / `non-strict`、`lighting on` / `lighting off` として表示される（エラー表示には「(only in {{variants}})」が付くことがある）。
+バリアントは **strict × lighting × program** の行列として生成される — v2 と同じ8通りだが、テレイン / 液体が明示的な行列の軸になった。バリアント名は `allow|strict · unlit|lit · terrain|liquid` と綴られ、UI では ``terrain`` / `liquid`、`strict` / `non-strict`、`lighting on` / `lighting off` として表示される (エラー表示には "(only in {{variants}})" が付くことがある)。
 
 | マクロ | 定義される場所 |
 |---|---|
-| `BLOXD_STRICT` | strict バリアント（両プログラム） |
-| `BLOXD_LIGHTING` | lighting オンのバリアント（両プログラム） |
-| `BLOXD_ALPHA` | **すべての液体バリアント**に加えて非 strict の**地形**バリアント |
+| `BLOXD_STRICT` | strict バリアント (両プログラム) |
+| `BLOXD_LIGHTING` | lighting オンのバリアント (両プログラム) |
+| `BLOXD_ALPHA` | **すべての液体バリアント**に加えて非 strict の**テレイン**バリアント |
 | `BLOXD_SCENE_DEPTH` | **すべての液体バリアント** |
 
-v2 の規則（[v2 移行ガイド](history/v2.md) §36）と比べて、作者向けの変更が2つある:
+v2 の規則 ([v2 移行ガイド](history/v2.md) §36) と比べて、作者向けの変更点は2つある:
 
-- **`BLOXD_ALPHA` は v2 から不変。** バリアント生成器にはリテラル行 `"liquid"!==program&&strict||push("BLOXD_ALPHA")` があり、JS の演算子優先順位により push をスキップするのは *(地形**かつ** strict)* の場合だけである。したがってマクロは**すべての液体バリアント (strict / 非 strict を問わず) と非 strict 地形**で定義され、strict 地形だけが省略する。液体側の `#ifdef BLOXD_ALPHA` コードはこれまでどおりそのままコンパイルされ、§49 の alpha 書き戻し (液体プログラムまたは非 strict バリアントに接ぎ木される) はこの集合と正確に一致する。
-- **`BLOXD_SCENE_DEPTH` は液体バリアントで常に定義される。** したがって液体側では深度利用をガードなしで書いてよい（v2 の §35 と同じ）。地形フックでは引き続き `#ifdef BLOXD_SCENE_DEPTH` で囲む必要がある。
+- **`BLOXD_ALPHA` は v2 から不変。** バリアント生成器はリテラル行 `"liquid"!==program&&strict||push("BLOXD_ALPHA")` を含む — JS の演算子優先順位により、push をスキップするのは *(テレイン**かつ** strict)* の場合だけである。したがってこのマクロは**すべての液体バリアント (strict / 非 strict を問わず) と非 strict テレイン**で定義され、省略するのは strict テレインだけである。液体側の `#ifdef BLOXD_ALPHA` コードは従来どおり正確にコンパイルされ、§49 の alpha 書き戻し (液体プログラムまたは非 strict バリアントに対して接ぎ木される) はこの集合と正確に一致する。
+- **`BLOXD_SCENE_DEPTH` は液体バリアントで常に定義される**ため、そこでは深度利用をガードなしで書いてよい — v2 (§35) とまったく同じである。テレインフックでは引き続き `#ifdef BLOXD_SCENE_DEPTH` で囲む必要がある。
 
 ### 47. v2 → v3 移行チェックリスト
 
 1. **pack.json**: `"apiVersion": 2` → `"apiVersion": 3`
-2. **`blockId` → `blockFlags`** を3つの入力構造体すべてで。マテリアル表現は `bloxdBlockFlag*` 定数に対するビットテストで書く (§42)。v2 の ID 範囲ヒューリスティックは捨てる
+2. **`blockId` → `blockFlags`** を3つの入力構造体すべてで。マテリアル表現は `bloxdBlockFlag*` 定数に対するビットテストとして書く (§42)。v2 の ID 範囲ヒューリスティックは捨てる
 3. **`bloxdTime()` → `bloxdSeconds()`**。削除された `bloxdTimeWrap` の代わりに自前の周期を宣言する (`% period`)
 4. **`bloxdOriginOffset()` → `bloxdRenderOffset()`**
-5. **ライト計算を `engineColour` から `litColour` + フォグへ再構築**する (§43 の表に従う)。既定処理が emission をフォグで減衰させる点に注意
-6. **液体フック**: 水を別扱いしたいときは `bloxdLiquid*` を明示的に定義する。省略すると地形フックへフォールバックする
-7. **`BLOXD_ALPHA` の監査は不要** — バリアント集合は v2 から不変: すべての液体バリアントと非 strict 地形で定義され、strict 地形だけが省略する (§46)
-8. **`bloxdPi` / `bloxdTau` を使う**。三角関数系の定数をハードコードしていた箇所で。ヘッダと重複するパックローカル再宣言を削除する
-9. **strict ガードを維持**: vertex フックと `discard` は `#ifndef BLOXD_STRICT` で囲む。テンプレートは `bloxdLiquidVertex` も地形側と同じようにガードする
-10. **実機で検証** — シェーダーパック対応ゲームでコンパイル・テストする
+5. **ライト計算を `engineColour` から `litColour` + フォグへ再構築する** (§43 の表に従う)。既定処理が emission をフォグで減衰させるようになった点に注意
+6. **液体フック**: 水を別扱いしたいときは `bloxdLiquid*` を明示的に定義する。省略するとテレインフックへフォールバックする
+7. **`BLOXD_ALPHA` の監査は不要** — バリアント集合は v2 から不変: すべての液体バリアントと非 strict テレインで定義され、strict テレインだけが省略する (§46)
+8. **`bloxdPi` / `bloxdTau` を使う** — 三角関数関連の定数をハードコードしていた箇所で。ヘッダーと重複するようになったパックローカル再宣言を削除する
+9. **strict ガードを維持する**: vertex フックと `discard` は `#ifndef BLOXD_STRICT` で囲んだままにする。テンプレートは `bloxdLiquidVertex` をテレインと同じようにガードしている
+10. **実機で検証する** — シェーダーパック対応ゲームでパックをコンパイル・テストする
 
 ### 48. その他の v3 変更と注意
 
-- **検証は2段階のまま**（[v2 移行ガイド](history/v2.md) §38）: まず静的検証、次にブラウザの実際の WebGPU コンパイル。フックを呼ぶ生成スタブスニペットを介して行われ、エラーは元のソースファイル／行にマップされ、診断はマッピングを通じてエンジン側識別子の元の名前を復元する。
-- **strict の診断は理由を名指しする**: 地形を動かす vertex フックは「… moves terrain, which strict games prevent.」、surface / light フック内の `discard` は「discard makes terrain see-through, which strict games prevent.」と報告される。設定 UI は引き続き「wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`」(`offInStrict`) の案内を表示する。
-- **ローダのメッセージ**: エラーの種類と制限は不変。「Zip64 archives aren't supported.」は UI メッセージ (`loadZip64`) として表示される。パック UI の文字列インベントリは合計 57 個の `shaderPack:*` キーを持ち、読み込み段階のエラーにはほかに `loadNoWgsl` (`.wgsl` ファイルを1つも含まない zip) と `loadNotZip` (zip の end-of-archive シグネチャを持たないファイル) がある。
-- **パック UI にゲーム内 WGSL エディタは同梱されていない。** 設定画面にシェーダーコードのエディタはなく、パックはゲーム外で zip ファイルとして作成する。(バンドルには CodeMirror エディタが実在するが、それはカスタムゲームのスクリプト UI 用の JavaScript エディタであり、WGSL サポートもパックシステムとの接続もない。)
-- **ハードウェア要件**: Lite は `shader-f16` WebGPU 機能をサポートするドライバを要求する。古すぎるドライバは「Intel driver too old for Lite (no shader-f16)」のようなメッセージで拒否される。
+- **検証は2段階のまま** ([v2 移行ガイド](history/v2.md) §38): まず静的検証、次に、フックを呼ぶ生成スタブスニペットを通じたブラウザの実際の WebGPU コンパイル。エラーは元のソースファイル/行にマップされ、診断はマッピングを通じてエンジン側識別子の元の名前を復元する。
+- **strict の診断は理由を名指しする**: テレインを動かす vertex フックは "… moves terrain, which strict games prevent." を報告し、surface / light フック内の `discard` は "discard makes terrain see-through, which strict games prevent." を報告する。設定 UI は "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." の案内 (`offInStrict`) を保ち続ける。
+- **ローダーメッセージ**: エラーの種類と制限は不変。"Zip64 archives aren't supported." は UI メッセージ (`loadZip64`) として表示される。パック UI の文字列一覧は合計 57 個の `shaderPack:*` キーからなり、読み込み段階のエラーとしては、`loadNoWgsl` (`.wgsl` ファイルを1つも含まない zip) と `loadNotZip` (zip の end-of-archive シグネチャを持たないファイル) が残りを埋める。
+- **パック UI にゲーム内 WGSL エディタは同梱されていない。** 設定画面にシェーダーコードエディタはなく、パックはゲームの外で zip ファイルとして作成する。(バンドルには CodeMirror エディタが実在するが、それはカスタムゲームスクリプト UI の JavaScript エディタであり、WGSL サポートもパックシステムとの接続もない。)
+- **ハードウェアゲート**: Lite は `shader-f16` WebGPU 機能をサポートするドライバを要求する。古すぎるドライバは "Intel driver too old for Lite (no shader-f16)" のようなメッセージで拒否される。
 - **ライティング変更は保存パックを再検証する**: 実行中にライティング設定が変わると、エンジンはパックチェックを再実行する (`changed → recheck`)。リプレイ視聴は同じフックを `changed: false` で呼び、再チェックをスキップする。
-- **文言**: シェーダーパックを受け入れるゲームについての文は「in games that **support** them」になった。
-- **対象タイトルの範囲**: パックが動作するゲームの集合は前ビルドから不変。
+- **文言**: シェーダーパックを受け入れるゲームについての文は、現在 "in games that **support** them" となっている。
+- **対象タイトルの範囲**: パックが動作するゲームの集合は前のビルドから不変。
 
 ### 49. エンジン内部仕様: Lite レンダラがフックを呼び出す方法
 
-§40–§48 はローダとヘッダが教えてくれることである。この節と続く4節は、エンジンが実行時に実際に何をしているかを本番バンドルから復元して文書化する（Lite レンダラ — 175 KB のチャンク。統合元ソースファイルの実名 `lite/terrainShaderPack.ts` がエラー文字列の中に残っている）。ここに書かれたことは、あなたが書くコードを変えるものではない。しかしフックが何を受け取るかについての推測をなくし、他のコミュニティガイドが未解決としている疑問のいくつかを決着させる。
+§40〜§48 の内容は、ローダーとヘッダーが教えてくれることである。この節と続く4節は、エンジンが実行時に実際に何をしているかを本番バンドルから復元して文書化する (Lite レンダラ — 175 KB のチャンク。統合元ソースファイルの実名 `lite/terrainShaderPack.ts` がそのエラー文字列の中に残っている)。ここに書かれたことはあなたが書くコードを変えるものではないが、フックが何を受け取るかについての推測を取り除き、他のコミュニティガイドがいまだ未解決として挙げている疑問のいくつかを決着させる。
 
-レンダラは JavaScript からフックを「呼び出す」のではない。パックが検証を通ると、エンジンは**シェーダーテキスト内の固定アンカー行を置換することで、あなたのフック呼び出しを自身の地形 WGSL に接ぎ木する**。アンカーはちょうど1回だけ一致しなければならない — 0回または複数回の一致は `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)` で中断する。
+レンダラが JavaScript からあなたのフックを「呼び出す」ことはない。パックが検証を通ると、エンジンは**シェーダーテキスト内の固定アンカー行を置き換えることで、フック呼び出しを自身のテレイン WGSL に接ぎ木する**。アンカーはちょうど1回だけ一致しなければならない — 0回または複数回の一致は `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)` で中断する。
 
 | 段階 | エンジンシェーダ内のアンカー行 | 接ぎ木される内容 |
 |---|---|---|
@@ -7064,7 +6870,7 @@ v2 の規則（[v2 移行ガイド](history/v2.md) §36）と比べて、作者�
 | lit colour | `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` の直前 | `let bloxdSpLitColour = color.rgb;` — フォグ前の色を捕捉する |
 | light | フラグメントシェーダ末尾の `return color;` 行 | `BloxdLightIn` を構築し、light フックを呼び、`color` を書き戻す — フォグ混合の後 |
 
-出荷バンドルから復元した接ぎ木コード（ライトレベルのサンプル式は、エンジン自身の整形が長くなる箇所を省略）:
+出荷バンドルから復元した接ぎ木コード (ライトレベルのサンプル式は、エンジン自身の整形が長くなる箇所で省略してある):
 
 ```wgsl
 // vertex 段階 — vertex フックを持つ非 strict バリアント
@@ -7083,7 +6889,7 @@ let bloxdSpSurfaceIn = BloxdSurfaceIn(baseColor.rgb, alpha,
         fragmentInputs.vBlockFlags);
 let bloxdSpSurface = /* あなたの surface フック */(bloxdSpSurfaceIn);
 baseColor = vec4f(bloxdSpSurface.colour, baseColor.a);
-alpha = bloxdSpSurface.alpha;   // 液体プログラムまたは非 strict バリアントのときだけ接ぎ木される
+alpha = bloxdSpSurface.alpha;   // 接ぎ木されるのは、プログラムが液体またはバリアントが非 strict のときだけ
 ```
 
 ```wgsl
@@ -7093,13 +6899,13 @@ alpha = bloxdSpSurface.alpha;   // 液体プログラムまたは非 strict バ�
         bloxdSpLitColour,                        // litColour
         fragmentInputs.vTerrainLambert,          // directional
         ambient,                                 // ambient
-        /* ライトレベルの varying */.rgb,        // blockLight
-        /* 同じ varying の sky チャンネル */,     // skyLight
+        /* ライトレベル varying */.rgb,          // blockLight
+        /* 同じ varying の sky チャンネル */,    // skyLight
         uniforms.uAmbientLightColour,            // ambientLightColour
         uniforms.uSkyLightColour,                // skyLightColour
-        /* 手持ちライト項 (下記) */,              // heldLight
+        /* 手持ちライト項 (下記参照) */,         // heldLight
         select(vec3f(0.0), uniforms.vFogColor,
-               uniforms.vFogInfos.x != 0.0),     // fogColour — フォグがまったく無いときだけ黒
+               uniforms.vFogInfos.x != 0.0),     // fogColour — フォグがまったくないときだけ黒
         fog,                                     // fogVisibility
         fragmentInputs.vPositionW,               // position
         normalize(fragmentInputs.vNormalW),      // normal
@@ -7111,32 +6917,32 @@ alpha = bloxdSpSurface.alpha;   // 液体プログラムまたは非 strict バ�
 
 この接ぎ木から直接導ける強制事項が4つある:
 
-- **strict 地形は surface フックの alpha 変更を無視する。** `alpha = bloxdSpSurface.alpha` の書き戻しは、液体プログラムまたは非 strict バリアントでのみ接ぎ木される — §46 のマクロ表の背後にある実装である。（strict 地形では `#ifdef BLOXD_ALPHA` コードはそもそもコンパイルされないが、ガードなしの alpha 書き込みもそこで破棄されることが確認された。）
-- **vertex フックを宣言した strict バリアントは、それを実行しない。** エンジンはビルド時に `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs` と報告する。公式テンプレート (§45) が `bloxdLiquidVertex` を地形側と同じ `#ifndef BLOXD_STRICT` で囲むのはこのためである。
-- `bloxdSp*` 識別子 — **合計14個**: `bloxdSpVertexIn`、`bloxdSpVertex`、`bloxdSpSurfaceIn`、`bloxdSpSurface`、`bloxdSpLightIn`、`bloxdSpLight`、`bloxdSpLitColour`、`bloxdSpSceneDepth`、`bloxdSpPixel`、`bloxdSpPositionW`、`bloxdSpZ`、`bloxdSpEye`、`bloxdSpScale`、`bloxdSpBehind` — はエンジン側の一時変数である。あなたのコードからは見えないが、診断や他人のリバースエンジニアリング出力には現れるので、見たらすぐ分かるようになっておく価値がある。
-- **既定 surface のショートカット。** バリアントの surface フックが文字どおり `bloxdDefaultSurface` である場合、エンジンは `baseColor` / `alpha` の書き戻し行の接ぎ木をまるごと省略する — 既定処理がすでにその値を生成しているため、代入はデッドコードになるからである。変更していないフックの連鎖には何のコストもかからない。
+- **strict テレインは surface フックの alpha 変更を無視する。** `alpha = bloxdSpSurface.alpha` の書き戻しは、液体プログラムまたは非 strict バリアントに対してのみ接ぎ木される — §46 のマクロ表の背後にある実装である。(strict テレインでは `#ifdef BLOXD_ALPHA` コードはそもそもコンパイルされないが、ガードなしの alpha 書き込みもそこでは破棄されることが今回確認された。)
+- **vertex フックを宣言したままの strict バリアントは、それを決して実行しない** — エンジンはビルド時に `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs` と報告する。公式テンプレート (§45) が `bloxdLiquidVertex` をテレイン側の双子と同じ `#ifndef BLOXD_STRICT` で囲むのはこのためである。
+- `bloxdSp*` 識別子 — **合計14個**: `bloxdSpVertexIn`、`bloxdSpVertex`、`bloxdSpSurfaceIn`、`bloxdSpSurface`、`bloxdSpLightIn`、`bloxdSpLight`、`bloxdSpLitColour`、`bloxdSpSceneDepth`、`bloxdSpPixel`、`bloxdSpPositionW`、`bloxdSpZ`、`bloxdSpEye`、`bloxdSpScale`、`bloxdSpBehind` — はエンジン側の一時変数である。あなたのコードからは見えないが、診断や他人のリバースエンジニアリング出力には現れるので、一目で認識できるようにしておく価値がある。
+- **既定 surface のショートカット。** バリアントの surface フックが文字どおり `bloxdDefaultSurface` である場合、エンジンは `baseColor` / `alpha` の書き戻し行の接ぎ木をまるごと省略する — 既定処理がすでにそれらの値を生成しているため、代入はデッドコードになるからである。変更していないフック連鎖にはコストがかからない。
 
 **`BloxdLightIn` に実際に入るもの** — 接ぎ木コードからのフィールド別:
 
 | フィールド | エンジン側の供給元 |
 |---|---|
-| `litColour` | フォグ混合の直前に捕捉されたフラグメント色（`bloxdSpLitColour` アンカー）— ヘッダの表現では「emission とフォグの前」 |
-| `directional` | `vTerrainLambert` — シーンの方向ライトごとの `max(0, dot(normal, lightDirection)) × intensity` を頂点補間した合計（式は §54）。シーンに方向ライトがなければ0 |
+| `litColour` | フォグ混合の直前に捕捉されたフラグメント色 (`bloxdSpLitColour` アンカー) — ヘッダーの表現では "before emission and fog" |
+| `directional` | `vTerrainLambert` — シーンの方向ライトそれぞれの `max(0, dot(normal, lightDirection)) × intensity` を頂点補間した合計 (式は §54)。シーンに1つもなければ 0 |
 | `ambient` | `material.ambientAndCutoff.xyz × uniforms.sceneAmbient` — マテリアルごと、フレームごと |
-| `blockLight` | デコードされたライトレベルの varying の `.rgb`（デコードは §54） |
-| `skyLight` | 同じライトレベルの varying の sky チャンネル — *「Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING」*（ヘッダ文） |
+| `blockLight` | デコードされたライトレベル varying の `.rgb` (デコードは §54) |
+| `skyLight` | 同じライトレベル varying の sky チャンネル — *"Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING"* (ヘッダー本文) |
 | `ambientLightColour` / `skyLightColour` | `uniforms.uAmbientLightColour` / `uniforms.uSkyLightColour` |
-| `heldLight` | ライトレベルの varying の w チャンネルと、フレーム uniform の `uHeldLightPos` / `uHeldLightColour` から作られる手持ちライト項（減衰とチャンネル床の挙動は[ライティングの内部](internals/lighting-internals.md)） |
-| `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)` — **フォグがまったく無いシーン（モード0、§50）でのみ黒** |
+| `heldLight` | 手持ちライト項 — ライトレベル varying の w チャンネルと `uHeldLightPos` / `uHeldLightColour` フレーム uniform から構築される (減衰とチャンネル床の挙動は[ライティングの内部](internals/lighting-internals.md)に文書化) |
+| `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)` — **フォグがまったくないシーンでのみ黒** (モード 0、§50) |
 | `fogVisibility` | クランプされたフォグ係数 — §50 の関数が返す正確な値 |
-| `position` / `normal` | `vPositionW` / `vNormalW` varying（法線はフラグメントごとに再正規化） |
+| `position` / `normal` | `vPositionW` / `vNormalW` varying (法線はフラグメントごとに再正規化) |
 | `blockFlags` | `vBlockFlags` フラット varying — §52 の完全な配送経路 |
 
-古い資料を読むときの向き付けとして: 同じ接ぎ木アーキテクチャは v2 レンダラにも存在した。v3 の統合差分は `vBlockId` → `vBlockFlags` と液体バリアントの追加だけである。フックシステムは v2 → v3 の断絶をまたいでアーキテクチャ上安定している。
+古い資料を読むときの方位付けとして: 同じ接ぎ木アーキテクチャは v2 レンダラにも存在し、v3 の統合上の差分は `vBlockId` → `vBlockFlags` と液体バリアントの追加だけである。フックシステムは v2 → v3 の断絶をまたいでアーキテクチャレベルで安定している。
 
 ### 50. フォグ関数: 4つのモード、1つのフィールド
 
-本番の地形シェーダから逐語的に復元:
+本番のテレインシェーダから逐語的に復元:
 
 ```wgsl
 fn calcFogFactor(fogDistance: vec3f) -> f32 {
@@ -7151,19 +6957,19 @@ fn calcFogFactor(fogDistance: vec3f) -> f32 {
         fogCoeff = 1.0 / pow(2.71828, dist * fogDensity);
     } else if (uniforms.vFogInfos.x == 2.0) { // exponential squared
         fogCoeff = 1.0 / pow(2.71828, dist * dist * fogDensity * fogDensity);
-    }                                          // 0.0 = フォグ off (係数は 1.0 のまま)
+    }                                          // 0.0 = fog off (coeff stays 1.0)
     return clamp(fogCoeff, 0.0, 1.0);
 }
 ```
 
 - `vFogInfos = vec4f(mode, start, end, density)` — 1つの vec4 がすべてを駆動する。
-- **シェーダには4つのモードが存在する: 0 = off、1 = exponential、2 = exponential-squared、3 = linear。** どのモードが動いても `fogVisibility` はクランプされた係数である — フィールドはちょうど1つで、モードフラグがパックに公開されることはない。
-- Bloxd 自身のタイトルはモード3（linear）を駆動し、[フォグの内部仕様](internals/fog-internals.md) で述べた32ブロック幅の帯を使う（`fogStart = 32 × D`、`fogEnd = 32 × (D + 1)`）。したがって同部の「常に linear」という観察は、出荷済みゲームプレイについては引き続き正しい。しかし exponential モードは実在する稼働中のエンジンコードである — タイトルはクライアント更新なしに `vFogInfos.x` を切り替えてランプを変えられる。`distance(l.position, bloxdEyePosition())` を自分で計算する距離レシピ（R-B）は、モード切替に影響されないため、距離駆動の見た目を書く堅牢な方法である。
-- これにより「エンジンは実際にどのフォグランプを使うのか」という問いがソースから決着する: 4つすべてが実装されており、出荷タイトルは linear を使う。（同じ関数はヘッダの fogColour に関するコメントも説明する — モード0だけが `fogColour` を黒で届けるケースであり、Bloxd のゲームはモード0を出荷しない。代わりにフォグを遠方へ押しやる。[フォグの内部仕様](internals/fog-internals.md)。）
+- **シェーダには4つのモードが存在する: 0 = off、1 = exponential、2 = exponential-squared、3 = linear。** どのモードが動いても `fogVisibility` はクランプされた係数である — フィールドはちょうど1つで、モードフラグがパックに公開されることは決してない。
+- Bloxd 自身のタイトルはモード3 (linear) を駆動し、[フォグの内部仕様](internals/fog-internals.md)に記述のある32ブロック幅の帯を使う (`fogStart = 32 × D`、`fogEnd = 32 × (D + 1)`)。したがって同部の「常に linear」という観察は、出荷済みゲームプレイについては今も正しい。とはいえ exponential モードは実在する稼働中のエンジンコードである — タイトルは `vFogInfos.x` を切り替えて、クライアント更新なしにランプを変えられる。`distance(l.position, bloxdEyePosition())` を自分で計算する距離レシピ (レシピ R-B) は、モード切替で動かされようがないため、距離駆動の見た目を書く堅牢な方法である。
+- これにより「エンジンは実際にどのフォグランプを使っているのか」という問いがソースから決着する: 4つすべてが実装されており、出荷タイトルは linear を使う。(同じ関数はヘッダーの fogColour コメントも説明する — モード0だけが `fogColour` が黒で届くケースであり、Bloxd のゲームはモード0を決して出荷しない。代わりにフォグを遠方へ押しやる、[フォグの内部仕様](internals/fog-internals.md)。)
 
 ### 51. bloxdOpaqueBehind(): 正確な実装
 
-関数全体を本番ビルドから逐語的に復元:
+関数全体を本番ビルドから逐語的に復元したもの:
 
 ```wgsl
 @group(3) @binding(1) var bloxdSpSceneDepth: texture_2d<f32>;
@@ -7182,16 +6988,16 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
 }
 ```
 
-- **深度テクスチャは `@group(3) @binding(1)` にある** — group 3 はパック自身の group である。binding 0 が 64 B の `bloxdPackInputs` uniform (§41)、binding 1 がこの深度テクスチャだ。どちらもエンジン提供で、あなたの側からは名指しできない。
-- **深度テクスチャは unfilterable-float のフラグメント専用リソースである。** バインドグループレイアウトはこれを `texture: { sampleType: "unfilterable-float" }`、可視性 `GPUShaderStage.FRAGMENT` のみとして登録する — `bloxdOpaqueBehind()` が `textureSample` ではなく `textureLoad` (明示的なテクセル座標、mip レベル 0) で組まれているのはまさにこのためで、このテクスチャではハードウェアフィルタリングがそもそも使えない。
-- `z ≤ 0` は深度サンプルが何にも当たらなかったこと（far plane／空）を意味する: `found = false` で、`position` / `distance` は意味を持たない — 必ず `found` を先に確認する。
-- 返される位置は**レイスケールの交点**である: 不透明面を `eye + (fragment − eye) × max(z / viewDepth, 1)` に置く。`distance` は目からその点までの距離 — 水面パックにとっては実質「固いものに当たるまでレイがどれだけ水を通過したか」であり、これが2つ目の深度バッファなしで深度ティント水レシピを成立させている。
+- **深度テクスチャは `@group(3) @binding(1)` にある** — group 3 はパック自身のグループである: binding 0 は 64 B の `bloxdPackInputs` uniform (§41)、binding 1 はこの深度テクスチャ。どちらもエンジン提供で、あなたの側からは名前を持たない。
+- **深度テクスチャは unfilterable-float のフラグメント専用リソースである。** バインドグループレイアウトはこれを `texture: { sampleType: "unfilterable-float" }` として、可視性は `GPUShaderStage.FRAGMENT` のみで登録する — `bloxdOpaqueBehind()` が `textureSample` ではなく `textureLoad` (明示的なテクセル座標、mip レベル 0) を基盤に構築されているのはまさにこのためである。このテクスチャではハードウェアフィルタリングが単純に利用できない。
+- `z ≤ 0` は深度サンプルが何にも当たらなかったこと (far plane / 空) を意味する: `found = false` となり、`position` / `distance` は意味を持たない — 常に `found` を先に確認すること。
+- 返される位置は**レイスケールの交点**である: 不透明表面は `eye + (fragment − eye) × max(z / viewDepth, 1)` に置かれる。`distance` は目からその点までの距離として測られる — 水面パックにとってこれは事実上「固いものに当たるまでにレイがどれだけの水を通過したか」であり、これこそが深度ティントの水レシピを2つ目の深度バッファなしで成立させているものである。
 
 ### 52. blockFlags の全経路: 登録からフックまで
 
-§42 はビットの意味を説明した。この節は、フラグビットがブロック登録からフックまで旅する完全な経路である — すべてのホップを本番ソースから確認しており、ヘッダの「面内で同一」がバイトレベルまで正しいことも証明する。
+§42 はビットの意味を説明した。この節は、フラグビットがブロック登録からあなたのフックまで旅する完全な経路である — すべてのホップを本番ソースで確認しており、ヘッダーの "the same across the face" がバイトレベルまで正しいことも証明する。
 
-**1. 登録（ブロック定義データベース）。** 各ブロックのフラグは登録時に1回計算される:
+**1. 登録 (ブロック定義データベース)。** 各ブロックのフラグは、登録時に1回だけ計算される:
 
 ```js
 flags[id] = nameFlags                     // 表示名の規則 (§42): vegetation / dirt / sand / rock
@@ -7199,11 +7005,11 @@ flags[id] = nameFlags                     // 表示名の規則 (§42): vegetati
           | (anyFaceEmission >= 1       ? 2 : 0);  // emissive ビット — ブロック光の発光データ
 ```
 
-表示名の規則が扱うのは4つのマテリアルビットだけである。2つの物理ビットは別のエンジンデータから来る — `opaque` はブロック定義から直接、`emissive` は面ごとのブロック光発光配列から。ヘッダの「光る鉱石はどんなに弱くても該当」は文字通りで、発光が1以上の面があればビットが立つ。
+表示名の規則が扱うのは4つのマテリアルビットだけである。2つの物理ビットは別々のエンジンデータから来る — `opaque` はブロック定義から直接、`emissive` は面ごとのブロック光発光配列から。ヘッダーの "Glowing ores count, however faint" は文字どおりで、発光が 1 以上の面が1つでもあればビットが立つ。
 
-**2. ブロック単位 → マテリアル単位（メッシャー初期化）。** 地形はブロック ID 単位ではなく*マテリアル*単位で描画されるため、フラグはマテリアル表に再集計される（マテリアル ID で索引する `Uint16Array`。各マテリアルは所有ブロックの最初の面のフラグを取る）。この表はメッシュ生成 Web Worker に送られる — ただし**パックパイプラインが有効な構成でのみ**。それ以外では表は `null` で、フラグバイトは一切書き込まれない。パックを使わないプレイヤーは、構造上ゼロのオーバーヘッドしか払わない。
+**2. ブロック単位 → マテリアル単位 (メッシャー初期化)。** テレインはブロック ID 単位ではなく*マテリアル*単位で描かれるため、フラグはマテリアル表に再集計される (マテリアル ID で索引する `Uint16Array`。各マテリアルは、所有ブロックの最初の面のフラグを取る)。この表はメッシュ生成 Web Worker へ送られる — ただし**パックパイプラインが有効な構成でのみ**。それ以外では表は `null` となり、フラグバイトは一切書き込まれない。パックを使わないプレイヤーは、構造上ゼロのオーバーヘッドしか払わない。
 
-**3. 頂点バイトへ（メッシャーワーカー）。** フラグは既存のインターリーブ頂点データの2バイトの空きに乗る:
+**3. 頂点バイトへ (メッシャーワーカー)。** フラグは既存のインターリーブ頂点データの空き2バイトに乗る:
 
 ```js
 addBlockFlagValues(buffer, stride, faceIndex, flags) {
@@ -7215,36 +7021,36 @@ addBlockFlagValues(buffer, stride, faceIndex, flags) {
 }
 ```
 
-面の4頂点すべてが同じ値を受け取る — これが「面内で同一」の実装レベルの意味である。
+面の4頂点すべてが同じ値を受け取る — これが "the same across the face" の実装レベルの意味である。
 
-**4. GPU 側のデコード（Lite 地形シェーダ）。** 2バイトは `blockFlagWords: vec2u` 頂点属性（location 7、パックパイプラインが有効なときだけ存在）として運ばれ、vertex 段階で再結合される:
+**4. GPU 側のデコード (Lite テレインシェーダ)。** 2バイトは `blockFlagWords: vec2u` 頂点属性 (location 7、パックパイプラインが有効なときにのみ存在) として運ばれ、vertex 段階で再結合される:
 
 ```wgsl
 vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
                           |  (vertexInputs.blockFlagWords.y >> 24u);
 ```
 
-`vBlockFlags` は `@interpolate(flat)` で宣言されている — 面ごとの定数がフラグメント段階まで続くため、§42 のビットテストは面内で安定し、面の途中でブレンドされることは決してない。
+`vBlockFlags` は `@interpolate(flat)` で宣言されている — 面ごとの定数がフラグメント段階まで続き、だからこそ §42 のビットテストは面内で安定し、面の途中でのブレンドを生じることは決してない。
 
-- パイプラインは**16ビット**分の容量を確保している（このデコードは2バイト全体を再結合する）が、v3 が定義するのは6ビットだけである — 将来のフラグは頂点フォーマットの変更も API バンプもなしに追加できる。
-- packed-vertex モードでは、同じ2バイトが専用属性ではなく `packed.y` と colour ワードの上位バイトに入る — 値は同じで、容器が違う。
-- このフラグについて最もよく聞かれる葉と草の判別については、§42 の[草を除いて葉だけを選ぶ](#草を除いて葉だけを選ぶ-よくある質問)を参照。
+- パイプラインは**16ビット**分の容量を確保している (上のデコードは2バイト全体を再結合する) のに対し、v3 が定義しているのは6ビットだけである — 将来のフラグは、頂点フォーマットの追加変更も API バンプもなしに登場できる。
+- packed-vertex モードでは、同じ2バイトが専用属性ではなく `packed.y` と colour ワードの上位バイトに入る — 値は同じで、入れ物が違う。
+- これらのフラグについて最もよく尋ねられる葉と草の判別については、§42 の[草を除いて葉だけを選ぶ](#leaves-without-the-grass-the-question-everyone-asks)を参照。
 
-### 53. 検証内部仕様: HEADER_VERSION、シグネチャ、予約名
+### 53. 検証の内部仕様: HEADER_VERSION、シグネチャ、予約名
 
-**実測ヘッダハッシュ。** すべてのパック検証はエンジンの `HEADER_VERSION` で刻印される。本番の検証モジュールを直接実行すると（ハーネスの注記は §54 の末尾）、次の値が測れる:
+**実測ヘッダーハッシュ。** すべてのパック検証には、エンジンの `HEADER_VERSION` が刻印される。本番の検証モジュールを直接実行すると (ハーネスに関する注記は §54 の末尾を参照)、次の値が測定できる:
 
 ```
 v2 (sjr0p7):  6.bc5e8338
 v3 (3ymzdd):  6.5bc26a63   ← 本番稼働バンドルから実測
 ```
 
-これは FNV-1a-32 ハッシュ（`6.` 接頭辞）で、5つの入力に対する: バリアントごとに前処理・トークン化されたエンジンヘッダ（8バリアント分のエントリ）、パーサの WGSL 字句宇宙全体、4つのマクロ名、特殊関数マップ、そして `BloxdPackInputs` 宣言とその `@group(3) @binding(0)` uniform 行。作者にとっての帰結は2つ:
+これは `6.` 接頭辞付きの FNV-1a-32 ハッシュで、5つの入力から作られる: **バリアントごとに**前処理・トークン化されたエンジンヘッダー (8バリアントそれぞれのエントリ)、パーサの WGSL 字句宇宙全体、4つのマクロ名、特殊関数マップ、そして `BloxdPackInputs` 宣言とその `@group(3) @binding(0)` uniform 行。作者にとっての帰結は2つある:
 
-- **エンジン側のヘッダ編集はハッシュを変える** — エンジン更新後に保存パックが自動で「要再チェック」になる仕組みの正体である（[v2 移行ガイド](history/v2.md) §31）。
-- ハッシュが覆うのは*エンジンヘッダ*であり、あなたのコードではない。エンジン更新をまたいで読み込まれ続けるパックは「まだ有効」なのではなく、単にヘッダ変更に引っかかっていないだけである。manifest が関与する唯一のバージョン検査は `apiVersion` ゲートである (§40)。
+- **エンジン側のヘッダー編集はハッシュを更新する** — エンジン更新後に保存パックが自動的に受ける「要再チェック」フラグの背後にある仕組みである ([v2 移行ガイド](history/v2.md) §31)。
+- ハッシュがカバーするのは*エンジンヘッダー*であって、あなたのコードではない。エンジン更新をまたいで読み込まれ続けるパックが「まだ有効」なのではない — まだヘッダー変更に引っかかっていないだけである。manifest が関与する唯一のバージョン検査は `apiVersion` ゲートである (§40)。
 
-**フックシグネチャ検査: 型はトークン厳密、名前は自由。** バリデータはフック slot ごとに1つのシグネチャを持つ:
+**フックシグネチャ検査: 型はトークン厳密、名前は自由。** バリデーターはフックスロットごとに1つのシグネチャを持つ:
 
 ```js
 {
@@ -7254,9 +7060,9 @@ v3 (3ymzdd):  6.5bc26a63   ← 本番稼働バンドルから実測
 }
 ```
 
-照合は**トークン単位**: パラメータ型名は厳密一致、`->` と戻り値型も厳密一致、パラメータ数とカンマ位置も検査される。パラメータ*名*は自由 — パラメータ位置の任意の識別子が受け入れられる。だから `fn bloxdTerrainLight(s, l)` は、テンプレートが `(surface, light)` と綴っていてもコンパイルできる。light フックはちょうど2引数を取る。
+照合は**トークン単位**で行われる: パラメータの型名は厳密に一致しなければならず、`->` と戻り値型も厳密一致、パラメータ数とカンマの位置も検査される。パラメータ*名*は自由である — パラメータ位置の任意の識別子が受け入れられる。だからこそ、テンプレートが `(surface, light)` と綴っていても `fn bloxdTerrainLight(s, l)` はコンパイルできる。light フックはちょうど2つのパラメータを取る。
 
-**予約名。** 規則は単一の正規表現 `/^bloxd/i` である。`bloxd` で始まる識別子はすべて予約 — `bloxd*` はすべてエンジン提供で、パックはその名前空間に宣言を置けない（§44 の `bloxdPi` / `bloxdTau` 再宣言が衝突する理由でもある）。
+**予約名。** 規則は単一の正規表現 `/^bloxd/i` である。`bloxd` で始まる識別子はすべて予約される — `bloxd*` はすべてエンジン提供であり、パックはその名前空間に宣言を出せない (§44 の `bloxdPi` / `bloxdTau` 再宣言が衝突するのもこのためである)。
 
 **特殊関数。** v3 で登録されているのはちょうど1つ:
 
@@ -7264,23 +7070,23 @@ v3 (3ymzdd):  6.5bc26a63   ← 本番稼働バンドルから実測
 ["bloxdOpaqueBehind", { returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }]
 ```
 
-「special」は*マクロに結び付いた*という意味である — 可用性がバリアントシンボルに依存するエンジン関数。正しい使用を強制するガード診断が2つある:
+「special」は*マクロに結び付いている*という意味である — 可用性がバリアントシンボルに依存するエンジン関数のことだ。正しい使用を強制するガード診断が2つある:
 
-> `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — vertex フックが surface / light 専用関数に到達した場合。
+> `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — vertex フックが surface / light 専用の関数に到達した場合。
 >
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — たとえば `#ifdef BLOXD_SCENE_DEPTH` で囲まずに地形側で `bloxdOpaqueBehind()` を呼んだ場合。
+> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 例えば、`#ifdef BLOXD_SCENE_DEPTH` で囲まずにテレイン側から `bloxdOpaqueBehind()` を呼んだ場合。
 
-**エンジンヘッダ（prelude）の固定。** v3 ヘッダは 5,637 バイトの文字列で、`// Engine-provided and read-only, prepended to all packs. apiVersion 3.` で始まる。エンジン自身の WGSL プリプロセッサがバリアントごとに評価する `#if` / `#ifdef` ディレクティブを含む — エンジンは本当に `#if` 式評価を実行し、不正な式は `Cannot evaluate #if ...` でエラーになる。本ガイドのすべての構造体、関数シグネチャ、引用コメントはこのレンダリング済みテキストに由来するため、ガイドと出荷ヘッダがずれることはない。 全文は §54 の末尾に逐語で掲載する。
+**エンジンヘッダー (prelude) の固定。** v3 ヘッダーは `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` で始まる 5,637 バイトの文字列である。エンジン自身の WGSL プリプロセッサがバリアントごとに評価する `#if` / `#ifdef` ディレクティブを含む — エンジンは本当に `#if` 式評価を実行しており、不正な式は `Cannot evaluate #if ...` でエラーになる。本ガイドのすべての構造体・関数シグネチャ・引用コメントはこのレンダリング済みテキストに由来するため、ガイドと出荷ヘッダーがずれることはありえない。全文は §54 の末尾に逐語で続く。
 
 **作者向けパーサ注記。**
 
-- パック側の関数はエンジンシェーダに統合されるとき `pack_` 接頭辞で改名される（衝突回避）。診断は元の名前にマップし直す — [v2 移行ガイド](history/v2.md) §38 が第2検証段階について説明したのと同じ機構。
-- 未宣言識別子のメッセージは `'${name}' isn't declared. Packs can use their own names, WGSL built-ins and the Bloxd header.`。`_ can only be the target of a phony assignment, as in _ = f();` と `'${name}' is a WGSL keyword or reserved word, so it can't be a member name.` が、新たに確認されたメッセージ群を補完する。
-- パーサの字句宇宙には**標準 WGSL ではない**識別子が含まれる: `bufferView`、`bufferArrayView`、`bufferLength`、`atomicStoreMax`、`atomicStoreMin`。エンジンはこれらを組み込みとして知っているが、特定ブラウザの WGSL 実装が提供する保証はない — 配布パックをこれらに依存させてはならない。
+- パック側の関数は、エンジンシェーダへ統合されるときに `pack_` 接頭辞で改名される (衝突回避)。診断はそれらを元の名前にマップし直す — [v2 移行ガイド](history/v2.md) §38 が第2検証段階について説明しているのと同じ機構である。
+- 未宣言識別子のメッセージは `'${name}' isn't declared. Packs can use their own names, WGSL built-ins and the Bloxd header.` と読める。`_ can only be the target of a phony assignment, as in _ = f();` と `'${name}' is a WGSL keyword or reserved word, so it can't be a member name.` が、新たに確認されたメッセージ群を補完する。
+- パーサの字句宇宙には、**標準 WGSL ではない**識別子が含まれる: `bufferView`、`bufferArrayView`、`bufferLength`、`atomicStoreMax`、`atomicStoreMin`。エンジンはこれらを組み込みとして知っているが、特定のブラウザの WGSL 実装がそれらを提供するかは保証されない — 配布パックをこれらの上に構築してはならない。
 
 ### 54. 確認済みの定数・制限・レイアウト
 
-本番の Lite レンダラから直接得た、地形プログラムの完全なリソースレイアウト:
+本番の Lite レンダラから直接得た、テレインプログラムの完全なリソースレイアウト:
 
 | Binding | 内容 |
 |---|---|
@@ -7291,17 +7097,17 @@ v3 (3ymzdd):  6.5bc26a63   ← 本番稼働バンドルから実測
 | `@group(3) @binding(0)` | `bloxdPackInputs` — パック uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth` — 深度テクスチャ (§51) |
 
-- **方向ライトは最大4灯でハードキャップ**されている。シーンがそれ以上を登録しようとすると、レンダラは `Terrain supports 4 directional lights, not ${n}` でエラーになる。`l.directional` は存在する灯数（0〜4。Bloxd 自身のシーンは2灯 — [ライティングの内部](internals/lighting-internals.md)）の Lambert 合計である。地形はまた、尊重できないライトについて警告を出す (逐語): 起動後に追加されたライト — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`、色付きのライト — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`、メッシュフィルタ付きのライト — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
-- **地形プログラムの命名**: パイプラインキャッシュキーは `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` と読める — パックは `-sp{variant}` 接尾辞として現れ、§46 のバリアントごとに1プログラムになる。ウォッチャ (`watchPipelineFailures`) はライブのパイプライン名を `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` と照合し、パイプラインのコンパイル失敗時に対応するパックバリアントを再チェックする。GPU デバイスロスト (`device.lost`) のときはチェックしない。
-- **`BLOXD_TERRAIN_DIRECTIONAL` はエンジン内部マクロ**である（dirLightCount > 0 のときに定義）。prelude の4つには含まれず、パックコードには決して届かない — ただしエンジン自身のシェーダの WGSL ダンプには現れるので、知っておくと混乱を避けられる。
-- **ライトレベルのデコード**: `aPackedLightLevels` 頂点属性は4つのニブルを詰めた1つの f32 で、各ニブルは15で割られる。rgb = 色付きブロック光、a = sky／held チャンネル。vertex 段階で `vLightLevels` varying にデコードされ、`blockLight` は `.rgb`、sky／held チャンネルは `.w` を読む。エンジンは補間前に rgb チャンネルを最も明るいチャンネルの35%で床打ちする — [ライティングの内部](internals/lighting-internals.md) がゲームプレイから文書化したリフトのエンジン側アンカーである。
-- **`vTerrainLambert`**（`directional` の供給元、§49）は、有効な方向ライトに関する合計として生成される: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`。`BLOXD_TERRAIN_DIRECTIONAL` でガードされる。
-- **インデックスバッファは最初の大メッシュで 32 ビットになる。** Lite レンダラが `Uint16Array` のインデックスを選ぶのは、すべてのインデックス値が 65,534 以下である間だけである — いずれかのインデックスが 65,535 に達した時点で、バッファは `Uint32Array` になる (バッファごとに `is32Bits` フラグで追跡される)。実際には: 頂点が最大 65,535 のチャンクメッシュは 16 ビットインデックスに収まり、ちょうど 65,536 頂点のメッシュは必然的に 65,535 のインデックスを出力し、バッファ全体が 32 ビットに切り替わる。
-- **manifest 読み込みの詳細**: `__MACOSX/` 配下の zip エントリ、`._` 接頭辞のファイル、`.DS_Store` は除外される（macOS アーカイブのノイズ）。`pack.json` は小文字化したパス比較で探され、0件なら `loadNoManifest`、2件以上なら `loadDuplicateManifest`。manifest の読み込みは 65,536 バイトで上限される。
-- **これらすべての検証方法**: 本番バンドルのモジュールを復元し（165チャンク。webpack のレジストリはこのバンドルで 4,951 モジュールを数える — 非同期の子依存を含めるかどうかでモジュール数は数個変わるため、正確な数はバンドル固有のものとして扱うこと）、Node.js 上の webpack 互換ハーネスで実行した。実測 `HEADER_VERSION` (§53)、レンダリングされた 5,637 バイトのヘッダ、バリアント表の正規順序、特殊関数マップはすべて*出荷コードの実行*から得たもので、文字列を読んだだけではない。同じハーネスはコミュニティ版 `pack_check` v6 の自然な中核になる — エンジン自身のバリデータをパックに対して実行すれば、その判定を正確に再現できる。
-#### v3 エンジンヘッダ全文 (逐語)
+- **方向ライトは4灯でハードキャップされている。** シーンがそれ以上を登録しようとすると、レンダラは `Terrain supports 4 directional lights, not ${n}` でエラーになる。`l.directional` は、存在する灯数ぶんの Lambert 合計である (0〜4。Bloxd 自身のシーンは2灯 — [ライティングの内部](internals/lighting-internals.md))。テレインはまた、尊重できないライトについても (逐語で) 警告を出す: 起動後に追加されたライト — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`。色付きのライト — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`。そしてメッシュフィルタ付きのライト — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **テレインプログラムの命名**: パイプラインキャッシュキーは `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` と読める — パックは `-sp{variant}` 接尾辞として現れ、§46 のバリアントごとに1つのプログラムになる。ウォッチャ (`watchPipelineFailures`) はライブのパイプライン名を `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` と照合し、パイプラインのコンパイル失敗時に該当するパックバリアントを再チェックする。GPU デバイスロスト (`device.lost`) のときはチェックをスキップする。
+- **`BLOXD_TERRAIN_DIRECTIONAL` はエンジン内部マクロである** (dirLightCount > 0 のときに定義)。prelude の4つには含まれず、パックコードには決して届かない — ただしエンジン自身のシェーダの WGSL ダンプには現れるので、認識しておくと混乱を避けられる。
+- **ライトレベルのデコード**: `aPackedLightLevels` 頂点属性は、4つのニブルを詰めた1つの f32 で、各ニブルは15で割られる: rgb = 色付きブロック光、a = sky / held チャンネル。vertex 段階でこれを `vLightLevels` varying にデコードし、`blockLight` は `.rgb` を、sky / held チャンネルは `.w` を読む。エンジンは補間の前に、rgb チャンネルを最も明るいチャンネルの35%で床打ちする — [ライティングの内部](internals/lighting-internals.md)がゲームプレイから文書化したリフトの、エンジン側アンカーである。
+- **`vTerrainLambert`** (`directional` の供給元、§49) は、有効な方向ライトにわたる合計として生成される: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`。`BLOXD_TERRAIN_DIRECTIONAL` でガードされる。
+- **インデックスバッファは最初の大メッシュで 32 ビットになる。** Lite レンダラが `Uint16Array` のインデックスを選ぶのは、すべてのインデックス値が 65,534 以下にとどまっている間だけである — いずれかのインデックスが 65,535 に達した瞬間、バッファは `Uint32Array` になる (バッファごとに `is32Bits` フラグで追跡される)。実際には: 頂点数が最大 65,535 のチャンクメッシュは 16 ビットインデックスに収まり、ちょうど 65,536 頂点のメッシュは必然的に 65,535 のインデックスを生成して、バッファ全体を 32 ビットに切り替える。
+- **manifest 読み込みの詳細**: `__MACOSX/` 配下の zip エントリ、`._` 接頭辞のファイル、`.DS_Store` は除外される (macOS アーカイブのノイズ)。`pack.json` は小文字化したパス比較で特定され、0件なら `loadNoManifest`、2件以上なら `loadDuplicateManifest`。manifest の読み込みは 65,536 バイトで上限される。
+- **これらすべての検証方法**: 本番バンドルのモジュールを復元し (165チャンク。webpack レジストリはこのバンドルで 4,951 モジュールを数える — 非同期の子依存を含めるかどうかでモジュール数は数個前後するため、正確な数はバンドル固有の値として扱うこと)、Node.js 上の webpack 互換ハーネスで実行した。実測 `HEADER_VERSION` (§53)、レンダリング済みの 5,637 バイトヘッダー、バリアント表の正規順序、特殊関数マップは、すべて*出荷コードを実行して*得たものであり、文字列を読んだだけではない。同じハーネスはコミュニティ版 `pack_check` v6 の自然な中核になる — エンジン自身のバリデーターをパックに対して実行すれば、その判定を正確に再現できる。
+#### v3 エンジンヘッダー全文 (逐語)
 
-上の §53 が記述した固定テキスト (5,637 バイト・127 行) そのものである — 本ガイドが対象とする v3 本番ビルド `3ymzdd` から逐語復元した。v4 移行ガイド §67 の v4 ヘッダに対応する v3 側の全文を、同じ理由で丸ごと掲載する: v3 パックをエンジンが先頭に付加した正確なテキストに対してデバッグでき、v3 → v4 の全差分 ([v4 移行ガイド](history/v4.md) §58〜§59) を両文本から並べて直接読み取れるようにするためである。
+上の §53 が記述する固定テキスト (5,637 バイト・127 行) そのもの — この部が対象とする v3 本番ビルド `3ymzdd` から逐語的に復元したものである。[テクスチャカタログ](api/texture-catalog.md) §67 の v4 ヘッダーに対応する v3 側の相当物であり、同じ理由で丸ごと収録する: v3 パックを、エンジンがその先頭に付加したものと正確に突き合わせてデバッグできるようにするためと、v3 → v4 のすべての差分 ([v4 移行ガイド](history/v4.md) §58〜§59) を両テキストを並べて読み取れるようにするためである。
 
 ```wgsl
 
@@ -9377,9 +9183,7 @@ wire_mill_top_rot4
 
 ---
 
-## v5
 ## API v5 移行ガイド
-
 > 検証状況: **Verified** — API v5 への移行ガイド (対象ビルド `ab90qa`、2026-11-03 本番確認)。現行の v5 仕様そのものを扱います。API の詳細は [API Reference](api/) を、内部解析は [Engine Internals](internals/) を参照。
 
 対象ビルド: `ab90qa.main.6188124c.js` — **2026-11-03 時点で本番と preprod が同時に稼働しているビルド**。両者のバンドルは再びバイト単位で同一である (メインバンドルを両ホストから生取得して md5 検証: `fc3322212d15be2445c0e8dfc9733fcc`) ので、本稿の内容はそのまま本番に当てはまる。これは v3 以来最大の API 改訂である: メインバンドルは 3.39 MB へ成長し (直前の v4 ビルド比 +115 KB)、チャンクマップは 195 ID (c0〜c195、既知の 7 欠番を除き 188 個が出力されている)、シェーダーパイプラインは引き続き c51〜c56 クラスタ (ローダ c53、バリデータ/ヘッダー/レジストリ構築器 c55、WebGPU/コード生成 c56、フォグ c9) に位置する — ただし**デフォルトパックテンプレートは c116 へ移動した** (`tcwczu` では c124 だった)。このレイアウト詳細はどれもパックからは見えない。

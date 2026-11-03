@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
+  "getting-started": "शुरुआत कैसे करें",
+  "api": "API रेफ़रेंस",
   "guides": "गाइड",
   "recipes": "रेसिपी",
   "troubleshooting": "समस्या निवारण",
-  "internals": "Engine Internals & Research",
+  "internals": "इंजन इंटर्नल्स और रिसर्च",
   "history": "संस्करण इतिहास"
 }
