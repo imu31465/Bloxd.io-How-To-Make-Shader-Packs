@@ -1,0 +1,18 @@
+{
+  "index": {
+    "title": "API Reference",
+    "theme": { "toc": false, "typesetting": "article" }
+  },
+  "pack-format": "パック形式",
+  "hooks": "シェーダーフック",
+  "flags": "フラグ (BloxdFlags)",
+  "structures": "入出力構造体",
+  "functions": "関数",
+  "lighting": "ライティング",
+  "texture-api": "テクスチャAPI",
+  "constants": "定数",
+  "preprocessor": "プリプロセッサ",
+  "restrictions": "制限と予約名",
+  "compatibility": "互換性",
+  "texture-catalog": "テクスチャカタログ"
+}
