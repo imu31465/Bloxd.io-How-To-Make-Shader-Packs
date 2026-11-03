@@ -1,117 +1,54 @@
-# How to Make Bloxd.io Shader Packs (Complete Guide)
+# Bloxd.io Shader Pack Documentation
 
-A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
-**The live API is `apiVersion: 5` — it rolled out to production on 2026-11-03**, and the current game rejects v1, v2, v3 and v4 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) and Part X (`10-apiv4.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`); for v2 → v3, Part IX. Part X covers the v4 texture API (`bloxdTexel`, `bloxdTextureId*`), the fog rename, and the strict-games contract, plus the engine internals restored from the production build (§63–§65: the exact `bloxdTexel` sampling code, the texture name registry, and the validation pipeline with its new registry hash). The v4 → v5 step is [Part XII](12-apiv5.md) (live since 2026-11-03).
+An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from creating, implementing, validating and distributing packs to the API specification and engine-internals research.
 
-> This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
-> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-11-03 (v5 production rollout confirmed by bundle comparison — build `ab90qa`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). The complete reference material is embedded as Part XI (`11-reference.md`): the engine header restored verbatim and the full measured catalogue of all 905 usable texture names; still verify recipes against the loader screen and in-game compilation.  
-> The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
-> (no JS execution or networking), so nothing dangerous happens with normal code.
+## Current spec
 
-## Contents
+- Current API: **5** (`pack.json` must declare `apiVersion: 5`)
+- Target: WebGPU renderer
+- Last verified: 2026-11-03
+- Target build: `ab90qa.main.6188124c.js` (production and preprod run the identical bundle — verified by md5 `fc3322212d15be2445c0e8dfc9733fcc`)
+- Shader hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-- [Full guide in one file](00-full.md)
-- [Part I: Making packs](01-making.md)
-  - [1. Overview and prerequisites](01-making.md#1-overview-and-prerequisites)
-  - [2. Quick start](01-making.md#2-quick-start)
-  - [3. Pack structure](01-making.md#3-pack-structure)
-  - [4. pack.json](01-making.md#4-packjson)
-  - [5. Minimal template](01-making.md#5-minimal-template)
-  - [6. The 6 hooks](01-making.md#6-the-6-hooks)
-  - [7. 8 variants and guards](01-making.md#7-8-variants-and-guards)
-  - [8. Available language features and prohibitions](01-making.md#8-available-language-features-and-prohibitions)
-  - [9. Validation, testing, and distribution](01-making.md#9-validation-testing-and-distribution)
-- [Part II: API reference](02-api.md)
-  - [10. Engine header (automatically prepended to pack code)](02-api.md#10-engine-header-automatically-prepended-to-pack-code)
-  - [11. Variant table](02-api.md#11-variant-table)
-  - [12. Skeleton cheat sheet](02-api.md#12-skeleton-cheat-sheet)
-- [Part III: Recipe collection](03-recipes.md)
-  - [R1. Color recipes (surface)](03-recipes.md#r1-color-recipes-surface)
-  - [R2. Lighting recipes (light)](03-recipes.md#r2-lighting-recipes-light)
-  - [R3. Emission recipes](03-recipes.md#r3-emission-recipes)
-  - [R4. Coordinate recipes (world / block / view)](03-recipes.md#r4-coordinate-recipes-world--block--view)
-  - [R5. Time recipes (animation)](03-recipes.md#r5-time-recipes-animation)
-  - [R6. Liquid recipes](03-recipes.md#r6-liquid-recipes)
-  - [R7. Vertex recipes (allow only)](03-recipes.md#r7-vertex-recipes-allow-only)
-  - [R8. Math tricks](03-recipes.md#r8-math-tricks)
-  - [R9. Realistic recipes](03-recipes.md#r9-realistic-recipes)
-- [Part IV: Realism guide](04-realism.md)
-  - [13. Engine default lighting and headroom for realism](04-realism.md#13-engine-default-lighting-and-headroom-for-realism)
-  - [14. Two implementation schools](04-realism.md#14-two-implementation-schools)
-  - [15. Unreachable looks (the realism "ceiling")](04-realism.md#15-unreachable-looks-the-realism-ceiling)
-  - [16. Debugging tips](04-realism.md#16-debugging-tips)
-- [Part V: Troubleshooting & notes](05-troubleshooting.md)
-  - [17. Common errors and fixes](05-troubleshooting.md#17-common-errors-and-fixes)
-  - [18. Rights and notes](05-troubleshooting.md#18-rights-and-notes)
-- [Part VI: Important implementation notes](06-implementation.md)
-  - [19. Fixing "shadows dark but surfaces bright" at night](06-implementation.md#19-fixing-shadows-dark-but-surfaces-bright-at-night)
-  - [20. Integrated recipe for natural-looking water](06-implementation.md#20-integrated-recipe-for-natural-looking-water)
-  - [21. In-game test checklist](06-implementation.md#21-in-game-test-checklist)
-  - [22. Combining with other packs when shaders alone hit limits](06-implementation.md#22-combining-with-other-packs-when-shaders-alone-hit-limits)
-  - [23. Underwater reality with shader packs](06-implementation.md#23-underwater-reality-with-shader-packs)
-- [Part VII: Internals supplement](07-internals.md)
-  - [24. Sun and moon identity](07-internals.md#24-sun-and-moon-identity)
-  - [25. Fog internals](07-internals.md#25-fog-internals)
-  - [26. blockLight / heldLight internals](07-internals.md#26-blocklight--heldlight-internals)
-  - [27. Pipeline details](07-internals.md#27-pipeline-details)
-  - [28. What changes pack-visible values — test checklist](07-internals.md#28-what-changes-pack-visible-values--test-checklist)
-  - [29. Debug means](07-internals.md#29-debug-means)
-  - [30. Per-game apply modes (`shaderPackPolicy`)](07-internals.md#30-per-game-apply-modes-shaderpackpolicy)
-- [Part VIII: API Version 2 migration guide](08-apiv2.md)
-  - [31. Fate of v1 packs (conclusion first)](08-apiv2.md#31-fate-of-v1-packs-conclusion-first)
-  - [32. Full identifier renaming (mapping table)](08-apiv2.md#32-full-identifier-renaming-mapping-table)
-  - [33. Where removed fields moved](08-apiv2.md#33-where-removed-fields-moved)
-  - [34. New feature 1: `blockId` (per-block shading)](08-apiv2.md#34-new-feature-1-blockid-per-block-shading)
-  - [35. New feature 2: `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` (the headline)](08-apiv2.md#35-new-feature-2-bloxd_scene_depth-and-bloxdopaquebehind-the-headline)
-  - [36. Other v2 changes](08-apiv2.md#36-other-v2-changes)
-  - [37. v1 → v2 migration checklist](08-apiv2.md#37-v1--v2-migration-checklist)
-  - [38. Second validation stage — the browser's WGSL compiler is stricter than the built-in parser](08-apiv2.md#38-second-validation-stage--the-browsers-wgsl-compiler-is-stricter-than-the-built-in-parser)
-  - [39. On independently similar materials](08-apiv2.md#39-on-independently-similar-materials)
-- [Part IX: API version 3 migration guide (live since 2026-10-19)](09-apiv3.md)
-  - [40. Fate of v2 packs (conclusion first)](09-apiv3.md#40-fate-of-v2-packs-conclusion-first)
-  - [41. pack.json and the uniform buffer (what stays unchanged)](09-apiv3.md#41-packjson-and-the-uniform-buffer-what-stays-unchanged)
-  - [42. blockId becomes blockFlags: per-block materials as bit flags (the headline)](09-apiv3.md#42-blockid-becomes-blockflags-per-block-materials-as-bit-flags-the-headline)
-  - [43. Function renames and semantic changes](09-apiv3.md#43-function-renames-and-semantic-changes)
-  - [44. New header constants: bloxdPi and bloxdTau](09-apiv3.md#44-new-header-constants-bloxdpi-and-bloxdtau)
-  - [45. The six-hook template (liquid hooks officially shown)](09-apiv3.md#45-the-six-hook-template-liquid-hooks-officially-shown)
-  - [46. Variant matrix: the program axis and macro changes](09-apiv3.md#46-variant-matrix-the-program-axis-and-macro-changes)
-  - [47. v2 to v3 migration checklist](09-apiv3.md#47-v2-to-v3-migration-checklist)
-  - [48. Other v3 changes and notes](09-apiv3.md#48-other-v3-changes-and-notes)
-  - [49. Engine internals: how the Lite renderer invokes your hooks](09-apiv3.md#49-engine-internals-how-the-lite-renderer-invokes-your-hooks)
-  - [50. The fog function: four modes, one field](09-apiv3.md#50-the-fog-function-four-modes-one-field)
-  - [51. bloxdOpaqueBehind(): the exact implementation](09-apiv3.md#51-bloxdopaquebehind-the-exact-implementation)
-  - [52. blockFlags end-to-end: from registration to your hook](09-apiv3.md#52-blockflags-end-to-end-from-registration-to-your-hook)
-  - [53. Validation internals: HEADER_VERSION, signatures, reserved names](09-apiv3.md#53-validation-internals-header_version-signatures-reserved-names)
-  - [54. Confirmed constants, limits, and layouts](09-apiv3.md#54-confirmed-constants-limits-and-layouts)
-- [Part X: API version 4 migration guide (live since 2026-10-26)](10-apiv4.md)
-  - [55. Fate of v3 packs (conclusion first)](10-apiv4.md#55-fate-of-v3-packs-conclusion-first)
-  - [56. pack.json and the uniform buffer (what stays unchanged)](10-apiv4.md#56-packjson-and-the-uniform-buffer-what-stays-unchanged)
-  - [57. The texture API: `bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` (the headline)](10-apiv4.md#57-the-texture-api-bloxdtexel-bloxdtexturesize-bloxdtextureid-the-headline)
-  - [58. The four new input fields](10-apiv4.md#58-the-four-new-input-fields)
-  - [59. Renames and semantic changes](10-apiv4.md#59-renames-and-semantic-changes)
-  - [60. The strict-games contract: vertex hooks, `discard`, and X-ray](10-apiv4.md#60-the-strict-games-contract-vertex-hooks-discard-and-x-ray)
-  - [61. v3 to v4 migration checklist](10-apiv4.md#61-v3-to-v4-migration-checklist)
-  - [62. Other v4 changes and notes](10-apiv4.md#62-other-v4-changes-and-notes)
-  - [63. Engine internals: how `bloxdTexel` actually samples](10-apiv4.md#63-engine-internals-how-bloxdtexel-actually-samples)
-  - [64. The texture name registry](10-apiv4.md#64-the-texture-name-registry)
-  - [65. Validation internals v4: HEADER_VERSION, the registry hash, special functions](10-apiv4.md#65-validation-internals-v4-header_version-the-registry-hash-special-functions)
-  - [66. Confirmed constants, limits, and layouts (v4)](10-apiv4.md#66-confirmed-constants-limits-and-layouts-v4)
-- [Part XI: Complete reference — the engine header and the texture catalogue](11-reference.md)
-  - [67. The complete v4 engine header, verbatim](11-reference.md#67-the-complete-v4-engine-header-verbatim)
-  - [68. The complete texture catalogue (905 names, measured)](11-reference.md#68-the-complete-texture-catalogue-905-names-measured)
-- [Part XII: API version 5 migration guide (live since 2026-11-03)](12-apiv5.md)
-  - [69. Fate of v4 packs (conclusion first)](12-apiv5.md#69-fate-of-v4-packs-conclusion-first)
-  - [70. pack.json, the loader, and the uniform (what stays unchanged)](12-apiv5.md#70-packjson-the-loader-and-the-uniform-what-stays-unchanged)
-  - [71. The flags rewrite: `blockFlags` → `BloxdFlags` (the headline)](12-apiv5.md#71-the-flags-rewrite-blockflags--bloxdflags-the-headline)
-  - [72. New inputs: `localPosition`, the enchant quartet, and `overlayColour`](12-apiv5.md#72-new-inputs-localposition-the-enchant-quartet-and-overlaycolour)
-  - [73. New outputs: `BloxdSurface` gains `enchantColour` and `overlayColour`](12-apiv5.md#73-new-outputs-bloxdsurface-gains-enchantcolour-and-overlaycolour)
-  - [74. The lighting recipe goes public: `bloxdLit()` and the three helpers](12-apiv5.md#74-the-lighting-recipe-goes-public-bloxdlit-and-the-three-helpers)
-  - [75. Removals: `bloxdFragmentBlockPosition()`, `bloxdBlockFlag*`, `bloxdSpLitColour`](12-apiv5.md#75-removals-bloxdfragmentblockposition-bloxdblockflag-bloxdsplitcolour)
-  - [76. The default pack ships all nine hooks](12-apiv5.md#76-the-default-pack-ships-all-nine-hooks)
-  - [77. v4 → v5 migration checklist](12-apiv5.md#77-v4--v5-migration-checklist)
-  - [78. Other v5 changes and notes](12-apiv5.md#78-other-v5-changes-and-notes)
-  - [79. Engine internals v5: the texture pipeline and the 46-symbol `bloxdSp*` namespace](12-apiv5.md#79-engine-internals-v5-the-texture-pipeline-and-the-46-symbol-bloxdsp-namespace)
-  - [80. The texture registry: 896 usable names (the drift, measured)](12-apiv5.md#80-the-texture-registry-896-usable-names-the-drift-measured)
-  - [81. Confirmed constants, limits, and layouts (v5)](12-apiv5.md#81-confirmed-constants-limits-and-layouts-v5)
-  - [82. The complete v5 engine header, verbatim](12-apiv5.md#82-the-complete-v5-engine-header-verbatim)
+New to shader packs? Start with [Getting Started](getting-started/). Looking up the API? Start with [API Reference](api/).
+
+> This documentation is not an official resource from the game's developers. Engine internals may change with updates — check the target build and verification status noted on each page.
+>
+> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior. Keep verifying recipes against the loader screen and in-game compilation.
+>
+> The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL (no JS execution, no networking), so nothing dangerous happens with normal code.
+
+## Entry points by goal
+
+| Goal | Category | Audience |
+|---|---|---|
+| Make your first shader pack | [Getting Started](getting-started/) | First-time pack authors |
+| Look up API functions & fields | [API Reference](api/) | Authors mid-implementation |
+| Implement an effect (light, water, models…) | [Guides & Recipes](guides/) | Anyone building a look |
+| Fix an error | [Troubleshooting](troubleshooting/) | Anyone with a broken pack |
+| Research engine internals | [Engine Internals & Research](internals/) | Engine analysts |
+| Look up older versions (v1–v5) | [Version History](history/) | Migrating legacy packs |
+
+## Documentation map
+
+- **[Getting Started](getting-started/)** — overview, quick start, pack structure, pack.json, the 9 hooks, variants, validation, distribution. A single-track tutorial to your first pack.
+- **[API Reference](api/)** — the systematic v5 specification: hooks, flags, input/output structures, all functions, lighting, texture API, constants, preprocessor, restrictions, compatibility, and the 896-name texture catalog.
+- **[Guides](guides/)** — how lighting works, shadows, water, night, model rendering, performance, realism concepts.
+- **[Recipes](recipes/)** — goal-oriented code examples: colors, lighting, emission, coordinates, animation, liquids, vertices, math, realism, model shaders, enchant effects.
+- **[Troubleshooting](troubleshooting/)** — symptom-driven error resolution: loading, API version, compilation, validation, variants, visual, texture, lighting, model, performance.
+- **[Engine Internals & Research](internals/)** — rendering pipeline, hook invocation, engine header, validation & compilation internals, reserved identifiers, lighting/fog internals, texture sampling & registry, model rendering, measured data.
+- **[Version History](history/)** — v1 through v5: changes per version, migration steps, removed APIs.
+
+## Verification status labels
+
+Each page notes its target API version, build, last-verified date and status.
+
+| Label | Meaning |
+|---|---|
+| Verified | Verified on-device / on the target build |
+| Analyzed | Confirmed by analyzing the internal implementation |
+| Partially Verified | Only partially confirmed |
+| Experimental | Experimental / unsettled |
+| Historical | Material for a past version |
+
+Raw engine-extracted data (header, registry, measurements) lives in [Engine Internals](internals/); the methodology and logs behind it are tracked in the [research log](internals/research-log.md).
