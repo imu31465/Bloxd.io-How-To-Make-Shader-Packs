@@ -1,20 +1,20 @@
-# Preprocessor
+# Präprozessor
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Validator restauriert)
 
-Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif`. The `#` goes at the start of a line (inside functions is fine). Flag-name matching is case-insensitive; a wrong `#ifdef` name makes the error message list the official set.
+Die bedingte Kompilierung unterstützt nur `#define NAME` (ohne Wert) / `#ifdef` / `#ifndef` / `#else` / `#endif`. Die `#` steht am Zeilenanfang (auch innerhalb von Funktionen ist das zulässig). Das Abgleichen der Flag-Namen ist case-insensitive; ein falscher `#ifdef`-Name lässt die Fehlermeldung die offizielle Menge auflisten.
 
-## Defined macros (3)
+## Definierte Makros (3)
 
-| Macro | Defined in | Typical use |
+| Makro | Definiert in | Typische Verwendung |
 |---|---|---|
-| `BLOXD_STRICT` | strict-game variants (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` around whole vertex hooks and `discard` |
-| `BLOXD_ALPHA` | variants where `BloxdSurface.alpha` exists — all liquid + non-strict terrain/model | wrap alpha-touching code |
-| `BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `BLOXD_STRICT` | Strict-Spiel-Varianten (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` um ganze Vertex-Hooks und `discard` |
+| `BLOXD_ALPHA` | Varianten, in denen `BloxdSurface.alpha` existiert — alle Liquid + nicht-strict Terrain/Model | Alpha-berührenden Code einpacken |
+| `BLOXD_SCENE_DEPTH` | alle Liquid-Varianten | `bloxdOpaqueBehind()`-Aufrufe einpacken |
 
-## Macro × variant matrix
+## Makro-×-Varianten-Matrix
 
-| Variant | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
+| Variante | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
 |---|---|---|---|
 | `allow.terrain` | – | ✓ | – |
 | `allow.liquid` | – | ✓ | ✓ |
@@ -23,15 +23,15 @@ Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#i
 | `strict.liquid` | ✓ | ✓ | ✓ |
 | `strict.model` | ✓ | – | – |
 
-Terrain / liquid / model differences are **separate programs, not macros** — `#ifdef BLOXD_TERRAIN` does not exist.
+Die Unterschiede Terrain / Liquid / Model sind **separate Programme, keine Makros** — ein `#ifdef BLOXD_TERRAIN` existiert nicht.
 
-## Removed macros
+## Entfernte Makros
 
-- **`BLOXD_LIGHTING`** — removed in v5. Lighting state is a runtime question for [`bloxdLit()`](lighting.md#bloxdlit--the-gate), not a compile branch. Using it fails validation with:
+- **`BLOXD_LIGHTING`** — in v5 entfernt. Der Beleuchtungszustand ist eine Laufzeitfrage für [`bloxdLit()`](lighting.md#bloxdlit--the-gate), kein Compile-Zweig. Die Verwendung scheitert an der Validierung mit:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-v4 migration pattern:
+v4-Migrationsmuster:
 
 ```wgsl
 // v4 (fails validation on v5)
@@ -46,7 +46,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Example
+## Beispiel
 
 ```wgsl
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -67,13 +67,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Macros shape the structs
+## Makros formen die Strukturen
 
-- `BloxdSurface.alpha` exists only inside `#ifdef BLOXD_ALPHA`
-- `bloxdOpaqueBehind()` is callable only inside `#ifdef BLOXD_SCENE_DEPTH`
+- `BloxdSurface.alpha` existiert nur innerhalb von `#ifdef BLOXD_ALPHA`
+- `bloxdOpaqueBehind()` ist nur innerhalb von `#ifdef BLOXD_SCENE_DEPTH` aufrufbar
 
-See [Structures](structures.md#conditional-fields--macros).
+Siehe [Strukturen](structures.md#conditional-fields--macros).
 
-## Related
+## Verwandte Seiten
 
-- [Getting Started: Variants](../getting-started/variants.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [Erste Schritte: Varianten](../getting-started/variants.md) · [Engine-Interna: Shader-Validierung](../internals/shader-validation.md)

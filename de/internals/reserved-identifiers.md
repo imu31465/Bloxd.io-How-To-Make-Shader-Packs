@@ -1,29 +1,29 @@
-# Reserved identifier internals
+# Interna reservierter Bezeichner
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle's generators)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus den Generatoren des Live-Bundles restauriert)
 
-The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](../api/restrictions.md).
+Der `bloxdSp*`-Namensraum — Symbole, die die Generatoren injizieren können und die Pakete daher nicht neu deklarieren dürfen. Die Zusammenfassung für Paket-Autoren: [Einschränkungen](../api/restrictions.md).
 
-## The 46 symbols
+## Die 46 Symbole
 
-Grown from v4's 27 to **46** (20 added, 1 retired — `bloxdSpLitColour`, promoted into the public `bloxdLitColour()`):
+Gewachsen von 27 (v4) auf **46** (20 hinzugekommen, 1 ausgemustert — `bloxdSpLitColour`, befördert in die öffentliche `bloxdLitColour()`):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-## New names ↔ v5 features
+## Neue Namen ↔ v5-Features
 
-- `bloxdSpFlags` — delivery of the `BloxdFlags` struct
-- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — the new inputs (enchant, model-local position)
-- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — the cell-sampling texture-pack path
-- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](texture-sampling.md))
-- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — extended-hook locals
+- `bloxdSpFlags` — Übergabe der `BloxdFlags`-Struktur
+- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — die neuen Eingaben (Enchant, modell-lokale Position)
+- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — der Zell-Sampling-Pfad der Texturpakete
+- `bloxdSpQuarterTurns` — die Rotationskette ([Textur-Sampling](texture-sampling.md))
+- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — Locals erweiterter Hooks
 
-## The pack-level rule
+## Die Regel auf Paket-Ebene
 
-Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](../troubleshooting/validation.md)).
+Breiter als dieser Namensraum: **alles, was auf `/^bloxd/i` (case-insensitive) passt**. Nur die 9 Hook-Funktionsnamen dürfen deklariert werden ([Validierungsfehler](../troubleshooting/validation.md)).
 
-`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](../troubleshooting/textures.md)).
+Bezeichner mit `bloxdTextureId`-Präfix lösen als Texturnamen auf, mit ihrer eigenen Fehlerfamilie ([Textur-Probleme](../troubleshooting/textures.md)).
 
-## Related
+## Verwandte Seiten
 
-- [Restrictions](../api/restrictions.md) · [Texture sampling](texture-sampling.md) · [Version History: v5](../history/v5.md)
+- [Einschränkungen](../api/restrictions.md) · [Textur-Sampling](texture-sampling.md) · [Versionsgeschichte: v5](../history/v5.md)

@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Engine-Interna & Forschung",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "rendering-pipeline": "Rendering pipeline",
-  "hook-invocation": "Hook invocation internals",
-  "engine-header": "Engine header (verbatim)",
-  "shader-validation": "Shader validation",
-  "wgsl-compilation": "WGSL compilation",
-  "reserved-identifiers": "Reserved identifier internals",
-  "lighting-internals": "Lighting internals",
-  "fog-internals": "Fog internals",
-  "texture-sampling": "Texture sampling internals",
-  "texture-registry": "Texture registry internals",
-  "model-rendering": "Model rendering internals",
-  "engine-data": "Engine data ledger",
-  "testing-factors": "What changes pack-visible values",
-  "policy": "Per-game shader-pack policy",
-  "sun-and-moon": "The sun and the moon",
-  "debugging": "Debugging tools",
-  "research-log": "Research log"
+  "rendering-pipeline": "Rendering-Pipeline",
+  "hook-invocation": "Hook-Aufruf-Interna",
+  "engine-header": "Engine-Header (wortwörtlich)",
+  "shader-validation": "Shader-Validierung",
+  "wgsl-compilation": "WGSL-Kompilierung",
+  "reserved-identifiers": "Interna reservierter Bezeichner",
+  "lighting-internals": "Lighting-Interna",
+  "fog-internals": "Fog-Interna",
+  "texture-sampling": "Textur-Sampling-Interna",
+  "texture-registry": "Textur-Registry-Interna",
+  "model-rendering": "Model-Rendering-Interna",
+  "engine-data": "Engine-Daten-Hauptbuch",
+  "testing-factors": "Was paket-sichtbare Werte verändert",
+  "policy": "Shader-Pack-Richtlinien je Spiel",
+  "sun-and-moon": "Sonne und Mond",
+  "debugging": "Debugging-Werkzeuge",
+  "research-log": "Forschungslog"
 }

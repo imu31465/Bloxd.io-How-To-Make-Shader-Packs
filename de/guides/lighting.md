@@ -1,6 +1,6 @@
-# Engine-Standardlicht und Realismus-Spielraum
+# Wie das Lighting funktioniert
 
-
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, Warm-Kalt-Trennung oder Hemisphären-Ambiente existiert. Folgendes lässt sich neu aufbauen:
 
@@ -16,5 +16,5 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 | Oberflächendetail | Nur Texturauflösung | △ Prozedurales Hash-Mikro-Bump (R9.8) |
 | Vertex-Wellen (Wasser) | Keine (flach) | ◎ Nur allow (R7) |
 | Wellennormalen / Sonnenglitzer | Keine | ◎ (R9.7) |
-| Nachtmondlicht | Himmelsfarbe dunkelt nur ab | △ Mondrichtung liegt in `-bloxdSunDirection()`: Pseudo-Looks (blaues Ambiente in R2 / Entsättigung in R9.11) plus gerichtetes Mondlicht (R-A, nur Tag/Nacht-Zyklus) |
+| Nachtmondlicht | Himmelsfarbe dunkelt nur ab | △ Kein Mondrichtungs-Input, also nur Pseudo-Looks (blaues Ambiente in R2 / Entsättigung in R9.11) |
 | Schatten (Himmelsverdeckung) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |

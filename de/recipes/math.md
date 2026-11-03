@@ -1,6 +1,6 @@
 # Mathe-Tricks
 
-
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ```wgsl
 // weiche Quantisierung von 0..1 (n Stufen)

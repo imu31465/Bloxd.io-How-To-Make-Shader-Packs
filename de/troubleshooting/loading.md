@@ -1,60 +1,60 @@
-# Loading errors
+# Ladefehler
 
-> Target API: 5 · Status: Verified
+> Ziel-API: 5 · Status: Verified
 
-Errors rejected at the **loader stage** (the first gate), shown in the settings status line with `shaderPack:load*` IDs.
+Fehler, die an der **Loader-Stufe** (dem ersten Gate) abgelehnt werden, angezeigt in der Statuszeile der Einstellungen mit `shaderPack:load*`-ids.
 
-## "There's no pack.json at the top of the pack."
+## „There's no pack.json at the top of the pack."
 
-- **Cause**: no `pack.json` at the zip root (e.g. the folder was zipped with an extra nesting level)
-- **Check**: open the zip — `pack.json` at the top level (or directly under one common root folder)
-- **Fix**: zip `pack.json` and the `.wgsl` files directly. A single common root folder is stripped automatically ([Pack structure](../getting-started/pack-structure.md))
-- **Prevention**: keep your zipping procedure fixed; macOS "Compress" works as-is (OS junk is auto-excluded)
+- **Ursache**: keine `pack.json` im Zip-Root (z. B. wurde der Ordner mit einer Extra-Verschachtelungsebene gezippt)
+- **Prüfen**: die Zip öffnen — `pack.json` auf der obersten Ebene (oder direkt unter genau einem gemeinsamen Wurzelordner)
+- **Fix**: `pack.json` und die `.wgsl`-Dateien direkt zippen. Ein einzelner gemeinsamer Wurzelordner wird automatisch abgeschnitten ([Pack-Struktur](../getting-started/pack-structure.md))
+- **Vorbeugen**: die Zip-Prozedur fix halten; macOS „Compress“ funktioniert direkt (OS-Müll wird automatisch ausgeschlossen)
 
-## `loadDuplicateManifest` on zip load
+## `loadDuplicateManifest` beim Zip-Laden
 
-- **Cause**: two `pack.json` files (including case differences)
-- **Fix**: keep exactly one
+- **Ursache**: zwei `pack.json`-Dateien (Groß/Klein-Differenzen eingeschlossen)
+- **Fix**: exakt eine behalten
 
-## Size & count limits
+## Größen- & Anzahl-Limits
 
-| Message | Limit |
+| Meldung | Limit |
 |---|---|
-| `The zip is over 32 MB.` | zip 32 MB |
-| `The zip has more than 1024 entries.` | 1,024 entries |
-| `The pack has more than 256 .wgsl files.` | 256 `.wgsl` files |
-| `The pack's .wgsl files are over 256 KB in total.` | 256 KB total |
-| `pack.json is over 64 KB.` | 64 KB manifest |
+| `The zip is over 32 MB.` | Zip 32 MB |
+| `The zip has more than 1024 entries.` | 1.024 Einträge |
+| `The pack has more than 256 .wgsl files.` | 256 `.wgsl`-Dateien |
+| `The pack's .wgsl files are over 256 KB in total.` | 256 KB gesamt |
+| `pack.json is over 64 KB.` | 64 KB Manifest |
 
-- **Fix**: drop unneeded `.wgsl` files / merge files / trim comments
-- **Prevention**: these limits are also practical compile-time ceilings — treat growth as a refactoring signal
+- **Fix**: unnötige `.wgsl`-Dateien wegwerfen / Dateien zusammenlegen / Kommentare trimmen
+- **Vorbeugen**: diese Limits sind zugleich praktische Compile-Zeit-Decken — Wachstum als Refactoring-Signal behandeln
 
-## Format problems
+## Formatprobleme
 
-Split zips, zip64, encrypted entries and unsupported compression are each rejected with dedicated messages. All files must be valid UTF-8.
+Split-Zips, zip64, verschlüsselte Einträge und nicht unterstützte Kompression werden je mit eigenen Meldungen abgelehnt. Alle Dateien müssen valides UTF-8 sein.
 
-## Loader error-ID reference
+## Loader-Fehler-id-Referenz
 
-| ID | Meaning |
+| id | Bedeutung |
 |---|---|
-| `loadZipTooBig` | zip over 32MB |
-| `loadTooManyZipEntries` | over 1024 entries |
-| `loadTooManyWgsl` | over 256 `.wgsl` |
-| `loadSourceTooBig` | over 256KB total (streamed per-file check) |
-| `loadManifestTooBig` | `pack.json` over 64KB |
-| `loadManifestNotJson` / `loadManifestNotObject` | not JSON / not an object |
-| `loadNoApiVersion` / `loadWrongApiVersion` | missing / not `5` ([API version errors](api-version.md)) |
-| `loadNoName` / `loadAuthorNotString` | missing `name` / non-string `author` |
-| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | unsupported compression / zip64 / split / encrypted |
-| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | duplicate path / non-UTF-8 / decompress failure / damaged zip |
-| `loadNoManifest` / `loadDuplicateManifest` | manifest position / duplication |
+| `loadZipTooBig` | Zip über 32 MB |
+| `loadTooManyZipEntries` | über 1.024 Einträge |
+| `loadTooManyWgsl` | über 256 `.wgsl` |
+| `loadSourceTooBig` | über 256 KB gesamt (gestreamte Prüfung pro Datei) |
+| `loadManifestTooBig` | `pack.json` über 64 KB |
+| `loadManifestNotJson` / `loadManifestNotObject` | kein JSON / kein Objekt |
+| `loadNoApiVersion` / `loadWrongApiVersion` | fehlt / nicht `5` ([API-Versionsfehler](api-version.md)) |
+| `loadNoName` / `loadAuthorNotString` | `name` fehlt / `author` kein String |
+| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | nicht unterstützte Kompression / zip64 / Split / verschlüsselt |
+| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | doppelter Pfad / Nicht-UTF-8 / Dekomprimier-Fehler / beschädigte Zip |
+| `loadNoManifest` / `loadDuplicateManifest` | Manifest-Position / Duplikation |
 
-## "Ready. Reload the page to use it." but nothing changes
+## „Ready. Reload the page to use it.", aber nichts ändert sich
 
-- **Cause**: packs need a **page reload** to activate
-- **Fix**: reload after selecting; status should become `Ready to use`
-- **Note**: leftover renderer overrides (`?renderer=`, localStorage `bloxdRenderer`) make packs refuse to start — clear them and reload
+- **Ursache**: Pakete brauchen einen **Seiten-Reload**, um zu aktivieren
+- **Fix**: nach der Auswahl neu laden; der Status sollte `Ready to use` werden
+- **Hinweis**: zurückgebliebene Renderer-Overrides (`?renderer=`, localStorage `bloxdRenderer`) lassen Pakete den Start verweigern — diese löschen und neu laden
 
-## Related
+## Verwandte Seiten
 
-- [API version errors](api-version.md) · [Pack structure](../getting-started/pack-structure.md) · [Pack format](../api/pack-format.md)
+- [API-Versionsfehler](api-version.md) · [Pack-Struktur](../getting-started/pack-structure.md) · [Packformat](../api/pack-format.md)

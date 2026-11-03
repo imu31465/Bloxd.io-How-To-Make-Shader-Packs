@@ -1,48 +1,54 @@
 # Bloxd.io Shader-Pack-Dokumentation
 
-Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer — von Erstellung, Implementierung, Validierung und Vertrieb bis zur API-Spezifikation und Engine-Interna.
+Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer — von Erstellung, Implementierung, Validierung und Vertrieb bis zur API-Spezifikation und Engine-Interna-Forschung.
 
 ## Aktueller Stand
 
 - Aktuelle API: **5** (`pack.json` muss `apiVersion: 5` deklarieren)
 - Ziel: WebGPU-Renderer
 - Zuletzt verifiziert: 2026-11-03
-- Ziel-Build: `ab90qa.main.6188124c.js` (Produktion und Preprod identisch — per md5 `fc3322212d15be2445c0e8df9733fcc` verifiziert)
+- Ziel-Build: `ab90qa.main.6188124c.js` (Produktion und Preprod fahren das identische Bundle — per md5 `fc3322212d15be2445c0e8dfc9733fcc` verifiziert)
 - Shader-Hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-Neu bei Shader Packs? Beginne mit [Getting Started](getting-started/) (Englisch). API nachschlagen? Siehe [API Reference](api/) (Englisch).
+Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachschlagen? Siehe [API-Referenz](api/).
 
-> Diese Dokumentation ist keine offizielle Ressource der Spieleentwickler. Engine-Interna können sich mit Updates ändern — prüfe den Ziel-Build und den Verifikationsstatus auf jeder Seite.
+> Diese Dokumentation ist keine offizielle Ressource der Spieleentwickler. Engine-Interna können sich mit Updates ändern — prüfe den Ziel-Build und den Verifikationsstatus, die auf jeder Seite vermerkt sind.
 >
-> Dieses Handbuch wurde mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Verifiziere am tatsächlichen In-Game-Verhalten.
+> Dieses Handbuch wurde mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Verifiziere am tatsächlichen In-Game-Verhalten. Rezepte weiterhin gegen den Loader-Bildschirm und die In-Game-Kompilierung prüfen.
 >
-> Die Shader-Pack-Funktion selbst ist ein offizielles Feature der In-Game-UI; Packs sind reines WGSL (keine JS-Ausführung, kein Netzwerk) — mit normalem Code passiert nichts Gefährliches.
+> Die Shader-Pack-Funktion selbst ist ein offizielles Feature, erreichbar aus der In-Game-UI, und Packs sind reines WGSL (keine JS-Ausführung, kein Netzwerk) — mit normalem Code passiert nichts Gefährliches.
 
 ## Einstiege nach Ziel
 
 | Ziel | Kategorie | Publikum |
 |---|---|---|
-| Das erste Shader Pack bauen | [Getting Started](getting-started/) | Einsteiger |
-| API-Funktionen & Felder nachschlagen | [API Reference](api/) | Autoren mitten in der Umsetzung |
-| Einen Effekt umsetzen (Licht, Wasser, Modelle…) | [Guides & Recipes](guides/) | alle, die ein Look bauen |
-| Einen Fehler beheben | [Troubleshooting](troubleshooting/) | alle mit kaputtem Pack |
-| Engine-Interna erforschen | [Engine Internals & Research](internals/) | Engine-Analytiker |
-| Ältere Versionen nachschlagen (v1–v5) | [Version History](history/) | Migratoren alter Packs |
+| Das erste Shader Pack bauen | [Erste Schritte](getting-started/) | Einsteiger |
+| API-Funktionen & Felder nachschlagen | [API-Referenz](api/) | Autoren mitten in der Umsetzung |
+| Einen Effekt umsetzen (Licht, Wasser, Modelle…) | [Leitfäden](guides/) · [Rezepte](recipes/) | alle, die einen Look bauen |
+| Einen Fehler beheben | [Fehlerbehebung](troubleshooting/) | alle mit kaputtem Paket |
+| Engine-Interna erforschen | [Engine-Interna & Forschung](internals/) | Engine-Analytiker |
+| Ältere Versionen nachschlagen (v1–v5) | [Versionsgeschichte](history/) | Migratoren alter Packs |
 
 ## Dokumentationsstruktur
 
-- **[Getting Started](getting-started/)** — Überblick, Quick Start, Pack-Struktur, pack.json, die 9 Hooks, Varianten, Validierung, Vertrieb.
-- **[API Reference](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Lighting, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 896-Namen-Texturkatalog.
-- **[Guides](guides/)** · **[Recipes](recipes/)** · **[Troubleshooting](troubleshooting/)** · **[Engine Internals & Research](internals/)** · **[Version History](history/)**
-
-> Hinweis: Getting Started / API Reference / Troubleshooting sowie die in v5 neu hinzugefügten Seiten von Guides, Recipes und Internals werden derzeit **auf Englisch** angeboten (gleiche Struktur wie die übersetzten Seiten dieser Ausgabe). Die bereits übersetzten Inhalte bleiben vollständig erhalten.
+- **[Erste Schritte](getting-started/)** — Überblick, Quick Start, Pack-Struktur, pack.json, die 9 Hooks, Varianten, Validierung, Vertrieb. Ein durchgängiges Tutorial bis zum ersten Paket.
+- **[API-Referenz](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Beleuchtung, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 896-Namen-Texturkatalog.
+- **[Leitfäden](guides/)** — wie Beleuchtung funktioniert, Schatten, Wasser, Nacht, Modell-Rendering, Performance, Realismus-Konzepte.
+- **[Rezepte](recipes/)** — zielgerichtete Codebeispiele: Farben, Beleuchtung, Emission, Koordinaten, Animation, Flüssigkeiten, Vertices, Mathematik, Realismus, Modell-Shader, Enchant-Effekte.
+- **[Fehlerbehebung](troubleshooting/)** — symptomgetriebene Fehlerlösung: Laden, API-Version, Kompilierung, Validierung, Varianten, visuell, Texturen, Beleuchtung, Modelle, Performance.
+- **[Engine-Interna & Forschung](internals/)** — Rendering-Pipeline, Hook-Aufruf, Engine-Header, Validierungs- & Kompilierungs-Interna, reservierte Bezeichner, Beleuchtungs-/Fog-Interna, Textur-Sampling & Registry, Modell-Rendering, Messdaten.
+- **[Versionsgeschichte](history/)** — v1 bis v5: Änderungen je Version, Migrationsschritte, entfernte APIs.
 
 ## Verifikationsstatus
 
+Jede Seite nennt ihre Ziel-API-Version, ihren Build, das Datum der letzten Verifikation und ihren Status.
+
 | Label | Bedeutung |
 |---|---|
-| Verified | am Ziel-Build verifiziert |
-| Analyzed | per Analyse der Interna bestätigt |
+| Verified | auf dem Gerät / am Ziel-Build verifiziert |
+| Analyzed | per Analyse der internen Implementierung bestätigt |
 | Partially Verified | nur teilweise bestätigt |
-| Experimental | experimentell |
-| Historical | Material zu einer alten Version |
+| Experimental | experimentell / ungeklärt |
+| Historical | Material zu einer vergangenen Version |
+
+Rohe engine-extrahierte Daten (Header, Registry, Messungen) leben in den [Engine-Interna](internals/); die Methodik und die Logs dahinter werden im [Forschungslog](internals/research-log.md) festgehalten.

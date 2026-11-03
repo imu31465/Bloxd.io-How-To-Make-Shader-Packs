@@ -1,33 +1,33 @@
-# Requirements
+# Voraussetzungen
 
-> Target API: 5 · Status: Verified
+> Ziel-API: 5 · Status: Verified
 
 ## Browser
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+Shader Packs laufen nur auf dem WebGPU-Renderer. Du brauchst einen WebGPU-fähigen Browser:
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- Chromium-basierte Browser (Chrome / Edge / Opera etc.) — auf dem Desktop stabil
+- Safari 17+ / Firefox (WebGPU-Support schwankt je nach Zeitraum)
+- **Mobil**: WebGPU-Support kann auf iOS / Android beschränkt sein. Erwähne das auf der Release-Seite deines Pakets
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+Während ein Paket installiert ist, ist die Spiel-Einstellung für den WebGPU-Renderer zwangsweise aktiviert.
 
-## Development environment
+## Entwicklungsumgebung
 
-No special tooling is required, though these help:
+Keine spezielle Toolchain nötig, aber das hier hilft:
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- Ein Texteditor (WGSL-Syntax-Highlighting ist ein Plus)
+- Ein Zip-Werkzeug für den Vertrieb; während der Entwicklung kannst du Ordner-Laden benutzen (nur Desktop-Browser)
+- Browser-Entwicklertools — Kompilierfehler erscheinen in der In-Game-UI und zusätzlich in der Konsole
 
-## On-device verification environments
+## Umgebungen für die Verifikation auf dem Gerät
 
-Before distribution, verify on ([Validation](validation.md)):
+Vor dem Vertrieb verifizieren auf ([Validierung](validation.md)):
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. Einem allow-Modus-Spiel (Pflicht, wenn du Vertex-Animation benutzt)
+2. Einem strict-Modus-Spiel (die meisten Spiele sind strict)
+3. Einem Seiten-Reload (gespeicherte Pakete revalidieren automatisch)
 
-## URL parameter caveat
+## URL-Parameter-Vorbehalt
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+In URL-Parametern oder localStorage zurückgebliebene Renderer-Overrides lassen Pakete den Start verweigern — diese löschen und die Seite neu laden.

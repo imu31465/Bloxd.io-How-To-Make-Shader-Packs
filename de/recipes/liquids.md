@@ -1,6 +1,6 @@
-# Flüssigkeitsrezepte
+# Flüssigkeiten
 
-
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ## Gekräuselte Oberfläche (Farbschimmer)
 
@@ -20,7 +20,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ## Höhen-Pseudo-Transparenz (kein echter Flachwassertest)
 
-> In v1 waren Szenentiefe und Grundposition nicht abfragbar: echte Wassertiefe ließ sich mit dieser API allein nicht berechnen. In v2 misst `bloxdOpaqueBehind()` — nur in Flüssigkeiten — die Dicke bis zur opaken Fläche dahinter ([Teil VIII](../history/v2.md) R-E). Folgendes ist der alte Pseudo-Effekt ohne das: `s.position.y` ist eine lokale Koordinate und roh verwendet verschiebt sich der Effekt mit dem Chunk-Ursprung. Er variiert alpha nur über Welthöhe — Pseudo-Effekt, kein küsten-/grundbewusstes Flachwasser. `packWaterReferenceY` an die eigene Welthöhe anpassen.
+> Echte Wassertiefe braucht das liquid-exklusive `bloxdOpaqueBehind()`, das die Dicke bis zur opaken Fläche dahinter misst (das vollständige Rezept: [Wasser natürlich aussehen lassen](../guides/water.md)). Folgendes ist ein einfacherer Pseudo-Stil ohne diese Funktion: `s.position.y` ist eine lokale Koordinate, roh verwendet verschiebt sich der Effekt mit dem Chunk-Ursprung. Für Welthöhe per `bloxdWorldPosition()` konvertieren. Das folgende variiert alpha nur über die Welthöhe — ein Pseudo-Effekt, kein küsten-/grundbewusstes Flachwasser. `packWaterReferenceY` an die eigene Welthöhe anpassen.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;

@@ -1,23 +1,23 @@
-# Distribution
+# Vertrieb
 
-> Target API: 5 · Status: Verified
+> Ziel-API: 5 · Status: Verified
 
-## Release format
+## Release-Format
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. Zip mit `pack.json` im Root, innerhalb der Größenlimits ([Pack-Struktur](pack-structure.md))
+2. Prüfen, dass `pack.json` am Zip-Root liegt (ein einzelner gemeinsamer Wurzelordner wird automatisch abgeschnitten)
+3. `name` / `author` für den Release polieren
 
-## Pre-release checklist
+## Checkliste vor dem Release
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (Zahl, kein String)
+- [ ] Alle 6 Varianten bestehen die Validierung (leere Fehlerliste auf dem Loader-Bildschirm)
+- [ ] Visuell verifiziert in einem allow-Spiel und einem strict-Spiel
+- [ ] Vertex-Animations- / `discard`-Pakete klar als allow-only markiert
+- [ ] Getestete Spiele und Datum in den Release-Notes vermerkt (Builds ändern sich)
 
-## After release
+## Nach dem Release
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- Von Spielern gespeicherte Pakete revalidieren automatisch, wenn Engine-Header oder Textur-Registry sich mit einem Spiel-Update ändern
+- **Als v1–v4 vertriebene Pakete werden auf v5 still deaktiviert** (siehe [pack.json](manifest.md)) — Spieler sehen nur die Statuszeile, also eine aktualisierte Version veröffentlichen und ankündigen
+- Wenn sich die API aktualisiert: den Migrationsschritten der [Versionsgeschichte](../history/) folgen, Version anheben und neu veröffentlichen

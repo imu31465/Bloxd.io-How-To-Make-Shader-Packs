@@ -1,21 +1,21 @@
-# Guides
+# Leitfäden
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht in [Was Shader Packs können und was nicht](constraints.md); zielgerichtete Codebeispiele leben in den [Rezepten](../recipes/).
 
 ## Map
 
-| Page | Contents |
+| Seite | Inhalt |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [Wie Beleuchtung funktioniert](lighting.md) | was die Standard-Beleuchtung der Engine tut, und wie weit du sie neu aufbauen kannst |
+| [Schatten](shadows.md) | skyLight als Voxel-Shadow-Map; die Lift-Inversion |
+| [Wasser natürlich aussehen lassen](water.md) | das integrierte Wasser-Rezept und die 3-Schicht-Unterwasser-Realität |
+| [Nacht-Looks designen](night.md) | das Problem „dunkle Schatten, aber helle Flächen“ |
+| [Modelle und Texturen](models.md) | was das Model-Programm zeichnet und liest |
+| [Realismus: zwei Schulen](realism.md) | die additive und die Voll-Neubeleuchtungs-Schule |
+| [Was Shader Packs können und was nicht](constraints.md) | die Fähigkeits-Map: erreichbar, unerreichbar, bedingt — und warum |
+| [Performance](performance.md) | Kostentabelle und praktische Anleitung |
+| [In-Game-Testcheckliste](testing.md) | die Checkliste vor dem Release |
+| [Kombination mit Texturpacks](combinations.md) | Zusammenspiel mit Texturpacks |
+| [Debugging-Tipps](debugging.md) | Diagnose Symptom → Ursache |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion)

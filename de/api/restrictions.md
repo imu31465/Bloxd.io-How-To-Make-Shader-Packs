@@ -1,57 +1,57 @@
-# Restrictions & reserved names
+# Einschränkungen & reservierte Namen
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
 
-What packs may write, and the complete name-reservation rules.
+Was Pakete schreiben dürfen — und die vollständigen Regeln der Namensreservierung.
 
-## Allowed
+## Erlaubt
 
-- WGSL built-ins (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select`, …)
-- your own `fn` / `struct` / `const` / `alias` / `var<private>`, in-function `let` and control flow (if/for/while/switch…)
-- derivatives (`dpdx` / `dpdy` / `fwidth`) in surface/light hooks (fragment stage) only — not in vertex hooks
-- `const` arrays (color LUTs etc.), pointers (`ptr<function, T>`), matrices (`mat3x3f` etc.)
-- flag definitions `#define NAME` (no value) + `#ifdef` conditionals
+- WGSL-Built-ins (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select`, …)
+- eigene `fn` / `struct` / `const` / `alias` / `var<private>`, funktionseigene `let` und Kontrollfluss (if/for/while/switch…)
+- Ableitungen (`dpdx` / `dpdy` / `fwidth`) nur in Surface-/Light-Hooks (Fragment-Stufe) — nicht in Vertex-Hooks
+- `const`-Arrays (Farb-LUTs etc.), Zeiger (`ptr<function, T>`), Matrizen (`mat3x3f` etc.)
+- Flag-Definitionen `#define NAME` (ohne Wert) + `#ifdef`-Bedingungen
 
-## Forbidden / caveats
+## Verboten / Vorbehalte
 
-- **No direct textures**: you cannot declare `texture_*` / `sampler` types; atlas reads go through [`bloxdTexel`](texture-api.md) only. *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
-- **`discard` is forbidden in strict** — wrap in `#ifndef BLOXD_STRICT`
-- `@attributes` / `enable` / `requires` / `override` are forbidden — no `enable f16;`, so **no f16 types**
-- no `@builtin`, so `fragCoord` / `vertex_index` are unreachable
-- **no module-scope `let`** — use `const` or `var`
-- no `atomic`
-- **never construct output structs directly**: `BloxdLight(...)` fails static validation; start from `bloxdDefault*`
-- a bare `var x: BloxdSurface;` is a validation error
-- hook parameters are read-only — copy before mutating
-- `#define` takes no value (names only)
+- **Keine direkten Texturen**: `texture_*` / `sampler`-Typen lassen sich nicht deklarieren; Atlas-Lesezugriffe gehen ausschließlich über [`bloxdTexel`](texture-api.md). *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
+- **`discard` ist in strict verboten** — in `#ifndef BLOXD_STRICT` einpacken
+- `@attributes` / `enable` / `requires` / `override` sind verboten — kein `enable f16;`, daher **keine f16-Typen**
+- kein `@builtin`, daher sind `fragCoord` / `vertex_index` unerreichbar
+- **kein `let` auf Modul-Ebene** — `const` oder `var` benutzen
+- kein `atomic`
+- **Ausgabe-Strukturen nie direkt konstruieren**: `BloxdLight(...)` scheitert an der statischen Validierung; bei `bloxdDefault*` beginnen
+- ein nacktes `var x: BloxdSurface;` ist ein Validierungsfehler
+- Hook-Parameter sind read-only — vor dem Mutieren kopieren
+- `#define` nimmt keinen Wert (nur Namen)
 
-## Reserved names
+## Reservierte Namen
 
-### The bloxd prefix (general rule)
+### Das bloxd-Präfix (allgemeine Regel)
 
-**Every identifier matching `/^bloxd/i` (case-insensitive) is reserved.** The only exceptions are the 9 hook function names.
+**Jeder Bezeichner, der auf `/^bloxd/i` (case-insensitive) passt, ist reserviert.** Die einzigen Ausnahmen sind die 9 Hook-Funktionsnamen.
 
-Validator wording, verbatim:
+Validator-Wortlaut, wortwörtlich:
 
 > *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
 
-### The bloxdSp* namespace (46 symbols)
+### Der bloxdSp*-Namensraum (46 Symbole)
 
-Symbols the code generator may inject and therefore cannot be redeclared (grown from 27 to 46 in v5):
+Die 46 Symbole, die der Codegenerator injizieren kann und die daher nicht neu deklariert werden dürfen:
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-The new names map directly to v5 features: `bloxdSpFlags` (flag struct delivery), `bloxdSpEnchant` / `bloxdSpItemLocalPosition` (new inputs), the cell-sampling texture-pack path, the rotation chain, and extended-hook locals. **The pack-level reservation rule is broader than this list** (everything matching `/^bloxd/i`), so you don't need to memorize it — just never start your own names with `bloxd`.
+Sie decken die Übergabe der Flag-Struktur (`bloxdSpFlags`), die Enchant- und Modell-lokalen Eingaben (`bloxdSpEnchant` / `bloxdSpItemLocalPosition`), den Zell-Sampling-Pfad der Texturpakete, die Rotationskette und erweiterte Hook-Locals ab. **Die Reservierungsregel auf Paket-Ebene ist breiter als diese Liste** (alles, was auf `/^bloxd/i` passt) — du musst sie also nicht auswendig lernen: Beginne deine eigenen Namen einfach nie mit `bloxd`.
 
-### Texture names
+### Texturnamen
 
-Identifiers starting `bloxdTextureId` are resolved as texture-name constants ([Texture API](texture-api.md#bloxdtextureid-named-texture-constants)).
+Bezeichner, die mit `bloxdTextureId` beginnen, werden als Textur-Namenskonstanten aufgelöst ([Textur-API](texture-api.md#bloxdtextureid-named-texture-constants)).
 
-## Auto-rewrite introduced in v5
+## Automatische Umschreibungen
 
-- **Y-derivative sign flip**: the analyzer rewrites every call to `dpdy`, `dpdyCoarse` and `dpdyFine` as `(-dpdy(...))` (measured in the validator's token-rewrite pass; the dpdy family is explicitly enumerated as the inversion set). Screen-space y points down, so this inversion makes "rate of change upward" match intuition. Write `dpdy(h)` with the intent "how does h change as I go up" and the emitted code carries the flip. `dpdx` and the `fwidth` family are untouched
+- **Vorzeichen-Flip der Y-Ableitung**: der Analyzer schreibt jeden Aufruf von `dpdy`, `dpdyCoarse` und `dpdyFine` als `(-dpdy(...))` um (die dpdy-Familie ist im Token-Rewrite-Pass des Validators explizit als Inversionsmenge aufgeführt). Das Screen-Space-y zeigt nach unten; diese Inversion bringt „Änderungsrate nach oben“ mit der Intuition in Einklang. Schreibe `dpdy(h)` in der Bedeutung „wie ändert sich h, wenn ich nach oben gehe“ — der emittierte Code trägt den Flip. `dpdx` und die `fwidth`-Familie bleiben unberührt
 
-## Diagnostics you'll actually see
+## Diagnosen, die du tatsächlich zu sehen bekommst
 
 - *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
 - *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
@@ -59,6 +59,6 @@ Identifiers starting `bloxdTextureId` are resolved as texture-name constants ([T
 - *"X reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and Y doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
 - *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## Related
+## Verwandte Seiten
 
-- [Troubleshooting: compilation](../troubleshooting/compilation.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [Fehlerbehebung: Kompilierung](../troubleshooting/compilation.md) · [Engine-Interna: Shader-Validierung](../internals/shader-validation.md)

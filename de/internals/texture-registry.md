@@ -1,47 +1,47 @@
-# Texture registry internals
+# Textur-Registry-Interna
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](../api/texture-catalog.md).
 
-## Methodology
+## Methodik
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+Wir haben das eigene Registry-Bau-Modul der Engine (29833 auf diesem Build, koordinierend die Module 1371 / 1391 / 1384 / 219) in einem Mini-Webpack-Harness gegen die Texturdaten des ausgelieferten Block-Registry laufen lassen und seine Ausgabe aufgezeichnet — diese Zahlen sind **die eigene Berechnung des Produktions-Bundles**, keine Re-Implementierung.
 
-## Output structure
+## Ausgabe-Struktur
 
-| Output | v5 measured | Meaning |
+| Ausgabe | v5 gemessen | Bedeutung |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | als `bloxdTextureId<Name>` referenzierbare Namen |
+| `aliases` | 416 | gefaltete Schreibweisen — 188 Rahmen-Aliasse (`lava0`…) und 228 Rotations-Aliasse (`chest_top[rot[1`…) |
+| `layers` | 228 | die Layer-Tabelle — einschließlich 171 vor-rotierter Slots (57 Wurzeln × 4 Rotationen) |
 
-## Folding rules
+## Faltungsregeln
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **Animationsfamilien** (42): Rahmen-Schreibweisen (`lava0`–`lava7`) falten auf den Basisnamen (`lava`); `bloxdTexel` liefert zur Sample-Zeit den aktuellen Rahmen
+- **Rotationsfamilien** (57): gedrehte Slots (`[rot[1..4`) falten auf den Wurzelnamen; `bloxdTexel` wendet pro Fläche die `textureRotation` erneut an
+- `radar_screen` ist der einzige Name in beiden Familien (seine vier vor-rotierten Kopien tragen jeweils eine eigene 4-Rahmen-Leiter — daher 45 Animationswurzeln im Atlas, nicht 42)
 
 ## Drift (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| Messung | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| Atlas-Einträge | 1.219 | **1.210** |
+| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
+| Animationsfamilien (Rahmen-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
+| benutzbare benannte Konstanten | 905 | **896** |
+| id-Änderungen unter überlebenden Namen | — | **334 von 905** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+Der vollständige Drift (11 Namen): hinzu (1) `scorpion_eggs`; entfernt (10) die acht Doppel-Truhentexturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (die Doppel-Truhe hat die Spieldaten verlassen; Spawner behalten `mob_spawner_block_top`).
 
-## Effect on HEADER_VERSION
+## Wirkung auf HEADER_VERSION
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes gespeicherte Paket als „muss erneut geprüft werden“** (beim Seitenladen automatisch revalidiert). Namens-geschriebene Pakete überstehen die Neuauflösung; Roh-id-Pakete brechen ([Kompatibilität](../api/compatibility.md)).
 
-## Past drift records
+## Frühere Drift-Aufzeichnungen
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt); 779 von 1121 unveränderten Namen änderten die id (69 %); eine Namenskonventions-Migration (Suffixe `_rot1..4` → Slots `[rot[1..4`); das Auftauchen der Doppel-Truhe. Die vollständige Aufzeichnung lebt in [Versionsgeschichte: v4](../history/v4.md).
 
-## Related
+## Verwandte Seiten
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [Texturkatalog](../api/texture-catalog.md) · [Shader-Validierung](shader-validation.md) · [Forschungslog](research-log.md)

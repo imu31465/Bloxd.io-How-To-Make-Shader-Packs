@@ -1,24 +1,24 @@
-# Shader hooks
+# Shader-Hooks
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
 
-A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
+Ein Paket kann **9 Hooks** einhängen: 3 Render-Ziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle sind optional — ein undefinierter Hook fällt auf den Engine-Standard zurück.
 
-## The hooks
+## Die Hooks
 
-| Hook | Stage | What it does |
+| Hook | Stufe | Was er tut |
 |---|---|---|
-| `bloxdTerrainVertex` | terrain · vertex | Terrain vertex animation. **Cannot run in strict games** |
-| `bloxdTerrainSurface` | terrain · surface | Terrain color, alpha, emission, enchant, overlay |
-| `bloxdTerrainLight` | terrain · light | Terrain final color — the last stage of the fragment |
-| `bloxdLiquidVertex` | liquid · vertex | Water vertex animation. **strict-only guard required** |
-| `bloxdLiquidSurface` | liquid · surface | Water color, alpha, emission |
-| `bloxdLiquidLight` | liquid · light | Water final color |
-| `bloxdModelVertex` | model · vertex | Block models / items / entities vertex animation. **strict-only guard required** |
-| `bloxdModelSurface` | model · surface | Model color, alpha, emission, enchant, overlay |
-| `bloxdModelLight` | model · light | Model final color |
+| `bloxdTerrainVertex` | Terrain · Vertex | Terrain-Vertex-Animation. **Kann in strict-Spielen nicht laufen** |
+| `bloxdTerrainSurface` | Terrain · Surface | Terrain-Farbe, Alpha, Emission, Enchant, Overlay |
+| `bloxdTerrainLight` | Terrain · Light | finale Terrain-Farbe — die letzte Stufe des Fragments |
+| `bloxdLiquidVertex` | Liquid · Vertex | Wasser-Vertex-Animation. **strict-only-Guard erforderlich** |
+| `bloxdLiquidSurface` | Liquid · Surface | Wasser-Farbe, Alpha, Emission |
+| `bloxdLiquidLight` | Liquid · Light | finale Wasser-Farbe |
+| `bloxdModelVertex` | Model · Vertex | Vertex-Animation von Block-Modellen / Items / Entities. **strict-only-Guard erforderlich** |
+| `bloxdModelSurface` | Model · Surface | Modell-Farbe, Alpha, Emission, Enchant, Overlay |
+| `bloxdModelLight` | Model · Light | finale Modell-Farbe |
 
-Signatures (types must match exactly; parameter names are free):
+Signaturen (Typen müssen exakt passen; Parameternamen sind frei):
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex;
@@ -27,18 +27,18 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## Render-target split
+## Aufteilung der Render-Ziele
 
-- **Terrain** — every block except water and block models
-- **Liquid** — water
-- **Model** — block models (slabs, stairs, crossed-plane plants), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics
+- **Terrain** — jeder Block außer Wasser und Block-Modellen
+- **Liquid** — Wasser
+- **Model** — Block-Modelle (Stufen, Treppen, Pflanzen aus gekreuzten Ebenen), gehaltene/gefallene/geworfene Items, Spieler, Mobs, NPCs, Rüstung, Kosmetik
 
-**Important**: if a pack defines no Liquid hook, **no Terrain hook runs on water either** (water is handled by Liquid hooks alone). This differs from pre-v4 behavior where liquid fell back to terrain hooks.
+**Wichtig**: Definiert ein Paket keinen Liquid-Hook, **läuft auf Wasser auch kein Terrain-Hook** (Wasser wird ausschließlich von Liquid-Hooks behandelt). Das unterscheidet sich vom Verhalten vor v4, wo Liquid auf Terrain-Hooks zurückfiel.
 
-## Fallbacks and code sharing
+## Fallbacks und Code-Sharing
 
-- An undefined hook means that stage uses the engine default (same behavior as `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **To share code across hooks**, define a module-scope function and call it from both:
+- Ein undefinierter Hook bedeutet: Diese Stufe benutzt den Engine-Standard (dasselbe Verhalten wie `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
+- **Um Code über Hooks zu teilen**, eine Funktion auf Modul-Ebene definieren und aus beiden aufrufen:
 
 ```wgsl
 fn applyWarmth(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -56,9 +56,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## The default pack (official 9-hook template)
+## Das Standardpaket (offizielle 9-Hook-Vorlage)
 
-The starting template now includes the light hooks. 1,683 bytes as shipped, verbatim:
+Die Startvorlage enthält inzwischen die Light-Hooks. 1.683 Byte wie ausgeliefert, wortwörtlich:
 
 ```wgsl
 // Every hook here returns its engine default. Modify the return values to start
@@ -113,14 +113,14 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-The template's comments are the design guidance: modify return values to start building; deleting a hook restores the default; strict games keep terrain where it is; share code via functions.
+Die Kommentare der Vorlage sind die Design-Leitlinie: Rückgabewerte verändern, um mit dem Bauen zu beginnen; einen Hook zu löschen stellt den Standard wieder her; strict-Spiele halten das Terrain an Ort und Stelle; Code über Funktionen teilen.
 
-## Writing conventions
+## Schreibkonventionen
 
-- **Never construct output structs directly** (`BloxdSurface(...)` fails validation). Always start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` and mutate fields. The light hook's first argument is already the output type, so `var out = s;` also works
-- A bare `var x: BloxdSurface;` (type annotation only) is also a validation error
-- Hook parameters are **read-only**. Copy first (`var sv = s;`)
-- You cannot use identifiers starting with `bloxd` (case-insensitive), except the 9 hook function names
-- Write constants as `const` (`#define` takes no value)
+- **Ausgabe-Strukturen nie direkt konstruieren** (`BloxdSurface(...)` scheitert an der Validierung). Immer bei `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` beginnen und Felder mutieren. Das erste Argument des Light-Hooks ist bereits der Ausgabetyp, daher funktioniert dort auch `var out = s;`
+- Ein nacktes `var x: BloxdSurface;` (nur Typ-Annotation) ist ebenfalls ein Validierungsfehler
+- Hook-Parameter sind **read-only**. Zuerst kopieren (`var sv = s;`)
+- Bezeichner, die mit `bloxd` beginnen (case-insensitive), sind unbenutzbar — außer den 9 Hook-Funktionsnamen
+- Konstanten als `const` schreiben (`#define` nimmt keinen Wert)
 
-For every field each hook can read and write, see [Structures](../api/structures.md).
+Welche Felder jeder Hook lesen und schreiben kann, steht in [Strukturen](../api/structures.md).

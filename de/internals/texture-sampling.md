@@ -1,12 +1,12 @@
-# Texture sampling internals
+# Textur-Sampling-Interna
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live generator, c56)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
 
-How `bloxdTexel` / `bloxdTextureSize` actually compile — the 3-variant texture codegen. The user side: [Texture API](../api/texture-api.md).
+Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — der 3-Varianten-Textur-Codegen. Die Nutzerseite: [Textur-API](../api/texture-api.md).
 
-## The three variants
+## Die drei Varianten
 
-### Variant 1 — texture pack inactive (stubs)
+### Variante 1 — Texturpack inaktiv (Stubs)
 
 ```wgsl
 fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
@@ -17,11 +17,11 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 }
 ```
 
-Code written for the real atlas still compiles and runs here — it just sees white texels and a 1×1 size.
+Code, der für den echten Atlas geschrieben ist, kompiliert und läuft auch hier — er sieht nur weiße Texel und die Größe 1×1.
 
-### Variant 2 — the atlas path (the game default)
+### Variante 2 — der Atlas-Pfad (der Spiel-Standard)
 
-`bloxdTextureSize` returns `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))`. `bloxdTexel` applies the face's quarter-turn before the load — the rotation trap written as the generated `bloxdSpTurned` if-chain:
+`bloxdTextureSize` liefert `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))`. `bloxdTexel` wendet die Vierteldrehung der Fläche vor dem Load an — die Rotationsfalle, geschrieben als generierte `bloxdSpTurned`-if-Kette:
 
 ```wgsl
         // Each quarter turn clockwise the face shows its texture at reads the unturned texture at (v, 1 - u)
@@ -35,24 +35,24 @@ Code written for the real atlas still compiles and runs here — it just sees wh
         }
 ```
 
-(`bloxdSpTextureRotation` is the engine's own storage of the input field `textureRotation`.)
+(`bloxdSpTextureRotation` ist die eigene Ablage der Engine für das Eingabefeld `textureRotation`.)
 
-### Variant 3 — custom texture-pack textures
+### Variante 3 — eigene Texturpack-Texturen
 
-`textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` samples the layered atlas's per-texture cell; the pack's own texels go through the `bloxdSpOwnTexel` path.
+`textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` sampelt die pro-Textur-Zelle des geschichteten Atlas; die eigenen Texel des Packs gehen über den `bloxdSpOwnTexel`-Pfad.
 
-## The animation frame ladder
+## Die Animationsrahmen-Leiter
 
-Animated textures (42 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](../api/texture-catalog.md#animation-families-42-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
+Animierte Texturen (42 Familien) rücken in festen pro-Familie-Intervallen (200 / 250 / 300 ms — die Intervall-Spalte im [Texturkatalog](../api/texture-catalog.md#animation-families-42-names)). Eine Animationsfamilien-id an `bloxdTexel` zu übergeben sampelt den aktuellen Rahmen.
 
-## Sampler settings
+## Sampler-Einstellungen
 
-The block textures are a `texture_2d_array`; the terrain sampler is nearest + repeat.
+Die Blocktexturen sind ein `texture_2d_array`; der Terrain-Sampler ist Nearest + Repeat.
 
-## Greedy meshing & UV
+## Greedy Meshing & UV
 
-The mesher merges faces with matching material/AO/light into single rectangles (**greedy meshing**), so vertex UVs can exceed tile width on merged faces (0.0015 inset at edges). Hardware repeat addressing handles the tiling, so merged faces look seamless — but procedural detail keyed to `uv` can discontinuity across merge boundaries; key world-dependent effects to `bloxdWorldPosition(position)` instead.
+Der Mesher verschmilzt Flächen mit gleichem Material/AO/Licht zu einzelnen Rechtecken (**Greedy Meshing**), daher können Vertex-UVs auf verschmolzenen Flächen eine Kachelbreite überschreiten (0.0015 eingerückt an Kanten). Die Hardware-Repeat-Adressierung übernimmt die Kachelung, verschmolzene Flächen wirken also nahtlos — aber an `uv` gekoppeltes prozedurales Detail kann an Verschmelzungsgrenzen Diskontinuitäten zeigen; weltabhängige Effekte stattdessen an `bloxdWorldPosition(position)` koppeln.
 
-## Related
+## Verwandte Seiten
 
-- [Texture API](../api/texture-api.md) · [Texture registry](texture-registry.md) · [Rendering pipeline](rendering-pipeline.md)
+- [Textur-API](../api/texture-api.md) · [Textur-Registry](texture-registry.md) · [Rendering-Pipeline](rendering-pipeline.md)

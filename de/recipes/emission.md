@@ -1,8 +1,8 @@
-# Emissionsrezepte
+# Emission
 
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
-
-> `emission` wird nach der Lichtberechnung addiert, aber die Standardverarbeitung **dämpft es mit `fogVisibility`. In völlig vernebelter Ferne verschwindet Emission ebenfalls. Um Glanz in der Ferne zu behalten, nicht auf emission addieren — direkt als `out.colour += ...` im Light-Hook addieren** (engineColour ist bereits gefoggt, also landet Licht in der Ferne auf der Fog-Farbe)
+> `emission` wird nach der Lichtberechnung addiert, aber die Standardverarbeitung **dämpft es mit der Fog-Menge (`fogAlpha`). In völlig vernebelter Ferne verschwindet Emission ebenfalls. Um Glanz in der Ferne zu behalten, nicht auf emission addieren — direkt als `out.colour += ...` im Light-Hook addieren** (der Standard-Output ist bereits gefoggt, also landet Licht in der Ferne auf der Fog-Farbe)
 
 ## Pulsierende Lampen (atmende Fackeln)
 

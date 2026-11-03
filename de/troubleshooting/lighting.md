@@ -1,51 +1,51 @@
-# Lighting issues
+# Beleuchtungsprobleme
 
-> Target API: 5 · Status: Verified
+> Ziel-API: 5 · Status: Verified
 
-Brightness, shadow and fog problems.
+Helligkeits-, Schatten- und Fog-Probleme.
 
-## Caves too bright
+## Höhlen zu hell
 
-- **Cause**: insufficient non-linearity on `skyLight`
-- **Fix**: the cave-darkening recipes in [lighting recipes](../recipes/lighting.md) and [realism recipes](../recipes/realism.md)
+- **Ursache**: unzureichende Nichtlinearität auf `skyLight`
+- **Fix**: die Höhlen-Abdunkel-Rezepte in [Lichtrezepten](../recipes/lighting.md) und [Realismusrezepten](../recipes/realism.md)
 
-## Lit faces too bright at night
+## Beleuchtete Flächen nachts zu hell
 
-- **Cause**: only shadow colors were darkened — the finished color keeps its daytime brightness
-- **Fix**: attenuate the whole finished color at night and relax only local light (`blockLight` / `heldLight`) — [the night guide](../guides/night.md)
+- **Ursache**: nur die Schattenfarben wurden abgedunkelt — die fertige Farbe behält ihre Tageshelligkeit
+- **Fix**: die ganze fertige Farbe nachts dämpfen und nur lokales Licht (`blockLight` / `heldLight`) entspannen — [der Nacht-Leitfaden](../guides/night.md)
 
-## Night too dark
+## Nacht zu dunkel
 
-- **Fix**: guarantee a minimum ambient; with a zero `bloxdSunDirection()` the true moon direction is unknown, so use pseudo blue ambient ([the night recipe](../recipes/lighting.md)). The moon direction itself is `-bloxdSunDirection()` (day-night-cycle worlds only)
+- **Fix**: ein Mindest-Ambiente garantieren; bei null `bloxdSunDirection()` ist die wahre Mondrichtung unbekannt, also pseudo-blaues Ambiente benutzen ([das Nacht-Rezept](../recipes/lighting.md)). Die Mondrichtung selbst ist `-bloxdSunDirection()` (nur Welten mit Tag/Nacht-Zyklus)
 
-## Daytime blows out
+## Tag brennt aus
 
-- **Fix**: lower the exposure before ACES ([ACES](../recipes/realism.md))
+- **Fix**: die Belichtung vor ACES senken ([ACES](../recipes/realism.md))
 
-## Torch surroundings saturated orange
+## Fackelumgebung gesättigt orange
 
-- **Fix**: lower the warm blend ratio ([warm torch × cool sky](../recipes/realism.md))
+- **Fix**: die Warm-Mischratio senken ([warme Fackel × kühler Himmel](../recipes/realism.md))
 
-## Want to keep the engine's world light exactly
+## Das Weltlicht der Engine exakt behalten wollen
 
-- **v5 solution**: call `bloxdWorldLight(light)` — identical math to the engine's "brightest of block/sky/held, floored by ambientLightColour" ([Lighting](../api/lighting.md#bloxdworldlight--the-worlds-light))
-- **Note**: `blockLight` / `heldLight` are 0 and sky-related fields are 1 when `!bloxdLit()` (header guarantee)
+- **v5-Lösung**: `bloxdWorldLight(light)` aufrufen — identische Mathematik wie das „hellstes aus Block/Himmel/Hand, von ambientLightColour abgefloort“ der Engine ([Beleuchtung](../api/lighting.md#bloxdworldlight--the-worlds-light))
+- **Hinweis**: `blockLight` / `heldLight` sind 0 und himmelsbezogene Felder sind 1, wenn `!bloxdLit()` (Header-Garantie)
 
-## Looks wrong in lighting-disabled games
+## Sieht falsch aus in Spielen mit deaktivierter Beleuchtung
 
-- **Cause**: lighting-only inputs (`blockLight` etc.) used unguarded. v5 has no `#ifdef BLOXD_LIGHTING` — branch on **runtime `bloxdLit()`**
-- **Fix**: early return `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Lighting](../api/lighting.md#bloxdlit--the-gate))
+- **Ursache**: beleuchtungsexklusive Eingaben (`blockLight` etc.) ungeschützt benutzt. v5 hat kein `#ifdef BLOXD_LIGHTING` — auf **Laufzeit-`bloxdLit()`** verzweigen
+- **Fix**: früh zurückgeben mit `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Beleuchtung](../api/lighting.md#bloxdlit--the-gate))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## „LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
 
-- **Cause**: dense glowing-block regions overflow the light seed queue and the chunk's light computation is cut short. **Not pack-caused**, but light gaps near glowing clusters trace to this
-- **Fix**: spread light sources in the world
+- **Ursache**: dichte Leuchtblock-Regionen überlaufen die Licht-Seed-Queue, und die Lichtberechnung des Chunks wird abgeschnitten. **Nicht paket-verursacht**, aber Lichtlücken nahe glühender Cluster gehen darauf zurück
+- **Fix**: Lichtquellen in der Welt verteilen
 
-## Want the theory?
+## Die Theorie dahinter?
 
-- Shadows: [Shadows](../guides/shadows.md) (skyLight = voxel shadow map)
-- Fog: [Engine Internals: Fog Internals](../internals/fog-internals.md)
+- Schatten: [Schatten](../guides/shadows.md) (skyLight = Voxel-Shadow-Map)
+- Fog: [Engine-Interna: Fog-Interna](../internals/fog-internals.md)
 
-## Related
+## Verwandte Seiten
 
-- [Lighting](../api/lighting.md) · [Visual issues](visual.md) · [Lighting Internals](../internals/lighting-internals.md)
+- [Beleuchtung](../api/lighting.md) · [Visuelle Probleme](visual.md) · [Beleuchtungs-Interna](../internals/lighting-internals.md)

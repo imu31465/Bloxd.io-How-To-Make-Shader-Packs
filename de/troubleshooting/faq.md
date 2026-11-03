@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ & rechtliche Hinweise
 
-> Status: Verified
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
 
-## Frequently asked questions
+## Häufig gestellte Fragen
 
-### Q. Are shader packs an official feature?
+### F. Sind Shader Packs ein offizielles Feature?
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+Die Shader-Pack-Funktion ist aus der In-Game-UI erreichbar, und Pakete-Bauen erscheint als beabsichtigte Aktivität. Eine öffentliche offizielle Dokumentation wurde allerdings nicht gefunden — dieses Handbuch ist ein inoffizielles, analysebasiertes Dokument.
 
-### Q. Can packs do anything dangerous?
+### F. Können Pakete etwas Gefährliches tun?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+Pakete sind reines WGSL — **JS-Ausführung und Netzwerkzugriff sind konstruktionsbedingt unmöglich**. Es läuft nur Code, der Validierung und Kompilierung besteht ([Einschränkungen](../api/restrictions.md)).
 
-### Q. Which games do packs work in?
+### F. In welchen Spielen funktionieren Pakete?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+Die meisten Spiele laufen im strict-Modus (keine Vertex-Animation, kein `discard`). Vertex-Animation funktioniert nur in allow-gelisteten Spielen. Die Liste pro Titel steht in [Engine-Interna: Policy](../internals/policy.md).
 
-### Q. Do packs work on mobile?
+### F. Funktionieren Pakete auf Mobil?
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+Nur in WebGPU-fähigen Umgebungen ([Voraussetzungen](../getting-started/requirements.md)).
 
-### Q. Can I ship my own textures?
+### F. Kann ich eigene Texturen ausliefern?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+Nicht in einem Shader Pack (der Atlas ist read-only). Das ist Aufgabe des Texturpack-Systems ([Kombinationen](../guides/combinations.md)).
 
-### Q. Can I keep using an old-version pack?
+### F. Kann ich ein Paket alter Version weiter benutzen?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+Das aktuelle Spiel akzeptiert nur `apiVersion: 5`; ältere Pakete werden still deaktiviert ([Kompatibilität](../api/compatibility.md)). Migration über die [Versionsgeschichte](../history/).
 
-### Q. Will the API change again?
+### F. Ändert sich die API nochmal?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
 
-### Q. What about "cinematic shader" distributions?
+### F. Was ist mit „Cinematic-Shader“-Distributionen?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte sich als Texturpack (128×128-Texturen, kein `pack.json` / `.wgsl`). Die meisten „schattig shader-artigen“ Looks sind texturseitiges Handwerk ([Kombinationen](../guides/combinations.md)).
 
-## Legal & notes
+## Rechtliches & Hinweise
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- Dies ist ein inoffizielles Handbuch und vertritt nicht die Sicht der Entwickler. Die API kann sich ohne Ankündigung ändern
+- Mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Am tatsächlichen In-Game-Verhalten verifizieren
+- Messwerte (Textur-ids etc.) sind Momentaufnahmen spezifischer Builds und ändern sich zwischen Builds ([Namen sind die API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
 
-## Related
+## Verwandte Seiten
 
-- [Documentation entry](../) · [Version History](../history/)
+- [Einstieg der Dokumentation](../) · [Versionsgeschichte](../history/)

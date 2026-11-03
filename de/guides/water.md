@@ -1,8 +1,8 @@
-# Integriertes Rezept für natürlich aussehendes Wasser
+# Wasser natürlich aussehen lassen
 
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
-
-Diese API kann die Szenenfarbe nicht sampeln: Es ist **Pseudo-Rendering per Fresnel-Farbmischung und Sonnen-Highlights, keine echte Reflexion/Refraktion**. Die Tiefenberechnung geht in v2 per `bloxdOpaqueBehind()` (ausgelagert in [Teil VIII](../history/v2.md) R-E). Das Sample behält die Basisfarbe, mischt bei streifenden Blickwinkeln etwas Richtung Himmelsfarbe und addiert nur mit Sonne einen kleinen Glint.
+Diese API kann die Szenenfarbe nicht sampeln: Es ist **Pseudo-Rendering per Fresnel-Farbmischung und Sonnen-Highlights, keine echte Reflexion/Refraktion** (die Tiefenberechnung nutzt das liquid-exklusive `bloxdOpaqueBehind()` — das Rezept für Dickenabsorption steht weiter unten auf dieser Seite). Das Sample behält die Basisfarbe, mischt bei streifenden Blickwinkeln etwas Richtung Himmelsfarbe und addiert nur mit Sonne einen kleinen Glint.
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -44,7 +44,7 @@ Tuning-Hinweise:
 - Wasser weiß/ausgewaschen: `0.38` in `fresnel * 0.38` und Glint `0.55` senken.
 - Wasser zu dunkel: etwas mehr `fakeSkyReflection` mischen. Zu viel wirkt plastisch.
 - Linien oder regelmäßige Streifen auf Wasser: Wellenfrequenzen und Glint-Stärke senken. Dieser Code verschiebt keine Mesh-Vertices.
-- Echte Landschaftsreflexionen: Diese API-Inputs haben keine Bildschirmfarbe: Farben zu mischen wird nie echte Reflexion (Tiefe ist in Flüssigkeiten abgreifbar. [Teil VIII](../history/v2.md) R-E).
+- Echte Landschaftsreflexionen: Die Inputs dieser API haben keine Bildschirmfarbe, Farb-Mischungen werden also nie echte Reflexion (Tiefe gibt es nur für Flüssigkeiten — siehe [Funktionen: bloxdOpaqueBehind](../api/functions.md)).
 
 Dieses Rezept **ersetzt** ein existierendes `bloxdLiquidLight`. Nicht neben die gleichnamige Wellenfunktion aus R9.7 oder andere gleichnamige Hooks kleben.
 
@@ -61,4 +61,4 @@ Unterwasser-Looks bestehen aus 3 Schichten:
 | ② Flüssigkeitsdefinitions-Schleier | Emissives Fullscreen-Quad aus Definitionsfarbe/-alpha des Flüssigkeitsblocks der Kamera, ganz vorne gezeichnet. Die Spieleinstellung `cameraTint` gewinnt, falls gesetzt | Nein (weder Farbe noch Dichte änderbar) |
 | ③ cameraTint | Spieleinstellung | Nein |
 
-Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nicht entfernbar / unter Wasser ist keine Verzweigung möglich (fogStart / fogEnd / fogColour ändern sich unter Wasser nicht: fogVisibility erkennt es auch nicht).
+Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nicht entfernbar / unter Wasser ist keine Verzweigung möglich (fogStart / fogEnd / fogColour ändern sich unter Wasser nicht: fogAlpha erkennt es auch nicht).

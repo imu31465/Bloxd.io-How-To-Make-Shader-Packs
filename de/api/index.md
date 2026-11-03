@@ -1,24 +1,24 @@
-# API Reference
+# API-Referenz
 
-The systematic specification of the current API v5. Everything here is measured from target build `ab90qa` (2026-11-03; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
+Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `ab90qa` gemessen (2026-11-03; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](../internals/engine-header.md)), ist die Primärquelle.
 
 ## Map
 
-| Page | Contents |
+| Seite | Inhalt |
 |---|---|
-| [Pack format](pack-format.md) | every `pack.json` field, loader limits, uniform layout |
-| [Shader hooks](hooks.md) | 9-hook comparison: signatures, targets, run conditions |
-| [Flags](flags.md) | all 14 `BloxdFlags` fields |
-| [Structures](structures.md) | every field of every struct (incl. conditional fields) |
-| [Functions](functions.md) | all frame/default/special function signatures |
-| [Lighting](lighting.md) | the lighting API and the processing order |
-| [Texture API](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` and naming |
-| [Constants](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
-| [Preprocessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
-| [Restrictions](restrictions.md) | language limits, reserved identifiers |
-| [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
+| [Packformat](pack-format.md) | jedes `pack.json`-Feld, Loader-Limits, Uniform-Layout |
+| [Shader-Hooks](hooks.md) | 9-Hook-Vergleich: Signaturen, Ziele, Laufbedingungen |
+| [Flags](flags.md) | alle 14 `BloxdFlags`-Felder |
+| [Strukturen](structures.md) | jedes Feld jeder Struktur (inkl. bedingter Felder) |
+| [Funktionen](functions.md) | alle Frame-/Default-/Spezialfunktions-Signaturen |
+| [Beleuchtung](lighting.md) | die Beleuchtungs-API und die Verarbeitungsreihenfolge |
+| [Textur-API](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` und Namensgebung |
+| [Konstanten](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
+| [Präprozessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
+| [Einschränkungen](restrictions.md) | Sprachgrenzen, reservierte Bezeichner |
+| [Kompatibilität](compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
+| [Texturkatalog](texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored verbatim from header & validator)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
 
-Migrating from v4? See [Version History: v5](../history/v5.md).
+Migration von v4? Siehe [Versionsgeschichte: v5](../history/v5.md).

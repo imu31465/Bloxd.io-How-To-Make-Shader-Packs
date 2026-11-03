@@ -1,68 +1,68 @@
-# Research log
+# Forschungslog
 
-> Status: Verified — how this documentation's measurements were obtained
+> Status: Verified — wie die Messungen dieser Dokumentation gewonnen wurden
 
-The technical statements here rest not on official developer documentation but on **production-bundle analysis**. This page records methodology and evidence so future builds can be re-verified.
+Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentation, sondern auf **Produktions-Bundle-Analyse**. Diese Seite hält Methodik und Evidenz fest, damit künftige Builds nachverifiziert werden können.
 
-## Core principles
+## Kernprinzipien
 
-1. **Direct production-bundle retrieval** — raw main.js and chunks fetched from both production and preprod, identity verified by md5
-2. **Verbatim respect** — headers, error messages and i18n strings are **quoted as-is**, never paraphrased
-3. **Reproduced measurement** — derived values like the registry are recomputed by running the engine's own modules in a harness (real output, not a lookalike re-implementation)
-4. **Named builds** — every measurement carries a build id and date
+1. **Direkter Produktions-Bundle-Abgriff** — rohe main.js und Chunks aus Produktion und Preprod geholt, Identität per md5 verifiziert
+2. **Wortwörtliche Wertschätzung** — Header, Fehlermeldungen und i18n-Strings werden **wie vorliegend zitiert**, nie paraphrasiert
+3. **Reproduzierte Messung** — abgeleitete Werte wie die Registry werden neu berechnet, indem die eigenen Module der Engine in einem Harness laufen (echte Ausgabe, keine nachgebaute Re-Implementierung)
+4. **Benannte Builds** — jede Messung trägt Build-id und Datum
 
-## Build history referenced by this documentation
+## Build-Historie, auf die sich diese Dokumentation bezieht
 
-| Build | API | Date | Note |
+| Build | API | Datum | Hinweis |
 |---|---|---|---|
-| `szby6g` | v3-era | 2026-10-17 | first allow/strict static analysis (111 game definitions) |
-| `3ymzdd` | v3 | 2026-10-20 | the v3 guide's evidence build |
-| `sjr0p7` | v3-era | 2026-10-17 | drift-comparison baseline |
-| `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **current**; this documentation's baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `szby6g` | v3-Ära | 2026-10-17 | erste allow/strict-Staticanalyse (111 Spieldefinitionen) |
+| `3ymzdd` | v3 | 2026-10-20 | der Evidenz-Build des v3-Leitfadens |
+| `sjr0p7` | v3-Ära | 2026-10-17 | Drift-Vergleichsbasis |
+| `cnty9` | v4 | 2026-10-27 | Evidenz des v4-Leitfadens & des 905-Namen-Katalogs |
+| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
+| `ab90qa` | **v5** | 2026-11-03 | **aktuell**; die Basislinie dieser Dokumentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 
-## Key methodology
+## Kern-Methodik
 
-### Engine-header restoration
+### Engine-Header-Restaurierung
 
-Rendering the c55 header template with its live interpolations (`${vC}` = apiVersion, the 5 uniform reads via `${Gq.j}`) — 6 interpolations on v5 ([Engine header](engine-header.md)).
+Rendern der c55-Header-Vorlage mit ihren Live-Interpolationen (`${vC}` = apiVersion, die 5 Uniform-Lesezugriffe über `${Gq.j}`) — 6 Interpolationen auf v5 ([Engine-Header](engine-header.md)).
 
-### Texture-registry recomputation
+### Textur-Registry-Neuberechnung
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 896 / aliases 416 / layers 228) ([Texture registry](texture-registry.md)).
+Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 896 / aliases 416 / layers 228) ([Textur-Registry](texture-registry.md)).
 
-Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
+Die Animationsintervalle stammen aus der `animDataPerTex`-artigen Tabelle (pro Layer `numAnimStates` / `animationInterval`) — es existieren nur drei Intervallwerte: 200 / 250 / 300 ms ([der Katalog](../api/texture-catalog.md#animation-families-42-names)).
 
-### Error-message capture
+### Fehlermeldungs-Erfassung
 
-Loader messages verbatim from the live i18n dictionary; validator messages from the validation module's string literals.
+Loader-Meldungen wortwörtlich aus dem Live-i18n-Wörterbuch; Validator-Meldungen aus den String-Literalen des Validierungsmoduls.
 
-### allow / strict static analysis
+### allow / strict-Staticanalyse
 
-Statically analyzing all 111 game definitions: `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too ([Policy](policy.md)).
+Statische Analyse aller 111 Spieldefinitionen: `shaderPackPolicy`-`"allow"`-Literale — 8 direkte + 4 Basis-Variable = 12 Titel (26 Einträge), Spread-Vererbung (`{...tb,...}`) ebenfalls verfolgt ([Policy](policy.md)).
 
-### Uniform / pipeline restoration
+### Uniform-/Pipeline-Restaurierung
 
-The `BloxdPackInputs` field layout from the uniform-layout module (29838); the texture 3-variant codegen from the WebGPU generator (c56) ([Texture sampling](texture-sampling.md)).
+Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Varianten-Textur-Codegen aus dem WebGPU-Generator (c56) ([Textur-Sampling](texture-sampling.md)).
 
-## Drift observations
+## Drift-Beobachtungen
 
-| Comparison | Period | Result |
+| Vergleich | Zeitraum | Ergebnis |
 |---|---|---|
-| sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
-| cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
+| sjr0p7 → cnty9 | 10 Tage | 98 hinzugekommen, 79 entfernt; 779/1121 Namen änderten die id (69 %) |
+| cnty9 → ab90qa | 7 Tage | +1 (`scorpion_eggs`), −10 (Doppel-Truhe ×8, Spawner-Seiten ×2); 334/905 Namen änderten die id |
 
-## Unverified / speculative
+## Unverifiziert / spekulativ
 
-- Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
-- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
-- Why `bloxdFragmentBlockPosition` remains in the signature table (removed from v5's header) is unanalyzed — plausibly an un-cleaned leftover, but unconfirmed
+- Pixelgenaue Shadow-Maps als „geplante Zukunft“ sind eine **Interpretation** (abgeleitet aus dem unbenutzten `var shadow: f32 = 1.;` in der Beleuchtungs-Vorlage)
+- Die allow/strict-Aufteilung kann sich pro Build ändern (12-Titel-Identität auf ab90qa nachbestätigt; künftige Spiele unbekannt)
+- `bloxdFragmentBlockPosition` (aus dem v5-Header): Signaturentabellen-Eintrag und Laufzeit-Injektion beide live bestätigt — Aufrufe validieren und kompilieren; ob das Engine-Team ihn behalten will, ist unbekannt
 
-## When to re-verify
+## Wann neu zu verifizieren ist
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above (c55 / c116 / c56) are the starting points.
+Beim Erkennen eines Spiel-Updates (ein neuer main.js-Hash): den Header (9.125 B) prüfen, die apiVersion-Konstante, die Registry neu berechnen und die allow/strict-Liste erneut bestätigen. Die detaillierte Monitoring-Methodik liegt außerhalb des Umfangs dieser Dokumentation, aber die oben genannten Modul-Orte (c55 / c116 / c56) sind die Ausgangspunkte.
 
-## Related
+## Verwandte Seiten
 
-- [Engine data](engine-data.md) · [Texture registry](texture-registry.md) · [Version History](../history/)
+- [Engine-Daten](engine-data.md) · [Textur-Registry](texture-registry.md) · [Versionsgeschichte](../history/)

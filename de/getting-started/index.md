@@ -1,19 +1,19 @@
-# Getting Started
+# Erste Schritte
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom Überblick bis zum Vertrieb. Es vermittelt direkt die fertige Form der API v5 (ältere Versionen zuerst zu lesen ist unnötig — das ist die Aufgabe der [Versionsgeschichte](../history/)).
 
-## The track
+## Der Weg
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [Überblick & Voraussetzungen](overview.md) — was Shader Packs können und was nicht
+2. [Voraussetzungen](requirements.md) — Browser- und Renderer-Anforderungen
+3. [Quick Start](quick-start.md) — dein erstes Paket in 5 Minuten
+4. [Pack-Struktur](pack-structure.md) — Zip-Inhalte und Größenlimits
+5. [pack.json](manifest.md) — jedes Manifest-Feld
+6. [Shader-Hooks](hooks.md) — die Rollen der 9 Hooks
+7. [Varianten](variants.md) — die 6 Varianten und Makro-Guards
+8. [Validierung](validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
+9. [Vertrieb](distribution.md) — Zippen und Release-Hygiene
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](../api/); für fertige Effekte siehe [Rezepte](../recipes/).

@@ -1,8 +1,8 @@
-# Debugging-Mittel
+# Debugging-Werkzeuge
 
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
-
-- URL-Parameter `?renderer=lite` — den Lite-Renderer (WebGPU) erzwingen (`?renderer=webgl2` / `babylon` gehen auch; `babylon` ist der alte Name für webgl2). Priorität: URL-Parameter > localStorage `bloxdRenderer` > Einstellungsbildschirm > Standard (webgl2). Ungültige Werte werden mit Warnung ignoriert. In URL oder localStorage belassene Overrides können Szenen brechen, die WebGPU (lite) brauchen — „needs the new WebGPU renderer, so remove the renderer override..." ([Teil V](../troubleshooting/) §17)
+- URL-Parameter `?renderer=lite` — den Lite-Renderer (WebGPU) erzwingen (`webgl2` / `babylon` gehen auch; `babylon` ist der alte Name für webgl2). Priorität: URL-Parameter > localStorage `bloxdRenderer` > Einstellungsbildschirm > Standard (webgl2). Ungültige Werte werden mit Warnung ignoriert. In URL oder localStorage belassene Overrides können Szenen brechen, die WebGPU (lite) brauchen — „needs the new WebGPU renderer, so remove the renderer override..." ([Fehler beim Laden](../troubleshooting/loading.md))
 - URL-Parameter `?vconsole` — On-Screen-Konsole (VConsole). Praktisch für echte Mobil-Verifikation
 - URL-Parameter `?drawcalls=1` — blendet ein Draw-Statistik-Debug-Panel ein. Spielobjekte aus der Debug-Konsole auswählen oder `drawCalls()` / `why()` / `configureDrawCallWatching()` nutzen, um Overdraw großer Mechanismen (Paket und sonstige) und die Annäherung ans Limit von ~65.000 Vertices pro Draw-Call zu inspizieren — nützlich zur Isolation von Performance-Engpässen
 - Die Konsole zeigt `noa-engine v0.33.0` und `Renderer: lite from <Quelle>` — erst prüfen, um Render-Pfad-Fehldiagnosen zu vermeiden
