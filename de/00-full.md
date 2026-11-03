@@ -12,7 +12,7 @@ Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Blo
 
 # Teil I: Pakete erstellen
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-11-03 `apiVersion: 5` und lehnt v1/v2/v3/v4-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung. Danach [Teil XII](12-apiv5.md) anwenden (v4 → v5).
 
 ## 1. Überblick und Voraussetzungen
 
@@ -1834,7 +1834,7 @@ Recherchiert von ltf_ahel (recherchiert mit glm)
 
 # Teil IX: Migrationsleitfaden für API Version 3
 
-> **Seit 2026-10-26 ersetzt: die aktuelle API ist Version 4** — v3-Pakete werden beim Laden genau so abgelehnt, wie es hier für v2 beschrieben ist. Diesen Teil *und danach* [Teil X](10-apiv4.md) anwenden (v3 → v4: Textur-API, `fogAlpha`-Umbenennung, `bloxdFragmentBlockPosition`, `hit`).
+> **Seit 2026-10-26 ersetzt: die aktuelle API ist Version 5** — v3-Pakete werden beim Laden genau so abgelehnt, wie es hier für v2 beschrieben ist. Diesen Teil *und danach* [Teil X](10-apiv4.md) anwenden (v3 → v4: Textur-API, `fogAlpha`-Umbenennung, `bloxdFragmentBlockPosition`, `hit`). Danach auch [Teil XII](12-apiv5.md) anwenden (v4 → v5).
 
 Ziel-Build: `3ymzdd.main.fae4743f.js` — **der seit 2026-10-19 live ausgelieferte Produktions-Build**. Das Bundle, das bloxd.io in Produktion ausliefert, ist byte-identisch (per md5 geprüft, Haupt-Bundle und Shader-Pack-Chunks gleichermaßen) mit dem Preprod-Deploy, gegen das dieser Teil ursprünglich untersucht wurde; alles hier gilt also unverändert für die Produktion. Das Paketmodell behält seine v2-Form (gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches Uniform-Layout).
 
@@ -2449,6 +2449,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 # Teil X: Migrationsleitfaden für API Version 4 (2026-10-26, Zusammenfassung)
 
+> **Seit 2026-11-03 ersetzt: die aktuelle API ist Version 5** — v4-Pakete werden beim Laden genau so abgelehnt, wie es hier für v3 beschrieben ist. Wende diesen Teil an *und dann* [Teil XII](12-apiv5.md) (v4 → v5: die `BloxdFlags`-Struktur ersetzt `blockFlags`, `bloxdLit()` und das öffentliche Beleuchtungsrezept, die Enchant-/Overlay-Eingaben, das 9-Hook-Standardpaket). Die Interna dieses Teils (§56–§66) bleiben für die v4-Builds, auf denen sie gemessen wurden, korrekt.
+
 > Dieser Text ist die kurze Zusammenfassung für diese Sprache. Die vollständige Fassung mit allen Details, Beispielrezepten und restaurierten Engine-Interna (§55–§66) gibt es auf [Englisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) und [Japanisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md).
 
 Ziel-Build: `cnty9.main.669f8081.js` — **seit 2026-10-26 gleichzeitig in Produktion und Preprod live** (beide byte-identisch). Das Pack-Modell behält seine Form: gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches 64-B-Uniform, dieselben 6 Hooks.
@@ -2480,6 +2482,8 @@ Das vollständige Referenzmaterial ist als Teil XI (`11-reference.md`) eingebett
 ---
 
 # Teil XI: Vollständige Referenz — Engine-Header und Textur-Katalog
+
+> **Die aktuelle API ist Version 5** (gemessen 2026-11-03, Build `ab90qa`, Produktion und Preprod byte-identisch): Der Header in §67 unten ist der v4-Text — der vollständige v5-Header ist in [Teil XII](12-apiv5.md) §82 eingebettet — und die §68-ids bleiben ein `cnty9`-Snapshot; die Katalognamen bleiben für v5 gültig modulo der 11-Namen-Drift aus Teil XII §80. Namen, nicht ids, sind die API.
 
 Ziel-Build: `cnty9.main.669f8081.js` (gemessen 2026-10-27; Produktion und Preprod byte-identisch). Dieser Teil bettet die zwei Referenz-Artefakte **vollständig** ein, damit das Handbuch in sich geschlossen ist. §67 ist der exakte Header-Text, den die Engine jedem Pack voranstellt (wortgetreu aus dem Produktions-Bundle restauriert); §68 ist der komplette Textur-Katalog: alle 905 nutzbaren `bloxdTextureId*`-Namen mit gemessenen ids, die 57 gedrehten Familien, die 42 animierten Familien und die gemessene Registry-Drift.
 
@@ -3746,3 +3750,37 @@ wire_mill_top_rot4
 
 
 [← Previous part](10-apiv4.md)·[Back to the manual](README.md)
+---
+
+# Teil XII: Migrationsleitfaden für API Version 5 (2026-11-03, Zusammenfassung)
+
+> Dieser Text ist die kurze Zusammenfassung für diese Sprache. Die vollständige Fassung mit allen Details, Beispielrezepten, dem restaurierten v5-Header im Volltext und den Engine-Interna (§69–§82) gibt es auf [Englisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/12-apiv5.md) und [Japanisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/12-apiv5.md).
+
+Ziel-Build: `ab90qa.main.6188124c.js` — **seit Messung am 2026-11-03 gleichzeitig in Produktion und Preprod live** (beide byte-identisch, md5-verifiziert). Dies ist die größte API-Revision seit v3: der dekodierte Engine-Header wächst von 6,021 auf **8,954 Byte**, und fast jede Struktur erhält neue Felder.
+
+## Was sich ändert
+
+- `pack.json` verlangt `"apiVersion": 5` (strikt `===`, Zahl) — v4-Pakete werden beim Laden abgelehnt; gespeicherte v4-Pakete sind still inaktiv.
+- **`blockFlags` wird durch eine Struktur ersetzt (die große Umstellung):** die sechs Bit-Konstanten `bloxdBlockFlag*` (opaque/emissive/vegetation/dirt/sand/rock) entfallen; stattdessen **`flags: BloxdFlags`** mit 14 benannten bool-Feldern — sechs davon sind die alten Bits unter neuem Namen, acht sind neu: **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`**. Modelle, gehaltene Items und Lebewesen sind jetzt von Terrain unterscheidbar.
+- **`#ifdef BLOXD_LIGHTING` ist entfernt:** der Kompilier-Schalter weicht einem Laufzeittest mit der neuen Header-Funktion **`bloxdLit()`**; das Uniform erhält das Feld `lit: u32` (Offset 4, weiterhin 64 B gesamt). Die Variantenmatrix schrumpft von 8 auf 6 (`strict|allow` × `terrain|liquid|model`).
+- **Die Beleuchtungsrezept der Engine wird öffentlich:** drei neue Header-Funktionen — **`bloxdShading(light)`**, **`bloxdWorldLight(light)`**, **`bloxdLitColour(surface, light)`** — plus zwei neue `BloxdLightIn`-Eingaben (`diffuse`, `emissive`).
+- **Neue Eingaben:** `localPosition: vec3f` (Modellkoordinaten, 0 für Terrain) überall; `enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` (Verzauberung und Treffer-Blitz) auf Surface/Light; **neue Ausgaben** `enchantColour` / `overlayColour` auf `BloxdSurface`, die `bloxdLitColour` einmischt.
+- **Entfernt:** `bloxdFragmentBlockPosition()` (ohne Ersatz), die `bloxdBlockFlag*`-Konstanten, `bloxdSpLitColour`.
+- **Die Standard-Pack-Vorlage liefert jetzt alle 9 Hooks** (Light-Hooks inklusive, 1,122 → 1,683 Byte) — und der neue Kommentar dokumentiert das Lösch-Modell: *„If you delete a hook, the default is used instead."*
+- Neu im Header: `const bloxdChunkSize: i32 = 32;`. Der Y-Ableitungs-Schutz wird automatisiert: `dpdy`/`dpdyCoarse`/`dpdyFine` schreibt die Engine als `(-dpdy(...))` um. `HEADER_VERSION` steigt auf `9.<hash>.<hash>`.
+- `bloxdSp*`-Namespace wächst von 27 auf **46 Symbole**; die Texturnamen-Registry misst jetzt **896 nutzbare Namen** (+1 `scorpion_eggs`, −10 u. a. die `chest_double_*`-Familie und `mob_spawner_*_block_side`) — Namen sind die API, ids nur Snapshot.
+- Alles andere bleibt eingefroren: Loader-Limits (256 `.wgsl` / 256 KB / 64 KB / 32 MB / 1,024 Einträge), Hook-Namen, Strict-Vertrag (allow 12 Titel), Group-3-Bindungen.
+
+## Migration in Kürze
+
+| v4 | v5 |
+|---|---|
+| `"apiVersion": 4` | `"apiVersion": 5` (Zahl) |
+| `(s.blockFlags & bloxdBlockFlagVegetation) != 0u` | `s.flags.vegetation` |
+| `#ifdef BLOXD_LIGHTING … #endif` | `if (bloxdLit()) { … } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdFragmentBlockPosition(p, n)` | entfallen — `bloxdWorldPosition()` / `flags` verwenden |
+| (nicht vorhanden) | `s.flags.held`, `s.flags.lifeform`, `s.localPosition`, `s.enchantTier` … |
+
+Der vollständige restaurierte v5-Engine-Header (8,954 Byte, Wort für Wort) und die komplette Drift-Liste der Texturnamen stehen in der englischen und japanischen Vollfassung (§82 bzw. §80).
+
+[← Vorheriger Teil](11-reference.md)·[Zurück zum Handbuch](README.md)

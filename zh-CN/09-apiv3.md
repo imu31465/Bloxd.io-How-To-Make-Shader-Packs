@@ -2,7 +2,7 @@
 
 # 第九部分: API Version 3 迁移指南
 
-> **已于 2026-10-26 被取代: 现行 API 为版本 4** —— v3 包在加载时被拒绝，方式与本文对 v2 的描述完全相同。请先应用本部分，*再*应用 [第十部分](10-apiv4.md) (v3 → v4: 纹理 API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`)。
+> **已于 2026-10-26 被取代: 现行 API 为版本 5** —— v3 包在加载时被拒绝，方式与本文对 v2 的描述完全相同。请先应用本部分，*再*应用 [第十部分](10-apiv4.md) (v3 → v4: 纹理 API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`)。 然后也应用 [第十二部分](12-apiv5.md)（v4 → v5）。
 
 目标构建: `3ymzdd.main.fae4743f.js` — **自 2026-10-19 起的正式生产构建**。bloxd.io 在生产环境提供的 bundle 与本部分最初调查所用的预发布部署逐字节一致 (已核对 md5，主 bundle 与着色器包 chunk 均如此)，因此这里的内容原样适用于生产环境。包模型保持 v2 形态 (相同的 `pack.json` 字段、相同的加载器限制、相同的 uniform 布局)。
 

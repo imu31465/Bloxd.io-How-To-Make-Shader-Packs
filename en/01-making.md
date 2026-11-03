@@ -2,7 +2,7 @@
 
 # Part I: Making packs
 
-> The live game has required `apiVersion: 4` since 2026-10-26 and rejects v1/v2/v3 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) and [Part X](10-apiv4.md) for migration before you distribute anything.
+> The live game has required `apiVersion: 5` since 2026-11-03 and rejects v1/v2/v3/v4 packs at load — the content below is written against the v2 specification; see [Part IX](09-apiv3.md) and [Part X](10-apiv4.md) for migration before you distribute anything. Then apply [Part XII](12-apiv5.md) (v4 → v5).
 
 ## 1. Overview and prerequisites
 

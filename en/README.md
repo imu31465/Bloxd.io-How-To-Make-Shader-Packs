@@ -1,11 +1,11 @@
 # How to Make Bloxd.io Shader Packs (Complete Guide)
 
 A self-contained guide to creating and distributing shader packs for Bloxd.io (WebGPU renderer only).
-**The live API is `apiVersion: 4` — it rolled out to production on 2026-10-26**, and the current game rejects v1, v2 and v3 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) and Part X (`10-apiv4.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`); for v2 → v3, Part IX. Part X covers the v4 texture API (`bloxdTexel`, `bloxdTextureId*`), the fog rename, and the strict-games contract, plus the engine internals restored from the production build (§63–§65: the exact `bloxdTexel` sampling code, the texture name registry, and the validation pipeline with its new registry hash).
+**The live API is `apiVersion: 5` — it rolled out to production on 2026-11-03**, and the current game rejects v1, v2, v3 and v4 packs at load (wrong-API-version messages). Parts I–VII below are still written on the v2 baseline and remain valid as the conceptual foundation — read them as v2, then apply the changes in Part IX (`09-apiv3.md`) and Part X (`10-apiv4.md`) before distributing. The guide is split into one file per part (this README is the table of contents; the recipe collection lives in `03-recipes.md`). For the earlier v1 → v2 step, see Part VIII (`08-apiv2.md`); for v2 → v3, Part IX. Part X covers the v4 texture API (`bloxdTexel`, `bloxdTextureId*`), the fog rename, and the strict-games contract, plus the engine internals restored from the production build (§63–§65: the exact `bloxdTexel` sampling code, the texture name registry, and the validation pipeline with its new registry hash). The v4 → v5 step is [Part XII](12-apiv5.md) (live since 2026-11-03).
 
 > This is an unofficial guide and does not represent the views of the developers. The API may change without notice.  
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior.  
-> Last reviewed: 2026-10-27 (v4 production rollout confirmed by bundle comparison — build `cnty9`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). The complete reference material is embedded as Part XI (`11-reference.md`): the engine header restored verbatim and the full measured catalogue of all 905 usable texture names; still verify recipes against the loader screen and in-game compilation.  
+> Last reviewed: 2026-11-03 (v5 production rollout confirmed by bundle comparison — build `ab90qa`, production and preprod identical; texture API, fog rename and strict-games internals restored from the production build — Part X §63–§65). The complete reference material is embedded as Part XI (`11-reference.md`): the engine header restored verbatim and the full measured catalogue of all 905 usable texture names; still verify recipes against the loader screen and in-game compilation.  
 > The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL  
 > (no JS execution or networking), so nothing dangerous happens with normal code.
 
@@ -97,3 +97,21 @@ A self-contained guide to creating and distributing shader packs for Bloxd.io (W
   - [64. The texture name registry](10-apiv4.md#64-the-texture-name-registry)
   - [65. Validation internals v4: HEADER_VERSION, the registry hash, special functions](10-apiv4.md#65-validation-internals-v4-header_version-the-registry-hash-special-functions)
   - [66. Confirmed constants, limits, and layouts (v4)](10-apiv4.md#66-confirmed-constants-limits-and-layouts-v4)
+- [Part XI: Complete reference — the engine header and the texture catalogue](11-reference.md)
+  - [67. The complete v4 engine header, verbatim](11-reference.md#67-the-complete-v4-engine-header-verbatim)
+  - [68. The complete texture catalogue (905 names, measured)](11-reference.md#68-the-complete-texture-catalogue-905-names-measured)
+- [Part XII: API version 5 migration guide (live since 2026-11-03)](12-apiv5.md)
+  - [69. Fate of v4 packs (conclusion first)](12-apiv5.md#69-fate-of-v4-packs-conclusion-first)
+  - [70. pack.json, the loader, and the uniform (what stays unchanged)](12-apiv5.md#70-packjson-the-loader-and-the-uniform-what-stays-unchanged)
+  - [71. The flags rewrite: `blockFlags` → `BloxdFlags` (the headline)](12-apiv5.md#71-the-flags-rewrite-blockflags--bloxdflags-the-headline)
+  - [72. New inputs: `localPosition`, the enchant quartet, and `overlayColour`](12-apiv5.md#72-new-inputs-localposition-the-enchant-quartet-and-overlaycolour)
+  - [73. New outputs: `BloxdSurface` gains `enchantColour` and `overlayColour`](12-apiv5.md#73-new-outputs-bloxdsurface-gains-enchantcolour-and-overlaycolour)
+  - [74. The lighting recipe goes public: `bloxdLit()` and the three helpers](12-apiv5.md#74-the-lighting-recipe-goes-public-bloxdlit-and-the-three-helpers)
+  - [75. Removals: `bloxdFragmentBlockPosition()`, `bloxdBlockFlag*`, `bloxdSpLitColour`](12-apiv5.md#75-removals-bloxdfragmentblockposition-bloxdblockflag-bloxdsplitcolour)
+  - [76. The default pack ships all nine hooks](12-apiv5.md#76-the-default-pack-ships-all-nine-hooks)
+  - [77. v4 → v5 migration checklist](12-apiv5.md#77-v4--v5-migration-checklist)
+  - [78. Other v5 changes and notes](12-apiv5.md#78-other-v5-changes-and-notes)
+  - [79. Engine internals v5: the texture pipeline and the 46-symbol `bloxdSp*` namespace](12-apiv5.md#79-engine-internals-v5-the-texture-pipeline-and-the-46-symbol-bloxdsp-namespace)
+  - [80. The texture registry: 896 usable names (the drift, measured)](12-apiv5.md#80-the-texture-registry-896-usable-names-the-drift-measured)
+  - [81. Confirmed constants, limits, and layouts (v5)](12-apiv5.md#81-confirmed-constants-limits-and-layouts-v5)
+  - [82. The complete v5 engine header, verbatim](12-apiv5.md#82-the-complete-v5-engine-header-verbatim)

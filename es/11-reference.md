@@ -2,6 +2,8 @@
 
 # Parte XI: Referencia completa — cabecera del motor y catálogo de texturas
 
+> **La API actual es la versión 5** (medida el 2026-11-03, build `ab90qa`, producción y preprod idénticas byte a byte): la cabecera de §67 es el texto de v4 — la cabecera v5 completa está incrustada en la [Parte XII](12-apiv5.md) §82 — y los ids de §68 siguen siendo una instantánea de `cnty9`; los nombres del catálogo siguen siendo válidos para v5 salvo la deriva de 11 nombres de la Parte XII §80. Los nombres, no los ids, son la API.
+
 Build objetivo: `cnty9.main.669f8081.js` (medido 2026-10-27; producción y preprod idénticas byte a byte). Esta parte incrusta **completos** los dos artefactos de referencia para que la guía sea autosuficiente. §67 es el texto exacto de la cabecera que el motor antepone a cada pack (restaurado verbatim del bundle de producción); §68 es el catálogo completo de texturas: los 905 nombres utilizables de `bloxdTextureId*` con sus ids medidos, las 57 familias giradas, las 42 animadas y la deriva medida del registro.
 
 El catálogo no es una aproximación: se produjo ejecutando el **propio** módulo constructor del registro del motor (módulo 28833, el mismo código que resuelve `bloxdTextureId*` al validar) sobre los datos del build en vivo (`textureNameToIndex`, `animDataPerTex`) y registrando su salida. Los nombres son la API; los ids son una instantánea de un build y derivan (§68.5).

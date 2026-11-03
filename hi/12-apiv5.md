@@ -1,0 +1,34 @@
+[← पिछला भाग](11-reference.md)·[मैनुअल पर लौटें](README.md)
+
+# भाग XII: API संस्करण 5 माइग्रेशन गाइड (2026-11-03, सारांश)
+
+> यह पाठ इस भाषा के लिए संक्षिप्त सारांश है। सभी विवरणों, उदाहरण-रेसिपियों, पूर्ण रूप से पुनर्स्थापित v5 हेडर और इंजन-आंतरिक तथ्यों (§69–§82) के साथ पूर्ण संस्करण [अंग्रेज़ी](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/12-apiv5.md) और [जापानी](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/12-apiv5.md) में उपलब्ध है।
+
+लक्ष्य बिल्ड: `ab90qa.main.6188124c.js` — **2026-11-03 को मापी गई, प्रोडक्शन और preprod दोनों पर एक साथ लाइव**, दोनों बंडल बाइट-समान (md5 सत्यापित)। v3 के बाद से यह सबसे बड़ा API संशोधन है: इंजन हेडर 6,021 से बढ़कर **8,954 डिकोडेड बाइट** हुआ और लगभग हर संरचना को नए फ़ील्ड मिले।
+
+## क्या बदलता है
+
+- `pack.json` अब `"apiVersion": 5` माँगता है (सख्त `===`, संख्या) — v4 पैक लोड पर अस्वीकृत; संग्रहीत v4 पैक मौन रूप से निष्क्रिय।
+- **`blockFlags` की जगह संरचना (मुख्य बदलाव):** छह बिट-स्थिरांक `bloxdBlockFlag*` समाप्त; अब **`flags: BloxdFlags`** — 14 नामित bool फ़ील्ड (छह पुराने बिट नए नाम से, आठ नए): **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`**। मॉडल, हाथ में पकड़े आइटम और जीव अब टेरेन से अलग पहचाने जा सकते हैं।
+- **`#ifdef BLOXD_LIGHTING` हटा दिया गया:** कंपाइल-टाइम स्विच की जगह नए हेडर फ़ंक्शन **`bloxdLit()`** से रन-टाइम परीक्षण; uniform में `lit: u32` (offset 4, कुल अब भी 64 B)। वेरिएंट मैट्रिक्स 8 से घटकर 6 (`strict|allow` × `terrain|liquid|model`)।
+- **इंजन की लाइटिंग रेसिपी सार्वजनिक:** तीन नए फ़ंक्शन — **`bloxdShading(light)`**, **`bloxdWorldLight(light)`**, **`bloxdLitColour(surface, light)`** — साथ ही `BloxdLightIn` के दो नए इनपुट (`diffuse`, `emissive`)।
+- **नए इनपुट:** हर जगह `localPosition: vec3f` (मॉडल निर्देशांक, टेरेन पर 0); Surface/Light पर `enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` (एनचांट और चोट की चमक); `BloxdSurface` पर **नए आउटपुट** `enchantColour` / `overlayColour`, जिन्हें `bloxdLitColour` मिलाता है।
+- **हटाए गए:** `bloxdFragmentBlockPosition()` (कोई विकल्प नहीं), `bloxdBlockFlag*` स्थिरांक, `bloxdSpLitColour`।
+- **डिफ़ॉल्ट पैक टेम्पलेट अब सभी 9 हुक लेकर आता है** (लाइट हुक सहित, 1,122 → 1,683 बाइट) और नया कमेंट मिटाने के नियम को बताता है: *"If you delete a hook, the default is used instead."*
+- हेडर में नया स्थिरांक: `const bloxdChunkSize: i32 = 32;`। Y-डेरिवेटिव स्वतः चिह्न-पलटे जाते हैं: `dpdy`/`dpdyCoarse`/`dpdyFine` को `(-dpdy(...))` रूप में फिर से लिखा जाता है। `HEADER_VERSION` अब `9.<hash>.<hash>`।
+- `bloxdSp*` नेमस्पेस 27 से बढ़कर **46 सिंबल**; टेक्सचर रजिस्ट्री अब **896 प्रयोज्य नाम** (+1 `scorpion_eggs`, −10 — `chest_double_*` परिवार और `mob_spawner_*_block_side` सहित) — नाम ही API हैं, ids केवल स्नैपशॉट।
+- बाकी सब जमा हुआ: लोडर सीमाएँ (256 `.wgsl` / 256 KB / 64 KB / 32 MB / 1,024 प्रविष्टियाँ), हुक नाम, strict अनुबंध (allow 12 शीर्षक), group-3 बाइंडिंग।
+
+## संक्षेप में माइग्रेशन
+
+| v4 | v5 |
+|---|---|
+| `"apiVersion": 4` | `"apiVersion": 5` (संख्या) |
+| `(s.blockFlags & bloxdBlockFlagVegetation) != 0u` | `s.flags.vegetation` |
+| `#ifdef BLOXD_LIGHTING … #endif` | `if (bloxdLit()) { … } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdFragmentBlockPosition(p, n)` | हटाया गया — `bloxdWorldPosition()` / `flags` उपयोग करें |
+| (पहले नहीं था) | `s.flags.held`, `s.flags.lifeform`, `s.localPosition`, `s.enchantTier` … |
+
+पूर्ण पुनर्स्थापित v5 इंजन हेडर (8,954 बाइट, शब्दशः) और टेक्सचर-नाम ड्रिफ्ट की पूरी सूची अंग्रेज़ी और जापानी पूर्ण संस्करणों (§82 और §80) में है।
+
+[← पिछला भाग](11-reference.md)·[मैनुअल पर लौटें](README.md)

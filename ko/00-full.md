@@ -12,7 +12,7 @@
 
 # 제1부: 팩 만들기
 
-> 현행 게임은 2026-10-26부터 `apiVersion: 4` 을 요구하며 로드 시 v1/v2/v3 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것.
+> 현행 게임은 2026-11-03부터 `apiVersion: 5` 을 요구하며 로드 시 v1/v2/v3/v4 팩을 거부한다 — 아래 내용은 v2 사양에 기반한 기술이다. 배포 전에 [제9부](09-apiv3.md) 와 [제10부](10-apiv4.md) 의 변경 사항을 확인할 것. 이후 [제12부](12-apiv5.md) (v4 → v5)를 적용할 것.
 
 ## 1. 개요와 전제
 
@@ -1834,7 +1834,7 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 # 제9부: API Version 3 마이그레이션 가이드
 
-> **2026-10-26 대체됨: 현행 API는 버전 4** — v3 팩은 여기서 v2에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 부를 적용한 뒤 [제10부](10-apiv4.md) (v3 → v4: 텍스처 API, `fogAlpha` 개명, `bloxdFragmentBlockPosition`, `hit`) 를 적용할 것.
+> **2026-10-26 대체됨: 현행 API는 버전 5** — v3 팩은 여기서 v2에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 부를 적용한 뒤 [제10부](10-apiv4.md) (v3 → v4: 텍스처 API, `fogAlpha` 개명, `bloxdFragmentBlockPosition`, `hit`) 를 적용할 것. 이어서 [제12부](12-apiv5.md) (v4 → v5)도 적용할 것.
 
 대상 빌드: `3ymzdd.main.fae4743f.js` — **2026-10-19부터 정식 프로덕션 빌드**. bloxd.io가 프로덕션에서 제공하는 번들은 이 부를 처음 조사할 때 사용한 프리프로드 배포와 바이트 단위로 동일하다 (md5로 확인했으며, 메인 번들과 셰이더 팩 청크 모두 그러하다). 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 팩 모델은 v2 형태를 유지한다 (`pack.json` 필드, 로더 제한, uniform 레이아웃이 모두 같다).
 
@@ -2448,6 +2448,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 # 제10부: API Version 4 마이그레이션 가이드 (2026-10-26, 요약)
 
+> **2026-11-03 대체됨: 현행 API는 버전 5** — v4 팩은 여기서 v3에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 부를 적용한 뒤 [제12부](12-apiv5.md)를 적용하라 (v4 → v5: `BloxdFlags` 구조체가 `blockFlags`를 대체, `bloxdLit()`와 공개 조명 레시피, 인챈트/오버레이 입력, 9-훅 기본 팩). 이 부의 내부 사항 (§56–§66)은 측정 대상이었던 v4 빌드에 대해 정확한 상태로 남는다.
+
 > 이 문서는 이 언어용 간략 요약이다. 모든 세부사항·예제 레시피·복원된 엔진 내부 (§55–§66)를 담은 완전판은 [영어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) 와 [일본어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md) 판에 있다.
 
 대상 빌드: `cnty9.main.669f8081.js` — **2026-10-26부터 프로덕션과 프리프로드에 동시 적용** (양쪽 모두 바이트 동일). 팩 모델은 형태를 유지한다: 같은 `pack.json` 필드, 같은 로더 제한, 같은 64 B uniform, 같은 6개 훅.
@@ -2479,6 +2481,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 # 제11부: 완전 레퍼런스 — 엔진 헤더와 텍스처 카탈로그
+
+> **현행 API는 버전 5** (2026-11-03 측정, 빌드 `ab90qa`, 프로덕션과 preprod 바이트 동일): 아래 §67 헤더는 v4 텍스트이며 — 전체 v5 헤더는 [제12부](12-apiv5.md) §82에 포함되어 있다 — §68의 id는 `cnty9` 스냅샷으로 남는다; 카탈로그 이름은 제12부 §80의 11-이름 드리프트를 제외하고 v5에서도 유효하다. 이름이 API이지 id가 아니다.
 
 대상 빌드: `cnty9.main.669f8081.js` (2026-10-27 측정; 프로덕션과 프리프로드 바이트 동일). 이 부는 두 레퍼런스 자료를 **통째로** 싣어 가이드가 자기완결적이 되게 한다. §67은 엔진이 모든 팩 앞에 붙이는 정확한 헤더 텍스트이고(프로덕션 번들에서 그대로 복원), §68은 텍스처 이름 카탈로그 완전판이다: 측정된 id와 함께 사용 가능한 905개 `bloxdTextureId*` 이름, 57개 회전족, 42개 애니메이션족, 레지스트리 드리프트 측정치.
 
@@ -3745,3 +3749,37 @@ wire_mill_top_rot4
 
 
 [← Previous part](10-apiv4.md)·[Back to the manual](README.md)
+---
+
+# 제12부: API 버전 5 마이그레이션 가이드 (2026-11-03, 요약)
+
+> 이 문서는 이 언어용 간략 요약입니다. 모든 세부 사항, 예제 레시피, 전체 복원된 v5 헤더, 엔진 내부 동작(§69–§82)을 담은 전체 버전은 [영어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/12-apiv5.md)와 [일본어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/12-apiv5.md)에 있습니다.
+
+대상 빌드: `ab90qa.main.6188124c.js` — **2026-11-03 기준 프로덕션과 preprod에 동시 적용** (두 환경 모두 바이트 동일, md5 검증). v3 이후 가장 큰 API 개정입니다: 엔진 헤더가 6,021바이트에서 **8,954 디코딩 바이트**로 커지고 거의 모든 구조체가 필드를 얻었습니다.
+
+## 무엇이 바뀌는가
+
+- `pack.json`은 `"apiVersion": 5`를 요구 (엄격 `===`, 숫자) — v4 팩은 로드 시 거부되며, 저장된 v4 팩은 조용히 비활성됩니다.
+- **`blockFlags`가 구조체로 교체됨 (핵심 변경):** 6개 비트 상수 `bloxdBlockFlag*`는 사라지고 **`flags: BloxdFlags`** — 이름 붙은 14개 bool 필드 (6개는 기존 비트의 개명, 8개는 신규): **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`**. 모델, 손에 든 아이템, 생명체를 이제 지형과 구별할 수 있습니다.
+- **`#ifdef BLOXD_LIGHTING` 제거:** 컴파일 시점 스위치 대신 새 헤더 함수 **`bloxdLit()`**로 런타임 검사; 유니폼에 `lit: u32` 추가 (오프셋 4, 총 크기는 여전히 64 B). 변형 행렬은 8에서 6으로 (`strict|allow` × `terrain|liquid|model`).
+- **엔진의 조명 레시피 공개:** 새 함수 3개 — **`bloxdShading(light)`**, **`bloxdWorldLight(light)`**, **`bloxdLitColour(surface, light)`** — 그리고 `BloxdLightIn`의 새 입력 2개 (`diffuse`, `emissive`).
+- **새 입력:** 모든 입력 구조체에 `localPosition: vec3f` (모델 좌표, 지형에서는 0); Surface/Light에 `enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` (인챈트와 피격 플래시); `BloxdSurface`에 **새 출력** `enchantColour` / `overlayColour` (bloxdLitColour가 혼합).
+- **제거됨:** `bloxdFragmentBlockPosition()` (대체 없음), `bloxdBlockFlag*` 상수, `bloxdSpLitColour`.
+- **기본 팩 템플릿이 이제 9개 훅 전부를 포함** (라이트 훅 포함, 1,122 → 1,683 바이트)하며, 삭제 모델을 주석으로 설명합니다: *"If you delete a hook, the default is used instead."*
+- 헤더에 새 상수: `const bloxdChunkSize: i32 = 32;`. Y-도함수는 자동 부호 반전: `dpdy`/`dpdyCoarse`/`dpdyFine`은 `(-dpdy(...))`로 재작성됩니다. `HEADER_VERSION`은 `9.<hash>.<hash>`로.
+- `bloxdSp*` 네임스페이스는 27에서 **46 심볼**로; 텍스처 레지스트리는 **896개 사용 가능 이름** (+1 `scorpion_eggs`, −10 — `chest_double_*` 계열과 `mob_spawner_*_block_side` 포함) — 이름이 API이고 id는 스냅샷일 뿐.
+- 나머지는 동결: 로더 제한 (256 `.wgsl` / 256 KB / 64 KB / 32 MB / 1,024 항목), 훅 이름, strict 계약 (allow 12 타이틀), group-3 바인딩.
+
+## 간략 마이그레이션
+
+| v4 | v5 |
+|---|---|
+| `"apiVersion": 4` | `"apiVersion": 5` (숫자) |
+| `(s.blockFlags & bloxdBlockFlagVegetation) != 0u` | `s.flags.vegetation` |
+| `#ifdef BLOXD_LIGHTING … #endif` | `if (bloxdLit()) { … } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdFragmentBlockPosition(p, n)` | 삭제됨 — `bloxdWorldPosition()` / `flags` 사용 |
+| (기존에 없음) | `s.flags.held`, `s.flags.lifeform`, `s.localPosition`, `s.enchantTier` … |
+
+전체 복원된 v5 엔진 헤더 (8,954 바이트, 전문 그대로)와 텍스처 이름 드리프트 전체 목록은 영어·일본어 전체 버전 (§82, §80)에 있습니다.
+
+[← 이전 부분](11-reference.md)·[매뉴얼로 돌아가기](README.md)

@@ -2,6 +2,8 @@
 
 # Partie XI : Référence complète — en-tête du moteur et catalogue des textures
 
+> **L'API actuelle est la version 5** (mesurée le 2026-11-03, build `ab90qa`, production et preprod identiques octet par octet) : l'en-tête du §67 ci-dessous est le texte v4 — l'en-tête v5 complet est intégré dans la [Partie XII](12-apiv5.md) §82 — et les ids du §68 restent une instantané `cnty9` ; les noms du catalogue restent valables pour v5 modulo la dérive de 11 noms listée dans la Partie XII §80. Les noms, pas les ids, sont l'API.
+
 Build cible : `cnty9.main.669f8081.js` (mesuré le 2026-10-27 ; production et préprod identiques à l'octet près). Cette partie intègre **en entier** les deux artefacts de référence afin que le guide soit autonome. §67 est le texte exact de l'en-tête que le moteur préfixe à chaque pack (restauré verbatim depuis le bundle de production) ; §68 est le catalogue complet des textures : les 905 noms utilisables de `bloxdTextureId*` avec leurs ids mesurés, les 57 familles pivotées, les 42 animées et la dérive mesurée du registre.
 
 Le catalogue n'est pas une approximation : il a été produit en exécutant le **propre** module de construction du registre du moteur (module 28833, le même code qui résout `bloxdTextureId*` à la validation) sur les données du build en direct (`textureNameToIndex`, `animDataPerTex`), puis en enregistrant sa sortie. Les noms sont l'API ; les ids sont l'instantané d'un build et dérivent (§68.5).

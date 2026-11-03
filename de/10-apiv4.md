@@ -2,6 +2,8 @@
 
 # Teil X: Migrationsleitfaden für API Version 4 (2026-10-26, Zusammenfassung)
 
+> **Seit 2026-11-03 ersetzt: die aktuelle API ist Version 5** — v4-Pakete werden beim Laden genau so abgelehnt, wie es hier für v3 beschrieben ist. Wende diesen Teil an *und dann* [Teil XII](12-apiv5.md) (v4 → v5: die `BloxdFlags`-Struktur ersetzt `blockFlags`, `bloxdLit()` und das öffentliche Beleuchtungsrezept, die Enchant-/Overlay-Eingaben, das 9-Hook-Standardpaket). Die Interna dieses Teils (§56–§66) bleiben für die v4-Builds, auf denen sie gemessen wurden, korrekt.
+
 > Dieser Text ist die kurze Zusammenfassung für diese Sprache. Die vollständige Fassung mit allen Details, Beispielrezepten und restaurierten Engine-Interna (§55–§66) gibt es auf [Englisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) und [Japanisch](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md).
 
 Ziel-Build: `cnty9.main.669f8081.js` — **seit 2026-10-26 gleichzeitig in Produktion und Preprod live** (beide byte-identisch). Das Pack-Modell behält seine Form: gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches 64-B-Uniform, dieselben 6 Hooks.

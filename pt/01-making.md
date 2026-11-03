@@ -2,7 +2,7 @@
 
 # Parte I: Criar pacotes
 
-> O jogo atual exige `apiVersion: 4` desde 2026-10-26 e rejeita pacotes v1/v2/v3 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir.
+> O jogo atual exige `apiVersion: 5` desde 2026-11-03 e rejeita pacotes v1/v2/v3/v4 ao carregar — o conteúdo abaixo está escrito sobre a especificação v2. Consulte [Parte IX](09-apiv3.md) e [Parte X](10-apiv4.md) para migrar antes de distribuir. Depois aplique a [Parte XII](12-apiv5.md) (v4 → v5).
 
 ## 1. Visão geral e pré-requisitos
 

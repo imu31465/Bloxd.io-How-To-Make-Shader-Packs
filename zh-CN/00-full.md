@@ -12,7 +12,7 @@
 
 # 第一部分: 制作包
 
-> 现行游戏自 2026-10-26 起要求 `apiVersion: 4`，加载时会拒绝 v1/v2/v3 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。
+> 现行游戏自 2026-11-03 起要求 `apiVersion: 5`，加载时会拒绝 v1/v2/v3/v4 包 —— 以下内容按 v2 规范撰写。分发前请查阅 [第九部分](09-apiv3.md) 与 [第十部分](10-apiv4.md) 以便迁移。 然后应用 [第十二部分](12-apiv5.md)（v4 → v5）。
 
 ## 1. 概述与前提
 
@@ -1834,7 +1834,7 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 # 第九部分: API Version 3 迁移指南
 
-> **已于 2026-10-26 被取代: 现行 API 为版本 4** —— v3 包在加载时被拒绝，方式与本文对 v2 的描述完全相同。请先应用本部分，*再*应用 [第十部分](10-apiv4.md) (v3 → v4: 纹理 API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`)。
+> **已于 2026-10-26 被取代: 现行 API 为版本 5** —— v3 包在加载时被拒绝，方式与本文对 v2 的描述完全相同。请先应用本部分，*再*应用 [第十部分](10-apiv4.md) (v3 → v4: 纹理 API、`fogAlpha` 改名、`bloxdFragmentBlockPosition`、`hit`)。 然后也应用 [第十二部分](12-apiv5.md)（v4 → v5）。
 
 目标构建: `3ymzdd.main.fae4743f.js` — **自 2026-10-19 起的正式生产构建**。bloxd.io 在生产环境提供的 bundle 与本部分最初调查所用的预发布部署逐字节一致 (已核对 md5，主 bundle 与着色器包 chunk 均如此)，因此这里的内容原样适用于生产环境。包模型保持 v2 形态 (相同的 `pack.json` 字段、相同的加载器限制、相同的 uniform 布局)。
 
@@ -2444,6 +2444,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 # 第十部分: API Version 4 迁移指南 (2026-10-26, 摘要)
 
+> **已于 2026-11-03 被取代: 现行 API 为版本 5** —— v4 包在加载时被拒绝，方式与本文对 v3 的描述完全相同。请先应用本部分，*再*应用 [第十二部分](12-apiv5.md)（v4 → v5：`BloxdFlags` 结构体取代 `blockFlags`、`bloxdLit()` 与公开的光照配方、附魔/覆盖输入、9 钩子默认包）。本部分的内部细节（§56–§66）对其测量时所基于的 v4 构建仍然准确。
+
 > 本文是该语言的简短摘要。包含全部细节、示例配方与复原的引擎内部实现 (§55–§66) 的完整版位于[英文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md)与[日文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md)。
 
 目标构建: `cnty9.main.669f8081.js` —— **自 2026-10-26 起同时在生产与预发布环境上线** (两者逐字节一致)。包模型保持形态: 相同的 `pack.json` 字段、相同的加载器限制、相同的 64 B uniform、相同的 6 个钩子。
@@ -2475,6 +2477,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 # 第十一部分：完整参考 — 引擎头文件与纹理目录
+
+> **现行 API 为版本 5**（2026-11-03 测量，构建 `ab90qa`，生产与预发布逐字节一致）：下方 §67 的头文件是 v4 文本 —— 完整的 v5 头文件已嵌入 [第十二部分](12-apiv5.md) §82 —— §68 的 id 仍是 `cnty9` 快照；目录名称除第十二部分 §80 列出的 11 个名称漂移外，在 v5 中仍然有效。名称才是 API，id 不是。
 
 目标构建：`cnty9.main.669f8081.js`（2026-10-27 实测；生产与预发布逐字节一致）。本部分将两份参考材料**完整**嵌入，使指南自洽。§67 是引擎在每个包前拼接的精确头文件文本（从生产包逐字复原）；§68 是完整的纹理名称目录：带实测 id 的全部 905 个可用 `bloxdTextureId*` 名称、57 个旋转族、42 个动画族，以及注册表漂移实测。
 
@@ -3741,3 +3745,37 @@ wire_mill_top_rot4
 
 
 [← 上一部分](10-apiv4.md)·[返回手册](README.md)
+---
+
+# 第十二部分：API 版本 5 迁移指南（2026-11-03，摘要）
+
+> 本文是该语言的简短摘要。包含全部细节、示例配方、完整复原的 v5 头文件以及引擎内部实现的完整版本位于[英文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/12-apiv5.md)和[日文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/12-apiv5.md)。
+
+目标构建：`ab90qa.main.6188124c.js` — **自 2026-11-03 测量起同时在生产与 preprod 环境上线**，两个捆绑包逐字节一致（md5 已验证）。这是 v3 以来最大的 API 修订：引擎头文件从 6,021 增长到 **8,954 解码字节**，几乎所有结构体都新增了字段。
+
+## 变更内容
+
+- `pack.json` 要求 `"apiVersion": 5`（严格 `===`，数字）— v4 包在加载时被拒绝；已存储的 v4 包静默失效。
+- **`blockFlags` 被结构体取代（核心变更）：** 六个位常量 `bloxdBlockFlag*` 消失，取而代之的是 **`flags: BloxdFlags`** — 14 个命名的 bool 字段（六个是旧位的新名称，八个是新增）：**`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`**。模型、手持物品和生物现在可以与地形区分。
+- **`#ifdef BLOXD_LIGHTING` 被移除：** 编译期开关改为用新头文件函数 **`bloxdLit()`** 做运行时判断；uniform 新增 `lit: u32`（偏移 4，总大小仍为 64 B）。变体矩阵从 8 缩减为 6（`strict|allow` × `terrain|liquid|model`）。
+- **引擎的光照配方公开：** 三个新函数 — **`bloxdShading(light)`**、**`bloxdWorldLight(light)`**、**`bloxdLitColour(surface, light)`** — 以及 `BloxdLightIn` 的两个新输入（`diffuse`、`emissive`）。
+- **新输入：** 所有输入结构体都有 `localPosition: vec3f`（模型坐标，地形上为 0）；Surface/Light 上有 `enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour`（附魔与受击闪光）；`BloxdSurface` 上有**新输出** `enchantColour` / `overlayColour`，由 `bloxdLitColour` 混合。
+- **已移除：** `bloxdFragmentBlockPosition()`（无替代）、`bloxdBlockFlag*` 常量、`bloxdSpLitColour`。
+- **默认包模板现在包含全部 9 个钩子**（包括 light 钩子，1,122 → 1,683 字节），新注释说明了删除模型：*"If you delete a hook, the default is used instead."*
+- 头文件新增常量：`const bloxdChunkSize: i32 = 32;`。Y 导数自动取反：`dpdy`/`dpdyCoarse`/`dpdyFine` 被改写为 `(-dpdy(...))`。`HEADER_VERSION` 升级为 `9.<hash>.<hash>`。
+- `bloxdSp*` 命名空间从 27 增长到 **46 个符号**；纹理名注册表现为 **896 个可用名称**（+1 `scorpion_eggs`，−10 — 包括 `chest_double_*` 家族与 `mob_spawner_*_block_side`）— 名称是 API，id 只是快照。
+- 其余全部冻结：加载器限制（256 个 `.wgsl` / 256 KB / 64 KB / 32 MB / 1,024 条目）、钩子名称、strict 契约（12 个 allow 标题）、group-3 绑定。
+
+## 迁移速览
+
+| v4 | v5 |
+|---|---|
+| `"apiVersion": 4` | `"apiVersion": 5`（数字） |
+| `(s.blockFlags & bloxdBlockFlagVegetation) != 0u` | `s.flags.vegetation` |
+| `#ifdef BLOXD_LIGHTING … #endif` | `if (bloxdLit()) { … } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdFragmentBlockPosition(p, n)` | 已移除 — 使用 `bloxdWorldPosition()` / `flags` |
+|（原先没有） | `s.flags.held`、`s.flags.lifeform`、`s.localPosition`、`s.enchantTier` … |
+
+完整复原的 v5 引擎头文件（8,954 字节，逐字）与纹理名漂移的完整清单位于英文和日文完整版（§82 与 §80）。
+
+[← 上一部分](11-reference.md)·[返回手册](README.md)

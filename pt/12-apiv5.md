@@ -1,0 +1,34 @@
+[← Parte anterior](11-reference.md)·[Voltar ao manual](README.md)
+
+# Parte XII: Guia de migração para a API versão 5 (2026-11-03, resumo)
+
+> Este texto é o resumo curto para este idioma. A versão completa, com todos os detalhes, receitas de exemplo, o cabeçalho v5 restaurado na íntegra e os internos do motor (§69–§82), está em [inglês](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/12-apiv5.md) e [japonês](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/12-apiv5.md).
+
+Build alvo: `ab90qa.main.6188124c.js` — **ativo em produção e preprod simultaneamente (medido em 2026-11-03)**, ambos os bundles idênticos byte a byte (md5 verificado). É a maior revisão da API desde a v3: o cabeçalho do motor cresce de 6.021 para **8.954 bytes decodificados** e quase toda estrutura ganha campos.
+
+## O que muda
+
+- `pack.json` exige `"apiVersion": 5` (estrito `===`, número) — pacotes v4 são rejeitados no carregamento; pacotes v4 guardados ficam silenciosamente inativos.
+- **`blockFlags` é substituído por uma struct (a grande mudança):** as seis constantes de bits `bloxdBlockFlag*` desaparecem; entra **`flags: BloxdFlags`** com 14 campos bool nomeados — seis são os bits antigos renomeados e oito são novos: **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`**. Modelos, itens na mão e criaturas agora são distinguíveis do terreno.
+- **`#ifdef BLOXD_LIGHTING` foi removido:** a chave de compilação dá lugar ao teste em execução com a nova função **`bloxdLit()`**; o uniform ganha `lit: u32` (offset 4, continua com 64 B no total). A matriz de variantes cai de 8 para 6 (`strict|allow` × `terrain|liquid|model`).
+- **A receita de iluminação do motor fica pública:** três novas funções — **`bloxdShading(light)`**, **`bloxdWorldLight(light)`**, **`bloxdLitColour(surface, light)`** — e duas novas entradas de `BloxdLightIn` (`diffuse`, `emissive`).
+- **Novas entradas:** `localPosition: vec3f` (coordenadas de modelo, 0 no terreno) em todas; `enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` (encantamento e clarão de dano) em Surface/Light; **novas saídas** `enchantColour` / `overlayColour` em `BloxdSurface`, misturadas por `bloxdLitColour`.
+- **Removido:** `bloxdFragmentBlockPosition()` (sem substituto), as constantes `bloxdBlockFlag*`, `bloxdSpLitColour`.
+- **O template do pack padrão agora traz os 9 hooks** (incluindo os de luz, 1.122 → 1.683 bytes) e o novo comentário documenta o modelo de exclusão: *"If you delete a hook, the default is used instead."*
+- Nova constante no cabeçalho: `const bloxdChunkSize: i32 = 32;`. Derivadas Y são negadas automaticamente: `dpdy`/`dpdyCoarse`/`dpdyFine` são reescritas como `(-dpdy(...))`. O `HEADER_VERSION` passa a `9.<hash>.<hash>`.
+- O namespace `bloxdSp*` cresce de 27 para **46 símbolos**; o registro de texturas mede agora **896 nomes utilizáveis** (+1 `scorpion_eggs`, −10 — incluindo a família `chest_double_*` e `mob_spawner_*_block_side`) — nomes são a API, ids são apenas uma fotografia.
+- Todo o resto permanece congelado: limites do loader (256 `.wgsl` / 256 KB / 64 KB / 32 MB / 1.024 entradas), nomes dos hooks, contrato strict (12 títulos allow), bindings do grupo 3.
+
+## Migração em resumo
+
+| v4 | v5 |
+|---|---|
+| `"apiVersion": 4` | `"apiVersion": 5` (número) |
+| `(s.blockFlags & bloxdBlockFlagVegetation) != 0u` | `s.flags.vegetation` |
+| `#ifdef BLOXD_LIGHTING … #endif` | `if (bloxdLit()) { … } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdFragmentBlockPosition(p, n)` | removido — use `bloxdWorldPosition()` / `flags` |
+| (não existia) | `s.flags.held`, `s.flags.lifeform`, `s.localPosition`, `s.enchantTier` … |
+
+O cabeçalho v5 completo restaurado (8.954 bytes, palavra por palavra) e a lista integral de deriva dos nomes de textura estão nas versões completas em inglês e japonês (§82 e §80).
+
+[← Parte anterior](11-reference.md)·[Voltar ao manual](README.md)

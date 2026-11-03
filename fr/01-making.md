@@ -2,7 +2,7 @@
 
 # Partie I : Créer des packs
 
-> Le jeu actuel exige `apiVersion: 4` depuis le 2026-10-26 et refuse les packs v1/v2/v3 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) et la [partie X](10-apiv4.md) pour migrer avant de distribuer.
+> Le jeu actuel exige `apiVersion: 5` depuis le 2026-11-03 et refuse les packs v1/v2/v3/v4 au chargement — le contenu ci-dessous est écrit sur la spécification v2. Consultez la [partie IX](09-apiv3.md) et la [partie X](10-apiv4.md) pour migrer avant de distribuer. Ensuite, appliquez la [Partie XII](12-apiv5.md) (v4 → v5).
 
 ## 1. Aperçu et prérequis
 

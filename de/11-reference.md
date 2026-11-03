@@ -2,6 +2,8 @@
 
 # Teil XI: Vollständige Referenz — Engine-Header und Textur-Katalog
 
+> **Die aktuelle API ist Version 5** (gemessen 2026-11-03, Build `ab90qa`, Produktion und Preprod byte-identisch): Der Header in §67 unten ist der v4-Text — der vollständige v5-Header ist in [Teil XII](12-apiv5.md) §82 eingebettet — und die §68-ids bleiben ein `cnty9`-Snapshot; die Katalognamen bleiben für v5 gültig modulo der 11-Namen-Drift aus Teil XII §80. Namen, nicht ids, sind die API.
+
 Ziel-Build: `cnty9.main.669f8081.js` (gemessen 2026-10-27; Produktion und Preprod byte-identisch). Dieser Teil bettet die zwei Referenz-Artefakte **vollständig** ein, damit das Handbuch in sich geschlossen ist. §67 ist der exakte Header-Text, den die Engine jedem Pack voranstellt (wortgetreu aus dem Produktions-Bundle restauriert); §68 ist der komplette Textur-Katalog: alle 905 nutzbaren `bloxdTextureId*`-Namen mit gemessenen ids, die 57 gedrehten Familien, die 42 animierten Familien und die gemessene Registry-Drift.
 
 Der Katalog ist keine Näherung: er entstand, indem das **eigene** Registry-Bauer-Modul der Engine (module 28833, derselbe Code, der `bloxdTextureId*` zur Validierungszeit auflöst) auf den Live-Daten des Builds (`textureNameToIndex`, `animDataPerTex`) ausgeführt und dessen Ausgabe aufgezeichnet wurde. Namen sind die API — ids sind ein Schnappschuss eines Builds und driften (§68.5).

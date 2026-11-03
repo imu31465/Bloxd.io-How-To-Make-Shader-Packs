@@ -1,0 +1,720 @@
+[← 前の部](11-reference.md)・[マニュアルに戻る](README.md)
+
+# 第十二部: API Version 5 移行ガイド
+
+対象ビルド: `ab90qa.main.6188124c.js` — **2026-11-03 時点で本番と preprod が同時に稼働しているビルド**。両者のバンドルは再びバイト単位で同一である (メインバンドルを両ホストから生取得して md5 検証: `fc3322212d15be2445c0e8dfc9733fcc`) ので、本稿の内容はそのまま本番に当てはまる。これは v3 以来最大の API 改訂である: メインバンドルは 3.39 MB へ成長し (直前の v4 ビルド比 +115 KB)、チャンクマップは 195 ID (c0〜c195、既知の 7 欠番を除き 188 個が出力されている)、シェーダーパイプラインは引き続き c51〜c56 クラスタ (ローダ c53、バリデータ/ヘッダー/レジストリ構築器 c55、WebGPU/コード生成 c56、フォグ c9) に位置する — ただし**デフォルトパックテンプレートは c116 へ移動した** (`tcwczu` では c124 だった)。このレイアウト詳細はどれもパックからは見えない。
+
+見えるのはこうだ: エンジンヘッダーは 6,021 B から**デコード後 8,954 B** へ成長し (151 行 → 208 行)、ほぼすべての構造体がフィールドを獲得し、4 個の新関数がエンジン自身のライティングレシピを文書化し、`blockFlags` ビットマスクは廃止されて boolean の `BloxdFlags` 構造体に置き換えられた。コンパイル時分岐の `#ifdef BLOXD_LIGHTING` も廃止である: ライティング状態は per-frame uniform の `lit: u32` メンバへ移り、実行時に `bloxdLit()` で問い合わせる。デフォルトパックテンプレートは 6 フックではなく** 9 フックすべて**を同梱するようになった。そしてエンジン内部の `bloxdSp*` 名前空間は 27 から 46 シンボルへ増えた。
+
+v5 の変更点を一目で:
+
+| 領域 | v4 | v5 |
+|---|---|---|
+| `pack.json` の `apiVersion` | `4` (厳密) | **`5` (厳密)** — v4 パックはロード時に拒否される |
+| ブロック識別 | `blockFlags: u32` + 6 個の `bloxdBlockFlag*` ビット定数 | **`flags: BloxdFlags`** — 14 個の名前付き bool フィールド (§71) |
+| 新しいフラグ種別 | — | **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`** — モデルとエンティティが地形から区別可能に (§71) |
+| モデル位置 | — | 全入力構造体に **`localPosition: vec3f`** (§72) |
+| エンチャントとオーバーレイ | エンジン内部のみ | **`enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` の入力と出力** (§72–§73) |
+| ライティングゲート | `#ifdef BLOXD_LIGHTING` (コンパイル時、8 バリアント) | **廃止** — uniform に `lit: u32` @ offset 4 を追加、実行時に **`bloxdLit()`** を検査、6 バリアントに (§74) |
+| ライティングヘルパー | エンジン内部の `litColour` | **公開**: `bloxdShading()`、`bloxdWorldLight()`、`bloxdLitColour()` (§74) |
+| `bloxdFragmentBlockPosition()` | 存在 | **廃止** (§75) |
+| デフォルトパック | 6 フック (vertex+surface) | **9 フック** — light フックも同梱 (§76) |
+| `bloxdChunkSize` | ヘッダーに無し | **新定数 `bloxdChunkSize: i32 = 32`** (§78) |
+| `bloxdSp*` 名前空間 | 27 シンボル | **46 シンボル** (+20、−1) (§79) |
+| テクスチャレジストリ | 利用可能 905 名 | **利用可能 896 名** — +1、−10 (§80) |
+| ローダ制限、zip 規則、`pack.json` の形、フック名、strict 契約 | — | **凍結、バイト同一の制限値** (§70) |
+
+v4 からの変換はほぼ機械的である (§77)。今回の静かな罠は別の形をしている: `blockFlags` を読み続けるパックや light フックを `#ifdef BLOXD_LIGHTING` で括るパックは**固有のメッセージ付きで検証に失敗する** (アナライザが両方の場合を説明するようになった) ので、暗黙に誤動作することはない — ただし旧ビット定数を名前で参照している限り、移植するまでロードを拒否され続ける。配布前のゲーム内コンパイル検証は毎度の通り必須である。
+
+## 69. v4 パックの行き先 (結論から)
+
+**v4 として配布されたパックも含め、すべての v4 パックは本番でロードのその瞬間に失敗する。** ローダは `manifest.apiVersion !== 5` を JavaScript の厳密な `!==` で比較する (バージョン定数 `5` とヘッダーテンプレートはこのビルドでは同じモジュール (29836) にあり、検証とそれが前提するヘッダー文本体が一緒に動く)。JSON は*数値*の `5` を運ばねばならず、文字列 `"5"` は失敗して JSON 上の表記つきで報告される — v4 と全く同じである。
+
+ロード時の 2 つのメッセージは v4 から不変、ライブ i18n 辞書から逐語で:
+
+> `pack.json needs "apiVersion": {{version}}.` — キー自体が存在しない場合。
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — キーは存在するが 5 に等しくない場合。
+
+保存されていた (以前は動いていた) v4 パックはプレイヤーに例外を投げない: 保存パックの結果は `{kind: "none", reason: "otherApiVersion"}` に解決し、パックは暗黙に不活性となり、シェーダーパック設定タブのステータス行が理由を説明する:
+
+> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+
+マニフェストの規則は再計測の上、不変である: `pack.json` は zip ルートの JSON オブジェクトでなければならず、`apiVersion` は存在して `=== 5`、`name` は必須・文字列・トリミング後非空、`author` は任意だが存在するなら文字列、それ以外のマニフェスト内容はローダに無視される。
+
+## 70. pack.json、ローダ、そして uniform (不変のもの)
+
+パックモデル全体が v4 からバイト単位で引き継がれる。ローダ制限、ライブローダチャンク (c53) で再計測:
+
+| 制限 | 値 | 超過時のメッセージ |
+|---|---|---|
+| パックあたりの `.wgsl` ファイル数 | 256 | `The pack has more than 256 .wgsl files.` |
+| `.wgsl` ソース合計 | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
+| `pack.json` のサイズ | 64 KB | `pack.json is over 64 KB.` |
+| zip サイズ | 32 MB | `The zip is over 32 MB.` |
+| zip エントリ数 | 1,024 | `The zip has more than 1024 entries.` |
+| zip の形 | — | 分割 zip・Zip64・暗号化エントリ・未対応圧縮はそれぞれ専用メッセージで拒否。全ファイルは有効な UTF-8、`pack.json` は厳密に 1 つ、パスの重複なし |
+
+per-frame uniform は相変わらず `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`、引き続き 64 バイト — ただしメンバが 1 個増えた。レイアウト表、ライブの uniform レイアウトモジュールから:
+
+| オフセット | フィールド | 型 | 備考 |
+|---|---|---|---|
+| 0 | `seconds` | `f32` | `bloxdSeconds()` の裏 |
+| 4 | `lit` | `u32` | **v5 の新設** — ブロック/空ライティングが有効なら 1、`bloxdLit()` の裏 |
+| 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` の裏 |
+| 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` の裏 |
+| 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` の裏 |
+
+`lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まった (オフセット 4〜15 は v4 ではアラインメントの隙間だった。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。よって構造体の合計サイズも他の全メンバのオフセットも不変である。エンジンはこれを `setUint32(4, lit ? 1 : 0)` の 1 命令で書き込む — これは光量ではなくフラグである: v4 の JS 側名 `terrainLightLevels` / `terrainHeldLight` はバンドルから完全に消えた。
+
+パックの bind-group レイアウトは他の点で不変: group 3 は `0` uniform・`1` シーン深度テクスチャ (liquid バリアント)・`2` `bloxdSpTextureLayers` ストレージバッファのまま。`minBindingSize` も 64 のままである。
+
+## 71. フラグの書き直し: `blockFlags` → `BloxdFlags` (目玉)
+
+v4 は面の識別を `blockFlags: u32` と 6 個の `bloxdBlockFlag*` 定数 (opaque 1、emissive 2、vegetation 4、dirt 8、sand 16、rock 32) で行っていた。v5 はこの機構全体を名前付き boolean の構造体で置き換える。ライブヘッダーから逐語で:
+
+```wgsl
+// What kind of block, item or lifeform a face is. Any number of flags may be
+// set, possibly even none. For example, sandstone is sand and rock.
+struct BloxdFlags {
+    opaque: bool,     // Opaque blocks, i.e. full cubes with no gaps or holes.
+    emissive: bool,   // Blocks that emit light, e.g. lava and glowing ores.
+    vegetation: bool, // Leaves, grass blocks and leafy plants, e.g. tall grass.
+    dirt: bool,       // Soil, grass blocks included. Rocky Dirt is rock too.
+    sand: bool,       // Sand, Red Sand and every sandstone, which is rock too.
+    rock: bool,       // Stone variants, and more, e.g. gravel, ores and magma.
+
+    // Drawn as block models, so never part of terrain or flagged as opaque.
+    slab: bool,       // Half blocks.
+    stairs: bool,     // Stairs and corner stairs.
+    flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
+
+    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
+    held: bool,       // Items in a hand, in first or third person.
+    dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
+    thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
+
+    lifeform: bool,   // Players, mobs and NPCs. Includes armour and cosmetics.
+}
+```
+
+6 個の v4 ビット検査はフィールドに 1 対 1 で対応する — 移行はリネームであって再設計ではない:
+
+| v4 | v5 |
+|---|---|
+| `(surface.blockFlags & bloxdBlockFlagOpaque) != 0u` | `surface.flags.opaque` |
+| `(surface.blockFlags & bloxdBlockFlagEmissive) != 0u` | `surface.flags.emissive` |
+| `(surface.blockFlags & bloxdBlockFlagVegetation) != 0u` | `surface.flags.vegetation` |
+| `(surface.blockFlags & bloxdBlockFlagDirt) != 0u` | `surface.flags.dirt` |
+| `(surface.blockFlags & bloxdBlockFlagSand) != 0u` | `surface.flags.sand` |
+| `(surface.blockFlags & bloxdBlockFlagRock) != 0u` | `surface.flags.rock` |
+
+本当の主役は 8 個の**新フィールド**である。v4 にはハーフブロックとフルブロックを区別する方法も、保持アイテムと地形を区別する方法も、プレイヤーとカボチャを区別する方法もなかった — 地形でない面はすべて「不透明でなく、テクスチャ id を持つ」だけだった。v5 は「何を見ているのか」に直接答える:
+
+- **`slab` / `stairs` / `flat`** — 3 種のブロックモデル形状。`flat` は交差平面の植物 (背の高い草、花、作物、クモの巣) を含む。これらは*ブロックモデルとして描画される*ため、ヘッダーは地形の一部には決してならず `opaque` にも決してならないと注記する。
+- **`placed`** — チャンクの一部として設置されたジオメトリ。アイテムや乗り物は明示的に含まない。
+- **`held`** — 手に持ったアイテム、一人称・三人称の両方。v1 から一人称シェーダー作者が欲しがり続けたフィールドである: 保持アイテムを検出して世界と違う扱いにすることがついに可能になった。
+- **`dropped` / `thrown`** — 地面/ベルト/パイプ上のアイテムと、飛行中のアイテム (雪玉、矢、ロケット)。
+- **`lifeform`** — プレイヤー、モブ、NPC。*防具とコスメティックを含む*。
+
+`localPosition` (§72) やエンチャント/オーバーレイ入力と組み合わせれば、モデルパイプラインは「何をレンダリングしているか」を完全に知った上でシェーディングできる。v4 では不可能だった最小の「保持アイテム微発光」レシピ:
+
+```wgsl
+fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(surface);
+    // ローカルプレイヤーが持っているものだけを明るく、他は何もしない。
+    if (surface.flags.held) {
+        out.colour *= 1.15;
+    }
+    return out;
+}
+```
+
+変化していない点にも注意: フィールドは 3 つの入力構造体 (`BloxdVertexIn`、`BloxdSurfaceIn`、`BloxdLightIn`) の同じ位置にあり (フィールド名 `flags`、型 `BloxdFlags`)、生き残った 6 boolean の意味は v4 の意味と同じで、ヘッダーが明示するのと同じエッジケース («Rocky Dirt is rock too»、«every sandstone is rock too») を持つ。複数フラグの自由な組み合わせ («sandstone is sand and rock»、«possibly even none») も同様である。
+
+## 72. 新入力: `localPosition`、エンチャント四点セット、`overlayColour`
+
+`BloxdVertexIn`、`BloxdSurfaceIn`、`BloxdLightIn` はすべて同じ新メンバを得る。ヘッダーから逐語で:
+
+```wgsl
+    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
+```
+
+- **`localPosition`** — モデルインスタンスが世界に配置される前の、モデル空間での頂点/フラグメント位置。地形と液体の面では `vec3f(0.0)` (モデルが無い)。プレイヤーの腕、保持した剣、風車の羽根にとって、これはモデルと一緒に回る座標である — 「剣のどの位置にいるか」でキーになるパーアニメーションや湾曲効果が、世界空間の当て推量なしの 1 フィールドで書ける。light 構造体ではヘッダーは «the same as in BloxdVertexIn, after the vertex hook» と注記する — つまり vertex フックが頂点を動かせば light フックの `localPosition` も追従する。
+
+そして `BloxdSurfaceIn` / `BloxdLightIn` のみに (vertex 構造体は必要としない):
+
+```wgsl
+     // Enchanted items and armour only, all 0 for anything else.
+     enchantTier: u32,     // 1-5 for Tier 1-5.
+     enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
+     enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
+
+     // Players and mobs only, 0 for anything else: RGB overlay colour, e.g. the
+     // red flash when hurt, and its alpha. bloxdLitColour mixes it into colour.
+     overlayColour: vec4f,
+```
+
+- **`enchantTier`** — アイテムのエンチャント階梯を 1〜5 の整数で。色を解析せずに古典的な «階梯別きらめき強度» が書ける。
+- **`enchantColour`** — ライブのエンチャント RGB と、*アニメーションする*アルファ (`.a`)。エンジンがきらめきの掃引をアニメーションするので、`.a` をフラグメント毎に読むだけで動くパターンが無料で手に入る。エンチャントされていない面ではすべてゼロ。
+- **`enchantSpeed`** — エンチャントパターンの移動速度。ヘッダー自身の注記は «faster at higher tiers» — `enchantTier` と `enchantSpeed` は構成上矛盾しない。
+- **`overlayColour`** — ダメージ/被弾フラッシュなどエンティティのオーバーレイ (RGB + アルファ)。プレイヤーかモブ以外では 0。エンジンはこれを*ライティングの前*に混合する。出力側は §73 を参照。
+
+旧四点セット (`textureId`、`textureRotation`、`uv`、`mipLevel`) は無傷で引き継がれるが、コメントの文言が 1 つ変わっている: v4 は `uv` を «texture coordinates in blocks» と説明し、v5 は «The texture spans 0-1. `fract(uv)` is drawn.» と説明する — 同じフィールドをテクスチャ側から見た記述である: テクスチャ 1 タイルが uv の `0.0–1.0` に広がり、uv の整数刻みが繰り返しの壁面でタイルを敷き詰める。複数ブロックにまたがる前提を手書きしていない限り移植作業は不要である。
+
+## 73. 新出力: `BloxdSurface` は `enchantColour` と `overlayColour` を得る
+
+surface **出力**構造体は 2 フィールド増える、逐語で:
+
+```wgsl
+struct BloxdSurface {
+    colour: vec3f,        // RGB colour output.
+#ifdef BLOXD_ALPHA
+    alpha: f32,           // Opacity output.
+#endif
+    emission: vec3f,      // Emissive RGB, added after lighting, before fog.
+    enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
+    overlayColour: vec4f, // Overlay output, mixed in by bloxdLitColour.
+}
+```
+
+surface フックは emission と同じ形で、エンチャントきらめきと被弾フラッシュも担当するようになった:
+
+- `bloxdDefaultSurface` は `surface.enchantColour` と `surface.overlayColour` を無変更で通すので、デフォルトの見た目は v4 のエンジン内部挙動と同一である。
+- フック内で **`out.enchantColour` をゼロにする**と、カスタムライティングからエンチャントきらめきが消える — «きらめき無しリアリズム» パックは 2 行になった。
+- **`out.overlayColour.a` を増幅する**と被弾フラッシュが基礎色をいじらずに際立つ。混合は `bloxdLitColour` (§74) の中、シェーディングの直後、つまりエンジンが置いたのと同じ位置で起きる。
+- emission の順序注記はそのまま引き継がれる: emission は*ライティングの後、フォグの前に加算* — そして 2 つの新フィールドは*`bloxdLitColour` によって混合される*、これは emission とフォグの*前*である。出力の全チェーンを順に: `colour` → オーバーレイ混合 → シェーディング → エンチャント混合 → ワールド光 → `+ emission` → フォグ。
+
+## 74. ライティングレシピの公開: `bloxdLit()` と 3 個のヘルパー
+
+v4 はライティングコードをコンパイル時に分岐していた: 8 バリアント (`strict|allow` × `lit|unlit` × `terrain|liquid`) で、`#ifdef BLOXD_LIGHTING` が light フックに lit 経路か unlit 経路のどちらを走らせるかを決めていた。v5 はライティング軸をコンパイルから丸ごと取り除く:
+
+- **バリアント行列は 8 ではなく 6**: `strict|allow` × `terrain|liquid|model` で、名前は `allow.terrain` … `strict.liquid` など (ローダ画面向けにエンジン自身が構成するラベル)。
+- `BLOXD_STRICT` は引き続き strict 専用。`BLOXD_ALPHA` は引き続き全 liquid + 非 strict の全バリアント (strict terrain と strict model では無効)。`BLOXD_SCENE_DEPTH` は引き続き liquid 専用。**`BLOXD_LIGHTING` はもはや存在しない。**
+- ライティング状態は uniform (`lit: u32`、§70) に移り、新しいヘッダー関数でコードから問い合わせる:
+
+```wgsl
+// Whether block and sky lighting is on. When it's off, BloxdLightIn's
+// blockLight and heldLight are 0, and its skyLight and light colours are 1.
+fn bloxdLit() -> bool {
+    return bloxdPackInputs.lit != 0u;
+}
+```
+
+v4 パックが light フックを `#ifdef BLOXD_LIGHTING ... #else ... #endif` で括っていたなら、v5 移植は早期 return である: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }`。アナライザはこれ自体を教えてくれる — `BLOXD_LIGHTING` を使うと検証メッセージ *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* が出る (ライブバリデータから逐語計測)。
+
+さらに 3 個の関数がヘッダーに加わり、これが v4 作者が手で再導出し続けてきたもの — エンジン自身のライティング、呼び出し可能な WGSL として文書化された:
+
+```wgsl
+// How the face's material and angle light it: directional light on its
+// diffuse colour, plus its emissive and ambient terms, clamped to 0-1.
+fn bloxdShading(light: BloxdLightIn) -> vec3f {
+    let diffuse = light.directional * light.diffuse;
+    return saturate(diffuse + light.emissive + light.ambient);
+}
+
+// The world's light at this fragment: the brightest of block, sky and held
+// light, none below ambientLightColour.
+fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
+    let ambientLight = light.ambientLightColour;
+    let blockLight = ambientLight + light.blockLight * (1.0 - ambientLight);
+    let skyLight = mix(ambientLight, light.skyLightColour, light.skyLight);
+    let heldLight = ambientLight + light.heldLight * (1.0 - ambientLight);
+    return max(max(blockLight, skyLight), heldLight);
+}
+
+// The surface's colour lit as the engine does, before emission and fog:
+// mixed with overlayColour, then bloxdShading, then mixed with
+// enchantColour, then bloxdWorldLight.
+fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
+    let overlay = surface.overlayColour;
+    let overlaid = mix(surface.colour, overlay.rgb, overlay.a);
+    let shaded = bloxdShading(light) * overlaid;
+    let enchant = surface.enchantColour;
+    let enchanted = mix(shaded, enchant.rgb, enchant.a);
+    return max(enchanted * bloxdWorldLight(light), vec3f(0.0));
+}
+```
+
+そして `bloxdDefaultLight` 自身がそれらを使うようになった — デフォルトは文字通り «エンジンのレシピを適用し、emission 加算の結果にフォグをかける» である:
+
+```wgsl
+fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    let lit = bloxdLitColour(surface, light);
+    return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
+}
+```
+
+`bloxdShading` に供給するため `BloxdLightIn` は 2 個の入力も得る (コメント逐語):
+
+```wgsl
+    directional: f32,  // Summed Lambert from directional lights; 0 if none.
+    diffuse: vec3f,    // The material's RGB response to directional light.
+    emissive: vec3f,   // The material's RGB glow, added to directional light.
+```
+
+`diffuse` と `emissive` は v5 の新設である (v4 は `directional` と `ambient` のみだった): これにより `bloxdShading` を修正付きで再構築できる — 例えばエンジンのワールド光はそのままに、Lambert 項だけを自前のラップアラウンドシェーディングに置き換える — エンジンが既に知っている材質応答を失わずに。光レベルの文書コメントも «0 without BLOXD_LIGHTING» から «0 when !bloxdLit()» に書き直された。同じ事実の v5 語彙版である。
+
+«カスタムシェーディング + エンジンのワールド光» の light フック — v4 作者が `litColour` のスケーリングで近似していたレシピが、正確に書けるようになった:
+
+```wgsl
+fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    // ハーフランバートのラップ: 柔らかく、裏面で完全に暗くならない。
+    let nDotL = light.directional; // すでに合算済みの Lambert 項
+    let wrapped = nDotL * 0.5 + 0.5;
+    let shaded = saturate(wrapped * light.diffuse + light.emissive + light.ambient);
+    let colour = max(shaded * bloxdWorldLight(light), vec3f(0.0));
+    return BloxdLight(bloxdApplyFog(colour + surface.emission, light));
+}
+```
+
+## 75. 削除: `bloxdFragmentBlockPosition()`、`bloxdBlockFlag*`、`bloxdSpLitColour`
+
+3 つが消え、バリデータは名指しでその旨を告げる:
+
+- **`bloxdFragmentBlockPosition(position, normal) -> vec3i`** — 代替なしで削除。フラグメントの位置と法線からブロックの世界位置を復元するために存在した (`vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`) が、`uv` と `flags` とモデル入力の間に残された利用者はおらず、ヘッダーの `bloxdWorldPosition()` が連続値の場合をカバーする。呼び出し箇所は削除せよ。「どのブロックの上か」が必要なら、セルを計算する代わりに `flags` を検査する。
+- **6 個の `bloxdBlockFlag*` 定数** — `BloxdFlags` (§71) に置換。残存参照はアナライザの予約名診断で検証に失敗する。
+- **`bloxdSpLitColour`** — その役割が公開の `bloxdLitColour()` (§74) になったエンジン内部シンボル。`bloxdSp*` 名前空間から去るが、名前空間自体は増える一方である (§79)。
+
+v4 時代から無傷で生き残る関数: `bloxdEyePosition()`、`bloxdRenderOffset()`、`bloxdSunDirection()`、`bloxdSeconds()`、`bloxdWorldPosition()`、`bloxdApplyFog()`、`bloxdDefaultVertex()`、`bloxdDefaultSurface()`、`bloxdDefaultLight()` に加え、テクスチャ API の全体 (`bloxdTexel`、`bloxdTextureSize`、`bloxdTextureId*` — §79 がレジストリを再計測) と、liquid バリアントでの `BloxdOpaqueBehind` / `bloxdSceneDepth`。
+
+## 76. デフォルトパックは 9 フックすべてを同梱
+
+新しいパックの出発点となるテンプレートに light フックが入った — v4 のテンプレートは 6 フック (プログラム毎に vertex+surface) で、light フックは文書からコピーするものだった。v5 のものを完全かつ逐語に (出荷形態で 1,683 バイト):
+
+```wgsl
+// Every hook here returns its engine default. Modify the return values to start
+// building a shader pack. If you delete a hook, the default is used instead.
+
+// All blocks but water and block models use terrain hooks.
+#ifndef BLOXD_STRICT
+// Strict games keep terrain where it is. Without the #ifndef, this hook would
+// turn the whole shader pack off there.
+fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return bloxdDefaultVertex(vertex);
+}
+#endif
+
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    return bloxdDefaultSurface(surface);
+}
+
+fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return bloxdDefaultLight(surface, light);
+}
+
+// Water uses liquid hooks. To share code with another hook, define a function
+// and call it from both places.
+#ifndef BLOXD_STRICT
+fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return bloxdDefaultVertex(vertex);
+}
+#endif
+
+fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    return bloxdDefaultSurface(surface);
+}
+
+fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return bloxdDefaultLight(surface, light);
+}
+
+// Models: block models such as slabs and plants, items, players and mobs.
+#ifndef BLOXD_STRICT
+fn bloxdModelVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return bloxdDefaultVertex(vertex);
+}
+#endif
+
+fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    return bloxdDefaultSurface(surface);
+}
+
+fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    return bloxdDefaultLight(surface, light);
+}
+```
+
+コメントは新しい文言で、削除モデルの文書として読む価値がある: *«Modify the return values to start building a shader pack. If you delete a hook, the default is used instead.»* liquid の注記も変わった — v4 は «If deleted, water uses your terrain hooks instead» と言い、v5 は «To share code with another hook, define a function and call it from both places» と言う — そして strict の注記は `#ifndef` を 1 文で説明するようになった: *«Strict games keep terrain where it is. Without the #ifndef, this hook would turn the whole shader pack off there.»*
+
+strict ゲーム契約そのもの (v4 §60) は不変である: 無防備な vertex フックは `<hook> moves terrain, which strict games prevent.` を報告し、到達可能な `discard` は `discard makes terrain see-through, which strict games prevent.` を報告し、いずれも strict ゲームで*全*フックを無効化する。allow 12 タイトルはライブバンドルで再計測した — 引き続き 12、不変。
+
+## 77. v4 → v5 移行チェックリスト
+
+1. **`pack.json`**: `"apiVersion": 5` — 文字列ではなく数値。
+2. **フラグの移植** (機械的、§71): `blockFlags & bloxdBlockFlagX != 0u` はすべて `flags.x` へ。定数は削除 — バリデータが名前で拒否する。
+3. **ライティングゲートの移植** (バリデータメッセージ付きの項目): `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(surface, light); }`。`BLOXD_LIGHTING` は今や *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* を引き起こす。
+4. **`bloxdFragmentBlockPosition` の呼び出し箇所を削除** (§75) — 代替は存在しない。
+5. **新入力/新出力の検討** *(任意)*: `flags.slab/stairs/flat/placed/held/dropped/thrown/lifeform` (§71)、`localPosition` (§72)、エンチャント四点セット + `overlayColour` (§72–§73)。`bloxdDefaultSurface` 経由のパススルーで v4 の見た目が正確に保たれる。
+6. **エンジンレシピヘルパーの採用** *(任意だが推奨)*: 手書きの光カラーを `bloxdLitColour(surface, light)` に置き換える — あるいは `bloxdShading` / `bloxdWorldLight` と組み合わせる (§74) — それから `bloxdDefaultLight` がそうするように `surface.emission` と `bloxdApplyFog` を加える。
+7. **strict 監査** (v4 から不変): vertex フックと到達可能な `discard` を `#ifndef BLOXD_STRICT` で括る。
+8. **ゲーム内コンパイル検証**: ローダは** 6** バリアントすべてを一度に検証する (strict × terrain/liquid/model — ライティング軸はもはや別コンパイルされない、§74)。それから allow ゲームと strict ゲームを 1 個ずつ目視確認する。
+9. **自パックのバージョンメタデータを上げて再配布**: プレイヤー機器に保存された v4 コピーは暗黙に不活性 (§69) で、理由を言うのは設定タブだけである。
+
+### 77.1 v4 → v5 の完全移植、Before / After
+
+コンパクトな v4 パッチ — «緑化ティント + 保持光源ブースト» — 現在なら検証に落ちる形と、移植後:
+
+```wgsl
+// ---- v4 (ab90qa では検証失敗) ----
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(surface);
+    if ((surface.blockFlags & bloxdBlockFlagVegetation) != 0u) {
+        out.colour *= vec3f(1.0, 1.08, 0.9);
+    }
+    if ((surface.blockFlags & bloxdBlockFlagEmissive) != 0u) {
+        out.emission += vec3f(0.05);
+    }
+    return out;
+}
+
+#ifdef BLOXD_LIGHTING
+fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(surface, light);
+    out.colour += light.heldLight * 0.15; // 保持光源付近の発光
+    return out;
+}
+#endif
+```
+
+```wgsl
+// ---- v5 (移植済み。画面上の挙動は同一) ----
+fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(surface);
+    if (surface.flags.vegetation) {
+        out.colour *= vec3f(1.0, 1.08, 0.9);
+    }
+    if (surface.flags.emissive) {
+        out.emission += vec3f(0.05);
+    }
+    return out;
+}
+
+fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }
+    var out = bloxdDefaultLight(surface, light);
+    out.colour += light.heldLight * 0.15;
+    return out;
+}
+```
+
+そして同じパックが v5 だけで追加できる恩恵 — モデル認識が 2 行で:
+
+```wgsl
+fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    var out = bloxdDefaultSurface(surface);
+    if (surface.flags.lifeform && !surface.flags.held) {
+        out.colour *= 1.05; // 世界のエンティティを微妙に持ち上げ、手は除外
+    }
+    return out;
+}
+```
+
+## 78. その他の v5 変更と注記
+
+- **`bloxdChunkSize` がヘッダーに参加** — `const bloxdChunkSize: i32 = 32;` («Blocks along each side of a chunk») 。以前はエンジン側のマジックナンバーだったのが、分岐に使える名前付き定数になった。`bloxdPi`/`bloxdTau` は不変。
+- **ヘッダーのフレーム関数節に共有コメント** — «These functions return the same value for the entire frame» (v4: «return 1 value per frame, the same for every call site») — 純粋に文言。
+- **パックコード内の Y 導関数が自動符号反転される。** アナライザは `dpdy`、`dpdyCoarse`、`dpdyFine` のすべての呼び出しを `(-dpdy(...))` に書き換える — スクリーン空間の y 軸は下向きなので、この反転によって «上方向への変化率» が直観と一致する。`dpdy(h)` は «h は上へ行くとどう変わるか» という意図で書けばよく、出力コードが反転を引き受ける。`dpdx` と `fwidth` 系は手つかずである (バリデータのトークン書き換えパスで計測。dpdy 系が反転セットとして明示列挙されている)。
+- **テクスチャ名診断にスペル補正エンジン。** `bloxdTextureId` で始まるが解決できない名前には Levenshtein 距離による提案が付く: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?"* — さらにフレーム綴り (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) と回転綴り (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*) の専用メッセージがある。予約の一般則も診断で言い直された: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*、そして *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
+- **参照されたテクスチャ定数だけが出力される。** ヘッダーの `bloxdTextureId*` ブロックは、パックが実際に参照した名前からパック毎に生成される — 3 個の定数を使うパックには 3 行の `const` が先頭に付くのであって、約 900 行ではない。
+- **`HEADER_VERSION` は `9.<hash>.<hash>` へ** — v4 と同じ 2 接尾辞構造 (ヘッダー素材の fnv1a32、ソート済み名前-id レジストリの fnv1a32) で、先頭整数が 8 から 9 へ上がった。保存パックの再検証ロジック (第十部 §55) は不変: ヘッダー/レジストリの変化は保存パッチを «要再チェック» にする。
+- **i18n 面**: シェーダーパックのキー群は形が不変 (第十部 §62 の `load*`、`status*`、バリアントラベル群はすべて再計測で存在、`loadNoWgsl`/`loadNotZip` もそのまま)。
+- **バンドル再調査者向けレイアウト**: ヘッダー c55 (不変)、ローダ/永続化 c51〜c53、バリデータ + レジストリ構築器 c55、WebGPU コード生成 c56、フォグ c9、**デフォルトパックテンプレート c116** (c124 から移動)、BLOXD_ALPHA 箇所 c51/c52/c53/c55/c9。チャンク形式の注記: 各チャンクは ES モジュール (`export const modules = {...}`) になった — c53 は c52 と c53 の両方のモジュールを運ぶ — なのでバンドルをテキスト検索するなら意味がある (モジュール id `1371` は*main* の疎モジュール配列にあり、どのチャンクにも無い)。
+
+## 79. エンジン内部 v5: テクスチャパイプラインと 46 シンボルの `bloxdSp*` 名前空間
+
+v4 §63 の 3 バリアント・テクスチャコード生成は同じ形で引き継がれる。ライブ生成器 (c56) から復元:
+
+**バリアント 1 — テクスチャパック非アクティブ** (生成ブロックの全体。`bloxdTextureSize` と `bloxdTexel` はスタブ):
+
+```wgsl
+fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
+	return vec2u(1u);
+}
+fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
+	return vec4f(1.0);
+}
+```
+
+**バリアント 2 — アトラス経路** (ゲームのデフォルト): `bloxdTextureSize` は `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))` を返し、`bloxdTexel` はロードの前に面の四半期回転を適用する — v4 の回転の罠 (第十部 §57.4) が、生成された `bloxdSpTurned` の明示的な if 連鎖として書き直された:
+
+```wgsl
+	// Each quarter turn clockwise the face shows its texture at reads the unturned texture at (v, 1 - u)
+	var bloxdSpTurned = bloxdSpUv;
+	if (bloxdSpTextureRotation == 1u) {
+		bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
+	} else if (bloxdSpTextureRotation == 2u) {
+		bloxdSpTurned = 1.0 - bloxdSpUv;
+	} else if (bloxdSpTextureRotation == 3u) {
+		bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
+	}
+```
+
+(この抜粋の `bloxdSpTextureRotation` は入力四点セットの回転メンバに対するエンジン自身の格納である — v4 §63.2 の配送経路、役割は不変。) **バリアント 3 — カスタムテクスチャパックのテクスチャ** — は `textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` でレイヤー化アトラスの per-texture セルをサンプリングし、パック自身のテクセルには `bloxdSpOwnTexel` 経路がある。
+
+`bloxdSp*` 名前空間 — 生成器が注入でき、ゆえに再宣言できないすべて — は 27 から** 46 シンボル**へ増えた: 20 追加、1 引退 (`bloxdSpLitColour`、その役割は公開の `bloxdLitColour` へ)、26 温存:
+
+`bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
+
+新しい名前は v5 の機能に直接対応する: `bloxdSpFlags` (フラグ構造体の経路)、`bloxdSpEnchant` / `bloxdSpItemLocalPosition` (新入力)、`bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` (セル・サンプリングのテクスチャパック経路)、`bloxdSpQuarterTurns` (上記の回転連鎖)、`bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` (拡張フックの生成ローカル)。パックレベルの予約則は不変で、このリストより広い: `/^bloxd/i` に一致するすべて (大小文字無視)。
+
+## 80. テクスチャレジストリ: 利用可能 896 名 (ドリフト、計測値)
+
+`ab90qa` (2026-11-03) で第十一部と同じ手法により再計測した: 出荷ブロックレジストリのテクスチャデータに対してエンジン自身のレジストリ構築モジュール (このビルドでは 29833) を走らせ、その出力を記録する。
+
+| 計測 | cnty9 (v4) | ab90qa (v5) |
+|---|---|---|
+| アトラスエントリ | 1,219 | **1,210** |
+| 回転ファミリ (回転綴り) | 57 (228) | **57 (228) — 不変** |
+| アニメファミリ (フレーム綴り) | 42 (188) | **42 (188) — 不変** |
+| 利用可能な名前付き定数 | 905 | **896** |
+| 生存名の id 変動 | — | **905 名中 334 名が異なる id に** |
+
+ドリフトの全体 (これが完全なリストである — 11 名):
+
+- **追加 (1):** `scorpion_eggs`。
+- **削除 (10):** 8 個のダブルチェストテクスチャ `chest_double_front`、`chest_double_front_hi`、`chest_double_front_lo`、`chest_double_back`、`chest_double_back_hi`、`chest_double_back_lo`、`chest_double_top_1_hi`、`chest_double_top_1_lo` に `chest_double_top_2_hi`、`chest_double_top_2_lo` (ダブルチェストがゲームデータから消えた。シングルチェストの `chest_*` ファミリは無傷で生存) — さらに `mob_spawner_hostile_block_side` と `mob_spawner_neutral_block_side` (スポナーは `mob_spawner_block_top` を維持。バリアント側面テクスチャは消滅)。
+
+第十一部 §68 のドクトリンがそのまま引き継がれる: **名前こそ API、id はスナップショット。** 2 ビルド間で 905 生存名のうち 334 名が id を変えた — `bloxdTextureIdStone` と書け、`351` と書くな。第十一部 §68.2 の完全アルファベット順カタログは上記 11 名のドリフトを除き v5 でも有効であり、畳み込み規則と両ファミリ表は不変なので、§68.3〜§68.4 (回転とアニメのファミリ) も引き続き正確である。
+
+## 81. 確定した定数・制限・レイアウト (v5)
+
+本ガイドの計測台帳の v5 行 — すべて `ab90qa` で計測 (2026-11-03、本番 = preprod、バイト同一):
+
+| 項目 | 値 |
+|---|---|
+| `apiVersion` | `5` (厳密 `===`、数値) |
+| エンジンヘッダー | デコード後 8,954 B / 208 行 (出荷形態 9,125 B、補間 6 個)。1 行目 `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — 全文は §82 |
+| フック | 9 (terrain/liquid/model × vertex/surface/light)。名前は不変。デフォルトテンプレートが 9 つすべてを同梱 (§76) |
+| バリアント | 6 (strict × program)。名前 `strict\|allow.terrain\|liquid\|model` — ライティング軸は消滅 (§74) |
+| マクロ | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (全 liquid + 非 strict の terrain/model) · `BLOXD_SCENE_DEPTH` (全 liquid) · ~~`BLOXD_LIGHTING`~~ **廃止** |
+| パック uniform | `@group(3) @binding(0)`、64 B: seconds@0、**lit@4 (u32、新設)**、renderOffset@16、sunDirection@32、eyePosition@48 |
+| パックバインディング | group 3: 0 uniform · 1 シーン深度 (liquid) · 2 `bloxdSpTextureLayers` ストレージ |
+| フラグ | `BloxdFlags` 構造体、14 bool (§71)。v4 のビット値は引退 |
+| ローダ制限 | 256 `.wgsl` / 256 KB ソース / 64 KB `pack.json` / 32 MB zip / 1,024 エントリ。UTF-8、マニフェスト 1 つ、パス一意 — すべて不変 |
+| テクスチャレジストリ | 1,210 エントリ → **896 利用可能名**。cnty9 比ドリフト +1/−10 (§80)。カタログ: 第十一部 §68 + §80 のドリフトリスト |
+| 光カーブ | 0〜15 レベル → 0〜1、ease-out カーブ (`6 → 0.45`、`12 → 0.92`) — ヘッダー内、不変 |
+| リフトカーブ | `1 - (1 - x / (3 - 2x))^3` — 不変 (現在チャンク c9) |
+| 方向性コーン | `0.12 / 0.65 / 0.62 / 0.95` — 不変 (チャンク c9) |
+| フォグ色 | `vec3f(183/255, 191/255, 195/255)` — 不変 |
+| 予約名 | `/^bloxd/i` (大小文字無視) + 46 個の `bloxdSp*` エンジンシンボル (§79) |
+| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
+| strict タイトル | 第七部 §30 の allow 12 タイトル以外のすべて (ab90qa で再検証、不変) |
+
+## 82. 完全な v5 エンジンヘッダー、逐語
+
+§67 の成果物を v5 向けに再計測したもの: ローダがすべてのパックの先頭に付す正確なテキスト、ライブ本番バンドル (`ab90qa`、チャンク c55、テンプレートを 6 個のライブ補間 — `apiVersion` と `bloxdPackInputs` 経由の 5 個の uniform 読み出し — でレンダリング) から復元。デコード後 8,954 バイト、208 行。言い換えは一箇所もない:
+
+```wgsl
+
+// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
+
+const bloxdPi: f32 = 3.1415926535898;
+const bloxdTau: f32 = 6.2831853071796;
+
+// Blocks along each side of a chunk.
+const bloxdChunkSize: i32 = 32;
+
+// These functions return the same value for the entire frame.
+
+// The camera's render position.
+fn bloxdEyePosition() -> vec3f {
+    return bloxdPackInputs.eyePosition;
+}
+
+// Integer distance, in blocks: render position + this offset = world position.
+// Changes as the player travels, so render positions stay close to 0,0,0.
+// See bloxdWorldPosition for one way to use it.
+fn bloxdRenderOffset() -> vec3i {
+    return bloxdPackInputs.renderOffset;
+}
+
+// The unit vector towards the sun, in world orientation; 0 when there's no sun.
+fn bloxdSunDirection() -> vec3f {
+    return bloxdPackInputs.sunDirection;
+}
+
+// Seconds since the page loaded. As an f32, it has sub-millisecond precision
+// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
+fn bloxdSeconds() -> f32 {
+    return bloxdPackInputs.seconds;
+}
+
+// Whether block and sky lighting is on. When it's off, BloxdLightIn's
+// blockLight and heldLight are 0, and its skyLight and light colours are 1.
+fn bloxdLit() -> bool {
+    return bloxdPackInputs.lit != 0u;
+}
+
+// What kind of block, item or lifeform a face is. Any number of flags may be
+// set, possibly even none. For example, sandstone is sand and rock.
+struct BloxdFlags {
+    opaque: bool,     // Opaque blocks, i.e. full cubes with no gaps or holes.
+    emissive: bool,   // Blocks that emit light, e.g. lava and glowing ores.
+    vegetation: bool, // Leaves, grass blocks and leafy plants, e.g. tall grass.
+    dirt: bool,       // Soil, grass blocks included. Rocky Dirt is rock too.
+    sand: bool,       // Sand, Red Sand and every sandstone, which is rock too.
+    rock: bool,       // Stone variants, and more, e.g. gravel, ores and magma.
+
+    // Drawn as block models, so never part of terrain or flagged as opaque.
+    slab: bool,       // Half blocks.
+    stairs: bool,     // Stairs and corner stairs.
+    flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
+
+    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
+    held: bool,       // Items in a hand, in first or third person.
+    dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
+    thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
+
+    lifeform: bool,   // Players, mobs and NPCs. Includes armour and cosmetics.
+}
+
+// Convert a render position to a world position, with possible f32 inaccuracy.
+fn bloxdWorldPosition(position: vec3f) -> vec3f {
+    return position + vec3f(bloxdRenderOffset());
+}
+
+struct BloxdVertexIn {
+    position: vec3f,      // Render position.
+    normal: vec3f,        // Unit vector pointing away from the face.
+    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
+    flags: BloxdFlags,    // What kind of block, item or lifeform.
+}
+
+struct BloxdVertex {
+    position: vec3f,      // The render position output.
+}
+
+struct BloxdSurfaceIn {
+    colour: vec3f,        // RGB colour = texture * tint * ambient occlusion.
+    alpha: f32,           // Opacity.
+
+    // Enchanted items and armour only, all 0 for anything else.
+    enchantTier: u32,     // 1-5 for Tier 1-5.
+    enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
+    enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
+
+    // Players and mobs only, 0 for anything else: RGB overlay colour, e.g. the
+    // red flash when hurt, and its alpha. bloxdLitColour mixes it into colour.
+    overlayColour: vec4f,
+
+    // These mean the same as in BloxdVertexIn, after the vertex hook.
+    position: vec3f,      // Render position.
+    normal: vec3f,        // Unit vector pointing away from the face.
+    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
+    flags: BloxdFlags,    // What kind of block, item or lifeform.
+
+    // These are all 0 if the face has no texture. Most models use textureId 0.
+    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
+    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
+    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
+    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
+}
+
+struct BloxdSurface {
+    colour: vec3f,        // RGB colour output.
+#ifdef BLOXD_ALPHA
+    alpha: f32,           // Opacity output.
+#endif
+    emission: vec3f,      // Emissive RGB, added after lighting, before fog.
+    enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
+    overlayColour: vec4f, // Overlay output, mixed in by bloxdLitColour.
+}
+
+// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
+// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
+// bloxdLitColour lights a surface from these as the engine does.
+struct BloxdLightIn {
+    litColour: vec3f,  // Lit and enchanted RGB colour, before emission and fog.
+    directional: f32,  // Summed Lambert from directional lights; 0 if none.
+    diffuse: vec3f,    // The material's RGB response to directional light.
+    emissive: vec3f,   // The material's RGB glow, added to directional light.
+    ambient: vec3f,    // RGB ambient colour, added to directional light.
+    blockLight: vec3f, // RGB block light; 0 when !bloxdLit().
+    skyLight: f32,     // Sky light; 1 when !bloxdLit().
+    ambientLightColour: vec3f, // Minimum RGB light; 1 when !bloxdLit().
+    skyLightColour: vec3f, // RGB colour of skyLight; 1 when !bloxdLit().
+    heldLight: vec3f,  // RGB held light; 0 when !bloxdLit() or no light held.
+    fogColour: vec3f,  // The game's RGB fog colour; 0 when the game has no fog.
+    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
+
+    // These are the same as in BloxdSurfaceIn.
+    position: vec3f,      // Render position.
+    normal: vec3f,        // Unit vector pointing away from the face.
+    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
+    flags: BloxdFlags,    // What kind of block, item or lifeform.
+    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
+    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
+    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
+    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
+}
+
+struct BloxdLight {
+    colour: vec3f, // RGB colour output.
+}
+
+struct BloxdOpaqueBehind {
+    hit: bool,       // False where nothing opaque is behind (sky).
+    position: vec3f, // The render position; 0 when !hit.
+    distance: f32,   // From the camera; 0 when !hit.
+}
+
+fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
+    return BloxdVertex(vertex.position);
+}
+
+fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
+    return BloxdSurface(
+        surface.colour,
+#ifdef BLOXD_ALPHA
+        surface.alpha,
+#endif
+        vec3f(0.0),
+        surface.enchantColour,
+        surface.overlayColour,
+    );
+}
+
+// Apply this fragment's fog to colour, as the engine does.
+fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
+    return mix(colour, light.fogColour, light.fogAlpha);
+}
+
+// How the face's material and angle light it: directional light on its
+// diffuse colour, plus its emissive and ambient terms, clamped to 0-1.
+fn bloxdShading(light: BloxdLightIn) -> vec3f {
+    let diffuse = light.directional * light.diffuse;
+    return saturate(diffuse + light.emissive + light.ambient);
+}
+
+// The world's light at this fragment: the brightest of block, sky and held
+// light, none below ambientLightColour.
+fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
+    let ambientLight = light.ambientLightColour;
+    let blockLight = ambientLight + light.blockLight * (1.0 - ambientLight);
+    let skyLight = mix(ambientLight, light.skyLightColour, light.skyLight);
+    let heldLight = ambientLight + light.heldLight * (1.0 - ambientLight);
+    return max(max(blockLight, skyLight), heldLight);
+}
+
+// The surface's colour lit as the engine does, before emission and fog:
+// mixed with overlayColour, then bloxdShading, then mixed with
+// enchantColour, then bloxdWorldLight.
+fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
+    let overlay = surface.overlayColour;
+    let overlaid = mix(surface.colour, overlay.rgb, overlay.a);
+    let shaded = bloxdShading(light) * overlaid;
+    let enchant = surface.enchantColour;
+    let enchanted = mix(shaded, enchant.rgb, enchant.a);
+    return max(enchanted * bloxdWorldLight(light), vec3f(0.0));
+}
+
+fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    let lit = bloxdLitColour(surface, light);
+    return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
+}
+```
+
+上のすべてのフックシグネチャ・構造体・定数・コメントが負荷を担う: これがライブバリデータが解析し、コード生成器が先頭に付し、パックがコンパイル対象とするものである。第十一部 §67 と差分すれば v5 が一目で分かる: 冒頭の `bloxdChunkSize` と `bloxdLit()`、ビット定数を置き換える `BloxdFlags` 構造体、入力構造体の `localPosition` とエンチャント/オーバーレイフィールド、2 個の新出力、そして `bloxdDefaultLight` の手前の 3 個のライティングヘルパー。
+
+[← 前の部](11-reference.md)・[マニュアルに戻る](README.md)

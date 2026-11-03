@@ -2,6 +2,8 @@
 
 # 第十部分: API Version 4 迁移指南 (2026-10-26, 摘要)
 
+> **已于 2026-11-03 被取代: 现行 API 为版本 5** —— v4 包在加载时被拒绝，方式与本文对 v3 的描述完全相同。请先应用本部分，*再*应用 [第十二部分](12-apiv5.md)（v4 → v5：`BloxdFlags` 结构体取代 `blockFlags`、`bloxdLit()` 与公开的光照配方、附魔/覆盖输入、9 钩子默认包）。本部分的内部细节（§56–§66）对其测量时所基于的 v4 构建仍然准确。
+
 > 本文是该语言的简短摘要。包含全部细节、示例配方与复原的引擎内部实现 (§55–§66) 的完整版位于[英文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md)与[日文版](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md)。
 
 目标构建: `cnty9.main.669f8081.js` —— **自 2026-10-26 起同时在生产与预发布环境上线** (两者逐字节一致)。包模型保持形态: 相同的 `pack.json` 字段、相同的加载器限制、相同的 64 B uniform、相同的 6 个钩子。

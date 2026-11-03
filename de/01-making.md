@@ -2,7 +2,7 @@
 
 # Teil I: Pakete erstellen
 
-> Das aktuelle Spiel verlangt seit dem 2026-10-26 `apiVersion: 4` und lehnt v1/v2/v3-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung.
+> Das aktuelle Spiel verlangt seit dem 2026-11-03 `apiVersion: 5` und lehnt v1/v2/v3/v4-Pakete beim Laden ab — der folgende Inhalt ist auf der v2-Spezifikation geschrieben. Siehe [Teil IX](09-apiv3.md) und [Teil X](10-apiv4.md) zum Migrieren vor der Verteilung. Danach [Teil XII](12-apiv5.md) anwenden (v4 → v5).
 
 ## 1. Überblick und Voraussetzungen
 

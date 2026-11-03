@@ -2,6 +2,8 @@
 
 # 제10부: API Version 4 마이그레이션 가이드 (2026-10-26, 요약)
 
+> **2026-11-03 대체됨: 현행 API는 버전 5** — v4 팩은 여기서 v3에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 부를 적용한 뒤 [제12부](12-apiv5.md)를 적용하라 (v4 → v5: `BloxdFlags` 구조체가 `blockFlags`를 대체, `bloxdLit()`와 공개 조명 레시피, 인챈트/오버레이 입력, 9-훅 기본 팩). 이 부의 내부 사항 (§56–§66)은 측정 대상이었던 v4 빌드에 대해 정확한 상태로 남는다.
+
 > 이 문서는 이 언어용 간략 요약이다. 모든 세부사항·예제 레시피·복원된 엔진 내부 (§55–§66)를 담은 완전판은 [영어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/en/10-apiv4.md) 와 [일본어](https://github.com/imu31465/Bloxd.io-How-To-Make-Shader-Packs/blob/main/ja/10-apiv4.md) 판에 있다.
 
 대상 빌드: `cnty9.main.669f8081.js` — **2026-10-26부터 프로덕션과 프리프로드에 동시 적용** (양쪽 모두 바이트 동일). 팩 모델은 형태를 유지한다: 같은 `pack.json` 필드, 같은 로더 제한, 같은 64 B uniform, 같은 6개 훅.
