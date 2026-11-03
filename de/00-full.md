@@ -6163,9 +6163,7 @@ Danach v3 → v4 → v5 der Reihe nach anwenden ([der Schnellweg](history/index.
 
 ---
 
-## v2
 ## API v2 Migrationsleitfaden
-
 > Version: 2 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 
 Ziel-Build: `6qxffk.main.5912a15f.js` (Produktions-Deployment mit Stand 2026-10-16). Teile I bis VII dieses Leitfadens sind bereits auf v2-Standard umgeschrieben; dieser Leitfaden fasst die Migrationspunkte von v1 und die v2-Neuerungen zusammen. Die Code-Beispiele der Neuerungen haben die 8/8-Variantenprüfung des v2-Compilers und die Browser-WGSL-Compiler-Prüfung (Tint) (§38) bestanden, und die v2-Konvertierung bestehender Rezepte ist rein mechanischer Bezeichnerersatz: vor Verteilung unbedingt per In-Game-Kompilierung prüfen.
@@ -6408,9 +6406,7 @@ Recherchiert von ltf_ahel (recherchiert mit glm)
 
 ---
 
-## v3
 ## API v3 Migrationsleitfaden
-
 > Version: 3 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 > **Seit 2026-10-26 ersetzt: die aktuelle API ist Version 5** — v3-Pakete werden beim Laden genau so abgelehnt, wie es hier für v2 beschrieben ist. Diesen Leitfaden *und danach* den [v4-Migrationsleitfaden](history/v4.md) anwenden (v3 → v4: Textur-API, `fogAlpha`-Umbenennung, `bloxdFragmentBlockPosition`, `hit`). Die Interna dieses Leitfadens (§49–§54) bleiben für die v3-Builds, auf denen sie gemessen wurden, korrekt. Danach auch den [v5-Migrationsleitfaden](history/v5.md) anwenden (v4 → v5).
 

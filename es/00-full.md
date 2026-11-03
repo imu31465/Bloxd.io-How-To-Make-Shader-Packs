@@ -6161,9 +6161,7 @@ Después aplica v3 → v4 → v5 en orden ([el camino rápido](history/index.md#
 
 ---
 
-## v2
 ## Guía de migración a API v2
-
 > Versión: 2 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 Build objetivo: `6qxffk.main.5912a15f.js` (despliegue en producción a 2026-10-16). Las Partes I–VII de esta guía ya están reescritas a la base v2; esta guía recoge los puntos de migración desde v1 y las novedades de v2. Los ejemplos de código de novedades pasan la validación de 8/8 variantes en el compilador v2 y la validación del compilador WGSL del navegador (Tint) (§38), pero la conversión v2 de recetas existentes es sustitución mecánica de identificadores — verifica siempre con compilación en juego antes de distribuir.
@@ -6406,9 +6404,7 @@ Investigado por ltf_ahel (investigado con glm)
 
 ---
 
-## v3
 ## Guía de migración a API v3
-
 > Versión: 3 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 > **Sustituida el 2026-10-26: la API actual es la versión 5** — los paquetes v3 se rechazan al cargar tal como se describe aquí para v2. Aplica esta guía *y después* [la guía de migración v4](history/v4.md) (v3 → v4: API de texturas, cambio de nombre a `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`). Las interioridades de esta guía (§49–§54) siguen siendo exactas para el build v3 en el que se midieron. Aplica también [la guía de migración v5](history/v5.md) (v4 → v5).
