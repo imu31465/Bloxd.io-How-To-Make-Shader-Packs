@@ -112,9 +112,3 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 }
 ```
-
-## 関連
-
-- [ライティングAPI](../api/lighting.md) — エンジンの照明レシピ
-- [リアル系レシピ](realism.md) — 物理ベースの再照明
-- [夜間表現の設計](../guides/night.md)

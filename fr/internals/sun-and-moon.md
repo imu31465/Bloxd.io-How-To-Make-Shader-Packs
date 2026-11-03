@@ -1,31 +1,30 @@
-# Identité du soleil et de la lune
+# Le soleil et la lune
 
-
-
-La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit seulement quand change le type de skybox — le critère n'est pas « si le ciel a un soleil » mais **« si le skybox est de type terre »**.
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Analyzed (analyse JavaScript du bundle de production)
+La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit uniquement quand le type de skybox change — le critère n'est pas « si le ciel a un soleil » mais **« si la skybox est de type terre »**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
-| `default` (ciel procédural) | Non zéro (défauts ci-dessous) |
+| `default` (ciel procédural) | Non nul (défauts ci-dessous) |
 | `gloomy` / `interstellar` / `space_*` (textures cubiques) | **Toujours (0,0,0)** |
 
-**La lune est toujours en `-bloxdSunDirection()`** (le moteur calcule la position lunaire comme l'opposé exact du soleil). La nuit se juge par hauteur solaire — il y a lune en haut quand `bloxdSunDirection().y < 0` (soleil sous l'horizon). Mais dans les mondes par défaut le soleil est statique, la lune aussi — seuls les mondes à cycle jour/nuit la voient bouger.
+**La lune est toujours en `-bloxdSunDirection()`** (le moteur calcule la position de la lune comme l'opposé exact du soleil). La nuit se juge par la hauteur du soleil — la lune est levée quand `bloxdSunDirection().y < 0` (soleil sous l'horizon). Mais dans les mondes par défaut le soleil est statique, donc la lune l'est aussi ; seuls les mondes implémentant un cycle jour/nuit la voient bouger.
 
-La direction solaire par défaut tourne autour de `(-0.56, 0.81, -0.18)` (vecteur unitaire d'inclination = −0.2 / azimuth = 0.55, statique). Référence pratique pour prédire les directions de reflet en testant des packs de distribution.
+La direction du soleil des mondes par défaut vaut environ `(-0.56, 0.81, -0.18)` (vecteur unitaire calculé depuis inclination = −0.2 / azimuth = 0.55, statique). Une référence pratique pour prédire sur papier les directions de reflet en testant des packs de distribution.
 
-Les cycles jour/nuit ne sont pas intégrés au moteur — inclination est un nombre statique que les mondes à jour mobile actualisent côté jeu. `bloxdSunDirection()` suit chaque mise à jour.
+Les cycles jour/nuit ne sont pas intégrés au moteur — l'inclination est un nombre statique, et les mondes à jour/nuit mobile l'actualisent côté jeu. `bloxdSunDirection()` suit chaque mise à jour.
 
-Les lumières directionnelles du terrain ne sont que 2 lampes créées au démarrage de scène, de **direction et intensité fixes, sans changement jour/nuit**. En bref : **aucun facteur de brillance du terrain ne dépend du temps. Les « looks » jour/nuit viennent seulement de la skybox et de bloxdSunDirection()** : les packs assombrissant de nuit doivent donc estimer la tranche horaire depuis bloxdSunDirection() (la technique `sunPresent` de §19).
+Les lumières directionnelles du terrain ne sont que 2 lampes créées au démarrage de la scène, à **direction et intensité fixes, inchangées jour et nuit**. En bref : **aucun facteur de luminosité du terrain ne dépend du temps. Les « looks » jour/nuit viennent uniquement de la skybox et de bloxdSunDirection()** — les packs assombrissant le terrain la nuit doivent donc estimer eux-mêmes la tranche horaire depuis bloxdSunDirection() (la technique `sunPresent` de [Conception des looks nocturnes](../guides/night.md)).
 
 ## R-A. Clair de lune directionnel — moonDir = −bloxdSunDirection()
 
-Ajoute du Lambert blanc-bleuté et un faible specular tant que la lune est en haut. `moonUp` vaut 0 dans les mondes à soleil statique par défaut : rien ne s'y passe — **clair de lune qui ne se déclenche qu'en mondes à cycle jour/nuit, donc sûr**.
+Ajoute du Lambert blanc bleuté et un faible specular uniquement pendant que la lune est levée. `moonUp` vaut 0 dans les mondes par défaut à soleil statique, donc rien ne s'y passe — **clair de lune qui ne se déclenche que dans les mondes à cycle jour/nuit, donc sûr**.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // la lune est toujours exactement opposée au soleil ; auto-off diurne via moonDir.y < 0
+        // la lune est toujours exactement à l'opposé du soleil ; auto-extinction en journée via moonDir.y < 0
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {

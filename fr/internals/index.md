@@ -1,29 +1,29 @@
-# Engine Internals & Research
+# Intérieurs du moteur et recherche
 
-Internal specifications restored by analyzing the engine's implementation. Everything here was recovered directly from the JavaScript of the current production build (`ab90qa`). Separated from the public-API documentation ([API Reference](../api/)) to preserve exact internal behavior and analysis results.
+Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`ab90qa`). Séparé de la documentation d'API publique ([Référence API](../api/)) pour préserver le comportement interne exact et les résultats d'analyse.
 
-## Map
+## Plan
 
-| Page | Contents |
+| Page | Contenu |
 |---|---|
-| [Rendering pipeline](rendering-pipeline.md) | alphaTest position, 2-light setup, uniform reality, greedy meshing |
-| [Hook invocation](hook-invocation.md) | how hooks are spliced into the engine's WGSL |
-| [Engine header](engine-header.md) | the full v5 header (verbatim, 8,954B) |
-| [Shader validation](shader-validation.md) | analyzer internals, the signature table, HEADER_VERSION |
-| [WGSL compilation](wgsl-compilation.md) | the stage-2 real compilation and validation stubs |
-| [Reserved identifiers](reserved-identifiers.md) | the 46 `bloxdSp*` symbols |
-| [Lighting internals](lighting-internals.md) | blockLight / heldLight structure |
-| [Fog internals](fog-internals.md) | linear-only, the 32-block gradient band |
-| [Texture sampling](texture-sampling.md) | the 3-variant texture codegen |
-| [Texture registry](texture-registry.md) | name→id resolution, 896 names, measured drift |
-| [Model rendering](model-rendering.md) | the v5 Model program |
-| [Engine data](engine-data.md) | the v5 constants/limits/layout ledger |
-| [Testing factors](testing-factors.md) | what world/player settings change pack-visible values |
-| [Policy](policy.md) | shaderPackPolicy — the 12 allow titles |
-| [Sun & moon](sun-and-moon.md) | what feeds bloxdSunDirection |
-| [Debugging](debugging.md) | URL parameters, stats panels |
-| [Research log](research-log.md) | methodology, build history, unverified items |
+| [Pipeline de rendu](rendering-pipeline.md) | position d'alphaTest, setup à 2 lumières, réalité de l'uniform, greedy meshing |
+| [Invocation des hooks](hook-invocation.md) | comment les hooks sont greffés dans le WGSL du moteur |
+| [En-tête du moteur](engine-header.md) | l'en-tête v5 complet (verbatim, 8,954B) |
+| [Validation des shaders](shader-validation.md) | les intérieurs de l'analyseur, la table des signatures, HEADER_VERSION |
+| [Compilation WGSL](wgsl-compilation.md) | la vraie compilation de l'étape 2 et les stubs de validation |
+| [Identifiants réservés](reserved-identifiers.md) | les 46 symboles `bloxdSp*` |
+| [Intérieurs de l'éclairage](lighting-internals.md) | structure de blockLight / heldLight |
+| [Intérieurs du brouillard](fog-internals.md) | linéaire uniquement, la bande de dégradé de 32 blocs |
+| [Échantillonnage des textures](texture-sampling.md) | le codegen de textures à 3 variantes |
+| [Registre des textures](texture-registry.md) | résolution nom→id, 896 noms, dérive mesurée |
+| [Rendu des modèles](model-rendering.md) | le programme Model v5 |
+| [Données du moteur](engine-data.md) | le relevé v5 des constantes/limites/layouts |
+| [Facteurs de test](testing-factors.md) | quels réglages monde/joueur changent les valeurs visibles des packs |
+| [Politique](policy.md) | shaderPackPolicy — les 12 titres allow |
+| [Soleil et lune](sun-and-moon.md) | ce qui alimente bloxdSunDirection |
+| [Débogage](debugging.md) | paramètres URL, panneaux de statistiques |
+| [Journal de recherche](research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03)
 
-Internals are not a stable API contract — they may change with engine updates, and each page names its evidence build ([research log](research-log.md)).
+Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](research-log.md)).

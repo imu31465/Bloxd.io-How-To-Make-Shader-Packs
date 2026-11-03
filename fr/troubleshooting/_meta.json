@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Troubleshooting",
+    "title": "Dépannage",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
+  "loading": "Erreurs de chargement",
+  "api-version": "Erreurs de version d'API",
+  "compilation": "Erreurs de compilation",
+  "validation": "Erreurs de validation",
+  "variants": "Problèmes propres aux variantes",
+  "visual": "Problèmes visuels",
+  "textures": "Problèmes de textures",
+  "lighting": "Problèmes d'éclairage",
+  "models": "Problèmes de modèles",
   "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "faq": "FAQ et notes légales"
 }

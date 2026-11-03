@@ -1,39 +1,39 @@
-# Model rendering internals
+# Intérieurs du rendu des modèles
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré depuis le bundle en production)
 
-The internals of the v5 Model program. The user-facing guide: [Models and textures](../guides/models.md).
+Les intérieurs du programme Model v5. Le guide côté utilisateur : [Modèles et textures](../guides/models.md).
 
-## What the Model program is
+## Ce qu'est le programme Model
 
-Before v5, packs could only plug into terrain / liquid; block models (slabs, stairs, plants) and entities (players, mobs, items) were **outside pack jurisdiction**. v5 added model as the third program, drawing:
+Avant la v5, les packs ne pouvaient se brancher que sur terrain / liquide ; les modèles de blocs (dalles, escaliers, plantes) et les entités (joueurs, mobs, objets) étaient **hors de la juridiction des packs**. La v5 a ajouté model comme troisième programme, dessinant :
 
-- blocks drawn as block models (header note: *"Drawn as block models, so never part of terrain or flagged as opaque"*)
-- held / dropped / thrown items
-- players, mobs, NPCs (armour and cosmetics included)
+- les blocs dessinés comme modèles de blocs (note d'en-tête : *« Drawn as block models, so never part of terrain or flagged as opaque »*)
+- les objets tenus / lâchés / lancés
+- les joueurs, mobs, PNJ (armures et cosmétiques inclus)
 
-## Flag & input delivery
+## Livraison des flags et des entrées
 
-- **`bloxdSpFlags`** — the delivery path for the `BloxdFlags` struct; the 8 new fields (`slab` / `stairs` / `flat` / `placed` / `held` / `dropped` / `thrown` / `lifeform`) carry values meaningful only on model faces
-- **`bloxdSpItemLocalPosition`** — delivery of `localPosition`; `vec3f(0.0)` on terrain/liquid
-- **`bloxdSpEnchant`** — delivery of the enchant inputs (`enchantTier` / `enchantColour` / `enchantSpeed`)
+- **`bloxdSpFlags`** — le chemin de livraison de la struct `BloxdFlags` ; les 8 nouveaux champs (`slab` / `stairs` / `flat` / `placed` / `held` / `dropped` / `thrown` / `lifeform`) ne portent des valeurs signifiantes que sur les faces de modèle
+- **`bloxdSpItemLocalPosition`** — livraison de `localPosition` ; `vec3f(0.0)` sur terrain/liquide
+- **`bloxdSpEnchant`** — livraison des entrées d'enchant (`enchantTier` / `enchantColour` / `enchantSpeed`)
 
-## Enchant computation
+## Calcul de l'enchant
 
-The engine animates the glint sweep and delivers it as `enchantColour.a` to the surface/light hooks ([Enchant effects](../recipes/enchant-effects.md)). The mixing happens inside `bloxdLitColour()` — right after shading, before world light ([Lighting](../api/lighting.md#the-full-pipeline)).
+Le moteur anime le balayage du scintillement et le livre en tant que `enchantColour.a` aux hooks surface/light ([Effets d'enchantement](../recipes/enchant-effects.md)). Le mélange se produit à l'intérieur de `bloxdLitColour()` — juste après l'ombrage, avant la lumière du monde ([Éclairage](../api/lighting.md#le-pipeline-complet)).
 
-## The overlay (hurt flash etc.)
+## L'overlay (flash de dégâts etc.)
 
-`overlayColour` carries entity state color (damage flash etc.) as RGB + alpha. `bloxdLitColour` mixes it **before lighting**, so state expression rides without breaking the base color. The processing existed internally in v4 and was opened to inputs/outputs in v5.
+`overlayColour` porte la couleur d'état d'entité (flash de dégâts etc.) en RVB + alpha. `bloxdLitColour` la mélange **avant l'éclairage**, si bien que l'expression d'état passe sans casser la couleur de base. Le traitement existait en interne en v4 et a été ouvert aux entrées/sorties en v5.
 
-## The texture path
+## Le chemin des textures
 
-Most model faces use `textureId: 0` (no texture) — player skins and mob textures are not in the block-texture-atlas namespace. `surface.colour` arrives with skin × tint baked in, so model-face processing starts from `colour` ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+La plupart des faces de modèle utilisent `textureId: 0` (pas de texture) — les skins de joueurs et les textures de mobs ne sont pas dans l'espace de noms de l'atlas de textures de blocs. `surface.colour` arrive avec skin × teinte cuits dedans, donc le traitement des faces de modèle part de `colour` ([textures possédées par le modèle](../api/texture-api.md#textures-possédées-par-le-modèle-textureid-0)).
 
-## Variants
+## Variantes
 
-The Model program forms one axis of the variant matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` is defined only in allow.model ([Preprocessor](../api/preprocessor.md#macro--variant-matrix)); strict.model has no vertex hooks.
+Le programme Model forme un axe de la matrice de variantes : `strict.model` / `allow.model`. `BLOXD_ALPHA` n'est défini que dans allow.model ([Préprocesseur](../api/preprocessor.md#matrice-macros--variantes)) ; strict.model n'a pas de hooks de vertex.
 
-## Related
+## Voir aussi
 
-- [Models and textures](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md) · [Rendering pipeline](rendering-pipeline.md)
+- [Modèles et textures](../guides/models.md) · [Recettes de shaders pour modèles](../recipes/model-shaders.md) · [Flags](../api/flags.md) · [Pipeline de rendu](rendering-pipeline.md)

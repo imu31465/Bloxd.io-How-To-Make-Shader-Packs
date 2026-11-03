@@ -4,8 +4,6 @@
 
 ヘッダーが提供する定数は3つです (テクスチャ名定数 `bloxdTextureId*` は [テクスチャAPI](texture-api.md) を参照)。
 
-## 一覧
-
 ```wgsl
 const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;

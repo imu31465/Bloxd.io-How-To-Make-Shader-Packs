@@ -1,7 +1,6 @@
-# Recettes de liquides
+# Liquides
 
-
-
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
 ## Surface ridée (scintillement de couleur)
 
 ```wgsl
@@ -18,9 +17,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Transparence pseudo par hauteur (pas un vrai test de bas-fond)
+## Transparence pseudo par profondeur selon la hauteur (pas un vrai test de bas-fond)
 
-> En v1, profondeur de scène et position du fond inconsultables : la vraie profondeur ne se calculait pas avec cette seule API. En v2, `bloxdOpaqueBehind()` mesure l'épaisseur jusqu'à la face opaque derrière, en liquides seuls ([partie VIII](../history/v2.md) R-E). Ci-dessous l'ancien pseudo-effet sans cela : `s.position.y` est une coordonnée locale et l'utiliser brute déplace l'effet avec l'origine du chunk. Il ne fait varier alpha que par hauteur monde — pseudo effet, pas une vraie représentation de bas-fond suivant le littoral ou le fond. Ajustez `packWaterReferenceY` à votre hauteur monde.
+> La vraie profondeur de l'eau exige le `bloxdOpaqueBehind()` réservé aux liquides, qui mesure l'épaisseur jusqu'à la face opaque derrière (la recette complète : [Rendre l'eau naturelle](../guides/water.md)). Ce qui suit est un pseudo style plus simple sans lui : `s.position.y` est une coordonnée locale, donc l'utiliser brute déplace l'effet quand l'origine du chunk change. Convertissez avec `bloxdWorldPosition()` pour la hauteur monde. Ce qui suit ne fait varier que l'alpha par hauteur monde — un effet pseudo, pas des bas-fonds sensibles au rivage ou au fond. Ajustez `packWaterReferenceY` à votre hauteur monde.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -31,7 +30,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     let worldY = s.position.y + f32(bloxdRenderOffset().y);
     let heightFactor = clamp((worldY - packWaterReferenceY) / packWaterHeightSpan, 0.0, 1.0);
     #ifdef BLOXD_ALPHA
-    // plus fin en bas, plus proche de l'alpha de base en haut ; vérifiez le sens en jeu
+    // plus fin en basse altitude, plus proche de l'alpha de base en haut ; vérifiez le sens en jeu
     out.alpha = mix(0.45, 0.9, heightFactor) * s.alpha;
     #endif
     return out;
@@ -53,7 +52,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Pack liquides seuls (terrain intact)
 
 ```wgsl
-// n'écrivez aucun hook terrain_*. Alors :
-//  - variantes terrain = sans hooks = défauts moteur
+// n'écrivez aucun hook terrain_* du tout. Alors :
+//  - variantes terrain = sans hooks = défauts moteur pour le terrain
 //  - variantes liquid  = seuls les hooks liquid_* agissent
 ```

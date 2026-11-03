@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Recipes",
+    "title": "Recettes",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "colors": "Colors",
-  "lighting": "Lighting",
-  "emission": "Emission",
-  "coordinates": "Coordinates",
-  "animation": "Time & animation",
-  "liquids": "Liquids",
-  "vertices": "Vertices (allow only)",
-  "math": "Math toolbox",
-  "realism": "Realism",
-  "model-shaders": "Model shaders",
-  "enchant-effects": "Enchant effects"
+  "colors": "Couleurs",
+  "lighting": "Éclairage",
+  "emission": "Émission",
+  "coordinates": "Coordonnées",
+  "animation": "Temps et animation",
+  "liquids": "Liquides",
+  "vertices": "Sommets (allow seul)",
+  "math": "Boîte à outils mathématiques",
+  "realism": "Réalisme",
+  "model-shaders": "Shaders de modèle",
+  "enchant-effects": "Effets d'enchantement"
 }

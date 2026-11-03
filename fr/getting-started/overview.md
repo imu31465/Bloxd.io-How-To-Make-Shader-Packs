@@ -1,33 +1,33 @@
-# Overview & prerequisites
+# Vue d'ensemble et prérequis
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified
 
-## What a shader pack is
+## Ce qu'est un pack de shaders
 
-A Bloxd.io shader pack changes the look of the game's **WebGPU renderer only**. Packs are written in a **restricted subset of WGSL** and loaded from the in-game settings → Shader Pack screen as a zip or folder. While a pack is installed, the WebGPU renderer is force-enabled in settings.
+Un pack de shaders Bloxd.io change l'apparence du jeu **pour le seul renderer WebGPU**. Les packs s'écrivent dans un **sous-ensemble restreint de WGSL** et se chargent depuis l'écran Réglages → Shader Pack du jeu, sous forme de zip ou de dossier. Tant qu'un pack est installé, le renderer WebGPU est activé de force dans les réglages.
 
-Packs are validated and compiled as pure WGSL — no JavaScript execution, no networking. Nothing dangerous can happen with normal code.
+Les packs sont validés et compilés en WGSL pur — pas d'exécution de JavaScript, pas de réseau. Rien de dangereux ne peut arriver avec du code normal.
 
-## What you can change (v5)
+## Ce que vous pouvez changer
 
-A pack plugs into the renderer's **3-stage per-face pipeline**. The render targets split into three programs with a total of **9 hooks**:
+Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les cibles de rendu se répartissent en trois programmes comptant **9 hooks** au total :
 
-| Target | Hooks (Vertex / Surface / Light) | What is drawn |
+| Cible | Hooks (Vertex / Surface / Light) | Ce qui est dessiné |
 |---|---|---|
-| **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | All blocks except water and block models |
-| **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Water |
-| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block models (slabs, stairs, plants), items, players, mobs, NPCs, armour, cosmetics |
+| **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | Tous les blocs sauf l'eau et les modèles de blocs |
+| **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | L'eau |
+| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modèles de blocs (dalles, escaliers, plantes), objets, joueurs, mobs, PNJ, armures, cosmétiques |
 
-- **Can do**: change colors, transparency and emission; rebuild lighting (published as the v5 [Lighting API](../api/lighting.md)); projected-style shadows (via `skyLight`); sample textures (`bloxdTexel` — reading the existing block-texture atlas); per-model effects (v5's `flags` tell you "this is a held item", "this is a player"); vertex animation (allow games only)
-- **Cannot do**: add your own textures (that is the texture-pack system's job); post-processing (bloom etc.); shadow-map shadows that rotate with the sun; true reflections (SSR); affect the sky, clouds or the sun disc itself
-- **Easy to miss but powerful**: **projected-style shadows using `skyLight` (voxel sky occlusion)** — clearly darken areas under trees and roofs. Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
+- **Possible** : changer les couleurs, la transparence et l'émission ; reconstruire l'éclairage (l'[API d'éclairage](../api/lighting.md)) ; les ombres de style projection (via `skyLight`) ; échantillonner des textures (`bloxdTexel` — lire l'atlas de textures de blocs existant) ; les effets par modèle (`flags` vous dit « c'est un objet tenu », « c'est un joueur ») ; l'animation de sommets (jeux allow uniquement)
+- **Impossible** : ajouter vos propres textures (c'est le travail du système de packs de textures) ; le post-traitement (bloom etc.) ; les ombres par shadow map qui tournent avec le soleil ; les vrais reflets (SSR) ; agir sur le ciel, les nuages ou le disque solaire lui-même
+- **Facile à manquer mais puissant** : **les ombres de style projection via `skyLight` (occlusion voxel du ciel)** — assombrissent nettement les zones sous les arbres et les toits. Casser des blocs fait recalculer LightEngine immédiatement, de sorte que les ombres suivent en temps réel
 
-## strict and allow modes
+## Modes strict et allow
 
-Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run in strict mode** (no vertex animation, no `discard`). Packs for general distribution must work in strict mode. See [Variants](variants.md) and the [policy reference](../internals/policy.md).
+Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et **la plupart des jeux tournent en mode strict** (pas d'animation de sommets, pas de `discard`). Les packs destinés à la distribution générale doivent fonctionner en mode strict. Voir [Variantes](variants.md) et la [référence de politique](../internals/policy.md).
 
-## Assumptions in this documentation
+## Hypothèses de cette documentation
 
-- The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](../api/compatibility.md))
-- Migrating a pack written for an older version? See [Version History](../history/)
-- Engine internals may change with updates, so every page names its target build
+- Le jeu actuel n'accepte que les packs `apiVersion: 5` ; les packs v1–v4 sont rejetés au chargement (les packs enregistrés deviennent silencieusement inactifs — [Compatibilité](../api/compatibility.md))
+- Vous migrez un pack écrit pour une ancienne version ? Voir l'[Historique des versions](../history/)
+- Les internals du moteur peuvent changer avec les mises à jour ; chaque page indique donc son build cible

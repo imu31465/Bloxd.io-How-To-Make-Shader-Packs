@@ -1,19 +1,19 @@
-# Getting Started
+# Premiers pas
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+Un tutoriel au parcours unique pour les auteurs de packs de shaders qui débutent, de la vue d'ensemble à la distribution. Il enseigne directement la forme aboutie de l'API v5 (nul besoin de lire d'abord les anciennes versions — c'est le rôle de l'[Historique des versions](../history/)).
 
-## The track
+## Le parcours
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [Vue d'ensemble et prérequis](overview.md) — ce que les packs de shaders peuvent et ne peuvent pas faire
+2. [Prérequis](requirements.md) — exigences de navigateur et de renderer
+3. [Démarrage rapide](quick-start.md) — votre premier pack en 5 minutes
+4. [Structure du pack](pack-structure.md) — contenu du zip et limites de taille
+5. [pack.json](manifest.md) — chaque champ du manifeste
+6. [Hooks de shader](hooks.md) — les rôles des 9 hooks
+7. [Variantes](variants.md) — les 6 variantes et les gardes de macros
+8. [Validation](validation.md) — le contrôle de chargement en 3 étapes et les tests sur appareil
+9. [Distribution](distribution.md) — compression en zip et hygiène de publication
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+Quand vous avez besoin de la spécification complète, poursuivez vers la [Référence API](../api/) ; pour des effets prêts à l'emploi, voyez les [Recettes](../recipes/).

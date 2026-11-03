@@ -68,9 +68,3 @@ group 3 のバインディングは:
 ## wgsl ファイルの連結
 
 複数の `.wgsl` は連結されて1モジュールとして扱われます。連結は**パス名の辞書順**。モジュールスコープの宣言は順序非依存のため通常は無関係ですが、`var` の初期化順序に依存する書き方をした場合のみ効きます。`.wgsl` 以外のファイルは無視されます。
-
-## 関連
-
-- 読み込み時の検証パイプライン → [Getting Started: 検証](../getting-started/validation.md)
-- uniform の内部 → [エンジン内部: Engine Data](../internals/engine-data.md)
-- 旧バージョンの uniform (v2〜v4) → [バージョン履歴](../history/)

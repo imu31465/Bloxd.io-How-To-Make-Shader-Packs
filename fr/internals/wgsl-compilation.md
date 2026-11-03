@@ -1,20 +1,20 @@
-# WGSL compilation internals
+# Compilation WGSL
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré depuis le bundle en production)
 
-The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
+La deuxième étape de validation — la compilation réelle via le compilateur WGSL du navigateur — et les stubs de validation de la v5.
 
-## Why two stages
+## Pourquoi deux étapes
 
-Static validation's type-checking is incomplete, so some mistakes only surface here (e.g. WGSL operator-precedence requirements like `mixing '*' and '^' requires parenthesis`). Errors surface in-game with the variant name ([Compilation errors](../troubleshooting/compilation.md)).
+Le contrôle de types de la validation statique est incomplet, donc certaines erreurs n'apparaissent qu'ici (p. ex. les exigences de précédence d'opérateurs de WGSL comme `mixing '*' and '^' requires parenthesis`). Les erreurs apparaissent en jeu avec le nom de la variante ([Erreurs de compilation](../troubleshooting/compilation.md)).
 
-## Validation-stub generation
+## Génération des stubs de validation
 
-The engine synthesizes stubs for code that passed static validation (restored from module 29866):
+Le moteur synthétise des stubs pour le code qui a passé la validation statique (restauré depuis le module 29866) :
 
-- the type-stub table:
+- la table de stubs de types :
 
-| Type | Stub value |
+| Type | Valeur de stub |
 |---|---|
 | `bool` | `p.x > 0.0` |
 | `f32` | `p.x` |
@@ -24,8 +24,8 @@ The engine synthesizes stubs for code that passed static validation (restored fr
 | `i32` / `vec2i` / `vec3i` / `vec4i` | `i32(p.x)` etc. |
 | `u32` / `vec2u` / `vec3u` / `vec4u` | `u32(p.x)` etc. |
 
-- structs build recursively — each field filled with stub values (nested structs recurse)
-- the synthesized entry points:
+- les structs se construisent récursivement — chaque champ rempli avec des valeurs de stub (récursion sur les structs imbriqués)
+- les points d'entrée synthétisés :
 
 ```wgsl
 var<private> bloxdValidationP: vec4f;
@@ -51,16 +51,16 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 }
 ```
 
-Validation literally compiles "WGSL that calls your hooks with stub inputs" in the browser, surfacing syntax, type and language-feature violations.
+La validation compile littéralement « du WGSL qui appelle vos hooks avec des entrées stub » dans le navigateur, faisant remonter les violations de syntaxe, de types et de fonctionnalités du langage.
 
-## Error-message name restoration
+## Restauration des noms dans les messages d'erreur
 
-When splicing hook calls the engine keeps an identifier mapping (`originalNames`). Identifiers in browser errors are mapped **back to your original names**, and `sourceOf(lineNum)` maps spliced line numbers back to (file, line) — you read errors against your own code, not the transformed text.
+En greffant les appels de hooks, le moteur garde une table de correspondance d'identifiants (`originalNames`). Les identifiants dans les erreurs du navigateur sont **remappés vers vos noms d'origine**, et `sourceOf(lineNum)` remappe les numéros de lignes greffées vers (fichier, ligne) — vous lisez les erreurs sur votre propre code, pas sur le texte transformé.
 
-## Runtime re-validation on join
+## Revalidation à l'exécution à l'entrée en jeu
 
-`checkCompilation` runs per game join and actually compiles every existing terrain material (stricter than the settings-screen check). Failing drops the pack for that game. The check has a 60-second forced timeout ([Performance](../troubleshooting/performance.md)).
+`checkCompilation` s'exécute à chaque entrée en jeu et compile réellement chaque matériau de terrain existant (plus stricte que le contrôle de l'écran de réglages). L'échec exclut le pack de ce jeu. Le contrôle a un délai d'expiration forcé de 60 secondes ([Performance](../troubleshooting/performance.md)).
 
-## Related
+## Voir aussi
 
-- [Compilation errors](../troubleshooting/compilation.md) · [Shader validation](shader-validation.md) · [Getting Started: Validation](../getting-started/validation.md)
+- [Erreurs de compilation](../troubleshooting/compilation.md) · [Validation des shaders](shader-validation.md) · [Premiers pas : Validation](../getting-started/validation.md)

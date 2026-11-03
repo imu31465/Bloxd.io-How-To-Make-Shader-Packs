@@ -1,10 +1,9 @@
-# Corriger « ombres sombres mais surfaces brillantes » la nuit
+# Concevoir des looks nocturnes
 
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+Assombrir seulement les ombres laisse la couleur terminée du moteur (`engineColour`) brillante en l'absence de soleil, et rend l'écart faces/ombres contre-nature. Atténuez plutôt toute la couleur terminée.
 
-
-Assombrir seules les ombres laisse la couleur terminée (`engineColour`) brillante sans soleil, et l'écart face/ombre devient contre-nature. Atténuez toute la couleur terminée.
-
-L'exemple traite `bloxdSunDirection()` zéro comme nuit et le soleil directionnel comme jour, atténuant les couleurs terminées du terrain aux heures sombres. Où `blockLight` et `heldLight` sont forts, l'atténuation faiblit pour préserver les lampes proches comme les torches. `0.52` est une valeur de réglage — baissez pour des nuits plus noires.
+L'exemple ci-dessous traite un `bloxdSunDirection()` nul comme la nuit et le soleil directionnel comme le jour, en atténuant les couleurs terminées du terrain aux heures sombres. Là où `blockLight` et `heldLight` sont forts, l'atténuation s'affaiblit pour préserver les lampes proches comme les torches. `0.52` est une valeur de réglage — baissez-la pour des nuits plus sombres.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -19,10 +18,10 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let protectLocalLight = smoothstep(0.03, 0.35, localLight);
         scale = mix(nightDim, 1.0, protectLocalLight);
 }
-    // atténue la couleur terminée ; ajoute l'émission du matériau avec brouillard par défaut
+    // atténue la couleur terminée ; ajoute l'émission du matériau à travers le brouillard par défaut
     out.colour = l.engineColour * scale + s.emission * (1.0 - l.fogAlpha);
     return out;
 }
 ```
 
-**Limites de cette correction :** si `bloxdSunDirection()` se comporte en « direction unitaire avec soleil, zéro sans », jour/nuit se distinguent mais le couchant ne s'estime pas en douceur. Et comme elle atténue la couleur terminée, elle affaiblit ensemble lumière diurne et ambiant du moteur — pas une reproduction totale de l'horaire. Pour l'appliquer aux liquides, revoyez la relation de repli des hooks liquide.
+**Limites de ce correctif :** si `bloxdSunDirection()` se comporte en « direction unitaire avec soleil, zéro sans », jour et nuit se distinguent, mais le crépuscule ne peut pas s'estimer en douceur. Et comme elle atténue la couleur terminée, elle affaiblit ensemble la lumière du jour et l'ambiant du moteur — pas une reproduction complète du cycle horaire. Pour appliquer la même chose aux liquides, revoyez la relation de repli du hook liquide.

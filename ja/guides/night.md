@@ -29,9 +29,3 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ```
 
 **この処理の限界:** `bloxdSunDirection()` の仕様が「太陽あり=単位方向、太陽なし=ゼロ」の二値であるなら、昼と夜の区別はできても、夕焼けや薄明を連続的に推定することはできない。また、完成色を減衰させるため、エンジン側の昼光・環境光をまとめて弱める方式であり、時間帯を完全に再現するものではない。液体にも同じ処理を適用したい場合は、液体フックのフォールバック関係を確認すること。
-
-## 関連
-
-- [照明のレシピ](../recipes/lighting.md) — 夜の青シフト
-- [ライティングAPI](../api/lighting.md)
-- [リアル系レシピ](../recipes/realism.md)

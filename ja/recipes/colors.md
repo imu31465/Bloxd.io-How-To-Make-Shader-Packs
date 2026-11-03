@@ -79,9 +79,3 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
     return clamp(floor(c * steps + vec3f(0.5)) / steps, vec3f(0.0), vec3f(1.0));
 }
 ```
-
-## 関連
-
-- [ライティングのレシピ](lighting.md) — light フック側の色調整
-- [数式小技集](math.md) — 彩度・色温度の計算部品
-- [APIリファレンス: 入出力構造体](../api/structures.md)

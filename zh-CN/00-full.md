@@ -608,7 +608,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `bloxdTextureSize` | 仅 surface / light 钩子 | — |
 | `bloxdOpaqueBehind` | surface / light 钩子 (液体变体中才有意义) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` 已不在有文档的标头中，但引擎仍会注入并接受它 — 见[函数: bloxdFragmentBlockPosition](api/functions.md#bloxdfragmentblockposition--undocumented-but-still-injected)。它曾是唯一可从 vertex 钩子调用的特殊函数；新代码请改用 `flags` 判断「这是哪个方块」。
+> `bloxdFragmentBlockPosition` 已不在有文档的标头中，但引擎仍会注入并接受它 — 见[函数: bloxdFragmentBlockPosition](api/functions.md#bloxdfragmentblockposition--未写入文档但仍在注入)。它曾是唯一可从 vertex 钩子调用的特殊函数；新代码请改用 `flags` 判断「这是哪个方块」。
 
 ### 回退与共享
 
@@ -1599,7 +1599,7 @@ terrain / liquid / model 的差异是**独立程序，不是宏** — `#ifdef BL
 
 ### 已移除的宏
 
-- **`BLOXD_LIGHTING`** — v5 已移除。光照状态是 [`bloxdLit()`](api/lighting.md#bloxdlit--the-gate) 的运行时问题，不再是编译分支。使用它会使验证失败：
+- **`BLOXD_LIGHTING`** — v5 已移除。光照状态是 [`bloxdLit()`](api/lighting.md#bloxdlit--门控) 的运行时问题，不再是编译分支。使用它会使验证失败：
 
 > *「BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.」*
 
@@ -1644,7 +1644,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `BloxdSurface.alpha` 只在 `#ifdef BLOXD_ALPHA` 内存在
 - `bloxdOpaqueBehind()` 只在 `#ifdef BLOXD_SCENE_DEPTH` 内可调用
 
-见[结构体](api/structures.md#conditional-fields--macros)。
+见[结构体](api/structures.md#条件字段--宏)。
 
 ### 相关
 
@@ -1699,7 +1699,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 #### 纹理名称
 
-以 `bloxdTextureId` 开头的标识符会被解析为纹理名称常量 ([纹理 API](api/texture-api.md#bloxdtextureid-named-texture-constants))。
+以 `bloxdTextureId` 开头的标识符会被解析为纹理名称常量 ([纹理 API](api/texture-api.md#bloxdtextureid-具名纹理常量))。
 
 ### 自动改写
 
@@ -1752,7 +1752,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 改名)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](api/functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
+- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](api/functions.md#bloxdfragmentblockposition--未写入文档但仍在注入))
 - 把 `pack.json` 提升为 `"apiVersion": 5`
 
 这次的暗坑：继续读取 `blockFlags`、或把光照钩子包在 `#ifdef BLOXD_LIGHTING` 里的包会**以专用消息验证失败** (分析器现在会对两种情形分别说明)，因此不会有静默的错误行为 — 只是迁移完成前始终被拒绝。
@@ -1772,7 +1772,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 - **仅 WebGPU 渲染器**: 安装包会强制启用 WebGPU 渲染器
 - **移动端**: 受 WebGPU 限制的环境完全无法运行包 ([环境要求](getting-started/requirements.md))
-- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](api/texture-api.md#where-the-texture-api-cant-go))
+- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](api/texture-api.md#纹理-api-到不了的地方))
 
 ### 版本支持一览
 
@@ -3094,7 +3094,7 @@ v5 新的 Model 钩子绘制与读取什么。
 | 附魔状态 | `enchantTier` / `enchantColour` / `enchantSpeed` | 全 0 |
 | 实体覆盖色 | `overlayColour` | 0 |
 
-而且**纹理的含义不同**: 地形面携带图集 `textureId`，但**大多数模型用 `textureId: 0`** («无纹理») — 玩家皮肤与生物纹理不在图集命名空间中。`surface.colour` 已含皮肤 × tint，请以它为起点 ([模型自带纹理](api/texture-api.md#model-owned-textures-textureid-0))。
+而且**纹理的含义不同**: 地形面携带图集 `textureId`，但**大多数模型用 `textureId: 0`** («无纹理») — 玩家皮肤与生物纹理不在图集命名空间中。`surface.colour` 已含皮肤 × tint，请以它为起点 ([模型自带纹理](api/texture-api.md#模型自带纹理-textureid-0))。
 
 `flags` 的 `held` / `dropped` / `thrown` / `lifeform` / `placed` 只在模型面上有意义 ([标志](api/flags.md))。
 
@@ -3286,7 +3286,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 1. **把效果设门到需要它的面** — `flags` 选取胜过「到处 +20%」
 2. **随距离丢弃细节** — `distance(surface.position, bloxdEyePosition())` 超过阈值即提前返回
-3. **用 mip** — `bloxdTexel(id, uv, mipLevel + 1.0)` 是 ¼ 分辨率的平均 ([实战示例](api/texture-api.md#worked-examples))
+3. **用 mip** — `bloxdTexel(id, uv, mipLevel + 1.0)` 是 ¼ 分辨率的平均 ([实战示例](api/texture-api.md#实战示例))
 4. **调色优先用 surface 钩子** — light 钩子是全像素的最终阶段
 5. **增量添加细节并对比 FPS** ([测试](guides/testing.md))
 6. **`#ifdef` 守卫不省运行时** — 变体是编译单元；运行时的节省来自标志与距离
@@ -4307,7 +4307,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` 的面 (皮肤) 采样为白色 — 不报错 ([模型自带纹理](api/texture-api.md#model-owned-textures-textureid-0))。
+`textureId: 0` 的面 (皮肤) 采样为白色 — 不报错 ([模型自带纹理](api/texture-api.md#模型自带纹理-textureid-0))。
 
 ### 盔甲与其余部分
 
@@ -4333,7 +4333,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-共享函数模式正是默认包模板自己推荐的做法 ([钩子](getting-started/hooks.md#fallbacks-and-code-sharing))。
+共享函数模式正是默认包模板自己推荐的做法 ([钩子](getting-started/hooks.md#回退与代码共享))。
 
 ### 相关
 
@@ -4636,7 +4636,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **原因**: `var x: BloxdSurface;` — 裸的类型标注声明会被拒绝，因为标头结构体会增字段
 - **修复**: `var out = bloxdDefaultSurface(s);` (light 钩子里也可 `var out = s;`)
-- **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](api/structures.md#writing-conventions-recap))
+- **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](api/structures.md#书写惯例-回顾))
 
 ### 「_ can only be the target of a phony assignment, as in _ = f();」
 
@@ -4651,7 +4651,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### dpdy 的符号看起来反了
 
 - **这是有意为之**: 分析器自动把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (屏幕空间 y 向下)
-- **修复**: 无需处理 — 写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转 ([限制](api/restrictions.md#auto-rewrite-introduced-in-v5))
+- **修复**: 无需处理 — 写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转 ([限制](api/restrictions.md#自动改写))
 - `dpdx` 与 `fwidth` 不受影响
 
 ### 加入游戏时包被弃用 / 实机检查一直跑不完
@@ -4685,7 +4685,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 「bloxdPackInputs isn't part of the bloxd_ header」
 
 - **原因**: 直接引用了该 uniform
-- **修复**: 经标头函数使用 ([包格式](api/pack-format.md#per-frame-uniform-bloxdpackinputs))
+- **修复**: 经标头函数使用 ([包格式](api/pack-format.md#逐帧-uniform-bloxdpackinputs))
 
 ### 「... reaches bloxdTexel, which only surface and light hooks can use.」
 
@@ -4712,7 +4712,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 | 消息 | 处理 |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | 迁移 `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([光照](api/lighting.md#bloxdlit--the-gate)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | 迁移 `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([光照](api/lighting.md#bloxdlit--门控)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | 残留位常量 → `flags.rock` ([标志](api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 内部符号 → 改用公开的 `bloxdLitColour()` |
 
@@ -4742,7 +4742,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 「.alpha is undefined」
 
 - **原因**: `alpha` 只在 `#ifdef BLOXD_ALPHA` 之后存在 (全部 liquid + 非 strict 的 terrain/model)
-- **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](api/preprocessor.md#macro--variant-matrix))
+- **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](api/preprocessor.md#宏--变体矩阵))
 
 ### 「BloxdVertex only exists when BLOXD_STRICT isn't defined」
 
@@ -4758,7 +4758,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **症状**: 写了地形钩子，水却没变
 - **原因**: **v5 中，包若未定义任何 Liquid 钩子，任何 Terrain 钩子也不会在水上运行** (v4 之前「液体回退到地形」的行为已移除)
-- **修复**: 编写 Liquid 钩子 ([钩子划分](api/hooks.md#what-each-program-draws))
+- **修复**: 编写 Liquid 钩子 ([钩子划分](api/hooks.md#各程序绘制什么))
 
 ### 模型 (实体、方块模型) 不受影响
 
@@ -4794,7 +4794,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **原因**: 雾叠了两层。默认 light 钩子输出**已带雾** (`bloxdApplyFog(lit + emission, light)`)，再往上混雾色就是双份
 - **修复**: 自定义雾保持克制；可考虑只做去饱和的大气透视 ([写实系配方](recipes/realism.md))
-- **预防**: 写雾之前先理解 `fogAlpha` 语义 (0 = 无雾，1 = 只剩 fogColour) 与[管线](api/lighting.md#the-full-pipeline)
+- **预防**: 写雾之前先理解 `fogAlpha` 语义 (0 = 无雾，1 = 只剩 fogColour) 与[管线](api/lighting.md#完整管线)
 
 ### pow(l.skyLight, γ) 怎么也压不黑阴影
 
@@ -4823,7 +4823,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 旋转面上的水面图样错位
 
-- **原因**: `bloxdTexel` 会把片段自身的 `textureRotation` 应用到你的 uv 上 ([旋转的微妙之处](api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
+- **原因**: `bloxdTexel` 会把片段自身的 `textureRotation` 应用到你的 uv 上 ([旋转的微妙之处](api/texture-api.md#旋转的微妙之处--中性采样器))
 - **修复**: 用 `texelNeutral` 辅助函数预旋转
 
 ### 附魔闪光 / 受伤红闪消失
@@ -4858,7 +4858,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **原因**: 给动画纹理写了**帧号** (`lava0` 等)
 - **修复**: 用基础名称 — 采样会自动返回当前帧
-- **预防**: 42 个动画族永远不要写帧号后缀 ([命名](api/texture-api.md#spelling-rules-and-naming-freedom))
+- **预防**: 42 个动画族永远不要写帧号后缀 ([命名](api/texture-api.md#拼写规则与命名自由度))
 
 ### 「...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...」
 
@@ -4877,12 +4877,12 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 「Case and underscores are not distinguished」— 两条规则怎么共存？
 
-名称解析会折叠大小写与 `_`，因此 `bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析为**同一个**常量。只有当折叠后剩下多个候选时才会触发专属的歧义错误 ([命名规则](api/texture-api.md#spelling-rules-and-naming-freedom))。
+名称解析会折叠大小写与 `_`，因此 `bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析为**同一个**常量。只有当折叠后剩下多个候选时才会触发专属的歧义错误 ([命名规则](api/texture-api.md#拼写规则与命名自由度))。
 
 ### bloxdTexel 在模型上总是返回白色
 
 - **设计如此**: 大多数模型用 `textureId: 0` (无纹理 — 玩家皮肤等)；`bloxdTexel(0, ...)` 返回 `vec4f(1.0)`
-- **修复**: 用 `surface.textureId != 0u` 选取 ([模型自带纹理](api/texture-api.md#model-owned-textures-textureid-0))
+- **修复**: 用 `surface.textureId != 0u` 选取 ([模型自带纹理](api/texture-api.md#模型自带纹理-textureid-0))
 
 ### 想添加纹理
 
@@ -4896,7 +4896,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 游戏更新后裸 id 失效了
 
 - **原因**: **id 是快照** — 实测两个构建之间 905 个幸存名称中 334 个改了 id
-- **修复**: 写 `bloxdTextureIdLava`，而不是 `19` ([名称即 API](api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **修复**: 写 `bloxdTextureIdLava`，而不是 `19` ([名称即 API](api/texture-catalog.md#实测漂移-cnty9--ab90qa))
 
 ### 相关
 
@@ -4934,13 +4934,13 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 想原样保留引擎的世界光照
 
-- **v5 解法**: 调用 `bloxdWorldLight(light)` — 与引擎「方块/天空/手持取最亮、`ambientLightColour` 兜底」完全相同的数学 ([光照](api/lighting.md#bloxdworldlight--the-worlds-light))
+- **v5 解法**: 调用 `bloxdWorldLight(light)` — 与引擎「方块/天空/手持取最亮、`ambientLightColour` 兜底」完全相同的数学 ([光照](api/lighting.md#bloxdworldlight--世界光照))
 - **注意**: `!bloxdLit()` 时 `blockLight` / `heldLight` 为 0、天空相关字段为 1 (标头保证)
 
 ### 关闭光照的游戏中画面不对
 
 - **原因**: 光照专属输入 (`blockLight` 等) 未加守卫地使用。v5 没有 `#ifdef BLOXD_LIGHTING` — 请按**运行时 `bloxdLit()`** 分支
-- **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](api/lighting.md#bloxdlit--the-gate))
+- **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](api/lighting.md#bloxdlit--门控))
 
 ### 「LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk」
 
@@ -4986,7 +4986,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 标志判断行为不对
 
 - **可能原因**:
-  1. **把标志当单选枚举** — 它们自由组合 («砂岩同时是沙和岩石»、«也可能全不满足») ([标志](api/flags.md#flags-combine-freely))
+  1. **把标志当单选枚举** — 它们自由组合 («砂岩同时是沙和岩石»、«也可能全不满足») ([标志](api/flags.md#标志可自由组合))
   2. 把 `else` 读作「其余一切」 — `flags.rock` 的 else 只是「不是岩石」，可能仍是沙
 - **修复**: 材质标志 (`opaque`…) 与形状/状态标志 (`slab`/`held`…) 相互独立地组合
 
@@ -5088,7 +5088,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### 问: API 还会再变吗？
 
-引擎内部可能随更新变化 — 每页都标注目标构建。标头或注册表变化时，已保存的包会自动重验 ([兼容性](api/compatibility.md#saved-pack-re-validation-needs-re-check))。
+引擎内部可能随更新变化 — 每页都标注目标构建。标头或注册表变化时，已保存的包会自动重验 ([兼容性](api/compatibility.md#已保存包的重验-需要重新检查))。
 
 #### 问: 那些「电影级着色器」分发物是怎么回事？
 
@@ -5098,7 +5098,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - 这是非官方指南，不代表开发者的观点。API 可能不加通知地变化
 - 借助 AI 协助编写，准确性不作保证。请以实际游戏行为为准验证
-- 实测值 (纹理 id 等) 是特定构建的快照，会随构建变化 ([名称即 API](api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- 实测值 (纹理 id 等) 是特定构建的快照，会随构建变化 ([名称即 API](api/texture-catalog.md#实测漂移-cnty9--ab90qa))
 
 ### 相关
 
@@ -5148,7 +5148,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **`l.ambient` 内容**为 `material.ambient × sceneAmbient`，按材质各异。场景侧直连图形设置「Ambient Lighting Intensity」(默认 0.5)，切勿写死默认值
 - **场景的方向光为 2 灯组合**：主光 (方向来自天空设置中的太阳位置，强度 1.0) 与补光 (方向 `[-0.5, -1, -1]`，强度 0.35) 的 Lambert 之和到达 `l.directional`。补光朝下，因此对朝上的面没有贡献，而会照到朝下的表面 (洞穴顶等)。地形只考虑 `_initScene` 中追加的光；启动后追加的光对地形与方块模型被忽略 (官方有一则此意的警告消息)
 - **`bloxdSeconds()` 的正体是 `performance.now()`**：浏览器启动后的流逝时间，按 1 小时回绕。与游戏内昼夜及世界流逝时间无关。想做与游戏时钟同步的动画，在昼夜循环世界由 `bloxdSunDirection()` 方位角推定时间比较现实
-- **标头函数读取同一个 uniform**：引擎将 64 字节的 `bloxdPackInputs` uniform 放在 `@group(3) @binding(0)` (5 槽——seconds / lit / renderOffset / sunDirection / eyePosition，little-endian)，`bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽 ([包格式: 逐帧 uniform](api/pack-format.md#per-frame-uniform-bloxdpackinputs))。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同的 group/binding 也不可能。`@group(3) @binding(1)` 是液体场景深度纹理，`@binding(2)` 是 `bloxdSpTextureLayers` 存储缓冲
+- **标头函数读取同一个 uniform**：引擎将 64 字节的 `bloxdPackInputs` uniform 放在 `@group(3) @binding(0)` (5 槽——seconds / lit / renderOffset / sunDirection / eyePosition，little-endian)，`bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽 ([包格式: 逐帧 uniform](api/pack-format.md#逐帧-uniform-bloxdpackinputs))。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同的 group/binding 也不可能。`@group(3) @binding(1)` 是液体场景深度纹理，`@binding(2)` 是 `bloxdSpTextureLayers` 存储缓冲
 - **顶点数据由 mesher (Web Worker) 构建**：方块地形以每顶点 28 字节交织 (开启 atlas 时 32 字节)——position = float32×3 / normal = 8 位有符号整数×4 / colour = 8 位归一化整数×4 (`s.colour` 的本体——tint × AO 在 mesher 阶段烘焙为 8 位，包侧分离或还原原理上不可能) / UV = float32×2 / atlasIndex = float32。只有光照等级走另外的 4 字节顶点缓冲 (实测值见[引擎数据台账](internals/engine-data.md))。顶点按区块实例化绘制
 - 加载时区块边界的细棋盘格为引擎屏幕空间 Bayer 4×4 抖动的区块淡入，非包 bug (可用图形设置 `chunkFadeIn` 关闭)
 - **`mod` 为保留字**：以 `pack.wgsl:3 'mod' is a reserved word in WGSL.` 拒绝。求余用 `%` 运算符书写
@@ -5542,7 +5542,7 @@ const Jq = new Map([
 
 ### 纹理名称解析与诊断
 
-`bloxdTextureId*` 的解析有专属路径 ([消息](api/texture-api.md#name-resolution-errors-verbatim-from-the-validator))：
+`bloxdTextureId*` 的解析有专属路径 ([消息](api/texture-api.md#名称解析错误-逐字取自验证器))：
 
 - **折叠**: 以非字母数字切分、驼峰化、加 `bloxdTextureId` 前缀；反向匹配不区分大小写与下划线
 - **拼写建议** (v5 新增): 未匹配的名称按莱文斯坦距离获得建议，阈值 `max(2, floor(len/4)) + 1`
@@ -5556,7 +5556,7 @@ const Jq = new Map([
 
 ### Y 导数改写
 
-分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](api/restrictions.md#auto-rewrite-introduced-in-v5))。
+分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](api/restrictions.md#自动改写))。
 
 ### 标头与纹理常量生成
 
@@ -5565,7 +5565,7 @@ const Jq = new Map([
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](api/compatibility.md#saved-pack-re-validation-needs-re-check))。
+`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](api/compatibility.md#已保存包的重验-需要重新检查))。
 
 ### 验证桩
 
@@ -5766,7 +5766,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 动画帧阶梯
 
-动画纹理 (42 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](api/texture-catalog.md#animation-families-42-names)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
+动画纹理 (42 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](api/texture-catalog.md#动画族-42-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
 
 ### 采样器设置
 
@@ -5854,7 +5854,7 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ### 附魔计算
 
-引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](api/lighting.md#the-full-pipeline))。
+引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](api/lighting.md#完整管线))。
 
 ### 覆盖色 (受伤红闪等)
 
@@ -5862,11 +5862,11 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ### 纹理路径
 
-大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](api/texture-api.md#model-owned-textures-textureid-0))。
+大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](api/texture-api.md#模型自带纹理-textureid-0))。
 
 ### 变体
 
-Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](api/preprocessor.md#macro--variant-matrix))；strict.model 没有 vertex 钩子。
+Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](api/preprocessor.md#宏--变体矩阵))；strict.model 没有 vertex 钩子。
 
 ### 相关
 
@@ -6059,7 +6059,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 在微型 webpack harness 中，针对随包分发的方块注册表纹理数据运行引擎的注册表构建模块 (29833 + 1371 + 1391 + 1384 + 219)；记录输出 (具名 896 / 别名 416 / 层 228) ([纹理注册表](internals/texture-registry.md))。
 
-动画间隔来自 `animDataPerTex` 式的表 (逐层 `numAnimStates` / `animationInterval`) — 只存在三种间隔值: 200 / 250 / 300 ms ([目录](api/texture-catalog.md#animation-families-42-names))。
+动画间隔来自 `animDataPerTex` 式的表 (逐层 `numAnimStates` / `animationInterval`) — 只存在三种间隔值: 200 / 250 / 300 ms ([目录](api/texture-catalog.md#动画族-42-个名称))。
 
 #### 错误消息采集
 
@@ -6155,7 +6155,7 @@ v1 是第一个着色器包 API。v2 全面改换了标识符 ([v2 指南](histo
 3. [§33 被移除字段去了哪里](history/v2.md)
 4. [§37 v1 → v2 检查清单](history/v2.md)
 
-然后依次应用 v3 → v4 → v5 ([直达路径](history/index.md#fast-path-to-a-checklist))。
+然后依次应用 v3 → v4 → v5 ([直达路径](history/index.md#直达检查清单))。
 
 ### 相关
 
@@ -6707,7 +6707,7 @@ alpha = bloxdSpSurface.alpha;   // 仅当程序为液体或变体为非严格时
 | `blockLight` | 解码后的光照等级 varying 的 `.rgb` (解码见 §54) |
 | `skyLight` | 同一光照等级 varying 的天空通道——*「体素天空光，经色调映射；无 BLOXD_LIGHTING 时为 1」* (标头文本) |
 | `ambientLightColour` / `skyLightColour` | `uniforms.uAmbientLightColour` / `uniforms.uSkyLightColour` |
-| `heldLight` | 手持光项，由光照等级 varying 的 w 通道与 `uHeldLightPos` / `uHeldLightColour` 帧 uniform 构成 ([引擎内部机制与研究](internals/) §26 记录了衰减与通道地板行为) |
+| `heldLight` | 手持光项，由光照等级 varying 的 w 通道与 `uHeldLightPos` / `uHeldLightColour` 帧 uniform 构成 ([光照内部机制](internals/lighting-internals.md) 记录了衰减与通道地板行为) |
 | `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)`——**仅在完全没有雾的场景中为黑色** (模式 0，§50) |
 | `fogVisibility` | 钳制后的雾系数——§50 函数返回的精确值 |
 | `position` / `normal` | `vPositionW` / `vNormalW` varying (法线逐片元重新归一化) |
@@ -6739,8 +6739,8 @@ fn calcFogFactor(fogDistance: vec3f) -> f32 {
 
 - `vFogInfos = vec4f(mode, start, end, density)`——一个 vec4 驱动一切。
 - **着色器中存在四种模式: 0 = 关闭，1 = 指数，2 = 指数平方，3 = 线性。** 无论运行哪种模式，`fogVisibility` 都是钳制后的系数——只有一个字段，且从不向包暴露模式标志。
-- Bloxd 自家标题使用模式 3 (线性)，采用[引擎内部机制与研究](internals/) §25 所述的 32 方块雾带 (`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)`)，因此该部分的「始终线性」观察仍描述已发布玩法。但指数模式是真实、活跃的引擎代码——标题可以切换 `vFogInfos.x`，在客户端不更新的情况下改变渐变。自行计算 `distance(l.position, bloxdEyePosition())` 的距离配方 (配方 R-B) 是编写距离驱动外观的稳健方式，因为它们不会被模式切换移动。
-- 这从源码层面解决了「引擎实际使用哪种雾渐变」的问题: 四种都已实现；已发布标题使用线性。(同一函数也解释了标头的 fogColour 注释——模式 0 是 `fogColour` 以黑色到达的唯一情况，而 Bloxd 的游戏从不发布模式 0；它们改为把雾推得很远，[引擎内部机制与研究](internals/) §25。
+- Bloxd 自家标题使用模式 3 (线性)，采用[雾的内部规格](internals/fog-internals.md) 所述的 32 方块雾带 (`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)`)，因此该部分的「始终线性」观察仍描述已发布玩法。但指数模式是真实、活跃的引擎代码——标题可以切换 `vFogInfos.x`，在客户端不更新的情况下改变渐变。自行计算 `distance(l.position, bloxdEyePosition())` 的距离配方 (配方 R-B) 是编写距离驱动外观的稳健方式，因为它们不会被模式切换移动。
+- 这从源码层面解决了「引擎实际使用哪种雾渐变」的问题: 四种都已实现；已发布标题使用线性。(同一函数也解释了标头的 fogColour 注释——模式 0 是 `fogColour` 以黑色到达的唯一情况，而 Bloxd 的游戏从不发布模式 0；它们改为把雾推得很远，[雾的内部规格](internals/fog-internals.md)。
 
 ### 51. bloxdOpaqueBehind(): 精确实现
 
@@ -6872,10 +6872,10 @@ v3 (3ymzdd):  6.5bc26a63   ← 从正式生产 bundle 实测
 | `@group(3) @binding(0)` | `bloxdPackInputs`——包 uniform (§41) |
 | `@group(3) @binding(1)` | `bloxdSpSceneDepth`——深度纹理 (§51) |
 
-- **方向光硬上限为四盏。** 场景尝试注册更多时，渲染器会以 `Terrain supports 4 directional lights, not ${n}` 报错。`l.directional` 是实际存在数量的 Lambert 之和 (0–4；Bloxd 自家场景使用 2 盏——[引擎内部机制与研究](internals/) §27)。地形还会对其无法满足的光源发出警告，原文如下: 延迟加入的光源——`Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`；带色调的光源——`Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`；以及过滤网格的光源——`Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
+- **方向光硬上限为四盏。** 场景尝试注册更多时，渲染器会以 `Terrain supports 4 directional lights, not ${n}` 报错。`l.directional` 是实际存在数量的 Lambert 之和 (0–4；Bloxd 自家场景使用 2 盏——[光照内部机制](internals/lighting-internals.md))。地形还会对其无法满足的光源发出警告，原文如下: 延迟加入的光源——`Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`；带色调的光源——`Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`；以及过滤网格的光源——`Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
 - **地形程序命名**: 管线缓存键为 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`——包以 `-sp{variant}` 后缀出现，每个 §46 变体对应一个程序。监视器 (`watchPipelineFailures`) 将活动管线名与 `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` 匹配，并在管线编译失败时重新检查对应的包变体；GPU 设备丢失 (`device.lost`) 会跳过该检查。
 - **`BLOXD_TERRAIN_DIRECTIONAL` 是引擎内部宏** (dirLightCount > 0 时定义)。它*不是* prelude 四个宏之一，也永远不会到达包代码——但它会出现在引擎自身着色器的 WGSL dump 中，认得它可以避免混淆。
-- **光照等级解码**: `aPackedLightLevels` 顶点属性是一个 f32，打包四个 nibble，各除以 15: rgb = 彩色方块光，a = 天空 / 手持通道。顶点阶段将其解码到 `vLightLevels` varying；`blockLight` 读取 `.rgb`，天空 / 手持通道读取 `.w`。引擎在插值前会把 rgb 通道抬到最亮通道的 35% 下限——这是[引擎内部机制与研究](internals/) §26 从玩法侧记录的提升在引擎侧的锚点。
+- **光照等级解码**: `aPackedLightLevels` 顶点属性是一个 f32，打包四个 nibble，各除以 15: rgb = 彩色方块光，a = 天空 / 手持通道。顶点阶段将其解码到 `vLightLevels` varying；`blockLight` 读取 `.rgb`，天空 / 手持通道读取 `.w`。引擎在插值前会把 rgb 通道抬到最亮通道的 35% 下限——这是[光照内部机制](internals/lighting-internals.md) 从玩法侧记录的提升在引擎侧的锚点。
 - **`vTerrainLambert`** (`directional` 的来源，§49) 由活动方向光求和生成: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`，受 `BLOXD_TERRAIN_DIRECTIONAL` 守卫。
 - **索引缓冲在首个大网格处转为 32 位。** Lite 渲染器只在所有索引值 ≤ 65,534 时选用 `Uint16Array` 索引——一旦任何索引达到 65,535，缓冲区就变为 `Uint32Array` (以 `is32Bits` 标志逐缓冲跟踪)。实际影响: 顶点数至多 65,535 的区块网格可用 16 位索引；恰好 65,536 个顶点的网格必然产生 65,535 的索引，并让整个缓冲区切换到 32 位。
 - **Manifest 加载细节**: `__MACOSX/` 下的 zip 条目、以 `._` 开头的文件与 `.DS_Store` 会被过滤 (macOS 归档噪声)；`pack.json` 通过小写路径比较定位——零个匹配 → `loadNoManifest`，两个或更多 → `loadDuplicateManifest`；manifest 读取上限为 65,536 字节。
@@ -7352,7 +7352,7 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 
 ### 60. strict 游戏契约: vertex 钩子、`discard` 与 X-ray
 
-strict 游戏是规则而非例外: **一切默认 strict**，只有 §30 列举的 12 个 allow 标题例外 (2026-10-27 在 v4 bundle 上逐字复核——同样的 12 个: Test Gym、Doodle Cube、Rocket Obby、Creative、Bloxd Hop、Fishing、Dress Up、Evil Tower、Plots、Test Mode、Tsunami Steal Brainrots、Work at a Restaurant；其余每个标题——survival、bedwars、skywars、custom games 等——都是 strict)。v4 把过去停留在文档层面的契约变成了**强制执行**的契约: 捆绑的验证器分析每个 strict 变体并发出专属诊断。
+strict 游戏是规则而非例外: **一切默认 strict**，只有 [各游戏的着色器适用策略](internals/policy.md) 列举的 12 个 allow 标题例外 (2026-10-27 在 v4 bundle 上逐字复核——同样的 12 个: Test Gym、Doodle Cube、Rocket Obby、Creative、Bloxd Hop、Fishing、Dress Up、Evil Tower、Plots、Test Mode、Tsunami Steal Brainrots、Work at a Restaurant；其余每个标题——survival、bedwars、skywars、custom games 等——都是 strict)。v4 把过去停留在文档层面的契约变成了**强制执行**的契约: 捆绑的验证器分析每个 strict 变体并发出专属诊断。
 
 #### 60.1 两条强制规则及其确切诊断
 
@@ -7689,7 +7689,7 @@ v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the 
 | 雾色 | `vec3f(183/255, 191/255, 195/255)` —— 不变；`fogAlpha` 为 v4 名称 (§59.1) |
 | 保留名 | `/^bloxd/i` (大小写不敏感) + 27 个 `bloxdSp*` 引擎符号 |
 | HEADER_VERSION | `8.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 标题 | 除 §30 的 12 个 allow 标题外全部 (2026-10-27 复核，不变) |
+| strict 标题 | 除 [各游戏的着色器适用策略](internals/policy.md) 的 12 个 allow 标题外全部 (2026-10-27 复核，不变) |
 
 
 ---
@@ -7851,6 +7851,1107 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
 }
+```
+
+### 68. 完整纹理目录（905 个名称，实测）
+
+#### 68.1 如何阅读
+
+**名称**列就是注册表名称——你实际书写的句柄。常量拼写随后在 `_` 和 `-` 边界处把它转换为 CamelCase，与 §57.3 的记载完全一致：`grass_top` → `bloxdTextureIdGrassTop`、`lava` → `bloxdTextureIdLava`、`chest_double_top_1_lo` → `bloxdTextureIdChestDoubleTop1Lo`。名称即 API；验证器会在加载时针对现行注册表重新解析名称，因此它们能在注册表漂移中幸存。
+
+**id** 列是该常量与之做相等比较的值——即图集层 + 1，在 `cnty9` 上实测。用它来解读 `surface.textureId` 转储与调试输出，并把行为异常的包与当前构建交叉核对。不要在 WGSL 中硬编码它：它只是某一个构建的图集顺序快照（§68.5 展示了它变化得有多快）。
+
+**备注**列标记两个被折叠的族。`animated (N frames)` 表示采样该名称会自动返回当前动画帧——绝不要寻址帧后缀（`lava0`、`radar_screen2` 是配有专属诊断的已知别名）。`turned (4 rotated copies)` 表示该纹理仅以预旋转的图集槽位形式存在；名称寻址的是根，`bloxdTexel` 会重新施加旋转（§57.4）。只有一个名称同时带有这两条备注（`radar_screen`）。
+
+有意*缺席*的部分：其余 416 个注册表拼写——188 个帧别名与 228 个旋转别名——并非可用常量；当你尝试使用它们时，引擎会用各自的特定错误消息族逐一说明（§57.3）。这一切背后的 1,219 行层表（含 171 个预旋转槽位）属于引擎内部数据，在 §63.2/§63.4 中讲述。
+
+#### 68.2 目录
+
+全部可用名称，按字母顺序排列。id 列是 `bloxdTextureId*` 的取值——图集层 + 1，在构建 `cnty9`（2026-10-27）上实测。**把 id 当作快照，把名称当作 API**：在本指南实测的十月两个构建之间，1121 个拼写未变的名称中有 779 个得到了不同的 id（§68.5）。引擎在验证时解析名称，因此以名称写就的包能在注册表漂移中幸存；以裸 id 写就的包则不能。
+
+| 名称 | id (cnty9) | 备注 |
+|---|---|---|
+| `alloy_kiln_back` | 1091 |  |
+| `alloy_kiln_front` | 1085 |  |
+| `alloy_kiln_side` | 1086 |  |
+| `alloy_kiln_side_running` | 33 | anim (4 帧) |
+| `alloy_kiln_top` | 1087 | 旋转族 (4 份拷贝) |
+| `andesite_brick` | 465 |  |
+| `apple_block_bottom` | 441 |  |
+| `apple_block_side` | 439 |  |
+| `apple_block_top` | 440 |  |
+| `armour_lucky_block` | 995 |  |
+| `armour_lucky_block_rare` | 997 |  |
+| `armour_lucky_block_super` | 999 |  |
+| `artisan_table_side` | 367 |  |
+| `artisan_table_top` | 368 |  |
+| `ash` | 1031 |  |
+| `auto_bench_back` | 1106 |  |
+| `auto_bench_front` | 1100 |  |
+| `auto_bench_side` | 1101 |  |
+| `auto_bench_side_running` | 35 | anim (4 帧) |
+| `auto_bench_top` | 1102 | 旋转族 (4 份拷贝) |
+| `autocrafter_bottom` | 962 |  |
+| `autocrafter_lunite_bottom` | 973 |  |
+| `autocrafter_lunite_side` | 972 |  |
+| `autocrafter_side` | 961 |  |
+| `banana_block_side` | 899 |  |
+| `banana_block_top` | 900 |  |
+| `beacon` | 330 |  |
+| `bedrock` | 334 |  |
+| `beetroot_block_bottom` | 925 |  |
+| `beetroot_block_side` | 923 |  |
+| `beetroot_block_top` | 924 |  |
+| `belt_drop_side` | 1185 |  |
+| `belt_drop_top` | 1184 |  |
+| `belt_lift_side` | 1183 |  |
+| `belt_lift_top` | 1182 |  |
+| `belt_loader_slab_front` | 1110 |  |
+| `belt_loader_top` | 1109 |  |
+| `belt_tunnel_back` | 1199 |  |
+| `belt_tunnel_exit_top` | 1200 | 旋转族 (4 份拷贝) |
+| `belt_tunnel_mouth` | 1193 |  |
+| `belt_tunnel_side` | 1194 |  |
+| `belt_tunnel_top` | 1195 | 旋转族 (4 份拷贝) |
+| `black_concrete` | 273 |  |
+| `black_glazed_terracotta` | 429 | 旋转族 (4 份拷贝) |
+| `black_planks` | 366 |  |
+| `black_portal` | 2 | anim (4 帧) |
+| `black_spawn_block_side` | 760 |  |
+| `black_spawn_block_top` | 756 | 旋转族 (4 份拷贝) |
+| `block_destroyer_tnt_side` | 1017 |  |
+| `block_destroyer_tnt_top` | 1018 |  |
+| `blue_concrete` | 274 |  |
+| `blue_gen_spawn_coal` | 774 |  |
+| `blue_gen_spawn_iron` | 775 |  |
+| `blue_gen_spawn_top` | 773 |  |
+| `blue_glazed_terracotta` | 413 | 旋转族 (4 份拷贝) |
+| `blue_lucky_block` | 994 |  |
+| `blue_lucky_block_rare` | 996 |  |
+| `blue_lucky_block_super` | 998 |  |
+| `blue_planks` | 362 |  |
+| `blue_portal` | 3 | anim (4 帧) |
+| `blue_spawn_block_side` | 755 |  |
+| `blue_spawn_block_top` | 751 | 旋转族 (4 份拷贝) |
+| `bone_block_side` | 818 |  |
+| `bone_block_top` | 819 |  |
+| `bookshelf` | 564 |  |
+| `bookshelf_1` | 566 |  |
+| `bookshelf_2` | 567 |  |
+| `bookshelf_3` | 568 |  |
+| `bookshelf_4` | 569 |  |
+| `bookshelf_5` | 570 |  |
+| `bookshelf_empty` | 565 |  |
+| `bouncy_bomb_block` | 591 |  |
+| `bowling_alley_floor` | 978 |  |
+| `bread_block_back` | 435 |  |
+| `bread_block_front` | 434 |  |
+| `bread_block_side` | 436 |  |
+| `bread_block_top` | 437 |  |
+| `brick` | 315 |  |
+| `brown_concrete` | 275 |  |
+| `brown_glazed_terracotta` | 417 | 旋转族 (4 份拷贝) |
+| `brown_mushroom_block` | 536 |  |
+| `brown_planks` | 363 |  |
+| `brown_portal` | 4 | anim (4 帧) |
+| `brown_spawn_block_side` | 750 |  |
+| `brown_spawn_block_top` | 746 | 旋转族 (4 份拷贝) |
+| `building_lucky_block` | 989 |  |
+| `building_lucky_block_rare` | 991 |  |
+| `building_lucky_block_super` | 993 |  |
+| `burner_drill_back` | 1048 |  |
+| `burner_drill_bottom` | 1047 |  |
+| `burner_drill_front` | 1041 |  |
+| `burner_drill_side` | 1042 |  |
+| `burner_drill_side_running` | 27 | anim (4 帧) |
+| `burner_drill_top` | 1043 | 旋转族 (4 份拷贝) |
+| `cactus_dry` | 350 |  |
+| `cactus_top` | 349 |  |
+| `carrot_block_bottom` | 921 |  |
+| `carrot_block_side` | 919 |  |
+| `carrot_block_top` | 920 |  |
+| `carved_messy_stone` | 827 |  |
+| `carved_pumpkin` | 543 |  |
+| `chalk` | 839 |  |
+| `chalk_black` | 855 |  |
+| `chalk_blue` | 854 |  |
+| `chalk_bricks_black` | 871 |  |
+| `chalk_bricks_blue` | 870 |  |
+| `chalk_bricks_brown` | 869 |  |
+| `chalk_bricks_cyan` | 868 |  |
+| `chalk_bricks_gray` | 867 |  |
+| `chalk_bricks_green` | 866 |  |
+| `chalk_bricks_light_blue` | 865 |  |
+| `chalk_bricks_light_gray` | 864 |  |
+| `chalk_bricks_lime` | 863 |  |
+| `chalk_bricks_magenta` | 862 |  |
+| `chalk_bricks_orange` | 861 |  |
+| `chalk_bricks_pink` | 860 |  |
+| `chalk_bricks_purple` | 859 |  |
+| `chalk_bricks_red` | 858 |  |
+| `chalk_bricks_slab_side_black` | 887 |  |
+| `chalk_bricks_slab_side_blue` | 886 |  |
+| `chalk_bricks_slab_side_brown` | 885 |  |
+| `chalk_bricks_slab_side_cyan` | 884 |  |
+| `chalk_bricks_slab_side_gray` | 883 |  |
+| `chalk_bricks_slab_side_green` | 882 |  |
+| `chalk_bricks_slab_side_light_blue` | 881 |  |
+| `chalk_bricks_slab_side_light_gray` | 880 |  |
+| `chalk_bricks_slab_side_lime` | 879 |  |
+| `chalk_bricks_slab_side_magenta` | 878 |  |
+| `chalk_bricks_slab_side_orange` | 877 |  |
+| `chalk_bricks_slab_side_pink` | 876 |  |
+| `chalk_bricks_slab_side_purple` | 875 |  |
+| `chalk_bricks_slab_side_red` | 874 |  |
+| `chalk_bricks_slab_side_white` | 873 |  |
+| `chalk_bricks_slab_side_yellow` | 872 |  |
+| `chalk_bricks_white` | 857 |  |
+| `chalk_bricks_yellow` | 856 |  |
+| `chalk_brown` | 853 |  |
+| `chalk_cyan` | 852 |  |
+| `chalk_gray` | 851 |  |
+| `chalk_green` | 850 |  |
+| `chalk_light_blue` | 849 |  |
+| `chalk_light_gray` | 848 |  |
+| `chalk_lime` | 847 |  |
+| `chalk_magenta` | 846 |  |
+| `chalk_orange` | 845 |  |
+| `chalk_pink` | 844 |  |
+| `chalk_purple` | 843 |  |
+| `chalk_red` | 842 |  |
+| `chalk_white` | 841 |  |
+| `chalk_yellow` | 840 |  |
+| `charge_vault_side` | 1114 |  |
+| `charge_vault_top` | 1113 |  |
+| `charging_pad_side` | 1159 |  |
+| `charging_pad_top` | 1158 |  |
+| `checkpoint_block` | 761 | 旋转族 (4 份拷贝) |
+| `cherry_block_bottom` | 590 |  |
+| `cherry_block_side` | 588 |  |
+| `cherry_block_top` | 589 |  |
+| `chest_back` | 347 |  |
+| `chest_double_back_hi` | 1219 |  |
+| `chest_double_back_lo` | 1218 |  |
+| `chest_double_front_hi` | 1213 |  |
+| `chest_double_front_lo` | 1212 |  |
+| `chest_double_top_1_hi` | 1215 |  |
+| `chest_double_top_1_lo` | 1214 |  |
+| `chest_double_top_2_hi` | 1217 |  |
+| `chest_double_top_2_lo` | 1216 |  |
+| `chest_front` | 341 |  |
+| `chest_side` | 342 |  |
+| `chest_top` | 343 | 旋转族 (4 份拷贝) |
+| `chili_pepper_block_bottom` | 678 |  |
+| `chili_pepper_block_side` | 676 |  |
+| `chili_pepper_block_top` | 677 |  |
+| `chiseled_red_sandstone` | 456 |  |
+| `chiseled_sandstone` | 325 |  |
+| `clay` | 195 |  |
+| `coal_block` | 233 |  |
+| `coal_deposit` | 1032 |  |
+| `coal_ore` | 227 |  |
+| `coarse_dirt` | 191 |  |
+| `coconut_block_bottom` | 522 |  |
+| `coconut_block_side` | 520 |  |
+| `coconut_block_top` | 521 |  |
+| `code_block` | 679 |  |
+| `comet_heart` | 1170 |  |
+| `comet_ore` | 1169 |  |
+| `compressed_messy_stone` | 530 |  |
+| `conveyor_belt_bottom` | 1081 |  |
+| `conveyor_belt_slab_side` | 1080 |  |
+| `conveyor_belt_top` | 1079 |  |
+| `conveyor_belt_turn_left` | 1171 |  |
+| `conveyor_belt_turn_right` | 1172 |  |
+| `copper_deposit` | 1035 |  |
+| `copper_ore` | 1040 |  |
+| `corn_block_bottom` | 594 |  |
+| `corn_block_side` | 592 |  |
+| `corn_block_top` | 593 |  |
+| `crafting_table_side` | 338 |  |
+| `crafting_table_top` | 339 |  |
+| `crate` | 918 |  |
+| `crop_harvester_back` | 1192 |  |
+| `crop_harvester_back_running` | 45 | anim (4 帧) |
+| `crop_harvester_front` | 1186 |  |
+| `crop_harvester_side` | 1187 |  |
+| `crop_harvester_side_running` | 44 | anim (4 帧) |
+| `crop_harvester_top` | 1188 | 旋转族 (4 份拷贝) |
+| `crusher_back` | 1055 |  |
+| `crusher_front` | 1049 |  |
+| `crusher_side` | 1050 |  |
+| `crusher_side_running` | 28 | anim (4 帧) |
+| `crusher_top` | 1051 | 旋转族 (4 份拷贝) |
+| `crystal_block` | 1029 |  |
+| `crystal_vat_back` | 1166 |  |
+| `crystal_vat_front` | 1160 |  |
+| `crystal_vat_side` | 1161 |  |
+| `crystal_vat_side_running` | 42 | anim (4 帧) |
+| `crystal_vat_top` | 1162 | 旋转族 (4 份拷贝) |
+| `custom_lobby_block_side` | 769 |  |
+| `custom_lobby_block_top` | 765 | 旋转族 (4 份拷贝) |
+| `cut_red_sandstone` | 457 |  |
+| `cut_sandstone` | 453 |  |
+| `cyan_concrete` | 276 |  |
+| `cyan_gen_spawn_coal` | 783 |  |
+| `cyan_gen_spawn_iron` | 784 |  |
+| `cyan_gen_spawn_top` | 782 |  |
+| `cyan_glazed_terracotta` | 405 | 旋转族 (4 份拷贝) |
+| `cyan_planks` | 360 |  |
+| `cyan_portal` | 5 | anim (4 帧) |
+| `cyan_spawn_block_side` | 745 |  |
+| `cyan_spawn_block_top` | 741 | 旋转族 (4 份拷贝) |
+| `dark_green_bricks` | 460 |  |
+| `darkstone` | 1206 |  |
+| `darkstone_bricks` | 1207 |  |
+| `darkstone_bricks_cracked` | 1208 |  |
+| `darkstone_bricks_lava` | 1209 |  |
+| `darkstone_engraved` | 1210 |  |
+| `darkstone_smooth` | 1211 |  |
+| `deep_drill_back` | 1140 |  |
+| `deep_drill_bottom` | 1139 |  |
+| `deep_drill_front` | 1133 |  |
+| `deep_drill_side` | 1134 |  |
+| `deep_drill_side_running` | 39 | anim (4 帧) |
+| `deep_drill_top` | 1135 | 旋转族 (4 份拷贝) |
+| `diamond_block` | 340 |  |
+| `diamond_gen_spawn_side` | 807 |  |
+| `diamond_gen_spawn_top` | 806 |  |
+| `diamond_ore` | 232 |  |
+| `diorite_brick` | 463 |  |
+| `dirt` | 190 |  |
+| `drop_location_block_side` | 814 |  |
+| `drop_location_block_top` | 813 |  |
+| `drop_pad` | 1038 |  |
+| `dry_grass_block` | 980 |  |
+| `dry_grass_block_side` | 979 |  |
+| `electric_drill_back` | 1099 |  |
+| `electric_drill_bottom` | 1098 |  |
+| `electric_drill_front` | 1092 |  |
+| `electric_drill_side` | 1093 |  |
+| `electric_drill_side_running` | 34 | anim (4 帧) |
+| `electric_drill_top` | 1094 | 旋转族 (4 份拷贝) |
+| `emerald_block` | 237 |  |
+| `emerald_ore` | 231 |  |
+| `end_stone` | 226 |  |
+| `engraved_andesite` | 464 |  |
+| `engraved_diorite` | 462 |  |
+| `engraved_granite` | 466 |  |
+| `evil_lucky_block` | 1022 |  |
+| `evil_lucky_block_face` | 1023 |  |
+| `explosive_paint_black_side` | 626 |  |
+| `explosive_paint_black_top` | 627 |  |
+| `explosive_paint_blue_side` | 624 |  |
+| `explosive_paint_blue_top` | 625 |  |
+| `explosive_paint_brown_side` | 622 |  |
+| `explosive_paint_brown_top` | 623 |  |
+| `explosive_paint_cyan_side` | 620 |  |
+| `explosive_paint_cyan_top` | 621 |  |
+| `explosive_paint_gray_side` | 618 |  |
+| `explosive_paint_gray_top` | 619 |  |
+| `explosive_paint_green_side` | 616 |  |
+| `explosive_paint_green_top` | 617 |  |
+| `explosive_paint_light_blue_side` | 614 |  |
+| `explosive_paint_light_blue_top` | 615 |  |
+| `explosive_paint_light_gray_side` | 612 |  |
+| `explosive_paint_light_gray_top` | 613 |  |
+| `explosive_paint_lime_side` | 610 |  |
+| `explosive_paint_lime_top` | 611 |  |
+| `explosive_paint_magenta_side` | 608 |  |
+| `explosive_paint_magenta_top` | 609 |  |
+| `explosive_paint_orange_side` | 606 |  |
+| `explosive_paint_orange_top` | 607 |  |
+| `explosive_paint_pink_side` | 604 |  |
+| `explosive_paint_pink_top` | 605 |  |
+| `explosive_paint_purple_side` | 602 |  |
+| `explosive_paint_purple_top` | 603 |  |
+| `explosive_paint_quick_black` | 643 |  |
+| `explosive_paint_quick_blue` | 642 |  |
+| `explosive_paint_quick_brown` | 641 |  |
+| `explosive_paint_quick_cyan` | 640 |  |
+| `explosive_paint_quick_gray` | 639 |  |
+| `explosive_paint_quick_green` | 638 |  |
+| `explosive_paint_quick_light_blue` | 637 |  |
+| `explosive_paint_quick_light_gray` | 636 |  |
+| `explosive_paint_quick_lime` | 635 |  |
+| `explosive_paint_quick_magenta` | 634 |  |
+| `explosive_paint_quick_orange` | 633 |  |
+| `explosive_paint_quick_pink` | 632 |  |
+| `explosive_paint_quick_purple` | 631 |  |
+| `explosive_paint_quick_red` | 630 |  |
+| `explosive_paint_quick_white` | 629 |  |
+| `explosive_paint_quick_yellow` | 628 |  |
+| `explosive_paint_red_side` | 600 |  |
+| `explosive_paint_red_top` | 601 |  |
+| `explosive_paint_seeking_black` | 659 |  |
+| `explosive_paint_seeking_blue` | 658 |  |
+| `explosive_paint_seeking_brown` | 657 |  |
+| `explosive_paint_seeking_cyan` | 656 |  |
+| `explosive_paint_seeking_gray` | 655 |  |
+| `explosive_paint_seeking_green` | 654 |  |
+| `explosive_paint_seeking_light_blue` | 653 |  |
+| `explosive_paint_seeking_light_gray` | 652 |  |
+| `explosive_paint_seeking_lime` | 651 |  |
+| `explosive_paint_seeking_magenta` | 650 |  |
+| `explosive_paint_seeking_orange` | 649 |  |
+| `explosive_paint_seeking_pink` | 648 |  |
+| `explosive_paint_seeking_purple` | 647 |  |
+| `explosive_paint_seeking_red` | 646 |  |
+| `explosive_paint_seeking_white` | 645 |  |
+| `explosive_paint_seeking_yellow` | 644 |  |
+| `explosive_paint_sticky_black` | 675 |  |
+| `explosive_paint_sticky_blue` | 674 |  |
+| `explosive_paint_sticky_brown` | 673 |  |
+| `explosive_paint_sticky_cyan` | 672 |  |
+| `explosive_paint_sticky_gray` | 671 |  |
+| `explosive_paint_sticky_green` | 670 |  |
+| `explosive_paint_sticky_light_blue` | 669 |  |
+| `explosive_paint_sticky_light_gray` | 668 |  |
+| `explosive_paint_sticky_lime` | 667 |  |
+| `explosive_paint_sticky_magenta` | 666 |  |
+| `explosive_paint_sticky_orange` | 665 |  |
+| `explosive_paint_sticky_pink` | 664 |  |
+| `explosive_paint_sticky_purple` | 663 |  |
+| `explosive_paint_sticky_red` | 662 |  |
+| `explosive_paint_sticky_white` | 661 |  |
+| `explosive_paint_sticky_yellow` | 660 |  |
+| `explosive_paint_white_side` | 598 |  |
+| `explosive_paint_white_top` | 599 |  |
+| `explosive_paint_yellow_side` | 596 |  |
+| `explosive_paint_yellow_top` | 597 |  |
+| `extra_compressed_messy_stone` | 531 |  |
+| `fallen_cherry_leaves_side` | 586 |  |
+| `fallen_maple_leaves_side` | 478 |  |
+| `farmland` | 433 |  |
+| `fast_belt_slab_side` | 1157 |  |
+| `fast_belt_top` | 1156 |  |
+| `fast_belt_turn_left` | 1173 |  |
+| `fast_belt_turn_right` | 1174 |  |
+| `fertilised_soil` | 926 |  |
+| `finish_block` | 812 |  |
+| `fireball_block` | 539 |  |
+| `food_lucky_block` | 1007 |  |
+| `food_lucky_block_rare` | 1009 |  |
+| `food_lucky_block_super` | 1011 |  |
+| `forge_hopper_top` | 1168 |  |
+| `furnace_front` | 335 |  |
+| `furnace_side` | 336 |  |
+| `furnace_top` | 337 |  |
+| `generator_side` | 1063 |  |
+| `generator_side_running` | 30 | anim (4 帧) |
+| `generator_top` | 1064 |  |
+| `ghost_chest_back` | 956 |  |
+| `ghost_chest_front` | 953 |  |
+| `ghost_chest_side` | 954 |  |
+| `ghost_chest_top` | 955 |  |
+| `ghost_lucky_block` | 957 |  |
+| `ghost_mystery_block` | 958 |  |
+| `glass` | 294 |  |
+| `glass_black` | 295 |  |
+| `glass_blue` | 296 |  |
+| `glass_brown` | 297 |  |
+| `glass_cyan` | 298 |  |
+| `glass_gray` | 299 |  |
+| `glass_green` | 301 |  |
+| `glass_light_blue` | 302 |  |
+| `glass_light_gray` | 300 |  |
+| `glass_lime` | 303 |  |
+| `glass_magenta` | 304 |  |
+| `glass_orange` | 305 |  |
+| `glass_pink` | 306 |  |
+| `glass_purple` | 307 |  |
+| `glass_red` | 308 |  |
+| `glass_silver` | 311 |  |
+| `glass_white` | 309 |  |
+| `glass_yellow` | 310 |  |
+| `glowstone` | 331 |  |
+| `gold_block` | 235 |  |
+| `gold_deposit` | 1036 |  |
+| `gold_ore` | 229 |  |
+| `granite_brick` | 467 |  |
+| `grass_block_side` | 192 |  |
+| `grass_top` | 193 |  |
+| `gravel` | 196 |  |
+| `gray_concrete` | 271 |  |
+| `gray_gen_spawn_coal` | 792 |  |
+| `gray_gen_spawn_iron` | 793 |  |
+| `gray_gen_spawn_top` | 791 |  |
+| `gray_glazed_terracotta` | 397 | 旋转族 (4 份拷贝) |
+| `gray_planks` | 358 |  |
+| `gray_portal` | 6 | anim (4 帧) |
+| `gray_spawn_block_side` | 740 |  |
+| `gray_spawn_block_top` | 736 | 旋转族 (4 份拷贝) |
+| `green_bricks` | 459 |  |
+| `green_concrete` | 285 |  |
+| `green_glazed_terracotta` | 421 | 旋转族 (4 份拷贝) |
+| `green_lucky_block` | 1006 |  |
+| `green_lucky_block_rare` | 1008 |  |
+| `green_lucky_block_super` | 1010 |  |
+| `green_planks` | 364 |  |
+| `green_portal` | 7 | anim (4 帧) |
+| `green_spawn_block_side` | 735 |  |
+| `green_spawn_block_top` | 731 | 旋转族 (4 份拷贝) |
+| `green_stone` | 458 |  |
+| `grenade_block` | 581 |  |
+| `grey_portal` | 8 | anim (4 帧) |
+| `gun_lucky_block` | 952 |  |
+| `hardened_clay` | 254 |  |
+| `hardened_clay_stained_black` | 270 |  |
+| `hardened_clay_stained_blue` | 266 |  |
+| `hardened_clay_stained_brown` | 267 |  |
+| `hardened_clay_stained_cyan` | 264 |  |
+| `hardened_clay_stained_gray` | 262 |  |
+| `hardened_clay_stained_green` | 268 |  |
+| `hardened_clay_stained_light_blue` | 258 |  |
+| `hardened_clay_stained_lime` | 260 |  |
+| `hardened_clay_stained_magenta` | 257 |  |
+| `hardened_clay_stained_orange` | 256 |  |
+| `hardened_clay_stained_pink` | 261 |  |
+| `hardened_clay_stained_purple` | 265 |  |
+| `hardened_clay_stained_red` | 269 |  |
+| `hardened_clay_stained_silver` | 263 |  |
+| `hardened_clay_stained_white` | 255 |  |
+| `hardened_clay_stained_yellow` | 259 |  |
+| `harvester_bottom` | 969 |  |
+| `harvester_lunite_bottom` | 977 |  |
+| `harvester_lunite_side_0` | 974 |  |
+| `harvester_lunite_side_1` | 975 |  |
+| `harvester_lunite_top` | 976 |  |
+| `harvester_side0` | 966 |  |
+| `harvester_side1` | 967 |  |
+| `harvester_top` | 968 |  |
+| `hay_block_side` | 328 |  |
+| `homestead_core` | 1037 |  |
+| `homestead_core_cap` | 1122 |  |
+| `homestead_core_crown` | 1121 |  |
+| `homestead_core_mid` | 26 | anim (4 帧) |
+| `hyper_compressed_messy_stone` | 533 |  |
+| `ice` | 326 |  |
+| `ice_brick` | 468 |  |
+| `iceball_block` | 540 |  |
+| `invisible_solid` | 314 |  |
+| `iron_block` | 234 |  |
+| `iron_chest_back` | 917 |  |
+| `iron_chest_front` | 911 |  |
+| `iron_chest_side` | 912 |  |
+| `iron_chest_top` | 913 | 旋转族 (4 份拷贝) |
+| `iron_deposit` | 1033 |  |
+| `iron_ore` | 228 |  |
+| `iron_watermelon_side` | 546 |  |
+| `iron_watermelon_top` | 547 |  |
+| `jungle_grass_block` | 889 |  |
+| `jungle_grass_block_side` | 888 |  |
+| `lapis_block` | 236 |  |
+| `lapis_ore` | 230 |  |
+| `lava` | 1 | anim (8 帧) |
+| `leather_block_side` | 908 |  |
+| `leather_block_top` | 909 |  |
+| `leaves_aspen` | 288 |  |
+| `leaves_aspen_autumn` | 910 |  |
+| `leaves_cedar` | 470 |  |
+| `leaves_cherry` | 585 |  |
+| `leaves_cherry_fruity` | 906 |  |
+| `leaves_jungle` | 290 |  |
+| `leaves_mango` | 894 |  |
+| `leaves_mango_fruity` | 907 |  |
+| `leaves_maple` | 289 |  |
+| `leaves_maple_autumn` | 477 |  |
+| `leaves_maple_fruity` | 901 |  |
+| `leaves_palm` | 471 |  |
+| `leaves_palm_fruity` | 904 |  |
+| `leaves_pear` | 525 |  |
+| `leaves_pear_fruity` | 905 |  |
+| `leaves_pine` | 287 |  |
+| `leaves_pine_cone` | 902 |  |
+| `leaves_plum` | 469 |  |
+| `leaves_plum_fruity` | 903 |  |
+| `leaves_spectral` | 831 |  |
+| `light_blue_concrete` | 277 |  |
+| `light_blue_glazed_terracotta` | 381 | 旋转族 (4 份拷贝) |
+| `light_blue_lucky_block` | 933 |  |
+| `light_blue_planks` | 354 |  |
+| `light_blue_spawn_block_side` | 730 |  |
+| `light_blue_spawn_block_top` | 726 | 旋转族 (4 份拷贝) |
+| `light_gray_concrete` | 272 |  |
+| `light_gray_glazed_terracotta` | 401 | 旋转族 (4 份拷贝) |
+| `light_gray_planks` | 359 |  |
+| `light_gray_spawn_block_side` | 725 |  |
+| `light_gray_spawn_block_top` | 721 | 旋转族 (4 份拷贝) |
+| `lightblue_portal` | 9 | anim (4 帧) |
+| `lightgray_portal` | 10 | anim (4 帧) |
+| `lime_concrete` | 278 |  |
+| `lime_gen_spawn_coal` | 777 |  |
+| `lime_gen_spawn_iron` | 778 |  |
+| `lime_gen_spawn_top` | 776 |  |
+| `lime_glazed_terracotta` | 389 | 旋转族 (4 份拷贝) |
+| `lime_planks` | 356 |  |
+| `lime_portal` | 11 | anim (4 帧) |
+| `lime_spawn_block_side` | 720 |  |
+| `lime_spawn_block_top` | 716 | 旋转族 (4 份拷贝) |
+| `log_ancient_maple` | 1021 |  |
+| `log_aspen` | 202 |  |
+| `log_cedar` | 201 |  |
+| `log_cherry` | 582 |  |
+| `log_jungle` | 203 |  |
+| `log_mango` | 891 |  |
+| `log_maple` | 198 |  |
+| `log_palm` | 472 |  |
+| `log_pear` | 523 |  |
+| `log_pine` | 199 |  |
+| `log_plum` | 200 |  |
+| `log_spectral` | 828 |  |
+| `lucky_block_pink_question` | 959 |  |
+| `lucky_block_pink_question_rare` | 1013 |  |
+| `lucky_block_pink_question_super` | 1015 |  |
+| `lunite_block` | 971 |  |
+| `lunite_ore` | 970 |  |
+| `machine_bench_side` | 1115 |  |
+| `machine_bench_top` | 1116 |  |
+| `machine_side` | 1039 |  |
+| `magenta_concrete` | 279 |  |
+| `magenta_glazed_terracotta` | 377 | 旋转族 (4 份拷贝) |
+| `magenta_planks` | 353 |  |
+| `magenta_portal` | 12 | anim (4 帧) |
+| `magenta_spawn_block_side` | 715 |  |
+| `magenta_spawn_block_top` | 711 | 旋转族 (4 份拷贝) |
+| `magma` | 451 |  |
+| `mailbox_front` | 571 |  |
+| `mailbox_front_full` | 573 |  |
+| `mailbox_side` | 572 |  |
+| `mango_block_bottom` | 898 |  |
+| `mango_block_side` | 896 |  |
+| `mango_block_top` | 897 |  |
+| `mega_compressed_messy_stone` | 535 |  |
+| `melon_side` | 544 |  |
+| `melon_top` | 545 |  |
+| `melting_ice` | 595 |  |
+| `messy_stone` | 216 |  |
+| `mob_spawner_block_empty_side` | 823 |  |
+| `mob_spawner_block_top` | 821 |  |
+| `mob_spawner_hostile_block_side` | 822 |  |
+| `mob_spawner_neutral_block_side` | 838 |  |
+| `mob_spawner_passive_block_side` | 820 |  |
+| `moonstone_block` | 450 |  |
+| `moonstone_chest_back` | 449 |  |
+| `moonstone_chest_front` | 443 |  |
+| `moonstone_chest_side` | 444 |  |
+| `moonstone_chest_top` | 445 | 旋转族 (4 份拷贝) |
+| `moonstone_explosive_side` | 332 |  |
+| `moonstone_explosive_top` | 333 |  |
+| `moonstone_gen_spawn_side` | 809 |  |
+| `moonstone_gen_spawn_top` | 808 |  |
+| `moonstone_ore` | 442 |  |
+| `mossy_cobblestone` | 438 |  |
+| `mushroom_stem` | 538 |  |
+| `mystery_block` | 578 |  |
+| `neon_black` | 951 |  |
+| `neon_blue` | 950 |  |
+| `neon_brown` | 949 |  |
+| `neon_cyan` | 948 |  |
+| `neon_gray` | 947 |  |
+| `neon_green` | 946 |  |
+| `neon_light_blue` | 945 |  |
+| `neon_light_gray` | 944 |  |
+| `neon_lime` | 943 |  |
+| `neon_magenta` | 942 |  |
+| `neon_orange` | 941 |  |
+| `neon_pink` | 940 |  |
+| `neon_purple` | 939 |  |
+| `neon_red` | 938 |  |
+| `neon_white` | 937 |  |
+| `neon_yellow` | 936 |  |
+| `nether_brick` | 317 |  |
+| `netherrack` | 318 |  |
+| `obby_absorb_block` | 816 |  |
+| `obby_absorb_death_block` | 817 |  |
+| `obby_death_block` | 815 |  |
+| `obsidian` | 327 |  |
+| `orange_concrete` | 280 |  |
+| `orange_glazed_terracotta` | 373 | 旋转族 (4 份拷贝) |
+| `orange_lucky_block` | 1000 |  |
+| `orange_lucky_block_rare` | 1002 |  |
+| `orange_lucky_block_super` | 1004 |  |
+| `orange_planks` | 352 |  |
+| `orange_portal` | 13 | anim (4 帧) |
+| `orange_spawn_block_side` | 710 |  |
+| `orange_spawn_block_top` | 706 | 旋转族 (4 份拷贝) |
+| `ore_gen_spawn_side` | 811 |  |
+| `ore_gen_spawn_top` | 810 |  |
+| `packed_snow` | 826 |  |
+| `parts_bench_side` | 1117 |  |
+| `parts_bench_top` | 1118 |  |
+| `patterned_glass_black` | 548 |  |
+| `patterned_glass_blue` | 549 |  |
+| `patterned_glass_brown` | 550 |  |
+| `patterned_glass_cyan` | 551 |  |
+| `patterned_glass_gray` | 552 |  |
+| `patterned_glass_green` | 554 |  |
+| `patterned_glass_light_blue` | 555 |  |
+| `patterned_glass_light_gray` | 553 |  |
+| `patterned_glass_lime` | 556 |  |
+| `patterned_glass_magenta` | 557 |  |
+| `patterned_glass_orange` | 558 |  |
+| `patterned_glass_pink` | 559 |  |
+| `patterned_glass_purple` | 560 |  |
+| `patterned_glass_red` | 561 |  |
+| `patterned_glass_white` | 562 |  |
+| `patterned_glass_yellow` | 563 |  |
+| `pear_block_bottom` | 529 |  |
+| `pear_block_side` | 527 |  |
+| `pear_block_top` | 528 |  |
+| `pet_lucky_block` | 960 |  |
+| `pine_cone_block_side` | 836 |  |
+| `pine_cone_block_top` | 837 |  |
+| `pine_grass_block` | 834 |  |
+| `pine_grass_block_side` | 833 |  |
+| `pink_concrete` | 281 |  |
+| `pink_gen_spawn_coal` | 789 |  |
+| `pink_gen_spawn_iron` | 790 |  |
+| `pink_gen_spawn_top` | 788 |  |
+| `pink_glazed_terracotta` | 393 | 旋转族 (4 份拷贝) |
+| `pink_planks` | 357 |  |
+| `pink_portal` | 14 | anim (4 帧) |
+| `pink_spawn_block_side` | 705 |  |
+| `pink_spawn_block_top` | 701 | 旋转族 (4 份拷贝) |
+| `planks_aspen` | 205 |  |
+| `planks_cedar` | 209 |  |
+| `planks_cherry` | 584 |  |
+| `planks_jungle` | 207 |  |
+| `planks_mango` | 893 |  |
+| `planks_maple` | 204 |  |
+| `planks_palm` | 473 |  |
+| `planks_pear` | 524 |  |
+| `planks_pine` | 208 |  |
+| `planks_plum` | 206 |  |
+| `planks_spectral` | 830 |  |
+| `plum_block_bottom` | 519 |  |
+| `plum_block_side` | 517 |  |
+| `plum_block_top` | 518 |  |
+| `podzol_top` | 452 |  |
+| `potato_block` | 922 |  |
+| `potion_lucky_block` | 1012 |  |
+| `potion_lucky_block_rare` | 1014 |  |
+| `potion_lucky_block_super` | 1016 |  |
+| `press_back` | 1071 |  |
+| `press_front` | 1065 |  |
+| `press_side` | 1066 |  |
+| `press_side_running` | 31 | anim (4 帧) |
+| `press_top` | 1067 | 旋转族 (4 份拷贝) |
+| `protector` | 348 |  |
+| `protector_faction` | 575 |  |
+| `protector_tribe` | 574 |  |
+| `pumpkin_face_on` | 291 |  |
+| `pumpkin_side` | 541 |  |
+| `pumpkin_top` | 542 |  |
+| `pure_coal_ore` | 1024 |  |
+| `pure_copper_ore` | 1204 |  |
+| `pure_diamond_ore` | 1027 |  |
+| `pure_gold_ore` | 1026 |  |
+| `pure_iron_ore` | 1025 |  |
+| `pure_moonstone_ore` | 1028 |  |
+| `pure_voltite_ore` | 1205 |  |
+| `purple_concrete` | 282 |  |
+| `purple_glazed_terracotta` | 409 | 旋转族 (4 份拷贝) |
+| `purple_lucky_block` | 988 |  |
+| `purple_lucky_block_rare` | 990 |  |
+| `purple_lucky_block_super` | 992 |  |
+| `purple_planks` | 361 |  |
+| `purple_portal` | 15 | anim (4 帧) |
+| `purple_spawn_block_side` | 700 |  |
+| `purple_spawn_block_top` | 696 | 旋转族 (4 份拷贝) |
+| `quartz_block_chiseled` | 320 |  |
+| `quartz_block_side` | 319 |  |
+| `radar_bottom` | 929 |  |
+| `radar_screen` | 19 | anim (4 帧) · 旋转族 (4 份拷贝) |
+| `radar_side_active` | 927 |  |
+| `radar_side_inactive` | 930 |  |
+| `radar_top_active` | 928 |  |
+| `radar_top_inactive` | 931 |  |
+| `recycler_back` | 1181 |  |
+| `recycler_front` | 1175 |  |
+| `recycler_side` | 1176 |  |
+| `recycler_side_running` | 43 | anim (4 帧) |
+| `recycler_top` | 1177 | 旋转族 (4 份拷贝) |
+| `red_concrete` | 283 |  |
+| `red_gen_spawn_coal` | 771 |  |
+| `red_gen_spawn_iron` | 772 |  |
+| `red_gen_spawn_top` | 770 |  |
+| `red_glazed_terracotta` | 425 | 旋转族 (4 份拷贝) |
+| `red_lucky_block` | 934 |  |
+| `red_lucky_block_rare` | 984 |  |
+| `red_lucky_block_super` | 986 |  |
+| `red_mushroom_block` | 537 |  |
+| `red_planks` | 365 |  |
+| `red_portal` | 16 | anim (4 帧) |
+| `red_sand` | 474 |  |
+| `red_sandstone` | 454 |  |
+| `red_sandstone_brick` | 475 |  |
+| `red_sandstone_top` | 455 |  |
+| `red_spawn_block_side` | 695 |  |
+| `red_spawn_block_top` | 691 | 旋转族 (4 份拷贝) |
+| `redstone_lamp_off` | 313 |  |
+| `redstone_lamp_on` | 312 |  |
+| `rocket_block` | 579 |  |
+| `rocky_dirt` | 476 |  |
+| `rope_block` | 1030 |  |
+| `sand` | 194 |  |
+| `sandstone_brick` | 461 |  |
+| `sandstone_normal` | 225 |  |
+| `sandstone_top` | 324 |  |
+| `shatter_mill_back` | 1147 |  |
+| `shatter_mill_front` | 1141 |  |
+| `shatter_mill_side` | 1142 |  |
+| `shatter_mill_side_running` | 40 | anim (4 帧) |
+| `shatter_mill_top` | 1143 | 旋转族 (4 份拷贝) |
+| `shop_trader_spawn_face` | 799 |  |
+| `shop_trader_spawn_side` | 798 |  |
+| `shop_trader_spawn_top` | 794 | 旋转族 (4 份拷贝) |
+| `shop_wizard_spawn_face` | 805 |  |
+| `shop_wizard_spawn_side` | 804 |  |
+| `shop_wizard_spawn_top` | 800 | 旋转族 (4 份拷贝) |
+| `sky_tap_back` | 1155 |  |
+| `sky_tap_bottom` | 1154 |  |
+| `sky_tap_front` | 1148 |  |
+| `sky_tap_side` | 1149 |  |
+| `sky_tap_side_running` | 41 | anim (4 帧) |
+| `sky_tap_top` | 1150 | 旋转族 (4 份拷贝) |
+| `slab_andesite_brick_side` | 498 |  |
+| `slab_aspen_side` | 483 |  |
+| `slab_brick_side` | 515 |  |
+| `slab_cedar_side` | 482 |  |
+| `slab_cherry_side` | 587 |  |
+| `slab_chiseled_red_sandstone_side` | 512 |  |
+| `slab_chiseled_sandstone_side` | 508 |  |
+| `slab_cobblestone_side` | 488 |  |
+| `slab_cut_red_sandstone_side` | 513 |  |
+| `slab_cut_sandstone_side` | 509 |  |
+| `slab_diorite_brick_side` | 502 |  |
+| `slab_dirt_side` | 486 |  |
+| `slab_dry_grass_top_side` | 981 |  |
+| `slab_engraved_andesite_side` | 497 |  |
+| `slab_engraved_diorite_side` | 501 |  |
+| `slab_engraved_granite_side` | 505 |  |
+| `slab_granite_brick_side` | 506 |  |
+| `slab_grass_top_side` | 487 |  |
+| `slab_ice_brick_side` | 516 |  |
+| `slab_jungle_grass_top_side` | 890 |  |
+| `slab_jungle_side` | 484 |  |
+| `slab_mango_side` | 895 |  |
+| `slab_maple_side` | 479 |  |
+| `slab_mossy_cobblestone_side` | 493 |  |
+| `slab_palm_side` | 485 |  |
+| `slab_pear_side` | 526 |  |
+| `slab_pine_grass_top_side` | 835 |  |
+| `slab_pine_side` | 480 |  |
+| `slab_plum_side` | 481 |  |
+| `slab_red_sandstone_brick_side` | 514 |  |
+| `slab_red_sandstone_side` | 511 |  |
+| `slab_sandstone_brick_side` | 510 |  |
+| `slab_sandstone_normal_side` | 507 |  |
+| `slab_smooth_stone_side` | 490 |  |
+| `slab_spectral_side` | 832 |  |
+| `slab_stone_andesite_side` | 495 |  |
+| `slab_stone_andesite_smooth_side` | 496 |  |
+| `slab_stone_diorite_side` | 499 |  |
+| `slab_stone_diorite_smooth_side` | 500 |  |
+| `slab_stone_granite_side` | 503 |  |
+| `slab_stone_granite_smooth_side` | 504 |  |
+| `slab_stone_side` | 489 |  |
+| `slab_stonebrick_carved_side` | 491 |  |
+| `slab_stonebrick_mossy_side` | 494 |  |
+| `slab_stonebrick_side` | 492 |  |
+| `smelter_back` | 1062 |  |
+| `smelter_front` | 1056 |  |
+| `smelter_side` | 1057 |  |
+| `smelter_side_running` | 29 | anim (4 帧) |
+| `smelter_top` | 1058 | 旋转族 (4 份拷贝) |
+| `smoke` | 23 | anim (4 帧) |
+| `smooth_stone` | 218 |  |
+| `snow` | 197 |  |
+| `snowy_messy_stone` | 824 |  |
+| `snowy_messy_stone_side` | 825 |  |
+| `solar_panel_bottom` | 965 |  |
+| `solar_panel_side` | 963 |  |
+| `solar_panel_top` | 964 |  |
+| `sorting_gate_slab_side` | 1108 |  |
+| `sorting_gate_top` | 1107 |  |
+| `splitter_slab_side` | 1083 |  |
+| `splitter_top` | 1082 |  |
+| `sponge` | 329 |  |
+| `starframe` | 1167 |  |
+| `stone` | 217 |  |
+| `stone_andesite` | 221 |  |
+| `stone_andesite_smooth` | 222 |  |
+| `stone_deposit` | 1034 |  |
+| `stone_diorite` | 219 |  |
+| `stone_diorite_smooth` | 220 |  |
+| `stone_granite` | 223 |  |
+| `stone_granite_smooth` | 224 |  |
+| `stonebrick` | 316 |  |
+| `stonebrick_carved` | 321 |  |
+| `stonebrick_cracked` | 323 |  |
+| `stonebrick_mossy` | 322 |  |
+| `storage_silo_side` | 1112 |  |
+| `storage_silo_top` | 1111 |  |
+| `stripped_aspen_log` | 211 |  |
+| `stripped_cedar_log` | 215 |  |
+| `stripped_cherry_log` | 583 |  |
+| `stripped_jungle_log` | 213 |  |
+| `stripped_mango_log` | 892 |  |
+| `stripped_maple_log` | 210 |  |
+| `stripped_palm_log` | 576 |  |
+| `stripped_pear_log` | 577 |  |
+| `stripped_pine_log` | 214 |  |
+| `stripped_plum_log` | 212 |  |
+| `stripped_spectral_log` | 829 |  |
+| `super_compressed_messy_stone` | 532 |  |
+| `super_rocket_block` | 580 |  |
+| `tool_bench_side` | 1119 |  |
+| `tool_bench_top` | 1120 |  |
+| `tools_lucky_block` | 1001 |  |
+| `tools_lucky_block_rare` | 1003 |  |
+| `tools_lucky_block_super` | 1005 |  |
+| `toxic_waste` | 25 | anim (8 帧) |
+| `toxic_waste_barrel_bottom` | 1020 |  |
+| `toxic_waste_barrel_side` | 1019 |  |
+| `toxic_waste_barrel_top` | 24 | anim (4 帧) |
+| `toxin_ball_block` | 680 |  |
+| `tree_cutter_back` | 1129 |  |
+| `tree_cutter_back_running` | 37 | anim (4 帧) |
+| `tree_cutter_front` | 1123 |  |
+| `tree_cutter_side` | 1124 |  |
+| `tree_cutter_side_running` | 36 | anim (4 帧) |
+| `tree_cutter_top` | 1125 | 旋转族 (4 份拷贝) |
+| `ultra_compressed_messy_stone` | 534 |  |
+| `unloaded` | 189 |  |
+| `volt_engine_side` | 1131 |  |
+| `volt_engine_side_running` | 38 | anim (4 帧) |
+| `volt_engine_top` | 1132 |  |
+| `voltite_deposit` | 1130 |  |
+| `voltite_ore` | 1084 |  |
+| `watermelon_side` | 292 |  |
+| `watermelon_top` | 293 |  |
+| `weapon_lucky_block` | 935 |  |
+| `weapon_lucky_block_rare` | 985 |  |
+| `weapon_lucky_block_super` | 987 |  |
+| `white_concrete` | 284 |  |
+| `white_gen_spawn_coal` | 786 |  |
+| `white_gen_spawn_iron` | 787 |  |
+| `white_gen_spawn_top` | 785 |  |
+| `white_glazed_terracotta` | 369 | 旋转族 (4 份拷贝) |
+| `white_planks` | 351 |  |
+| `white_portal` | 17 | anim (4 帧) |
+| `white_spawn_block_side` | 690 |  |
+| `white_spawn_block_top` | 686 | 旋转族 (4 份拷贝) |
+| `wire_mill_back` | 1078 |  |
+| `wire_mill_front` | 1072 |  |
+| `wire_mill_side` | 1073 |  |
+| `wire_mill_side_running` | 32 | anim (4 帧) |
+| `wire_mill_top` | 1074 | 旋转族 (4 份拷贝) |
+| `wool_colored_black` | 253 |  |
+| `wool_colored_blue` | 249 |  |
+| `wool_colored_brown` | 250 |  |
+| `wool_colored_cyan` | 247 |  |
+| `wool_colored_gray` | 245 |  |
+| `wool_colored_green` | 251 |  |
+| `wool_colored_light_blue` | 241 |  |
+| `wool_colored_light_grey` | 246 |  |
+| `wool_colored_lime` | 243 |  |
+| `wool_colored_magenta` | 240 |  |
+| `wool_colored_orange` | 239 |  |
+| `wool_colored_pink` | 244 |  |
+| `wool_colored_purple` | 248 |  |
+| `wool_colored_red` | 252 |  |
+| `wool_colored_white` | 238 |  |
+| `wool_colored_yellow` | 242 |  |
+| `yellow_concrete` | 286 |  |
+| `yellow_gen_spawn_coal` | 780 |  |
+| `yellow_gen_spawn_iron` | 781 |  |
+| `yellow_gen_spawn_top` | 779 |  |
+| `yellow_glazed_terracotta` | 385 | 旋转族 (4 份拷贝) |
+| `yellow_lucky_block` | 932 |  |
+| `yellow_lucky_block_rare` | 982 |  |
+| `yellow_lucky_block_super` | 983 |  |
+| `yellow_planks` | 355 |  |
+| `yellow_portal` | 18 | anim (4 帧) |
+| `yellow_spawn_block_side` | 685 |  |
+| `yellow_spawn_block_top` | 681 | 旋转族 (4 份拷贝) |
+
+#### 68.3 旋转族（57 个根）
+
+这些纹理仅以预旋转拷贝（`name[rot[1..4`）的形式存在。注册表把它们折叠为下方列出的根；`bloxdTexel` 在采样时重新施加旋转（§57.4），所以你寻址的是根，而绝不是拷贝。为形如 `[rot[N` 的拼写建立别名，会收到旋转名的专属诊断（§57.3）。
+
+- `alloy_kiln_top` (id 1087)
+- `auto_bench_top` (id 1102)
+- `belt_tunnel_exit_top` (id 1200)
+- `belt_tunnel_top` (id 1195)
+- `black_glazed_terracotta` (id 429)
+- `black_spawn_block_top` (id 756)
+- `blue_glazed_terracotta` (id 413)
+- `blue_spawn_block_top` (id 751)
+- `brown_glazed_terracotta` (id 417)
+- `brown_spawn_block_top` (id 746)
+- `burner_drill_top` (id 1043)
+- `checkpoint_block` (id 761)
+- `chest_top` (id 343)
+- `crop_harvester_top` (id 1188)
+- `crusher_top` (id 1051)
+- `crystal_vat_top` (id 1162)
+- `custom_lobby_block_top` (id 765)
+- `cyan_glazed_terracotta` (id 405)
+- `cyan_spawn_block_top` (id 741)
+- `deep_drill_top` (id 1135)
+- `electric_drill_top` (id 1094)
+- `gray_glazed_terracotta` (id 397)
+- `gray_spawn_block_top` (id 736)
+- `green_glazed_terracotta` (id 421)
+- `green_spawn_block_top` (id 731)
+- `iron_chest_top` (id 913)
+- `light_blue_glazed_terracotta` (id 381)
+- `light_blue_spawn_block_top` (id 726)
+- `light_gray_glazed_terracotta` (id 401)
+- `light_gray_spawn_block_top` (id 721)
+- `lime_glazed_terracotta` (id 389)
+- `lime_spawn_block_top` (id 716)
+- `magenta_glazed_terracotta` (id 377)
+- `magenta_spawn_block_top` (id 711)
+- `moonstone_chest_top` (id 445)
+- `orange_glazed_terracotta` (id 373)
+- `orange_spawn_block_top` (id 706)
+- `pink_glazed_terracotta` (id 393)
+- `pink_spawn_block_top` (id 701)
+- `press_top` (id 1067)
+- `purple_glazed_terracotta` (id 409)
+- `purple_spawn_block_top` (id 696)
+- `radar_screen0` (id 19) · 同时是动画
+- `recycler_top` (id 1177)
+- `red_glazed_terracotta` (id 425)
+- `red_spawn_block_top` (id 691)
+- `shatter_mill_top` (id 1143)
+- `shop_trader_spawn_top` (id 794)
+- `shop_wizard_spawn_top` (id 800)
+- `sky_tap_top` (id 1150)
+- `smelter_top` (id 1058)
+- `tree_cutter_top` (id 1125)
+- `white_glazed_terracotta` (id 369)
+- `white_spawn_block_top` (id 686)
+- `wire_mill_top` (id 1074)
+- `yellow_glazed_terracotta` (id 385)
+- `yellow_spawn_block_top` (id 681)
+
+#### 68.4 动画族（42 个名称）
+
+采样这些名称中的任何一个都会自动返回当前动画帧（§63.3 的帧阶梯）。引擎按每个族各自的固定间隔逐纹理推进帧——在 `cnty9` 上实测，间隔恰好取三个值：**200 ms**（`lava`、`toxic_waste`、`radar_screen`）、**250 ms**（`smoke`、`homestead_core_mid`、所有机器的 `*_running` 族）、**300 ms**（十七个传送门与 `toxic_waste_barrel_top`）——见“间隔”列——因此包永远不去寻址帧后缀（`lava0` 是错误；`lava` 才是名称）。
+
+| 名称 | 帧数 | 间隔 | 注册表基址 |
+|---|---|---|---|
+| `lava` | 8 | 200 ms | `lava0` |
+| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
+| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
+| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
+| `black_portal` | 4 | 300 ms | `black_portal0` |
+| `blue_portal` | 4 | 300 ms | `blue_portal0` |
+| `brown_portal` | 4 | 300 ms | `brown_portal0` |
+| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
+| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
+| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
+| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
+| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
+| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
+| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
+| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
+| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
+| `gray_portal` | 4 | 300 ms | `gray_portal0` |
+| `green_portal` | 4 | 300 ms | `green_portal0` |
+| `grey_portal` | 4 | 300 ms | `grey_portal0` |
+| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
+| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
+| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
+| `lime_portal` | 4 | 300 ms | `lime_portal0` |
+| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
+| `orange_portal` | 4 | 300 ms | `orange_portal0` |
+| `pink_portal` | 4 | 300 ms | `pink_portal0` |
+| `press_side_running` | 4 | 250 ms | `press_side_running0` |
+| `purple_portal` | 4 | 300 ms | `purple_portal0` |
+| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
+| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
+| `red_portal` | 4 | 300 ms | `red_portal0` |
+| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
+| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
+| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
+| `smoke` | 4 | 250 ms | `smoke0` |
+| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
+| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
+| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
+| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
+| `white_portal` | 4 | 300 ms | `white_portal0` |
+| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
+| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
+
+原始数据还显露出一条结构性注记：图集容纳的是 45 个动画根，而非 42 个——`radar_screen` 的四个预旋转拷贝各自携带自己的 4 帧阶梯，这也正是 `radar_screen` 成为唯一同时带有两个族备注的名称的原因。
+
+#### 68.5 注册表漂移实测（sjr0p7 → cnty9）
+
+注册表是随构建一同发布的内容，因此会随方块更新而漂移。本指南实测的两个构建（2026-10-17 与 2026-10-27，相隔十天）恰好展示了这种漂移有多快：
+
+- 条目：1200 → 1219（新增 98 个，移除 79 个）
+- 保持拼写的名称：1121 个——其中 **779 个更改了 id**（69%）
+- 一项命名约定在月中迁移：68 个 `_rot1..4` 后缀名称（如 `chest_top_rot1`）变成了 `[rot[1..4` 槽位（如 `chest_top[rot[1`），双箱纹理（`chest_double_*`，8 个条目）随之出现
+- 可用名称数移至 900 → 905，且 `HEADER_VERSION`（§65.1）中的注册表哈希令所有烘焙了 id 的已保存包再度失效
+
+最后一条正是运维层面的教训：**写 `bloxdTextureIdLava`，而不是 `19`**——名称常量能原封不动地挺过上述每一条变化，因为验证器在加载时会针对现行注册表重新解析它。
+
+#### 68.6 完整漂移清单（98 新增，79 移除）
+
+把 §68.5 的标题数字逐名称展开——因为更新十月包的纹理包作者需要确切知道哪些文件名不再匹配。这些清单比较的是*拼写*层（即纹理包使用的文件名）；把拼写变成 §68.2 的可用常量的，正是 §64 的折叠规则。
+
+**旋转折叠迁移——17 个机器顶面（移出 68 个拼写，移入 68 个槽位）。** `alloy_kiln_top`、`auto_bench_top`、`belt_tunnel_exit_top`、`belt_tunnel_top`、`burner_drill_top`、`crop_harvester_top`、`crusher_top`、`crystal_vat_top`、`deep_drill_top`、`electric_drill_top`、`press_top`、`recycler_top`、`shatter_mill_top`、`sky_tap_top`、`smelter_top`、`tree_cutter_top`、`wire_mill_top` 从 `_rot1..4` 变体拼写迁移为 `[rot[1..4` 预旋转槽位；折叠出的根就是可用名称，因此纹理包现在只需附带一个 `X_top.png`，而不是四个 `X_top_rotN.png` 文件。
+
+**箱顶折叠——3 个族（移出 6 个拼写，移入 12 个槽位）。** `chest_top_1`/`chest_top_2` → `chest_top`、`iron_chest_top_1`/`_2` → `iron_chest_top`、`moonstone_chest_top_1`/`_2` → `moonstone_chest_top`：双变体拼写变成了根之下的预旋转槽位——请相应地重命名 PNG 文件。
+
+**新纹理——17 个名称。** 双箱（`chest_double_back_hi`/`_lo`、`chest_double_front_hi`/`_lo`、`chest_double_top_1_hi`/`_lo`、`chest_double_top_2_hi`/`_lo`）、darkstone 族（`darkstone`、`darkstone_bricks`、`darkstone_bricks_cracked`、`darkstone_bricks_lava`、`darkstone_engraved`、`darkstone_smooth`）、`pure_copper_ore`、`pure_voltite_ore`，以及 `forge_hopper_top`。
+
+**一次单纯折叠。** `ghost_chest_top_1`/`ghost_chest_top_2` 合并为单个 `ghost_chest_top`。
+
+**彻底移除——3 个名称。** `shaft_hopper_top`、`sun_panel_side`、`sun_panel_top` 在新注册表中没有后继拼写——这些内容随本构建离开了游戏。`forge_hopper_top` 是货真价实的新纹理，而非经过证实的重命名。
+
+原始拼写 diff，供核对：
+
+```text
++ 98 added (cnty9):
+alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
+auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
+belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
+burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
+chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
+chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
+crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
+crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
+darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
+electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
+iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
+moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
+pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
+shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
+sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
+tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
+wire_mill_top[rot[3, wire_mill_top[rot[4
+
+- 79 removed (sjr0p7):
+alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
+auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
+belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
+burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
+crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
+crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
+deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
+ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
+press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
+recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
+shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
+smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
+tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
+wire_mill_top_rot4
 ```
 
 
@@ -8354,7 +9455,7 @@ v4 名录的信条 ([v4 迁移指南](history/v4.md) §68) 逐字沿用: **名�
 | 雾色 | `vec3f(183/255, 191/255, 195/255)` —— 不变 |
 | 保留名 | `/^bloxd/i` (大小写不敏感) + 46 个 `bloxdSp*` 引擎符号 (§79) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 标题 | 除第七部分 §30 的 12 个 allow 标题外全部 (在 ab90qa 上复核，不变) |
+| strict 标题 | 除[各游戏的着色器适用策略](internals/policy.md) 的 12 个 allow 标题外全部 (在 ab90qa 上复核，不变) |
 
 ### 82. 完整的 v5 引擎头文件 (逐字)
 

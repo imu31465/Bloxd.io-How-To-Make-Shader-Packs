@@ -305,9 +305,3 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
 [← 前の部](../api/)・[マニュアルに戻る](../)・[次の部 →](../guides/realism.md)
-
-## 関連
-
-- [リアル化ガイド](../guides/realism.md) — 考え方と2つの流派
-- [影の表現](../guides/shadows.md) — R9.12 の背景
-- [ライティングAPI](../api/lighting.md)

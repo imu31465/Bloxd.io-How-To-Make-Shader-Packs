@@ -1,59 +1,59 @@
-# Texture issues
+# Problèmes de textures
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (messages recorded verbatim from the live validator)
+> API cible : 5 · Build cible : `ab90qa` · État : Verified (messages relevés verbatim depuis le validateur en production)
 
-Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
+Problèmes autour de `bloxdTextureId*` / `bloxdTexel`. Cherchez parmi les 896 noms dans le [catalogue de textures](../api/texture-catalog.md).
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
-- **Cause**: a misspelling; v5's validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
-- **Fix**: accept the suggestion; cross-check the [catalog](../api/texture-catalog.md)
-- **Prevention**: copy-paste names from the catalog
+- **Cause** : une faute d'orthographe ; le validateur fait des **suggestions de Levenshtein** (seuil `max(2, floor(len/4)) + 1`)
+- **Correction** : acceptez la suggestion ; recoupez avec le [catalogue](../api/texture-catalog.md)
+- **Prévention** : copier-coller les noms depuis le catalogue
 
 ## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
 
-- **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
-- **Fix**: use the base name — sampling returns the current frame automatically
-- **Prevention**: never write frame suffixes for the 42 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **Cause** : écrire un **numéro d'image** sur une texture animée (`lava0` etc.)
+- **Correction** : utilisez le nom de base — l'échantillonnage renvoie automatiquement l'image courante
+- **Prévention** : n'écrivez jamais de suffixes d'image pour les 42 familles d'animation ([nommage](../api/texture-api.md#règles-dorthographe-et-liberté-de-nommage))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
-- **Cause**: writing a rotation-family turned-copy spelling (`[rot[N`)
-- **Fix**: use the root name — `bloxdTexel` re-applies the rotation
+- **Cause** : écrire l'orthographe d'une copie tournée de la famille rotation (`[rot[N`)
+- **Correction** : utilisez le nom racine — `bloxdTexel` réapplique la rotation
 
 ## "...could name X and Y, which differ only by case or underscores, so it can't be used."
 
-- **Cause**: the case/underscore-insensitive fold left the name **ambiguous**
-- **Fix**: disambiguate the spelling
+- **Cause** : le repli insensible à la casse/aux tirets bas a laissé le nom **ambigu**
+- **Correction** : désambiguïsez l'orthographe
 
 ## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
 
-- **Cause**: prefix misspelling (e.g. `bloxdTextureID`, `bloxdtextureid`)
-- **Fix**: start names with exactly `bloxdTextureId`
+- **Cause** : préfixe mal orthographié (p. ex. `bloxdTextureID`, `bloxdtextureid`)
+- **Correction** : commencez les noms par exactement `bloxdTextureId`
 
-## "Case and underscores are not distinguished" — how do both rules coexist?
+## "Case and underscores are not distinguished" — comment les deux règles coexistent-elles ?
 
-Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](../api/texture-api.md#spelling-rules-and-naming-freedom)).
+La résolution de noms replie la casse et les `_`, donc `bloxdTextureId_grass_top` et `bloxdTextureIdGrassTop` se résolvent en la **même** constante. Ce n'est que lorsque le repli laisse plusieurs candidats que l'erreur dédiée d'ambiguïté se déclenche ([règles de nommage](../api/texture-api.md#règles-dorthographe-et-liberté-de-nommage)).
 
-## bloxdTexel always returns white on models
+## bloxdTexel renvoie toujours du blanc sur les modèles
 
-- **By design**: most models use `textureId: 0` (no texture — player skins etc.); `bloxdTexel(0, ...)` returns `vec4f(1.0)`
-- **Fix**: select with `surface.textureId != 0u` ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0))
+- **Comportement voulu** : la plupart des modèles utilisent `textureId: 0` (pas de texture — skins de joueurs etc.) ; `bloxdTexel(0, ...)` renvoie `vec4f(1.0)`
+- **Correction** : sélectionnez avec `surface.textureId != 0u` ([textures possédées par le modèle](../api/texture-api.md#textures-possédées-par-le-modèle-textureid-0))
 
-## Wanting to add textures
+## Vouloir ajouter des textures
 
-- **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](../guides/combinations.md))
+- **Limite** : l'API de shader pack ne fait que **lire** l'atlas ; ajouter des textures est le travail du système de texture pack ([combinaisons](../guides/combinations.md))
 
 ## "Packs can't use X: the engine binds every texture and sampler..."
 
-- **Cause**: declaring `texture_*` / `sampler` types directly
-- **Fix**: go through `bloxdTexel()` ([Restrictions](../api/restrictions.md))
+- **Cause** : déclarer directement des types `texture_*` / `sampler`
+- **Correction** : passez par `bloxdTexel()` ([Restrictions](../api/restrictions.md))
 
-## Raw ids broke after a game update
+## Des ids bruts ont cassé après une mise à jour du jeu
 
-- **Cause**: **ids are snapshots** — measured, 334 of 905 surviving names changed id between two builds
-- **Fix**: write `bloxdTextureIdLava`, not `19` ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **Cause** : **les ids sont des instantanés** — mesuré, 334 des 905 noms survivants ont changé d'id entre deux builds
+- **Correction** : écrivez `bloxdTextureIdLava`, pas `19` ([les noms sont l'API](../api/texture-catalog.md#dérive-mesurée-cnty9--ab90qa))
 
-## Related
+## Voir aussi
 
-- [Texture API](../api/texture-api.md) · [Texture catalog](../api/texture-catalog.md) · [Texture Registry internals](../internals/texture-registry.md)
+- [API de textures](../api/texture-api.md) · [Catalogue de textures](../api/texture-catalog.md) · [Internals du registre de textures](../internals/texture-registry.md)

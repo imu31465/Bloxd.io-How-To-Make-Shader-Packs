@@ -22,9 +22,3 @@
 - `bloxdSeconds()` はアニメーション用の時間であり、ゲーム内の昼夜と連動する保証はない。
 - `bloxdSunDirection()` がゼロなら真の月方向ではなく、青い環境光を加える処理は雰囲気を作る近似。方向性のある月光は `-bloxdSunDirection()` で作れる (昼夜サイクルワールド限定。[エンジン内部: 太陽と月の正体](../internals/sun-and-moon.md))。
 - `s.position` / `l.position` はローカル座標であるため、ワールド位置に依存する効果では `bloxdRenderOffset()` を加える。ブロック内ローカルの模様を作成する場合は、意図的にローカル座標を使用することもある。
-
-## 関連
-
-- [検証と動作確認](../getting-started/validation.md)
-- [到達できない表現](constraints.md)
-- [エンジン内部: パックに見える値を変えるもの](../internals/testing-factors.md)

@@ -1,14 +1,14 @@
-# Quick start
+# Démarrage rapide
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified
 
-Your first pack in five minutes.
+Votre premier pack en cinq minutes.
 
-## 1. Create the files
+## 1. Créez les fichiers
 
-Make a folder with `pack.json` and `pack.wgsl`:
+Créez un dossier contenant `pack.json` et `pack.wgsl` :
 
-**`pack.json`**:
+**`pack.json`** :
 
 ```json
 {
@@ -18,7 +18,7 @@ Make a folder with `pack.json` and `pack.wgsl`:
 }
 ```
 
-**`pack.wgsl`** — a minimal warm-tint pack:
+**`pack.wgsl`** — un pack minimal de teinte chaude :
 
 ```wgsl
 const packWarmth = 0.18;
@@ -31,26 +31,26 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> The engine header (constants, structures, functions) is prepended to every pack automatically at load — you never write it yourself. The full header is reproduced in [Engine Internals](../internals/engine-header.md).
+> L'en-tête du moteur (constantes, structures, fonctions) est préfixé automatiquement à chaque pack au chargement — vous ne l'écrivez jamais vous-même. L'en-tête complet est reproduit dans [Engine Internals](../internals/engine-header.md).
 
-## 2. Load it in the game
+## 2. Chargez-le dans le jeu
 
-1. Open settings → Shader Pack and load the zip or folder (folder loading is desktop browsers only)
-2. Check the status: right after selecting it you'll see "Ready. Reload the page to use it." — after a **page reload**, "Ready to use" means success
-3. If you see "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+1. Ouvrez Réglages → Shader Pack et chargez le zip ou le dossier (le chargement par dossier n'existe que sur navigateurs de bureau)
+2. Vérifiez le statut : juste après l'avoir sélectionné, vous verrez "Ready. Reload the page to use it." — après un **rechargement de la page**, "Ready to use" signale le succès
+3. Si vous voyez "Saved, but it won't run until you fix these errors...", corrigez les erreurs listées (fichier:ligne + variante) et rechargez
 
-## 3. Verify
+## 3. Vérifiez
 
-1. Test in a permissive game first
-2. Then in a strict-mode game (most games are strict)
-3. Vertex animation only works in games marked allow
+1. Testez d'abord dans un jeu permissif
+2. Puis dans un jeu en mode strict (la plupart des jeux sont stricts)
+3. L'animation de sommets ne fonctionne que dans les jeux marqués allow
 
-## 4. Distribute
+## 4. Distribuez
 
-Zip it up — see [Distribution](distribution.md).
+Zippez le tout — voir [Distribution](distribution.md).
 
-## Stuck?
+## Bloqué ?
 
-- What errors mean → [Troubleshooting](../troubleshooting/)
-- How to write hooks → [Shader hooks](hooks.md)
-- The full 9-hook template is in the next page, [Shader hooks](hooks.md)
+- Ce que signifient les erreurs → [Dépannage](../troubleshooting/)
+- Comment écrire des hooks → [Hooks de shader](hooks.md)
+- Le gabarit complet à 9 hooks se trouve dans la page suivante, [Hooks de shader](hooks.md)

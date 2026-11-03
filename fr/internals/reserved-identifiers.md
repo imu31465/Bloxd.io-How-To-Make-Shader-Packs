@@ -1,29 +1,29 @@
-# Reserved identifier internals
+# Intérieurs des identifiants réservés
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle's generators)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré depuis les générateurs du bundle en production)
 
-The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](../api/restrictions.md).
+L'espace de noms `bloxdSp*` — des symboles que les générateurs peuvent injecter et que les packs ne peuvent donc pas redéclarer. Le résumé pour auteurs de packs : [Restrictions](../api/restrictions.md).
 
-## The 46 symbols
+## Les 46 symboles
 
-Grown from v4's 27 to **46** (20 added, 1 retired — `bloxdSpLitColour`, promoted into the public `bloxdLitColour()`):
+Passé de 27 en v4 à **46** (20 ajoutés, 1 retiré — `bloxdSpLitColour`, promu en la fonction publique `bloxdLitColour()`) :
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-## New names ↔ v5 features
+## Nouveaux noms ↔ fonctionnalités v5
 
-- `bloxdSpFlags` — delivery of the `BloxdFlags` struct
-- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — the new inputs (enchant, model-local position)
-- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — the cell-sampling texture-pack path
-- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](texture-sampling.md))
-- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — extended-hook locals
+- `bloxdSpFlags` — la livraison de la struct `BloxdFlags`
+- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — les nouvelles entrées (enchant, position locale au modèle)
+- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — le chemin d'échantillonnage par cellules des texture packs
+- `bloxdSpQuarterTurns` — la chaîne de rotation ([Échantillonnage des textures](texture-sampling.md))
+- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — les variables locales des hooks étendus
 
-## The pack-level rule
+## La règle au niveau pack
 
-Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](../troubleshooting/validation.md)).
+Plus large que cet espace de noms : **tout ce qui correspond à `/^bloxd/i` (insensible à la casse)**. Seuls les 9 noms de fonctions hook peuvent être déclarés ([Erreurs de validation](../troubleshooting/validation.md)).
 
-`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](../troubleshooting/textures.md)).
+Les identifiants préfixés par `bloxdTextureId` se résolvent en noms de textures avec leur famille d'erreurs dédiée ([Problèmes de textures](../troubleshooting/textures.md)).
 
-## Related
+## Voir aussi
 
-- [Restrictions](../api/restrictions.md) · [Texture sampling](texture-sampling.md) · [Version History: v5](../history/v5.md)
+- [Restrictions](../api/restrictions.md) · [Échantillonnage des textures](texture-sampling.md) · [Historique des versions : v5](../history/v5.md)

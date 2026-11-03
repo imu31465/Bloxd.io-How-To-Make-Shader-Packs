@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ et notes légales
 
-> Status: Verified
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified
 
-## Frequently asked questions
+## Questions fréquentes
 
-### Q. Are shader packs an official feature?
+### Q. Les shader packs sont-ils une fonctionnalité officielle ?
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+La fonctionnalité de shader pack est accessible depuis l'interface du jeu et la création de packs semble être une activité prévue. Aucune documentation officielle publique n'a toutefois été trouvée — ce guide est un document non officiel, fondé sur l'analyse.
 
-### Q. Can packs do anything dangerous?
+### Q. Les packs peuvent-ils faire quelque chose de dangereux ?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+Les packs sont du WGSL pur — **l'exécution de JS et l'accès réseau sont impossibles par conception**. Seul le code qui passe la validation et la compilation s'exécute ([Restrictions](../api/restrictions.md)).
 
-### Q. Which games do packs work in?
+### Q. Dans quels jeux les packs fonctionnent-ils ?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+La plupart des jeux tournent en mode strict (pas d'animation de sommets, pas de `discard`). L'animation de sommets ne fonctionne que dans les jeux de la liste allow. La liste par titre est dans [Engine Internals : policy](../internals/policy.md).
 
-### Q. Do packs work on mobile?
+### Q. Les packs fonctionnent-ils sur mobile ?
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+Uniquement sur les environnements capables de WebGPU ([Prérequis](../getting-started/requirements.md)).
 
-### Q. Can I ship my own textures?
+### Q. Puis-je livrer mes propres textures ?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+Pas dans un shader pack (l'atlas est en lecture seule). C'est le travail du système de texture pack ([combinaisons](../guides/combinations.md)).
 
-### Q. Can I keep using an old-version pack?
+### Q. Puis-je continuer à utiliser un pack d'une ancienne version ?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+Le jeu actuel n'accepte que `apiVersion: 5` ; les packs plus anciens sont désactivés silencieusement ([Compatibilité](../api/compatibility.md)). Migrez via l'[Historique des versions](../history/).
 
-### Q. Will the API change again?
+### Q. L'API changera-t-elle encore ?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+Les internals du moteur peuvent changer avec les mises à jour — chaque page nomme son build cible. Les packs sauvegardés se revalident automatiquement quand l'en-tête ou le registre change ([Compatibilité](../api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
 
-### Q. What about "cinematic shader" distributions?
+### Q. Qu'en est-il des distributions « cinematic shader » ?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+Une distribution communautaire « cinematic shader » que nous avons analysée s'est révélée être un texture pack (textures 128×128, sans `pack.json` / `.wgsl`). La plupart des looks « ombrés façon shader » sont de l'artisanat côté textures ([combinaisons](../guides/combinations.md)).
 
-## Legal & notes
+## Légal et notes
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- Ceci est un guide non officiel et ne représente pas l'opinion des développeurs. L'API peut changer sans préavis
+- Créé avec l'aide d'une IA ; l'exactitude n'est pas garantie. Vérifiez par rapport au comportement réel en jeu
+- Les valeurs mesurées (ids de texture etc.) sont des instantanés de builds précis et changent entre builds ([les noms sont l'API](../api/texture-catalog.md#dérive-mesurée-cnty9--ab90qa))
 
-## Related
+## Voir aussi
 
-- [Documentation entry](../) · [Version History](../history/)
+- [Entrée de la documentation](../) · [Historique des versions](../history/)

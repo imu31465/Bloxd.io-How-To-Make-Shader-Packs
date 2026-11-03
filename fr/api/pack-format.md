@@ -1,8 +1,8 @@
-# Pack format
+# Format du pack
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (re-measured on the live loader)
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified (remesuré sur le chargeur en production)
 
-The whole pack model on one page — manifest, loader limits, per-frame uniform. For the step-by-step version see [Getting Started](../getting-started/manifest.md).
+Tout le modèle de pack sur une seule page — manifeste, limites du chargeur, uniform par frame. Pour la version pas à pas, voir [Prise en main](../getting-started/manifest.md).
 
 ## pack.json
 
@@ -14,55 +14,55 @@ The whole pack model on one page — manifest, loader limits, per-frame uniform.
 }
 ```
 
-| Field | Type | Required | Description |
+| Champ | Type | Requis | Description |
 |---|---|---|---|
-| `apiVersion` | number | required | **must strictly equal `5`** (`===`). A string `"5"` fails and is reported with its JSON spelling |
-| `name` | string | required | non-empty after trimming; shown in settings |
-| `author` | string | optional | must be a string if present |
+| `apiVersion` | number | requis | **doit être strictement égal à `5`** (`===`). Une chaîne `"5"` échoue et est signalée avec son orthographe JSON |
+| `name` | string | requis | non vide après trim ; affiché dans les réglages |
+| `author` | string | optionnel | doit être une chaîne s'il est présent |
 
-Everything else in the manifest is ignored. `pack.json` must be exactly one JSON object at the zip root.
+Tout le reste du manifeste est ignoré. `pack.json` doit être exactement un objet JSON à la racine du zip.
 
-## Loader limits (re-measured on live c53)
+## Limites du chargeur (remesurées sur le c53 en production)
 
-| Limit | Value | Message when exceeded |
+| Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
-| `.wgsl` files per pack | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` size | 64 KB | `pack.json is over 64 KB.` |
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| zip shape | — | split zip / zip64 / encrypted / unsupported compression each rejected with its own message; all files valid UTF-8; exactly one `pack.json`; no duplicate paths |
+| fichiers `.wgsl` par pack | 256 | `The pack has more than 256 .wgsl files.` |
+| source `.wgsl` totale | 256 Ko | `The pack's .wgsl files are over 256 KB in total.` |
+| taille de `pack.json` | 64 Ko | `pack.json is over 64 KB.` |
+| taille du zip | 32 Mo | `The zip is over 32 MB.` |
+| entrées du zip | 1 024 | `The zip has more than 1024 entries.` |
+| forme du zip | — | zip découpé / zip64 / chiffré / compression non prise en charge : chacun rejeté avec son propre message ; tous les fichiers en UTF-8 valide ; exactement un `pack.json` ; aucun chemin en double |
 
-## API-version check
+## Vérification de la version d'API
 
-The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. The version constant `5` and the header template live in the same module (c55 / module 29836), so validation and the header it assumes move together. Mismatch messages: see [Compatibility](compatibility.md).
+Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScript. La constante de version `5` et le gabarit de l'en-tête vivent dans le même module (c55 / module 29836), donc la validation et l'en-tête qu'elle présuppose évoluent ensemble. Messages d'incompatibilité : voir [Compatibilité](compatibility.md).
 
-## Per-frame uniform: bloxdPackInputs
+## Uniform par frame : bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — still 64 bytes, but v5 added one member (from the live uniform-layout module):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — toujours 64 octets, mais v5 a ajouté un membre (d'après le module de disposition de l'uniform en production) :
 
-| Offset | Field | Type | Note |
+| Offset | Champ | Type | Remarque |
 |---|---|---|---|
-| 0 | `seconds` | `f32` | backs `bloxdSeconds()` |
-| 4 | `lit` | `u32` | **new in v5** — 1 when block/sky lighting is on; backs `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
+| 0 | `seconds` | `f32` | alimente `bloxdSeconds()` |
+| 4 | `lit` | `u32` | 1 quand l'éclairage bloc/ciel est actif ; alimente `bloxdLit()` |
+| 16 | `renderOffset` | `vec3i` | alimente `bloxdRenderOffset()` |
+| 32 | `sunDirection` | `vec3f` | alimente `bloxdSunDirection()` |
+| 48 | `eyePosition` | `vec3f` | alimente `bloxdEyePosition()` |
 
-`lit` fit into the padding v4 already had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16). Total size and all other offsets are unchanged. The engine writes it with a single `setUint32(4, lit ? 1 : 0)` — it is a flag, not a light level (v4's JS-side names `terrainLightLevels` / `terrainHeldLight` are gone from the bundle entirely).
+`lit` s'insère dans le padding que v4 avait déjà entre `seconds` et `renderOffset` (les offsets 4–15 étaient des trous d'alignement ; un `vec3i` exige un alignement de 16 octets, donc `renderOffset` reste à 16). La taille totale et tous les autres offsets sont inchangés. Le moteur l'écrit avec un seul `setUint32(4, lit ? 1 : 0)` — c'est un flag, pas un niveau de lumière (les noms côté JS de v4 `terrainLightLevels` / `terrainHeldLight` ont entièrement disparu du bundle).
 
-**Never reference the uniform directly from a pack.** Use it through the header functions (`bloxdSeconds()` etc.). Stage visibility is VERTEX|FRAGMENT, so header functions work from module-scope functions and vertex hooks too.
+**Ne référencez jamais l'uniform directement depuis un pack.** Utilisez-le à travers les fonctions de l'en-tête (`bloxdSeconds()` etc.). La visibilité des étapes est VERTEX|FRAGMENT, donc les fonctions de l'en-tête fonctionnent aussi depuis des fonctions à portée module et depuis les hooks de sommet.
 
-## Bind-group layout
+## Disposition du groupe de bindings
 
-| binding | Contents |
+| binding | Contenu |
 |---|---|
-| 0 | `bloxdPackInputs` uniform (64 B) |
-| 1 | scene-depth texture (liquid variants) |
-| 2 | `bloxdSpTextureLayers` storage buffer |
+| 0 | uniform `bloxdPackInputs` (64 o) |
+| 1 | texture de profondeur de scène (variantes liquid) |
+| 2 | buffer de stockage `bloxdSpTextureLayers` |
 
-`minBindingSize` remains 64. The depth texture (binding 1) is FRAGMENT-only, which is why `bloxdOpaqueBehind()` is surface/light-hook only.
+`minBindingSize` reste 64. La texture de profondeur (binding 1) est FRAGMENT-only, ce qui explique pourquoi `bloxdOpaqueBehind()` est réservé aux hooks surface/light.
 
-## wgsl concatenation
+## Concaténation wgsl
 
-Multiple `.wgsl` files are concatenated into one module in **dictionary order by path name**. Module-scope declarations are order-independent; only `var` initialization order can matter. Non-`.wgsl` files are ignored.
+Les fichiers `.wgsl` multiples sont concaténés en un seul module en **ordre dictionnaire du nom de chemin**. Les déclarations à portée module sont indépendantes de l'ordre ; seul l'ordre d'initialisation des `var` peut compter. Les fichiers non-`.wgsl` sont ignorés.

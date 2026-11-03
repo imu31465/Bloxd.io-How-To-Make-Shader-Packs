@@ -50,8 +50,3 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
-## 関連
-
-- [ライティングAPI](../api/lighting.md) — emission とフォグの順序
-- [リアル系レシピ](realism.md)

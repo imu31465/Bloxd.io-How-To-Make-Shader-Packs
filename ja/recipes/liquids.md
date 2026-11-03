@@ -60,9 +60,3 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 //  - terrain バリアント = フック無し = 地形はエンジンの既定設定のまま
 //  - liquid バリアント  = liquid_* フックのみ有効
 ```
-
-## 関連
-
-- [水を自然に見せる方法](../guides/water.md) — 統合レシピ
-- [頂点のレシピ](vertices.md) — 液面の波 (allow 限定)
-- [APIリファレンス: シェーダーフック](../api/hooks.md)

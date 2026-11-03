@@ -1,7 +1,6 @@
-# Recettes de couleur (surface)
+# Couleurs
 
-
-
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
 ## Teinte unique (le plus basique)
 
 ```wgsl
@@ -19,14 +18,14 @@ fn pack_saturation(c: vec3f, amount: f32) -> vec3f {
     let luma = dot(c, vec3f(0.299, 0.587, 0.114));
     return clamp(mix(vec3f(luma), c, 1.0 + amount), vec3f(0.0), vec3f(1.0));
 }
-// amount : +0,3 vif / -1,0 monochrome total
+// amount : +0.3 vif / -1.0 monochrome total
 ```
 
 ## Température de couleur (chaud ⇄ froid)
 
 ```wgsl
 fn pack_colorTemp(c: vec3f, warmth: f32) -> vec3f {
-    // warmth : +1,0 = chaud (rouge fort), -1,0 = froid (bleu fort)
+    // warmth : +1.0 = chaud (rouge fort), -1.0 = froid (bleu fort)
     let warm = vec3f(1.08, 1.0, 0.90);
     let cool = vec3f(0.92, 1.0, 1.10);
     let tint = mix(cool, warm, warmth * 0.5 + 0.5);

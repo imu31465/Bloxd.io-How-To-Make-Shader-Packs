@@ -1,33 +1,33 @@
-# Requirements
+# Prérequis
 
-> Target API: 5 · Status: Verified
+> API cible : 5 · État : Verified
 
-## Browser
+## Navigateur
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+Les packs de shaders ne concernent que le renderer WebGPU. Il vous faut un navigateur capable de WebGPU :
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- Navigateurs basés sur Chromium (Chrome / Edge / Opera etc.) — stables sur ordinateur de bureau
+- Safari 17+ / Firefox (la prise en charge de WebGPU varie selon les périodes)
+- **Mobile** : la prise en charge de WebGPU peut être limitée sur iOS / Android. Mentionnez-le sur la page de publication de votre pack
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+Tant qu'un pack est installé, le réglage du jeu pour le renderer WebGPU est activé de force.
 
-## Development environment
+## Environnement de développement
 
-No special tooling is required, though these help:
+Aucun outil particulier n'est requis, mais ceux-ci aident :
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- Un éditeur de texte (la coloration syntaxique WGSL est un plus)
+- Un outil de zip pour la distribution ; pendant le développement, vous pouvez charger depuis un dossier (navigateurs de bureau uniquement)
+- Les outils de développement du navigateur — les erreurs de compilation s'affichent dans l'interface du jeu et aussi dans la console
 
-## On-device verification environments
+## Environnements de vérification sur appareil
 
-Before distribution, verify on ([Validation](validation.md)):
+Avant la distribution, vérifiez sur ([Validation](validation.md)) :
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. Un jeu en mode allow (obligatoire si vous utilisez l'animation de sommets)
+2. Un jeu en mode strict (la plupart des jeux sont stricts)
+3. Un rechargement de page (les packs enregistrés se revalident automatiquement)
 
-## URL parameter caveat
+## Mise en garde sur les paramètres d'URL
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+Des overrides de renderer restants dans les paramètres d'URL ou le localStorage empêchent les packs de démarrer — effacez-les et rechargez la page.

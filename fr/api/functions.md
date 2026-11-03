@@ -1,12 +1,12 @@
-# Functions
+# Fonctions
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
-Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](texture-api.md), along with `bloxdOpaqueBehind`.
+Toutes les fonctions de l'en-tête. L'API de textures (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) est couverte dans [API de textures](texture-api.md), tout comme `bloxdOpaqueBehind`.
 
-## Frame functions (same value for the entire frame)
+## Fonctions d'image (même valeur pour toute l'image)
 
-Header note: *"These functions return the same value for the entire frame."* They read the `bloxdPackInputs` uniform, so they are callable from vertex hooks and module-scope functions too.
+Note d'en-tête : *« These functions return the same value for the entire frame. »* Elles lisent l'uniform `bloxdPackInputs`, elles sont donc aussi appelables depuis les hooks de sommet et les fonctions à portée de module.
 
 ### bloxdEyePosition
 
@@ -14,9 +14,9 @@ Header note: *"These functions return the same value for the entire frame."* The
 fn bloxdEyePosition() -> vec3f
 ```
 
-- **Returns**: the camera's render position
-- **Callable from**: all 9 hooks + module scope
-- **Uses**: view vectors (`normalize(l.position - bloxdEyePosition())`), rim light, distances
+- **Renvoie** : la position de rendu de la caméra
+- **Appelable depuis** : les 9 hooks + la portée de module
+- **Usages** : vecteurs de vue (`normalize(l.position - bloxdEyePosition())`), rim light, distances
 
 ### bloxdRenderOffset
 
@@ -24,9 +24,9 @@ fn bloxdEyePosition() -> vec3f
 fn bloxdRenderOffset() -> vec3i
 ```
 
-- **Returns**: integer block offset; **render position + this offset = world position**
-- Changes as the player travels (keeps render positions near 0,0,0)
-- Used internally by `bloxdWorldPosition()`
+- **Renvoie** : le décalage entier en blocs ; **position de rendu + ce décalage = position monde**
+- Change à mesure que le joueur se déplace (garde les positions de rendu proches de 0,0,0)
+- Utilisé en interne par `bloxdWorldPosition()`
 
 ### bloxdSunDirection
 
@@ -34,12 +34,12 @@ fn bloxdRenderOffset() -> vec3i
 fn bloxdSunDirection() -> vec3f
 ```
 
-- **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
-- **Facts**:
-  - **the moon is always at `-bloxdSunDirection()`** (the engine places it opposite the sun)
-  - **never pass the zero vector to `normalize`** — guard with `dot(d, d) < 1e-8` and fall back to a constant direction
-  - the current build has no day-night cycle; sun, moon and stars do not move during a session (only opacity toggles). In the default earth sky the sun sits near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°)
-- **Uses**: color temperature, light direction, sun gating, pseudo moonlight
+- **Renvoie** : vecteur unitaire vers le soleil en orientation monde ; **vecteur nul quand il n'y a pas de soleil**
+- **Faits** :
+  - **la lune est toujours à `-bloxdSunDirection()`** (le moteur la place à l'opposé du soleil)
+  - **ne jamais passer le vecteur nul à `normalize`** — protégez avec `dot(d, d) < 1e-8` et retombez sur une direction constante
+  - le build actuel n'a pas de cycle jour/nuit ; soleil, lune et étoiles ne bougent pas pendant une session (seule l'opacité bascule). Dans le ciel « terre » par défaut, le soleil se tient près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°)
+- **Usages** : température de couleur, direction de la lumière, porte solaire, pseudo clair de lune
 
 ### bloxdSeconds
 
@@ -47,9 +47,9 @@ fn bloxdSunDirection() -> vec3f
 fn bloxdSeconds() -> f32
 ```
 
-- **Returns**: seconds since the page loaded (no wrap — f32 keeps sub-millisecond precision for the first 4.5 hours)
-- **Uses**: animation; recurring timers via `bloxdSeconds() % period`
-- **Note**: unlike v2's `bloxdTime()` (which wrapped at 3600s), it does not wrap
+- **Renvoie** : secondes depuis le chargement de la page (pas de wrap — le f32 garde une précision inférieure à la milliseconde pendant les 4,5 premières heures)
+- **Usages** : animation ; minuteurs récurrents via `bloxdSeconds() % period`
+- **Note** : contrairement au `bloxdTime()` de v2 (qui bouclait à 3600 s), il ne boucle pas
 
 ### bloxdLit
 
@@ -59,23 +59,23 @@ fn bloxdSeconds() -> f32
 fn bloxdLit() -> bool
 ```
 
-- **Returns**: whether block & sky lighting is enabled
-- **New in v5**: replaces v4's `#ifdef BLOXD_LIGHTING` compile-time branch with a runtime check
-- **Guarantees when off** (header note): `blockLight` and `heldLight` are 0; `skyLight` and the light colors (`ambientLightColour` / `skyLightColour`) are 1
-- **Use**: gate lighting-dependent code:
+- **Renvoie** : si l'éclairage de bloc et de ciel est activé
+- **Nouveau en v5** : remplace la branche à la compilation `#ifdef BLOXD_LIGHTING` de v4 par un test à l'exécution
+- **Garanties quand c'est coupé** (note d'en-tête) : `blockLight` et `heldLight` valent 0 ; `skyLight` et les couleurs de lumière (`ambientLightColour` / `skyLightColour`) valent 1
+- **Usage** : conditionner le code dépendant de l'éclairage :
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }
     var out = bloxdDefaultLight(surface, light);
-    // ... lighting-enabled processing
+    // ... traitement avec éclairage activé
     return out;
 }
 ```
 
-Using `BLOXD_LIGHTING` produces *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+Utiliser `BLOXD_LIGHTING` produit *« BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead. »*
 
-## Coordinate conversion
+## Conversion de coordonnées
 
 ### bloxdWorldPosition
 
@@ -84,20 +84,30 @@ Using `BLOXD_LIGHTING` produces *"BLOXD_LIGHTING was removed in apiVersion 5; te
 fn bloxdWorldPosition(position: vec3f) -> vec3f
 ```
 
-- **Returns**: `position + vec3f(bloxdRenderOffset())`
-- **Note**: f32 precision limits mean far coordinates can be inexact (header: *"with possible f32 inaccuracy"*)
+- **Renvoie** : `position + vec3f(bloxdRenderOffset())`
+- **Note** : les limites de précision du f32 font que les coordonnées lointaines peuvent être inexactes (en-tête : *« with possible f32 inaccuracy »*)
 
-### bloxdFragmentBlockPosition — removed
+### bloxdFragmentBlockPosition — non documentée mais toujours injectée
 
-`bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i` (existed through v4) was **removed in v5 with no replacement**. It reconstructed a fragment's block position from position and normal, but nothing remained that needed it between `uv`, `flags` and the model inputs; continuous values are covered by `bloxdWorldPosition()`. Delete call sites.
+```wgsl
+fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
+```
 
-## Default functions (engine behavior)
+Cette fonction **ne fait plus partie de l'en-tête documenté** (elle y était en v4), mais le moteur l'accepte et la définit toujours :
+
+- **Validateur** : toujours listée dans la table des signatures en production, donc les appels passent la validation de noms dans chaque hook (hooks de sommet compris)
+- **Exécution** : le générateur de code injecte toujours une définition dans le module terrain/liquide et dans les deux programmes de modèle — terrain/liquide utilisent `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()` ; les pipelines de modèle utilisent un décalage d'1/64 de bloc, en s'alignant sur la cellule du modèle pour les modèles de blocs posés
+- **Réserve** : comme il s'agit d'une fonction interne non documentée, elle peut disparaître dans une future version sans préavis — préférez `bloxdWorldPosition()` pour les positions continues et `flags` pour « quel bloc est-ce » (voir [Historique des versions : v5](../history/v5.md) pour son retrait de l'en-tête)
+
+Les packs écrits pour v4 qui l'appellent continuent de fonctionner ; les nouveaux packs ne doivent pas l'adopter.
+
+## Fonctions par défaut (comportement du moteur)
 
 ### bloxdDefaultVertex
 
 ```wgsl
 fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex
-// impl: return BloxdVertex(vertex.position);
+// implémentation : return BloxdVertex(vertex.position);
 ```
 
 ### bloxdDefaultSurface
@@ -106,31 +116,31 @@ fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex
 fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface
 ```
 
-Passes `colour` through, passes `enchantColour` / `overlayColour` unchanged, zeroes `emission` (and passes `alpha` in `BLOXD_ALPHA` variants). **Output structs can only be built via this function.**
+Transmet `colour`, transmet `enchantColour` / `overlayColour` sans changement, met `emission` à zéro (et transmet `alpha` dans les variantes `BLOXD_ALPHA`). **Les structures de sortie ne peuvent être construites que via cette fonction.**
 
 ### bloxdDefaultLight
 
 ```wgsl
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
-// impl:
+// implémentation :
 //   let lit = bloxdLitColour(surface, light);
 //   return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
 ```
 
-Literally "apply the engine's recipe, then fog the emission-added result".
+Littéralement « appliquer la recette du moteur, puis appliquer le brouillard au résultat augmenté de l'émission ».
 
-## Lighting recipe functions (published in v5)
+## Fonctions de la recette d'éclairage
 
-What v4 authors kept re-deriving by hand is now documented as callable WGSL. Explanations and the flow diagram: [Lighting](lighting.md).
+La recette d'éclairage propre du moteur, documentée comme WGSL appelable — composez ou surchargez les étages individuellement. Explications et diagramme de flux : [Éclairage](lighting.md).
 
-| Function | Signature | Role |
+| Fonction | Signature | Rôle |
 |---|---|---|
-| `bloxdShading` | `(light: BloxdLightIn) -> vec3f` | how the face's material & angle light it (Lambert × diffuse + emissive + ambient, clamped 0–1) |
-| `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | the world's light here (brightest of block/sky/held, floored by `ambientLightColour`) |
-| `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | the surface's color lit as the engine does (before emission and fog) |
-| `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | apply this fragment's fog (`mix(colour, fogColour, fogAlpha)`) |
+| `bloxdShading` | `(light: BloxdLightIn) -> vec3f` | comment le matériau et l'angle de la face l'éclairent (Lambert × diffuse + emissive + ambient, clampé 0–1) |
+| `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | la lumière du monde à cet endroit (la plus brillante de bloc/ciel/main, `ambientLightColour` comme plancher) |
+| `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | la couleur de la surface éclairée comme le moteur le fait (avant émission et brouillard) |
+| `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | appliquer le brouillard de ce fragment (`mix(colour, fogColour, fogAlpha)`) |
 
-## Special functions
+## Fonctions spéciales
 
 ### bloxdOpaqueBehind
 
@@ -138,13 +148,13 @@ What v4 authors kept re-deriving by hand is now documented as callable WGSL. Exp
 fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ```
 
-- **Returns**: `BloxdOpaqueBehind` (`hit: bool`, `position: vec3f`, `distance: f32`)
-- **Callable from**: surface / light hooks only (the depth texture is FRAGMENT-only)
-- **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (defined in liquid variants)
-- **Meaning**: the opaque face behind this fragment (terrain seen through water); `hit == false` for sky
-- **Rename from v2**: `found` → `hit`
-- **Deep dive**: [Version History: v3](../history/v3.md) and [Engine Internals](../internals/rendering-pipeline.md)
+- **Renvoie** : `BloxdOpaqueBehind` (`hit: bool`, `position: vec3f`, `distance: f32`)
+- **Appelable depuis** : uniquement les hooks surface / light (la texture de profondeur est FRAGMENT-only)
+- **Garde** : `#ifdef BLOXD_SCENE_DEPTH` (défini dans les variantes liquides)
+- **Signification** : la face opaque derrière ce fragment (terrain vu à travers l'eau) ; `hit == false` pour le ciel
+- **Renommage depuis v2** : `found` → `hit`
+- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Intérieurs du moteur](../internals/rendering-pipeline.md)
 
-## Related
+## Voir aussi
 
-- [Lighting](lighting.md) · [Texture API](texture-api.md) · [Pack format](pack-format.md)
+- [Éclairage](lighting.md) · [API de textures](texture-api.md) · [Format de pack](pack-format.md)

@@ -1,8 +1,7 @@
-# Recettes d'émission
+# Émission
 
-
-
-> `emission` s'ajoute après le calcul d'éclairage, mais le traitement par défaut **l'atténue avec `fogVisibility`. Au loin totalement brumeux, l'émission disparaît aussi. Pour garder de l'éclat au loin, n'ajoutez pas à emission — ajoutez directement en `out.colour += ...` dans le hook light** (engineColour porte déjà le brouillard : au loin, la lumière tombe sur la couleur de brouillard)
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> `emission` s'ajoute après le calcul d'éclairage, mais le traitement par défaut **l'atténue avec la quantité de brouillard (`fogAlpha`). En pleine brume au loin, l'émission disparaît aussi. Pour garder de l'éclat à distance, n'ajoutez pas à emission — ajoutez directement en `out.colour += ...` dans le hook light** (la sortie par défaut est déjà brumée, donc au loin la lumière se pose par-dessus la couleur du brouillard)
 
 ## Lampes pulsantes (torches qui respirent)
 
@@ -18,10 +17,10 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Allure de minerai lumineux (les matériaux clairs émettent)
+## Aspect de minerai lumineux (les matériaux clairs émettent)
 
 ```wgsl
-// côté surface : plus le matériau est clair (blanc), plus d'émission
+// côté surface : plus le matériau est clair (blanc), plus il y a d'émission
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
@@ -31,13 +30,13 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Nuée de lucioles (points de lumière à la dérive)
+## Aspect de nuée de lucioles (points de lumière dérivant au fil du temps)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let world = bloxdWorldPosition(l.position);
-    // quelques « orbes de lumière » à la dérive lente ; éclat par inverse de distance
+    // quelques « orbes de lumière » dérivant lentement ; éclat par distance inverse
     let t = bloxdSeconds() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);

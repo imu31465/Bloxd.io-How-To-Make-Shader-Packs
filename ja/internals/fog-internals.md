@@ -25,9 +25,3 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
-## 関連
-
-- [水を自然に見せる方法](../guides/water.md)
-- [視覚の問題](../troubleshooting/visual.md)
-- [エンジンデータ台帳](engine-data.md)

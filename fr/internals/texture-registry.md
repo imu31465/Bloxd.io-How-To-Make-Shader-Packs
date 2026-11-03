@@ -1,47 +1,47 @@
-# Texture registry internals
+# Intérieurs du registre des textures
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](../api/texture-catalog.md).
 
-## Methodology
+## Méthodologie
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+Nous avons exécuté le propre module de construction du registre du moteur (29833 sur ce build, coordonnant les modules 1371 / 1391 / 1384 / 219) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal, et enregistré sa sortie — ces chiffres sont **le calcul propre du bundle de production**, pas une réimplémentation.
 
-## Output structure
+## Structure de sortie
 
-| Output | v5 measured | Meaning |
+| Sortie | mesuré en v5 | Signification |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | noms référençables comme `bloxdTextureId<Name>` |
+| `aliases` | 416 | orthographes repliées — 188 alias d'image (`lava0`…) et 228 alias de rotation (`chest_top[rot[1`…) |
+| `layers` | 228 | la table de couches — dont 171 emplacements pré-rotés (57 racines × 4 rotations) |
 
-## Folding rules
+## Règles de pliage
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **familles d'animation** (42) : les orthographes d'image (`lava0`–`lava7`) se replient vers le nom de base (`lava`) ; `bloxdTexel` renvoie l'image courante au moment de l'échantillonnage
+- **familles de rotation** (57) : les emplacements tournés (`[rot[1..4`) se replient vers le nom racine ; `bloxdTexel` réapplique le `textureRotation` par face
+- `radar_screen` est le seul nom appartenant aux deux familles à la fois (ses quatre copies pré-rotées portent chacune leur propre échelle de 4 images — d'où 45 racines d'animation dans l'atlas, et non 42)
 
-## Drift (cnty9 → ab90qa)
+## Dérive (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| Mesure | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| entrées d'atlas | 1,219 | **1,210** |
+| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
+| familles d'animation (orthographes d'image) | 42 (188) | **42 (188) — inchangé** |
+| constantes nommées utilisables | 905 | **896** |
+| changements d'id parmi les noms survivants | — | **334 sur 905** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+La dérive complète (11 noms) : ajouté (1) `scorpion_eggs` ; retirés (10) les huit textures de coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (le coffre double a quitté les données du jeu ; les générateurs conservent `mob_spawner_block_top`).
 
-## Effect on HEADER_VERSION
+## Effet sur HEADER_VERSION
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive marque **chaque pack sauvegardé « à revérifier »** (revalidé automatiquement au chargement de la page). Les packs écrits avec des noms survivent à la re-résolution ; les packs à ids bruts cassent ([Compatibilité](../api/compatibility.md)).
 
-## Past drift records
+## Anciens relevés de dérive
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+La comparaison d'octobre entre deux builds (sjr0p7 → cnty9, 10 jours) : entrées 1200 → 1219 (98 ajoutées, 79 retirées) ; 779 des 1121 noms inchangés ont changé d'id (69 %) ; une migration de convention de nommage (suffixes `_rot1..4` → emplacements `[rot[1..4`) ; l'apparition du coffre double. Le relevé complet se trouve dans [Historique des versions : v4](../history/v4.md).
 
-## Related
+## Voir aussi
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [Catalogue de textures](../api/texture-catalog.md) · [Validation des shaders](shader-validation.md) · [Journal de recherche](research-log.md)

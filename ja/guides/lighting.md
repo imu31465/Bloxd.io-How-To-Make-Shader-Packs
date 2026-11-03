@@ -21,9 +21,3 @@
 | 波法線 / 太陽グリント | 非対応 | ◎ ([波法線+グリント](../recipes/realism.md)) |
 | 影 (スカイ遮蔽シャドウ) | `mix(環境色, 空色, skyLight)` で緩やかに混合 | ◎ リフト逆変換 + しきい値カット + 太陽ゲート ([投影風シャドウ](../recipes/realism.md))。木陰や屋根下が明確に反応し、ブロック編集にリアルタイム追従 |
 | 夜の月光処理 | 空色が暗くなるだけ | △ 月の方向は入力にないため、方向性を持つ月光は不可。青い環境光や彩度低下による擬似表現のみ ([夜の青い環境光](../recipes/lighting.md) / [シネマgrade](../recipes/realism.md)) |
-
-## 関連
-
-- [ライティングAPI](../api/lighting.md) — 公開されている照明関数
-- [リアル系レシピ](../recipes/realism.md) — 実装例
-- [エンジン内部: Lighting Internals](../internals/lighting-internals.md)

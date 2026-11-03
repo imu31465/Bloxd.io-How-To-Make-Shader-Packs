@@ -1,19 +1,19 @@
-# Shader validation internals
+# Validation des shaders
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré depuis le validateur en production)
 
-The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](../troubleshooting/validation.md).
+La validation statique (l'analyseur, étape 1 du contrôle de chargement). Les correctifs côté utilisateur : [Erreurs de validation](../troubleshooting/validation.md).
 
-## The stages
+## Les étapes
 
-1. **Loader limits** (zip / pack.json shape) → [Pack format](../api/pack-format.md)
-2. **Static validation (analyzer)** — this page; syntax, types, reserved names, hook contracts across all 6 variants
-3. **Real browser compilation** → [WGSL compilation](wgsl-compilation.md)
-4. **Runtime re-validation on game join** — actually compiles every existing terrain material (stricter than the settings-screen check); failing it drops the pack for that game
+1. **Limites du chargeur** (zip / forme du pack.json) → [Format du pack](../api/pack-format.md)
+2. **Validation statique (analyseur)** — cette page ; syntaxe, types, noms réservés, contrats de hooks à travers les 6 variantes
+3. **Compilation réelle dans le navigateur** → [Compilation WGSL](wgsl-compilation.md)
+4. **Revalidation à l'exécution à l'entrée en jeu** — compile réellement chaque matériau de terrain existant (plus stricte que le contrôle de l'écran de réglages) ; son échec exclut le pack de ce jeu
 
-## The special-function signature table
+## La table de signatures des fonctions spéciales
 
-The validator keeps a table in module 29849 and checks cross-hook call restrictions:
+Le validateur tient une table dans le module 29849 et vérifie les restrictions d'appel entre hooks :
 
 ```js
 const Jq = new Map([
@@ -24,49 +24,49 @@ const Jq = new Map([
 ]);
 ```
 
-Restored logic:
+Logique restaurée :
 
-- calling a non-`vertex: true` special function from a vertex hook → *"X reaches Y, which only surface and light hooks can use."*
-- a function with a `symbol` (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) reached from a variant that doesn't define that macro → *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
+- appeler une fonction spéciale non `vertex: true` depuis un hook de vertex → *« X reaches Y, which only surface and light hooks can use. »*
+- une fonction dotée d'un `symbol` (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) atteinte depuis une variante qui ne définit pas cette macro → *« X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH. »*
 
-Note: `bloxdFragmentBlockPosition` is gone from v5's header generation but its old definition remains in this table (observed on the v5 build). Calls are rejected by validation.
+Note : `bloxdFragmentBlockPosition` a disparu de la génération de l'en-tête, mais son entrée demeure dans cette table en production — et c'est cette table que le contrôle des identifiants consulte, donc les appels passent toujours la validation. Le générateur de code continue également d'injecter la définition (terrain/liquide et les deux programmes de modèle), donc la fonction reste appelable en pratique. Considérée comme dépréciée : non documentée, et susceptible d'être retirée dans n'importe quelle version future.
 
-## Reserved-name diagnostics
+## Diagnostics des noms réservés
 
-- **the `/^bloxd/i` general rule**: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
-- **direct texture/sampler declarations**: *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
+- **la règle générale `/^bloxd/i`** : *« Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light> »*
+- **les déclarations directes de texture/sampler** : *« Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel. »*
 
-## Texture-name resolution & diagnostics
+## Résolution des noms de textures & diagnostics
 
-`bloxdTextureId*` resolution has a dedicated path ([the messages](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+La résolution `bloxdTextureId*` possède un chemin dédié ([les messages](../api/texture-api.md#erreurs-de-résolution-de-noms-verbatim-depuis-le-validateur)) :
 
-- **folding**: split on non-alphanumerics, CamelCase, prefix with `bloxdTextureId`; reverse matching is case/underscore-insensitive
-- **spelling suggestions** (new in v5): unmatched names get Levenshtein proposals at threshold `max(2, floor(len/4)) + 1`
-- dedicated messages for frame spellings and turned-copy spellings
-- post-fold ambiguous names are unusable
+- **pliage** : découpage sur les non-alphanumériques, CamelCase, préfixe `bloxdTextureId` ; la correspondance inverse est insensible à la casse et aux underscores
+- **suggestions d'orthographe** (nouveau en v5) : les noms sans correspondance reçoivent des propositions Levenshtein au seuil `max(2, floor(len/4)) + 1`
+- messages dédiés pour les orthographes d'image et les orthographes de copie tournée
+- les noms ambigus après pliage sont inutilisables
 
-## v5's new diagnostics
+## Les nouveaux diagnostics de la v5
 
-- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* — names the removed macro
-- packs reading `blockFlags` or referencing `bloxdBlockFlag*` fail the reserved-name diagnostic — **no pack misbehaves silently**
+- *« BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead. »* — nomme la macro retirée
+- les packs lisant `blockFlags` ou référençant `bloxdBlockFlag*` échouent au diagnostic des noms réservés — **aucun pack ne dysfonctionne silencieusement**
 
-## The Y-derivative rewrite
+## La réécriture des dérivées en Y
 
-The analyzer's token-rewrite pass rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (the dpdy family is explicitly enumerated as the inversion set). `dpdx` and `fwidth` are untouched ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5)).
+La passe de réécriture de jetons de l'analyseur réécrit chaque appel `dpdy` / `dpdyCoarse` / `dpdyFine` en `(-dpdy(...))` (la famille dpdy est explicitement énumérée comme l'ensemble d'inversion). `dpdx` et `fwidth` restent intouchés ([Restrictions](../api/restrictions.md#réécritures-automatiques)).
 
-## Header & texture-constant generation
+## Génération de l'en-tête & des constantes de textures
 
-- the header is prepended read-only ([Engine header](engine-header.md))
-- the `bloxdTextureId*` block is generated **per pack** from referenced names
+- l'en-tête est préfixé en lecture seule ([En-tête du moteur](engine-header.md))
+- le bloc `bloxdTextureId*` est généré **par pack** à partir des noms référencés
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (leading integer 8 → 9 from v4). The two fnv1a32 suffixes fingerprint the header material and the sorted name-id registry. Saved-pack re-validation uses this fingerprint to decide "needs re-check" ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` vaut `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (entier de tête passé de 8 à 9 depuis la v4). Les deux suffixes fnv1a32 prennent l'empreinte du matériau d'en-tête et du registre nom-id trié. La revalidation des packs sauvegardés utilise cette empreinte pour décider « à revérifier » ([Compatibilité](../api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
 
-## Validation stubs
+## Stubs de validation
 
-Code that passes static validation gets stub code synthesized before the real browser-WGSL check: `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — the type-stub table (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) builds input structs and invokes the hooks. Details: [WGSL compilation](wgsl-compilation.md).
+Le code qui passe la validation statique reçoit du code stub synthétisé avant le vrai contrôle WGSL du navigateur : `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — la table de stubs de types (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) construit les structs d'entrée et invoque les hooks. Détails : [Compilation WGSL](wgsl-compilation.md).
 
-## Related
+## Voir aussi
 
-- [Validation errors](../troubleshooting/validation.md) · [WGSL compilation](wgsl-compilation.md) · [Texture registry](texture-registry.md) · [Engine data](engine-data.md)
+- [Erreurs de validation](../troubleshooting/validation.md) · [Compilation WGSL](wgsl-compilation.md) · [Registre des textures](texture-registry.md) · [Relevé des données du moteur](engine-data.md)

@@ -1,34 +1,34 @@
 # Performance
 
-> Target API: 5 · Status: Verified
+> API cible : 5 · État : Verified
 
-Speed problems and their fixes.
+Problèmes de vitesse et leurs corrections.
 
-## The on-device check never finishes and drops the pack
+## Le contrôle sur appareil ne se termine jamais et écarte le pack
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **Cause** : le contrôle a un **délai impératif de 60 secondes** (le dépassement est traité comme `skipped`) — courant sur les appareils peu puissants et les mondes lourds
+- **Correction** : réduisez le travail lourd sur les sommets et les boucles complexes, puis réessayez
+- **Prévention** : suivez le [guide de performance](../guides/performance.md)
 
-## Frame rate drops
+## Baisse de la fréquence d'images
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **Vérification** : comparez les FPS avec et sans le pack ; mesurez séparément les scènes riches en terrain et l'eau
+- **Causes typiques** : effets lourds sur chaque face sans condition (aucune sélection par flag/distance) ; bruit de hash haute fréquence ; grands exposants de `pow`
+- **Corrections** ([le guide](../guides/performance.md)) :
+  - réservez les effets aux faces qui en ont besoin via `flags`
+  - sortie anticipée par distance (`distance(surface.position, bloxdEyePosition())`)
+  - échantillonnez un mip au-dessus pour des lectures `bloxdTexel` moins coûteuses
+- **Prévention** : ajoutez le détail progressivement et comparez les FPS ([tests](../guides/testing.md))
 
-## Slow only on mobile
+## Lent seulement sur mobile
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **Cause** : les packs tournent sur le renderer WebGPU ; les GPU mobiles peuvent être des dizaines de fois plus lents que ceux de bureau
+- **Correction** : réduisez la force/la fréquence des effets, renforcez l'élagage par distance — ou indiquez clairement que le mobile n'est pas pris en charge ([Prérequis](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## À l'approche de la limite de 256 Ko du pack
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **Correction** : allégez les commentaires, factorisez le code partagé en fonctions, supprimez les recettes inutilisées ([Structure du pack](../getting-started/pack-structure.md))
 
-## Related
+## Voir aussi
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [Guide de performance](../guides/performance.md) · [Tests](../guides/testing.md)

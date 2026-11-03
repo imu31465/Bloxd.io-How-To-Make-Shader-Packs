@@ -18,9 +18,3 @@
 - 発光ブロックが光らない → 再構築系で emission の再加算漏れ。`+ s.emission * (1.0 - l.fogAlpha)` を追加する
 
 [← 前の部](../recipes/)・[マニュアルに戻る](../)・[次の部 →](../troubleshooting/)
-
-## 関連
-
-- [トラブルシューティング](../troubleshooting/) — 検証・コンパイルエラー
-- [実機テストのチェックリスト](testing.md)
-- [エンジン内部: デバッグ手段](../internals/debugging.md)

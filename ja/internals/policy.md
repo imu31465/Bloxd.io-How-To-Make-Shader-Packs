@@ -29,9 +29,3 @@ strict 側で特に誤解しやすい点は以下の通りである。
 この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新により allow/strict の配分は変更され得る。新版が公開された際は再確認されたい。
 
 [← 前の部](../guides/)・[マニュアルに戻る](../)・[次の部 →](../history/v2.md)
-
-## 関連
-
-- [バリアントとガード](../getting-started/variants.md)
-- [バリアント固有の問題](../troubleshooting/variants.md)
-- [リサーチログ](research-log.md)

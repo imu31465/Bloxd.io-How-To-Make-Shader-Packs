@@ -64,9 +64,3 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 実用上の要点: 水中でもパックは動作している / ヴェールは無効化できない / 水中かどうかを条件分岐できない (fogStart / fogEnd / fogColour は水中で変化せず、fogAlpha から推定する方法もない)。
 
 [← 前の部](../troubleshooting/)・[マニュアルに戻る](../)・[次の部 →](../internals/)
-
-## 関連
-
-- [液体のレシピ](../recipes/liquids.md)
-- [頂点のレシピ](../recipes/vertices.md) — 液面の波
-- [エンジン内部: Fog Internals](../internals/fog-internals.md)

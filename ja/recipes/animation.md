@@ -38,8 +38,3 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
     return (vec3f(0.2, 0.9, 0.55) * w1 + vec3f(0.55, 0.3, 0.95) * w2 + vec3f(0.95, 0.35, 0.75) * w3) / (w1 + w2 + w3 + 0.001);
 }
 ```
-
-## 関連
-
-- [関数](../api/functions.md) — `bloxdSeconds`
-- [定数](../api/constants.md) — `bloxdTau`

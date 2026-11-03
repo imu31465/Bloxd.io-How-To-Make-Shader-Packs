@@ -71,9 +71,3 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
-## 関連
-
-- [パック形式](../api/pack-format.md)
-- [エンジンデータ台帳](engine-data.md)
-- [シェーダー検証の内部](shader-validation.md)

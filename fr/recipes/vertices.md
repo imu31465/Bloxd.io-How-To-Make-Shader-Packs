@@ -1,11 +1,10 @@
-# Recettes de sommets (allow seul)
+# Sommets (allow seul)
 
+> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> Entourez tout de `#ifndef BLOXD_STRICT`.
+> Pour les conditions exactes (liste des titres allow ; Custom Games est strict), voir [Politique de shader packs par jeu](../internals/policy.md)
 
-
-> Tout entourer de `#ifndef BLOXD_STRICT`.
-> Pour les conditions exactes (liste des titres allow ; Custom Games est strict) voir §30 : [§30 Modes d'application par jeu](../internals/)
-
-## Herbe au vent (ne bouger que les pointes)
+## Herbe qui se balance au vent (ne bouger que les pointes)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -19,7 +18,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Vagues en liquide (faces du dessus seules)
+## Vagues en surface de liquide (faces du dessus seules)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -36,7 +35,7 @@ fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Terrain pulsant
+## Terrain qui respire
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -49,7 +48,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Terrain ondulant (vagues sinus géantes)
+## Terrain vallonné (vagues sinusoïdales géantes)
 
 ```wgsl
 #ifndef BLOXD_STRICT

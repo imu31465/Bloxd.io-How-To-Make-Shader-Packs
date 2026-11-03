@@ -1,47 +1,47 @@
-# Compilation errors
+# Erreurs de compilation
 
-> Target API: 5 · Status: Verified
+> API cible : 5 · État : Verified
 
-Errors that pass static validation but fail as WGSL, or fail only in the browser's WGSL compiler (stage 2).
+Erreurs qui passent la validation statique mais échouent en tant que WGSL, ou qui n'échouent que dans le compilateur WGSL du navigateur (étape 2).
 
 ## "bloxdTerrainVertex must be declared as: fn ..."
 
-- **Cause**: hook signature mismatch (argument/return types)
-- **Fix**: rewrite to the declaration shown in the message (parameter names are free; types must match exactly)
-- **Prevention**: start from the [hook comparison table](../api/hooks.md)
+- **Cause** : non-concordance de signature de hook (types d'arguments/retour)
+- **Correction** : réécrivez selon la déclaration montrée dans le message (les noms de paramètres sont libres ; les types doivent correspondre exactement)
+- **Prévention** : partez du [tableau comparatif des hooks](../api/hooks.md)
 
 ## "mixing '*' and '^' requires parenthesis (only in ...)"
 
-- **Cause**: WGSL requires parentheses when mixing `^` `&` `|` `<<` `>>` with other operators
-- **Fix**: parenthesize the operands
+- **Cause** : le WGSL exige des parenthèses quand on mélange `^` `&` `|` `<<` `>>` avec d'autres opérateurs
+- **Correction** : mettez les opérandes entre parenthèses
 
 ## "... can only be a function's parameter or return type, ..."
 
-- **Cause**: `var x: BloxdSurface;` — bare type-annotated declarations are rejected because header structs gain fields
-- **Fix**: `var out = bloxdDefaultSurface(s);` (or `var out = s;` in light hooks)
-- **Prevention**: always build outputs from `bloxdDefault*` ([conventions](../api/structures.md#writing-conventions-recap))
+- **Cause** : `var x: BloxdSurface;` — les déclarations nues annotées d'un type sont rejetées car les structures de l'en-tête gagnent des champs
+- **Correction** : `var out = bloxdDefaultSurface(s);` (ou `var out = s;` dans les hooks de lumière)
+- **Prévention** : construisez toujours les sorties depuis les `bloxdDefault*` ([conventions](../api/structures.md#conventions-décriture-rappel))
 
 ## "_ can only be the target of a phony assignment, as in _ = f();"
 
-- **Cause**: `let _ = f();` is invalid WGSL
-- **Fix**: write `_ = f();`
+- **Cause** : `let _ = f();` est du WGSL invalide
+- **Correction** : écrivez `_ = f();`
 
 ## "Lite: …reads scene depth on a page that didn't turn it on"
 
-- **Cause**: a depth-reading pack (`bloxdOpaqueBehind`) was active when the page was generated; depth availability is decided at page generation
-- **Fix**: reload the page with the pack active
+- **Cause** : un pack lisant la profondeur (`bloxdOpaqueBehind`) était actif quand la page a été générée ; la disponibilité de la profondeur se décide à la génération de la page
+- **Correction** : rechargez la page avec le pack actif
 
-## dpdy sign looks inverted
+## Le signe de dpdy semble inversé
 
-- **This is by design**: v5's analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
-- `dpdx` and `fwidth` are untouched
+- **Comportement voulu** : l'analyseur réécrit automatiquement tout appel `dpdy` / `dpdyCoarse` / `dpdyFine` en `(-dpdy(...))` (le y en espace écran pointe vers le bas)
+- **Correction** : rien — écrivez `dpdy(h)` avec l'intention « comment h varie-t-il quand on monte » et le code émis porte l'inversion ([Restrictions](../api/restrictions.md#réécritures-automatiques))
+- `dpdx` et `fwidth` restent inchangés
 
-## Pack gets dropped on game join / the on-device check never finishes
+## Le pack est écarté à l'entrée en jeu / le contrôle sur appareil ne se termine jamais
 
-- **Cause**: the on-device check failed, or hit the 60-second forced timeout (`skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops; see [Performance](performance.md)
+- **Cause** : le contrôle sur appareil a échoué, ou a atteint le délai impératif de 60 secondes (`skipped`) — courant sur les appareils peu puissants et les mondes lourds
+- **Correction** : réduisez le travail lourd sur les sommets et les boucles complexes ; voir [Performance](performance.md)
 
-## Related
+## Voir aussi
 
-- [Validation errors](validation.md) · [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)
+- [Erreurs de validation](validation.md) · [Engine Internals : compilation WGSL](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)

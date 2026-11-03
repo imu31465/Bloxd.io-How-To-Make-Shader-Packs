@@ -64,8 +64,3 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 }
 #endif
 ```
-
-## 関連
-
-- [バリアントとガード](../getting-started/variants.md)
-- [エンジン内部: ゲーム別の適用モード](../internals/policy.md)

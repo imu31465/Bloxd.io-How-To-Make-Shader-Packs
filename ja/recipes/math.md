@@ -29,8 +29,3 @@ fn pack_triangle(x: f32) -> f32 { return abs(fract(x) * 2.0 - 1.0); }
 // 秒 → 「ゆっくりな位相」に変換
 let phase = t * 0.15;
 ```
-
-## 関連
-
-- [色のレシピ](colors.md)
-- [時間とアニメーションのレシピ](animation.md)

@@ -53,8 +53,3 @@ let viewDir = normalize(bloxdEyePosition() - s.position);
 let facing = clamp(dot(viewDir, s.normal), 0.0, 1.0);   // 真上から 1 / 浅い角度 0
 let fresnel = pow(1.0 - facing, 3.0);
 ```
-
-## 関連
-
-- [関数](../api/functions.md) — `bloxdWorldPosition` / `bloxdRenderOffset`
-- [数式小技集](math.md)

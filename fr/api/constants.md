@@ -1,8 +1,8 @@
-# Constants
+# Constantes
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
-The header provides three constants (texture name constants `bloxdTextureId*` are covered in [Texture API](texture-api.md)).
+L'en-tête fournit trois constantes (les constantes de noms de textures `bloxdTextureId*` sont couvertes dans [API de textures](texture-api.md)).
 
 ```wgsl
 const bloxdPi: f32 = 3.1415926535898;
@@ -12,17 +12,17 @@ const bloxdTau: f32 = 6.2831853071796;
 const bloxdChunkSize: i32 = 32;
 ```
 
-| Constant | Type | Value | Description |
+| Constante | Type | Valeur | Description |
 |---|---|---|---|
 | `bloxdPi` | `f32` | 3.1415926535898 | pi |
-| `bloxdTau` | `f32` | 6.2831853071796 | 2π (handy for periods) |
-| `bloxdChunkSize` | `i32` | 32 | blocks along each side of a chunk (**new in v5**) |
+| `bloxdTau` | `f32` | 6.2831853071796 | 2π (pratique pour les périodes) |
+| `bloxdChunkSize` | `i32` | 32 | blocs le long de chaque côté d'un chunk |
 
-## Usage
+## Utilisation
 
 ### bloxdPi / bloxdTau
 
-Declared for you — no need to define your own pi. `bloxdTau` is convenient for periodic animation:
+Déclarées pour vous — inutile de définir votre propre pi. `bloxdTau` est pratique pour l'animation périodique :
 
 ```wgsl
 fn sway(worldPos: vec3f, time: f32) -> f32 {
@@ -31,9 +31,9 @@ fn sway(worldPos: vec3f, time: f32) -> f32 {
 }
 ```
 
-### bloxdChunkSize — new in v5
+### bloxdChunkSize
 
-The engine's former magic number "chunks are 32 blocks wide" is now a named constant you can branch on. Useful for chunk-periodic effects (checkerboards, chunk-border accents):
+Le nombre de blocs le long de chaque côté d'un chunk, en constante nommée sur laquelle vous pouvez brancher. Utile pour les effets périodiques par chunk (damiers, accents de bordure de chunk) :
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -46,8 +46,8 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-Note: `bloxdChunkSize` is `i32` — cast with `f32(bloxdChunkSize)` when mixing with floats.
+Note : `bloxdChunkSize` est `i32` — convertissez avec `f32(bloxdChunkSize)` quand vous la mélangez à des flottants.
 
-## Related
+## Voir aussi
 
-- [Functions](functions.md) · [Version History: v3](../history/v3.md) (where `bloxdPi` / `bloxdTau` arrived)
+- [Fonctions](functions.md) · [Historique des versions : v3](../history/v3.md) (où `bloxdPi` / `bloxdTau` sont apparues)

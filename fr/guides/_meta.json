@@ -1,17 +1,20 @@
 {
   "index": {
     "title": "Guides",
-    "theme": { "toc": false, "typesetting": "article" }
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "lighting": "How lighting works",
-  "shadows": "Shadows",
-  "water": "Making water look natural",
-  "night": "Designing night looks",
-  "models": "Models and textures",
-  "realism": "Realism: two schools",
-  "constraints": "Unreachable effects",
+  "lighting": "Comment fonctionne l'éclairage",
+  "shadows": "Ombres",
+  "water": "Rendre l'eau d'aspect naturel",
+  "night": "Concevoir des looks nocturnes",
+  "models": "Modèles et textures",
+  "realism": "Réalisme : deux écoles",
+  "constraints": "Ce que les packs de shaders peuvent et ne peuvent pas faire",
   "performance": "Performance",
-  "testing": "On-device test checklist",
-  "combinations": "Combining with texture packs",
-  "debugging": "Debugging tips"
+  "testing": "Liste de vérification en jeu",
+  "combinations": "Combiner avec des packs de textures",
+  "debugging": "Astuces de débogage"
 }
