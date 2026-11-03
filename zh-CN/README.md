@@ -1,89 +1,52 @@
-# Bloxd.io 着色器包制作方法 (完整版)
+# Bloxd.io 着色器包开发文档
 
-自包含的 Bloxd.io 着色器包 (仅 WebGPU 渲染器) 制作与分发指南。
-**现行 API 为 `apiVersion: 5` —— 已于 2026-11-03 正式上线**，当前游戏在加载时会拒绝 v1、v2、v3 与 v4 包 (API 版本不符消息)。下文中第一至第七部分仍以 v2 为基准撰写，作为概念基础继续有效——请按 v2 阅读，然后在分发前应用第九部分 (`09-apiv3.md`) 与第十部分 (`10-apiv4.md`) 的变更。第十部分涵盖 v4 的纹理 API (`bloxdTexel`、`bloxdTextureId*`)、雾字段改名 (`fogAlpha`，含义反转！) 以及严格游戏契约。指南按部拆分为独立文件 (本 README 为目录；配方集在 `03-recipes.md`)。更早的 v1 → v2 迁移见第八部分 (`08-apiv2.md`)。第九部分还记录了从生产构建复原的引擎内部实现 (§49–§54: 钩子调用、四模式雾函数、`bloxdOpaqueBehind()` 实现、blockFlags 传递路径，以及带实测标头哈希的验证管线)。 v4 → v5 的迁移步骤见 [第十二部分](12-apiv5.md)（2026-11-03 起上线）。
+关于 Bloxd.io 的 WebGPU 渲染器着色器包的非官方文档——从创建、实现、验证、分发，到 API 规格与引擎内部研究。
 
-> 本书为非官方指南，不代表开发者的官方立场。API 可能随时变更。  
-> 本指南在 AI 协助下创建，不保证准确性。请以实际游戏表现为准。  
-> 最后检查: 2026-10-27 (已确认 v4 上线 —— 构建 `cnty9`，生产与预发布一致；见第十部分。 通过对比构建确认 v3 已正式上线；钩子调用、雾、深度与 blockFlags 内部实现均从生产构建复原——第九部分 §49–§54)。完整参考材料已作为第十一部分 (`11-reference.md`) 嵌入——逐字复原的引擎头文件与含全部 905 个可用纹理名称的完整实测目录；API 说明与配方仍请持续以加载界面与游戏内编译为准。  
-> 着色器包功能本身是游戏内 UI 可加载的官方功能，包为纯 WGSL  
-> (无 JS 执行、无网络通信)，正常代码不会发生危险。
+## 当前规格
 
-## 目录
+- 当前 API：**5**（`pack.json` 必须声明 `apiVersion: 5`）
+- 目标：WebGPU 渲染器
+- 最后验证：2026-11-03
+- 目标构建：`ab90qa.main.6188124c.js`（正式服与预发布服为同一捆绑包——md5 `fc3322212d15be2445c0e8df9733fcc` 已验证）
+- 着色器钩子：9 个（Terrain / Liquid / Model × Vertex / Surface / Light）
 
-- [一体化全指南（单文件版）](00-full.md)
-- [第一部分: 制作包](01-making.md)
-  - [1. 概述与前提](01-making.md#1-概述与前提)
-  - [2. 最短步骤](01-making.md#2-最短步骤)
-  - [3. 包结构](01-making.md#3-包结构)
-  - [4. pack.json](01-making.md#4-packjson)
-  - [5. 最小模板](01-making.md#5-最小模板)
-  - [6. 六个钩子](01-making.md#6-六个钩子)
-  - [7. 八种变体与守卫](01-making.md#7-八种变体与守卫)
-  - [8. 可用的语言功能与禁项](01-making.md#8-可用的语言功能与禁项)
-  - [9. 验证、测试与分发](01-making.md#9-验证测试与分发)
-- [第二部分: API 参考](02-api.md)
-  - [10. 引擎头 (自动前置于包代码)](02-api.md#10-引擎头-自动前置于包代码)
-  - [11. 变体一览](02-api.md#11-变体一览)
-  - [12. 骨架速查](02-api.md#12-骨架速查)
-- [第三部分: 配方集](03-recipes.md)
-  - [R1. 颜色配方 (surface)](03-recipes.md#r1-颜色配方-surface)
-  - [R2. 光照配方 (light)](03-recipes.md#r2-光照配方-light)
-  - [R3. 自发光配方 (emission)](03-recipes.md#r3-自发光配方-emission)
-  - [R4. 坐标配方 (世界/方块/视线)](03-recipes.md#r4-坐标配方-世界方块视线)
-  - [R5. 时间配方 (动画)](03-recipes.md#r5-时间配方-动画)
-  - [R6. 液体配方](03-recipes.md#r6-液体配方)
-  - [R7. 顶点配方 (仅 allow)](03-recipes.md#r7-顶点配方-仅-allow)
-  - [R8. 数学小技巧](03-recipes.md#r8-数学小技巧)
-  - [R9. 写实系配方](03-recipes.md#r9-写实系配方)
-- [第四部分: 写实化指南](04-realism.md)
-  - [13. 引擎默认光照与写实余地](04-realism.md#13-引擎默认光照与写实余地)
-  - [14. 写实化的实现流派 —— 两种](04-realism.md#14-写实化的实现流派--两种)
-  - [15. 达不到的表现 (写实化的「天花板」)](04-realism.md#15-达不到的表现-写实化的天花板)
-  - [16. 调试技巧](04-realism.md#16-调试技巧)
-- [第五部分: 故障排除与注意事项](05-troubleshooting.md)
-  - [17. 常见错误与修复](05-troubleshooting.md#17-常见错误与修复)
-  - [18. 权利与注意事项](05-troubleshooting.md#18-权利与注意事项)
-- [第六部分: 重要的实现补充](06-implementation.md)
-  - [19. 修复夜间「影黑了面却亮」](06-implementation.md#19-修复夜间影黑了面却亮)
-  - [20. 让水自然的水体统合配方](06-implementation.md#20-让水自然的水体统合配方)
-  - [21. 实机测试清单](06-implementation.md#21-实机测试清单)
-  - [22. 着色器到极限时的组合](06-implementation.md#22-着色器到极限时的组合)
-  - [23. 水中与着色器包的实情](06-implementation.md#23-水中与着色器包的实情)
-- [第七部分: 内部规格的补充](07-internals.md)
-  - [24. 太阳与月亮的正体](07-internals.md#24-太阳与月亮的正体)
-  - [25. 雾的内部规格](07-internals.md#25-雾的内部规格)
-  - [26. blockLight / heldLight 内部构造](07-internals.md#26-blocklight--heldlight-内部构造)
-  - [27. 管线细节](07-internals.md#27-管线细节)
-  - [28. 包可见值变化之物 — 测试清单](07-internals.md#28-包可见值变化之物--测试清单)
-  - [29. 调试手段](07-internals.md#29-调试手段)
-  - [30. 每个游戏的适用模式 (`shaderPackPolicy`)](07-internals.md#30-每个游戏的适用模式-shaderpackpolicy)
-- [第八部分: API Version 2 迁移指南](08-apiv2.md)
-  - [31. v1 包的命运 (先说结论)](08-apiv2.md#31-v1-包的命运-先说结论)
-  - [32. 标识符全面改名 (对照表)](08-apiv2.md#32-标识符全面改名-对照表)
-  - [33. 删除字段的移植去向](08-apiv2.md#33-删除字段的移植去向)
-  - [34. 新功能 ①: `blockId` (按方块着色)](08-apiv2.md#34-新功能-①-blockid-按方块着色)
-  - [35. 新功能 ②: `BLOXD_SCENE_DEPTH` 与 `bloxdOpaqueBehind()` (核心)](08-apiv2.md#35-新功能-②-bloxd_scene_depth-与-bloxdopaquebehind-核心)
-  - [36. 其他 v2 变更](08-apiv2.md#36-其他-v2-变更)
-  - [37. v1 → v2 迁移清单](08-apiv2.md#37-v1--v2-迁移清单)
-  - [38. 第二验证阶段 — 浏览器的 WGSL 编译器比内置解析器更严格](08-apiv2.md#38-第二验证阶段--浏览器的-wgsl-编译器比内置解析器更严格)
-  - [39. 关于独立相似资料](08-apiv2.md#39-关于独立相似资料)
-- [第九部分: API Version 3 迁移指南 (2026-10-19 起已上线)](09-apiv3.md)
-  - [40. v2 包的命运 (先说结论)](09-apiv3.md#40-v2-包的命运-先说结论)
-  - [41. pack.json 与 uniform 缓冲 (不变的部分)](09-apiv3.md#41-packjson-与-uniform-缓冲-不变的部分)
-  - [42. blockId 变成 blockFlags: 每方块材质以位标志表示 (核心)](09-apiv3.md#42-blockid-变成-blockflags-每方块材质以位标志表示-核心)
-  - [43. 函数改名与语义变化](09-apiv3.md#43-函数改名与语义变化)
-  - [44. 新标头常量: `bloxdPi` 与 `bloxdTau`](09-apiv3.md#44-新标头常量-bloxdpi-与-bloxdtau)
-  - [45. 六钩子模板 (官方展示液体钩子)](09-apiv3.md#45-六钩子模板-官方展示液体钩子)
-  - [46. 变体矩阵: 程序轴与宏的变化](09-apiv3.md#46-变体矩阵-程序轴与宏的变化)
-  - [47. v2 → v3 迁移清单](09-apiv3.md#47-v2--v3-迁移清单)
-  - [48. 其他 v3 变更与注意事项](09-apiv3.md#48-其他-v3-变更与注意事项)
-  - [49. 引擎内部: Lite 渲染器如何调用你的钩子](09-apiv3.md#49-引擎内部-lite-渲染器如何调用你的钩子)
-  - [50. 雾函数: 四种模式，一个字段](09-apiv3.md#50-雾函数-四种模式一个字段)
-  - [51. bloxdOpaqueBehind(): 精确实现](09-apiv3.md#51-bloxdopaquebehind-精确实现)
-  - [52. blockFlags 全链路: 从注册到钩子](09-apiv3.md#52-blockflags-全链路-从注册到钩子)
-  - [53. 验证内部: HEADER_VERSION、签名、保留名](09-apiv3.md#53-验证内部-header_version签名保留名)
-  - [54. 已确认的常量、限制与布局](09-apiv3.md#54-已确认的常量限制与布局)
-- [第十部分: API Version 4 迁移指南 (2026-10-26, 摘要)](10-apiv4.md)
-- [第十一部分：完整参考 — 引擎头文件与纹理目录](11-reference.md)
-- [第十二部分：API 版本 5 迁移指南（2026-11-03，摘要）](12-apiv5.md)
+初次制作着色器包请从 [Getting Started](getting-started/)（英文）开始；查询 API 请看 [API Reference](api/)（英文）。
+
+> 本文档不是游戏开发方的官方资料。引擎内部规格可能随更新变化——请确认各页面标注的目标构建与验证状态。
+>
+> 本指南借助 AI 协助编写，准确性不作保证。请以实际游戏行为为准验证。
+>
+> 着色器包功能本身是游戏内 UI 提供的官方功能，包是纯 WGSL（无 JS 执行、无网络访问），正常编写不会产生危险行为。
+
+## 按目的选择入口
+
+| 目的 | 分类 | 读者 |
+|---|---|---|
+| 制作第一个着色器包 | [Getting Started](getting-started/) | 初次制作者 |
+| 查询 API 函数与字段 | [API Reference](api/) | 实现中的作者 |
+| 实现某种效果（光、水、模型…） | [Guides & Recipes](guides/) | 追求观感的人 |
+| 修复错误 | [Troubleshooting](troubleshooting/) | 包出问题的人 |
+| 研究引擎内部 | [Engine Internals & Research](internals/) | 引擎分析者 |
+| 查询旧版本 (v1–v5) | [Version History](history/) | 迁移旧包的人 |
+
+## 文档结构
+
+- **[Getting Started](getting-started/)** — 概览、快速开始、包结构、pack.json、9 个钩子、变体、验证、分发。通向第一个包的单线教程。
+- **[API Reference](api/)** — 当前 API v5 的系统规格：钩子、标志、输入/输出结构体、全部函数、光照、纹理 API、常量、预处理器、限制、兼容性、896 个名称的纹理目录。
+- **[Guides](guides/)** — 光照原理、阴影、水、夜晚、模型渲染、性能、写实思路。
+- **[Recipes](recipes/)** — 按目的分类的代码示例。
+- **[Troubleshooting](troubleshooting/)** — 按症状组织的排错。
+- **[Engine Internals & Research](internals/)** — 渲染管线、钩子接入、引擎头文件、验证与编译内部、保留标识符、光照/雾内部、纹理采样与注册表、模型渲染、实测数据。
+- **[Version History](history/)** — v1 到 v5：各版本变更、迁移步骤、废弃 API。
+
+> 注：Getting Started / API Reference / Troubleshooting 以及 Guides、Recipes、Internals 中 v5 新增的页面当前以**英文**提供（与本站其他已翻译页面同构）。已翻译的历史内容全部保留在本语言版本中。
+
+## 验证状态标签
+
+| 标签 | 含义 |
+|---|---|
+| Verified | 已在目标构建上实测验证 |
+| Analyzed | 通过分析内部实现确认 |
+| Partially Verified | 仅部分确认 |
+| Experimental | 实验性、未定 |
+| Historical | 过去版本的资料 |

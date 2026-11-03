@@ -1,0 +1,17 @@
+{
+  "index": {
+    "title": "Troubleshooting",
+    "theme": { "toc": false, "typesetting": "article" }
+  },
+  "loading": "Loading errors",
+  "api-version": "API version errors",
+  "compilation": "Compilation errors",
+  "validation": "Validation errors",
+  "variants": "Variant-specific issues",
+  "visual": "Visual issues",
+  "textures": "Texture issues",
+  "lighting": "Lighting issues",
+  "models": "Model issues",
+  "performance": "Performance",
+  "faq": "FAQ & legal notes"
+}

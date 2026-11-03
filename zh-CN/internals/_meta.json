@@ -1,0 +1,23 @@
+{
+  "index": {
+    "title": "Engine Internals & Research",
+    "theme": { "toc": false, "typesetting": "article" }
+  },
+  "rendering-pipeline": "Rendering pipeline",
+  "hook-invocation": "Hook invocation internals",
+  "engine-header": "Engine header (verbatim)",
+  "shader-validation": "Shader validation",
+  "wgsl-compilation": "WGSL compilation",
+  "reserved-identifiers": "Reserved identifier internals",
+  "lighting-internals": "Lighting internals",
+  "fog-internals": "Fog internals",
+  "texture-sampling": "Texture sampling internals",
+  "texture-registry": "Texture registry internals",
+  "model-rendering": "Model rendering internals",
+  "engine-data": "Engine data ledger",
+  "testing-factors": "What changes pack-visible values",
+  "policy": "Per-game shader-pack policy",
+  "sun-and-moon": "The sun and the moon",
+  "debugging": "Debugging tools",
+  "research-log": "Research log"
+}
