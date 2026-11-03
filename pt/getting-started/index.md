@@ -1,19 +1,19 @@
-# Getting Started
+# Primeiros passos
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+Um tutorial de trilha única para autores de pacotes de shaders de primeira viagem, da visão geral à distribuição. Ele ensina diretamente a forma completa da API v5 (não é preciso ler as versões antigas primeiro — esse é o trabalho do [Histórico de versões](../history/)).
 
-## The track
+## A trilha
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [Visão geral e pré-requisitos](overview.md) — o que pacotes de shaders podem e não podem fazer
+2. [Requisitos](requirements.md) — requisitos de navegador e renderizador
+3. [Início rápido](quick-start.md) — seu primeiro pacote em 5 minutos
+4. [Estrutura do pacote](pack-structure.md) — conteúdo do zip e limites de tamanho
+5. [pack.json](manifest.md) — cada campo do manifesto
+6. [Hooks de shader](hooks.md) — os papéis dos 9 hooks
+7. [Variantes](variants.md) — as 6 variantes e as guardas de macro
+8. [Validação](validation.md) — a verificação de carga em 3 etapas e os testes no dispositivo
+9. [Distribuição](distribution.md) — compactação em zip e higiene de lançamento
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção em 2026-11-03) · Estado: Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+Quando você precisar da especificação completa, siga para a [Referência da API](../api/); para efeitos prontos, veja [Receitas](../recipes/).

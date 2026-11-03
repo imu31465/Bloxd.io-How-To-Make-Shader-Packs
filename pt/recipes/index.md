@@ -1,21 +1,21 @@
-# Recipes
+# Receitas
 
-Goal-oriented code examples. The "how it works" side lives in [Guides](../guides/). Everything here is ported to v5 vocabulary (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) and guarded to pass the 6 variants (strict × terrain / liquid / model).
+Exemplos de código orientados a objetivo. O lado do "como funciona" vive em [Guias](../guides/). Tudo aqui está portado ao vocabulário do v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) e protegido para passar nas 6 variantes (strict × terreno / líquido / modelo).
 
-## Map
+## Mapa
 
-| Page | Contents |
+| Página | Conteúdo |
 |---|---|
-| [Color recipes](colors.md) | tint, saturation, color temperature, sepia, altitude gradients |
-| [Lighting recipes](lighting.md) | S-curves, custom fog, night, caves, sunset |
-| [Emission recipes](emission.md) | pulsing lights, glowing ores, fireflies |
-| [Coordinate recipes](coordinates.md) | world/block coords, checkers, hashes, view vectors |
-| [Animation recipes](animation.md) | day cycles, wobble, aurora |
-| [Liquid recipes](liquids.md) | ripples, alpha, underwater murk |
-| [Vertex recipes (allow only)](vertices.md) | grass sway, waves, pulsing terrain |
-| [Math toolbox](math.md) | smoothstep, triangle waves, luma |
-| [Realism recipes](realism.md) | warm×cool, specular, ACES, projected shadows |
-| [Model shaders](model-shaders.md) | v5 — held items, skins, plant sway |
-| [Enchant effects](enchant-effects.md) | v5 — removing, boosting, recoloring the glint |
+| [Receitas de cor](colors.md) | tinta, saturação, temperatura de cor, sépia, gradientes de altitude |
+| [Receitas de iluminação](lighting.md) | curvas S, névoa própria, noite, cavernas, pôr do sol |
+| [Receitas de emissão](emission.md) | luzes pulsantes, minérios brilhantes, vaga-lumes |
+| [Receitas de coordenadas](coordinates.md) | coordenadas de mundo/bloco, xadrez, hashes, vetores de vista |
+| [Receitas de animação](animation.md) | ciclos dia, oscilação, aurora |
+| [Receitas de líquidos](liquids.md) | ondulações, alpha, turvação submarina |
+| [Receitas de vértices (só allow)](vertices.md) | vaivém de grama, ondas, terreno pulsante |
+| [Caixa de ferramentas matemática](math.md) | smoothstep, ondas triangulares, luma |
+| [Receitas de realismo](realism.md) | quente×frio, especular, ACES, sombras projetadas |
+| [Shaders de modelo](model-shaders.md) | v5 — itens na mão, skins, vaivém de plantas |
+| [Efeitos de encantamento](enchant-effects.md) | v5 — remover, reforçar e recolorir o brilho |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (v5 ports of the original recipes — still verify with in-game compilation before distributing)
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Verified (portes v5 das receitas originais — verifique ainda assim com compilação no jogo antes de distribuir)

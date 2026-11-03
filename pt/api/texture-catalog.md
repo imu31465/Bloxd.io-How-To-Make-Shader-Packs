@@ -1,30 +1,42 @@
-# Texture catalog
+# Catálogo de texturas
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Verified (extraído ao reexecutar o construtor de registro do próprio motor)
 
-The complete catalog of usable texture-name constants (`bloxdTextureId*`). **896 names**, alphabetical.
+O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdTextureId*`). **896 nomes**, em ordem alfabética.
 
-## How to read
+## Como ler
 
-The **name** column is the registry name — the handle you actually write. Constant spelling CamelCases the file name: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Case and underscores are not distinguished** (`bloxdTextureId_grass_top` resolves identically to `bloxdTextureIdGrassTop`). Names are the API — the loader re-resolves them against the live registry at load, so names survive registry drift ([Texture API](texture-api.md)).
+A coluna **nome** é o nome do registro — o identificador que você realmente escreve. A grafia da constante converte o nome do arquivo para CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Maiúsculas e sublinhados não são distinguidos** (`bloxdTextureId_grass_top` resolve de forma idêntica a `bloxdTextureIdGrassTop`). Os nomes são a API — o carregador os resolve novamente contra o registro vivo ao carregar, então os nomes sobrevivem à deriva do registro ([API de texturas](texture-api.md)).
 
-The **id** column is the value the constant compares against — measured on `ab90qa` (atlas layer + 1). Use it to decode `surface.textureId` dumps and to cross-check debug output against the day's build. **Never write ids into WGSL** — they are a snapshot of one build's atlas order (see the drift measurements below).
+A coluna **id** é o valor contra o qual a constante se compara — medido em `ab90qa` (camada do atlas + 1). Use-o para decodificar dumps de `surface.textureId` e para conferir a saída de depuração com o build do dia. **Nunca escreva ids em WGSL** — eles são o instantâneo da ordem do atlas de um único build (veja as medições de deriva abaixo).
 
-The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
+A coluna **notas** marca as duas famílias de dobramento. «anim (N quadros)» significa que amostrar este nome retorna automaticamente o quadro de animação atual — **nunca escreva o sufixo de quadro** (`lava0` é um alias conhecido com um diagnóstico dedicado). «família de rotação (4 cópias)» significa que a textura existe apenas como slots pré-rotacionados — o nome refere-se à raiz e `bloxdTexel` reaplica a rotação. Exatamente um nome (`radar_screen`) carrega ambas as notas.
 
-Deliberately **not** listed: the remaining registry spellings — 188 frame aliases and 228 rotation aliases — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,210-row layer table (including 171 pre-rotated slots) is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
+Deliberadamente **não** listadas: as demais grafias do registro — 188 aliases de quadro e 228 aliases de rotação — que não são constantes utilizáveis; escrevê-las dispara mensagens de erro dedicadas do motor. A tabela de camadas subjacente, de 1,210 linhas (incluindo 171 slots pré-rotacionados), é interna do motor e tratada em [Interior do motor: registro de texturas](../internals/texture-registry.md).
 
-## The catalog
+### Como os números se relacionam
 
-All usable names, alphabetically. The id column is the `bloxdTextureId*` value — measured on `ab90qa` (2026-11-03). **Ids are snapshots; treat names as the API**: even between the v4 build (cnty9) and this build, 334 of the names that kept their spelling changed id (see the drift measurements below).
+As contagens nomeiam conjuntos distintos, então elas não se somam de forma ingênua:
 
-| Name | id (ab90qa) | Notes |
+| Contagem | O que conta |
+|---|---|
+| **896** | constantes nomeadas utilizáveis — nomes de textura que você pode escrever como `bloxdTextureId*` |
+| **416** | nomes de alias (188 de quadro + 228 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
+| **1,210** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1210) |
+
+Cada um dos 896 nomes mapeia para uma entrada distinta do atlas. As **314 entradas** restantes são quadros extras de animação (143) e cópias pré-rotacionadas (171) sem nome utilizável — os pacotes nunca as referenciam diretamente, porque `bloxdTexel` anima os quadros e aplica a rotação automaticamente. O primeiro quadro de cada família de animação e a raiz de cada família de rotação *têm* nome, razão pela qual algumas entradas contam ao mesmo tempo como «com nome» e «base de quadro/rotação». Em comparação com o build anterior: a v4 tinha 905 nomes utilizáveis; este build tem 896 (+1 `scorpion_eggs`, −10: baú duplo ×8 e laterais do spawner de mobs ×2), e 334 nomes sobreviventes mudaram de id.
+
+## O catálogo
+
+Todos os nomes utilizáveis, em ordem alfabética. A coluna id é o valor de `bloxdTextureId*` — medido em `ab90qa` (2026-11-03). **Ids são instantâneos; trate os nomes como a API**: mesmo entre o build da v4 (cnty9) e este build, 334 dos nomes que mantiveram a grafia mudaram de id (veja as medições de deriva abaixo).
+
+| Nome | id (ab90qa) | Notas |
 |---|---|---|
 | `alloy_kiln_back` | 1089 |  |
 | `alloy_kiln_front` | 1083 |  |
 | `alloy_kiln_side` | 1084 |  |
-| `alloy_kiln_side_running` | 33 | anim (4 frames) |
-| `alloy_kiln_top` | 1085 | rotation family (4 copies) |
+| `alloy_kiln_side_running` | 33 | anim (4 quadros) |
+| `alloy_kiln_top` | 1085 | família de rotação (4 cópias) |
 | `andesite_brick` | 465 |  |
 | `apple_block_bottom` | 441 |  |
 | `apple_block_side` | 439 |  |
@@ -38,8 +50,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `auto_bench_back` | 1104 |  |
 | `auto_bench_front` | 1098 |  |
 | `auto_bench_side` | 1099 |  |
-| `auto_bench_side_running` | 35 | anim (4 frames) |
-| `auto_bench_top` | 1100 | rotation family (4 copies) |
+| `auto_bench_side_running` | 35 | anim (4 quadros) |
+| `auto_bench_top` | 1100 | família de rotação (4 cópias) |
 | `autocrafter_bottom` | 960 |  |
 | `autocrafter_lunite_bottom` | 971 |  |
 | `autocrafter_lunite_side` | 970 |  |
@@ -58,30 +70,30 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `belt_loader_slab_front` | 1108 |  |
 | `belt_loader_top` | 1107 |  |
 | `belt_tunnel_back` | 1197 |  |
-| `belt_tunnel_exit_top` | 1198 | rotation family (4 copies) |
+| `belt_tunnel_exit_top` | 1198 | família de rotação (4 cópias) |
 | `belt_tunnel_mouth` | 1191 |  |
 | `belt_tunnel_side` | 1192 |  |
-| `belt_tunnel_top` | 1193 | rotation family (4 copies) |
+| `belt_tunnel_top` | 1193 | família de rotação (4 cópias) |
 | `black_concrete` | 273 |  |
-| `black_glazed_terracotta` | 429 | rotation family (4 copies) |
+| `black_glazed_terracotta` | 429 | família de rotação (4 cópias) |
 | `black_planks` | 366 |  |
-| `black_portal` | 2 | anim (4 frames) |
+| `black_portal` | 2 | anim (4 quadros) |
 | `black_spawn_block_side` | 760 |  |
-| `black_spawn_block_top` | 756 | rotation family (4 copies) |
+| `black_spawn_block_top` | 756 | família de rotação (4 cópias) |
 | `block_destroyer_tnt_side` | 1015 |  |
 | `block_destroyer_tnt_top` | 1016 |  |
 | `blue_concrete` | 274 |  |
 | `blue_gen_spawn_coal` | 774 |  |
 | `blue_gen_spawn_iron` | 775 |  |
 | `blue_gen_spawn_top` | 773 |  |
-| `blue_glazed_terracotta` | 413 | rotation family (4 copies) |
+| `blue_glazed_terracotta` | 413 | família de rotação (4 cópias) |
 | `blue_lucky_block` | 992 |  |
 | `blue_lucky_block_rare` | 994 |  |
 | `blue_lucky_block_super` | 996 |  |
 | `blue_planks` | 362 |  |
-| `blue_portal` | 3 | anim (4 frames) |
+| `blue_portal` | 3 | anim (4 quadros) |
 | `blue_spawn_block_side` | 755 |  |
-| `blue_spawn_block_top` | 751 | rotation family (4 copies) |
+| `blue_spawn_block_top` | 751 | família de rotação (4 cópias) |
 | `bone_block_side` | 818 |  |
 | `bone_block_top` | 819 |  |
 | `bookshelf` | 564 |  |
@@ -99,12 +111,12 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `bread_block_top` | 437 |  |
 | `brick` | 315 |  |
 | `brown_concrete` | 275 |  |
-| `brown_glazed_terracotta` | 417 | rotation family (4 copies) |
+| `brown_glazed_terracotta` | 417 | família de rotação (4 cópias) |
 | `brown_mushroom_block` | 536 |  |
 | `brown_planks` | 363 |  |
-| `brown_portal` | 4 | anim (4 frames) |
+| `brown_portal` | 4 | anim (4 quadros) |
 | `brown_spawn_block_side` | 750 |  |
-| `brown_spawn_block_top` | 746 | rotation family (4 copies) |
+| `brown_spawn_block_top` | 746 | família de rotação (4 cópias) |
 | `building_lucky_block` | 987 |  |
 | `building_lucky_block_rare` | 989 |  |
 | `building_lucky_block_super` | 991 |  |
@@ -112,8 +124,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `burner_drill_bottom` | 1045 |  |
 | `burner_drill_front` | 1039 |  |
 | `burner_drill_side` | 1040 |  |
-| `burner_drill_side_running` | 27 | anim (4 frames) |
-| `burner_drill_top` | 1041 | rotation family (4 copies) |
+| `burner_drill_side_running` | 27 | anim (4 quadros) |
+| `burner_drill_top` | 1041 | família de rotação (4 cópias) |
 | `cactus_dry` | 350 |  |
 | `cactus_top` | 349 |  |
 | `carrot_block_bottom` | 919 |  |
@@ -174,14 +186,14 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `charge_vault_top` | 1111 |  |
 | `charging_pad_side` | 1157 |  |
 | `charging_pad_top` | 1156 |  |
-| `checkpoint_block` | 761 | rotation family (4 copies) |
+| `checkpoint_block` | 761 | família de rotação (4 cópias) |
 | `cherry_block_bottom` | 590 |  |
 | `cherry_block_side` | 588 |  |
 | `cherry_block_top` | 589 |  |
 | `chest_back` | 347 |  |
 | `chest_front` | 341 |  |
 | `chest_side` | 342 |  |
-| `chest_top` | 343 | rotation family (4 copies) |
+| `chest_top` | 343 | família de rotação (4 cópias) |
 | `chili_pepper_block_bottom` | 678 |  |
 | `chili_pepper_block_side` | 676 |  |
 | `chili_pepper_block_top` | 677 |  |
@@ -213,35 +225,35 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `crafting_table_top` | 339 |  |
 | `crate` | 916 |  |
 | `crop_harvester_back` | 1190 |  |
-| `crop_harvester_back_running` | 45 | anim (4 frames) |
+| `crop_harvester_back_running` | 45 | anim (4 quadros) |
 | `crop_harvester_front` | 1184 |  |
 | `crop_harvester_side` | 1185 |  |
-| `crop_harvester_side_running` | 44 | anim (4 frames) |
-| `crop_harvester_top` | 1186 | rotation family (4 copies) |
+| `crop_harvester_side_running` | 44 | anim (4 quadros) |
+| `crop_harvester_top` | 1186 | família de rotação (4 cópias) |
 | `crusher_back` | 1053 |  |
 | `crusher_front` | 1047 |  |
 | `crusher_side` | 1048 |  |
-| `crusher_side_running` | 28 | anim (4 frames) |
-| `crusher_top` | 1049 | rotation family (4 copies) |
+| `crusher_side_running` | 28 | anim (4 quadros) |
+| `crusher_top` | 1049 | família de rotação (4 cópias) |
 | `crystal_block` | 1027 |  |
 | `crystal_vat_back` | 1164 |  |
 | `crystal_vat_front` | 1158 |  |
 | `crystal_vat_side` | 1159 |  |
-| `crystal_vat_side_running` | 42 | anim (4 frames) |
-| `crystal_vat_top` | 1160 | rotation family (4 copies) |
+| `crystal_vat_side_running` | 42 | anim (4 quadros) |
+| `crystal_vat_top` | 1160 | família de rotação (4 cópias) |
 | `custom_lobby_block_side` | 769 |  |
-| `custom_lobby_block_top` | 765 | rotation family (4 copies) |
+| `custom_lobby_block_top` | 765 | família de rotação (4 cópias) |
 | `cut_red_sandstone` | 457 |  |
 | `cut_sandstone` | 453 |  |
 | `cyan_concrete` | 276 |  |
 | `cyan_gen_spawn_coal` | 783 |  |
 | `cyan_gen_spawn_iron` | 784 |  |
 | `cyan_gen_spawn_top` | 782 |  |
-| `cyan_glazed_terracotta` | 405 | rotation family (4 copies) |
+| `cyan_glazed_terracotta` | 405 | família de rotação (4 cópias) |
 | `cyan_planks` | 360 |  |
-| `cyan_portal` | 5 | anim (4 frames) |
+| `cyan_portal` | 5 | anim (4 quadros) |
 | `cyan_spawn_block_side` | 745 |  |
-| `cyan_spawn_block_top` | 741 | rotation family (4 copies) |
+| `cyan_spawn_block_top` | 741 | família de rotação (4 cópias) |
 | `dark_green_bricks` | 460 |  |
 | `darkstone` | 1204 |  |
 | `darkstone_bricks` | 1205 |  |
@@ -253,8 +265,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `deep_drill_bottom` | 1137 |  |
 | `deep_drill_front` | 1131 |  |
 | `deep_drill_side` | 1132 |  |
-| `deep_drill_side_running` | 39 | anim (4 frames) |
-| `deep_drill_top` | 1133 | rotation family (4 copies) |
+| `deep_drill_side_running` | 39 | anim (4 quadros) |
+| `deep_drill_top` | 1133 | família de rotação (4 cópias) |
 | `diamond_block` | 340 |  |
 | `diamond_gen_spawn_side` | 807 |  |
 | `diamond_gen_spawn_top` | 806 |  |
@@ -270,8 +282,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `electric_drill_bottom` | 1096 |  |
 | `electric_drill_front` | 1090 |  |
 | `electric_drill_side` | 1091 |  |
-| `electric_drill_side_running` | 34 | anim (4 frames) |
-| `electric_drill_top` | 1092 | rotation family (4 copies) |
+| `electric_drill_side_running` | 34 | anim (4 quadros) |
+| `electric_drill_top` | 1092 | família de rotação (4 cópias) |
 | `emerald_block` | 237 |  |
 | `emerald_ore` | 231 |  |
 | `end_stone` | 226 |  |
@@ -379,7 +391,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `furnace_side` | 336 |  |
 | `furnace_top` | 337 |  |
 | `generator_side` | 1061 |  |
-| `generator_side_running` | 30 | anim (4 frames) |
+| `generator_side_running` | 30 | anim (4 quadros) |
 | `generator_top` | 1062 |  |
 | `ghost_chest_back` | 954 |  |
 | `ghost_chest_front` | 951 |  |
@@ -417,24 +429,24 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `gray_gen_spawn_coal` | 792 |  |
 | `gray_gen_spawn_iron` | 793 |  |
 | `gray_gen_spawn_top` | 791 |  |
-| `gray_glazed_terracotta` | 397 | rotation family (4 copies) |
+| `gray_glazed_terracotta` | 397 | família de rotação (4 cópias) |
 | `gray_planks` | 358 |  |
-| `gray_portal` | 6 | anim (4 frames) |
+| `gray_portal` | 6 | anim (4 quadros) |
 | `gray_spawn_block_side` | 740 |  |
-| `gray_spawn_block_top` | 736 | rotation family (4 copies) |
+| `gray_spawn_block_top` | 736 | família de rotação (4 cópias) |
 | `green_bricks` | 459 |  |
 | `green_concrete` | 285 |  |
-| `green_glazed_terracotta` | 421 | rotation family (4 copies) |
+| `green_glazed_terracotta` | 421 | família de rotação (4 cópias) |
 | `green_lucky_block` | 1004 |  |
 | `green_lucky_block_rare` | 1006 |  |
 | `green_lucky_block_super` | 1008 |  |
 | `green_planks` | 364 |  |
-| `green_portal` | 7 | anim (4 frames) |
+| `green_portal` | 7 | anim (4 quadros) |
 | `green_spawn_block_side` | 735 |  |
-| `green_spawn_block_top` | 731 | rotation family (4 copies) |
+| `green_spawn_block_top` | 731 | família de rotação (4 cópias) |
 | `green_stone` | 458 |  |
 | `grenade_block` | 581 |  |
-| `grey_portal` | 8 | anim (4 frames) |
+| `grey_portal` | 8 | anim (4 quadros) |
 | `gun_lucky_block` | 950 |  |
 | `hardened_clay` | 254 |  |
 | `hardened_clay_stained_black` | 270 |  |
@@ -465,7 +477,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `homestead_core` | 1035 |  |
 | `homestead_core_cap` | 1120 |  |
 | `homestead_core_crown` | 1119 |  |
-| `homestead_core_mid` | 26 | anim (4 frames) |
+| `homestead_core_mid` | 26 | anim (4 quadros) |
 | `hyper_compressed_messy_stone` | 533 |  |
 | `ice` | 326 |  |
 | `ice_brick` | 468 |  |
@@ -475,7 +487,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `iron_chest_back` | 915 |  |
 | `iron_chest_front` | 909 |  |
 | `iron_chest_side` | 910 |  |
-| `iron_chest_top` | 911 | rotation family (4 copies) |
+| `iron_chest_top` | 911 | família de rotação (4 cópias) |
 | `iron_deposit` | 1031 |  |
 | `iron_ore` | 228 |  |
 | `iron_watermelon_side` | 546 |  |
@@ -484,7 +496,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `jungle_grass_block_side` | 886 |  |
 | `lapis_block` | 236 |  |
 | `lapis_ore` | 230 |  |
-| `lava` | 1 | anim (8 frames) |
+| `lava` | 1 | anim (8 quadros) |
 | `leather_block_side` | 906 |  |
 | `leather_block_top` | 907 |  |
 | `leaves_aspen` | 288 |  |
@@ -508,27 +520,27 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `leaves_plum_fruity` | 901 |  |
 | `leaves_spectral` | 830 |  |
 | `light_blue_concrete` | 277 |  |
-| `light_blue_glazed_terracotta` | 381 | rotation family (4 copies) |
+| `light_blue_glazed_terracotta` | 381 | família de rotação (4 cópias) |
 | `light_blue_lucky_block` | 931 |  |
 | `light_blue_planks` | 354 |  |
 | `light_blue_spawn_block_side` | 730 |  |
-| `light_blue_spawn_block_top` | 726 | rotation family (4 copies) |
+| `light_blue_spawn_block_top` | 726 | família de rotação (4 cópias) |
 | `light_gray_concrete` | 272 |  |
-| `light_gray_glazed_terracotta` | 401 | rotation family (4 copies) |
+| `light_gray_glazed_terracotta` | 401 | família de rotação (4 cópias) |
 | `light_gray_planks` | 359 |  |
 | `light_gray_spawn_block_side` | 725 |  |
-| `light_gray_spawn_block_top` | 721 | rotation family (4 copies) |
-| `lightblue_portal` | 9 | anim (4 frames) |
-| `lightgray_portal` | 10 | anim (4 frames) |
+| `light_gray_spawn_block_top` | 721 | família de rotação (4 cópias) |
+| `lightblue_portal` | 9 | anim (4 quadros) |
+| `lightgray_portal` | 10 | anim (4 quadros) |
 | `lime_concrete` | 278 |  |
 | `lime_gen_spawn_coal` | 777 |  |
 | `lime_gen_spawn_iron` | 778 |  |
 | `lime_gen_spawn_top` | 776 |  |
-| `lime_glazed_terracotta` | 389 | rotation family (4 copies) |
+| `lime_glazed_terracotta` | 389 | família de rotação (4 cópias) |
 | `lime_planks` | 356 |  |
-| `lime_portal` | 11 | anim (4 frames) |
+| `lime_portal` | 11 | anim (4 quadros) |
 | `lime_spawn_block_side` | 720 |  |
-| `lime_spawn_block_top` | 716 | rotation family (4 copies) |
+| `lime_spawn_block_top` | 716 | família de rotação (4 cópias) |
 | `log_ancient_maple` | 1019 |  |
 | `log_aspen` | 202 |  |
 | `log_cedar` | 201 |  |
@@ -550,11 +562,11 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `machine_bench_top` | 1114 |  |
 | `machine_side` | 1037 |  |
 | `magenta_concrete` | 279 |  |
-| `magenta_glazed_terracotta` | 377 | rotation family (4 copies) |
+| `magenta_glazed_terracotta` | 377 | família de rotação (4 cópias) |
 | `magenta_planks` | 353 |  |
-| `magenta_portal` | 12 | anim (4 frames) |
+| `magenta_portal` | 12 | anim (4 quadros) |
 | `magenta_spawn_block_side` | 715 |  |
-| `magenta_spawn_block_top` | 711 | rotation family (4 copies) |
+| `magenta_spawn_block_top` | 711 | família de rotação (4 cópias) |
 | `magma` | 451 |  |
 | `mailbox_front` | 571 |  |
 | `mailbox_front_full` | 573 |  |
@@ -574,7 +586,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `moonstone_chest_back` | 449 |  |
 | `moonstone_chest_front` | 443 |  |
 | `moonstone_chest_side` | 444 |  |
-| `moonstone_chest_top` | 445 | rotation family (4 copies) |
+| `moonstone_chest_top` | 445 | família de rotação (4 cópias) |
 | `moonstone_explosive_side` | 332 |  |
 | `moonstone_explosive_top` | 333 |  |
 | `moonstone_gen_spawn_side` | 809 |  |
@@ -606,14 +618,14 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `obby_death_block` | 815 |  |
 | `obsidian` | 327 |  |
 | `orange_concrete` | 280 |  |
-| `orange_glazed_terracotta` | 373 | rotation family (4 copies) |
+| `orange_glazed_terracotta` | 373 | família de rotação (4 cópias) |
 | `orange_lucky_block` | 998 |  |
 | `orange_lucky_block_rare` | 1000 |  |
 | `orange_lucky_block_super` | 1002 |  |
 | `orange_planks` | 352 |  |
-| `orange_portal` | 13 | anim (4 frames) |
+| `orange_portal` | 13 | anim (4 quadros) |
 | `orange_spawn_block_side` | 710 |  |
-| `orange_spawn_block_top` | 706 | rotation family (4 copies) |
+| `orange_spawn_block_top` | 706 | família de rotação (4 cópias) |
 | `ore_gen_spawn_side` | 811 |  |
 | `ore_gen_spawn_top` | 810 |  |
 | `packed_snow` | 825 |  |
@@ -647,11 +659,11 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `pink_gen_spawn_coal` | 789 |  |
 | `pink_gen_spawn_iron` | 790 |  |
 | `pink_gen_spawn_top` | 788 |  |
-| `pink_glazed_terracotta` | 393 | rotation family (4 copies) |
+| `pink_glazed_terracotta` | 393 | família de rotação (4 cópias) |
 | `pink_planks` | 357 |  |
-| `pink_portal` | 14 | anim (4 frames) |
+| `pink_portal` | 14 | anim (4 quadros) |
 | `pink_spawn_block_side` | 705 |  |
-| `pink_spawn_block_top` | 701 | rotation family (4 copies) |
+| `pink_spawn_block_top` | 701 | família de rotação (4 cópias) |
 | `planks_aspen` | 205 |  |
 | `planks_cedar` | 209 |  |
 | `planks_cherry` | 584 |  |
@@ -674,8 +686,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `press_back` | 1069 |  |
 | `press_front` | 1063 |  |
 | `press_side` | 1064 |  |
-| `press_side_running` | 31 | anim (4 frames) |
-| `press_top` | 1065 | rotation family (4 copies) |
+| `press_side_running` | 31 | anim (4 quadros) |
+| `press_top` | 1065 | família de rotação (4 cópias) |
 | `protector` | 348 |  |
 | `protector_faction` | 575 |  |
 | `protector_tribe` | 574 |  |
@@ -690,18 +702,18 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `pure_moonstone_ore` | 1026 |  |
 | `pure_voltite_ore` | 1203 |  |
 | `purple_concrete` | 282 |  |
-| `purple_glazed_terracotta` | 409 | rotation family (4 copies) |
+| `purple_glazed_terracotta` | 409 | família de rotação (4 cópias) |
 | `purple_lucky_block` | 986 |  |
 | `purple_lucky_block_rare` | 988 |  |
 | `purple_lucky_block_super` | 990 |  |
 | `purple_planks` | 361 |  |
-| `purple_portal` | 15 | anim (4 frames) |
+| `purple_portal` | 15 | anim (4 quadros) |
 | `purple_spawn_block_side` | 700 |  |
-| `purple_spawn_block_top` | 696 | rotation family (4 copies) |
+| `purple_spawn_block_top` | 696 | família de rotação (4 cópias) |
 | `quartz_block_chiseled` | 320 |  |
 | `quartz_block_side` | 319 |  |
 | `radar_bottom` | 927 |  |
-| `radar_screen` | 19 | anim (4 frames) rotation family (4 copies) |
+| `radar_screen` | 19 | anim (4 quadros) família de rotação (4 cópias) |
 | `radar_side_active` | 925 |  |
 | `radar_side_inactive` | 928 |  |
 | `radar_top_active` | 926 |  |
@@ -709,25 +721,25 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `recycler_back` | 1179 |  |
 | `recycler_front` | 1173 |  |
 | `recycler_side` | 1174 |  |
-| `recycler_side_running` | 43 | anim (4 frames) |
-| `recycler_top` | 1175 | rotation family (4 copies) |
+| `recycler_side_running` | 43 | anim (4 quadros) |
+| `recycler_top` | 1175 | família de rotação (4 cópias) |
 | `red_concrete` | 283 |  |
 | `red_gen_spawn_coal` | 771 |  |
 | `red_gen_spawn_iron` | 772 |  |
 | `red_gen_spawn_top` | 770 |  |
-| `red_glazed_terracotta` | 425 | rotation family (4 copies) |
+| `red_glazed_terracotta` | 425 | família de rotação (4 cópias) |
 | `red_lucky_block` | 932 |  |
 | `red_lucky_block_rare` | 982 |  |
 | `red_lucky_block_super` | 984 |  |
 | `red_mushroom_block` | 537 |  |
 | `red_planks` | 365 |  |
-| `red_portal` | 16 | anim (4 frames) |
+| `red_portal` | 16 | anim (4 quadros) |
 | `red_sand` | 474 |  |
 | `red_sandstone` | 454 |  |
 | `red_sandstone_brick` | 475 |  |
 | `red_sandstone_top` | 455 |  |
 | `red_spawn_block_side` | 695 |  |
-| `red_spawn_block_top` | 691 | rotation family (4 copies) |
+| `red_spawn_block_top` | 691 | família de rotação (4 cópias) |
 | `redstone_lamp_off` | 313 |  |
 | `redstone_lamp_on` | 312 |  |
 | `rocket_block` | 579 |  |
@@ -741,20 +753,20 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `shatter_mill_back` | 1145 |  |
 | `shatter_mill_front` | 1139 |  |
 | `shatter_mill_side` | 1140 |  |
-| `shatter_mill_side_running` | 40 | anim (4 frames) |
-| `shatter_mill_top` | 1141 | rotation family (4 copies) |
+| `shatter_mill_side_running` | 40 | anim (4 quadros) |
+| `shatter_mill_top` | 1141 | família de rotação (4 cópias) |
 | `shop_trader_spawn_face` | 799 |  |
 | `shop_trader_spawn_side` | 798 |  |
-| `shop_trader_spawn_top` | 794 | rotation family (4 copies) |
+| `shop_trader_spawn_top` | 794 | família de rotação (4 cópias) |
 | `shop_wizard_spawn_face` | 805 |  |
 | `shop_wizard_spawn_side` | 804 |  |
-| `shop_wizard_spawn_top` | 800 | rotation family (4 copies) |
+| `shop_wizard_spawn_top` | 800 | família de rotação (4 cópias) |
 | `sky_tap_back` | 1153 |  |
 | `sky_tap_bottom` | 1152 |  |
 | `sky_tap_front` | 1146 |  |
 | `sky_tap_side` | 1147 |  |
-| `sky_tap_side_running` | 41 | anim (4 frames) |
-| `sky_tap_top` | 1148 | rotation family (4 copies) |
+| `sky_tap_side_running` | 41 | anim (4 quadros) |
+| `sky_tap_top` | 1148 | família de rotação (4 cópias) |
 | `slab_andesite_brick_side` | 498 |  |
 | `slab_aspen_side` | 483 |  |
 | `slab_brick_side` | 515 |  |
@@ -803,9 +815,9 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `smelter_back` | 1060 |  |
 | `smelter_front` | 1054 |  |
 | `smelter_side` | 1055 |  |
-| `smelter_side_running` | 29 | anim (4 frames) |
-| `smelter_top` | 1056 | rotation family (4 copies) |
-| `smoke` | 23 | anim (4 frames) |
+| `smelter_side_running` | 29 | anim (4 quadros) |
+| `smelter_top` | 1056 | família de rotação (4 cópias) |
+| `smoke` | 23 | anim (4 quadros) |
 | `smooth_stone` | 218 |  |
 | `snow` | 197 |  |
 | `snowy_messy_stone` | 823 |  |
@@ -851,21 +863,21 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `tools_lucky_block` | 999 |  |
 | `tools_lucky_block_rare` | 1001 |  |
 | `tools_lucky_block_super` | 1003 |  |
-| `toxic_waste` | 25 | anim (8 frames) |
+| `toxic_waste` | 25 | anim (8 quadros) |
 | `toxic_waste_barrel_bottom` | 1018 |  |
 | `toxic_waste_barrel_side` | 1017 |  |
-| `toxic_waste_barrel_top` | 24 | anim (4 frames) |
+| `toxic_waste_barrel_top` | 24 | anim (4 quadros) |
 | `toxin_ball_block` | 680 |  |
 | `tree_cutter_back` | 1127 |  |
-| `tree_cutter_back_running` | 37 | anim (4 frames) |
+| `tree_cutter_back_running` | 37 | anim (4 quadros) |
 | `tree_cutter_front` | 1121 |  |
 | `tree_cutter_side` | 1122 |  |
-| `tree_cutter_side_running` | 36 | anim (4 frames) |
-| `tree_cutter_top` | 1123 | rotation family (4 copies) |
+| `tree_cutter_side_running` | 36 | anim (4 quadros) |
+| `tree_cutter_top` | 1123 | família de rotação (4 cópias) |
 | `ultra_compressed_messy_stone` | 534 |  |
 | `unloaded` | 189 |  |
 | `volt_engine_side` | 1129 |  |
-| `volt_engine_side_running` | 38 | anim (4 frames) |
+| `volt_engine_side_running` | 38 | anim (4 quadros) |
 | `volt_engine_top` | 1130 |  |
 | `voltite_deposit` | 1128 |  |
 | `voltite_ore` | 1082 |  |
@@ -878,16 +890,16 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `white_gen_spawn_coal` | 786 |  |
 | `white_gen_spawn_iron` | 787 |  |
 | `white_gen_spawn_top` | 785 |  |
-| `white_glazed_terracotta` | 369 | rotation family (4 copies) |
+| `white_glazed_terracotta` | 369 | família de rotação (4 cópias) |
 | `white_planks` | 351 |  |
-| `white_portal` | 17 | anim (4 frames) |
+| `white_portal` | 17 | anim (4 quadros) |
 | `white_spawn_block_side` | 690 |  |
-| `white_spawn_block_top` | 686 | rotation family (4 copies) |
+| `white_spawn_block_top` | 686 | família de rotação (4 cópias) |
 | `wire_mill_back` | 1076 |  |
 | `wire_mill_front` | 1070 |  |
 | `wire_mill_side` | 1071 |  |
-| `wire_mill_side_running` | 32 | anim (4 frames) |
-| `wire_mill_top` | 1072 | rotation family (4 copies) |
+| `wire_mill_side_running` | 32 | anim (4 quadros) |
+| `wire_mill_top` | 1072 | família de rotação (4 cópias) |
 | `wool_colored_black` | 253 |  |
 | `wool_colored_blue` | 249 |  |
 | `wool_colored_brown` | 250 |  |
@@ -908,18 +920,18 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `yellow_gen_spawn_coal` | 780 |  |
 | `yellow_gen_spawn_iron` | 781 |  |
 | `yellow_gen_spawn_top` | 779 |  |
-| `yellow_glazed_terracotta` | 385 | rotation family (4 copies) |
+| `yellow_glazed_terracotta` | 385 | família de rotação (4 cópias) |
 | `yellow_lucky_block` | 930 |  |
 | `yellow_lucky_block_rare` | 980 |  |
 | `yellow_lucky_block_super` | 981 |  |
 | `yellow_planks` | 355 |  |
-| `yellow_portal` | 18 | anim (4 frames) |
+| `yellow_portal` | 18 | anim (4 quadros) |
 | `yellow_spawn_block_side` | 685 |  |
-| `yellow_spawn_block_top` | 681 | rotation family (4 copies) |
+| `yellow_spawn_block_top` | 681 | família de rotação (4 cópias) |
 
-### Rotation families (57 roots)
+### Famílias de rotação (57 raízes)
 
-These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry folds them to the root below, and `bloxdTexel` re-applies the rotation at sample time — reference the root, never the copies. Writing a `[rot[N` spelling draws the dedicated rotation diagnostic.
+Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). O registro as dobra para a raiz listada abaixo, e `bloxdTexel` reaplica a rotação no momento da amostragem — referencie a raiz, nunca as cópias. Escrever uma grafia `[rot[N` dispara o diagnóstico dedicado de rotação.
 
 - `alloy_kiln_top` (id 1085)
 - `auto_bench_top` (id 1100)
@@ -979,11 +991,11 @@ These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry 
 - `yellow_glazed_terracotta` (id 385)
 - `yellow_spawn_block_top` (id 681)
 
-### Animation families (42 names)
+### Famílias de animação (42 nomes)
 
-Sampling these names automatically returns the current animation frame. The engine advances frames at a fixed interval per family — measured values are only 3: **200 ms** (3 families), **250 ms** (21 families), **300 ms** (18 families). Packs never write frame suffixes (`lava0` is an error; `lava` is the name).
+Amostrar estes nomes retorna automaticamente o quadro de animação atual. O motor avança os quadros em um intervalo fixo por família — os valores medidos são apenas 3: **200 ms** (3 famílias), **250 ms** (21 famílias), **300 ms** (18 famílias). Os pacotes nunca escrevem sufixos de quadro (`lava0` é um erro; `lava` é o nome).
 
-| Name | Frames | Interval |
+| Nome | Quadros | Intervalo |
 |---|---|---|
 | `alloy_kiln_side_running` | 4 | 250 ms |
 | `auto_bench_side_running` | 4 | 250 ms |
@@ -1028,26 +1040,25 @@ Sampling these names automatically returns the current animation frame. The engi
 | `wire_mill_side_running` | 4 | 250 ms |
 | `yellow_portal` | 4 | 300 ms |
 
-Structural note visible in the raw data: the atlas holds 45 animation roots, not 42 — `radar_screen`'s four pre-rotated copies each carry their own 4-frame ladder, which is also why `radar_screen` is the only name carrying both family notes.
+Nota estrutural visível nos dados brutos: o atlas contém 45 raízes de animação, não 42 — as quatro cópias pré-rotacionadas de `radar_screen` carregam cada uma sua própria escada de 4 quadros, que é também a razão de `radar_screen` ser o único nome a carregar ambas as notas de família.
 
-## Measured drift (cnty9 → ab90qa)
+## Deriva medida (cnty9 → ab90qa)
 
-The registry is build-shipped content and moves with every block update. v4 build (`cnty9`, 2026-10-27) → v5 build (`ab90qa`, 2026-11-03):
+O registro é conteúdo embarcado no build e se move a cada atualização de blocos. Build da v4 (`cnty9`, 2026-10-27) → build da v5 (`ab90qa`, 2026-11-03):
 
-- atlas entries: 1,219 → 1,210
-- rotation families (turned spellings): 57 (228) → 57 (228) — **unchanged**
-- animation families (frame spellings): 42 (188) → 42 (188) — **unchanged**
-- usable named constants: 905 → **896**
-- id changes among surviving names: **334 of 905**
+- entradas do atlas: 1,219 → 1,210
+- famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **sem alterações**
+- famílias de animação (grafias de quadro): 42 (188) → 42 (188) — **sem alterações**
+- constantes nomeadas utilizáveis: 905 → **896**
+- mudanças de id entre os nomes sobreviventes: **334 de 905**
 
-The complete drift (11 names):
+A deriva completa (11 nomes):
 
-- **added (1):** `scorpion_eggs`.
-- **removed (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — the double chest (8 faces) left the game data (the single-chest `chest_*` family survives intact), and spawners keep `mob_spawner_block_top` while the variant side textures are gone.
+- **adicionados (1):** `scorpion_eggs`.
+- **removidos (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — o baú duplo (8 faces) saiu dos dados do jogo (a família `chest_*` do baú simples sobrevive intacta), e os spawners mantêm `mob_spawner_block_top` enquanto as texturas laterais das variantes desapareceram.
 
-**Names are the API; ids are snapshots.** Between the two builds, 334 of 905 surviving names changed id — write `bloxdTextureIdStone`, not `351`. The engine resolves names at validation, so name-written packs survive drift; raw-id packs do not.
+**Os nomes são a API; os ids são instantâneos.** Entre os dois builds, 334 dos 905 nomes sobreviventes mudaram de id — escreva `bloxdTextureIdStone`, não `351`. O motor resolve os nomes na validação, então pacotes escritos com nomes sobrevivem à deriva; pacotes com ids crus, não.
 
-## Related
+## Relacionados
 
-- [Texture API](texture-api.md) · [Engine Internals: Texture Registry](../internals/texture-registry.md) · [Version History: v4](../history/v4.md)
-
+- [API de texturas](texture-api.md) · [Interior do motor: registro de texturas](../internals/texture-registry.md) · [Histórico de versões: v4](../history/v4.md)

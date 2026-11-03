@@ -1,15 +1,15 @@
 # Dicas de depuração
 
+> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 
-
-- Cavernas claras demais → falta curva não linear de `skyLight` (receita de cavernas R2 / R9.9)
+- Cavernas claras demais → falta a curva não linear de `skyLight` (receita de cavernas R2 / R9.9)
 - Dias estourados → baixe a exposição pré-ACES
-- Noites escuras demais → assegure ambiente mínimo (o `skyLightColour` noturno é quase preto por premissa)
-- Distância com bruma demais → baixe coeficientes aéreos
-- Tudo laranja em torno de tochas → baixe a proporção quente (conserve algo de luz crua tingida)
-- Blocos quase todo brancos → o total de saída do hook light supera 1.0 (sem clamp águas abaixo). Termine com `clamp(col, vec3f(0.0), vec3f(1.0))`
-- Branco sem somas → inversão un-fog por divisão com fogVisibility. Tire un-fog; reconstrua desde `s.colour` e `mix` de névoa uma só vez ao final
-- Blocos emissivos não brilham → falta re-soma de emission em receitas de reconstrução. Some `+ s.emission * (1.0 - l.fogAlpha)`
-- De noite só restam faces iluminadas → não escureça só sombras; atenue toda a cor terminada (`engineColour`) de noite. Para conservar lamparinas locais, atenue menos com `blockLight` / `heldLight` ([Parte VI](../guides/), seção 19)
-- Sombra não aprofunda com `pow(skyLight, γ)` → `l.skyLight` é pós-curva (seção 10). Mude para inversão + limiar de R9.12
-- Ajustar área/densidade de sombra → guia de ajuste de R9.12 (área = limiar `shTh` / borda = `shSoft` / escuridão do núcleo = duplo ajuste de ambiente mínimo e dispersão do céu)
+- Noites escuras demais para enxergar → garanta um ambiente mínimo (o `skyLightColour` noturno é quase preto por premissa)
+- Distância com bruma demais → baixe os coeficientes de perspectiva aérea
+- Arredores de tocha todo laranja → baixe a proporção da mistura quente (mantenha algo de luz crua tingida)
+- Blocos quase todo brancos → o total da saída do hook light supera 1.0 (sem clamp a jusante). Termine com `clamp(col, vec3f(0.0), vec3f(1.0))`
+- Branco sem adições → inversão un-fog por divisão de névoa. Abandone o un-fog; reconstrua a partir de `s.colour` e aplique o `mix` de névoa uma única vez ao final
+- Blocos emissivos não brilham → falta a re-soma de emission em receitas de reconstrução. Some `+ s.emission * (1.0 - l.fogAlpha)`
+- Looks noturnos errados só nas faces iluminadas → não escureça apenas as cores de sombra; atenue toda a cor terminada do motor (`engineColour`) à noite. Para manter lamparinas locais, enfraqueça a atenuação com `blockLight` / `heldLight` ([Projetando looks noturnos](night.md))
+- A sombra não aprofunda com `pow(skyLight, γ)` → `l.skyLight` é pós-lift (seção 10). Mude para a inversão + corte por limiar de R9.12
+- Ajuste de área/densidade de sombra → veja o guia de ajuste de R9.12 (área = limiar `shTh` / borda = `shSoft` / escuridão do núcleo = deslocamento em dois pontos do ambiente mínimo e da dispersão do céu)

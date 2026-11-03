@@ -1,12 +1,12 @@
-# Texture sampling internals
+# Interioridades da amostragem de texturas
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live generator, c56)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Analyzed (restaurado do gerador em produção, c56)
 
-How `bloxdTexel` / `bloxdTextureSize` actually compile — the 3-variant texture codegen. The user side: [Texture API](../api/texture-api.md).
+Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — o codegen de texturas de 3 variantes. O lado do usuário: [API de texturas](../api/texture-api.md).
 
-## The three variants
+## As três variantes
 
-### Variant 1 — texture pack inactive (stubs)
+### Variante 1 — pacote de texturas inativo (stubs)
 
 ```wgsl
 fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
@@ -17,11 +17,11 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 }
 ```
 
-Code written for the real atlas still compiles and runs here — it just sees white texels and a 1×1 size.
+Código escrito para o atlas real ainda compila e roda aqui — ele só vê texels brancos e um tamanho 1×1.
 
-### Variant 2 — the atlas path (the game default)
+### Variante 2 — o caminho do atlas (o padrão do jogo)
 
-`bloxdTextureSize` returns `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))`. `bloxdTexel` applies the face's quarter-turn before the load — the rotation trap written as the generated `bloxdSpTurned` if-chain:
+`bloxdTextureSize` devolve `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))`. `bloxdTexel` aplica o quarto de volta da face antes da leitura — a armadilha de rotação escrita como a cadeia de `if` gerada de `bloxdSpTurned`:
 
 ```wgsl
         // Each quarter turn clockwise the face shows its texture at reads the unturned texture at (v, 1 - u)
@@ -35,24 +35,24 @@ Code written for the real atlas still compiles and runs here — it just sees wh
         }
 ```
 
-(`bloxdSpTextureRotation` is the engine's own storage of the input field `textureRotation`.)
+(`bloxdSpTextureRotation` é o armazenamento que o próprio motor faz do campo de entrada `textureRotation`.)
 
-### Variant 3 — custom texture-pack textures
+### Variante 3 — texturas de pacotes de texturas personalizados
 
-`textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` samples the layered atlas's per-texture cell; the pack's own texels go through the `bloxdSpOwnTexel` path.
+`textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` amostra a célula por textura do atlas em camadas; os texels próprios do pacote passam pelo caminho `bloxdSpOwnTexel`.
 
-## The animation frame ladder
+## A escada de quadros de animação
 
-Animated textures (42 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](../api/texture-catalog.md#animation-families-42-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
+Texturas animadas (42 famílias) avançam em intervalos fixos por família (200 / 250 / 300 ms — a coluna de intervalo no [catálogo de texturas](../api/texture-catalog.md#famílias-de-animação-42-nomes)). Passar um id de família de animação a `bloxdTexel` amostra o quadro atual.
 
-## Sampler settings
+## Ajustes do sampler
 
-The block textures are a `texture_2d_array`; the terrain sampler is nearest + repeat.
+As texturas de blocos são uma `texture_2d_array`; o sampler do terreno é nearest + repeat.
 
-## Greedy meshing & UV
+## Greedy meshing e UV
 
-The mesher merges faces with matching material/AO/light into single rectangles (**greedy meshing**), so vertex UVs can exceed tile width on merged faces (0.0015 inset at edges). Hardware repeat addressing handles the tiling, so merged faces look seamless — but procedural detail keyed to `uv` can discontinuity across merge boundaries; key world-dependent effects to `bloxdWorldPosition(position)` instead.
+O mesher funde faces com material/AO/luz correspondentes num único retângulo (**greedy meshing**), então as UVs de vértice podem exceder a largura de um tile em faces fundidas (bordas recuadas em 0.0015). O endereçamento repeat do hardware cuida do encaixe, então faces fundidas parecem sem costura — mas um detalhe procedural atrelado à `uv` pode ficar descontínuo nas fronteiras de fusão; atrele efeitos dependentes do mundo a `bloxdWorldPosition(position)`.
 
-## Related
+## Relacionado
 
-- [Texture API](../api/texture-api.md) · [Texture registry](texture-registry.md) · [Rendering pipeline](rendering-pipeline.md)
+- [API de texturas](../api/texture-api.md) · [Registro de texturas](texture-registry.md) · [Pipeline de renderização](rendering-pipeline.md)

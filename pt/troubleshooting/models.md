@@ -1,58 +1,58 @@
-# Model issues
+# Problemas de modelos
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (new v5 territory)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Analyzed (novo território da v5)
 
-Issues around the new v5 Model hooks.
+Problemas em torno dos novos hooks de Model da v5.
 
-## Players/mobs unaffected
+## Jogadores/mobs sem efeito
 
-- **Cause**: entities (players, mobs, NPCs, armour, cosmetics) are drawn by the **Model program** — terrain hooks don't touch them
-- **Fix**: add Model hooks ([the models guide](../guides/models.md))
+- **Causa**: entidades (jogadores, mobs, NPCs, armaduras, cosméticos) são desenhadas pelo **programa Model** — hooks de terrain não as tocam
+- **Correção**: adicione hooks de Model ([o guia de modelos](../guides/models.md))
 
-## Slabs, stairs, plants unaffected
+## Lajes, escadas, plantas sem efeito
 
-- **Cause**: block models (`slab` / `stairs` / `flat`) are also Model-program geometry, never terrain
-- **Fix**: use Model hooks with `flags.slab` / `flags.stairs` / `flags.flat` ([Flags](../api/flags.md))
+- **Causa**: modelos de bloco (`slab` / `stairs` / `flat`) também são geometria do programa Model, nunca terrain
+- **Correção**: use hooks de Model com `flags.slab` / `flags.stairs` / `flags.flat` ([Flags](../api/flags.md))
 
-## Water unaffected
+## Água sem efeito
 
-- **Cause**: water is Liquid-hook-only; **without Liquid hooks, no Terrain hook runs on water either** (v5 change)
-- **Fix**: define `bloxdLiquidSurface` / `bloxdLiquidLight` ([Variant issues](variants.md))
+- **Causa**: a água é só de hooks de Liquid; **sem hooks de Liquid, nenhum hook de Terrain roda na água também** (mudança da v5)
+- **Correção**: defina `bloxdLiquidSurface` / `bloxdLiquidLight` ([Problemas de variantes](variants.md))
 
-## Want to change only held items but everything changes
+## Quer mudar só os itens na mão, mas tudo muda
 
-- **Fix**: select with `surface.flags.held` ([model shader recipes](../recipes/model-shaders.md))
+- **Correção**: selecione com `surface.flags.held` ([receitas de sombreadores de modelo](../recipes/model-shaders.md))
 
-## Flag checks don't behave
+## Verificações de flags não se comportam
 
-- **Likely causes**:
-  1. **treating flags as a single-choice enum** — they combine freely («sandstone is sand and rock», «possibly even none») ([Flags](../api/flags.md#flags-combine-freely))
-  2. reading `else` as "everything else" — the else of `flags.rock` is merely "not rock", possibly still sand
-- **Fix**: combine material flags (`opaque`…) independently of shape/state flags (`slab`/`held`…)
+- **Causas prováveis**:
+  1. **tratar as flags como um enum de escolha única** — elas se combinam livremente («arenito é areia e rocha», «possivelmente até nenhuma») ([Flags](../api/flags.md#as-flags-se-combinam-livremente))
+  2. ler `else` como "todo o resto" — o else de `flags.rock` é meramente "não é rocha", possivelmente ainda areia
+- **Correção**: combine flags de material (`opaque`…) independentemente das flags de forma/estado (`slab`/`held`…)
 
-## Enchant glint disappeared
+## Brilho de encantamento desapareceu
 
-- **Fix**: pass `enchantColour` through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
+- **Correção**: repasse `enchantColour` ou use `bloxdLitColour()` ([Efeitos de encantamento](../recipes/enchant-effects.md))
 
-## Hurt flash disappeared / too strong
+## Clarão de dano desapareceu / forte demais
 
-- **Fix**: pass `overlayColour` through or adjust `out.overlayColour.a` ([Enchant effects](../recipes/enchant-effects.md))
+- **Correção**: repasse `overlayColour` ou ajuste `out.overlayColour.a` ([Efeitos de encantamento](../recipes/enchant-effects.md))
 
-## localPosition always reads 0
+## localPosition sempre lê 0
 
-- **By design**: `localPosition` is `vec3f(0.0)` on terrain and liquid faces — **no model there**
-- **Fix**: read it in Model hooks ([model recipes](../recipes/model-shaders.md))
+- **Por design**: `localPosition` é `vec3f(0.0)` em faces de terrain e liquid — **ali não há modelo**
+- **Correção**: leia-o em hooks de Model ([receitas de modelo](../recipes/model-shaders.md))
 
-## bloxdTexel returns white on models
+## bloxdTexel devolve branco em modelos
 
-- **By design**: `textureId: 0` (skins) samples as white
-- **Fix**: select with `surface.textureId != 0u` or work from `surface.colour` ([Texture issues](textures.md))
+- **Por design**: `textureId: 0` (skins) amostra como branco
+- **Correção**: selecione com `surface.textureId != 0u` ou trabalhe desde `surface.colour` ([Problemas de texturas](textures.md))
 
-## Want armour-only / cosmetics-only changes
+## Quer mudanças só na armadura / só nos cosméticos
 
-- **Limit**: no flag says "armour"; `flags.lifeform` includes armour and cosmetics
-- **Approximation**: combine with `localPosition` (placement) or the presence of `overlayColour` ([model recipes](../recipes/model-shaders.md))
+- **Limite**: nenhuma flag diz "armadura"; `flags.lifeform` inclui armaduras e cosméticos
+- **Aproximação**: combine com `localPosition` (posicionamento) ou a presença de `overlayColour` ([receitas de modelo](../recipes/model-shaders.md))
 
-## Related
+## Relacionado
 
-- [Models guide](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md)
+- [Guia de modelos](../guides/models.md) · [Receitas de sombreadores de modelo](../recipes/model-shaders.md) · [Flags](../api/flags.md)

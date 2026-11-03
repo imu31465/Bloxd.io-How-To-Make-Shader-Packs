@@ -1,11 +1,10 @@
 # Receitas de vértices (só allow)
 
-
-
+> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 > Envolva tudo em `#ifndef BLOXD_STRICT`.
-> Para as condições exatas (lista de títulos allow; Custom Games é estrito) veja §30: [§30 Modos de aplicação por jogo](../internals/)
+> Para as condições exatas (a lista de títulos allow; Custom Games sendo estrito) veja [Política de shader packs por jogo](../internals/policy.md)
 
-## Grama ao vento (move só as pontas)
+## Grama balançando ao vento (move só as pontas)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -19,7 +18,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Ondas em líquido (só faces de cima)
+## Ondas na superfície do líquido (só faces de cima)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -36,7 +35,7 @@ fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Terreno pulsante
+## Terreno que respira
 
 ```wgsl
 #ifndef BLOXD_STRICT

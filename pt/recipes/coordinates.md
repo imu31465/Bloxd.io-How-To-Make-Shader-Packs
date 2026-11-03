@@ -1,7 +1,6 @@
-# Receitas de coordenadas (mundo / bloco / vista)
+# Coordenadas
 
-
-
+> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado à API atual — re-verificação no dispositivo recomendada)
 ## Coordenadas de mundo
 
 ```wgsl
@@ -31,7 +30,7 @@ fn pack_hash3(b: vec3i) -> f32 {
     h = h ^ (h >> 13u);
     return f32(h & 4095u) / 4095.0;   // 0..1
 }
-// usos: variação de grama, mosqueado de pedra etc.
+// usos: variação de cor de grama, mosqueado de pedra etc.
 out.colour *= mix(0.94, 1.06, pack_hash3(worldBlock));
 ```
 
@@ -43,7 +42,7 @@ let rim = pow(1.0 - clamp(dot(viewDir, l.normal), 0.0, 1.0), 2.2);
 out.colour += vec3f(0.9, 0.95, 1.0) * rim * 0.2;
 ```
 
-## Ângulo de vista (fresnel caseiro — para líquidos)
+## Ângulo de vista (look fresnel — para líquidos)
 
 ```wgsl
 let viewDir = normalize(bloxdEyePosition() - s.position);

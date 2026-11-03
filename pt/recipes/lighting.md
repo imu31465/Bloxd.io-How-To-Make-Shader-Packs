@@ -1,7 +1,6 @@
 # Receitas de iluminação (light)
 
-
-
+> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 ## Curva S de contraste
 
 ```wgsl
@@ -17,14 +16,14 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let dist = distance(bloxdEyePosition(), l.position);
-    // 0..0.35 de névoa própria de 64 a 192 blocos
+    // adiciona 0..0.35 de névoa própria de 64 a 192 blocos
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
     return out;
 }
 ```
 
-## Noite (tom azul por skyLight + proteção de lamparinas)
+## Noite (deslocamento azul guiado por skyLight + proteção de lamparinas)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -39,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Cavernas escuras (escurecer mais onde não há skyLight)
+## Cavernas totalmente escuras (escurecer ainda mais as áreas sem céu)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -53,11 +52,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-> `skyLight` chega pós-lift (seção 10): oclusão leve (sob árvores: cru 0.87 → lift 0.97) quase não escurece com este método. Serve para cavernas (cru 0). Para marcar "sombra de árvore", use inversão + limiar de R9.12.
+> `skyLight` chega pós-lift (seção 10), então oclusão leve (ex.: sob árvores: cru 0.87 → liftado 0.97) quase não escurece com este método. Ele funciona para cavernas (cru 0). Para afiar a "sombra de árvore", use o método de inversão do lift + limiar de R9.12.
 
-## Azul noturno ambiente (pseudo look sem direção lunar)
+## Azul noturno ambiente (pseudo look sem direção da lua)
 
-> Nesta API, `bloxdSunDirection()` é zero quando o céu não tem sol. O abaixo não é luar direcional, só um tênue ambiente azul quando o céu está escuro. A direção lunar em si está disponível via `-bloxdSunDirection()` (só mundos com ciclo dia/noite. [Parte VII](../internals/) R-A).
+> Nesta API, `bloxdSunDirection()` é zero quando o céu não tem sol. O que segue não é luar direcional, apenas um tênue ambiente azul somado quando o céu está escuro. A direção da lua em si está disponível via `-bloxdSunDirection()` (apenas mundos com ciclo dia/noite — [O sol e a lua](../internals/sun-and-moon.md)).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -73,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Calor de pôr do sol (tom por altura do sol)
+## Calor de pôr do sol (tingimento pela elevação do sol)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -89,7 +88,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Substituição total da saída do motor (reiluminação simples)
+## Substituição total da saída do motor (reiluminação mais simples)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -99,10 +98,10 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let sky = clamp(l.skyLight, 0.0, 1.0);
         let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
         let level = clamp(sky * 0.7 + block, 0.0, 1.0);
-        // descarta engineColour (o resultado de iluminação do motor) e usa "cor base × brilho calculado"
+        // descarta engineColour (o resultado da iluminação do motor) e usa "cor base × brilho que você mesmo calcula"
         var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
-        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // descartado engineColour: refazer névoa é obrigatório
-        out.colour = col + s.emission * (1.0 - l.fogAlpha);   // some emission você também (obrigatório)
+        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // engineColour descartado: refazer a névoa é obrigatório
+        out.colour = col + s.emission * (1.0 - l.fogAlpha);   // adicione também a emission você mesmo (obrigatório)
         return out;
 } else {
         return bloxdDefaultLight(s, l);

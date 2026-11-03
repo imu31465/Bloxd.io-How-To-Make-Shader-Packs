@@ -1,6 +1,6 @@
-# Corrigindo "sombras escuras mas superfícies brilhantes" de noite
+# Projetando looks noturnos
 
-
+> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado para a API atual — reverificação em jogo recomendada)
 
 Escurecer só sombras deixa a cor terminada (`engineColour`) brilhante sem sol, e o salto face/sombra fica antinatural. Atenue toda a cor terminada.
 

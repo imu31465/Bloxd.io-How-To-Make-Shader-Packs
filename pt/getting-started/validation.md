@@ -1,24 +1,24 @@
-# Validation
+# Validação
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção em 2026-11-03) · Estado: Verified
 
-## The 3-stage load check
+## A verificação de carga em 3 etapas
 
-1. **Loader limits** — size, shape, manifest validity (see [Pack structure](pack-structure.md))
-2. **Static validation (analyzer)** — syntax, types, reserved names, strict contract, across all 6 variants
-3. **Real WebGPU compilation in the browser** — static validation's type-checking is incomplete, so some mistakes only surface here
+1. **Limites do carregador** — tamanho, forma, validade do manifesto (veja [Estrutura do pacote](pack-structure.md))
+2. **Validação estática (analisador)** — sintaxe, tipos, nomes reservados, contrato strict, em todas as 6 variantes
+3. **Compilação WebGPU real no navegador** — a checagem de tipos da validação estática é incompleta, então alguns erros só aparecem aqui
 
-For reading each error, see [Troubleshooting](../troubleshooting/) (organized by symptom).
+Para ler cada erro, veja [Solução de problemas](../troubleshooting/) (organizado por sintoma).
 
-## Procedure
+## Procedimento
 
-1. Load the zip or folder from settings → Shader Pack
-2. Check status: "Ready. Reload the page to use it." right after selecting; **after a page reload**, "Ready to use" means success
-3. On "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
-4. Test in a permissive game first, then a strict-mode game (most games). Vertex animation works only in allow games
-5. Replacing a pack reloads from the same screen; changes need a page reload
-6. Remove with Remove Pack. After game updates, saved packs re-validate automatically on page load (header/registry changes mark them "needs re-check")
+1. Carregue o zip ou a pasta a partir de configurações → Shader Pack
+2. Confira o estado: "Ready. Reload the page to use it." logo após selecionar; **depois de um recarregamento da página**, "Ready to use" significa sucesso
+3. Diante de "Saved, but it won't run until you fix these errors...", corrija os erros listados (arquivo:linha + variante) e recarregue
+4. Teste primeiro em um jogo permissivo, depois em um jogo em modo strict (a maioria dos jogos). Animação de vértices funciona somente em jogos allow
+5. Substituir um pacote recarrega a partir da mesma tela; mudanças precisam de recarregamento da página
+6. Remova com Remove Pack. Depois de atualizações do jogo, pacotes salvos são revalidados automaticamente no carregamento da página (mudanças de cabeçalho/registro os marcam como "precisa de nova verificação")
 
-## On-device test checklist
+## Lista de verificação de testes no dispositivo
 
-See the [testing guide](../guides/testing.md) for the full checklist and the complete list of factors that change what a pack sees.
+Veja o [guia de testes](../guides/testing.md) para a lista de verificação completa e a lista integral de fatores que mudam o que um pacote vê.

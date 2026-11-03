@@ -1,68 +1,68 @@
-# Compatibility
+# Compatibilidade
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Verified
 
-How the current game and old-version packs interoperate.
+Como o jogo atual e os pacotes de versões antigas interoperam.
 
-## Accepted versions
+## Versões aceitas
 
-**Only `apiVersion: 5`.** The loader compares `manifest.apiVersion !== 5` strictly and v1/v2/v3/v4 packs **fail at the instant of load**. No multi-version acceptance exists.
+**Apenas `apiVersion: 5`.** O carregador compara `manifest.apiVersion !== 5` estritamente e pacotes v1/v2/v3/v4 **falham no instante do carregamento**. Não existe aceitação de múltiplas versões.
 
-## Load-time messages (verbatim from the live i18n dictionary)
+## Mensagens no momento do carregamento (verbatim do dicionário i18n em produção)
 
-- `pack.json needs "apiVersion": {{version}}.` — the `apiVersion` key is missing
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — a chave `apiVersion` está faltando
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — a chave existe, mas não é 5
 
-## Saved old packs (no exceptions — silent inactivation)
+## Pacotes antigos salvos (sem exceções — desativação silenciosa)
 
-Previously-saved v1–v4 packs don't throw. The saved-pack result resolves to:
+Pacotes v1–v4 salvos anteriormente não geram erro. O resultado do pacote salvo resolve para:
 
 ```
 {kind: "none", reason: "otherApiVersion"}
 ```
 
-and the pack becomes **silently inactive**. Only the shader-pack settings tab explains why:
+e o pacote fica **silenciosamente inativo**. Só a aba de ajustes de pacotes de shaders explica o porquê:
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-## The nature of the v4 → v5 conversion
+## A natureza da conversão v4 → v5
 
-The conversion is mostly mechanical (full checklist in [the v5 migration guide](../history/v5.md)):
+A conversão é majoritariamente mecânica (lista completa no [guia de migração para a v5](../history/v5.md)):
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
+- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (uma renomeação 1:1)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- delete `bloxdFragmentBlockPosition` call sites (no replacement)
-- bump `pack.json` to `"apiVersion": 5`
+- os pontos de chamada de `bloxdFragmentBlockPosition` ainda compilam (o motor o injeta), mas ele já não está documentado — migrar para fora dele é o caminho seguro ([Funções](functions.md#bloxdfragmentblockposition--indocumentada-mas-ainda-injetada))
+- atualize o `pack.json` para `"apiVersion": 5`
 
-The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.
+A armadilha silenciosa desta vez: pacotes que continuam lendo `blockFlags` ou envolvendo hooks de luz em `#ifdef BLOXD_LIGHTING` **falham na validação com mensagens dedicadas** (o analisador agora explica os dois casos), então nada se comporta mal em silêncio — eles apenas continuam recusados até serem migrados.
 
-## Saved-pack re-validation ("needs re-check")
+## Revalidação de pacotes salvos ("precisa de nova verificação")
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
+`HEADER_VERSION` é `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (o inteiro inicial passou do 8 da v4 para 9). Quando o cabeçalho do motor ou o registro de texturas muda (comum com atualizações do jogo), os pacotes salvos são marcados como "precisa de nova verificação" e revalidam automaticamente no carregamento da página.
 
-A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
+Um exemplo medido do movimento do registro (duas builds, 10 dias de distância): entradas 1200 → 1219 (98 adicionadas, 79 removidas) e, dos nomes que mantiveram a grafia, **779 de 1121 mudaram de id**. Em outras palavras:
 
-- **packs written with names (`bloxdTextureIdLava`) survive drift** (the loader re-resolves against the live registry)
-- **packs written with raw ids (`19`) break on re-validation**
+- **pacotes escritos com nomes (`bloxdTextureIdLava`) sobrevivem à deriva** (o carregador os resolve de novo contra o registro em produção)
+- **pacotes escritos com ids brutos (`19`) quebram na revalidação**
 
-Details: [Engine Internals: Texture Registry](../internals/texture-registry.md).
+Detalhes: [Interior do motor: Registro de texturas](../internals/texture-registry.md).
 
-## Runtime environments
+## Ambientes de execução
 
-- **WebGPU-renderer only**: installing a pack force-enables the WebGPU renderer
-- **Mobile**: WebGPU-limited environments can't run packs at all ([Requirements](../getting-started/requirements.md))
-- **Non-atlas renderer configurations**: `bloxdTexel` / `bloxdTextureSize` degrade to stubs (white texels, 1×1); code still compiles and runs ([Texture API](texture-api.md#where-the-texture-api-cant-go))
+- **Somente renderizador WebGPU**: instalar um pacote força a ativação do renderizador WebGPU
+- **Celular**: ambientes com WebGPU limitado não conseguem executar pacotes de forma alguma ([Requisitos](../getting-started/requirements.md))
+- **Configurações de renderizador sem atlas**: `bloxdTexel` / `bloxdTextureSize` degradam para stubs (texels brancos, 1×1); o código ainda compila e roda ([API de texturas](texture-api.md#onde-a-api-de-texturas-não-pode-chegar))
 
-## Version support summary
+## Resumo de suporte a versões
 
-| API version | Live since | Treatment by the current game |
+| Versão da API | Em produção desde | Tratamento pelo jogo atual |
 |---|---|---|
-| v1 | — | rejected at load (migrate via [v2](../history/v2.md)) |
-| v2 | — | rejected at load |
-| v3 | 2026-10-19 | rejected at load |
-| v4 | 2026-10-26 | rejected at load |
-| **v5** | **2026-11-03** | **current** |
+| v1 | — | rejeitado no carregamento (migre pela [v2](../history/v2.md)) |
+| v2 | — | rejeitado no carregamento |
+| v3 | 2026-10-19 | rejeitado no carregamento |
+| v4 | 2026-10-26 | rejeitado no carregamento |
+| **v5** | **2026-11-03** | **atual** |
 
-## Related
+## Relacionados
 
-- [v5 migration checklist](../history/v5.md) · [Version History](../history/)
+- [Lista de verificação de migração para a v5](../history/v5.md) · [Histórico de versões](../history/)

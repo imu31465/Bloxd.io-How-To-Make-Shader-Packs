@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Interior do motor e pesquisa",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "rendering-pipeline": "Rendering pipeline",
-  "hook-invocation": "Hook invocation internals",
-  "engine-header": "Engine header (verbatim)",
-  "shader-validation": "Shader validation",
-  "wgsl-compilation": "WGSL compilation",
-  "reserved-identifiers": "Reserved identifier internals",
-  "lighting-internals": "Lighting internals",
-  "fog-internals": "Fog internals",
-  "texture-sampling": "Texture sampling internals",
-  "texture-registry": "Texture registry internals",
-  "model-rendering": "Model rendering internals",
-  "engine-data": "Engine data ledger",
-  "testing-factors": "What changes pack-visible values",
-  "policy": "Per-game shader-pack policy",
-  "sun-and-moon": "The sun and the moon",
-  "debugging": "Debugging tools",
-  "research-log": "Research log"
+  "rendering-pipeline": "Pipeline de renderização",
+  "hook-invocation": "Interioridades da invocação de hooks",
+  "engine-header": "Cabeçalho do motor (verbatim)",
+  "shader-validation": "Interioridades da validação de shaders",
+  "wgsl-compilation": "Compilação de WGSL",
+  "reserved-identifiers": "Interioridades dos identificadores reservados",
+  "lighting-internals": "Interioridades de iluminação",
+  "fog-internals": "Interioridades da névoa",
+  "texture-sampling": "Interioridades da amostragem de texturas",
+  "texture-registry": "Interioridades do registro de texturas",
+  "model-rendering": "Interioridades da renderização de modelos",
+  "engine-data": "Ledger de dados do motor",
+  "testing-factors": "O que muda os valores visíveis para os pacotes",
+  "policy": "Política de pacotes de shaders por jogo",
+  "sun-and-moon": "O sol e a lua",
+  "debugging": "Ferramentas de depuração",
+  "research-log": "Registro de pesquisa"
 }

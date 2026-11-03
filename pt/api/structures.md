@@ -1,10 +1,10 @@
-# Input & output structures
+# Estruturas de entrada e saída
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
 
-Seven structs are readable/writable by packs. Every field is listed below (`#ifdef` fields are conditional). The full header is in [Engine Internals](../internals/engine-header.md).
+Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Interioridades do motor](../internals/engine-header.md).
 
-## BloxdVertexIn (vertex hook input)
+## BloxdVertexIn (entrada do hook de vértice)
 
 ```wgsl
 struct BloxdVertexIn {
@@ -15,14 +15,14 @@ struct BloxdVertexIn {
 }
 ```
 
-| Field | Type | Description |
+| Campo | Tipo | Descrição |
 |---|---|---|
-| `position` | `vec3f` | render-space position (world space via `bloxdWorldPosition()`) |
-| `normal` | `vec3f` | unit vector pointing away from the face |
-| `localPosition` | `vec3f` | model-local coordinates; **`vec3f(0.0)` for terrain and liquid**; for a player's arm, a held sword or windmill blades this rotates with the model |
-| `flags` | `BloxdFlags` | face kind ([Flags](flags.md)) |
+| `position` | `vec3f` | posição em espaço de render (espaço de mundo via `bloxdWorldPosition()`) |
+| `normal` | `vec3f` | vetor unitário apontando para fora da face |
+| `localPosition` | `vec3f` | coordenadas locais do modelo; **`vec3f(0.0)` para terreno e líquido**; para o braço de um jogador, uma espada na mão ou as pás de um moinho, gira com o modelo |
+| `flags` | `BloxdFlags` | classe de face ([Flags](flags.md)) |
 
-## BloxdVertex (vertex hook output)
+## BloxdVertex (saída do hook de vértice)
 
 ```wgsl
 struct BloxdVertex {
@@ -30,7 +30,7 @@ struct BloxdVertex {
 }
 ```
 
-## BloxdSurfaceIn (surface hook input)
+## BloxdSurfaceIn (entrada do hook de surface)
 
 ```wgsl
 struct BloxdSurfaceIn {
@@ -60,21 +60,21 @@ struct BloxdSurfaceIn {
 }
 ```
 
-| Field | Type | Description |
+| Campo | Tipo | Descrição |
 |---|---|---|
-| `colour` | `vec3f` | RGB = texture × tint × AO, baked by the mesher |
-| `alpha` | `f32` | opacity |
-| `enchantTier` | `u32` | enchant tier 1–5; 0 for anything not enchanted |
-| `enchantColour` | `vec4f` | enchant RGB plus an **animated** alpha (`.a`) — reading `.a` per fragment gives a moving pattern for free; all zero on unenchanted faces |
-| `enchantSpeed` | `f32` | enchant pattern speed («faster at higher tiers») |
-| `overlayColour` | `vec4f` | entity overlay (hurt flash etc.) RGB + alpha; 0 outside players/mobs; mixed in by `bloxdLitColour` before lighting |
-| `position` / `normal` / `localPosition` / `flags` | — | same meanings as `BloxdVertexIn`, **after the vertex hook** (they follow moved vertices) |
-| `textureId` | `u32` | this face's texture; compare with `bloxdTextureId*`; **0 when the face has no texture** — most models use textureId 0 (model-owned textures, player skins) |
-| `textureRotation` | `u32` | quarter turns clockwise (0–3), applied by `bloxdTexel` |
-| `uv` | `vec2f` | the texture spans 0–1; `fract(uv)` is drawn (integer steps tile) |
-| `mipLevel` | `f32` | mipmap level: 0 = full size, 1 = half… |
+| `colour` | `vec3f` | RGB = textura × tinta × AO, cozido pelo mesher |
+| `alpha` | `f32` | opacidade |
+| `enchantTier` | `u32` | nível de encantamento 1–5; 0 para qualquer coisa não encantada |
+| `enchantColour` | `vec4f` | RGB de encantamento mais um alfa **animado** (`.a`) — ler `.a` por fragmento dá de graça um padrão em movimento; tudo zero em faces não encantadas |
+| `enchantSpeed` | `f32` | velocidade do padrão de encantamento («faster at higher tiers») |
+| `overlayColour` | `vec4f` | sobreposição de entidade (clarão de dano etc.) RGB + alfa; 0 fora de jogadores/mobs; misturada por `bloxdLitColour` antes da iluminação |
+| `position` / `normal` / `localPosition` / `flags` | — | mesmos significados que em `BloxdVertexIn`, **depois do hook de vértice** (seguem vértices movidos) |
+| `textureId` | `u32` | a textura desta face; compare com `bloxdTextureId*`; **0 quando a face não tem textura** — a maioria dos modelos usa textureId 0 (texturas próprias do modelo, skins de jogador) |
+| `textureRotation` | `u32` | quartos de volta no sentido horário (0–3), aplicados por `bloxdTexel` |
+| `uv` | `vec2f` | a textura abrange 0–1; `fract(uv)` é desenhado (passos inteiros ladrilham) |
+| `mipLevel` | `f32` | nível de mipmap: 0 = tamanho completo, 1 = metade… |
 
-## BloxdSurface (surface hook output)
+## BloxdSurface (saída do hook de surface)
 
 ```wgsl
 struct BloxdSurface {
@@ -88,17 +88,17 @@ struct BloxdSurface {
 }
 ```
 
-| Field | Type | Condition | Description |
+| Campo | Tipo | Condição | Descrição |
 |---|---|---|---|
-| `colour` | `vec3f` | always | RGB output |
-| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model) | opacity output |
-| `emission` | `vec3f` | always | emissive RGB — **added after lighting, before fog** |
-| `enchantColour` | `vec4f` | always | enchant output, mixed in by `bloxdLitColour` |
-| `overlayColour` | `vec4f` | always | overlay output, mixed in by `bloxdLitColour` |
+| `colour` | `vec3f` | sempre | saída RGB |
+| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (todo líquido + terreno/modelo não strict) | saída de opacidade |
+| `emission` | `vec3f` | sempre | RGB emissivo — **somado depois da iluminação, antes da névoa** |
+| `enchantColour` | `vec4f` | sempre | saída de encantamento, misturada por `bloxdLitColour` |
+| `overlayColour` | `vec4f` | sempre | saída de sobreposição, misturada por `bloxdLitColour` |
 
-`bloxdDefaultSurface` passes `enchantColour` / `overlayColour` through unchanged, so the default look matches v4's engine-internal behavior. Zero `out.enchantColour` to remove the glint under custom lighting; amplify `out.overlayColour.a` to emphasize the hurt flash.
+`bloxdDefaultSurface` passa `enchantColour` / `overlayColour` adiante sem alteração, então o visual padrão coincide com o comportamento interno do motor na v4. Zere `out.enchantColour` para remover o brilho sob iluminação própria; amplifique `out.overlayColour.a` para destacar o clarão de dano.
 
-## BloxdLightIn (light hook input)
+## BloxdLightIn (entrada do hook de light)
 
 ```wgsl
 struct BloxdLightIn {
@@ -127,16 +127,11 @@ struct BloxdLightIn {
 }
 ```
 
-Field-by-field meaning and role in lighting math: see [Lighting](lighting.md).
+Significado campo por campo e papel na matemática de iluminação: veja [Iluminação](lighting.md).
 
-**Versus v4**:
+**Frente a versões mais antigas da API**: `fogVisibility` (v2–v4) agora é `fogAlpha` com semântica invertida (0 = sem névoa); `engineColour` agora é `litColour`; a redação dos níveis de luz é «0 when !bloxdLit()». As mudanças de campo por versão, completas: [Histórico de versões](../history/).
 
-- `fogVisibility: f32` (1 = no fog) was renamed **`fogAlpha: f32` (0 = no fog, 1 = only fogColour)** — semantics inverted
-- `diffuse` / `emissive` are new in v5 (v4 had only `directional` and `ambient`) — `bloxdShading()` can now rebuild the material response
-- `engineColour` (v2–v4) is gone; `litColour` is «Lit and enchanted RGB colour, before emission and fog»
-- light-level wording changed from «0 without BLOXD_LIGHTING» to «0 when !bloxdLit()» — the same facts in v5 vocabulary
-
-## BloxdLight (light hook output)
+## BloxdLight (saída do hook de light)
 
 ```wgsl
 struct BloxdLight {
@@ -144,7 +139,7 @@ struct BloxdLight {
 }
 ```
 
-## BloxdOpaqueBehind (special-function return)
+## BloxdOpaqueBehind (retorno da função especial)
 
 ```wgsl
 struct BloxdOpaqueBehind {
@@ -154,23 +149,23 @@ struct BloxdOpaqueBehind {
 }
 ```
 
-Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef BLOXD_SCENE_DEPTH` guard (the field was `found: bool` in v2).
+Valor de retorno de `bloxdOpaqueBehind()`. Use em variantes de líquido atrás de uma guarda `#ifdef BLOXD_SCENE_DEPTH` (o campo era `found: bool` na v2).
 
-## Conditional fields ↔ macros
+## Campos condicionais ↔ macros
 
-| Field | Exists when | Note |
+| Campo | Existe quando | Nota |
 |---|---|---|
-| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | all liquid variants + non-strict terrain/model |
-| `bloxdOpaqueBehind()` call | `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants |
+| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | todas as variantes de líquido + terreno/modelo não strict |
+| chamada a `bloxdOpaqueBehind()` | `#ifdef BLOXD_SCENE_DEPTH` | todas as variantes de líquido |
 
-`BLOXD_STRICT` controls **hook existence** (vertex hooks), not struct shape. See [Preprocessor](preprocessor.md).
+`BLOXD_STRICT` controla a **existência de hooks** (os de vértice), não a forma das structs. Veja [Pré-processador](preprocessor.md).
 
-## Writing conventions (recap)
+## Convenções de escrita (recapitulação)
 
-- Never construct output structs directly — start from `bloxdDefault*`; in light hooks `var out = s;` also works
-- A bare `var x: BloxdSurface;` is a validation error
-- Hook parameters are read-only — copy before mutating
+- Nunca construa structs de saída diretamente — parta de `bloxdDefault*`; em hooks de light `var out = s;` também funciona
+- Um `var x: BloxdSurface;` isolado é um erro de validação
+- Os parâmetros dos hooks são somente leitura — copie antes de modificar
 
-## Related
+## Relacionado
 
-- [Lighting](lighting.md) · [Flags](flags.md) · [Texture API](texture-api.md)
+- [Iluminação](lighting.md) · [Flags](flags.md) · [API de texturas](texture-api.md)

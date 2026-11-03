@@ -1,59 +1,59 @@
-# Texture issues
+# Problemas de texturas
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (messages recorded verbatim from the live validator)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Verified (mensagens registradas literalmente do validador em produção)
 
-Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
+Problemas em torno de `bloxdTextureId*` / `bloxdTexel`. Pesquise os 896 nomes no [catálogo de texturas](../api/texture-catalog.md).
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
-- **Cause**: a misspelling; v5's validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
-- **Fix**: accept the suggestion; cross-check the [catalog](../api/texture-catalog.md)
-- **Prevention**: copy-paste names from the catalog
+- **Causa**: um erro de grafia; o validador tem **sugestões de Levenshtein** (limiar `max(2, floor(len/4)) + 1`)
+- **Correção**: aceite a sugestão; confira no [catálogo](../api/texture-catalog.md)
+- **Prevenção**: copie e cole os nomes do catálogo
 
 ## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
 
-- **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
-- **Fix**: use the base name — sampling returns the current frame automatically
-- **Prevention**: never write frame suffixes for the 42 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **Causa**: escrever um **número de quadro** em uma textura animada (`lava0` etc.)
+- **Correção**: use o nome base — a amostragem devolve o quadro atual automaticamente
+- **Prevenção**: nunca escreva sufixos de quadro para as 42 famílias de animação ([nomenclatura](../api/texture-api.md#regras-de-grafia-e-liberdade-de-nomes))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
-- **Cause**: writing a rotation-family turned-copy spelling (`[rot[N`)
-- **Fix**: use the root name — `bloxdTexel` re-applies the rotation
+- **Causa**: escrever a grafia de cópia girada de uma família de rotação (`[rot[N`)
+- **Correção**: use o nome raiz — `bloxdTexel` reaplica a rotação
 
 ## "...could name X and Y, which differ only by case or underscores, so it can't be used."
 
-- **Cause**: the case/underscore-insensitive fold left the name **ambiguous**
-- **Fix**: disambiguate the spelling
+- **Causa**: o folding sem distinção de maiúsculas/underscores deixou o nome **ambíguo**
+- **Correção**: desambigue a grafia
 
 ## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
 
-- **Cause**: prefix misspelling (e.g. `bloxdTextureID`, `bloxdtextureid`)
-- **Fix**: start names with exactly `bloxdTextureId`
+- **Causa**: erro de grafia no prefixo (ex. `bloxdTextureID`, `bloxdtextureid`)
+- **Correção**: comece os nomes exatamente com `bloxdTextureId`
 
-## "Case and underscores are not distinguished" — how do both rules coexist?
+## "Case and underscores are not distinguished" — como as duas regras coexistem?
 
-Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](../api/texture-api.md#spelling-rules-and-naming-freedom)).
+A resolução de nomes faz folding de maiúsculas e `_`, então `bloxdTextureId_grass_top` e `bloxdTextureIdGrassTop` resolvem para a **mesma** constante. Só quando o folding deixa múltiplos candidatos o erro dedicado de ambiguidade dispara ([regras de nomenclatura](../api/texture-api.md#regras-de-grafia-e-liberdade-de-nomes)).
 
-## bloxdTexel always returns white on models
+## bloxdTexel sempre devolve branco em modelos
 
-- **By design**: most models use `textureId: 0` (no texture — player skins etc.); `bloxdTexel(0, ...)` returns `vec4f(1.0)`
-- **Fix**: select with `surface.textureId != 0u` ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0))
+- **Por design**: a maioria dos modelos usa `textureId: 0` (sem textura — skins de jogador etc.); `bloxdTexel(0, ...)` devolve `vec4f(1.0)`
+- **Correção**: selecione com `surface.textureId != 0u` ([texturas próprias do modelo](../api/texture-api.md#texturas-próprias-do-modelo-textureid-0))
 
-## Wanting to add textures
+## Querer adicionar texturas
 
-- **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](../guides/combinations.md))
+- **Limite**: a API de pacotes de shaders apenas **lê** o atlas; adicionar texturas é trabalho do sistema de pacotes de texturas ([combinações](../guides/combinations.md))
 
 ## "Packs can't use X: the engine binds every texture and sampler..."
 
-- **Cause**: declaring `texture_*` / `sampler` types directly
-- **Fix**: go through `bloxdTexel()` ([Restrictions](../api/restrictions.md))
+- **Causa**: declarar tipos `texture_*` / `sampler` diretamente
+- **Correção**: passe por `bloxdTexel()` ([Restrições](../api/restrictions.md))
 
-## Raw ids broke after a game update
+## Ids crus quebraram após uma atualização do jogo
 
-- **Cause**: **ids are snapshots** — measured, 334 of 905 surviving names changed id between two builds
-- **Fix**: write `bloxdTextureIdLava`, not `19` ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **Causa**: **ids são fotografias** — medido, 334 de 905 nomes sobreviventes mudaram de id entre duas builds
+- **Correção**: escreva `bloxdTextureIdLava`, não `19` ([nomes são a API](../api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
 
-## Related
+## Relacionado
 
-- [Texture API](../api/texture-api.md) · [Texture catalog](../api/texture-catalog.md) · [Texture Registry internals](../internals/texture-registry.md)
+- [API de texturas](../api/texture-api.md) · [Catálogo de texturas](../api/texture-catalog.md) · [Interioridades do registro de texturas](../internals/texture-registry.md)

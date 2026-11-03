@@ -1,15 +1,18 @@
 {
   "index": {
-    "title": "Getting Started",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Primeiros passos",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "overview": "Overview & prerequisites",
-  "requirements": "Requirements",
-  "quick-start": "Quick start",
-  "pack-structure": "Pack structure",
-  "manifest": "pack.json",
-  "hooks": "Shader hooks",
-  "variants": "Variants and guards",
-  "validation": "Validation",
-  "distribution": "Distribution"
+  "overview": "Visão geral e pré-requisitos",
+  "requirements": "Requisitos",
+  "quick-start": "Início rápido",
+  "pack-structure": "Estrutura do pacote",
+  "manifest": "pack.json (manifesto)",
+  "hooks": "Hooks de shader",
+  "variants": "Variantes e guardas",
+  "validation": "Validação",
+  "distribution": "Distribuição"
 }

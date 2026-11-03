@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Troubleshooting",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Solução de problemas",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
-  "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "loading": "Erros de carregamento",
+  "api-version": "Erros de versão de API",
+  "compilation": "Erros de compilação",
+  "validation": "Erros de validação",
+  "variants": "Problemas específicos de variantes",
+  "visual": "Problemas visuais",
+  "textures": "Problemas de texturas",
+  "lighting": "Problemas de iluminação",
+  "models": "Problemas de modelos",
+  "performance": "Desempenho",
+  "faq": "FAQ e notas legais"
 }

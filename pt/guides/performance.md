@@ -1,44 +1,44 @@
-# Performance-aware implementation
+# Desempenho
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (measurement-based practice)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Verified (prática baseada em medições)
 
-Pack hooks run on every fragment (all pixels of terrain / liquid / model), so style choices move frame rate significantly.
+Os hooks do pacote rodam em cada fragmento (todos os pixels de terreno / líquido / modelo), então escolhas de estilo movem a taxa de quadros de forma significativa.
 
-## First facts
+## Primeiros fatos
 
-- **The light hook is the final stage**: it runs for every drawn pixel of terrain, liquid and model — most of the screen
-- **Packs run on WebGPU**: evaluate cost assuming a range of GPUs including mobile
-- The loader's size cap (256 KB of `.wgsl`) is also a practical **compile-time** ceiling
+- **O hook de light é o estágio final**: ele roda para cada pixel desenhado de terreno, líquido e modelo — a maior parte da tela
+- **Pacotes rodam em WebGPU**: avalie o custo assumindo uma faixa de GPUs, incluindo dispositivos móveis
+- O teto de tamanho do carregador (256 KB de `.wgsl`) é também um teto prático **de compilação**
 
-## Cost ladder (cheap → expensive)
+## Escada de custos (barato → caro)
 
-| Operation | Cost | Note |
+| Operação | Custo | Nota |
 |---|---|---|
-| `mix` / `clamp` / arithmetic | ◎ minimal | |
-| input reads (`l.skyLight`…) | ◎ | uniform/vertex-attribute sourced |
-| `smoothstep` / `pow` | ○ | `pow` varies by exponent |
-| `sin` / `cos` | ○ | animation staple |
+| `mix` / `clamp` / aritmética | ◎ mínimo | |
+| leituras de entrada (`l.skyLight`…) | ◎ | originadas de uniform/atributo de vértice |
+| `smoothstep` / `pow` | ○ | `pow` varia conforme o expoente |
+| `sin` / `cos` | ○ | base de animação |
 | `dot` / `normalize` | ○ | |
-| `bloxdTexel()` (texture sample) | △ | cheaper at higher mips |
-| `dpdx` / `dpdy` / `fwidth` | △ | surface/light hooks only |
-| branching (`if`) | △ | WGSL may evaluate both sides; uniform-ish conditions (flag checks) are cheap |
-| hash noise (many `sin`/`fract`) | △ | gate micro-bump effects by distance |
+| `bloxdTexel()` (amostragem de textura) | △ | mais barato em mips mais altos |
+| `dpdx` / `dpdy` / `fwidth` | △ | só hooks de surface/light |
+| ramificações (`if`) | △ | o WGSL pode avaliar ambos os lados; condições aproximadamente uniformes (checagens de flags) são baratas |
+| ruído por hash (muitos `sin`/`fract`) | △ | limite efeitos de micro-relevo por distância |
 
-## Practice
+## Prática
 
-1. **Gate effects to the faces that need them** — `flags` selection beats "+20% everywhere"
-2. **Drop detail with distance** — early-out when `distance(surface.position, bloxdEyePosition())` exceeds a threshold
-3. **Use mips** — `bloxdTexel(id, uv, mipLevel + 1.0)` is a ¼-resolution average ([worked examples](../api/texture-api.md#worked-examples))
-4. **Prefer surface hooks for color tweaks** — the light hook is the all-pixels final stage
-5. **Add detail incrementally and compare FPS** ([testing](testing.md))
-6. **`#ifdef` guards don't save runtime** — variants are compile units; runtime savings come from flags and distance
+1. **Limite os efeitos às faces que precisam deles** — a seleção por `flags` vence "+20% em toda parte"
+2. **Abandone detalhe com a distância** — saia cedo quando `distance(surface.position, bloxdEyePosition())` superar um limiar
+3. **Use os mips** — `bloxdTexel(id, uv, mipLevel + 1.0)` é uma média a ¼ de resolução ([exemplos práticos](../api/texture-api.md#exemplos-resolvidos))
+4. **Prefira hooks de surface para retoques de cor** — o hook de light é o estágio final sobre todos os pixels
+5. **Adicione detalhe de forma incremental e compare FPS** ([testes](testing.md))
+6. **As guardas `#ifdef` não economizam tempo de execução** — as variantes são unidades de compilação; a economia em tempo de execução vem de flags e distância
 
-## Measuring
+## Medição
 
-- Compare FPS with/without the pack via browser devtools (performance panel / WebGPU stats)
-- Measure terrain-heavy scenes (shadow-rich forest) and water (liquid hooks) separately
-- Check mobile hardware — it can be tens of times slower
+- Compare o FPS com e sem o pacote pelas ferramentas de desenvolvedor do navegador (painel de desempenho / estatísticas de WebGPU)
+- Meça separadamente cenas carregadas de terreno (floresta rica em sombras) e água (hooks de líquido)
+- Verifique o hardware móvel — ele pode ser dezenas de vezes mais lento
 
-## Related
+## Relacionado
 
-- [Testing](testing.md) · [Rendering Pipeline](../internals/rendering-pipeline.md) · [Texture API](../api/texture-api.md)
+- [Testes](testing.md) · [Pipeline de renderização](../internals/rendering-pipeline.md) · [API de texturas](../api/texture-api.md)

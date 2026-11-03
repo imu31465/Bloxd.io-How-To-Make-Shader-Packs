@@ -1,10 +1,10 @@
 # Flags (BloxdFlags)
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> API alvo: 5 · Build alvo: `ab90qa` · Estado: Analyzed (restaurado literalmente do cabeçalho em produção)
 
-v5 identifies faces with a named boolean struct. The v4 `blockFlags: u32` bitmask and its 6 `bloxdBlockFlag*` constants are gone.
+A v5 identifica faces com uma struct de booleanos nomeados. A máscara de bits `blockFlags: u32` da v4 e as suas 6 constantes `bloxdBlockFlag*` desapareceram.
 
-## Definition (verbatim from the header)
+## Definição (verbatim do cabeçalho)
 
 ```wgsl
 // What kind of block, item or lifeform a face is. Any number of flags may be
@@ -31,40 +31,40 @@ struct BloxdFlags {
 }
 ```
 
-## Field reference
+## Referência de campos
 
-| Field | Class | Meaning | Typical objects | Hooks |
+| Campo | Classe | Significado | Objetos típicos | Hooks |
 |---|---|---|---|---|
-| `opaque` | material | full cube without gaps or holes | stone, dirt, solid wood | all 9 |
-| `emissive` | material | blocks that emit light | lava, glowing ores | all 9 |
-| `vegetation` | material | leaves, grass blocks, leafy plants | leaves, tall grass | all 9 |
-| `dirt` | material | soil (grass blocks included) | dirt, grass block, Rocky Dirt (also rock) | all 9 |
-| `sand` | material | sand & sandstone family | sand, red sand, every sandstone (also rock) | all 9 |
-| `rock` | material | stone family (+ gravel, ores, magma) | stone variants, gravel, ores | all 9 |
-| `slab` | shape | half blocks | slabs | Model hooks |
-| `stairs` | shape | stairs & corner stairs | stairs | Model hooks |
-| `flat` | shape | planes (incl. crossed planes) | tall grass, flowers, crops, cobwebs | Model hooks |
-| `placed` | placement | geometry placed as part of chunks | world blocks | Model hooks (not items/vehicles) |
-| `held` | placement | items held in a hand (1st/3rd person) | held items, armour | Model hooks |
-| `dropped` | placement | items on ground / belt / pipe | dropped items | Model hooks |
-| `thrown` | placement | items in flight | snowballs, arrows, rockets | Model hooks |
-| `lifeform` | target | players, mobs, NPCs (armour & cosmetics included) | entities | Model hooks |
+| `opaque` | material | cubo cheio sem vazios nem furos | pedra, terra, madeira maciça | todos os 9 |
+| `emissive` | material | blocos que emitem luz | lava, minérios brilhantes | todos os 9 |
+| `vegetation` | material | folhas, blocos de grama, plantas folhosas | folhas, grama alta | todos os 9 |
+| `dirt` | material | solo (blocos de grama incluídos) | terra, bloco de grama, Rocky Dirt (também rock) | todos os 9 |
+| `sand` | material | família de areia e arenito | areia, areia vermelha, todo arenito (também rock) | todos os 9 |
+| `rock` | material | família de pedra (+ cascalho, minérios, magma) | variantes de pedra, cascalho, minérios | todos os 9 |
+| `slab` | forma | meio-blocos | lajes | hooks Model |
+| `stairs` | forma | escadas e escadas de canto | escadas | hooks Model |
+| `flat` | forma | planos (incl. planos cruzados) | grama alta, flores, plantações, teias de aranha | hooks Model |
+| `placed` | colocação | geometria colocada como parte dos chunks | blocos do mundo | hooks Model (não itens/veículos) |
+| `held` | colocação | itens segurados na mão (1ª/3ª pessoa) | itens na mão, armaduras | hooks Model |
+| `dropped` | colocação | itens no chão / em esteira / em tubo | itens caídos | hooks Model |
+| `thrown` | colocação | itens em voo | bolas de neve, flechas, foguetes | hooks Model |
+| `lifeform` | alvo | jogadores, mobs, NPCs (armaduras e cosméticos incluídos) | entidades | hooks Model |
 
-## Flags combine freely
+## As flags se combinam livremente
 
-**Flags are not a single-choice enum.** Any number may be true at once — possibly none (the header itself says *"Any number of flags may be set, possibly even none"*).
+**As flags não são um enum de escolha única.** Qualquer número delas pode ser verdadeiro ao mesmo tempo — possivelmente nenhuma (o próprio cabeçalho diz *"Any number of flags may be set, possibly even none"*).
 
-Examples the header itself gives:
+Exemplos que o próprio cabeçalho dá:
 
-- **sandstone is both `sand` and `rock`**
-- **Rocky Dirt is both `dirt` and `rock`**
-- A slab can be `slab` and (depending on material) `rock` at the same time
+- **arenito é `sand` e `rock` ao mesmo tempo**
+- **Rocky Dirt é `dirt` e `rock` ao mesmo tempo**
+- Uma laje pode ser `slab` e (dependendo do material) `rock` ao mesmo tempo
 
-Reading the `else` branch of one flag as "everything else" is a bug. Material flags (`opaque`/`emissive`/…) combine **independently** with shape/state flags (`slab`/`held`/…).
+Ler o ramo `else` de uma flag como "todo o resto" é um bug. Flags de material (`opaque`/`emissive`/…) se combinam **de forma independente** de flags de forma/estado (`slab`/`held`/…).
 
-## Usage
+## Uso
 
-`flags` is a same-named field on all three input structs (`BloxdVertexIn`, `BloxdSurfaceIn`, `BloxdLightIn`):
+`flags` é um campo de mesmo nome nas três structs de entrada (`BloxdVertexIn`, `BloxdSurfaceIn`, `BloxdLightIn`):
 
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -79,22 +79,22 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-In the model pipeline, flags answer "what am I looking at":
+No pipeline de modelos, as flags respondem "no que estou olhando":
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if (surface.flags.lifeform && !surface.flags.held) {
-        out.colour *= 1.05;   // lift world entities, exclude the hand
+        out.colour *= 1.05;   // levanta entidades do mundo, exclui a mão
     }
     if (surface.flags.held) {
-        out.colour *= 1.15;   // brighten the local player's held items
+        out.colour *= 1.15;   // clareia os itens na mão do jogador local
     }
     return out;
 }
 ```
 
-## Migrating from v4 (mechanical)
+## Migrando da v4 (mecânico)
 
 | v4 | v5 |
 |---|---|
@@ -105,17 +105,17 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | `(surface.blockFlags & bloxdBlockFlagSand) != 0u` | `surface.flags.sand` |
 | `(surface.blockFlags & bloxdBlockFlagRock) != 0u` | `surface.flags.rock` |
 
-Remaining references to the `bloxdBlockFlag*` constants fail the analyzer's reserved-name diagnostic (the constants are deleted).
+Referências restantes às constantes `bloxdBlockFlag*` falham no diagnóstico de nome reservado do analisador (as constantes foram excluídas).
 
-## Edge cases (exhaustive, from the header)
+## Casos de borda (exaustivo, do cabeçalho)
 
 - «Rocky Dirt is rock too»
 - «every sandstone, which is rock too»
-- «Drawn as block models, so never part of terrain or flagged as opaque» — `slab`/`stairs`/`flat` faces never enter the Terrain program and never set `opaque`
-- «Includes armour and cosmetics» — `lifeform` covers player equipment too
-- «Not items or vehicles» — `placed` excludes vehicles
+- «Drawn as block models, so never part of terrain or flagged as opaque» — faces `slab`/`stairs`/`flat` nunca entram no programa Terrain e nunca definem `opaque`
+- «Includes armour and cosmetics» — `lifeform` cobre também o equipamento dos jogadores
+- «Not items or vehicles» — `placed` exclui veículos
 
-## Related
+## Relacionados
 
-- Full v4 migration → [Version History: v5](../history/v5.md)
-- Flag delivery internals → [Engine Internals](../internals/rendering-pipeline.md)
+- Migração completa da v4 → [Histórico de versões: v5](../history/v5.md)
+- Interioridades da entrega de flags → [Interior do motor](../internals/rendering-pipeline.md)

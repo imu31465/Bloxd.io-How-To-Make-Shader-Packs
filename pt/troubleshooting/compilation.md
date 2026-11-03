@@ -1,47 +1,47 @@
-# Compilation errors
+# Erros de compilação
 
-> Target API: 5 · Status: Verified
+> API alvo: 5 · Estado: Verified
 
-Errors that pass static validation but fail as WGSL, or fail only in the browser's WGSL compiler (stage 2).
+Erros que passam pela validação estática mas falham como WGSL, ou falham apenas no compilador WGSL do navegador (etapa 2).
 
 ## "bloxdTerrainVertex must be declared as: fn ..."
 
-- **Cause**: hook signature mismatch (argument/return types)
-- **Fix**: rewrite to the declaration shown in the message (parameter names are free; types must match exactly)
-- **Prevention**: start from the [hook comparison table](../api/hooks.md)
+- **Causa**: incompatibilidade de assinatura do hook (tipos de argumento/retorno)
+- **Correção**: reescreva conforme a declaração mostrada na mensagem (nomes de parâmetros são livres; os tipos devem corresponder exatamente)
+- **Prevenção**: comece pela [tabela comparativa de hooks](../api/hooks.md)
 
 ## "mixing '*' and '^' requires parenthesis (only in ...)"
 
-- **Cause**: WGSL requires parentheses when mixing `^` `&` `|` `<<` `>>` with other operators
-- **Fix**: parenthesize the operands
+- **Causa**: o WGSL exige parênteses ao misturar `^` `&` `|` `<<` `>>` com outros operadores
+- **Correção**: coloque parênteses nos operandos
 
 ## "... can only be a function's parameter or return type, ..."
 
-- **Cause**: `var x: BloxdSurface;` — bare type-annotated declarations are rejected because header structs gain fields
-- **Fix**: `var out = bloxdDefaultSurface(s);` (or `var out = s;` in light hooks)
-- **Prevention**: always build outputs from `bloxdDefault*` ([conventions](../api/structures.md#writing-conventions-recap))
+- **Causa**: `var x: BloxdSurface;` — declarações nuas com anotação de tipo são rejeitadas porque as structs do cabeçalho ganham campos
+- **Correção**: `var out = bloxdDefaultSurface(s);` (ou `var out = s;` em hooks light)
+- **Prevenção**: construa sempre as saídas a partir de `bloxdDefault*` ([convenções](../api/structures.md#convenções-de-escrita-recapitulação))
 
 ## "_ can only be the target of a phony assignment, as in _ = f();"
 
-- **Cause**: `let _ = f();` is invalid WGSL
-- **Fix**: write `_ = f();`
+- **Causa**: `let _ = f();` é WGSL inválido
+- **Correção**: escreva `_ = f();`
 
 ## "Lite: …reads scene depth on a page that didn't turn it on"
 
-- **Cause**: a depth-reading pack (`bloxdOpaqueBehind`) was active when the page was generated; depth availability is decided at page generation
-- **Fix**: reload the page with the pack active
+- **Causa**: um pacote leitor de profundidade (`bloxdOpaqueBehind`) estava ativo quando a página foi gerada; a disponibilidade de profundidade é decidida na geração da página
+- **Correção**: recarregue a página com o pacote ativo
 
-## dpdy sign looks inverted
+## O sinal de dpdy parece invertido
 
-- **This is by design**: v5's analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
-- `dpdx` and `fwidth` are untouched
+- **Isto é por design**: o analisador reescreve automaticamente toda chamada `dpdy` / `dpdyCoarse` / `dpdyFine` para `(-dpdy(...))` (o y do espaço de tela aponta para baixo)
+- **Correção**: nada — escreva `dpdy(h)` com a intenção "como h muda ao subir" e o código emitido carrega a inversão ([Restrições](../api/restrictions.md#reescritas-automáticas))
+- `dpdx` e `fwidth` ficam intactas
 
-## Pack gets dropped on game join / the on-device check never finishes
+## O pacote é descartado ao entrar em um jogo / a verificação no dispositivo nunca termina
 
-- **Cause**: the on-device check failed, or hit the 60-second forced timeout (`skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops; see [Performance](performance.md)
+- **Causa**: a verificação no dispositivo falhou, ou atingiu o timeout forçado de 60 segundos (`skipped`) — comum em dispositivos de baixo desempenho e mundos pesados
+- **Correção**: reduza o trabalho pesado de vértices e os loops complexos; veja [Desempenho](performance.md)
 
-## Related
+## Relacionado
 
-- [Validation errors](validation.md) · [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)
+- [Erros de validação](validation.md) · [Interioridades do motor: compilação de WGSL](../internals/wgsl-compilation.md) · [Restrições](../api/restrictions.md)

@@ -1,68 +1,68 @@
-# Research log
+# Registro de pesquisa
 
-> Status: Verified — how this documentation's measurements were obtained
+> Estado: Verified — como as medições desta documentação foram obtidas
 
-The technical statements here rest not on official developer documentation but on **production-bundle analysis**. This page records methodology and evidence so future builds can be re-verified.
+As afirmações técnicas daqui não se apoiam em documentação oficial de desenvolvedores, mas na **análise do bundle de produção**. Esta página registra a metodologia e as evidências para que builds futuros possam ser reverificados.
 
-## Core principles
+## Princípios básicos
 
-1. **Direct production-bundle retrieval** — raw main.js and chunks fetched from both production and preprod, identity verified by md5
-2. **Verbatim respect** — headers, error messages and i18n strings are **quoted as-is**, never paraphrased
-3. **Reproduced measurement** — derived values like the registry are recomputed by running the engine's own modules in a harness (real output, not a lookalike re-implementation)
-4. **Named builds** — every measurement carries a build id and date
+1. **Recuperação direta do bundle de produção** — o main.js e os chunks brutos baixados tanto da produção quanto do preprod, identidade verificada por md5
+2. **Respeito verbatim** — cabeçalhos, mensagens de erro e strings de i18n são **citadas tal como são**, nunca parafraseadas
+3. **Medição reproduzida** — valores derivados, como o registro, são recalculados executando os próprios módulos do motor em um harness (saída real, não uma reimplementação parecida)
+4. **Builds nomeados** — cada medição carrega um id de build e data
 
-## Build history referenced by this documentation
+## Histórico de builds referenciado por esta documentação
 
-| Build | API | Date | Note |
+| Build | API | Data | Nota |
 |---|---|---|---|
-| `szby6g` | v3-era | 2026-10-17 | first allow/strict static analysis (111 game definitions) |
-| `3ymzdd` | v3 | 2026-10-20 | the v3 guide's evidence build |
-| `sjr0p7` | v3-era | 2026-10-17 | drift-comparison baseline |
-| `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **current**; this documentation's baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `szby6g` | era v3 | 2026-10-17 | primeira análise estática allow/strict (111 definições de jogo) |
+| `3ymzdd` | v3 | 2026-10-20 | a build de evidência do guia da v3 |
+| `sjr0p7` | era v3 | 2026-10-17 | linha de base para comparação de deriva |
+| `cnty9` | v4 | 2026-10-27 | evidência do guia da v4 e do catálogo de 905 nomes |
+| `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
+| `ab90qa` | **v5** | 2026-11-03 | **atual**; linha de base desta documentação. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 
-## Key methodology
+## Metodologia chave
 
-### Engine-header restoration
+### Restauração do cabeçalho do motor
 
-Rendering the c55 header template with its live interpolations (`${vC}` = apiVersion, the 5 uniform reads via `${Gq.j}`) — 6 interpolations on v5 ([Engine header](engine-header.md)).
+Renderizando o template de cabeçalho do c55 com suas interpolações reais (`${vC}` = apiVersion, as 5 leituras de uniform via `${Gq.j}`) — 6 interpolações na v5 ([Cabeçalho do motor](engine-header.md)).
 
-### Texture-registry recomputation
+### Recomputação do registro de texturas
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 896 / aliases 416 / layers 228) ([Texture registry](texture-registry.md)).
+Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (896 nomes / 416 aliases / 228 camadas) ([Registro de texturas](texture-registry.md)).
 
-Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
+Os intervalos de animação vêm da tabela no estilo `animDataPerTex` (`numAnimStates` / `animationInterval` por camada) — só existem três valores de intervalo: 200 / 250 / 300 ms ([o catálogo](../api/texture-catalog.md#famílias-de-animação-42-nomes)).
 
-### Error-message capture
+### Captura de mensagens de erro
 
-Loader messages verbatim from the live i18n dictionary; validator messages from the validation module's string literals.
+Mensagens do carregador, verbatim do dicionário i18n em execução; mensagens do validador, dos literais de string do módulo de validação.
 
-### allow / strict static analysis
+### Análise estática allow / strict
 
-Statically analyzing all 111 game definitions: `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too ([Policy](policy.md)).
+Analisando estaticamente as 111 definições de jogo: literais `"allow"` de `shaderPackPolicy` — 8 diretos + 4 por variável base = 12 títulos (26 entradas), com a herança por spread (`{...tb,...}`) rastreada também ([Política](policy.md)).
 
-### Uniform / pipeline restoration
+### Restauração de uniform / pipeline
 
-The `BloxdPackInputs` field layout from the uniform-layout module (29838); the texture 3-variant codegen from the WebGPU generator (c56) ([Texture sampling](texture-sampling.md)).
+O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838); o codegen de texturas de 3 variantes do gerador WebGPU (c56) ([Amostragem de texturas](texture-sampling.md)).
 
-## Drift observations
+## Observações de deriva
 
-| Comparison | Period | Result |
+| Comparação | Período | Resultado |
 |---|---|---|
-| sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
-| cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
+| sjr0p7 → cnty9 | 10 dias | 98 adicionados, 79 removidos; 779/1121 nomes mudaram de id (69%) |
+| cnty9 → ab90qa | 7 dias | +1 (scorpion_eggs), −10 (cofre duplo ×8, laterais de spawner ×2); 334/905 nomes mudaram de id |
 
-## Unverified / speculative
+## Não verificado / especulativo
 
-- Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
-- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
-- Why `bloxdFragmentBlockPosition` remains in the signature table (removed from v5's header) is unanalyzed — plausibly an un-cleaned leftover, but unconfirmed
+- Mapas de sombra precisos ao pixel como "planos futuros" é uma **interpretação** (inferida do `var shadow: f32 = 1.;` não usado no template de iluminação)
+- A divisão allow/strict pode mudar por build (identidade dos 12 títulos reconfirmada em ab90qa; jogos futuros desconhecidos)
+- `bloxdFragmentBlockPosition` (fora do cabeçalho da v5): entrada na tabela de assinaturas e injeção em tempo de execução, ambas confirmadas no bundle em execução — as chamadas validam e compilam; se a equipe do motor pretende mantê-la é desconhecido
 
-## When to re-verify
+## Quando reverificar
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above (c55 / c116 / c56) are the starting points.
+Ao detectar uma atualização do jogo (um novo hash de main.js): reconferir o cabeçalho (9.125 B), a constante apiVersion, recomputar o registro e reconfirmar a lista allow/strict. A metodologia detalhada de monitoramento está fora do escopo desta documentação, mas as localizações de módulos acima (c55 / c116 / c56) são os pontos de partida.
 
-## Related
+## Relacionado
 
-- [Engine data](engine-data.md) · [Texture registry](texture-registry.md) · [Version History](../history/)
+- [Ledger de dados do motor](engine-data.md) · [Registro de texturas](texture-registry.md) · [Histórico de versões](../history/)

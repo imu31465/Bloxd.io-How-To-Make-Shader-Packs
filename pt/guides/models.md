@@ -1,72 +1,72 @@
-# Models and textures
+# Modelos e texturas
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from header & validator)
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Analyzed (restaurado do cabeçalho e do validador)
 
-What the new v5 Model hooks draw and read.
+O que os novos hooks de Model do v5 desenham e leem.
 
-## What the Model program draws
+## O que o programa Model desenha
 
-- **Block models**: half blocks (`slab`), stairs (`stairs`), crossed-plane plants — tall grass, flowers, crops, cobwebs (`flat`)
-- **Items**: held (`held`), dropped (`dropped`), thrown (`thrown` — snowballs, arrows, rockets)
-- **Entities**: players, mobs, NPCs (`lifeform`) — **including armour and cosmetics**
+- **Modelos de bloco**: meio-blocos (`slab`), escadas (`stairs`), plantas de planos cruzados — grama alta, flores, cultivos, teias de aranha (`flat`)
+- **Itens**: na mão (`held`), caídos (`dropped`), arremessados (`thrown` — bolas de neve, flechas, foguetes)
+- **Entidades**: jogadores, mobs, NPCs (`lifeform`) — **incluindo armaduras e cosméticos**
 
-Terrain (full blocks) and Liquid (water) never enter this program.
+Terreno (blocos completos) e Líquido (água) nunca entram neste programa.
 
-## What reads differently
+## O que se lê diferente
 
-Model faces carry three things terrain faces never have:
+Faces de modelo carregam três coisas que faces de terreno nunca têm:
 
-| Information | Field | Value on terrain |
+| Informação | Campo | Valor no terreno |
 |---|---|---|
-| model-local coordinates | `localPosition: vec3f` | `vec3f(0.0)` (no model) |
-| enchant state | `enchantTier` / `enchantColour` / `enchantSpeed` | all 0 |
-| entity overlay | `overlayColour` | 0 |
+| coordenadas locais do modelo | `localPosition: vec3f` | `vec3f(0.0)` (sem modelo) |
+| estado de encantamento | `enchantTier` / `enchantColour` / `enchantSpeed` | todos 0 |
+| sobreposição de entidade | `overlayColour` | 0 |
 
-And **textures mean something different**: terrain faces carry atlas `textureId`s, but **most models use `textureId: 0`** ("no texture") — player skins and mob textures are not in the atlas namespace. `surface.colour` already contains skin × tint, so work from it ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+E **texturas significam outra coisa**: faces de terreno carregam `textureId`s do atlas, mas **a maioria dos modelos usa `textureId: 0`** ("sem textura") — skins de jogador e texturas de mobs não estão no namespace do atlas. `surface.colour` já contém skin × tinta, então trabalhe a partir dele ([texturas próprias do modelo](../api/texture-api.md#texturas-próprias-do-modelo-textureid-0)).
 
-`flags`'s `held` / `dropped` / `thrown` / `lifeform` / `placed` are meaningful only on model faces ([Flags](../api/flags.md)).
+Os `held` / `dropped` / `thrown` / `lifeform` / `placed` de `flags` só têm significado em faces de modelo ([Flags](../api/flags.md)).
 
 ## localPosition
 
-The model-instance-local position **before** world placement; `vec3f(0.0)` for terrain/liquid.
+A posição local da instância do modelo **antes** do posicionamento no mundo; `vec3f(0.0)` para terreno/líquido.
 
-- For a player's arm, a held sword or windmill blades it rotates with the model
-- **Keyed per-part animation and bending effects** become a one-field write — "how far up the blade am I" is directly `localPosition.y`
-- In light structs it is the **post-vertex-hook** value (header: *"the same as in BloxdVertexIn, after the vertex hook"*)
+- Para o braço de um jogador, uma espada na mão ou as pás de um moinho, ela gira com o modelo
+- **Animação com chave por parte e efeitos de dobramento** viram uma escrita de um único campo — "a que altura da lâmina estou" é diretamente `localPosition.y`
+- Nas structs de light é o valor **pós-hook-de-vértice** (cabeçalho: *"the same as in BloxdVertexIn, after the vertex hook"*)
 
-## Selection patterns
+## Padrões de seleção
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if (surface.flags.lifeform && !surface.flags.held) {
-        out.colour *= 1.05;   // lift world entities, exclude the hand
+        out.colour *= 1.05;   // levanta entidades do mundo, exclui a mão
     }
     if (surface.flags.held) {
-        out.colour *= 1.15;   // brighten the local player's held items
+        out.colour *= 1.15;   // clareia os itens na mão do jogador local
     }
     return out;
 }
 ```
 
-Full examples: [model shader recipes](../recipes/model-shaders.md) and [enchant effects](../recipes/enchant-effects.md).
+Exemplos completos: [receitas de shaders de modelo](../recipes/model-shaders.md) e [efeitos de encantamento](../recipes/enchant-effects.md).
 
-## Terrain / Liquid / Model cheat sheet
+## Cola de Terrain / Liquid / Model
 
-| Want to affect | Hooks | Selection fields |
+| Quer afetar | Hooks | Campos de seleção |
 |---|---|---|
-| full-block look | `bloxdTerrain*` | material flags (`opaque` / `rock`…) |
-| water | `bloxdLiquid*` | always Liquid (no Liquid hooks = water untouched) |
-| plants, slabs, stairs | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
-| held items | `bloxdModel*` | `flags.held` |
-| dropped items | `bloxdModel*` | `flags.dropped` |
-| thrown items | `bloxdModel*` | `flags.thrown` |
-| players & mobs | `bloxdModel*` | `flags.lifeform` |
+| o look de blocos completos | `bloxdTerrain*` | flags de material (`opaque` / `rock`…) |
+| a água | `bloxdLiquid*` | sempre Liquid (sem hooks de Liquid = água intacta) |
+| plantas, lajes, escadas | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
+| itens na mão | `bloxdModel*` | `flags.held` |
+| itens caídos | `bloxdModel*` | `flags.dropped` |
+| itens arremessados | `bloxdModel*` | `flags.thrown` |
+| jogadores e mobs | `bloxdModel*` | `flags.lifeform` |
 
-## Lighting
+## Iluminação
 
-`bloxdModelLight` takes the same `BloxdSurface` / `BloxdLightIn` and works with `bloxdDefaultLight` / `bloxdLitColour()`. The enchant glint (`enchantColour`) and hurt flash (`overlayColour`) mix inside `bloxdLitColour`, so **defaults preserve both looks automatically**; to control them see [enchant effects](../recipes/enchant-effects.md).
+`bloxdModelLight` recebe os mesmos `BloxdSurface` / `BloxdLightIn` e trabalha com `bloxdDefaultLight` / `bloxdLitColour()`. O brilho de encantamento (`enchantColour`) e o clarão de dano (`overlayColour`) se misturam dentro de `bloxdLitColour`, então **os padrões preservam ambos os looks automaticamente**; para controlá-los, veja [efeitos de encantamento](../recipes/enchant-effects.md).
 
-## Internals
+## Interioridades
 
-How models render and how flags/enchant inputs flow: [Engine Internals: Model Rendering](../internals/model-rendering.md); generated symbols like `bloxdSpItemLocalPosition` and `bloxdSpEnchant` are listed in [restrictions](../api/restrictions.md).
+Como os modelos são renderizados e como as entradas de flags/encantamento fluem: [Interioridades do motor: renderização de modelos](../internals/model-rendering.md); símbolos gerados como `bloxdSpItemLocalPosition` e `bloxdSpEnchant` estão listados em [restrições](../api/restrictions.md).
