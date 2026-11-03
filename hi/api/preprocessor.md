@@ -27,7 +27,7 @@
 
 ## हटाए गए मैक्रो
 
-- **`BLOXD_LIGHTING`** — v5 में हटा दिया गया। लाइटिंग की स्थिति [`bloxdLit()`](lighting.md#bloxdlit--गट) के लिए रनटाइम का प्रश्न है, कंपाइल ब्रांच नहीं। इसका उपयोग करने पर सत्यापन इसके साथ विफल हो जाता है:
+- **`BLOXD_LIGHTING`** — v5 में हटा दिया गया। लाइटिंग की स्थिति [`bloxdLit()`](lighting.md#bloxdlit--गेट) के लिए रनटाइम का प्रश्न है, कंपाइल ब्रांच नहीं। इसका उपयोग करने पर सत्यापन इसके साथ विफल हो जाता है:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
@@ -72,7 +72,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `BloxdSurface.alpha` केवल `#ifdef BLOXD_ALPHA` के भीतर मौजूद है
 - `bloxdOpaqueBehind()` केवल `#ifdef BLOXD_SCENE_DEPTH` के भीतर कॉल किया जा सकता है
 
-देखें [स्ट्रक्चर](structures.md#सशरत-फलड--मकर)।
+देखें [स्ट्रक्चर](structures.md#सशर्त-फ़ील्ड--मैक्रो)।
 
 ## संबंधित
 

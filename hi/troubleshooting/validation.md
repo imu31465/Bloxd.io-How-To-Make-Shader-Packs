@@ -18,7 +18,7 @@
 ## "bloxdPackInputs isn't part of the bloxd_ header"
 
 - **कारण**: uniform को सीधे संदर्भित करना
-- **समाधान**: हेडर फ़ंक्शनों के ज़रिए उसका उपयोग करें ([पैक फ़ॉर्मैट](../api/pack-format.md#परत-फरम-uniform-bloxdpackinputs))
+- **समाधान**: हेडर फ़ंक्शनों के ज़रिए उसका उपयोग करें ([पैक फ़ॉर्मैट](../api/pack-format.md#प्रति-फ़्रेम-uniform-bloxdpackinputs))
 
 ## "... reaches bloxdTexel, which only surface and light hooks can use."
 
@@ -45,7 +45,7 @@
 
 | संदेश | कार्रवाई |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` माइग्रेट करें ([लाइटिंग](../api/lighting.md#bloxdlit--गट)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` माइग्रेट करें ([लाइटिंग](../api/lighting.md#bloxdlit--गेट)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | छूटा हुआ बिट कॉन्स्टैंट → `flags.rock` ([फ़्लैग](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 का आंतरिक प्रतीक → सार्वजनिक `bloxdLitColour()` का उपयोग करें |
 

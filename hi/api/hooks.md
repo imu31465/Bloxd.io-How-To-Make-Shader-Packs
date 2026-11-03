@@ -59,7 +59,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `bloxdTextureSize` | केवल surface / light हुक | — |
 | `bloxdOpaqueBehind` | surface / light हुक (liquid वेरिएंट में अर्थपूर्ण) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` अब प्रलेखित हेडर में नहीं है, पर इंजन इसे अब भी इंजेक्ट करता और स्वीकार करता है — देखें [फ़ंक्शन्स: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--अनडकयमटड-पर-अब-भ-इजकट-हत-ह)। यह इकलौता स्पेशल फ़ंक्शन था जो vertex हुकों से बुलाया जा सकता था; नए कोड में "यह कौन-सा ब्लॉक है" के लिए `flags` को तरजीह दें।
+> `bloxdFragmentBlockPosition` अब प्रलेखित हेडर में नहीं है, पर इंजन इसे अब भी इंजेक्ट करता और स्वीकार करता है — देखें [फ़ंक्शन्स: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--अनडॉक्यूमेंटेड-पर-अब-भी-इंजेक्ट-होती-है)। यह इकलौता स्पेशल फ़ंक्शन था जो vertex हुकों से बुलाया जा सकता था; नए कोड में "यह कौन-सा ब्लॉक है" के लिए `flags` को तरजीह दें।
 
 ## फ़ॉलबैक और साझा करना
 

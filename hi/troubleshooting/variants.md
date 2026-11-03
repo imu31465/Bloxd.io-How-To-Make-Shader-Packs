@@ -14,7 +14,7 @@
 ## ".alpha is undefined"
 
 - **कारण**: `alpha` केवल `#ifdef BLOXD_ALPHA` के पीछे मौजूद है (सभी liquid + ग़ैर-strict terrain/model)
-- **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](../api/preprocessor.md#मकर--वरएट-मटरकस))
+- **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](../api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स))
 
 ## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
@@ -30,7 +30,7 @@
 
 - **लक्षण**: terrain हुक लिखे हैं, पानी जैसा था वैसा ही है
 - **कारण**: **v5 में, यदि पैक कोई Liquid हुक परिभाषित नहीं करता, तो पानी पर कोई Terrain हुक भी नहीं चलता** (pre-v4 का "liquid, terrain पर गिर जाता है" व्यवहार जा चुका है)
-- **समाधान**: Liquid हुक लिखें ([हुक विभाजन](../api/hooks.md#हर-परगरम-कय-डर-करत-ह))
+- **समाधान**: Liquid हुक लिखें ([हुक विभाजन](../api/hooks.md#हर-प्रोग्राम-क्या-ड्रॉ-करता-है))
 
 ## मॉडल (एंटिटी, ब्लॉक मॉडल) अछूते
 

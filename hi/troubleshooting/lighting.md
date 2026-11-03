@@ -28,13 +28,13 @@
 
 ## इंजन की दुनिया-प्रकाश को बिल्कुल वैसा ही रखना चाहते हैं
 
-- **v5 समाधान**: `bloxdWorldLight(light)` को कॉल करें — इंजन के "block/sky/held में सबसे चमकीला, ambientLightColour से फ़्लोर" से बिल्कुल वही गणित ([लाइटिंग](../api/lighting.md#bloxdworldlight--वरलड-क-परकश))
+- **v5 समाधान**: `bloxdWorldLight(light)` को कॉल करें — इंजन के "block/sky/held में सबसे चमकीला, ambientLightColour से फ़्लोर" से बिल्कुल वही गणित ([लाइटिंग](../api/lighting.md#bloxdworldlight--वर्ल्ड-का-प्रकाश))
 - **टिप्पणी**: `!bloxdLit()` पर `blockLight` / `heldLight` 0 और आकाश-संबंधी फ़ील्ड 1 होते हैं (हेडर गारंटी)
 
 ## लाइटिंग-बंद गेमों में ग़लत दिखना
 
 - **कारण**: केवल-लाइटिंग इनपुट (`blockLight` आदि) बिना गार्ड उपयोग किए गए। v5 में कोई `#ifdef BLOXD_LIGHTING` नहीं — **रनटाइम `bloxdLit()`** पर शाखा बनाएँ
-- **समाधान**: जल्दी वापसी `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([लाइटिंग](../api/lighting.md#bloxdlit--गट))
+- **समाधान**: जल्दी वापसी `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([लाइटिंग](../api/lighting.md#bloxdlit--गेट))
 
 ## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
 

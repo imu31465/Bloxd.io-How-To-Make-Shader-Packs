@@ -116,7 +116,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` फलक (स्किन) सफ़ेद सैंपल होते हैं — कोई त्रुटि नहीं ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मडल-सवमतव-टकसचर-textureid-0))।
+`textureId: 0` फलक (स्किन) सफ़ेद सैंपल होते हैं — कोई त्रुटि नहीं ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मॉडल-स्वामित्व-टेक्सचर-textureid-0))।
 
 ## कवच बनाम बाकी सब
 
@@ -142,7 +142,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-साझा-फ़ंक्शन पैटर्न वही है जो डिफ़ॉल्ट पैक टेम्पलेट स्वयं सुझाता है ([hooks](../getting-started/hooks.md#फलबक-और-कड-सझ-करन))।
+साझा-फ़ंक्शन पैटर्न वही है जो डिफ़ॉल्ट पैक टेम्पलेट स्वयं सुझाता है ([hooks](../getting-started/hooks.md#फ़ॉलबैक-और-कोड-साझा-करना))।
 
 ## संबंधित
 
