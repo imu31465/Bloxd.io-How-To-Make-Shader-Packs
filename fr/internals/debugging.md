@@ -1,0 +1,11 @@
+# Moyens de débogage
+
+
+
+- Paramètre URL `?renderer=lite` — force le moteur Lite (`?renderer=webgl2` / `babylon` valent aussi ; `babylon` = ancien nom de webgl2). La priorité : paramètre URL > localStorage `bloxdRenderer` > écran de réglages > défaut (webgl2). Les valeurs invalides sont ignorées avec un avertissement. Des overrides restants dans l'URL ou le localStorage peuvent casser des scènes nécessitant WebGPU (lite) avec `needs the new WebGPU renderer, so remove the renderer override...` ([Partie V](../troubleshooting/) §17)
+- Paramètre URL `?vconsole` — console à l'écran (VConsole). Utile en vérification mobile réelle
+- Paramètre URL `?drawcalls=1` — ajoute un panneau de debug des statistiques de draw. Sélectionnez des objets de jeu dans la console de debug, ou utilisez `drawCalls()` / `why()` / `configureDrawCallWatching()`, pour inspecter le surdessin des gros mécanismes (pack ou autres) et l'approche du plafond de ~65 000 sommets par draw — utile pour isoler les goulots de performance
+- La console affiche `noa-engine v0.33.0` et `Renderer: lite from <source>` — revoyez-les d'abord pour ne pas mal diagnostiquer la voie de rendu
+- Le moteur WebGPU se verrouille « forcé ON » avec pack appliqué. Le réglage « Disable Block Texture Atlas » se verrouille aussi (l'atlas reste ON), et sans WebGPU le pack n'applique même pas. Base pour écrire « navigateur WebGPU requis » en pages de distribution
+- Les textures de blocs sont une texture tableau 2D (`texture_2d_array`), et le sampler du terrain est nearest + repeat. Le mesher fusionne aussi les faces aux material / AO / lumière identiques en un rectangle (**greedy meshing**), si bien qu'une face fusionnée peut avoir une UV dépassant la largeur d'une tuile (bords rentrés de 0.0015). L'adressage repeat matériel gère le raccord, donc les faces fusionnées paraissent sans couture. Notez qu'un détail procédural accroché à `vUV` peut casser aux frontières de fusion — accrochez-le plutôt à la position monde (`s.position` + `bloxdRenderOffset()`)
+- La revalidation runtime par partie (`checkCompilation`) compile des matériaux de terrain réels en WebGPU du navigateur (plus stricte que la validation statique de réglages). Les packs qui échouent ici s'excluent de ce jeu
