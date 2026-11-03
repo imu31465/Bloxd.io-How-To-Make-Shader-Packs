@@ -1,0 +1,11 @@
+# Debugging-Mittel
+
+
+
+- URL-Parameter `?renderer=lite` — den Lite-Renderer (WebGPU) erzwingen (`?renderer=webgl2` / `babylon` gehen auch; `babylon` ist der alte Name für webgl2). Priorität: URL-Parameter > localStorage `bloxdRenderer` > Einstellungsbildschirm > Standard (webgl2). Ungültige Werte werden mit Warnung ignoriert. In URL oder localStorage belassene Overrides können Szenen brechen, die WebGPU (lite) brauchen — „needs the new WebGPU renderer, so remove the renderer override..." ([Teil V](../troubleshooting/) §17)
+- URL-Parameter `?vconsole` — On-Screen-Konsole (VConsole). Praktisch für echte Mobil-Verifikation
+- URL-Parameter `?drawcalls=1` — blendet ein Draw-Statistik-Debug-Panel ein. Spielobjekte aus der Debug-Konsole auswählen oder `drawCalls()` / `why()` / `configureDrawCallWatching()` nutzen, um Overdraw großer Mechanismen (Paket und sonstige) und die Annäherung ans Limit von ~65.000 Vertices pro Draw-Call zu inspizieren — nützlich zur Isolation von Performance-Engpässen
+- Die Konsole zeigt `noa-engine v0.33.0` und `Renderer: lite from <Quelle>` — erst prüfen, um Render-Pfad-Fehldiagnosen zu vermeiden
+- Der WebGPU-Renderer sperrt sich mit Paket auf „zwangsweise AN". Die Einstellung „Disable Block Texture Atlas" sperrt sich ebenfalls (Atlas bleibt AN), und ohne WebGPU wendet sich das Paket gar nicht erst an. Basis, um auf Vertriebsseiten „WebGPU-Browser nötig" zu schreiben
+- Block-Texturen sind eine 2D-Array-Textur (`texture_2d_array`), der Terrain-Sampler ist Nearest + Repeat. Der Mesher verschmilzt außerdem Flächen mit gleichem Material / AO / Licht zu einem Rechteck (**Greedy Meshing**), die UV einer verschmolzenen Fläche kann daher eine Kachelbreite überschreiten (Kanten um 0.0015 eingerückt). Hardware-Repeat-Adressierung übernimmt die Kachelung, verschmolzene Flächen wirken nahtlos. Beachte: an `vUV` gekoppeltes prozedurales Detail kann an Verschmelzungsgrenzen brechen — stattdessen an die Weltposition (`s.position` + `bloxdRenderOffset()`) koppeln
+- Die Laufzeit-Revalidierung pro Beitritt (`checkCompilation`) kompiliert echte Terrain-Materialien im Browser-WebGPU (strenger als Einstellungs-Static-Validierung). Hier fallende Pakete werden aus diesem Spiel ausgeschlossen

@@ -1,89 +1,48 @@
-# Bloxd.io-Shader-Pakete erstellen (Komplette Anleitung)
+# Bloxd.io Shader-Pack-Dokumentation
 
-Eigenständige Anleitung zum Erstellen und Verteilen von Shader-Paketen für Bloxd.io (nur WebGPU-Renderer).
-**Die aktuelle API ist `apiVersion: 5` — sie ist am 2026-11-03 in Produktion gegangen**, und das aktuelle Spiel lehnt Pakete mit v1, v2, v3 und v4 beim Laden ab (Meldungen zur falschen API-Version). Die Teile I–VII unten sind weiterhin auf v2-Basis geschrieben und bleiben als konzeptionelle Grundlage gültig: Lies sie als v2 und wende vor der Verteilung die Änderungen aus Teil IX (`09-apiv3.md`) und Teil X (`10-apiv4.md`) an. Teil X behandelt die v4-Textur-API (`bloxdTexel`, `bloxdTextureId*`), die Fog-Umbenennung (`fogAlpha`, Bedeutung invertiert!) und den Strict-Games-Vertrag. Die Anleitung ist pro Teil in eine eigene Datei aufgeteilt (dieses README ist das Inhaltsverzeichnis; die Rezeptsammlung liegt in `03-recipes.md`). Für den vorherigen Schritt v1 → v2 siehe Teil VIII (`08-apiv2.md`). Teil IX dokumentiert außerdem aus dem Produktions-Build restaurierte Engine-Interna (§49–§54: Aufruf der Hooks, Fog-Funktion mit vier Modi, Implementierung von `bloxdOpaqueBehind()`, Übertragungsweg von `blockFlags` und Validierungspipeline mit gemessenem Header-Hash). Der Schritt v4 → v5 ist [Teil XII](12-apiv5.md) (seit 2026-11-03 live).
+Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer — von Erstellung, Implementierung, Validierung und Vertrieb bis zur API-Spezifikation und Engine-Interna.
 
-> Dies ist eine inoffizielle Anleitung und gibt nicht die Sicht der Entwickler wieder. Die API kann sich ohne Ankündigung ändern.  
-> Zuletzt geprüft: 2026-10-27 (v4-Produktionsrollout bestätigt — Build `cnty9`, Produktion und Preprod identisch; siehe Teil X. v3-Produktionsrollout durch Bundle-Vergleich bestätigt; Hook-Aufruf, Fog, Tiefe und `blockFlags`-Interna aus dem Produktions-Build restauriert — Teil IX §49–§54). Das vollständige Referenzmaterial ist als Teil XI (`11-reference.md`) eingebettet — der wortgetreu restaurierte Engine-Header und der komplette gemessene Katalog aller 905 nutzbaren Textur-Namen; prüfe Rezepte trotzdem weiter anhand des Ladebildschirms und der Kompilierung im Spiel.  
-> Die Shader-Paket-Funktion ist eine offizielle Funktion aus der Spieloberfläche, und Pakete sind reines WGSL  
-> (keine JS-Ausführung, kein Netzwerk) – mit normalem Code passiert also nichts Gefährliches.  
-> Dieser Leitfaden wurde mit KI-Unterstützung erstellt; Korrektheit ist nicht garantiert. Prüfe am tatsächlichen Spielverhalten.
+## Aktueller Stand
 
-## Inhalt
+- Aktuelle API: **5** (`pack.json` muss `apiVersion: 5` deklarieren)
+- Ziel: WebGPU-Renderer
+- Zuletzt verifiziert: 2026-11-03
+- Ziel-Build: `ab90qa.main.6188124c.js` (Produktion und Preprod identisch — per md5 `fc3322212d15be2445c0e8df9733fcc` verifiziert)
+- Shader-Hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-- [Komplette Anleitung in einer Datei](00-full.md)
-- [Teil I: Pakete erstellen](01-making.md)
-  - [1. Überblick und Voraussetzungen](01-making.md#1-überblick-und-voraussetzungen)
-  - [2. Schnellstart](01-making.md#2-schnellstart)
-  - [3. Paketstruktur](01-making.md#3-paketstruktur)
-  - [4. pack.json](01-making.md#4-packjson)
-  - [5. Minimalvorlage](01-making.md#5-minimalvorlage)
-  - [6. Die 6 Hooks](01-making.md#6-die-6-hooks)
-  - [7. 8 Varianten und Guards](01-making.md#7-8-varianten-und-guards)
-  - [8. Verfügbare Sprachfeatures und Verbote](01-making.md#8-verfügbare-sprachfeatures-und-verbote)
-  - [9. Prüfung, Test und Verteilung](01-making.md#9-prüfung-test-und-verteilung)
-- [Teil II: API-Referenz](02-api.md)
-  - [10. Engine-Header (wird automatisch vor Paket-Code gesetzt)](02-api.md#10-engine-header-wird-automatisch-vor-paket-code-gesetzt)
-  - [11. Variantentabelle](02-api.md#11-variantentabelle)
-  - [12. Skelett-Spickzettel](02-api.md#12-skelett-spickzettel)
-- [Teil III: Rezeptsammlung](03-recipes.md)
-  - [R1. Farbrezepte (Surface)](03-recipes.md#r1-farbrezepte-surface)
-  - [R2. Lichtrezepte (Light)](03-recipes.md#r2-lichtrezepte-light)
-  - [R3. Emissionsrezepte](03-recipes.md#r3-emissionsrezepte)
-  - [R4. Koordinatenrezepte (Welt / Block / Sicht)](03-recipes.md#r4-koordinatenrezepte-welt--block--sicht)
-  - [R5. Zeitrezepte (Animation)](03-recipes.md#r5-zeitrezepte-animation)
-  - [R6. Flüssigkeitsrezepte](03-recipes.md#r6-flüssigkeitsrezepte)
-  - [R7. Vertex-Rezepte (nur allow)](03-recipes.md#r7-vertex-rezepte-nur-allow)
-  - [R8. Mathe-Tricks](03-recipes.md#r8-mathe-tricks)
-  - [R9. Realismus-Rezepte](03-recipes.md#r9-realismus-rezepte)
-- [Teil IV: Realismus-Leitfaden](04-realism.md)
-  - [13. Engine-Standardlicht und Realismus-Spielraum](04-realism.md#13-engine-standardlicht-und-realismus-spielraum)
-  - [14. Zwei Umsetzungs-Schulen](04-realism.md#14-zwei-umsetzungs-schulen)
-  - [15. Unerreichbare Looks (die Realismus-„Decke")](04-realism.md#15-unerreichbare-looks-die-realismus-decke)
-  - [16. Debugging-Tipps](04-realism.md#16-debugging-tipps)
-- [Teil V: Fehlersuche & Hinweise](05-troubleshooting.md)
-  - [17. Häufige Fehler und Fixes](05-troubleshooting.md#17-häufige-fehler-und-fixes)
-  - [18. Rechte & Hinweise](05-troubleshooting.md#18-rechte--hinweise)
-- [Teil VI: Wichtige Umsetzungshinweise](06-implementation.md)
-  - [19. „Dunkle Schatten, aber helle Flächen" nachts beheben](06-implementation.md#19-dunkle-schatten-aber-helle-flächen-nachts-beheben)
-  - [20. Integriertes Rezept für natürlich aussehendes Wasser](06-implementation.md#20-integriertes-rezept-für-natürlich-aussehendes-wasser)
-  - [21. In-Game-Testcheckliste](06-implementation.md#21-in-game-testcheckliste)
-  - [22. Mit anderen Paketen kombinieren, wenn der Shader allein ans Limit stößt](06-implementation.md#22-mit-anderen-paketen-kombinieren-wenn-der-shader-allein-ans-limit-stößt)
-  - [23. Unterwasser-Realität mit Shader-Paketen](06-implementation.md#23-unterwasser-realität-mit-shader-paketen)
-- [Teil VII: Interna-Ergänzung](07-internals.md)
-  - [24. Sonnen- und Mondidentität](07-internals.md#24-sonnen--und-mondidentität)
-  - [25. Fog-Interna](07-internals.md#25-fog-interna)
-  - [26. blockLight-/heldLight-Interna](07-internals.md#26-blocklight-heldlight-interna)
-  - [27. Pipeline-Details](07-internals.md#27-pipeline-details)
-  - [28. Was sichtbare Paket-Werte ändert — Testcheckliste](07-internals.md#28-was-sichtbare-paket-werte-ändert--testcheckliste)
-  - [29. Debugging-Mittel](07-internals.md#29-debugging-mittel)
-  - [30. Anwendungsmodi je Spiel (`shaderPackPolicy`)](07-internals.md#30-anwendungsmodi-je-spiel-shaderpackpolicy)
-- [Teil VIII: Migrationsleitfaden für API Version 2](08-apiv2.md)
-  - [31. Das Schicksal von v1-Paketen (erst das Fazit)](08-apiv2.md#31-das-schicksal-von-v1-paketen-erst-das-fazit)
-  - [32. Komplettumbenennung der Bezeichner (Zuordnungstabelle)](08-apiv2.md#32-komplettumbenennung-der-bezeichner-zuordnungstabelle)
-  - [33. Wohin gelöschte Felder wandern](08-apiv2.md#33-wohin-gelöschte-felder-wandern)
-  - [34. Neuerung ①: `blockId` (blockeigenes Shading)](08-apiv2.md#34-neuerung-①-blockid-blockeigenes-shading)
-  - [35. Neuerung ②: `BLOXD_SCENE_DEPTH` und `bloxdOpaqueBehind()` (die wichtigste)](08-apiv2.md#35-neuerung-②-bloxd_scene_depth-und-bloxdopaquebehind-die-wichtigste)
-  - [36. Sonstige v2-Änderungen](08-apiv2.md#36-sonstige-v2-änderungen)
-  - [37. v1 → v2-Migrationscheckliste](08-apiv2.md#37-v1--v2-migrationscheckliste)
-  - [38. Zweite Prüfstufe — der Browser-WGSL-Compiler ist strenger als der eingebaute Parser](08-apiv2.md#38-zweite-prüfstufe--der-browser-wgsl-compiler-ist-strenger-als-der-eingebaute-parser)
-  - [39. Über unabhängig ähnliche Materialien](08-apiv2.md#39-über-unabhängig-ähnliche-materialien)
-- [Teil IX: Migrationsleitfaden für API Version 3](09-apiv3.md)
-  - [40. Das Schicksal von v2-Paketen (erst das Fazit)](09-apiv3.md#40-das-schicksal-von-v2-paketen-erst-das-fazit)
-  - [41. pack.json und der Uniform-Buffer (was unverändert bleibt)](09-apiv3.md#41-packjson-und-der-uniform-buffer-was-unverändert-bleibt)
-  - [42. blockId wird blockFlags: Materialien pro Block als Bitflags (die Hauptänderung)](09-apiv3.md#42-blockid-wird-blockflags-materialien-pro-block-als-bitflags-die-hauptänderung)
-  - [43. Funktionsumbenennungen und semantische Änderungen](09-apiv3.md#43-funktionsumbenennungen-und-semantische-änderungen)
-  - [44. Neue Header-Konstanten: `bloxdPi` und `bloxdTau`](09-apiv3.md#44-neue-header-konstanten-bloxdpi-und-bloxdtau)
-  - [45. Das Sechs-Hook-Template (Flüssigkeits-Hooks offiziell gezeigt)](09-apiv3.md#45-das-sechs-hook-template-flüssigkeits-hooks-offiziell-gezeigt)
-  - [46. Variantenmatrix: die Programm-Achse und Makro-Änderungen](09-apiv3.md#46-variantenmatrix-die-programm-achse-und-makro-änderungen)
-  - [47. v2 → v3-Migrationscheckliste](09-apiv3.md#47-v2--v3-migrationscheckliste)
-  - [48. Weitere v3-Änderungen und Hinweise](09-apiv3.md#48-weitere-v3-änderungen-und-hinweise)
-  - [49. Engine-Interna: wie der Lite-Renderer deine Hooks aufruft](09-apiv3.md#49-engine-interna-wie-der-lite-renderer-deine-hooks-aufruft)
-  - [50. Die Fog-Funktion: vier Modi, ein Feld](09-apiv3.md#50-die-fog-funktion-vier-modi-ein-feld)
-  - [51. bloxdOpaqueBehind(): die exakte Implementierung](09-apiv3.md#51-bloxdopaquebehind-die-exakte-implementierung)
-  - [52. blockFlags von Ende zu Ende: von der Registrierung bis zu deinem Hook](09-apiv3.md#52-blockflags-von-ende-zu-ende-von-der-registrierung-bis-zu-deinem-hook)
-  - [53. Interna der Validierung: HEADER_VERSION, Signaturen, reservierte Namen](09-apiv3.md#53-interna-der-validierung-header_version-signaturen-reservierte-namen)
-  - [54. Bestätigte Konstanten, Limits und Layouts](09-apiv3.md#54-bestätigte-konstanten-limits-und-layouts)
-- [Teil X: Migrationsleitfaden für API Version 4 (2026-10-26, Zusammenfassung)](10-apiv4.md)
-- [Teil XI: Vollständige Referenz — Engine-Header und Textur-Katalog](11-reference.md)
-- [Teil XII: Migrationsleitfaden für API Version 5 (2026-11-03, Zusammenfassung)](12-apiv5.md)
+Neu bei Shader Packs? Beginne mit [Getting Started](getting-started/) (Englisch). API nachschlagen? Siehe [API Reference](api/) (Englisch).
+
+> Diese Dokumentation ist keine offizielle Ressource der Spieleentwickler. Engine-Interna können sich mit Updates ändern — prüfe den Ziel-Build und den Verifikationsstatus auf jeder Seite.
+>
+> Dieses Handbuch wurde mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Verifiziere am tatsächlichen In-Game-Verhalten.
+>
+> Die Shader-Pack-Funktion selbst ist ein offizielles Feature der In-Game-UI; Packs sind reines WGSL (keine JS-Ausführung, kein Netzwerk) — mit normalem Code passiert nichts Gefährliches.
+
+## Einstiege nach Ziel
+
+| Ziel | Kategorie | Publikum |
+|---|---|---|
+| Das erste Shader Pack bauen | [Getting Started](getting-started/) | Einsteiger |
+| API-Funktionen & Felder nachschlagen | [API Reference](api/) | Autoren mitten in der Umsetzung |
+| Einen Effekt umsetzen (Licht, Wasser, Modelle…) | [Guides & Recipes](guides/) | alle, die ein Look bauen |
+| Einen Fehler beheben | [Troubleshooting](troubleshooting/) | alle mit kaputtem Pack |
+| Engine-Interna erforschen | [Engine Internals & Research](internals/) | Engine-Analytiker |
+| Ältere Versionen nachschlagen (v1–v5) | [Version History](history/) | Migratoren alter Packs |
+
+## Dokumentationsstruktur
+
+- **[Getting Started](getting-started/)** — Überblick, Quick Start, Pack-Struktur, pack.json, die 9 Hooks, Varianten, Validierung, Vertrieb.
+- **[API Reference](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Lighting, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 896-Namen-Texturkatalog.
+- **[Guides](guides/)** · **[Recipes](recipes/)** · **[Troubleshooting](troubleshooting/)** · **[Engine Internals & Research](internals/)** · **[Version History](history/)**
+
+> Hinweis: Getting Started / API Reference / Troubleshooting sowie die in v5 neu hinzugefügten Seiten von Guides, Recipes und Internals werden derzeit **auf Englisch** angeboten (gleiche Struktur wie die übersetzten Seiten dieser Ausgabe). Die bereits übersetzten Inhalte bleiben vollständig erhalten.
+
+## Verifikationsstatus
+
+| Label | Bedeutung |
+|---|---|
+| Verified | am Ziel-Build verifiziert |
+| Analyzed | per Analyse der Interna bestätigt |
+| Partially Verified | nur teilweise bestätigt |
+| Experimental | experimentell |
+| Historical | Material zu einer alten Version |
