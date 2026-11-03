@@ -1,6 +1,6 @@
-# 光照配方 (light)
+# 照明
 
-
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ## 对比 S 曲线
 
@@ -57,7 +57,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 夜晚蓝色环境光 (无月亮方向的拟似表现)
 
-> 本 API 中无太阳的天空 `bloxdSunDirection()` 为零。这不是方向性月光，只是天空暗时极弱的蓝色环境光。月亮方向本身经 `-bloxdSunDirection()` 可得 (仅昼夜循环世界。第七部 R-A)。
+> 本 API 中无太阳的天空 `bloxdSunDirection()` 为零。这不是方向性月光，只是天空暗时极弱的蓝色环境光。月亮方向本身经 `-bloxdSunDirection()` 可得 (仅昼夜循环世界——见[引擎内部机制与研究：太阳与月亮](../internals/sun-and-moon.md))。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

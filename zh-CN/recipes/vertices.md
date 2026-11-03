@@ -1,9 +1,9 @@
-# 顶点配方 (仅 allow)
+# 顶点（仅 allow）
 
-
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
-> 关于执行条件 (allow 标题一览; Custom Games 为 strict) 的细节参见本篇 §30 → [§30 每个游戏的适用模式](../internals/)
+> 关于确切条件 (allow 标题一览；Custom Games 为 strict) 见[各游戏的着色器适用策略](../internals/policy.md)
 
 ## 草随风摆 (只动上端)
 

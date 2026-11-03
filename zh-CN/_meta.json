@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
-  "guides": "Guides",
-  "recipes": "Recipes",
-  "troubleshooting": "Troubleshooting",
-  "internals": "Engine Internals & Research",
-  "history": "Version History"
+  "getting-started": "入门指南",
+  "api": "API 参考",
+  "guides": "指南",
+  "recipes": "实战配方",
+  "troubleshooting": "故障排查",
+  "internals": "引擎内部机制与研究",
+  "history": "版本历史"
 }

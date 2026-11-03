@@ -1,8 +1,8 @@
 # pack.json (manifest)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
 
-`pack.json` is the pack manifest — exactly one JSON object at the zip root.
+`pack.json` 是包的 manifest — zip 根部恰好一个 JSON 对象。
 
 ```json
 {
@@ -12,25 +12,25 @@
 }
 ```
 
-## Fields
+## 字段
 
-| Field | Type | Required | Description |
+| 字段 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `apiVersion` | number | required | Must **exactly equal `5`** (strict `===`). A string `"5"` or any other type fails, reported with the JSON spelling |
-| `name` | string | required | Non-empty after trimming. Shown in the settings UI |
-| `author` | string | optional | May be omitted; must be a string if present |
+| `apiVersion` | number | 必填 | 必须**精确等于 `5`** (严格 `===`)。字符串 `"5"` 或任何其他类型都会失败，并按 JSON 原始写法报出 |
+| `name` | string | 必填 | 去除首尾空白后非空。显示在设置界面 |
+| `author` | string | 可选 | 可省略；若存在则必须是字符串 |
 
-All other fields are ignored by the loader.
+其余字段一律被加载器忽略。
 
-## What happens on version mismatch
+## 版本不符时会发生什么
 
-The loader compares `manifest.apiVersion !== 5` strictly and **fails at the instant of load**. Messages, verbatim from the live i18n dictionary:
+加载器以严格比较 `manifest.apiVersion !== 5`，**在加载瞬间即告失败**。消息逐字取自现行 i18n 字典：
 
-- `pack.json needs "apiVersion": {{version}}.` — the key is missing entirely
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — 键完全缺失
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 键存在但不是 5
 
-Previously-saved older packs don't throw exceptions; they resolve to `{kind: "none", reason: "otherApiVersion"}` and become **silently inactive**. The shader-pack settings tab explains why:
+此前保存的旧版本包不会抛异常；它们解析为 `{kind: "none", reason: "otherApiVersion"}` 并**静默失效**。着色器包设置页会解释原因：
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-For migrating from v1–v4, see [Version History](../history/).
+从 v1–v4 迁移请见[版本历史](../history/)。

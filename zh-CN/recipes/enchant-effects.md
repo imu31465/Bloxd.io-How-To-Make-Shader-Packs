@@ -1,12 +1,12 @@
-# Enchant effects
+# 附魔效果
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live header)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从现行标头复原)
 
-v5 opened the enchant pipeline on both inputs and outputs. Recipes for controlling the glint of enchanted items and armour while preserving the engine's math.
+v5 在输入与输出两端都开放了附魔管线。这些配方在保留引擎数学的前提下控制附魔物品与盔甲的闪光。
 
-## Inputs & outputs
+## 输入与输出
 
-**Inputs** (`BloxdSurfaceIn` / `BloxdLightIn` — enchanted items and armour only, all 0 otherwise):
+**输入** (`BloxdSurfaceIn` / `BloxdLightIn` — 仅附魔物品与盔甲，其余全为 0)：
 
 ```wgsl
 enchantTier: u32,     // 1-5 for Tier 1-5.
@@ -14,21 +14,21 @@ enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
 enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
 ```
 
-**Output** (`BloxdSurface`):
+**输出** (`BloxdSurface`)：
 
 ```wgsl
 enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
 ```
 
-The engine mixes it inside [`bloxdLitColour()`](../api/lighting.md) — right after shading, before world light. `bloxdDefaultSurface` passes the input through unchanged, so **the default look matches v4's engine-internal behavior**.
+引擎在 [`bloxdLitColour()`](../api/lighting.md) 内部混入它 — 紧接着色之后、世界光照之前。`bloxdDefaultSurface` 原样透传输入，因此**默认外观与 v4 的引擎内部行为一致**。
 
-## Understanding the defaults
+## 理解默认行为
 
-Input `enchantColour.a` is an **animated** alpha — the engine animates the glint sweep, so reading `.a` per fragment yields a moving pattern for free. `enchantTier` and `enchantSpeed` are consistent by construction («faster at higher tiers»).
+输入的 `enchantColour.a` 是**带动画**的 alpha — 引擎为闪光扫掠做动画，因此逐片段读取 `.a` 就免费得到流动图样。`enchantTier` 与 `enchantSpeed` 构造上自洽 («faster at higher tiers»，等级越高越快)。
 
-Unenchanted faces carry `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0`.
+非附魔面携带 `enchantTier == 0`、`enchantColour == vec4f(0.0)`、`enchantSpeed == 0.0`。
 
-## Recipe 1: no-glint realism (two lines)
+## 配方 1: 无闪光的写实化 (两行)
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -38,9 +38,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 2: stronger glint by tier
+## 配方 2: 按等级增强闪光
 
-`enchantTier` gives the classic "tier-scaled glint" without parsing colors:
+`enchantTier` 无需解析颜色即可实现经典的「等级缩放闪光」：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -54,7 +54,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 3: recoloring the glint
+## 配方 3: 给闪光重新着色
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -69,9 +69,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 4: enchantSpeed-driven sweep
+## 配方 4: 由 enchantSpeed 驱动的扫掠
 
-Turn `enchantSpeed` into a phase for a custom sweep:
+把 `enchantSpeed` 变成相位，做自定义扫掠：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -87,9 +87,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 5: amplifying the hurt flash (overlayColour)
+## 配方 5: 放大受伤红闪 (overlayColour)
 
-`overlayColour` (players/mobs only; hurt flash etc.) mixes before lighting in `bloxdLitColour`:
+`overlayColour` (仅玩家/生物；受伤红闪等) 在 `bloxdLitColour` 中于光照前混入：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -99,11 +99,11 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Harmless on non-entities (`overlayColour` is 0 there).
+对非实体无害 (那里 `overlayColour` 为 0)。
 
-## Combining with custom lighting
+## 与自定义光照组合
 
-Using `bloxdLitColour()` keeps the enchant/overlay mixing automatic:
+使用 `bloxdLitColour()` 可让附魔/覆盖色的混合保持自动：
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -113,12 +113,12 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Notes
+## 注意
 
-- Enchant inputs arrive **only on enchanted items and armour** — all 0 on terrain, water and unenchanted faces
-- Changing the `enchantColour` output never touches `colour` directly — mixing happens in `bloxdLitColour` / `bloxdDefaultLight`
-- Outside the model pipeline the enchant inputs are always 0
+- 附魔输入**只在附魔物品与盔甲上到来** — 地形、水与非附魔面上全为 0
+- 修改 `enchantColour` 输出从不直接触碰 `colour` — 混合发生在 `bloxdLitColour` / `bloxdDefaultLight` 中
+- 模型管线之外附魔输入恒为 0
 
-## Related
+## 相关
 
-- [Lighting](../api/lighting.md) · [Structures](../api/structures.md) · [Model shader recipes](model-shaders.md)
+- [光照](../api/lighting.md) · [结构体](../api/structures.md) · [模型着色器配方](model-shaders.md)

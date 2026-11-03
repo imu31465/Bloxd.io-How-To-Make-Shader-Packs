@@ -1,40 +1,40 @@
-# Models and textures
+# 模型与纹理
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from header & validator)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从标头与验证器复原)
 
-What the new v5 Model hooks draw and read.
+v5 新的 Model 钩子绘制与读取什么。
 
-## What the Model program draws
+## Model 程序绘制什么
 
-- **Block models**: half blocks (`slab`), stairs (`stairs`), crossed-plane plants — tall grass, flowers, crops, cobwebs (`flat`)
-- **Items**: held (`held`), dropped (`dropped`), thrown (`thrown` — snowballs, arrows, rockets)
-- **Entities**: players, mobs, NPCs (`lifeform`) — **including armour and cosmetics**
+- **方块模型**: 半砖 (`slab`)、楼梯 (`stairs`)、交叉平面植物 — 高草、花、作物、蜘蛛网 (`flat`)
+- **物品**: 手持 (`held`)、掉落 (`dropped`)、投掷 (`thrown` — 雪球、箭、火箭)
+- **实体**: 玩家、生物、NPC (`lifeform`) — **含盔甲与外观装饰**
 
-Terrain (full blocks) and Liquid (water) never enter this program.
+地形 (完整方块) 与 Liquid (水) 永远不进入该程序。
 
-## What reads differently
+## 读取有什么不同
 
-Model faces carry three things terrain faces never have:
+模型面携带三样地形面上从不出现的东西：
 
-| Information | Field | Value on terrain |
+| 信息 | 字段 | 地形上的值 |
 |---|---|---|
-| model-local coordinates | `localPosition: vec3f` | `vec3f(0.0)` (no model) |
-| enchant state | `enchantTier` / `enchantColour` / `enchantSpeed` | all 0 |
-| entity overlay | `overlayColour` | 0 |
+| 模型局部坐标 | `localPosition: vec3f` | `vec3f(0.0)` (无模型) |
+| 附魔状态 | `enchantTier` / `enchantColour` / `enchantSpeed` | 全 0 |
+| 实体覆盖色 | `overlayColour` | 0 |
 
-And **textures mean something different**: terrain faces carry atlas `textureId`s, but **most models use `textureId: 0`** ("no texture") — player skins and mob textures are not in the atlas namespace. `surface.colour` already contains skin × tint, so work from it ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+而且**纹理的含义不同**: 地形面携带图集 `textureId`，但**大多数模型用 `textureId: 0`** («无纹理») — 玩家皮肤与生物纹理不在图集命名空间中。`surface.colour` 已含皮肤 × tint，请以它为起点 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))。
 
-`flags`'s `held` / `dropped` / `thrown` / `lifeform` / `placed` are meaningful only on model faces ([Flags](../api/flags.md)).
+`flags` 的 `held` / `dropped` / `thrown` / `lifeform` / `placed` 只在模型面上有意义 ([标志](../api/flags.md))。
 
 ## localPosition
 
-The model-instance-local position **before** world placement; `vec3f(0.0)` for terrain/liquid.
+模型实例局部坐标，位于世界放置**之前**；terrain/liquid 为 `vec3f(0.0)`。
 
-- For a player's arm, a held sword or windmill blades it rotates with the model
-- **Keyed per-part animation and bending effects** become a one-field write — "how far up the blade am I" is directly `localPosition.y`
-- In light structs it is the **post-vertex-hook** value (header: *"the same as in BloxdVertexIn, after the vertex hook"*)
+- 对玩家手臂、手持剑或风车叶片，它随模型旋转
+- **按部件分动画与弯曲效果**变成一次字段读取 —「我在剑刃多高的位置」直接就是 `localPosition.y`
+- 在 light 结构体中它是 **vertex 钩子之后**的值 (标头: *«the same as in BloxdVertexIn, after the vertex hook»*)
 
-## Selection patterns
+## 选取模式
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -49,24 +49,24 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Full examples: [model shader recipes](../recipes/model-shaders.md) and [enchant effects](../recipes/enchant-effects.md).
+完整示例: [模型着色器配方](../recipes/model-shaders.md)与[附魔效果](../recipes/enchant-effects.md)。
 
-## Terrain / Liquid / Model cheat sheet
+## Terrain / Liquid / Model 速查表
 
-| Want to affect | Hooks | Selection fields |
+| 想影响什么 | 钩子 | 选取字段 |
 |---|---|---|
-| full-block look | `bloxdTerrain*` | material flags (`opaque` / `rock`…) |
-| water | `bloxdLiquid*` | always Liquid (no Liquid hooks = water untouched) |
-| plants, slabs, stairs | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
-| held items | `bloxdModel*` | `flags.held` |
-| dropped items | `bloxdModel*` | `flags.dropped` |
-| thrown items | `bloxdModel*` | `flags.thrown` |
-| players & mobs | `bloxdModel*` | `flags.lifeform` |
+| 完整方块外观 | `bloxdTerrain*` | 材质标志 (`opaque` / `rock`…) |
+| 水 | `bloxdLiquid*` | 永远是 Liquid (无 Liquid 钩子 = 水保持原样) |
+| 植物、半砖、楼梯 | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
+| 手持物品 | `bloxdModel*` | `flags.held` |
+| 掉落物品 | `bloxdModel*` | `flags.dropped` |
+| 投掷物品 | `bloxdModel*` | `flags.thrown` |
+| 玩家与生物 | `bloxdModel*` | `flags.lifeform` |
 
-## Lighting
+## 光照
 
-`bloxdModelLight` takes the same `BloxdSurface` / `BloxdLightIn` and works with `bloxdDefaultLight` / `bloxdLitColour()`. The enchant glint (`enchantColour`) and hurt flash (`overlayColour`) mix inside `bloxdLitColour`, so **defaults preserve both looks automatically**; to control them see [enchant effects](../recipes/enchant-effects.md).
+`bloxdModelLight` 接收同样的 `BloxdSurface` / `BloxdLightIn`，与 `bloxdDefaultLight` / `bloxdLitColour()` 配合。附魔闪光 (`enchantColour`) 与受伤红闪 (`overlayColour`) 在 `bloxdLitColour` 内混合，因此**默认行为会自动保留这两种观感**；要控制它们见[附魔效果](../recipes/enchant-effects.md)。
 
-## Internals
+## 内部机制
 
-How models render and how flags/enchant inputs flow: [Engine Internals: Model Rendering](../internals/model-rendering.md); generated symbols like `bloxdSpItemLocalPosition` and `bloxdSpEnchant` are listed in [restrictions](../api/restrictions.md).
+模型如何渲染、标志/附魔输入如何流动: [引擎内部: 模型渲染](../internals/model-rendering.md)；`bloxdSpItemLocalPosition`、`bloxdSpEnchant` 等生成符号列在[限制](../api/restrictions.md)中。

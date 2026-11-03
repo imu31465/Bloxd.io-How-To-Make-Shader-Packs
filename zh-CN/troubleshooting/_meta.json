@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Troubleshooting",
+    "title": "故障排查",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
-  "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "loading": "加载错误",
+  "api-version": "API 版本错误",
+  "compilation": "编译错误",
+  "validation": "验证错误",
+  "variants": "变体专属问题",
+  "visual": "画面问题",
+  "textures": "纹理问题",
+  "lighting": "光照问题",
+  "models": "模型问题",
+  "performance": "性能",
+  "faq": "FAQ 与法律事项"
 }

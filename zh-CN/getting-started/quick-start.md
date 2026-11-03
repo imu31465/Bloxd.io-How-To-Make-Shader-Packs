@@ -1,12 +1,12 @@
-# Quick start
+# 快速开始
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
 
-Your first pack in five minutes.
+五分钟做出你的第一个包。
 
-## 1. Create the files
+## 1. 创建文件
 
-Make a folder with `pack.json` and `pack.wgsl`:
+建一个文件夹，放入 `pack.json` 与 `pack.wgsl`：
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@ Make a folder with `pack.json` and `pack.wgsl`:
 }
 ```
 
-**`pack.wgsl`** — a minimal warm-tint pack:
+**`pack.wgsl`** — 一个最小的暖色调包：
 
 ```wgsl
 const packWarmth = 0.18;
@@ -31,26 +31,26 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> The engine header (constants, structures, functions) is prepended to every pack automatically at load — you never write it yourself. The full header is reproduced in [Engine Internals](../internals/engine-header.md).
+> 引擎标头 (常量、结构体、函数) 会在加载时自动拼在每个包前面 — 你从不亲手编写它。完整标头复现于[引擎内部](../internals/engine-header.md)。
 
-## 2. Load it in the game
+## 2. 在游戏中加载
 
-1. Open settings → Shader Pack and load the zip or folder (folder loading is desktop browsers only)
-2. Check the status: right after selecting it you'll see "Ready. Reload the page to use it." — after a **page reload**, "Ready to use" means success
-3. If you see "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+1. 打开设置 → Shader Pack，加载 zip 或文件夹 (文件夹加载仅限桌面浏览器)
+2. 查看状态: 选中后立刻会显示「Ready. Reload the page to use it.」— **页面重载**后显示「Ready to use」即成功
+3. 若看到「Saved, but it won't run until you fix these errors...」，修复列出的错误 (文件:行号 + 变体) 后重载
 
-## 3. Verify
+## 3. 验证
 
-1. Test in a permissive game first
-2. Then in a strict-mode game (most games are strict)
-3. Vertex animation only works in games marked allow
+1. 先在宽松 (allow) 的游戏中测试
+2. 再在 strict 模式游戏中测试 (大多数游戏是 strict)
+3. 顶点动画只在标记为 allow 的游戏中有效
 
-## 4. Distribute
+## 4. 分发
 
-Zip it up — see [Distribution](distribution.md).
+打成 zip — 见[分发](distribution.md)。
 
-## Stuck?
+## 卡住了？
 
-- What errors mean → [Troubleshooting](../troubleshooting/)
-- How to write hooks → [Shader hooks](hooks.md)
-- The full 9-hook template is in the next page, [Shader hooks](hooks.md)
+- 错误的含义 → [故障排查](../troubleshooting/)
+- 怎么写钩子 → [着色器钩子](hooks.md)
+- 完整的 9 钩子模板在下一页 [着色器钩子](hooks.md)

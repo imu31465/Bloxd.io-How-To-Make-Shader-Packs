@@ -1,10 +1,10 @@
-# Input & output structures
+# 输入与输出结构体
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
 
-Seven structs are readable/writable by packs. Every field is listed below (`#ifdef` fields are conditional). The full header is in [Engine Internals](../internals/engine-header.md).
+包可读写的结构体共七个。每个字段都列在下面 (`#ifdef` 字段为条件存在)。完整标头见[引擎内部](../internals/engine-header.md)。
 
-## BloxdVertexIn (vertex hook input)
+## BloxdVertexIn (vertex 钩子输入)
 
 ```wgsl
 struct BloxdVertexIn {
@@ -15,14 +15,14 @@ struct BloxdVertexIn {
 }
 ```
 
-| Field | Type | Description |
+| 字段 | 类型 | 说明 |
 |---|---|---|
-| `position` | `vec3f` | render-space position (world space via `bloxdWorldPosition()`) |
-| `normal` | `vec3f` | unit vector pointing away from the face |
-| `localPosition` | `vec3f` | model-local coordinates; **`vec3f(0.0)` for terrain and liquid**; for a player's arm, a held sword or windmill blades this rotates with the model |
-| `flags` | `BloxdFlags` | face kind ([Flags](flags.md)) |
+| `position` | `vec3f` | 渲染空间位置 (世界空间经 `bloxdWorldPosition()`) |
+| `normal` | `vec3f` | 从面指向外的单位向量 |
+| `localPosition` | `vec3f` | 模型局部坐标；**terrain 与 liquid 为 `vec3f(0.0)`**；对玩家手臂、手持剑或风车叶片等，它随模型旋转 |
+| `flags` | `BloxdFlags` | 面的种类 ([标志](flags.md)) |
 
-## BloxdVertex (vertex hook output)
+## BloxdVertex (vertex 钩子输出)
 
 ```wgsl
 struct BloxdVertex {
@@ -30,7 +30,7 @@ struct BloxdVertex {
 }
 ```
 
-## BloxdSurfaceIn (surface hook input)
+## BloxdSurfaceIn (surface 钩子输入)
 
 ```wgsl
 struct BloxdSurfaceIn {
@@ -60,21 +60,21 @@ struct BloxdSurfaceIn {
 }
 ```
 
-| Field | Type | Description |
+| 字段 | 类型 | 说明 |
 |---|---|---|
-| `colour` | `vec3f` | RGB = texture × tint × AO, baked by the mesher |
-| `alpha` | `f32` | opacity |
-| `enchantTier` | `u32` | enchant tier 1–5; 0 for anything not enchanted |
-| `enchantColour` | `vec4f` | enchant RGB plus an **animated** alpha (`.a`) — reading `.a` per fragment gives a moving pattern for free; all zero on unenchanted faces |
-| `enchantSpeed` | `f32` | enchant pattern speed («faster at higher tiers») |
-| `overlayColour` | `vec4f` | entity overlay (hurt flash etc.) RGB + alpha; 0 outside players/mobs; mixed in by `bloxdLitColour` before lighting |
-| `position` / `normal` / `localPosition` / `flags` | — | same meanings as `BloxdVertexIn`, **after the vertex hook** (they follow moved vertices) |
-| `textureId` | `u32` | this face's texture; compare with `bloxdTextureId*`; **0 when the face has no texture** — most models use textureId 0 (model-owned textures, player skins) |
-| `textureRotation` | `u32` | quarter turns clockwise (0–3), applied by `bloxdTexel` |
-| `uv` | `vec2f` | the texture spans 0–1; `fract(uv)` is drawn (integer steps tile) |
-| `mipLevel` | `f32` | mipmap level: 0 = full size, 1 = half… |
+| `colour` | `vec3f` | RGB = 纹理 × tint × AO，由网格生成器烘焙 |
+| `alpha` | `f32` | 不透明度 |
+| `enchantTier` | `u32` | 附魔等级 1–5；非附魔为 0 |
+| `enchantColour` | `vec4f` | 附魔 RGB 加**带动画**的 alpha (`.a`) — 逐片段读 `.a` 就免费得到流动图样；非附魔面全零 |
+| `enchantSpeed` | `f32` | 附魔图样速度 («faster at higher tiers»，等级越高越快) |
+| `overlayColour` | `vec4f` | 实体覆盖色 (受伤红闪等) RGB + alpha；玩家/生物以外为 0；由 `bloxdLitColour` 在光照前混入 |
+| `position` / `normal` / `localPosition` / `flags` | — | 含义同 `BloxdVertexIn`，但为 **vertex 钩子之后**的值 (跟随移动后的顶点) |
+| `textureId` | `u32` | 该面的纹理；与 `bloxdTextureId*` 比较；**无纹理时为 0** — 大多数模型都用 textureId 0 (模型自带纹理、玩家皮肤) |
+| `textureRotation` | `u32` | 顺时针四分之一转数 (0–3)，由 `bloxdTexel` 应用 |
+| `uv` | `vec2f` | 纹理铺满 0–1；实际绘制 `fract(uv)` (整数步进即平铺) |
+| `mipLevel` | `f32` | mipmap 级别: 0 = 全尺寸，1 = 一半… |
 
-## BloxdSurface (surface hook output)
+## BloxdSurface (surface 钩子输出)
 
 ```wgsl
 struct BloxdSurface {
@@ -88,17 +88,17 @@ struct BloxdSurface {
 }
 ```
 
-| Field | Type | Condition | Description |
+| 字段 | 类型 | 条件 | 说明 |
 |---|---|---|---|
-| `colour` | `vec3f` | always | RGB output |
-| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model) | opacity output |
-| `emission` | `vec3f` | always | emissive RGB — **added after lighting, before fog** |
-| `enchantColour` | `vec4f` | always | enchant output, mixed in by `bloxdLitColour` |
-| `overlayColour` | `vec4f` | always | overlay output, mixed in by `bloxdLitColour` |
+| `colour` | `vec3f` | 总是 | RGB 输出 |
+| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (全部 liquid + 非 strict 的 terrain/model) | 不透明度输出 |
+| `emission` | `vec3f` | 总是 | 自发光 RGB — **在光照之后、雾之前加入** |
+| `enchantColour` | `vec4f` | 总是 | 附魔输出，由 `bloxdLitColour` 混入 |
+| `overlayColour` | `vec4f` | 总是 | 覆盖色输出，由 `bloxdLitColour` 混入 |
 
-`bloxdDefaultSurface` passes `enchantColour` / `overlayColour` through unchanged, so the default look matches v4's engine-internal behavior. Zero `out.enchantColour` to remove the glint under custom lighting; amplify `out.overlayColour.a` to emphasize the hurt flash.
+`bloxdDefaultSurface` 原样透传 `enchantColour` / `overlayColour`，因此默认外观与 v4 的引擎内部行为一致。自定义光照下把 `out.enchantColour` 置零可去掉附魔闪光；放大 `out.overlayColour.a` 可强调受伤红闪。
 
-## BloxdLightIn (light hook input)
+## BloxdLightIn (light 钩子输入)
 
 ```wgsl
 struct BloxdLightIn {
@@ -127,16 +127,11 @@ struct BloxdLightIn {
 }
 ```
 
-Field-by-field meaning and role in lighting math: see [Lighting](lighting.md).
+逐字段的含义与在光照数学中的角色: 见[光照](lighting.md)。
 
-**Versus v4**:
+**与旧版 API 的差异**: `fogVisibility` (v2–v4) 现为语义相反的 `fogAlpha` (0 = 无雾)；`engineColour` 现为 `litColour`；光照等级的措辞为 «0 when !bloxdLit()»。逐版本字段变更全表: [版本历史](../history/)。
 
-- `fogVisibility: f32` (1 = no fog) was renamed **`fogAlpha: f32` (0 = no fog, 1 = only fogColour)** — semantics inverted
-- `diffuse` / `emissive` are new in v5 (v4 had only `directional` and `ambient`) — `bloxdShading()` can now rebuild the material response
-- `engineColour` (v2–v4) is gone; `litColour` is «Lit and enchanted RGB colour, before emission and fog»
-- light-level wording changed from «0 without BLOXD_LIGHTING» to «0 when !bloxdLit()» — the same facts in v5 vocabulary
-
-## BloxdLight (light hook output)
+## BloxdLight (light 钩子输出)
 
 ```wgsl
 struct BloxdLight {
@@ -144,7 +139,7 @@ struct BloxdLight {
 }
 ```
 
-## BloxdOpaqueBehind (special-function return)
+## BloxdOpaqueBehind (特殊函数返回值)
 
 ```wgsl
 struct BloxdOpaqueBehind {
@@ -154,23 +149,23 @@ struct BloxdOpaqueBehind {
 }
 ```
 
-Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef BLOXD_SCENE_DEPTH` guard (the field was `found: bool` in v2).
+`bloxdOpaqueBehind()` 的返回值。在液体变体中于 `#ifdef BLOXD_SCENE_DEPTH` 守卫内使用 (v2 中该字段为 `found: bool`)。
 
-## Conditional fields ↔ macros
+## 条件字段 ↔ 宏
 
-| Field | Exists when | Note |
+| 字段 | 存在条件 | 备注 |
 |---|---|---|
-| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | all liquid variants + non-strict terrain/model |
-| `bloxdOpaqueBehind()` call | `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants |
+| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | 全部液体变体 + 非 strict 的 terrain/model |
+| `bloxdOpaqueBehind()` 调用 | `#ifdef BLOXD_SCENE_DEPTH` | 全部液体变体 |
 
-`BLOXD_STRICT` controls **hook existence** (vertex hooks), not struct shape. See [Preprocessor](preprocessor.md).
+`BLOXD_STRICT` 控制的是**钩子存在与否** (vertex 钩子)，不是结构体形状。见[预处理器](preprocessor.md)。
 
-## Writing conventions (recap)
+## 书写惯例 (回顾)
 
-- Never construct output structs directly — start from `bloxdDefault*`; in light hooks `var out = s;` also works
-- A bare `var x: BloxdSurface;` is a validation error
-- Hook parameters are read-only — copy before mutating
+- 切勿直接构造输出结构体 — 从 `bloxdDefault*` 起步；light 钩子里 `var out = s;` 亦可
+- 裸写 `var x: BloxdSurface;` 是验证错误
+- 钩子参数只读 — 修改前先复制
 
-## Related
+## 相关
 
-- [Lighting](lighting.md) · [Flags](flags.md) · [Texture API](texture-api.md)
+- [光照](lighting.md) · [标志](flags.md) · [纹理 API](texture-api.md)

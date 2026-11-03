@@ -1,10 +1,10 @@
-# Flags (BloxdFlags)
+# 标志 (BloxdFlags)
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
 
-v5 identifies faces with a named boolean struct. The v4 `blockFlags: u32` bitmask and its 6 `bloxdBlockFlag*` constants are gone.
+v5 以具名布尔结构体标识面。v4 的 `blockFlags: u32` 位掩码及其 6 个 `bloxdBlockFlag*` 常量已被移除。
 
-## Definition (verbatim from the header)
+## 定义 (逐字取自标头)
 
 ```wgsl
 // What kind of block, item or lifeform a face is. Any number of flags may be
@@ -31,40 +31,40 @@ struct BloxdFlags {
 }
 ```
 
-## Field reference
+## 字段参考
 
-| Field | Class | Meaning | Typical objects | Hooks |
+| 字段 | 类别 | 含义 | 典型对象 | 钩子 |
 |---|---|---|---|---|
-| `opaque` | material | full cube without gaps or holes | stone, dirt, solid wood | all 9 |
-| `emissive` | material | blocks that emit light | lava, glowing ores | all 9 |
-| `vegetation` | material | leaves, grass blocks, leafy plants | leaves, tall grass | all 9 |
-| `dirt` | material | soil (grass blocks included) | dirt, grass block, Rocky Dirt (also rock) | all 9 |
-| `sand` | material | sand & sandstone family | sand, red sand, every sandstone (also rock) | all 9 |
-| `rock` | material | stone family (+ gravel, ores, magma) | stone variants, gravel, ores | all 9 |
-| `slab` | shape | half blocks | slabs | Model hooks |
-| `stairs` | shape | stairs & corner stairs | stairs | Model hooks |
-| `flat` | shape | planes (incl. crossed planes) | tall grass, flowers, crops, cobwebs | Model hooks |
-| `placed` | placement | geometry placed as part of chunks | world blocks | Model hooks (not items/vehicles) |
-| `held` | placement | items held in a hand (1st/3rd person) | held items, armour | Model hooks |
-| `dropped` | placement | items on ground / belt / pipe | dropped items | Model hooks |
-| `thrown` | placement | items in flight | snowballs, arrows, rockets | Model hooks |
-| `lifeform` | target | players, mobs, NPCs (armour & cosmetics included) | entities | Model hooks |
+| `opaque` | 材质 | 无缝隙无孔洞的完整方块 | 石头、泥土、实心木 | 全部 9 个 |
+| `emissive` | 材质 | 发光方块 | 岩浆、发光矿石 | 全部 9 个 |
+| `vegetation` | 材质 | 树叶、草方块、叶状植物 | 树叶、高草 | 全部 9 个 |
+| `dirt` | 材质 | 土壤 (含草方块) | 泥土、草方块、Rocky Dirt (同时也是岩石) | 全部 9 个 |
+| `sand` | 材质 | 沙与砂岩一族 | 沙子、红沙、各种砂岩 (同时也是岩石) | 全部 9 个 |
+| `rock` | 材质 | 石头一族 (+ 砂砾、矿石、岩浆) | 各类石头、砂砾、矿石 | 全部 9 个 |
+| `slab` | 形状 | 半砖 | 台阶 | Model 钩子 |
+| `stairs` | 形状 | 楼梯与转角楼梯 | 楼梯 | Model 钩子 |
+| `flat` | 形状 | 平面 (含交叉平面) | 高草、花、作物、蜘蛛网 | Model 钩子 |
+| `placed` | 放置 | 作为区块一部分放置的几何体 | 世界方块 | Model 钩子 (不含物品/载具) |
+| `held` | 放置 | 手持物品 (第一/第三人称) | 手持物、盔甲 | Model 钩子 |
+| `dropped` | 放置 | 地面 / 传送带 / 管道上的物品 | 掉落物 | Model 钩子 |
+| `thrown` | 放置 | 飞行中的物品 | 雪球、箭、火箭 | Model 钩子 |
+| `lifeform` | 目标 | 玩家、生物、NPC (含盔甲与外观装饰) | 实体 | Model 钩子 |
 
-## Flags combine freely
+## 标志可自由组合
 
-**Flags are not a single-choice enum.** Any number may be true at once — possibly none (the header itself says *"Any number of flags may be set, possibly even none"*).
+**标志不是单选枚举。** 任意数量可同时为真 — 也可能全不为真 (标头自己写着 *「Any number of flags may be set, possibly even none」*)。
 
-Examples the header itself gives:
+标头自己给出的例子：
 
-- **sandstone is both `sand` and `rock`**
-- **Rocky Dirt is both `dirt` and `rock`**
-- A slab can be `slab` and (depending on material) `rock` at the same time
+- **砂岩同时是 `sand` 和 `rock`**
+- **Rocky Dirt 同时是 `dirt` 和 `rock`**
+- 一个台阶可以同时是 `slab` 和 (依材质而定) `rock`
 
-Reading the `else` branch of one flag as "everything else" is a bug. Material flags (`opaque`/`emissive`/…) combine **independently** with shape/state flags (`slab`/`held`/…).
+把某个标志的 `else` 分支当作「其余一切」来读是 bug。材质标志 (`opaque`/`emissive`/…) 与形状/状态标志 (`slab`/`held`/…) **相互独立地**组合。
 
-## Usage
+## 用法
 
-`flags` is a same-named field on all three input structs (`BloxdVertexIn`, `BloxdSurfaceIn`, `BloxdLightIn`):
+`flags` 是三个输入结构体 (`BloxdVertexIn`、`BloxdSurfaceIn`、`BloxdLightIn`) 上的同名字段：
 
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -79,7 +79,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-In the model pipeline, flags answer "what am I looking at":
+在模型管线中，标志回答「我看的是什么」：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -94,7 +94,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Migrating from v4 (mechanical)
+## 从 v4 迁移 (机械操作)
 
 | v4 | v5 |
 |---|---|
@@ -105,17 +105,17 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | `(surface.blockFlags & bloxdBlockFlagSand) != 0u` | `surface.flags.sand` |
 | `(surface.blockFlags & bloxdBlockFlagRock) != 0u` | `surface.flags.rock` |
 
-Remaining references to the `bloxdBlockFlag*` constants fail the analyzer's reserved-name diagnostic (the constants are deleted).
+残留的 `bloxdBlockFlag*` 常量引用会触发分析器的保留名称诊断 (这些常量已删除)。
 
-## Edge cases (exhaustive, from the header)
+## 边界情形 (穷举，来自标头)
 
-- «Rocky Dirt is rock too»
-- «every sandstone, which is rock too»
-- «Drawn as block models, so never part of terrain or flagged as opaque» — `slab`/`stairs`/`flat` faces never enter the Terrain program and never set `opaque`
-- «Includes armour and cosmetics» — `lifeform` covers player equipment too
-- «Not items or vehicles» — `placed` excludes vehicles
+- «Rocky Dirt is rock too» (Rocky Dirt 同时也是岩石)
+- «every sandstone, which is rock too» (所有砂岩同时也是岩石)
+- «Drawn as block models, so never part of terrain or flagged as opaque» — `slab`/`stairs`/`flat` 的面从不进入 Terrain 程序、从不置 `opaque`
+- «Includes armour and cosmetics» — `lifeform` 也覆盖玩家装备
+- «Not items or vehicles» — `placed` 不含载具
 
-## Related
+## 相关
 
-- Full v4 migration → [Version History: v5](../history/v5.md)
-- Flag delivery internals → [Engine Internals](../internals/rendering-pipeline.md)
+- 完整 v4 迁移 → [版本历史: v5](../history/v5.md)
+- 标志传递内部机制 → [引擎内部](../internals/rendering-pipeline.md)

@@ -1,68 +1,68 @@
-# Compatibility
+# 兼容性
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
 
-How the current game and old-version packs interoperate.
+当前游戏与旧版本包如何互操作。
 
-## Accepted versions
+## 接受的版本
 
-**Only `apiVersion: 5`.** The loader compares `manifest.apiVersion !== 5` strictly and v1/v2/v3/v4 packs **fail at the instant of load**. No multi-version acceptance exists.
+**仅接受 `apiVersion: 5`。** 加载器以 `manifest.apiVersion !== 5` 严格比较，v1/v2/v3/v4 包在**加载瞬间即告失败**。不存在多版本并行接受。
 
-## Load-time messages (verbatim from the live i18n dictionary)
+## 加载时消息 (逐字取自现行 i18n 字典)
 
-- `pack.json needs "apiVersion": {{version}}.` — the `apiVersion` key is missing
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — 缺少 `apiVersion` 键
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 键存在但不是 5
 
-## Saved old packs (no exceptions — silent inactivation)
+## 已保存的旧包 (无例外 — 静默失效)
 
-Previously-saved v1–v4 packs don't throw. The saved-pack result resolves to:
+此前保存的 v1–v4 包不会抛错。已保存包的解析结果为：
 
 ```
 {kind: "none", reason: "otherApiVersion"}
 ```
 
-and the pack becomes **silently inactive**. Only the shader-pack settings tab explains why:
+包随即**静默失效**。只有着色器包设置页会解释原因：
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-## The nature of the v4 → v5 conversion
+## v4 → v5 转换的本质
 
-The conversion is mostly mechanical (full checklist in [the v5 migration guide](../history/v5.md)):
+转换大多是机械性的 (完整清单见 [v5 迁移指南](../history/v5.md))：
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
+- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 改名)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- delete `bloxdFragmentBlockPosition` call sites (no replacement)
-- bump `pack.json` to `"apiVersion": 5`
+- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
+- 把 `pack.json` 提升为 `"apiVersion": 5`
 
-The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.
+这次的暗坑：继续读取 `blockFlags`、或把光照钩子包在 `#ifdef BLOXD_LIGHTING` 里的包会**以专用消息验证失败** (分析器现在会对两种情形分别说明)，因此不会有静默的错误行为 — 只是迁移完成前始终被拒绝。
 
-## Saved-pack re-validation ("needs re-check")
+## 已保存包的重验 (「需要重新检查」)
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
+`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。当引擎标头或纹理注册表变化时 (常见于游戏更新)，已保存包会被标记为「需要重新检查」，并在页面加载时自动重新验证。
 
-A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
+一个实测的注册表漂移示例 (相隔 10 天的两个构建)：条目 1200 → 1219 (新增 98 个、移除 79 个)，且拼写未变的名称中 **1121 个里有 779 个改了 id**。换言之：
 
-- **packs written with names (`bloxdTextureIdLava`) survive drift** (the loader re-resolves against the live registry)
-- **packs written with raw ids (`19`) break on re-validation**
+- **按名称编写的包 (`bloxdTextureIdLava`) 能在漂移中幸存** (加载器会对照现行注册表重新解析)
+- **按裸 id 编写的包 (`19`) 在重验时损坏**
 
-Details: [Engine Internals: Texture Registry](../internals/texture-registry.md).
+详情: [引擎内部: 纹理注册表](../internals/texture-registry.md)。
 
-## Runtime environments
+## 运行环境
 
-- **WebGPU-renderer only**: installing a pack force-enables the WebGPU renderer
-- **Mobile**: WebGPU-limited environments can't run packs at all ([Requirements](../getting-started/requirements.md))
-- **Non-atlas renderer configurations**: `bloxdTexel` / `bloxdTextureSize` degrade to stubs (white texels, 1×1); code still compiles and runs ([Texture API](texture-api.md#where-the-texture-api-cant-go))
+- **仅 WebGPU 渲染器**: 安装包会强制启用 WebGPU 渲染器
+- **移动端**: 受 WebGPU 限制的环境完全无法运行包 ([环境要求](../getting-started/requirements.md))
+- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](texture-api.md#where-the-texture-api-cant-go))
 
-## Version support summary
+## 版本支持一览
 
-| API version | Live since | Treatment by the current game |
+| API 版本 | 上线时间 | 当前游戏的处理 |
 |---|---|---|
-| v1 | — | rejected at load (migrate via [v2](../history/v2.md)) |
-| v2 | — | rejected at load |
-| v3 | 2026-10-19 | rejected at load |
-| v4 | 2026-10-26 | rejected at load |
-| **v5** | **2026-11-03** | **current** |
+| v1 | — | 加载即拒绝 (经 [v2](../history/v2.md) 迁移) |
+| v2 | — | 加载即拒绝 |
+| v3 | 2026-10-19 | 加载即拒绝 |
+| v4 | 2026-10-26 | 加载即拒绝 |
+| **v5** | **2026-11-03** | **现行** |
 
-## Related
+## 相关
 
-- [v5 migration checklist](../history/v5.md) · [Version History](../history/)
+- [v5 迁移清单](../history/v5.md) · [版本历史](../history/)

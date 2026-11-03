@@ -1,21 +1,21 @@
-# Guides
+# 指南
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+「机制与思路」类材料。什么从根本上可行见[着色器包能与不能做的事](constraints.md)；按目的组织的代码示例在[实战配方](../recipes/)。
 
-## Map
+## 导航
 
-| Page | Contents |
+| 页面 | 内容 |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [光照的运作方式](lighting.md) | 引擎默认光照做了什么，以及你能重建到什么程度 |
+| [阴影](shadows.md) | 把 skyLight 当体素阴影贴图用；提升曲线的逆变换 |
+| [让水自然](water.md) | 水体统合配方与水下 3 层现实 |
+| [设计夜晚观感](night.md) | 「影黑了面却亮」的问题 |
+| [模型与纹理](models.md) | Model 程序绘制与读取什么 |
+| [写实化: 两种流派](realism.md) | 叠加系与全量重打光系 |
+| [着色器包能与不能做的事](constraints.md) | 能力地图: 可达、不可达、有条件，以及原因 |
+| [性能](performance.md) | 开销表与实践指引 |
+| [实机测试清单](testing.md) | 发布前检查清单 |
+| [与纹理包组合](combinations.md) | 与纹理包的搭配 |
+| [调试技巧](debugging.md) | 症状 → 原因诊断 |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认)

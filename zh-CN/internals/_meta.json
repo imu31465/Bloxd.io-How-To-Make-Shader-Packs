@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "引擎内部机制与研究",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "rendering-pipeline": "Rendering pipeline",
-  "hook-invocation": "Hook invocation internals",
-  "engine-header": "Engine header (verbatim)",
-  "shader-validation": "Shader validation",
-  "wgsl-compilation": "WGSL compilation",
-  "reserved-identifiers": "Reserved identifier internals",
-  "lighting-internals": "Lighting internals",
-  "fog-internals": "Fog internals",
-  "texture-sampling": "Texture sampling internals",
-  "texture-registry": "Texture registry internals",
-  "model-rendering": "Model rendering internals",
-  "engine-data": "Engine data ledger",
-  "testing-factors": "What changes pack-visible values",
-  "policy": "Per-game shader-pack policy",
-  "sun-and-moon": "The sun and the moon",
-  "debugging": "Debugging tools",
-  "research-log": "Research log"
+  "rendering-pipeline": "渲染管线",
+  "hook-invocation": "钩子接入内部机制",
+  "engine-header": "引擎标头 (v5, 逐字)",
+  "shader-validation": "着色器验证",
+  "wgsl-compilation": "WGSL 编译",
+  "reserved-identifiers": "保留标识符内部机制",
+  "lighting-internals": "光照内部机制",
+  "fog-internals": "雾的内部规格",
+  "texture-sampling": "纹理采样内部机制",
+  "texture-registry": "纹理注册表内部机制",
+  "model-rendering": "模型渲染内部机制",
+  "engine-data": "引擎数据台账 (v5 实测)",
+  "testing-factors": "会改变包可见值的因素",
+  "policy": "各游戏的着色器适用策略",
+  "sun-and-moon": "太阳与月亮",
+  "debugging": "调试工具",
+  "research-log": "研究日志"
 }

@@ -1,31 +1,31 @@
-# WGSL compilation internals
+# WGSL 编译
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行 bundle 复原)
 
-The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
+第二验证阶段 — 经浏览器 WGSL 编译器的真实编译 — 以及 v5 的验证桩。
 
-## Why two stages
+## 为什么分两个阶段
 
-Static validation's type-checking is incomplete, so some mistakes only surface here (e.g. WGSL operator-precedence requirements like `mixing '*' and '^' requires parenthesis`). Errors surface in-game with the variant name ([Compilation errors](../troubleshooting/compilation.md)).
+静态验证的类型检查并不完整，因此有些错误只在这里暴露 (例如 WGSL 的运算符优先级要求，如 `mixing '*' and '^' requires parenthesis`)。错误会带着变体名出现在游戏内 ([编译错误](../troubleshooting/compilation.md))。
 
-## Validation-stub generation
+## 验证桩的生成
 
-The engine synthesizes stubs for code that passed static validation (restored from module 29866):
+引擎为通过静态验证的代码合成桩 (从模块 29866 复原)：
 
-- the type-stub table:
+- 类型桩表：
 
-| Type | Stub value |
+| 类型 | 桩值 |
 |---|---|
 | `bool` | `p.x > 0.0` |
 | `f32` | `p.x` |
 | `vec2f` | `p.xy` |
 | `vec3f` | `p.xyz` |
 | `vec4f` | `p` |
-| `i32` / `vec2i` / `vec3i` / `vec4i` | `i32(p.x)` etc. |
-| `u32` / `vec2u` / `vec3u` / `vec4u` | `u32(p.x)` etc. |
+| `i32` / `vec2i` / `vec3i` / `vec4i` | `i32(p.x)` 等 |
+| `u32` / `vec2u` / `vec3u` / `vec4u` | `u32(p.x)` 等 |
 
-- structs build recursively — each field filled with stub values (nested structs recurse)
-- the synthesized entry points:
+- 结构体递归构造 — 每个字段填入桩值 (嵌套结构体递归)
+- 合成的入口点：
 
 ```wgsl
 var<private> bloxdValidationP: vec4f;
@@ -51,16 +51,16 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 }
 ```
 
-Validation literally compiles "WGSL that calls your hooks with stub inputs" in the browser, surfacing syntax, type and language-feature violations.
+验证字面上就是在浏览器里编译「以桩输入调用你钩子的 WGSL」，从而暴露语法、类型与语言特性违规。
 
-## Error-message name restoration
+## 错误消息的名称还原
 
-When splicing hook calls the engine keeps an identifier mapping (`originalNames`). Identifiers in browser errors are mapped **back to your original names**, and `sourceOf(lineNum)` maps spliced line numbers back to (file, line) — you read errors against your own code, not the transformed text.
+拼接钩子调用时，引擎保留一份标识符映射 (`originalNames`)。浏览器错误中的标识符会被映射**回你的原始名称**，`sourceOf(lineNum)` 把拼接后的行号映射回 (文件, 行) — 你读到的是针对自己代码的错误，而不是变换后文本的。
 
-## Runtime re-validation on join
+## 加入游戏时的运行时重验
 
-`checkCompilation` runs per game join and actually compiles every existing terrain material (stricter than the settings-screen check). Failing drops the pack for that game. The check has a 60-second forced timeout ([Performance](../troubleshooting/performance.md)).
+`checkCompilation` 在每次加入游戏时运行，实际编译每一个既存的地形材质 (比设置界面的检查更严)。失败则该游戏弃用该包。该检查有 60 秒强制超时 ([性能](../troubleshooting/performance.md))。
 
-## Related
+## 相关
 
-- [Compilation errors](../troubleshooting/compilation.md) · [Shader validation](shader-validation.md) · [Getting Started: Validation](../getting-started/validation.md)
+- [编译错误](../troubleshooting/compilation.md) · [着色器验证](shader-validation.md) · [入门指南: 验证](../getting-started/validation.md)

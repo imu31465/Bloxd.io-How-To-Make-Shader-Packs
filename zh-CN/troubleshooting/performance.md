@@ -1,34 +1,34 @@
-# Performance
+# 性能
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-Speed problems and their fixes.
+速度问题与修复。
 
-## The on-device check never finishes and drops the pack
+## 实机检查一直跑不完并弃用了包
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **原因**: 该检查有 **60 秒强制超时** (超时按 `skipped` 处理) — 低配设备与重负载世界常见
+- **修复**: 削减重型顶点运算与复杂循环后重试
+- **预防**: 遵循[性能指南](../guides/performance.md)
 
-## Frame rate drops
+## 帧率下降
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **检查**: 对比有无包时的 FPS；地形重的场景与水分开测
+- **典型原因**: 无条件地对每个面跑重型效果 (无标志/距离选取)；高频哈希噪声；过大的 `pow` 指数
+- **修复** ([指南](../guides/performance.md))：
+  - 经 `flags` 把效果设门到需要它们的面
+  - 按距离提前返回 (`distance(surface.position, bloxdEyePosition())`)
+  - 上采一层 mip 让 `bloxdTexel` 读取更便宜
+- **预防**: 增量添加细节并对比 FPS ([测试](../guides/testing.md))
 
-## Slow only on mobile
+## 只在移动端卡
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **原因**: 包跑在 WebGPU 渲染器上；移动 GPU 可能比桌面慢几十倍
+- **修复**: 降低效果强度/频率、加强距离剔除 — 或明确标注不支持移动端 ([环境要求](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## 逼近 256 KB 包上限
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **修复**: 精简注释、把共享代码提炼成函数、删掉未用的配方 ([包结构](../getting-started/pack-structure.md))
 
-## Related
+## 相关
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [性能指南](../guides/performance.md) · [测试](../guides/testing.md)

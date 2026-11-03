@@ -1,12 +1,12 @@
-# Model shader recipes
+# 模型着色器配方
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (依 v5 标头规格撰写)
 
-Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
+使用 v5 Model 钩子与新标志的配方，实现 **v5 之前不可能做到的「我看的是什么」选取**。基础: [模型与纹理](../guides/models.md)。
 
-## Held-item glow
+## 手持物品发光
 
-What first-person shader authors wanted since v1, in two lines:
+第一人称着色器作者从 v1 起就想要的东西，两行：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -18,7 +18,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Splitting the world from the hand
+## 把世界与手分开
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -33,9 +33,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Glowing blade tips (localPosition)
+## 发光的剑刃尖端 (localPosition)
 
-`localPosition` rotates with the model — "where on the model am I" without world-space guesswork:
+`localPosition` 随模型旋转 — 无需世界空间猜测就能知道「我在模型的哪个位置」：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -48,9 +48,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Note: actual `localPosition` ranges vary per model — verify on-device and `clamp` defensively.
+注意: 实际的 `localPosition` 取值范围随模型而异 — 请实机验证并防御性地 `clamp`。
 
-## Highlighting dropped items
+## 高亮掉落物
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -64,9 +64,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Cool rim on player skins (lifeform)
+## 玩家皮肤的冷色边缘光 (lifeform)
 
-Most models use `textureId: 0` (skins); `surface.colour` already has skin × tint:
+大多数模型用 `textureId: 0` (皮肤)；`surface.colour` 已含皮肤 × tint：
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -80,9 +80,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Swaying plants in the wind (allow only)
+## 风中摇摆的植物 (仅 allow)
 
-Plants (`flags.flat`) are drawn as models — sway via the vertex hook:
+植物 (`flags.flat`) 以模型绘制 — 经 vertex 钩子摇摆：
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -99,11 +99,11 @@ fn bloxdModelVertex(vertex: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-(Vegetation is also `flags.vegetation`: `flat` = "drawn as a crossed plane", `vegetation` = "is a plant" — grass and flowers are both.)
+(植被同时是 `flags.vegetation`: `flat` = «以交叉平面绘制»，`vegetation` = «是植物» — 草和花两者都是。)
 
-## Atlas-textured model faces only
+## 只处理带图集纹理的模型面
 
-Block-model faces (slabs, stairs…) carry atlas `textureId`s; select with `textureId != 0u`:
+方块模型面 (台阶、楼梯…) 携带图集 `textureId`；用 `textureId != 0u` 选取：
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -116,15 +116,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` faces (skins) sample as white — no error ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+`textureId: 0` 的面 (皮肤) 采样为白色 — 不报错 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))。
 
-## Armour vs the rest
+## 盔甲与其余部分
 
-`flags.lifeform` includes armour and cosmetics ([Flags](../api/flags.md)). No finer-grained input exists; combine `localPosition` (placement) or `overlayColour` presence as practical approximations.
+`flags.lifeform` 含盔甲与外观装饰 ([标志](../api/flags.md))。没有更细粒度的输入；可组合 `localPosition` (位置) 或 `overlayColour` 的存在性作实用近似。
 
-## Sharing with terrain
+## 与地形共享
 
-Uniform grading across full blocks and block models:
+对完整方块与方块模型做统一调色：
 
 ```wgsl
 fn applyGrade(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -142,8 +142,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-The shared-function pattern is what the default pack template itself recommends ([hooks](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+共享函数模式正是默认包模板自己推荐的做法 ([钩子](../getting-started/hooks.md#fallbacks-and-code-sharing))。
 
-## Related
+## 相关
 
-- [Models and textures](../guides/models.md) · [Enchant effects](enchant-effects.md) · [Flags](../api/flags.md) · [Structures](../api/structures.md)
+- [模型与纹理](../guides/models.md) · [附魔效果](enchant-effects.md) · [标志](../api/flags.md) · [结构体](../api/structures.md)

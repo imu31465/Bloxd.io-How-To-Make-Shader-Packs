@@ -1,8 +1,8 @@
-# Constants
+# 常量
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
 
-The header provides three constants (texture name constants `bloxdTextureId*` are covered in [Texture API](texture-api.md)).
+标头提供三个常量 (纹理名称常量 `bloxdTextureId*` 见[纹理 API](texture-api.md))。
 
 ```wgsl
 const bloxdPi: f32 = 3.1415926535898;
@@ -12,17 +12,17 @@ const bloxdTau: f32 = 6.2831853071796;
 const bloxdChunkSize: i32 = 32;
 ```
 
-| Constant | Type | Value | Description |
+| 常量 | 类型 | 值 | 说明 |
 |---|---|---|---|
-| `bloxdPi` | `f32` | 3.1415926535898 | pi |
-| `bloxdTau` | `f32` | 6.2831853071796 | 2π (handy for periods) |
-| `bloxdChunkSize` | `i32` | 32 | blocks along each side of a chunk (**new in v5**) |
+| `bloxdPi` | `f32` | 3.1415926535898 | 圆周率 |
+| `bloxdTau` | `f32` | 6.2831853071796 | 2π (周期计算很顺手) |
+| `bloxdChunkSize` | `i32` | 32 | 区块每边的方块数 |
 
-## Usage
+## 用法
 
 ### bloxdPi / bloxdTau
 
-Declared for you — no need to define your own pi. `bloxdTau` is convenient for periodic animation:
+已替你声明 — 无需自己定义 pi。`bloxdTau` 适合周期动画：
 
 ```wgsl
 fn sway(worldPos: vec3f, time: f32) -> f32 {
@@ -31,9 +31,9 @@ fn sway(worldPos: vec3f, time: f32) -> f32 {
 }
 ```
 
-### bloxdChunkSize — new in v5
+### bloxdChunkSize
 
-The engine's former magic number "chunks are 32 blocks wide" is now a named constant you can branch on. Useful for chunk-periodic effects (checkerboards, chunk-border accents):
+区块每边的方块数，以具名常量提供、可用于分支。适合区块周期效果 (棋盘格、区块边界描边)：
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -46,8 +46,8 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-Note: `bloxdChunkSize` is `i32` — cast with `f32(bloxdChunkSize)` when mixing with floats.
+注意: `bloxdChunkSize` 是 `i32` — 与浮点数混用时以 `f32(bloxdChunkSize)` 转换。
 
-## Related
+## 相关
 
-- [Functions](functions.md) · [Version History: v3](../history/v3.md) (where `bloxdPi` / `bloxdTau` arrived)
+- [函数](functions.md) · [版本历史: v3](../history/v3.md) (`bloxdPi` / `bloxdTau` 登场的版本)

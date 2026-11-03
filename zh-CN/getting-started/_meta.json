@@ -1,15 +1,15 @@
 {
   "index": {
-    "title": "Getting Started",
+    "title": "入门指南",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "overview": "Overview & prerequisites",
-  "requirements": "Requirements",
-  "quick-start": "Quick start",
-  "pack-structure": "Pack structure",
-  "manifest": "pack.json",
-  "hooks": "Shader hooks",
-  "variants": "Variants and guards",
-  "validation": "Validation",
-  "distribution": "Distribution"
+  "overview": "概览与前置条件",
+  "requirements": "环境要求",
+  "quick-start": "快速开始",
+  "pack-structure": "包结构",
+  "manifest": "pack.json (manifest)",
+  "hooks": "着色器钩子",
+  "variants": "变体与守卫",
+  "validation": "验证",
+  "distribution": "分发"
 }

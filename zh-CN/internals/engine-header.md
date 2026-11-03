@@ -1,17 +1,17 @@
-# The engine header (v5, verbatim)
+# 引擎标头 (v5, 逐字)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从现行生产包复原)
 
-The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere.
+加载器拼在每个包前面的精确文本。复原自现行生产包 (`ab90qa`，chunk c55，以 6 处现行插值渲染模板 — `apiVersion` 与经 `bloxdPackInputs` 的 5 个 uniform 读取)。解码后 8,954 字节、208 行。没有任何转述。
 
-Reading guide:
-- Field-by-field explanations → [Structures](../api/structures.md)
-- Function-by-function → [Functions](../api/functions.md) / [Lighting](../api/lighting.md)
-- Flags (BloxdFlags) → [Flags](../api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](../api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](../api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](../history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](shader-validation.md)
+阅读指引:
+- 逐字段说明 → [结构体](../api/structures.md)
+- 逐函数说明 → [函数](../api/functions.md) / [光照](../api/lighting.md)
+- 标志 (BloxdFlags) → [标志](../api/flags.md)
+- `bloxdTextureId*` 块**不**在本标头中 — 它按包从被引用名称生成 ([纹理 API](../api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` 标出条件字段 ([预处理器](../api/preprocessor.md))
+- 与 v4 标头 (6,021B) 的差异 → [版本历史: v5](../history/v5.md)
+- 标头如何被验证 (HEADER_VERSION) → [着色器验证](shader-validation.md)
 
 ```wgsl
 
@@ -223,8 +223,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## 相关
 
-- [API Reference](../api/) — the annotated version of this header
-- [Shader Validation](shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](engine-data.md) — the measurement ledger
+- [API 参考](../api/) — 本标头的注释版
+- [着色器验证](shader-validation.md) — HEADER_VERSION 与已保存包重验
+- [引擎数据](engine-data.md) — 实测台账

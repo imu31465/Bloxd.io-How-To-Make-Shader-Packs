@@ -1,64 +1,64 @@
-# Restrictions & reserved names
+# 限制与保留名称
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
 
-What packs may write, and the complete name-reservation rules.
+包可以写什么，以及完整的名称保留规则。
 
-## Allowed
+## 允许
 
-- WGSL built-ins (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select`, …)
-- your own `fn` / `struct` / `const` / `alias` / `var<private>`, in-function `let` and control flow (if/for/while/switch…)
-- derivatives (`dpdx` / `dpdy` / `fwidth`) in surface/light hooks (fragment stage) only — not in vertex hooks
-- `const` arrays (color LUTs etc.), pointers (`ptr<function, T>`), matrices (`mat3x3f` etc.)
-- flag definitions `#define NAME` (no value) + `#ifdef` conditionals
+- WGSL 内建 (`sin`、`mix`、`clamp`、`distance`、`smoothstep`、`reflect`、`select`…)
+- 自定义 `fn` / `struct` / `const` / `alias` / `var<private>`、函数内 `let` 与控制流 (if/for/while/switch…)
+- 导数 (`dpdx` / `dpdy` / `fwidth`) 仅在 surface/light 钩子 (fragment 阶段) — vertex 钩子中不可
+- `const` 数组 (颜色 LUT 等)、指针 (`ptr<function, T>`)、矩阵 (`mat3x3f` 等)
+- 标志定义 `#define NAME` (不带值) + `#ifdef` 条件
 
-## Forbidden / caveats
+## 禁止 / 注意
 
-- **No direct textures**: you cannot declare `texture_*` / `sampler` types; atlas reads go through [`bloxdTexel`](texture-api.md) only. *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
-- **`discard` is forbidden in strict** — wrap in `#ifndef BLOXD_STRICT`
-- `@attributes` / `enable` / `requires` / `override` are forbidden — no `enable f16;`, so **no f16 types**
-- no `@builtin`, so `fragCoord` / `vertex_index` are unreachable
-- **no module-scope `let`** — use `const` or `var`
-- no `atomic`
-- **never construct output structs directly**: `BloxdLight(...)` fails static validation; start from `bloxdDefault*`
-- a bare `var x: BloxdSurface;` is a validation error
-- hook parameters are read-only — copy before mutating
-- `#define` takes no value (names only)
+- **不得直接使用纹理**: 不能声明 `texture_*` / `sampler` 类型；图集读取只能经 [`bloxdTexel`](texture-api.md)。*「Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel.」*
+- **strict 中禁止 `discard`** — 用 `#ifndef BLOXD_STRICT` 包裹
+- `@attributes` / `enable` / `requires` / `override` 被禁止 — 没有 `enable f16;`，因此**没有 f16 类型**
+- 没有 `@builtin`，故 `fragCoord` / `vertex_index` 不可触达
+- **模块作用域不得使用 `let`** — 请用 `const` 或 `var`
+- 没有 `atomic`
+- **切勿直接构造输出结构体**: `BloxdLight(...)` 会静态验证失败；从 `bloxdDefault*` 起步
+- 裸写 `var x: BloxdSurface;` 是验证错误
+- 钩子参数只读 — 修改前先复制
+- `#define` 不带值 (只有名称)
 
-## Reserved names
+## 保留名称
 
-### The bloxd prefix (general rule)
+### bloxd 前缀 (总则)
 
-**Every identifier matching `/^bloxd/i` (case-insensitive) is reserved.** The only exceptions are the 9 hook function names.
+**所有匹配 `/^bloxd/i` (不区分大小写) 的标识符均为保留。** 唯一例外是 9 个钩子函数名。
 
-Validator wording, verbatim:
+验证器原文，逐字：
 
-> *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
+> *「Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>」*
 
-### The bloxdSp* namespace (46 symbols)
+### bloxdSp* 命名空间 (46 个符号)
 
-Symbols the code generator may inject and therefore cannot be redeclared (grown from 27 to 46 in v5):
+代码生成器可能注入、因而不可重声明的 46 个符号：
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-The new names map directly to v5 features: `bloxdSpFlags` (flag struct delivery), `bloxdSpEnchant` / `bloxdSpItemLocalPosition` (new inputs), the cell-sampling texture-pack path, the rotation chain, and extended-hook locals. **The pack-level reservation rule is broader than this list** (everything matching `/^bloxd/i`), so you don't need to memorize it — just never start your own names with `bloxd`.
+它们覆盖标志结构体传递 (`bloxdSpFlags`)、附魔与模型局部输入 (`bloxdSpEnchant` / `bloxdSpItemLocalPosition`)、单元格采样纹理包路径、旋转链与扩展钩子局部量。**包级保留规则比这张表更宽** (一切匹配 `/^bloxd/i` 者)，因此无需背表 — 只要自己的名称不以 `bloxd` 开头即可。
 
-### Texture names
+### 纹理名称
 
-Identifiers starting `bloxdTextureId` are resolved as texture-name constants ([Texture API](texture-api.md#bloxdtextureid-named-texture-constants)).
+以 `bloxdTextureId` 开头的标识符会被解析为纹理名称常量 ([纹理 API](texture-api.md#bloxdtextureid-named-texture-constants))。
 
-## Auto-rewrite introduced in v5
+## 自动改写
 
-- **Y-derivative sign flip**: the analyzer rewrites every call to `dpdy`, `dpdyCoarse` and `dpdyFine` as `(-dpdy(...))` (measured in the validator's token-rewrite pass; the dpdy family is explicitly enumerated as the inversion set). Screen-space y points down, so this inversion makes "rate of change upward" match intuition. Write `dpdy(h)` with the intent "how does h change as I go up" and the emitted code carries the flip. `dpdx` and the `fwidth` family are untouched
+- **Y 导数符号翻转**: 分析器把对 `dpdy`、`dpdyCoarse` 与 `dpdyFine` 的每次调用改写为 `(-dpdy(...))` (验证器的 token 改写环节明确枚举 dpdy 一族为翻转集)。屏幕空间 y 向下，因此这一翻转让「向上的变化率」符合直觉。写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转。`dpdx` 与 `fwidth` 一族不受影响
 
-## Diagnostics you'll actually see
+## 实际会看到的诊断
 
-- *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
-- *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
-- *"X reaches bloxdTexel, which only surface and light hooks can use."*
-- *"X reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and Y doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
-- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+- *「Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>」*
+- *「Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel.」*
+- *「X reaches bloxdTexel, which only surface and light hooks can use.」*
+- *「X reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and Y doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH.」*
+- *「BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.」*
 
-## Related
+## 相关
 
-- [Troubleshooting: compilation](../troubleshooting/compilation.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [故障排查: 编译](../troubleshooting/compilation.md) · [引擎内部: 着色器验证](../internals/shader-validation.md)

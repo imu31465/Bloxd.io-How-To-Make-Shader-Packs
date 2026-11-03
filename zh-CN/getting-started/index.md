@@ -1,19 +1,19 @@
-# Getting Started
+# 入门指南
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+面向初次制作着色器包的作者的单线教程，从概览到分发。它直接讲授已完成的 API v5 形态 (无需先读旧版本 — 那是[版本历史](../history/)的职责)。
 
-## The track
+## 学习路线
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [概览与前置条件](overview.md) — 着色器包能做什么、不能做什么
+2. [环境要求](requirements.md) — 浏览器与渲染器要求
+3. [快速开始](quick-start.md) — 5 分钟做出你的第一个包
+4. [包结构](pack-structure.md) — zip 内容与大小限制
+5. [pack.json](manifest.md) — manifest 的每个字段
+6. [着色器钩子](hooks.md) — 9 个钩子的职责
+7. [变体](variants.md) — 6 种变体与宏守卫
+8. [验证](validation.md) — 三阶段加载检查与实机测试
+9. [分发](distribution.md) — 打 zip 与发布卫生
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+需要完整规格时请继续前往 [API 参考](../api/)；要现成效果请看[实战配方](../recipes/)。

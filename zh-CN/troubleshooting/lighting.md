@@ -1,51 +1,51 @@
-# Lighting issues
+# 光照问题
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-Brightness, shadow and fog problems.
+亮度、阴影与雾的问题。
 
-## Caves too bright
+## 洞穴过亮
 
-- **Cause**: insufficient non-linearity on `skyLight`
-- **Fix**: the cave-darkening recipes in [lighting recipes](../recipes/lighting.md) and [realism recipes](../recipes/realism.md)
+- **原因**: `skyLight` 上的非线性不足
+- **修复**: [光照配方](../recipes/lighting.md)与[写实系配方](../recipes/realism.md)中的洞穴压暗配方
 
-## Lit faces too bright at night
+## 夜晚受光面过亮
 
-- **Cause**: only shadow colors were darkened — the finished color keeps its daytime brightness
-- **Fix**: attenuate the whole finished color at night and relax only local light (`blockLight` / `heldLight`) — [the night guide](../guides/night.md)
+- **原因**: 只压暗了阴影色 — 完成色仍保持白天的亮度
+- **修复**: 夜间对整体完成色施加衰减，仅对局部光 (`blockLight` / `heldLight`) 放宽 — [夜晚指南](../guides/night.md)
 
-## Night too dark
+## 夜晚黑到看不见
 
-- **Fix**: guarantee a minimum ambient; with a zero `bloxdSunDirection()` the true moon direction is unknown, so use pseudo blue ambient ([the night recipe](../recipes/lighting.md)). The moon direction itself is `-bloxdSunDirection()` (day-night-cycle worlds only)
+- **修复**: 保证最低环境光；`bloxdSunDirection()` 为零时无法得知真实月亮方向，请用拟似蓝色环境光 ([夜晚配方](../recipes/lighting.md))。月亮方向本身是 `-bloxdSunDirection()` (仅昼夜循环世界)
 
-## Daytime blows out
+## 白天过曝
 
-- **Fix**: lower the exposure before ACES ([ACES](../recipes/realism.md))
+- **修复**: 降低 ACES 之前的曝光 ([ACES](../recipes/realism.md))
 
-## Torch surroundings saturated orange
+## 火把周围一片橙
 
-- **Fix**: lower the warm blend ratio ([warm torch × cool sky](../recipes/realism.md))
+- **修复**: 调低暖色混合比 ([暖火把 × 冷天空](../recipes/realism.md))
 
-## Want to keep the engine's world light exactly
+## 想原样保留引擎的世界光照
 
-- **v5 solution**: call `bloxdWorldLight(light)` — identical math to the engine's "brightest of block/sky/held, floored by ambientLightColour" ([Lighting](../api/lighting.md#bloxdworldlight--the-worlds-light))
-- **Note**: `blockLight` / `heldLight` are 0 and sky-related fields are 1 when `!bloxdLit()` (header guarantee)
+- **v5 解法**: 调用 `bloxdWorldLight(light)` — 与引擎「方块/天空/手持取最亮、`ambientLightColour` 兜底」完全相同的数学 ([光照](../api/lighting.md#bloxdworldlight--the-worlds-light))
+- **注意**: `!bloxdLit()` 时 `blockLight` / `heldLight` 为 0、天空相关字段为 1 (标头保证)
 
-## Looks wrong in lighting-disabled games
+## 关闭光照的游戏中画面不对
 
-- **Cause**: lighting-only inputs (`blockLight` etc.) used unguarded. v5 has no `#ifdef BLOXD_LIGHTING` — branch on **runtime `bloxdLit()`**
-- **Fix**: early return `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Lighting](../api/lighting.md#bloxdlit--the-gate))
+- **原因**: 光照专属输入 (`blockLight` 等) 未加守卫地使用。v5 没有 `#ifdef BLOXD_LIGHTING` — 请按**运行时 `bloxdLit()`** 分支
+- **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](../api/lighting.md#bloxdlit--the-gate))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## 「LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk」
 
-- **Cause**: dense glowing-block regions overflow the light seed queue and the chunk's light computation is cut short. **Not pack-caused**, but light gaps near glowing clusters trace to this
-- **Fix**: spread light sources in the world
+- **原因**: 密集的发光方块区溢出光照种子队列，该区块的光照计算被截断。**不是包造成的**，但发光簇附近的光照缺口源于此
+- **修复**: 在世界中分散光源
 
-## Want the theory?
+## 想了解原理？
 
-- Shadows: [Shadows](../guides/shadows.md) (skyLight = voxel shadow map)
-- Fog: [Engine Internals: Fog Internals](../internals/fog-internals.md)
+- 阴影: [阴影](../guides/shadows.md) (skyLight = 体素阴影贴图)
+- 雾: [引擎内部: 雾](../internals/fog-internals.md)
 
-## Related
+## 相关
 
-- [Lighting](../api/lighting.md) · [Visual issues](visual.md) · [Lighting Internals](../internals/lighting-internals.md)
+- [光照](../api/lighting.md) · [画面问题](visual.md) · [光照内部](../internals/lighting-internals.md)

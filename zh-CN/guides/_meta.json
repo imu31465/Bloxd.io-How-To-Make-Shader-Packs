@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Guides",
+    "title": "指南",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "lighting": "How lighting works",
-  "shadows": "Shadows",
-  "water": "Making water look natural",
-  "night": "Designing night looks",
-  "models": "Models and textures",
-  "realism": "Realism: two schools",
-  "constraints": "Unreachable effects",
-  "performance": "Performance",
-  "testing": "On-device test checklist",
-  "combinations": "Combining with texture packs",
-  "debugging": "Debugging tips"
+  "lighting": "光照的机制",
+  "shadows": "阴影",
+  "water": "让水看起来自然",
+  "night": "夜间表现设计",
+  "models": "模型与纹理",
+  "realism": "写实化的两大流派",
+  "constraints": "着色器包能做到什么、做不到什么",
+  "performance": "性能",
+  "testing": "实机测试清单",
+  "combinations": "与纹理包的组合",
+  "debugging": "调试技巧"
 }

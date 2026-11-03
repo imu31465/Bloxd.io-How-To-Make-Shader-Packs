@@ -1,18 +1,18 @@
 {
   "index": {
-    "title": "API Reference",
+    "title": "API 参考",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "pack-format": "Pack format",
-  "hooks": "Shader hooks",
-  "flags": "Flags (BloxdFlags)",
-  "structures": "Input & output structures",
-  "functions": "Functions",
-  "lighting": "Lighting",
-  "texture-api": "Texture API",
-  "constants": "Constants",
-  "preprocessor": "Preprocessor",
-  "restrictions": "Restrictions & reserved names",
-  "compatibility": "Compatibility",
-  "texture-catalog": "Texture catalog"
+  "pack-format": "包格式",
+  "hooks": "着色器钩子",
+  "flags": "标志 (BloxdFlags)",
+  "structures": "输入与输出结构体",
+  "functions": "函数",
+  "lighting": "光照",
+  "texture-api": "纹理 API",
+  "constants": "常量",
+  "preprocessor": "预处理器",
+  "restrictions": "限制与保留名称",
+  "compatibility": "兼容性",
+  "texture-catalog": "纹理目录"
 }

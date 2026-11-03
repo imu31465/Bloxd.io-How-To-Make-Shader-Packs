@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Recipes",
+    "title": "实战配方",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "colors": "Colors",
-  "lighting": "Lighting",
-  "emission": "Emission",
-  "coordinates": "Coordinates",
-  "animation": "Time & animation",
-  "liquids": "Liquids",
-  "vertices": "Vertices (allow only)",
-  "math": "Math toolbox",
-  "realism": "Realism",
-  "model-shaders": "Model shaders",
-  "enchant-effects": "Enchant effects"
+  "colors": "颜色",
+  "lighting": "照明",
+  "emission": "发光",
+  "coordinates": "坐标",
+  "animation": "时间与动画",
+  "liquids": "液体",
+  "vertices": "顶点（仅 allow）",
+  "math": "数学小技巧",
+  "realism": "写实化",
+  "model-shaders": "模型着色器配方",
+  "enchant-effects": "附魔效果"
 }

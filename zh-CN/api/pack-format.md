@@ -1,8 +1,8 @@
-# Pack format
+# 包格式
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (re-measured on the live loader)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (在现行加载器上重新实测)
 
-The whole pack model on one page — manifest, loader limits, per-frame uniform. For the step-by-step version see [Getting Started](../getting-started/manifest.md).
+整个包模型一页讲完 — manifest、加载器限制、逐帧 uniform。分步版本见[入门指南](../getting-started/manifest.md)。
 
 ## pack.json
 
@@ -14,55 +14,55 @@ The whole pack model on one page — manifest, loader limits, per-frame uniform.
 }
 ```
 
-| Field | Type | Required | Description |
+| 字段 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `apiVersion` | number | required | **must strictly equal `5`** (`===`). A string `"5"` fails and is reported with its JSON spelling |
-| `name` | string | required | non-empty after trimming; shown in settings |
-| `author` | string | optional | must be a string if present |
+| `apiVersion` | number | 必填 | **必须严格等于 `5`** (`===`)。字符串 `"5"` 会失败，并按其 JSON 写法原样报出 |
+| `name` | string | 必填 | 去除首尾空白后非空；显示在设置中 |
+| `author` | string | 可选 | 若存在则必须是字符串 |
 
-Everything else in the manifest is ignored. `pack.json` must be exactly one JSON object at the zip root.
+manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰好一个 JSON 对象。
 
-## Loader limits (re-measured on live c53)
+## 加载器限制 (在现行 c53 上重新实测)
 
-| Limit | Value | Message when exceeded |
+| 限制 | 值 | 超限消息 |
 |---|---|---|
-| `.wgsl` files per pack | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` size | 64 KB | `pack.json is over 64 KB.` |
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| zip shape | — | split zip / zip64 / encrypted / unsupported compression each rejected with its own message; all files valid UTF-8; exactly one `pack.json`; no duplicate paths |
+| 每包 `.wgsl` 文件数 | 256 | `The pack has more than 256 .wgsl files.` |
+| `.wgsl` 源码总量 | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
+| `pack.json` 大小 | 64 KB | `pack.json is over 64 KB.` |
+| zip 大小 | 32 MB | `The zip is over 32 MB.` |
+| zip 条目数 | 1,024 | `The zip has more than 1024 entries.` |
+| zip 形态 | — | 分卷 zip / zip64 / 加密 / 不支持的压缩各自以专属消息拒绝；所有文件须为合法 UTF-8；恰好一个 `pack.json`；路径不得重复 |
 
-## API-version check
+## API 版本检查
 
-The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. The version constant `5` and the header template live in the same module (c55 / module 29836), so validation and the header it assumes move together. Mismatch messages: see [Compatibility](compatibility.md).
+加载器以 JavaScript 严格 `!==` 比较 `manifest.apiVersion !== 5`。版本常量 `5` 与标头模板位于同一模块 (c55 / 模块 29836)，因此校验与它所假定的标头同步变动。不符时的消息: 见[兼容性](compatibility.md)。
 
-## Per-frame uniform: bloxdPackInputs
+## 逐帧 uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — still 64 bytes, but v5 added one member (from the live uniform-layout module):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 仍是 64 字节，但 v5 新增了一个成员 (来自现行 uniform 布局模块)：
 
-| Offset | Field | Type | Note |
+| 偏移 | 字段 | 类型 | 备注 |
 |---|---|---|---|
-| 0 | `seconds` | `f32` | backs `bloxdSeconds()` |
-| 4 | `lit` | `u32` | **new in v5** — 1 when block/sky lighting is on; backs `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
+| 0 | `seconds` | `f32` | 支撑 `bloxdSeconds()` |
+| 4 | `lit` | `u32` | 方块/天空光照开启时为 1；支撑 `bloxdLit()` |
+| 16 | `renderOffset` | `vec3i` | 支撑 `bloxdRenderOffset()` |
+| 32 | `sunDirection` | `vec3f` | 支撑 `bloxdSunDirection()` |
+| 48 | `eyePosition` | `vec3f` | 支撑 `bloxdEyePosition()` |
 
-`lit` fit into the padding v4 already had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16). Total size and all other offsets are unchanged. The engine writes it with a single `setUint32(4, lit ? 1 : 0)` — it is a flag, not a light level (v4's JS-side names `terrainLightLevels` / `terrainHeldLight` are gone from the bundle entirely).
+`lit` 填进了 v4 在 `seconds` 与 `renderOffset` 之间本就存在的填充区 (偏移 4–15 原为对齐间隙；`vec3i` 需要 16 字节对齐，故 `renderOffset` 保持在 16)。总大小与其余偏移均未变。引擎以单次 `setUint32(4, lit ? 1 : 0)` 写入它 — 它是标志，不是光照等级 (v4 的 JS 侧名称 `terrainLightLevels` / `terrainHeldLight` 已从 bundle 中彻底消失)。
 
-**Never reference the uniform directly from a pack.** Use it through the header functions (`bloxdSeconds()` etc.). Stage visibility is VERTEX|FRAGMENT, so header functions work from module-scope functions and vertex hooks too.
+**切勿从包中直接引用该 uniform。** 请通过标头函数 (`bloxdSeconds()` 等) 使用。阶段可见性为 VERTEX|FRAGMENT，因此标头函数在模块级函数与 vertex 钩子中也可用。
 
-## Bind-group layout
+## 绑定组布局
 
-| binding | Contents |
+| binding | 内容 |
 |---|---|
 | 0 | `bloxdPackInputs` uniform (64 B) |
-| 1 | scene-depth texture (liquid variants) |
-| 2 | `bloxdSpTextureLayers` storage buffer |
+| 1 | 场景深度纹理 (液体变体) |
+| 2 | `bloxdSpTextureLayers` 存储缓冲 |
 
-`minBindingSize` remains 64. The depth texture (binding 1) is FRAGMENT-only, which is why `bloxdOpaqueBehind()` is surface/light-hook only.
+`minBindingSize` 仍为 64。深度纹理 (binding 1) 仅限 FRAGMENT，这正是 `bloxdOpaqueBehind()` 只能在 surface/light 钩子中使用的原因。
 
-## wgsl concatenation
+## wgsl 拼接
 
-Multiple `.wgsl` files are concatenated into one module in **dictionary order by path name**. Module-scope declarations are order-independent; only `var` initialization order can matter. Non-`.wgsl` files are ignored.
+多个 `.wgsl` 文件按**路径名的字典序**拼接为一个模块。模块级声明与顺序无关；只有 `var` 的初始化顺序可能有影响。非 `.wgsl` 文件被忽略。

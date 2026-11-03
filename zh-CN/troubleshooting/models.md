@@ -1,58 +1,58 @@
-# Model issues
+# 模型问题
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (new v5 territory)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (v5 新领域)
 
-Issues around the new v5 Model hooks.
+围绕 v5 新 Model 钩子的问题。
 
-## Players/mobs unaffected
+## 玩家/生物不受影响
 
-- **Cause**: entities (players, mobs, NPCs, armour, cosmetics) are drawn by the **Model program** — terrain hooks don't touch them
-- **Fix**: add Model hooks ([the models guide](../guides/models.md))
+- **原因**: 实体 (玩家、生物、NPC、盔甲、外观装饰) 由 **Model 程序**绘制 — 地形钩子碰不到它们
+- **修复**: 添加 Model 钩子 ([模型指南](../guides/models.md))
 
-## Slabs, stairs, plants unaffected
+## 台阶、楼梯、植物不受影响
 
-- **Cause**: block models (`slab` / `stairs` / `flat`) are also Model-program geometry, never terrain
-- **Fix**: use Model hooks with `flags.slab` / `flags.stairs` / `flags.flat` ([Flags](../api/flags.md))
+- **原因**: 方块模型 (`slab` / `stairs` / `flat`) 同样是 Model 程序几何体，从不属于地形
+- **修复**: 在 Model 钩子中用 `flags.slab` / `flags.stairs` / `flags.flat` ([标志](../api/flags.md))
 
-## Water unaffected
+## 水不受影响
 
-- **Cause**: water is Liquid-hook-only; **without Liquid hooks, no Terrain hook runs on water either** (v5 change)
-- **Fix**: define `bloxdLiquidSurface` / `bloxdLiquidLight` ([Variant issues](variants.md))
+- **原因**: 水只归 Liquid 钩子管；**没有 Liquid 钩子时，任何 Terrain 钩子也不会在水上运行** (v5 变更)
+- **修复**: 定义 `bloxdLiquidSurface` / `bloxdLiquidLight` ([变体问题](variants.md))
 
-## Want to change only held items but everything changes
+## 想只改手持物品，结果全都变了
 
-- **Fix**: select with `surface.flags.held` ([model shader recipes](../recipes/model-shaders.md))
+- **修复**: 用 `surface.flags.held` 选取 ([模型着色器配方](../recipes/model-shaders.md))
 
-## Flag checks don't behave
+## 标志判断行为不对
 
-- **Likely causes**:
-  1. **treating flags as a single-choice enum** — they combine freely («sandstone is sand and rock», «possibly even none») ([Flags](../api/flags.md#flags-combine-freely))
-  2. reading `else` as "everything else" — the else of `flags.rock` is merely "not rock", possibly still sand
-- **Fix**: combine material flags (`opaque`…) independently of shape/state flags (`slab`/`held`…)
+- **可能原因**:
+  1. **把标志当单选枚举** — 它们自由组合 («砂岩同时是沙和岩石»、«也可能全不满足») ([标志](../api/flags.md#flags-combine-freely))
+  2. 把 `else` 读作「其余一切」 — `flags.rock` 的 else 只是「不是岩石」，可能仍是沙
+- **修复**: 材质标志 (`opaque`…) 与形状/状态标志 (`slab`/`held`…) 相互独立地组合
 
-## Enchant glint disappeared
+## 附魔闪光消失了
 
-- **Fix**: pass `enchantColour` through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
+- **修复**: 透传 `enchantColour` 或改用 `bloxdLitColour()` ([附魔效果](../recipes/enchant-effects.md))
 
-## Hurt flash disappeared / too strong
+## 受伤红闪消失 / 过强
 
-- **Fix**: pass `overlayColour` through or adjust `out.overlayColour.a` ([Enchant effects](../recipes/enchant-effects.md))
+- **修复**: 透传 `overlayColour` 或调整 `out.overlayColour.a` ([附魔效果](../recipes/enchant-effects.md))
 
-## localPosition always reads 0
+## localPosition 读出来永远是 0
 
-- **By design**: `localPosition` is `vec3f(0.0)` on terrain and liquid faces — **no model there**
-- **Fix**: read it in Model hooks ([model recipes](../recipes/model-shaders.md))
+- **设计如此**: 地形与液体面上的 `localPosition` 为 `vec3f(0.0)` — **那里没有模型**
+- **修复**: 在 Model 钩子中读取 ([模型配方](../recipes/model-shaders.md))
 
-## bloxdTexel returns white on models
+## bloxdTexel 在模型上返回白色
 
-- **By design**: `textureId: 0` (skins) samples as white
-- **Fix**: select with `surface.textureId != 0u` or work from `surface.colour` ([Texture issues](textures.md))
+- **设计如此**: `textureId: 0` (皮肤) 采样为白色
+- **修复**: 用 `surface.textureId != 0u` 选取，或从 `surface.colour` 起步 ([纹理问题](textures.md))
 
-## Want armour-only / cosmetics-only changes
+## 想只改盔甲 / 只改外观装饰
 
-- **Limit**: no flag says "armour"; `flags.lifeform` includes armour and cosmetics
-- **Approximation**: combine with `localPosition` (placement) or the presence of `overlayColour` ([model recipes](../recipes/model-shaders.md))
+- **限制**: 没有「盔甲」标志；`flags.lifeform` 包含盔甲与外观装饰
+- **近似做法**: 与 `localPosition` (位置) 或 `overlayColour` 的存在性组合 ([模型配方](../recipes/model-shaders.md))
 
-## Related
+## 相关
 
-- [Models guide](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md)
+- [模型指南](../guides/models.md) · [模型着色器配方](../recipes/model-shaders.md) · [标志](../api/flags.md)

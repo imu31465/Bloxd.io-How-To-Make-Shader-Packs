@@ -1,19 +1,19 @@
-# Shader validation internals
+# 着色器验证
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行验证器复原)
 
-The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](../troubleshooting/validation.md).
+静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](../troubleshooting/validation.md)。
 
-## The stages
+## 各阶段
 
-1. **Loader limits** (zip / pack.json shape) → [Pack format](../api/pack-format.md)
-2. **Static validation (analyzer)** — this page; syntax, types, reserved names, hook contracts across all 6 variants
-3. **Real browser compilation** → [WGSL compilation](wgsl-compilation.md)
-4. **Runtime re-validation on game join** — actually compiles every existing terrain material (stricter than the settings-screen check); failing it drops the pack for that game
+1. **加载器限制** (zip / pack.json 形态) → [包格式](../api/pack-format.md)
+2. **静态验证 (分析器)** — 本页；跨全部 6 种变体检查语法、类型、保留名称、钩子契约
+3. **浏览器真实编译** → [WGSL 编译](wgsl-compilation.md)
+4. **加入游戏时的运行时重验** — 实际编译每一个既存地形材质 (比设置界面检查更严)；失败则该游戏弃用该包
 
-## The special-function signature table
+## 特殊函数签名表
 
-The validator keeps a table in module 29849 and checks cross-hook call restrictions:
+验证器在模块 29849 中维护一张表，检查跨钩子调用限制：
 
 ```js
 const Jq = new Map([
@@ -24,49 +24,49 @@ const Jq = new Map([
 ]);
 ```
 
-Restored logic:
+复原出的逻辑：
 
-- calling a non-`vertex: true` special function from a vertex hook → *"X reaches Y, which only surface and light hooks can use."*
-- a function with a `symbol` (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) reached from a variant that doesn't define that macro → *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
+- 从 vertex 钩子调用非 `vertex: true` 的特殊函数 → *「X reaches Y, which only surface and light hooks can use.」*
+- 带有 `symbol` 的函数 (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) 被未定义该宏的变体触达 → *「X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH.」*
 
-Note: `bloxdFragmentBlockPosition` is gone from v5's header generation but its old definition remains in this table (observed on the v5 build). Calls are rejected by validation.
+注意: `bloxdFragmentBlockPosition` 已不在标头生成中，但它的条目仍留在这张现行表里 — 而标识符检查查的正是这张表，因此调用仍能通过验证。代码生成器也仍会注入定义 (terrain/liquid 与两个 model 程序)，所以该函数在实践中仍可调用。应视其为已弃用: 未写入文档，且可能在任何未来版本中被移除。
 
-## Reserved-name diagnostics
+## 保留名称诊断
 
-- **the `/^bloxd/i` general rule**: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
-- **direct texture/sampler declarations**: *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
+- **`/^bloxd/i` 总则**: *«Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>»*
+- **直接的纹理/采样器声明**: *«Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel.»*
 
-## Texture-name resolution & diagnostics
+## 纹理名称解析与诊断
 
-`bloxdTextureId*` resolution has a dedicated path ([the messages](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+`bloxdTextureId*` 的解析有专属路径 ([消息](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator))：
 
-- **folding**: split on non-alphanumerics, CamelCase, prefix with `bloxdTextureId`; reverse matching is case/underscore-insensitive
-- **spelling suggestions** (new in v5): unmatched names get Levenshtein proposals at threshold `max(2, floor(len/4)) + 1`
-- dedicated messages for frame spellings and turned-copy spellings
-- post-fold ambiguous names are unusable
+- **折叠**: 以非字母数字切分、驼峰化、加 `bloxdTextureId` 前缀；反向匹配不区分大小写与下划线
+- **拼写建议** (v5 新增): 未匹配的名称按莱文斯坦距离获得建议，阈值 `max(2, floor(len/4)) + 1`
+- 帧拼写与旋转副本拼写各有专属消息
+- 折叠后有歧义的名称不可用
 
-## v5's new diagnostics
+## v5 的新诊断
 
-- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* — names the removed macro
-- packs reading `blockFlags` or referencing `bloxdBlockFlag*` fail the reserved-name diagnostic — **no pack misbehaves silently**
+- *«BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.»* — 点名被移除的宏
+- 读取 `blockFlags` 或引用 `bloxdBlockFlag*` 的包会触发保留名称诊断 — **没有包会静默地行为异常**
 
-## The Y-derivative rewrite
+## Y 导数改写
 
-The analyzer's token-rewrite pass rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (the dpdy family is explicitly enumerated as the inversion set). `dpdx` and `fwidth` are untouched ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5)).
+分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](../api/restrictions.md#auto-rewrite-introduced-in-v5))。
 
-## Header & texture-constant generation
+## 标头与纹理常量生成
 
-- the header is prepended read-only ([Engine header](engine-header.md))
-- the `bloxdTextureId*` block is generated **per pack** from referenced names
+- 标头以只读形式前置 ([引擎标头](engine-header.md))
+- `bloxdTextureId*` 块按包从被引用名称**逐包生成**
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (leading integer 8 → 9 from v4). The two fnv1a32 suffixes fingerprint the header material and the sorted name-id registry. Saved-pack re-validation uses this fingerprint to decide "needs re-check" ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](../api/compatibility.md#saved-pack-re-validation-needs-re-check))。
 
-## Validation stubs
+## 验证桩
 
-Code that passes static validation gets stub code synthesized before the real browser-WGSL check: `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — the type-stub table (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) builds input structs and invokes the hooks. Details: [WGSL compilation](wgsl-compilation.md).
+通过静态验证的代码会在浏览器真实 WGSL 检查之前被合成桩代码: `var<private> bloxdValidationP: vec4f` 加 `bloxdValidateVertex` / `bloxdValidateFragment` — 类型桩表 (`bool` → `p.x > 0.0`、`vec3f` → `p.xyz`…) 构造输入结构体并调用钩子。细节: [WGSL 编译](wgsl-compilation.md)。
 
-## Related
+## 相关
 
-- [Validation errors](../troubleshooting/validation.md) · [WGSL compilation](wgsl-compilation.md) · [Texture registry](texture-registry.md) · [Engine data](engine-data.md)
+- [验证错误](../troubleshooting/validation.md) · [WGSL 编译](wgsl-compilation.md) · [纹理注册表](texture-registry.md) · [引擎数据](engine-data.md)

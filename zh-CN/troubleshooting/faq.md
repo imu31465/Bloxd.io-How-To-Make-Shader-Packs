@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ 与法律事项
 
-> Status: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified
 
-## Frequently asked questions
+## 常见问题
 
-### Q. Are shader packs an official feature?
+### 问: 着色器包是官方功能吗？
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+着色器包功能可从游戏内 UI 访问，制作包看起来也是被预期的活动。不过尚未发现公开的官方文档 — 本指南是基于分析的非官方文档。
 
-### Q. Can packs do anything dangerous?
+### 问: 包能做危险的事吗？
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+包是纯 WGSL — **设计上就不可能执行 JS 或访问网络**。只有通过验证与编译的代码才会运行 ([限制](../api/restrictions.md))。
 
-### Q. Which games do packs work in?
+### 问: 包在哪些游戏中有效？
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+大多数游戏以 strict 模式运行 (无顶点动画、无 `discard`)。顶点动画只在 allow 列表的游戏中有效。逐标题清单见[引擎内部: 策略](../internals/policy.md)。
 
-### Q. Do packs work on mobile?
+### 问: 包在移动端能用吗？
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+仅限支持 WebGPU 的环境 ([环境要求](../getting-started/requirements.md))。
 
-### Q. Can I ship my own textures?
+### 问: 我能随包分发自己的纹理吗？
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+不能放在着色器包里 (图集只读)。那是纹理包系统的职责 ([组合](../guides/combinations.md))。
 
-### Q. Can I keep using an old-version pack?
+### 问: 我能继续用旧版本的包吗？
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+当前游戏只接受 `apiVersion: 5`；旧包会被静默停用 ([兼容性](../api/compatibility.md))。请经[版本历史](../history/)迁移。
 
-### Q. Will the API change again?
+### 问: API 还会再变吗？
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+引擎内部可能随更新变化 — 每页都标注目标构建。标头或注册表变化时，已保存的包会自动重验 ([兼容性](../api/compatibility.md#saved-pack-re-validation-needs-re-check))。
 
-### Q. What about "cinematic shader" distributions?
+### 问: 那些「电影级着色器」分发物是怎么回事？
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+我们分析过的一个社区「电影级着色器」分发物其实是纹理包 (128×128 纹理，没有 `pack.json` / `.wgsl`)。大多数「带阴影的着色器风」观感来自纹理侧的手艺 ([组合](../guides/combinations.md))。
 
-## Legal & notes
+## 法律与注意事项
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- 这是非官方指南，不代表开发者的观点。API 可能不加通知地变化
+- 借助 AI 协助编写，准确性不作保证。请以实际游戏行为为准验证
+- 实测值 (纹理 id 等) 是特定构建的快照，会随构建变化 ([名称即 API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
 
-## Related
+## 相关
 
-- [Documentation entry](../) · [Version History](../history/)
+- [文档入口](../) · [版本历史](../history/)

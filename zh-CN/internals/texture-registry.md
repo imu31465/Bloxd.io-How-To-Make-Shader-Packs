@@ -1,47 +1,47 @@
-# Texture registry internals
+# 纹理注册表内部机制
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+名称→id 的解析机制与实测的注册表漂移。面向用户的目录: [纹理目录](../api/texture-catalog.md)。
 
-## Methodology
+## 方法论
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+我们在微型 webpack harness 中，以随包分发的方块注册表纹理数据运行引擎自己的注册表构建模块 (本构建为 29833，协调模块 1371 / 1391 / 1384 / 219)，并记录其输出 — 这些数字是**生产包自身的计算结果**，不是重实现。
 
-## Output structure
+## 输出结构
 
-| Output | v5 measured | Meaning |
+| 输出 | v5 实测 | 含义 |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
+| `aliases` | 416 | 被折叠的拼写 — 188 个帧别名 (`lava0`…) 与 228 个旋转别名 (`chest_top[rot[1`…) |
+| `layers` | 228 | 层表 — 含 171 个预旋转槽位 (57 个根 × 4 个旋转) |
 
-## Folding rules
+## 折叠规则
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **动画族** (42 个): 帧拼写 (`lava0`–`lava7`) 折叠为基础名称 (`lava`)；`bloxdTexel` 在采样时返回当前帧
+- **旋转族** (57 个): 旋转槽位 (`[rot[1..4`) 折叠为根名称；`bloxdTexel` 重新应用逐面的 `textureRotation`
+- `radar_screen` 是唯一同属两族的名称 (它的四个预旋转副本各带一条 4 帧阶梯 — 因此图集上有 45 个动画根而非 42)
 
-## Drift (cnty9 → ab90qa)
+## 漂移 (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| 测量项 | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| 图集条目 | 1,219 | **1,210** |
+| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
+| 动画族 (帧拼写) | 42 (188) | **42 (188) — 不变** |
+| 可用具名常量 | 905 | **896** |
+| 幸存名称中的 id 变更 | — | **905 个中 334 个** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+完整漂移 (11 个名称): 新增 (1) `scorpion_eggs`；移除 (10) 八个双箱纹理加 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (双箱离开了游戏数据；刷怪笼保留 `mob_spawner_block_top`)。
 
-## Effect on HEADER_VERSION
+## 对 HEADER_VERSION 的影响
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+注册表哈希后缀烘焙了 id，因此这次漂移会把**每个已保存的包标记为「需要重新检查」** (页面加载时自动重验)。按名称编写的包经得起重新解析；裸 id 包会损坏 ([兼容性](../api/compatibility.md))。
 
-## Past drift records
+## 过往漂移记录
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+十月的双构建对比 (sjr0p7 → cnty9，10 天): 条目 1200 → 1219 (新增 98、移除 79)；1121 个未改名名称中 779 个改了 id (69%)；一次命名约定迁移 (`_rot1..4` 后缀 → `[rot[1..4` 槽位)；双箱出现。完整记录见[版本历史: v4](../history/v4.md)。
 
-## Related
+## 相关
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [纹理目录](../api/texture-catalog.md) · [着色器验证](shader-validation.md) · [研究日志](research-log.md)

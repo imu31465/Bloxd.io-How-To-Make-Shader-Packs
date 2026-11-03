@@ -1,24 +1,24 @@
-# Shader hooks
+# 着色器钩子
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
 
-A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
+包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
 
-## The hooks
+## 钩子一览
 
-| Hook | Stage | What it does |
+| 钩子 | 阶段 | 职责 |
 |---|---|---|
-| `bloxdTerrainVertex` | terrain · vertex | Terrain vertex animation. **Cannot run in strict games** |
-| `bloxdTerrainSurface` | terrain · surface | Terrain color, alpha, emission, enchant, overlay |
-| `bloxdTerrainLight` | terrain · light | Terrain final color — the last stage of the fragment |
-| `bloxdLiquidVertex` | liquid · vertex | Water vertex animation. **strict-only guard required** |
-| `bloxdLiquidSurface` | liquid · surface | Water color, alpha, emission |
-| `bloxdLiquidLight` | liquid · light | Water final color |
-| `bloxdModelVertex` | model · vertex | Block models / items / entities vertex animation. **strict-only guard required** |
-| `bloxdModelSurface` | model · surface | Model color, alpha, emission, enchant, overlay |
-| `bloxdModelLight` | model · light | Model final color |
+| `bloxdTerrainVertex` | terrain · vertex | 地形顶点动画。**strict 游戏中无法运行** |
+| `bloxdTerrainSurface` | terrain · surface | 地形颜色、alpha、自发光、附魔、覆盖色 |
+| `bloxdTerrainLight` | terrain · light | 地形最终颜色 — 片段的最后阶段 |
+| `bloxdLiquidVertex` | liquid · vertex | 水面顶点动画。**必须加 strict 守卫** |
+| `bloxdLiquidSurface` | liquid · surface | 水的颜色、alpha、自发光 |
+| `bloxdLiquidLight` | liquid · light | 水的最终颜色 |
+| `bloxdModelVertex` | model · vertex | 方块模型 / 物品 / 实体顶点动画。**必须加 strict 守卫** |
+| `bloxdModelSurface` | model · surface | 模型颜色、alpha、自发光、附魔、覆盖色 |
+| `bloxdModelLight` | model · light | 模型最终颜色 |
 
-Signatures (types must match exactly; parameter names are free):
+签名 (类型必须完全匹配；参数名自由)：
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex;
@@ -27,18 +27,18 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## Render-target split
+## 渲染目标的划分
 
-- **Terrain** — every block except water and block models
-- **Liquid** — water
-- **Model** — block models (slabs, stairs, crossed-plane plants), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics
+- **Terrain** — 水与方块模型以外的所有方块
+- **Liquid** — 水
+- **Model** — 方块模型 (台阶、楼梯、交叉平面植物)、手持/掉落/投掷物品、玩家、生物、NPC、盔甲、外观装饰
 
-**Important**: if a pack defines no Liquid hook, **no Terrain hook runs on water either** (water is handled by Liquid hooks alone). This differs from pre-v4 behavior where liquid fell back to terrain hooks.
+**重要**: 包若未定义任何 Liquid 钩子，**水面上任何 Terrain 钩子也不运行** (水只由 Liquid 钩子处理)。这与 v4 之前液体回退到 terrain 钩子的行为不同。
 
-## Fallbacks and code sharing
+## 回退与代码共享
 
-- An undefined hook means that stage uses the engine default (same behavior as `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **To share code across hooks**, define a module-scope function and call it from both:
+- 未定义的钩子表示该阶段使用引擎默认 (与 `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` 行为相同)
+- **要在钩子间共享代码**，定义一个模块级函数，两处都调用：
 
 ```wgsl
 fn applyWarmth(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -56,9 +56,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## The default pack (official 9-hook template)
+## 默认包 (官方 9 钩子模板)
 
-The starting template now includes the light hooks. 1,683 bytes as shipped, verbatim:
+起始模板现在包含 light 钩子。随包分发时为 1,683 字节，逐字如下：
 
 ```wgsl
 // Every hook here returns its engine default. Modify the return values to start
@@ -113,14 +113,14 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-The template's comments are the design guidance: modify return values to start building; deleting a hook restores the default; strict games keep terrain where it is; share code via functions.
+模板的注释就是设计指引: 修改返回值即开始构建；删除钩子即恢复默认；strict 游戏让地形留在原地；用函数共享代码。
 
-## Writing conventions
+## 书写惯例
 
-- **Never construct output structs directly** (`BloxdSurface(...)` fails validation). Always start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` and mutate fields. The light hook's first argument is already the output type, so `var out = s;` also works
-- A bare `var x: BloxdSurface;` (type annotation only) is also a validation error
-- Hook parameters are **read-only**. Copy first (`var sv = s;`)
-- You cannot use identifiers starting with `bloxd` (case-insensitive), except the 9 hook function names
-- Write constants as `const` (`#define` takes no value)
+- **切勿直接构造输出结构体** (`BloxdSurface(...)` 会验证失败)。总是从 `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` 起步再改字段。light 钩子的第一个参数已是输出类型，因此 `var out = s;` 亦可
+- 裸写 `var x: BloxdSurface;` (仅类型标注) 同样是验证错误
+- 钩子参数**只读**。先复制 (`var sv = s;`)
+- 不能使用以 `bloxd` 开头的标识符 (不区分大小写)，9 个钩子函数名除外
+- 常量写成 `const` (`#define` 不带值)
 
-For every field each hook can read and write, see [Structures](../api/structures.md).
+每个钩子可读写的全部字段见[结构体](../api/structures.md)。

@@ -1,6 +1,6 @@
-# 液体配方
+# 液体
 
-
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ## 水面涟漪 (颜色明灭)
 
@@ -20,7 +20,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 高度伪透明度 (非真正的浅滩判定)
 
-> v1 中场景深度与水底位置无法引用，仅凭本 API 算不出真实水深。v2 中经液体限定的 `bloxdOpaqueBehind()` 可测得至后方不透明面的厚度 ([第八部分](../history/v2.md) R-E)。以下为不使用它的旧式拟似演出：`s.position.y` 是局部坐标，直接用会随区块原点漂移。以下仅按世界高度改变 alpha 的拟似演出，非沿岸线/水底的浅滩表现。`packWaterReferenceY` 请按世界高度调整。
+> 真实水深需要液体限定的 `bloxdOpaqueBehind()`——它测得到到后方不透明面的厚度 (完整配方：[让水看起来自然](../guides/water.md))。以下是不使用它的简化拟似做法：`s.position.y` 是局部坐标，直接用会随区块原点漂移。要按世界高度使用时请换算为 `bloxdWorldPosition()`。以下仅按世界高度改变 alpha——是拟似效果，并非感知岸线/水底的浅滩表现。`packWaterReferenceY` 请按你的世界高度调整。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;

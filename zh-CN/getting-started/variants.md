@@ -1,36 +1,36 @@
-# Variants and guards
+# 变体与守卫
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed
 
-## 6 variants
+## 6 种变体
 
-You write one body of code, but it must compile in all **6 variants**: `{strict, allow} × {terrain, liquid, model}`. The loader validates all six at load time.
+你写一份代码，但它必须在全部 **6 种变体**中编译通过: `{strict, allow} × {terrain, liquid, model}`。加载器在加载时验证全部六种。
 
-The v4-and-earlier "lighting on/off" axis is gone (v4 had 8 variants). Lighting state is now a runtime question for [`bloxdLit()`](../api/lighting.md), not a compile-time branch.
+v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光照状态现在是 [`bloxdLit()`](../api/lighting.md) 的运行时问题，不再是编译期分支。
 
-| Variant | Example | Macros defined |
+| 变体 | 示例 | 定义的宏 |
 |---|---|---|
-| `allow.terrain` | terrain in an allow game | `BLOXD_ALPHA` |
-| `allow.liquid` | water in an allow game | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
-| `allow.model` | models in an allow game | `BLOXD_ALPHA` |
-| `strict.terrain` | terrain in a strict game | — |
-| `strict.liquid` | water in a strict game | `BLOXD_SCENE_DEPTH` |
-| `strict.model` | models in a strict game | — |
+| `allow.terrain` | allow 游戏中的地形 | `BLOXD_ALPHA` |
+| `allow.liquid` | allow 游戏中的水 | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
+| `allow.model` | allow 游戏中的模型 | `BLOXD_ALPHA` |
+| `strict.terrain` | strict 游戏中的地形 | — |
+| `strict.liquid` | strict 游戏中的水 | `BLOXD_SCENE_DEPTH` |
+| `strict.model` | strict 游戏中的模型 | — |
 
-## Conditionals
+## 条件编译
 
-Only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif` are available. The `#` goes at the start of a line (inside functions is fine).
+只有 `#define NAME` (不带值) / `#ifdef` / `#ifndef` / `#else` / `#endif` 可用。`#` 须在行首 (函数体内也可以)。
 
-| Guard | Meaning | Typical use |
+| 守卫 | 含义 | 典型用法 |
 |---|---|---|
-| `#ifndef BLOXD_STRICT` | non-strict (allow) variants only | wrap whole vertex hooks, wrap `discard` |
-| `#ifdef BLOXD_ALPHA` | variants where `alpha` exists (all liquid + non-strict terrain/model) | wrap alpha-touching code |
-| `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `#ifndef BLOXD_STRICT` | 仅非 strict (allow) 变体 | 包住整个 vertex 钩子、包住 `discard` |
+| `#ifdef BLOXD_ALPHA` | 存在 `alpha` 的变体 (全部 liquid + 非 strict 的 terrain/model) | 包住涉及 alpha 的代码 |
+| `#ifdef BLOXD_SCENE_DEPTH` | 全部液体变体 | 包住 `bloxdOpaqueBehind()` 调用 |
 
-`BLOXD_LIGHTING` was **removed in v5**. Using it fails validation with: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+`BLOXD_LIGHTING` 已在 **v5 移除**。使用它会验证失败: *「BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.」*
 
-## The strict-games contract
+## strict 游戏的契约
 
-Most games are strict (no vertex animation, no `discard`). An unguarded vertex hook reports `<hook> moves terrain, which strict games prevent.` and a reachable `discard` reports `discard makes terrain see-through, which strict games prevent.` — both disable **all hooks** in that strict game. Always wrap vertex hooks in `#ifndef BLOXD_STRICT`.
+大多数游戏是 strict (无顶点动画、无 `discard`)。未加守卫的 vertex 钩子会报 `<hook> moves terrain, which strict games prevent.`，可达的 `discard` 会报 `discard makes terrain see-through, which strict games prevent.` — 两者都会在该 strict 游戏中禁用**全部钩子**。永远用 `#ifndef BLOXD_STRICT` 包住 vertex 钩子。
 
-For per-game policy internals, see [Engine Internals: policy](../internals/policy.md).
+逐游戏策略的内部机制见[引擎内部: 策略](../internals/policy.md)。

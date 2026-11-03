@@ -1,8 +1,8 @@
-# 调试手段
+# 调试工具
 
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
-
-- URL 参数 `?renderer=lite` — 强制 Lite (WebGPU) 渲染器 (`?renderer=webgl2` / `babylon` 亦可；`babylon` 是 webgl2 的旧名)。优先级：URL 参数 > localStorage `bloxdRenderer` > 设置画面 > 默认 (webgl2)。无效值附带警告忽略。URL 或 localStorage 中残留的覆盖会使需要 WebGPU (lite) 的场景以「needs the new WebGPU renderer, so remove the renderer override...」出错 ([第五部分](../troubleshooting/) §17)
+- URL 参数 `?renderer=lite` — 强制 Lite (WebGPU) 渲染器 (`webgl2` / `babylon` 亦可；`babylon` 是 webgl2 的旧名)。优先级：URL 参数 > localStorage `bloxdRenderer` > 设置画面 > 默认 (webgl2)。无效值附带警告忽略。URL 或 localStorage 中残留的覆盖会使需要 WebGPU (lite) 的场景以「needs the new WebGPU renderer, so remove the renderer override...」出错 ([加载错误](../troubleshooting/loading.md))
 - URL 参数 `?vconsole` — 屏幕内控制台 (VConsole)。手机实机验证趁手
 - URL 参数 `?drawcalls=1` — 追加绘制统计调试面板。可从调试控制台拾取游戏对象，或用 `drawCalls()` / `why()` / `configureDrawCallWatching()` 查看大型机制 (包内外) 的重绘与每一次绘制逼近约 65,000 顶点上限的情况——很适合定位性能瓶颈
 - 控制台输出 `noa-engine v0.33.0` 与 `Renderer: lite from <来源>` — 先确认以防渲染路径误诊

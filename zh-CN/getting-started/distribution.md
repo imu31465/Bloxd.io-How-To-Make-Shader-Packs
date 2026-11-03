@@ -1,23 +1,23 @@
-# Distribution
+# 分发
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-## Release format
+## 发布格式
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. 打成 zip，`pack.json` 位于根部，且在大小限制之内 ([包结构](pack-structure.md))
+2. 确认 `pack.json` 位于 zip 根部 (单个公共根文件夹会被自动剥掉)
+3. 为发布润色 `name` / `author`
 
-## Pre-release checklist
+## 发布前检查清单
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (数字，不是字符串)
+- [ ] 全部 6 种变体验证通过 (加载器界面错误列表为空)
+- [ ] 已在 allow 游戏与 strict 游戏中目视验证
+- [ ] 顶点动画 / `discard` 包明确标注仅限 allow
+- [ ] 发布说明中记录测试过的游戏与日期 (构建会变)
 
-## After release
+## 发布之后
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- 玩家保存的包会在游戏更新导致引擎标头或纹理注册表变化时自动重新验证
+- **以 v1–v4 分发的包在 v5 上会静默失效** (见 [pack.json](manifest.md)) — 玩家只能看到状态行，因此请发布并公告更新版本
+- API 更新时，按[版本历史](../history/)的迁移步骤操作、升版本号、重新发布

@@ -1,33 +1,33 @@
-# Requirements
+# 环境要求
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-## Browser
+## 浏览器
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+着色器包仅限 WebGPU 渲染器。你需要支持 WebGPU 的浏览器：
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- 基于 Chromium 的浏览器 (Chrome / Edge / Opera 等) — 桌面端稳定
+- Safari 17+ / Firefox (WebGPU 支持随时期而异)
+- **移动端**: iOS / Android 上的 WebGPU 支持可能受限。请在包的发布页说明这一点
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+安装包期间，游戏的 WebGPU 渲染器设置会被强制启用。
 
-## Development environment
+## 开发环境
 
-No special tooling is required, though these help:
+无需特殊工具链，但以下几样有帮助：
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- 文本编辑器 (最好带 WGSL 语法高亮)
+- 用于分发的 zip 工具；开发期间可用文件夹加载 (仅桌面浏览器)
+- 浏览器开发者工具 — 编译错误既显示在游戏内 UI，也显示在控制台
 
-## On-device verification environments
+## 实机验证环境
 
-Before distribution, verify on ([Validation](validation.md)):
+分发前请在以下环境验证 ([验证](validation.md))：
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. 一个 allow 模式游戏 (使用顶点动画则必做)
+2. 一个 strict 模式游戏 (大多数游戏是 strict)
+3. 一次页面重载 (已保存的包会自动重新验证)
 
-## URL parameter caveat
+## URL 参数陷阱
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+URL 参数或 localStorage 中残留的渲染器覆盖项会让包拒绝启动 — 清掉它们再重载。

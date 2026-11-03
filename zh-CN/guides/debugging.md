@@ -1,6 +1,6 @@
 # 调试技巧
 
-
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 - 洞穴过亮 → `skyLight` 非线性曲线不足 (R2 洞穴配方 / R9.9)
 - 白天过曝 → 降低 ACES 前曝光
@@ -8,8 +8,8 @@
 - 远景霾太重 → 调低大气系数
 - 火把周围一片橙 → 调低暖色混合比 (保留部分原始染色光)
 - 方块几乎全白 → light 钩子输出合计超 1.0 (下游无 clamp)。末尾加 `clamp(col, vec3f(0.0), vec3f(1.0))`
-- 无叠加却发白 → fogVisibility 除法 un-fog 逆算所致。去掉 un-fog，改从 `s.colour` 起重建、雾最后一次性 `mix`
+- 无叠加却发白 → 雾除法式 un-fog 逆算所致。去掉 un-fog，改从 `s.colour` 起重建、雾最后一次性 `mix`
 - 发光方块不亮 → 重建系漏加 emission。补 `+ s.emission * (1.0 - l.fogAlpha)`
-- 夜晚只剩受光面偏亮 → 别只压暗阴影，对完成色 (`engineColour`) 整体施加夜间衰减。保留局部灯光时用 `blockLight` / `heldLight` 减弱衰减 ([第六部分](../guides/) 19 节)
+- 夜晚只剩受光面偏亮 → 别只压暗阴影，对完成色 (`engineColour`) 整体施加夜间衰减。保留局部灯光时用 `blockLight` / `heldLight` 减弱衰减 ([夜间表现设计](night.md))
 - `pow(skyLight, γ)` 怎么也压不黑影 → `l.skyLight` 为提升后之值 (第 10 章)。切换 R9.12 逆变换 + 阈值切割
 - 想调阴影面积/浓度 → 看 R9.12 调整指南 (面积=阈值 `shTh` / 边缘=`shSoft` / 影芯暗度=最低环境光与天空散射光的两点偏移)

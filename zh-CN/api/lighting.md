@@ -1,12 +1,12 @@
-# Lighting
+# 光照
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
 
-v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
+v5 公开了光照 API。引擎原先在内部做的事 (构建 `litColour`) 现在可从包中调用。本页把光照输入、函数与处理顺序作为一个体系来讲。
 
-## The full pipeline
+## 完整管线
 
-The complete color chain, as the default light-stage implementation (`bloxdDefaultLight`) shows it:
+完整的颜色链，如默认 light 阶段实现 (`bloxdDefaultLight`) 所示：
 
 ```
 surface.colour
@@ -29,34 +29,34 @@ lit = bloxdLitColour(surface, light)   ← the color "before emission and fog"
 BloxdLight.colour (final color)
 ```
 
-`bloxdLitColour()` order (header summary: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
+`bloxdLitColour()` 的顺序 (标头摘要: *「mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight」*):
 
-1. apply `overlayColour`
-2. shade with `bloxdShading()`
-3. apply `enchantColour`
-4. apply world light with `bloxdWorldLight()`
+1. 套用 `overlayColour`
+2. 以 `bloxdShading()` 着色
+3. 套用 `enchantColour`
+4. 以 `bloxdWorldLight()` 套用世界光照
 
-Emission and fog order: **emission is added after lighting and before fog**, and fog sinks emission too (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
+emission 与雾的顺序: **emission 在光照之后、雾之前加入**，且雾也会吞掉 emission (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`)。
 
-## Functions
+## 函数
 
-### bloxdLit() — the gate
+### bloxdLit() — 门控
 
 ```wgsl
 fn bloxdLit() -> bool
 ```
 
-Whether block & sky lighting is on. **Guarantees when off**:
+方块与天空光照是否开启。**关闭时的保证**：
 
-| Field | Value when off |
+| 字段 | 关闭时的值 |
 |---|---|
 | `blockLight` / `heldLight` | `0` |
 | `skyLight` | `1` |
-| `ambientLightColour` / `skyLightColour` | `1` (white) |
+| `ambientLightColour` / `skyLightColour` | `1` (白) |
 
-v4's `#ifdef BLOXD_LIGHTING` is gone. Replace with `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
+v4 的 `#ifdef BLOXD_LIGHTING` 已移除。请改用 `if (!bloxdLit()) { return bloxdDefaultLight(...); }`。
 
-### bloxdShading() — material & angle response
+### bloxdShading() — 材质与角度响应
 
 ```wgsl
 fn bloxdShading(light: BloxdLightIn) -> vec3f {
@@ -65,10 +65,10 @@ fn bloxdShading(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- multiplies `directional` (summed Lambert) by `diffuse` (material RGB response), adds `emissive` (material glow) and `ambient` (RGB ambient), clamps to 0–1
-- **the new v5 inputs `diffuse` / `emissive`** let you swap just the Lambert term while keeping the engine's material response
+- 将 `directional` (求和后的 Lambert) 乘以 `diffuse` (材质 RGB 响应)，加上 `emissive` (材质发光) 与 `ambient` (RGB 环境光)，截断到 0–1
+- **v5 新输入 `diffuse` / `emissive`** 让你可以只换掉 Lambert 项、保留引擎的材质响应
 
-### bloxdWorldLight() — the world's light
+### bloxdWorldLight() — 世界光照
 
 ```wgsl
 fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
@@ -80,10 +80,10 @@ fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- shapes each of the three channels (block / sky / held) with `ambientLightColour` as the floor, then takes the **brightest**
-- `skyLight` interpolates from `ambientLightColour` toward `skyLightColour` by the sky-light amount
+- 以 `ambientLightColour` 为下限整型三个通道 (方块 / 天空 / 手持)，再取**最亮者**
+- `skyLight` 按天空光量从 `ambientLightColour` 向 `skyLightColour` 插值
 
-### bloxdLitColour() — the engine recipe
+### bloxdLitColour() — 引擎配方
 
 ```wgsl
 fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
@@ -96,7 +96,7 @@ fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-### bloxdApplyFog() — fog
+### bloxdApplyFog() — 雾
 
 ```wgsl
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -104,10 +104,10 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- `fogAlpha`: **0 = no fog, 1 = only fogColour** (inverted from v4's `fogVisibility`)
-- `fogColour` is the game's fog RGB; **`vec3f(0.0)` when the game has no fog**
+- `fogAlpha`: **0 = 无雾，1 = 只剩 fogColour** (与 v4 的 `fogVisibility` 相反)
+- `fogColour` 是游戏的雾 RGB；**游戏没有雾时为 `vec3f(0.0)`**
 
-### bloxdDefaultLight() — the whole default
+### bloxdDefaultLight() — 整套默认
 
 ```wgsl
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -116,34 +116,34 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Input fields (BloxdLightIn)
+## 输入字段 (BloxdLightIn)
 
-| Field | Type | Meaning | Note |
+| 字段 | 类型 | 含义 | 备注 |
 |---|---|---|---|
-| `litColour` | `vec3f` | lit & enchanted RGB (before emission and fog) | a result value, not a source |
-| `directional` | `f32` | summed Lambert from directional lights | 0 when no directional lights |
-| `diffuse` | `vec3f` | material RGB response to directional light | new in v5 |
-| `emissive` | `vec3f` | material RGB glow (added to directional) | new in v5 |
-| `ambient` | `vec3f` | RGB ambient (added to directional) | |
-| `blockLight` | `vec3f` | RGB block light | 0 when `!bloxdLit()` |
-| `skyLight` | `f32` | sky light | 1 when `!bloxdLit()` |
-| `ambientLightColour` | `vec3f` | minimum RGB light (floor) | 1 when `!bloxdLit()` |
-| `skyLightColour` | `vec3f` | RGB color of skyLight | 1 when `!bloxdLit()` |
-| `heldLight` | `vec3f` | RGB held light | 0 when `!bloxdLit()` or nothing held |
-| `fogColour` | `vec3f` | game fog RGB | 0 with no fog |
-| `fogAlpha` | `f32` | 0 = no fog, 1 = only fogColour | inverted from v4 `fogVisibility` |
+| `litColour` | `vec3f` | 已照亮并附魔的 RGB (emission 与雾之前) | 是结果值，不是来源 |
+| `directional` | `f32` | 方向光求和的 Lambert | 无方向光时为 0 |
+| `diffuse` | `vec3f` | 材质对方向光的 RGB 响应 | 让 `bloxdShading()` 可重建材质响应 |
+| `emissive` | `vec3f` | 材质 RGB 发光 (加到方向光上) | |
+| `ambient` | `vec3f` | RGB 环境光 (加到方向光上) | |
+| `blockLight` | `vec3f` | RGB 方块光 | `!bloxdLit()` 时为 0 |
+| `skyLight` | `f32` | 天空光 | `!bloxdLit()` 时为 1 |
+| `ambientLightColour` | `vec3f` | 最低 RGB 光照 (下限) | `!bloxdLit()` 时为 1 |
+| `skyLightColour` | `vec3f` | 天空光的 RGB 颜色 | `!bloxdLit()` 时为 1 |
+| `heldLight` | `vec3f` | RGB 手持光 | `!bloxdLit()` 或空手时为 0 |
+| `fogColour` | `vec3f` | 游戏雾 RGB | 无雾时为 0 |
+| `fogAlpha` | `f32` | 0 = 无雾，1 = 只剩 fogColour | 与 v4 `fogVisibility` 相反 |
 
-## Light-level physics (background, skippable)
+## 光照等级物理 (背景，可跳过)
 
-- **`blockLight` / `skyLight` / `heldLight` arrive mapped to 0–1**: the 0–15 levels through an ease-out curve (e.g. `6 → 0.45`, `12 → 0.92`). All exclude `ambientLightColour`
-- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](../guides/realism.md))
-- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](../internals/fog-internals.md))
+- **`blockLight` / `skyLight` / `heldLight` 已映射到 0–1**: 0–15 的等级经过一条缓出曲线 (如 `6 → 0.45`、`12 → 0.92`)。三者都不含 `ambientLightColour`
+- **提升曲线**: `skyLight` 实为「该处能否看到天空」— 体素遮蔽数据，即一张阴影贴图。基于阈值的向阳/背阴分离可能需要逆变换 (见[写实化指南](../guides/realism.md))
+- **雾的内部**: 线性模式下 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (截断 0..1)，按视空间逐顶点计算。当前构建仅支持线性 (细节见[引擎内部: 雾](../internals/fog-internals.md))
 
-## Recipes
+## 配方
 
-### Custom shading + the engine's world light
+### 自定义着色 + 引擎的世界光照
 
-What v4 authors approximated by scaling `litColour` can now be written exactly:
+v4 作者靠缩放 `litColour` 近似的效果，现在可以精确写出：
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -155,7 +155,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Keep the engine's world light, boost emission only
+### 保留引擎世界光照，只放大 emission
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -164,7 +164,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Night blue shift (skyLight-driven)
+### 夜晚偏蓝 (由 skyLight 驱动)
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -176,6 +176,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## 相关
 
-- [Functions](functions.md) · [Guides: lighting](../guides/lighting.md) · [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [函数](functions.md) · [指南: 光照](../guides/lighting.md) · [引擎内部: 光照内部](../internals/lighting-internals.md)

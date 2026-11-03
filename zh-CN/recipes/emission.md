@@ -1,8 +1,8 @@
-# 自发光配方 (emission)
+# 发光
 
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
-
-> `emission` 在光照计算后叠加，但默认处理以 **`fogVisibility` 衰减。完全沉雾的远景发光也消失。远景也想发光的成分不要加到 emission，在 light 钩子内以 `out.colour += ...` 直接叠加** (engineColour 已打雾，远景光落在雾色之上)
+> `emission` 在光照计算后叠加，但默认处理会**按雾量 (`fogAlpha`) 衰减它。完全沉雾的远景发光也一并消失。远景也想发光的成分不要加到 emission，在 light 钩子内以 `out.colour += ...` 直接叠加** (默认输出已打雾，远景光落在雾色之上)
 
 ## 灯光脉动 (火把呼吸)
 

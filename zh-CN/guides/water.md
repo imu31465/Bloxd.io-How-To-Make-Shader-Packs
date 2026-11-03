@@ -1,8 +1,8 @@
-# 让水自然的水体统合配方
+# 让水看起来自然
 
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
-
-本 API 采样不到场景色，因此**是以菲涅尔风颜色混合与太阳高光的拟似表现，而非真实的反射/折射** (水深计算在 v2 中经 `bloxdOpaqueBehind()` 已可能实现，分离至[第八部分](../history/v2.md) R-E)。下例保留基色，掠角混入近空色，仅有太阳时加小闪光。
+本 API 采样不到场景色，因此**是以菲涅尔风颜色混合与太阳高光的拟似表现，而非真实的反射/折射** (深度计算使用液体限定的 `bloxdOpaqueBehind()`——厚度吸收配方在本页后文)。下例保留基色，掠角混入近空色，仅有太阳时加小闪光。
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -44,7 +44,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 - 水发白/过亮：调低 `fresnel * 0.38` 的 `0.38` 与闪光的 `0.55`。
 - 水过浓：稍调高 `fakeSkyReflection` 混合比。但过高会像塑料。
 - 水面出现线条或规则条纹：调低波频率与闪光强度。本代码没有水面网格顶点位移。
-- 想要真实映景：本 API 输入没有屏幕色，只混色成不了真反射 (深度为液体限定可取。[第八部分](../history/v2.md) R-E)。
+- 想要真实映景：本 API 输入没有屏幕色，只混色成不了真反射 (深度为液体限定可取——见[函数](../api/functions.md))。
 
 该配方**替换**既有 `bloxdLiquidLight`。勿与 R9.7 同名波法线函数或其他同名钩子重复粘贴。
 
@@ -61,4 +61,4 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | ② 液体定义色幕 | 相机所在液体方块定义 color/alpha 的 emissive 全屏 quad，绘制在最前面。游戏设置 `cameraTint` 有则优先 | 不可 (颜色浓度都改不了) |
 | ③ cameraTint | 游戏设置 | 不可 |
 
-实用要点：包在水下也继续工作 / 幕去不掉 / 水下不可分支 (fogStart / fogEnd / fogColour 在水下不变，fogVisibility 也检测不到)。
+实用要点：包在水下也继续工作 / 幕去不掉 / 水下不可分支 (fogStart / fogEnd / fogColour 在水下不变，fogAlpha 也检测不到)。

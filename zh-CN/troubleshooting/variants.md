@@ -1,47 +1,47 @@
-# Variant-specific issues
+# 变体专属问题
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-Problems that occur in only some of the 6 variants (`strict|allow` × `terrain|liquid|model`). v5 removed the lighting axis (the old `BLOXD_LIGHTING`) and the loader validates **all 6 variants at once** on load.
+只在 6 种变体 (`strict|allow` × `terrain|liquid|model`) 的部分中发生的问题。v5 移除了光照轴 (旧 `BLOXD_LIGHTING`)，加载器在加载时**一次验证全部 6 种变体**。
 
-## Loads only in non-strict games / dropped in strict
+## 只在非 strict 游戏中能加载 / 在 strict 中被弃用
 
-- **Cause**: an unguarded vertex hook or a reachable `discard`; strict games forbid both and violate = **whole-pack auto-disable** (`shaderPack:offInStrict`)
-- **Check**: the loader screen shows `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
-- **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT`
-- **Prevention**: always start vertex hooks from the guarded template ([Variants](../getting-started/variants.md))
+- **原因**: 未加守卫的 vertex 钩子或可达的 `discard`；strict 游戏两者皆禁，违规 = **整包自动禁用** (`shaderPack:offInStrict`)
+- **检查**: 加载器界面显示 `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
+- **修复**: 用 `#ifndef BLOXD_STRICT` 包住 vertex 钩子与 `discard`
+- **预防**: vertex 钩子永远从带守卫的模板起步 ([变体](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## 「.alpha is undefined」
 
-- **Cause**: `alpha` exists only behind `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model)
-- **Fix**: wrap alpha-touching code in `#ifdef BLOXD_ALPHA` ([Preprocessor](../api/preprocessor.md#macro--variant-matrix))
+- **原因**: `alpha` 只在 `#ifdef BLOXD_ALPHA` 之后存在 (全部 liquid + 非 strict 的 terrain/model)
+- **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](../api/preprocessor.md#macro--variant-matrix))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## 「BloxdVertex only exists when BLOXD_STRICT isn't defined」
 
-- **Cause**: strict variants have no vertex hooks at all, so no `BloxdVertex` either; vertex code is reachable from strict variants
-- **Fix**: guard the vertex hook
+- **原因**: strict 变体根本没有 vertex 钩子，也就没有 `BloxdVertex`；而 vertex 代码从 strict 变体中也可触达
+- **修复**: 给 vertex 钩子加守卫
 
-## bloxdOpaqueBehind fails in only some variants
+## bloxdOpaqueBehind 只在部分变体中失败
 
-- **Cause**: `BLOXD_SCENE_DEPTH` is defined only in all-liquid variants
-- **Fix**: `#ifdef BLOXD_SCENE_DEPTH` ([Validation errors](validation.md))
+- **原因**: `BLOXD_SCENE_DEPTH` 只在全部液体变体中定义
+- **修复**: `#ifdef BLOXD_SCENE_DEPTH` ([验证错误](validation.md))
 
-## Water ignores the pack (Liquid)
+## 水无视包 (Liquid)
 
-- **Symptom**: terrain hooks written, water unchanged
-- **Cause**: **in v5, if a pack defines no Liquid hook, no Terrain hook runs on water either** (the pre-v4 "liquid falls back to terrain" behavior is gone)
-- **Fix**: write Liquid hooks ([hook split](../api/hooks.md#what-each-program-draws))
+- **症状**: 写了地形钩子，水却没变
+- **原因**: **v5 中，包若未定义任何 Liquid 钩子，任何 Terrain 钩子也不会在水上运行** (v4 之前「液体回退到地形」的行为已移除)
+- **修复**: 编写 Liquid 钩子 ([钩子划分](../api/hooks.md#what-each-program-draws))
 
-## Models (entities, block models) unaffected
+## 模型 (实体、方块模型) 不受影响
 
-- **Cause**: out of scope before v5; now requires `bloxdModel*` hooks
-- **Fix**: define `bloxdModelSurface` / `bloxdModelLight` ([Models guide](../guides/models.md))
+- **原因**: v5 之前不在包的范围内；现在需要 `bloxdModel*` 钩子
+- **修复**: 定义 `bloxdModelSurface` / `bloxdModelLight` ([模型指南](../guides/models.md))
 
-## About the 6-variant validation
+## 关于 6 变体验证
 
-The loader validates **all 6 variants at once** at load (the lighting axis is no longer compiled separately). Even if a game uses only some conditions, distributed packs must anticipate all six.
+加载器在加载时**一次验证全部 6 种变体** (光照轴不再单独编译)。即便某个游戏只用其中某些条件，分发的包也必须兼顾全部六种。
 
-| Variant | Macros defined |
+| 变体 | 定义的宏 |
 |---|---|
 | `allow.terrain` | `BLOXD_ALPHA` |
 | `allow.liquid` | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
@@ -50,6 +50,6 @@ The loader validates **all 6 variants at once** at load (the lighting axis is no
 | `strict.liquid` | `BLOXD_SCENE_DEPTH` |
 | `strict.model` | — |
 
-## Related
+## 相关
 
-- [Variants](../getting-started/variants.md) · [Preprocessor](../api/preprocessor.md) · [Policy](../internals/policy.md)
+- [变体](../getting-started/variants.md) · [预处理器](../api/preprocessor.md) · [策略](../internals/policy.md)

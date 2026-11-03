@@ -1,47 +1,47 @@
-# Compilation errors
+# 编译错误
 
-> Target API: 5 · Status: Verified
+> 目标API: 5 · 状态: Verified
 
-Errors that pass static validation but fail as WGSL, or fail only in the browser's WGSL compiler (stage 2).
+通过了静态验证却作为 WGSL 失败的错误，或只在浏览器 WGSL 编译器 (第二阶段) 失败的错误。
 
-## "bloxdTerrainVertex must be declared as: fn ..."
+## 「bloxdTerrainVertex must be declared as: fn ...」
 
-- **Cause**: hook signature mismatch (argument/return types)
-- **Fix**: rewrite to the declaration shown in the message (parameter names are free; types must match exactly)
-- **Prevention**: start from the [hook comparison table](../api/hooks.md)
+- **原因**: 钩子签名不符 (参数/返回类型)
+- **修复**: 按消息中展示的声明改写 (参数名自由；类型必须完全匹配)
+- **预防**: 从[钩子对照表](../api/hooks.md)起步
 
-## "mixing '*' and '^' requires parenthesis (only in ...)"
+## 「mixing '*' and '^' requires parenthesis (only in ...)」
 
-- **Cause**: WGSL requires parentheses when mixing `^` `&` `|` `<<` `>>` with other operators
-- **Fix**: parenthesize the operands
+- **原因**: WGSL 要求 `^` `&` `|` `<<` `>>` 与其他运算符混用时加括号
+- **修复**: 给操作数加括号
 
-## "... can only be a function's parameter or return type, ..."
+## 「... can only be a function's parameter or return type, ...」
 
-- **Cause**: `var x: BloxdSurface;` — bare type-annotated declarations are rejected because header structs gain fields
-- **Fix**: `var out = bloxdDefaultSurface(s);` (or `var out = s;` in light hooks)
-- **Prevention**: always build outputs from `bloxdDefault*` ([conventions](../api/structures.md#writing-conventions-recap))
+- **原因**: `var x: BloxdSurface;` — 裸的类型标注声明会被拒绝，因为标头结构体会增字段
+- **修复**: `var out = bloxdDefaultSurface(s);` (light 钩子里也可 `var out = s;`)
+- **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](../api/structures.md#writing-conventions-recap))
 
-## "_ can only be the target of a phony assignment, as in _ = f();"
+## 「_ can only be the target of a phony assignment, as in _ = f();」
 
-- **Cause**: `let _ = f();` is invalid WGSL
-- **Fix**: write `_ = f();`
+- **原因**: `let _ = f();` 不是合法 WGSL
+- **修复**: 写成 `_ = f();`
 
-## "Lite: …reads scene depth on a page that didn't turn it on"
+## 「Lite: …reads scene depth on a page that didn't turn it on」
 
-- **Cause**: a depth-reading pack (`bloxdOpaqueBehind`) was active when the page was generated; depth availability is decided at page generation
-- **Fix**: reload the page with the pack active
+- **原因**: 读取深度的包 (`bloxdOpaqueBehind`) 在页面生成时处于激活状态；深度可用性在页面生成时就已决定
+- **修复**: 保持包激活并重载页面
 
-## dpdy sign looks inverted
+## dpdy 的符号看起来反了
 
-- **This is by design**: v5's analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
-- `dpdx` and `fwidth` are untouched
+- **这是有意为之**: 分析器自动把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (屏幕空间 y 向下)
+- **修复**: 无需处理 — 写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转 ([限制](../api/restrictions.md#auto-rewrite-introduced-in-v5))
+- `dpdx` 与 `fwidth` 不受影响
 
-## Pack gets dropped on game join / the on-device check never finishes
+## 加入游戏时包被弃用 / 实机检查一直跑不完
 
-- **Cause**: the on-device check failed, or hit the 60-second forced timeout (`skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops; see [Performance](performance.md)
+- **原因**: 实机检查失败，或触发 60 秒强制超时 (`skipped`) — 低配设备与重负载世界常见
+- **修复**: 削减重型顶点运算与复杂循环；见[性能](performance.md)
 
-## Related
+## 相关
 
-- [Validation errors](validation.md) · [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)
+- [验证错误](validation.md) · [引擎内部: WGSL 编译](../internals/wgsl-compilation.md) · [限制](../api/restrictions.md)
