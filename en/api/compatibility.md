@@ -31,7 +31,7 @@ The conversion is mostly mechanical (full checklist in [the v5 migration guide](
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- delete `bloxdFragmentBlockPosition` call sites (no replacement)
+- `bloxdFragmentBlockPosition` call sites still compile (the engine injects it), but it is undocumented now — migrating off it is the safe move ([Functions](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
 - bump `pack.json` to `"apiVersion": 5`
 
 The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.

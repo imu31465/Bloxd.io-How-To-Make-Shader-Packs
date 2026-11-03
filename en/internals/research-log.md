@@ -57,7 +57,7 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 
 - Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
 - The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
-- Why `bloxdFragmentBlockPosition` remains in the signature table (removed from v5's header) is unanalyzed — plausibly an un-cleaned leftover, but unconfirmed
+- `bloxdFragmentBlockPosition` (out of the v5 header): signature-table entry and runtime injection both confirmed live — calls validate and compile; whether the engine team intends to keep it is unknown
 
 ## When to re-verify
 

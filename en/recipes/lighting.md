@@ -1,7 +1,6 @@
-# Lighting recipes
+# Lighting
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ## Contrast S-curve
 
 ```wgsl
@@ -57,7 +56,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## Blue night ambience (pseudo look without moon direction)
 
-> In this API, `bloxdSunDirection()` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-bloxdSunDirection()` (day/night-cycle worlds only. [Part VII](../internals/) R-A).
+> In this API, `bloxdSunDirection()` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-bloxdSunDirection()` (day/night-cycle worlds only — [The sun and the moon](../internals/sun-and-moon.md)).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

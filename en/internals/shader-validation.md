@@ -1,4 +1,4 @@
-# Shader validation internals
+# Shader validation
 
 > Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
 
@@ -29,7 +29,7 @@ Restored logic:
 - calling a non-`vertex: true` special function from a vertex hook → *"X reaches Y, which only surface and light hooks can use."*
 - a function with a `symbol` (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) reached from a variant that doesn't define that macro → *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
 
-Note: `bloxdFragmentBlockPosition` is gone from v5's header generation but its old definition remains in this table (observed on the v5 build). Calls are rejected by validation.
+Note: `bloxdFragmentBlockPosition` is gone from the header generation, but its entry remains in this live table — and the table is what the identifier check consults, so calls still pass validation. The code generator also still injects the definition (terrain/liquid and both model programs), so the function remains callable in practice. Treated as deprecated: undocumented, and may be dropped in any future version.
 
 ## Reserved-name diagnostics
 

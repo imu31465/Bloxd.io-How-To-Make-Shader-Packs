@@ -1,8 +1,7 @@
-# Integrated recipe for natural-looking water
+# Making water look natural
 
-
-
-This API cannot sample scene color, so this is **pseudo styling with fresnel-style color blending and sun highlights, not real reflection/refraction** (depth math became possible in v2 with `bloxdOpaqueBehind()`, split out to [Part VIII](../history/v2.md) R-E). The sample below keeps the base color, blends slightly toward a sky-like color at grazing view angles, and adds a small glint only when the sun exists.
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+This API cannot sample scene color, so this is **pseudo styling with fresnel-style color blending and sun highlights, not real reflection/refraction** (depth math uses the liquid-only `bloxdOpaqueBehind()` — the thickness-absorption recipe is further below in this page). The sample below keeps the base color, blends slightly toward a sky-like color at grazing view angles, and adds a small glint only when the sun exists.
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -44,7 +43,7 @@ Tuning pointers:
 - Water looks white/washed: lower `0.38` in `fresnel * 0.38` and the glint `0.55`.
 - Water looks too dark: blend a bit more `fakeSkyReflection`. Too much looks plasticky.
 - Lines or regular stripes on water: lower wave frequencies and glint strength. This code has no mesh vertex displacement.
-- Want real scenery reflections: this API's inputs have no screen color, so blending colors never becomes real reflection (depth is liquid-only. [Part VIII](../history/v2.md) R-E).
+- Want real scenery reflections: this API's inputs have no screen color, so blending colors never becomes real reflection (depth is liquid-only — see [Functions: bloxdOpaqueBehind](../api/functions.md)).
 
 This recipe **replaces** an existing `bloxdLiquidLight`. Don't paste it alongside R9.7's same-named wave function or other same-named hooks.
 

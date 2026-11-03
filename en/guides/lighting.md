@@ -1,7 +1,6 @@
-# Engine default lighting and headroom for realism
+# How lighting works
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 Engine default lighting is "multiplication only" — no specular, fresnel, warm/cool separation, or hemisphere ambient exists. The following can be rebuilt:
 
 | Feature | Default | Buildable in packs? |

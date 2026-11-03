@@ -1,4 +1,4 @@
-# The engine header (v5, verbatim)
+# Engine header (verbatim)
 
 > Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
 

@@ -59,7 +59,7 @@ The engine's validator restricts which hooks may reach certain functions (violat
 | `bloxdTextureSize` | surface / light hooks only | — |
 | `bloxdOpaqueBehind` | surface / light hooks (meaningful in liquid variants) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` was removed in v5 (it was the only special function callable from vertex hooks through v4). There is no replacement — use `flags` when you need "which block is this".
+> `bloxdFragmentBlockPosition` is no longer in the documented header, but the engine still injects and accepts it — see [Functions: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected). It was the one special function callable from vertex hooks; for new code prefer `flags` for "which block is this".
 
 ## Fallbacks and sharing
 

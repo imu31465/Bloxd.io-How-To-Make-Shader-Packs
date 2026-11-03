@@ -41,7 +41,7 @@ Static-validation (analyzer, stage 1) errors — mostly reserved names, the stri
 - **Important**: these are not compile errors — strict games **auto-disable the whole pack** (`shaderPack:offInStrict`)
 - **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT` ([Variants](../getting-started/variants.md))
 
-## v5 additions/changes
+## Current-version messages
 
 | Message | Action |
 |---|---|
@@ -49,7 +49,7 @@ Static-validation (analyzer, stage 1) errors — mostly reserved names, the stri
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | leftover bit constant → `flags.rock` ([Flags](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 internal symbol → use the public `bloxdLitColour()` |
 
-v5's analyzer gives **dedicated messages** to packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING`, so nothing misbehaves silently ([v5 migration](../history/v5.md)).
+The analyzer gives **dedicated messages** to packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING`, so nothing misbehaves silently (the migration steps: [v5 migration](../history/v5.md)).
 
 Texture-name resolution errors (spelling suggestions, frame/rotation spellings) live in [Texture issues](textures.md).
 

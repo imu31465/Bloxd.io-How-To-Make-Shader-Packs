@@ -1,7 +1,6 @@
-# Liquid recipes
+# Liquids
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ## Rippling surface (color shimmer)
 
 ```wgsl
@@ -20,7 +19,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ## Pseudo depth-based transparency by height (not a real shallows test)
 
-> In v1, scene depth and the water bottom position could not be referenced, so true water depth could not be computed with that API alone. In v2, liquid-only `bloxdOpaqueBehind()` measures the thickness to the opaque face behind ([Part VIII](../history/v2.md) R-E). The following is the old pseudo styling without it: `s.position.y` is a local coordinate, so using it raw shifts the effect as the chunk origin changes. Convert with `bloxdWorldPosition()` for world height. The following only varies alpha by world height — a pseudo effect, not shoreline/bottom-aware shallows. Adjust `packWaterReferenceY` to your world height.
+> True water depth needs the liquid-only `bloxdOpaqueBehind()`, which measures the thickness to the opaque face behind (the full recipe: [Making water look natural](../guides/water.md)). The following is a simpler pseudo styling without it: `s.position.y` is a local coordinate, so using it raw shifts the effect as the chunk origin changes. Convert with `bloxdWorldPosition()` for world height. The following only varies alpha by world height — a pseudo effect, not shoreline/bottom-aware shallows. Adjust `packWaterReferenceY` to your world height.
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;

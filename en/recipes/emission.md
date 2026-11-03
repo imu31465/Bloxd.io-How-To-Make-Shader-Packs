@@ -1,7 +1,6 @@
-# Emission recipes
+# Emission
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 > `emission` is added after the lighting calculation, but the default process **attenuates it with the fog amount (`fogAlpha`). In fully fogged distance, emission disappears too. To keep glowing at distance, don't add to emission — add directly as `out.colour += ...` inside the light hook** (the default output is already fogged, so light lands on top of the fog color at distance)
 
 ## Pulsing lamps (breathing torches)

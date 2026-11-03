@@ -14,6 +14,18 @@ The **notes** column marks the two folding families. "anim (N frames)" means sam
 
 Deliberately **not** listed: the remaining registry spellings — 188 frame aliases and 228 rotation aliases — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,210-row layer table (including 171 pre-rotated slots) is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
 
+### How the numbers relate
+
+The counts name different sets, so they do not sum naively:
+
+| Count | What it counts |
+|---|---|
+| **896** | usable named constants — texture names you can write as `bloxdTextureId*` |
+| **416** | alias names (188 frame + 228 rotation) — recognized spellings that are *rejected* with guidance to the base name; they are names, not constants, and add no ids |
+| **1,210** | atlas entries — the actual slots in the texture atlas (ids 1–1210) |
+
+Every one of the 896 names maps to one distinct atlas entry. The remaining **314 entries** are extra animation frames (143) and pre-rotated copies (171) with no usable name — packs never reference them directly, because `bloxdTexel` animates frames and applies rotation automatically. The first frame of each animation family and the root of each rotation family *are* named, which is why some entries count as both "named" and "frame/rotation base". For comparison with the previous build: v4 had 905 usable names; this build has 896 (+1 `scorpion_eggs`, −10 double-chest ×8 and mob-spawner side ×2), and 334 surviving names changed id.
+
 ## The catalog
 
 All usable names, alphabetically. The id column is the `bloxdTextureId*` value — measured on `ab90qa` (2026-11-03). **Ids are snapshots; treat names as the API**: even between the v4 build (cnty9) and this build, 334 of the names that kept their spelling changed id (see the drift measurements below).

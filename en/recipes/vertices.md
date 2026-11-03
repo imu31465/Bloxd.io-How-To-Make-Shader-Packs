@@ -1,9 +1,8 @@
-# Vertex recipes (allow only)
+# Vertices (allow only)
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 > Wrap everything in `#ifndef BLOXD_STRICT`.
-> For exact conditions (the allow title list; Custom Games being strict) see §30: [§30 Per-game apply modes](../internals/)
+> For exact conditions (the allow title list; Custom Games being strict) see [Per-game shader-pack policy](../internals/policy.md)
 
 ## Grass swaying in wind (move only the tops)
 

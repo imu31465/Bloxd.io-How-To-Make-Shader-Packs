@@ -1,4 +1,4 @@
-# Performance-aware implementation
+# Performance
 
 > Target API: 5 · Target build: `ab90qa` · Status: Verified (measurement-based practice)
 

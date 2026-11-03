@@ -1,8 +1,8 @@
-# Engine data ledger (v5 measurements)
+# Engine data ledger
 
 > Target API: 5 · Target build: `ab90qa` (2026-11-03; production = preprod, byte-identical) · Status: Verified
 
-The documentation's v5 measurement ledger — every confirmed value, all measured on `ab90qa`.
+The documentation's measurement ledger — every confirmed value, all measured on the current target build `ab90qa`.
 
 ## The ledger
 

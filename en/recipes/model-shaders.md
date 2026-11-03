@@ -1,4 +1,4 @@
-# Model shader recipes
+# Model shaders
 
 > Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
 

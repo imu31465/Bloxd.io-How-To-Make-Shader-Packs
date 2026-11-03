@@ -2,7 +2,7 @@
 
 > Target API: 5 · Target build: `ab90qa` · Status: Verified (API unchanged since v4, re-confirmed on the v5 build)
 
-The API for reading the block-texture atlas, introduced in v4 and carried into v5 unchanged. Two functions, a named-constant family, and four input fields. The header's own one-liner: *"This face's texture. Compare with `bloxdTextureId*`."*
+The API for reading the game's own textures: two functions, a named-constant family, and four input fields. The header's own one-liner: *"This face's texture. Compare with `bloxdTextureId*`."*
 
 ## bloxdTexel
 
@@ -12,16 +12,36 @@ fn bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f
 
 - **Callable from**: **surface / light hooks only** (reaching it from a vertex hook fails with a "reaches" diagnostic)
 
-Samples the block-texture atlas **exactly as the engine's own sampler does** — same `texture_2d_array<f32>` atlas, same sampler, `textureSampleLevel` at `round(mipLevel)` — so the texel you read structurally matches the texel the engine drew.
+Reads a texel **the same way the engine's own sampler does** — same `texture_2d_array<f32>` atlas, same sampler, `textureSampleLevel` at `round(mipLevel)` — so the texel you read structurally matches the texel the engine drew.
 
-Semantics:
+### What `bloxdTexel` reads depends on the pipeline
+
+The engine generates a different definition of `bloxdTexel` per pipeline, so one function has three behaviors:
+
+| Pipeline | `textureId == 0` | Non-zero `textureId` | Notes |
+|---|---|---|---|
+| **Atlas pipelines** — terrain, liquid, and block models drawn from the block atlas | `vec4f(1.0)` (white — "no texture") | samples that **atlas entry** | named constants apply; animation and rotation are automatic |
+| **Own-texture pipelines** — models whose mesh carries its own diffuse texture (player skins, mob textures, item sprites) | samples **the mesh's own texture** at the uv you pass | `vec4f(1.0)` (white) | exactly one texture is in scope; named constants do not apply |
+| **Texture-less pipelines** | white | white | stub; `bloxdTextureSize() -> vec2u(1u)` |
+
+Atlas-pipeline semantics in detail:
 
 - **`textureId == 0` returns `vec4f(1.0)` (white).** That is the "no texture" id; texture-less faces carry 0 in all four input fields, so `bloxdTexel(surface.textureId, ...)` is always safe to call
 - **Animated textures automatically return the current frame.** Frames advance on the game's animation clock — you cannot stop or step them, and never need to
 - **`mipLevel` clamps exactly like the engine's own**: `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`; out-of-range mips saturate rather than error
 - **The fragment's own `textureRotation` is applied to the uv you pass** (see below)
 
-`textureId` is **1-based**: `bloxdTextureIdGrassTop` is the id, and the atlas layer the engine samples for it is `id - 1`. Ids are stable per texture *name*, not per atlas slot — the engine reshuffles the atlas across builds, but the named comparison keeps its meaning.
+`textureId` is **1-based** on atlas pipelines: `bloxdTextureIdGrassTop` is the id, and the atlas layer the engine samples for it is `id - 1`. Ids are stable per texture *name*, not per atlas slot — the engine reshuffles the atlas across builds, but the named comparison keeps its meaning.
+
+### The universal call pattern
+
+```wgsl
+// Works in every pipeline: on atlas faces it samples the atlas entry;
+// on own-texture models textureId is 0 and it samples the model's own texture.
+let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
+```
+
+`surface.colour` already contains `texture × tint × ambient occlusion` (skins and tints included), so texel reads are for *additional* detail — luminance estimates, per-texture effects — not for rebuilding the base colour.
 
 ## bloxdTextureSize
 
@@ -42,17 +62,20 @@ let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 
 ## Model-owned textures (textureId: 0)
 
-**`bloxdTexel()` can also read model-owned textures** — most notably via `textureId: 0`:
+The header notes: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — most model faces have no *atlas* texture, because their meshes carry their own textures:
 
-- **Player skins** and other non-atlas model textures (mobs etc.) use `textureId: 0`
-- Header note: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — most models bypass the atlas
-- Passing 0 to `bloxdTexel()` returns white `vec4f(1.0)`, never an error. Atlas-reading code takes effect only on faces with `textureId != 0u`:
+- **Player skins** and other non-atlas model textures (mobs, item sprites) arrive as `textureId: 0`
+- On those pipelines `bloxdTexel(0u, uv, mip)` samples **the mesh's own texture** (see the table above); any non-zero id returns white — there is no atlas in scope
+- The header's fields still work as documented: `uv` spans the model texture 0–1, `mipLevel` is the face's mip
+- **`bloxdTextureSize()`** reports the size of *the texture the pipeline samples*: the atlas on atlas pipelines, the model's own texture on own-texture pipelines
+
+Effects that only make sense on atlas faces should be guarded:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if (surface.textureId != 0u) {
-        // only faces whose texture lives in the atlas (block models)
+        // only faces whose texture lives in the block atlas (block models)
         let t = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
         out.colour = mix(out.colour, t.rgb, 0.2);
     }
@@ -61,7 +84,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ```
 
 - **Skins vs the atlas**: the atlas maps texture *names* to layers and is comparable via `bloxdTextureId*`. Model-owned textures (skins) are not in that namespace and arrive as id 0. `surface.colour` already contains skin × tint, so work from it
-- **`bloxdTextureSize()`** still reports the *atlas* size on model faces (not the model texture's size)
 
 ## bloxdTextureId*: named texture constants
 
@@ -91,9 +113,11 @@ Every usable texture name becomes a comparable `const`. **Spelling is the file n
 >
 > **Ambiguous after folding:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 >
-> **Not found (with suggestion):** `There's no texture called X. Did you mean bloxdTextureIdY?` — suggestion threshold is Levenshtein distance `max(2, floor(len/4)) + 1` (new in v5)
+> **Not found (with suggestion):** `There's no texture called X. Did you mean bloxdTextureIdY?` — suggestion threshold is Levenshtein distance `max(2, floor(len/4)) + 1`
 >
 > **Not found (no suggestion):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
+
+> `BLOCK_TEXTURES.md` in that message is the game's own internal texture-name list, referenced by the engine's validator — it is not a page on this site. The equivalent here is the [Texture catalog](texture-catalog.md).
 
 ### Only referenced constants are emitted
 

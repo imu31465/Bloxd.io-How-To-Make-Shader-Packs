@@ -16,7 +16,7 @@ const bloxdChunkSize: i32 = 32;
 |---|---|---|---|
 | `bloxdPi` | `f32` | 3.1415926535898 | pi |
 | `bloxdTau` | `f32` | 6.2831853071796 | 2π (handy for periods) |
-| `bloxdChunkSize` | `i32` | 32 | blocks along each side of a chunk (**new in v5**) |
+| `bloxdChunkSize` | `i32` | 32 | blocks along each side of a chunk |
 
 ## Usage
 
@@ -31,9 +31,9 @@ fn sway(worldPos: vec3f, time: f32) -> f32 {
 }
 ```
 
-### bloxdChunkSize — new in v5
+### bloxdChunkSize
 
-The engine's former magic number "chunks are 32 blocks wide" is now a named constant you can branch on. Useful for chunk-periodic effects (checkerboards, chunk-border accents):
+The number of blocks along each side of a chunk, as a named constant you can branch on. Useful for chunk-periodic effects (checkerboards, chunk-border accents):
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {

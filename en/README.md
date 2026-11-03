@@ -24,7 +24,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 |---|---|---|
 | Make your first shader pack | [Getting Started](getting-started/) | First-time pack authors |
 | Look up API functions & fields | [API Reference](api/) | Authors mid-implementation |
-| Implement an effect (light, water, models…) | [Guides & Recipes](guides/) | Anyone building a look |
+| Implement an effect (light, water, models…) | [Guides](guides/) · [Recipes](recipes/) | Anyone building a look |
 | Fix an error | [Troubleshooting](troubleshooting/) | Anyone with a broken pack |
 | Research engine internals | [Engine Internals & Research](internals/) | Engine analysts |
 | Look up older versions (v1–v5) | [Version History](history/) | Migrating legacy packs |

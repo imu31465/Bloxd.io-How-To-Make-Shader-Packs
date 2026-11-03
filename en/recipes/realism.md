@@ -1,7 +1,6 @@
-# Realism recipes
+# Realism
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 > Physical recipes for "rebuilding vanilla's look from materials". Read these premises first:
 >
 > 1. **The light hook is called at the final fragment stage**. Its returned colour becomes the final colour as-is. **You must re-apply fog yourself** (R9.10)  

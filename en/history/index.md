@@ -1,5 +1,7 @@
 # Version History
 
+> Status: Historical — version-by-version records; each guide names its own target build
+
 Changes, migration steps and removed APIs for v1 through v5. For migrating legacy packs and for the preserved per-era specifications.
 
 ## Timeline

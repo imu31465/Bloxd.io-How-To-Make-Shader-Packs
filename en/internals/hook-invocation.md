@@ -39,7 +39,7 @@ The splice architecture existed in the v2 renderer and stayed stable across v2 �
 |---|---|
 | `litColour` | the fragment color captured just before the fog mix — "before emission and fog" in header terms |
 | `directional` | the vertex-interpolated sum of per-directional-light Lambert (2-light setup in [Rendering pipeline](rendering-pipeline.md)) |
-| `diffuse` / `emissive` | the material's directional RGB response / RGB glow (new in v5) |
+| `diffuse` / `emissive` | the material's directional RGB response / RGB glow |
 | `ambient` | `material.ambient × sceneAmbient` — per material, per frame |
 | `blockLight` / `skyLight` | the decoded light-level varyings ([Lighting internals](lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | the corresponding uniforms |

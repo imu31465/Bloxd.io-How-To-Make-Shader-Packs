@@ -122,8 +122,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 |---|---|---|---|
 | `litColour` | `vec3f` | lit & enchanted RGB (before emission and fog) | a result value, not a source |
 | `directional` | `f32` | summed Lambert from directional lights | 0 when no directional lights |
-| `diffuse` | `vec3f` | material RGB response to directional light | new in v5 |
-| `emissive` | `vec3f` | material RGB glow (added to directional) | new in v5 |
+| `diffuse` | `vec3f` | material RGB response to directional light | lets `bloxdShading()` rebuild the material response |
+| `emissive` | `vec3f` | material RGB glow (added to directional) | |
 | `ambient` | `vec3f` | RGB ambient (added to directional) | |
 | `blockLight` | `vec3f` | RGB block light | 0 when `!bloxdLit()` |
 | `skyLight` | `f32` | sky light | 1 when `!bloxdLit()` |

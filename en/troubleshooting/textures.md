@@ -6,7 +6,7 @@ Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [t
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
-- **Cause**: a misspelling; v5's validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
+- **Cause**: a misspelling; the validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
 - **Fix**: accept the suggestion; cross-check the [catalog](../api/texture-catalog.md)
 - **Prevention**: copy-paste names from the catalog
 

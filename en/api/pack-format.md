@@ -44,7 +44,7 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Th
 | Offset | Field | Type | Note |
 |---|---|---|---|
 | 0 | `seconds` | `f32` | backs `bloxdSeconds()` |
-| 4 | `lit` | `u32` | **new in v5** — 1 when block/sky lighting is on; backs `bloxdLit()` |
+| 4 | `lit` | `u32` | 1 when block/sky lighting is on; backs `bloxdLit()` |
 | 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |

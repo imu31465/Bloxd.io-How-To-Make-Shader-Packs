@@ -1,7 +1,6 @@
-# Color recipes
+# Colors
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ## Single tint (most basic)
 
 ```wgsl

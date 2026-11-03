@@ -1,4 +1,4 @@
-# WGSL compilation internals
+# WGSL compilation
 
 > Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
 

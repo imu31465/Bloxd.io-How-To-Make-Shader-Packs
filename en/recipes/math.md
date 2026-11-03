@@ -1,7 +1,6 @@
 # Math toolbox
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ```wgsl
 // smooth quantization of 0..1 (n steps)
 fn pack_bands(x: f32, n: f32) -> f32 { return floor(x * n) / n; }

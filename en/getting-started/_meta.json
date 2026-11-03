@@ -1,13 +1,16 @@
 {
   "index": {
     "title": "Getting Started",
-    "theme": { "toc": false, "typesetting": "article" }
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "overview": "Overview & prerequisites",
   "requirements": "Requirements",
   "quick-start": "Quick start",
   "pack-structure": "Pack structure",
-  "manifest": "pack.json",
+  "manifest": "pack.json (manifest)",
   "hooks": "Shader hooks",
   "variants": "Variants and guards",
   "validation": "Validation",

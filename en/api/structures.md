@@ -129,12 +129,7 @@ struct BloxdLightIn {
 
 Field-by-field meaning and role in lighting math: see [Lighting](lighting.md).
 
-**Versus v4**:
-
-- `fogVisibility: f32` (1 = no fog) was renamed **`fogAlpha: f32` (0 = no fog, 1 = only fogColour)** — semantics inverted
-- `diffuse` / `emissive` are new in v5 (v4 had only `directional` and `ambient`) — `bloxdShading()` can now rebuild the material response
-- `engineColour` (v2–v4) is gone; `litColour` is «Lit and enchanted RGB colour, before emission and fog»
-- light-level wording changed from «0 without BLOXD_LIGHTING» to «0 when !bloxdLit()» — the same facts in v5 vocabulary
+**Versus older API versions**: `fogVisibility` (v2–v4) is now `fogAlpha` with inverted semantics (0 = no fog); `engineColour` is now `litColour`; light-level wording is «0 when !bloxdLit()». The full per-version field changes: [Version History](../history/).
 
 ## BloxdLight (light hook output)
 

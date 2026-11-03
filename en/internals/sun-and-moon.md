@@ -1,7 +1,6 @@
-# Sun and moon identity
+# The sun and the moon
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Analyzed (production-bundle JavaScript analysis)
 The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
 
 | Skybox | `bloxdSunDirection()` |
@@ -15,7 +14,7 @@ The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector com
 
 Day/night cycles are not built into the engine — inclination is a static number, and worlds with moving day/night update it game-side. `bloxdSunDirection()` follows each update.
 
-Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and bloxdSunDirection()**, so packs darkening terrain at night must estimate the time band from bloxdSunDirection() themselves (the §19 `sunPresent` technique).
+Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and bloxdSunDirection()**, so packs darkening terrain at night must estimate the time band from bloxdSunDirection() themselves (the `sunPresent` technique in [Designing night looks](../guides/night.md)).
 
 ## R-A. Directional moonlight — moonDir = −bloxdSunDirection()
 

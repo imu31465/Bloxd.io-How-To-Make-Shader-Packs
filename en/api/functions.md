@@ -87,9 +87,19 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Returns**: `position + vec3f(bloxdRenderOffset())`
 - **Note**: f32 precision limits mean far coordinates can be inexact (header: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — removed
+### bloxdFragmentBlockPosition — undocumented but still injected
 
-`bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i` (existed through v4) was **removed in v5 with no replacement**. It reconstructed a fragment's block position from position and normal, but nothing remained that needed it between `uv`, `flags` and the model inputs; continuous values are covered by `bloxdWorldPosition()`. Delete call sites.
+```wgsl
+fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
+```
+
+This function is **no longer part of the documented header** (it was in v4's), but the engine still accepts and defines it:
+
+- **Validator**: still listed in the live signature table, so calls pass name validation in every hook (including vertex hooks)
+- **Runtime**: the code generator still injects a definition into the terrain/liquid module and into both model programs — terrain/liquid use `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`; model pipelines use a 1/64-block offset, snapping to the model's cell for placed block models
+- **Caveat**: as an undocumented internal it can disappear in a future version without notice — prefer `bloxdWorldPosition()` for continuous positions and `flags` for "which block is this" (see [Version History: v5](../history/v5.md) for the removal from the header)
+
+Packs written for v4 that call it keep working; new packs should not adopt it.
 
 ## Default functions (engine behavior)
 
@@ -119,9 +129,9 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 Literally "apply the engine's recipe, then fog the emission-added result".
 
-## Lighting recipe functions (published in v5)
+## Lighting recipe functions
 
-What v4 authors kept re-deriving by hand is now documented as callable WGSL. Explanations and the flow diagram: [Lighting](lighting.md).
+The engine's own lighting recipe, documented as callable WGSL — compose or override the stages individually. Explanations and the flow diagram: [Lighting](lighting.md).
 
 | Function | Signature | Role |
 |---|---|---|

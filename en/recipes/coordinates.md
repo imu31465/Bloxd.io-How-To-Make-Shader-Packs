@@ -1,7 +1,6 @@
-# Coordinate recipes
+# Coordinates
 
-
-
+> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ## World coordinates
 
 ```wgsl
