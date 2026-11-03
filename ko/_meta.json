@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
+  "getting-started": "시작하기",
+  "api": "API 레퍼런스",
   "guides": "가이드",
   "recipes": "레시피",
   "troubleshooting": "문제 해결",
-  "internals": "Engine Internals & Research",
+  "internals": "엔진 내부와 연구",
   "history": "버전 히스토리"
 }

@@ -1,18 +1,21 @@
 {
   "index": {
-    "title": "API Reference",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "API 레퍼런스",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "pack-format": "Pack format",
-  "hooks": "Shader hooks",
-  "flags": "Flags (BloxdFlags)",
-  "structures": "Input & output structures",
-  "functions": "Functions",
-  "lighting": "Lighting",
-  "texture-api": "Texture API",
-  "constants": "Constants",
-  "preprocessor": "Preprocessor",
-  "restrictions": "Restrictions & reserved names",
-  "compatibility": "Compatibility",
-  "texture-catalog": "Texture catalog"
+  "pack-format": "팩 형식",
+  "hooks": "셰이더 훅",
+  "flags": "플래그 (BloxdFlags)",
+  "structures": "입출력 구조체",
+  "functions": "함수",
+  "lighting": "라이팅",
+  "texture-api": "텍스처 API",
+  "constants": "상수",
+  "preprocessor": "전처리기",
+  "restrictions": "제한과 예약명",
+  "compatibility": "호환성",
+  "texture-catalog": "텍스처 카탈로그"
 }

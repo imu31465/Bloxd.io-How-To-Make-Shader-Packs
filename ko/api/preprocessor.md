@@ -1,20 +1,20 @@
-# Preprocessor
+# 전처리기
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (라이브 검증기에서 복원)
 
-Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif`. The `#` goes at the start of a line (inside functions is fine). Flag-name matching is case-insensitive; a wrong `#ifdef` name makes the error message list the official set.
+조건부 컴파일이 지원하는 것은 `#define NAME` (값 없음) / `#ifdef` / `#ifndef` / `#else` / `#endif` 뿐이다. `#` 은 행 머리에 붙인다 (함수 안도 상관없다). 플래그명 대조는 대소문자를 구별하지 않으며, 틀린 `#ifdef` 이름을 쓰면 오류 메시지가 공식 목록을 보여준다.
 
-## Defined macros (3)
+## 정의되는 매크로 (3개)
 
-| Macro | Defined in | Typical use |
+| 매크로 | 정의되는 곳 | 전형적 용도 |
 |---|---|---|
-| `BLOXD_STRICT` | strict-game variants (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` around whole vertex hooks and `discard` |
-| `BLOXD_ALPHA` | variants where `BloxdSurface.alpha` exists — all liquid + non-strict terrain/model | wrap alpha-touching code |
-| `BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `BLOXD_STRICT` | strict 게임 베리언트 (strict.terrain / strict.liquid / strict.model) | 버텍스 훅 전체와 `discard` 를 `#ifndef BLOXD_STRICT` 로 감싸기 |
+| `BLOXD_ALPHA` | `BloxdSurface.alpha` 가 존재하는 베리언트 — 모든 액체 + 비strict 지형/모델 | alpha 를 만지는 코드 감싸기 |
+| `BLOXD_SCENE_DEPTH` | 모든 액체 베리언트 | `bloxdOpaqueBehind()` 호출 감싸기 |
 
-## Macro × variant matrix
+## 매크로 × 베리언트 매트릭스
 
-| Variant | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
+| 베리언트 | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
 |---|---|---|---|
 | `allow.terrain` | – | ✓ | – |
 | `allow.liquid` | – | ✓ | ✓ |
@@ -23,15 +23,15 @@ Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#i
 | `strict.liquid` | ✓ | ✓ | ✓ |
 | `strict.model` | ✓ | – | – |
 
-Terrain / liquid / model differences are **separate programs, not macros** — `#ifdef BLOXD_TERRAIN` does not exist.
+지형 / 액체 / 모델의 차이는 **별개의 프로그램이지 매크로가 아니다** — `#ifdef BLOXD_TERRAIN` 은 존재하지 않는다.
 
-## Removed macros
+## 제거된 매크로
 
-- **`BLOXD_LIGHTING`** — removed in v5. Lighting state is a runtime question for [`bloxdLit()`](lighting.md#bloxdlit--the-gate), not a compile branch. Using it fails validation with:
+- **`BLOXD_LIGHTING`** — v5 에서 제거. 라이팅 상태는 컴파일 분기가 아니라 [`bloxdLit()`](lighting.md#bloxdlit--the-gate) 의 런타임 질문이다. 쓰면 다음과 함께 검증에 실패한다:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-v4 migration pattern:
+v4 이주 패턴:
 
 ```wgsl
 // v4 (fails validation on v5)
@@ -46,7 +46,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Example
+## 예시
 
 ```wgsl
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -67,13 +67,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Macros shape the structs
+## 매크로가 구조체를 결정한다
 
-- `BloxdSurface.alpha` exists only inside `#ifdef BLOXD_ALPHA`
-- `bloxdOpaqueBehind()` is callable only inside `#ifdef BLOXD_SCENE_DEPTH`
+- `BloxdSurface.alpha` 는 `#ifdef BLOXD_ALPHA` 안에서만 존재한다
+- `bloxdOpaqueBehind()` 는 `#ifdef BLOXD_SCENE_DEPTH` 안에서만 호출할 수 있다
 
-See [Structures](structures.md#conditional-fields--macros).
+[구조체](structures.md#conditional-fields--macros) 를 보라.
 
-## Related
+## 관련 문서
 
-- [Getting Started: Variants](../getting-started/variants.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [시작하기: 베리언트](../getting-started/variants.md) · [엔진 내부와 연구: 셰이더 검증](../internals/shader-validation.md)

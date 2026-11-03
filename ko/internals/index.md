@@ -1,29 +1,29 @@
-# Engine Internals & Research
+# 엔진 내부와 연구
 
-Internal specifications restored by analyzing the engine's implementation. Everything here was recovered directly from the JavaScript of the current production build (`ab90qa`). Separated from the public-API documentation ([API Reference](../api/)) to preserve exact internal behavior and analysis results.
+엔진 구현을 분석해 복원한 내부 사양. 여기의 모든 것은 현행 프로덕션 빌드 (`ab90qa`) 의 JavaScript 에서 직접 회수했다. 정확한 내부 동작과 분석 결과를 보존하기 위해 공개 API 문서 ([API 레퍼런스](../api/)) 와 분리해 두었다.
 
-## Map
+## 구성
 
-| Page | Contents |
+| 페이지 | 내용 |
 |---|---|
-| [Rendering pipeline](rendering-pipeline.md) | alphaTest position, 2-light setup, uniform reality, greedy meshing |
-| [Hook invocation](hook-invocation.md) | how hooks are spliced into the engine's WGSL |
-| [Engine header](engine-header.md) | the full v5 header (verbatim, 8,954B) |
-| [Shader validation](shader-validation.md) | analyzer internals, the signature table, HEADER_VERSION |
-| [WGSL compilation](wgsl-compilation.md) | the stage-2 real compilation and validation stubs |
-| [Reserved identifiers](reserved-identifiers.md) | the 46 `bloxdSp*` symbols |
-| [Lighting internals](lighting-internals.md) | blockLight / heldLight structure |
-| [Fog internals](fog-internals.md) | linear-only, the 32-block gradient band |
-| [Texture sampling](texture-sampling.md) | the 3-variant texture codegen |
-| [Texture registry](texture-registry.md) | name→id resolution, 896 names, measured drift |
-| [Model rendering](model-rendering.md) | the v5 Model program |
-| [Engine data](engine-data.md) | the v5 constants/limits/layout ledger |
-| [Testing factors](testing-factors.md) | what world/player settings change pack-visible values |
-| [Policy](policy.md) | shaderPackPolicy — the 12 allow titles |
-| [Sun & moon](sun-and-moon.md) | what feeds bloxdSunDirection |
-| [Debugging](debugging.md) | URL parameters, stats panels |
-| [Research log](research-log.md) | methodology, build history, unverified items |
+| [렌더링 파이프라인](rendering-pipeline.md) | alphaTest 위치, 2광원 구성, uniform 의 실상, greedy 메싱 |
+| [훅 호출](hook-invocation.md) | 훅이 엔진의 WGSL 에 어떻게 이어지는가 |
+| [엔진 헤더](engine-header.md) | v5 헤더 전문 (그대로, 8,954B) |
+| [셰이더 검증](shader-validation.md) | 분석기 내부, 시그니처 표, HEADER_VERSION |
+| [WGSL 컴파일](wgsl-compilation.md) | 2단계 진짜 컴파일과 검증 스텁 |
+| [예약 식별자](reserved-identifiers.md) | 46개 `bloxdSp*` 심볼 |
+| [라이팅의 내부](lighting-internals.md) | blockLight / heldLight 의 구조 |
+| [포그의 내부](fog-internals.md) | 선형뿐, 32블록 기울기대 |
+| [텍스처 샘플링](texture-sampling.md) | 3변형 텍스처 코드젠 |
+| [텍스처 레지스트리](texture-registry.md) | 이름→id 해석, 896 이름, 실측 드리프트 |
+| [모델 렌더링](model-rendering.md) | v5 의 Model 프로그램 |
+| [엔진 데이터](engine-data.md) | v5 상수·제한·레이아웃 대장 |
+| [테스트 요인](testing-factors.md) | 월드·플레이어 설정 중 팩 가시값을 바꾸는 것 |
+| [정책](policy.md) | shaderPackPolicy — allow 12 타이틀 |
+| [태양과 달](sun-and-moon.md) | bloxdSunDirection 에 무엇이 흐르는가 |
+| [디버깅](debugging.md) | URL 파라미터, 통계 패널 |
+| [리서치 로그](research-log.md) | 방법론, 빌드 이력, 미검증 항목 |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인)
 
-Internals are not a stable API contract — they may change with engine updates, and each page names its evidence build ([research log](research-log.md)).
+내부 사양은 안정된 API 계약이 아니다 — 엔진 업데이트로 바뀔 수 있으며, 각 페이지는 근거 빌드를 명시한다 ([리서치 로그](research-log.md)).

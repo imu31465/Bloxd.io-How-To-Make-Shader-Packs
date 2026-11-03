@@ -10,11 +10,11 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 - 대상 빌드: `ab90qa.main.6188124c.js` (프로덕션과 프리프로덕션이 동일 번들 — md5 `fc3322212d15be2445c0e8dfc9733fcc`로 검증)
 - 셰이더 훅: 9개 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-셰이더 팩이 처음이라면 [Getting Started](getting-started/)(영어)부터, API를 찾는다면 [API Reference](api/)(영어)부터 시작하세요.
+셰이더 팩이 처음이라면 [시작하기](getting-started/)부터, API를 찾는다면 [API 레퍼런스](api/)부터 시작하세요.
 
 > 이 문서는 게임 개발사의 공식 자료가 아닙니다. 엔진 내부 사양은 업데이트로 바뀔 수 있습니다 — 각 페이지에 표기된 대상 빌드와 검증 상태를 확인하세요.
 >
-> 이 가이드는 AI 지원으로 작성되었으며 정확성은 보장되지 않습니다. 실제 게임 동작으로 검증하세요.
+> 이 가이드는 AI 지원으로 작성되었으며 정확성은 보장되지 않습니다. 실제 게임 동작으로 검증하세요. 레시피는 로더 화면과 게임 내 컴파일로 계속 검증하세요.
 >
 > 셰이더 팩 기능 자체는 게임 내 UI에서 접근하는 공식 기능이며, 팩은 순수 WGSL입니다(JS 실행·네트워크 없음). 일반적인 코드로는 위험한 일이 일어나지 않습니다.
 
@@ -22,27 +22,33 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 
 | 목적 | 분류 | 독자 |
 |---|---|---|
-| 첫 셰이더 팩 만들기 | [Getting Started](getting-started/) | 처음 만드는 사람 |
-| API 함수·필드 조회 | [API Reference](api/) | 구현 중인 작가 |
-| 효과 구현 (빛, 물, 모델…) | [Guides & Recipes](guides/) | 특정 룩을 만드는 사람 |
-| 오류 해결 | [Troubleshooting](troubleshooting/) | 깨진 팩을 가진 사람 |
-| 엔진 내부 조사 | [Engine Internals & Research](internals/) | 엔진 분석가 |
-| 이전 버전 조회 (v1–v5) | [Version History](history/) | 구형 팩 마이그레이션 |
+| 첫 셰이더 팩 만들기 | [시작하기](getting-started/) | 처음 만드는 사람 |
+| API 함수·필드 조회 | [API 레퍼런스](api/) | 구현 중인 작가 |
+| 효과 구현 (빛, 물, 모델…) | [가이드](guides/) · [레시피](recipes/) | 특정 룩을 만드는 사람 |
+| 오류 해결 | [문제 해결](troubleshooting/) | 깨진 팩을 가진 사람 |
+| 엔진 내부 조사 | [엔진 내부와 연구](internals/) | 엔진 분석가 |
+| 이전 버전 조회 (v1–v5) | [버전 히스토리](history/) | 구형 팩 마이그레이션 |
 
 ## 문서 구성
 
-- **[Getting Started](getting-started/)** — 개요, 퀵 스타트, 팩 구조, pack.json, 9개 훅, 배리언트, 검증, 배포.
-- **[API Reference](api/)** — v5 체계적 사양: 훅, 플래그, 입/출력 구조체, 전체 함수, 라이팅, 텍스처 API, 상수, 전처리기, 제한, 호환성, 896개 이름의 텍스처 카탈로그.
-- **[Guides](guides/)** · **[Recipes](recipes/)** · **[Troubleshooting](troubleshooting/)** · **[Engine Internals & Research](internals/)** · **[Version History](history/)**
-
-> 참고: Getting Started / API Reference / Troubleshooting와 Guides·Recipes·Internals의 v5 신규 페이지는 현재 **영어**로 제공됩니다(이 판의 번역 페이지와 동일한 구조). 이미 번역된 콘텐츠는 모두 보존됩니다.
+- **[시작하기](getting-started/)** — 개요, 퀵 스타트, 팩 구조, pack.json, 9개 훅, 베리언트, 검증, 배포. 첫 팩을 완성시키는 한 줄 트랙 튜토리얼.
+- **[API 레퍼런스](api/)** — v5 체계적 사양: 훅, 플래그, 입출력 구조체, 전체 함수, 라이팅, 텍스처 API, 상수, 전처리기, 제한, 호환성, 896개 이름의 텍스처 카탈로그.
+- **[가이드](guides/)** — 라이팅의 구조, 그림자, 물, 밤, 모델 렌더링, 퍼포먼스, 리얼화 개념.
+- **[레시피](recipes/)** — 목적별 코드 예시: 컬러, 라이팅, 이미션, 좌표, 애니메이션, 액체, 정점, 수학, 리얼화, 모델 셰이더, 인챈트 효과.
+- **[문제 해결](troubleshooting/)** — 증상 기반 오류 해결: 로드, API 버전, 컴파일, 검증, 베리언트, 외관, 텍스처, 라이팅, 모델, 퍼포먼스.
+- **[엔진 내부와 연구](internals/)** — 렌더링 파이프라인, 훅 호출, 엔진 헤더, 검증·컴파일 내부, 예약 식별자, 라이팅/포그 내부, 텍스처 샘플링·레지스트리, 모델 렌더링, 실측 데이터.
+- **[버전 히스토리](history/)** — v1부터 v5까지: 버전별 변경, 이주 절차, 폐지된 API.
 
 ## 검증 상태 라벨
 
+각 페이지에는 대상 API 버전, 대상 빌드, 최종 확인일, 검증 상태가 기재되어 있습니다.
+
 | 라벨 | 의미 |
 |---|---|
-| Verified | 대상 빌드에서 검증됨 |
+| Verified | 실기기·대상 빌드에서 검증됨 |
 | Analyzed | 내부 구현 분석으로 확인됨 |
 | Partially Verified | 일부만 확인됨 |
 | Experimental | 실험적·미확정 |
 | Historical | 과거 버전 자료 |
+
+엔진에서 추출한 원시 데이터 (헤더, 레지스트리, 실측값)는 [엔진 내부와 연구](internals/)에, 그 뒤의 방법론과 로그는 [리서치 로그](internals/research-log.md)에서 추적할 수 있습니다.

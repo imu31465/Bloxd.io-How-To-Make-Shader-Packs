@@ -1,12 +1,12 @@
-# Model shader recipes
+# 모델 셰이더
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Analyzed (v5 헤더 사양에 맞춰 작성)
 
-Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
+v5 Model 훅과 새 플래그로, **v5 이전에는 불가능했던 「지금 무엇을 보고 있는가」 선택**을 하는 레시피. 기초: [모델과 텍스처](../guides/models.md).
 
-## Held-item glow
+## 손에 든 아이템 발광
 
-What first-person shader authors wanted since v1, in two lines:
+1인칭 셰이더 작가가 v1 때부터 바라던 것을 두 줄로:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -18,7 +18,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Splitting the world from the hand
+## 월드와 손의 분리
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -33,9 +33,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Glowing blade tips (localPosition)
+## 빛나는 검 끝 (localPosition)
 
-`localPosition` rotates with the model — "where on the model am I" without world-space guesswork:
+`localPosition` 은 모델과 함께 회전한다 — 월드 좌표 추측 없이 「모델의 어디인가」:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -48,9 +48,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Note: actual `localPosition` ranges vary per model — verify on-device and `clamp` defensively.
+주의: 실제 `localPosition` 범위는 모델마다 다르다 — 실기기에서 확인하고 방어적으로 `clamp` 하라.
 
-## Highlighting dropped items
+## 떨어진 아이템 강조
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -64,9 +64,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Cool rim on player skins (lifeform)
+## 플레이어 스킨의 시원한 림 (lifeform)
 
-Most models use `textureId: 0` (skins); `surface.colour` already has skin × tint:
+대부분의 모델은 `textureId: 0` (스킨). `surface.colour` 에는 이미 스킨 × tint 가 있다:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -80,9 +80,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Swaying plants in the wind (allow only)
+## 바람에 흔들리는 식물 (allow 한정)
 
-Plants (`flags.flat`) are drawn as models — sway via the vertex hook:
+식물 (`flags.flat`) 은 모델로 그려진다 — 버텍스 훅으로 흔든다:
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -99,11 +99,11 @@ fn bloxdModelVertex(vertex: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-(Vegetation is also `flags.vegetation`: `flat` = "drawn as a crossed plane", `vegetation` = "is a plant" — grass and flowers are both.)
+(식물은 `flags.vegetation` 이기도 하다: `flat` = 「교차 평면으로 그려진다」, `vegetation` = 「식물이다」 — 잔디와 꽃은 둘 다 해당.)
 
-## Atlas-textured model faces only
+## 아틀라스 텍스처 모델 면만
 
-Block-model faces (slabs, stairs…) carry atlas `textureId`s; select with `textureId != 0u`:
+블록 모델 면 (반 블록, 계단…) 은 아틀라스 `textureId` 를 싣는다. `textureId != 0u` 로 골라낸다:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -116,15 +116,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` faces (skins) sample as white — no error ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+`textureId: 0` 면 (스킨) 은 흰색으로 샘플된다 — 오류 아님 ([모델 자체 텍스처](../api/texture-api.md#model-owned-textures-textureid-0)).
 
-## Armour vs the rest
+## 방어구와 나머지
 
-`flags.lifeform` includes armour and cosmetics ([Flags](../api/flags.md)). No finer-grained input exists; combine `localPosition` (placement) or `overlayColour` presence as practical approximations.
+`flags.lifeform` 은 방어구와 화장품을 포함한다 ([플래그](../api/flags.md)). 더 세분화된 입력은 없다. `localPosition` (배치) 이나 `overlayColour` 유무를 실용적 근사로 조합하라.
 
-## Sharing with terrain
+## 지형과의 공유
 
-Uniform grading across full blocks and block models:
+완전 블록과 블록 모델에 걸쳐 균일한 그레이딩:
 
 ```wgsl
 fn applyGrade(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -142,8 +142,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-The shared-function pattern is what the default pack template itself recommends ([hooks](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+공유 함수 패턴은 기본 팩 템플릿 자신이 권하는 방식이다 ([훅](../getting-started/hooks.md#fallbacks-and-code-sharing)).
 
-## Related
+## 관련 문서
 
-- [Models and textures](../guides/models.md) · [Enchant effects](enchant-effects.md) · [Flags](../api/flags.md) · [Structures](../api/structures.md)
+- [모델과 텍스처](../guides/models.md) · [인챈트 효과](enchant-effects.md) · [플래그](../api/flags.md) · [구조체](../api/structures.md)

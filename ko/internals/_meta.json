@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "엔진 내부와 연구",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "rendering-pipeline": "Rendering pipeline",
-  "hook-invocation": "Hook invocation internals",
-  "engine-header": "Engine header (verbatim)",
-  "shader-validation": "Shader validation",
-  "wgsl-compilation": "WGSL compilation",
-  "reserved-identifiers": "Reserved identifier internals",
-  "lighting-internals": "Lighting internals",
-  "fog-internals": "Fog internals",
-  "texture-sampling": "Texture sampling internals",
-  "texture-registry": "Texture registry internals",
-  "model-rendering": "Model rendering internals",
-  "engine-data": "Engine data ledger",
-  "testing-factors": "What changes pack-visible values",
-  "policy": "Per-game shader-pack policy",
-  "sun-and-moon": "The sun and the moon",
-  "debugging": "Debugging tools",
-  "research-log": "Research log"
+  "rendering-pipeline": "렌더링 파이프라인",
+  "hook-invocation": "훅 호출의 내부",
+  "engine-header": "엔진 헤더 (그대로)",
+  "shader-validation": "셰이더 검증의 내부",
+  "wgsl-compilation": "WGSL 컴파일의 내부",
+  "reserved-identifiers": "예약 식별자의 내부",
+  "lighting-internals": "라이팅 내부",
+  "fog-internals": "포그 내부",
+  "texture-sampling": "텍스처 샘플링의 내부",
+  "texture-registry": "텍스처 레지스트리의 내부",
+  "model-rendering": "모델 렌더링의 내부",
+  "engine-data": "엔진 데이터 대장",
+  "testing-factors": "팩에 보이는 값을 바꾸는 요인",
+  "policy": "게임별 셰이더 팩 정책",
+  "sun-and-moon": "태양과 달",
+  "debugging": "디버깅 도구",
+  "research-log": "리서치 로그"
 }

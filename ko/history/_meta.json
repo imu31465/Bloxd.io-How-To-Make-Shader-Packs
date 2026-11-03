@@ -1,11 +1,14 @@
 {
   "index": {
-    "title": "Version History",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "버전 히스토리",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "v1": "API v1",
-  "v2": "API v2 migration guide",
-  "v3": "API v3 migration guide",
-  "v4": "API v4 migration guide",
-  "v5": "API v5 migration guide"
+  "v2": "API v2 마이그레이션 가이드",
+  "v3": "API v3 마이그레이션 가이드",
+  "v4": "API v4 마이그레이션 가이드",
+  "v5": "API v5 마이그레이션 가이드"
 }

@@ -1,24 +1,24 @@
-# Validation
+# 검증
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Verified
 
-## The 3-stage load check
+## 3단계 로드 검사
 
-1. **Loader limits** — size, shape, manifest validity (see [Pack structure](pack-structure.md))
-2. **Static validation (analyzer)** — syntax, types, reserved names, strict contract, across all 6 variants
-3. **Real WebGPU compilation in the browser** — static validation's type-checking is incomplete, so some mistakes only surface here
+1. **로더 제한** — 크기, 형태, 매니페스트 유효성 ([팩 구조](pack-structure.md) 참조)
+2. **정적 검증 (분석기)** — 구문, 형, 예약명, strict 계약을 6개 베리언트 전부에 걸쳐
+3. **브라우저 안의 진짜 WebGPU 컴파일** — 정적 검증의 형 검사는 불완전하므로, 어떤 실수는 여기서만 드러난다
 
-For reading each error, see [Troubleshooting](../troubleshooting/) (organized by symptom).
+각 오류 읽는 법은 [문제 해결](../troubleshooting/) (증상별 구성) 을 보라.
 
-## Procedure
+## 절차
 
-1. Load the zip or folder from settings → Shader Pack
-2. Check status: "Ready. Reload the page to use it." right after selecting; **after a page reload**, "Ready to use" means success
-3. On "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
-4. Test in a permissive game first, then a strict-mode game (most games). Vertex animation works only in allow games
-5. Replacing a pack reloads from the same screen; changes need a page reload
-6. Remove with Remove Pack. After game updates, saved packs re-validate automatically on page load (header/registry changes mark them "needs re-check")
+1. 설정 → Shader Pack 에서 zip 이나 폴더를 로드한다
+2. 상태를 확인한다: 선택 직후 "Ready. Reload the page to use it." — **페이지 새로고침 후** "Ready to use" 가 성공
+3. "Saved, but it won't run until you fix these errors..." 이면 나열된 오류 (file:line + 베리언트) 를 고치고 다시 불러온다
+4. 먼저 허용적인 게임에서, 이어서 strict 모드 게임에서 (대부분의 게임) 테스트한다. 정점 애니메이션은 allow 게임에서만 동작한다
+5. 팩 교체는 같은 화면에서 다시 로드한다. 변경 사항은 페이지 새로고침이 필요하다
+6. Remove Pack 으로 제거한다. 게임 업데이트 후에는 저장 팩이 페이지 로드 시 자동 재검증된다 (헤더/레지스트리 변화가 「재확인 필요」로 표시한다)
 
-## On-device test checklist
+## 실기기 테스트 체크리스트
 
-See the [testing guide](../guides/testing.md) for the full checklist and the complete list of factors that change what a pack sees.
+전체 체크리스트와 팩이 보는 값을 바꾸는 요인의 완전한 목록은 [테스팅 가이드](../guides/testing.md) 를 보라.

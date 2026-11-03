@@ -1,24 +1,24 @@
-# Shader hooks
+# 셰이더 훅
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Verified
 
-A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
+팩은 **9개의 훅**에 끼어들 수 있다: 3개 렌더 대상 (Terrain / Liquid / Model) × 3개 파이프라인 단계 (Vertex / Surface / Light). 모두 선택 사항이다 — 정의하지 않은 훅은 엔진 기본값으로 폴백한다.
 
-## The hooks
+## 훅 일람
 
-| Hook | Stage | What it does |
+| 훅 | 단계 | 하는 일 |
 |---|---|---|
-| `bloxdTerrainVertex` | terrain · vertex | Terrain vertex animation. **Cannot run in strict games** |
-| `bloxdTerrainSurface` | terrain · surface | Terrain color, alpha, emission, enchant, overlay |
-| `bloxdTerrainLight` | terrain · light | Terrain final color — the last stage of the fragment |
-| `bloxdLiquidVertex` | liquid · vertex | Water vertex animation. **strict-only guard required** |
-| `bloxdLiquidSurface` | liquid · surface | Water color, alpha, emission |
-| `bloxdLiquidLight` | liquid · light | Water final color |
-| `bloxdModelVertex` | model · vertex | Block models / items / entities vertex animation. **strict-only guard required** |
-| `bloxdModelSurface` | model · surface | Model color, alpha, emission, enchant, overlay |
-| `bloxdModelLight` | model · light | Model final color |
+| `bloxdTerrainVertex` | terrain · 버텍스 | 지형 정점 애니메이션. **strict 게임에서는 실행 불가** |
+| `bloxdTerrainSurface` | terrain · 서피스 | 지형의 색, alpha, emission, 인챈트, 오버레이 |
+| `bloxdTerrainLight` | terrain · 라이트 | 지형의 최종색 — 프래그먼트의 마지막 단계 |
+| `bloxdLiquidVertex` | liquid · 버텍스 | 물 정점 애니메이션. **strict 전용 가드 필수** |
+| `bloxdLiquidSurface` | liquid · 서피스 | 물의 색, alpha, emission |
+| `bloxdLiquidLight` | liquid · 라이트 | 물의 최종색 |
+| `bloxdModelVertex` | model · 버텍스 | 블록 모델 / 아이템 / 엔티티 정점 애니메이션. **strict 전용 가드 필수** |
+| `bloxdModelSurface` | model · 서피스 | 모델의 색, alpha, emission, 인챈트, 오버레이 |
+| `bloxdModelLight` | model · 라이트 | 모델의 최종색 |
 
-Signatures (types must match exactly; parameter names are free):
+시그니처 (형은 정확히 맞아야 한다. 파라미터명은 자유):
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex;
@@ -27,18 +27,18 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## Render-target split
+## 렌더 대상 분할
 
-- **Terrain** — every block except water and block models
-- **Liquid** — water
-- **Model** — block models (slabs, stairs, crossed-plane plants), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics
+- **Terrain** — 물과 블록 모델을 제외한 모든 블록
+- **Liquid** — 물
+- **Model** — 블록 모델 (반 블록, 계단, 교차 평면 식물), 손에 든/떨어진/던진 아이템, 플레이어, 몹, NPC, 방어구, 화장품
 
-**Important**: if a pack defines no Liquid hook, **no Terrain hook runs on water either** (water is handled by Liquid hooks alone). This differs from pre-v4 behavior where liquid fell back to terrain hooks.
+**중요**: 팩이 Liquid 훅을 하나도 정의하지 않으면, **물 위에서는 Terrain 훅도 돌지 않는다** (물은 Liquid 훅이 단독 처리). 액체가 terrain 훅으로 폴백하던 v4 이전 동작과 다르다.
 
-## Fallbacks and code sharing
+## 폴백과 코드 공유
 
-- An undefined hook means that stage uses the engine default (same behavior as `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **To share code across hooks**, define a module-scope function and call it from both:
+- 정의하지 않은 훅은 그 단계가 엔진 기본값을 쓴다는 뜻이다 (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` 와 같은 동작)
+- **훅 간 코드 공유**는 모듈 스코프 함수를 정의해 양쪽에서 호출한다:
 
 ```wgsl
 fn applyWarmth(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -56,9 +56,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## The default pack (official 9-hook template)
+## 기본 팩 (공식 9훅 템플릿)
 
-The starting template now includes the light hooks. 1,683 bytes as shipped, verbatim:
+시작 템플릿이 이제 light 훅을 포함한다. 출하 상태 그대로 1,683 바이트:
 
 ```wgsl
 // Every hook here returns its engine default. Modify the return values to start
@@ -113,14 +113,14 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-The template's comments are the design guidance: modify return values to start building; deleting a hook restores the default; strict games keep terrain where it is; share code via functions.
+템플릿의 주석이 곧 설계 지침이다: 반환값을 고쳐 만들기 시작한다. 훅을 지우면 기본값으로 돌아간다. strict 게임은 지형을 제자리에 둔다. 코드 공유는 함수로 한다.
 
-## Writing conventions
+## 작성 규칙
 
-- **Never construct output structs directly** (`BloxdSurface(...)` fails validation). Always start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` and mutate fields. The light hook's first argument is already the output type, so `var out = s;` also works
-- A bare `var x: BloxdSurface;` (type annotation only) is also a validation error
-- Hook parameters are **read-only**. Copy first (`var sv = s;`)
-- You cannot use identifiers starting with `bloxd` (case-insensitive), except the 9 hook function names
-- Write constants as `const` (`#define` takes no value)
+- **출력 구조체를 직접 생성하지 마라** (`BloxdSurface(...)` 은 검증에 실패한다). 항상 `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` 에서 시작해 필드를 바꾼다. light 훅의 첫 인수는 이미 출력형이므로 `var out = s;` 도 통한다
+- bare `var x: BloxdSurface;` (형 주석만) 도 검증 오류이다
+- 훅 파라미터는 **읽기 전용**. 먼저 복사한다 (`var sv = s;`)
+- `bloxd` 로 시작하는 식별자 (대소문자 무관) 는 쓸 수 없다. 9개 훅 함수명만 예외다
+- 상수는 `const` 로 쓴다 (`#define` 은 값을 받지 않는다)
 
-For every field each hook can read and write, see [Structures](../api/structures.md).
+각 훅이 읽고 쓸 수 있는 모든 필드는 [구조체](../api/structures.md) 를 보라.

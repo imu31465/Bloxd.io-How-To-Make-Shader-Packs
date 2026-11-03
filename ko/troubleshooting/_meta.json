@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Troubleshooting",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "문제 해결",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
-  "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "loading": "로드 오류",
+  "api-version": "API 버전 오류",
+  "compilation": "컴파일 오류",
+  "validation": "검증 오류",
+  "variants": "베리언트 고유 문제",
+  "visual": "외관 문제",
+  "textures": "텍스처 문제",
+  "lighting": "라이팅 문제",
+  "models": "모델 문제",
+  "performance": "퍼포먼스",
+  "faq": "FAQ와 법적 주석"
 }

@@ -1,46 +1,46 @@
-# Engine data ledger (v5 measurements)
+# 엔진 데이터 대장
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03; production = preprod, byte-identical) · Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03; 프로덕션 = preprod, 바이트 동일) · 상태: Verified
 
-The documentation's v5 measurement ledger — every confirmed value, all measured on `ab90qa`.
+이 문서의 실측 대장 — 확정된 모든 값을, 현행 대상 빌드 `ab90qa` 에서 잰 값으로 실었다.
 
-## The ledger
+## 대장
 
-| Item | Value |
+| 항목 | 값 |
 |---|---|
-| `apiVersion` | `5` (strict `===`, number) |
-| engine header | 8,954 B decoded / 208 lines (9,125 B as shipped, 6 interpolations). First line `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — full text in [Engine header](engine-header.md) |
-| hooks | 9 (terrain/liquid/model × vertex/surface/light). Names unchanged; the default template bundles all 9 |
-| variants | 6 (strict × program). Names `strict\|allow.terrain\|liquid\|model` — the lighting axis is gone |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (all liquid + non-strict terrain/model) · `BLOXD_SCENE_DEPTH` (all liquid) · ~~`BLOXD_LIGHTING`~~ **removed** |
-| pack uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, new)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
-| flags | the `BloxdFlags` struct, 14 bools; v4's bit values retired |
-| loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 entries; UTF-8; one manifest; unique paths — all unchanged |
-| texture registry | 1,210 entries → **896 usable names**; drift vs cnty9 +1/−10 ([Texture registry](texture-registry.md)) |
-| light curve | 0–15 levels → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — in the header, unchanged |
-| lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged (currently chunk c9) |
-| directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged (chunk c9) |
-| fog color | `vec3f(183/255, 191/255, 195/255)` — unchanged |
-| reserved names | `/^bloxd/i` (case-insensitive) + the 46 `bloxdSp*` engine symbols ([Reserved identifiers](reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict titles | everything except the 12 allow titles in [Policy](policy.md) (re-verified on ab90qa, unchanged) |
-| header/registry builders | chunk c55 (module 29833 + 1371 + 1391 + 1384 + 219 coordinating) |
-| default pack template | chunk c116 (moved from v4's c124), 1,683 B |
+| `apiVersion` | `5` (엄격 `===`, 숫자) |
+| 엔진 헤더 | 디코드 8,954 B / 208행 (출하 상태 9,125 B, 보간 6개). 첫 줄 `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — 전문은 [엔진 헤더](engine-header.md) |
+| 훅 | 9개 (terrain/liquid/model × vertex/surface/light). 이름 불변. 기본 템플릿이 9개 전부를 묶는다 |
+| 베리언트 | 6개 (strict × 프로그램). 이름은 `strict\|allow.terrain\|liquid\|model` — 라이팅 축은 소멸 |
+| 매크로 | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (모든 액체 + 비strict 지형/모델) · `BLOXD_SCENE_DEPTH` (모든 액체) · ~~`BLOXD_LIGHTING`~~ **제거** |
+| 팩 uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, 신규)**, renderOffset@16, sunDirection@32, eyePosition@48 |
+| 팩 바인딩 | group 3: 0 uniform · 1 씬 깊이 (액체) · 2 `bloxdSpTextureLayers` 스토리지 |
+| 플래그 | `BloxdFlags` 구조체, 14 bool. v4 의 비트값은 은퇴 |
+| 로더 제한 | 256 `.wgsl` / 256 KB 소스 / 64 KB `pack.json` / 32 MB zip / 1,024 엔트리; UTF-8; 매니페스트 하나; 경로 유일 — 모두 불변 |
+| 텍스처 레지스트리 | 1,210 엔트리 → **사용 가능 896 이름**. cnty9 대비 드리프트 +1/−10 ([텍스처 레지스트리](texture-registry.md)) |
+| 라이트 곡선 | 0–15 레벨 → 0–1, 이즈아웃 (`6 → 0.45`, `12 → 0.92`) — 헤더 안, 불변 |
+| 리프트 곡선 | `1 - (1 - x / (3 - 2x))^3` — 불변 (현재 청크 c9) |
+| 방향광 원뿔 | `0.12 / 0.65 / 0.62 / 0.95` — 불변 (청크 c9) |
+| 포그 색 | `vec3f(183/255, 191/255, 195/255)` — 불변 |
+| 예약명 | `/^bloxd/i` (대소문자 무관) + 46개 `bloxdSp*` 엔진 심볼 ([예약 식별자](reserved-identifiers.md)) |
+| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` |
+| strict 타이틀 | [정책](policy.md) 의 allow 12 타이틀 이외 전부 (ab90qa 에서 재확인, 불변) |
+| 헤더/레지스트리 빌더 | 청크 c55 (모듈 29833 + 1371 + 1391 + 1384 + 219 이 조정) |
+| 기본 팩 템플릿 | 청크 c116 (v4 의 c124 에서 이동), 1,683 B |
 
-## Bundle layout (for re-surveyors)
+## 번들 구성 (재조사자용)
 
-The shader-pipeline cluster: loader/persistence c51–c53, validator/header/registry builder c55, WebGPU/codegen c56, fog c9. **The default pack template is c116** (c124 in v4).
+셰이더 파이프라인 클러스터: 로더/퍼시스턴스 c51–c53, 검증기/헤더/레지스트리 빌더 c55, WebGPU/코드젠 c56, 포그 c9. **기본 팩 템플릿은 c116** (v4 에서는 c124).
 
-Chunk-format note: every chunk is an ES module (`export const modules = {...}`) — c53 carries both c52's and c53's modules — so plain-text search of the bundle remains meaningful (module id `1371` lives in *main*'s sparse module array, in no chunk).
+청크 형식 비고: 모든 청크는 ES 모듈 (`export const modules = {...}`) 이며 — c53 이 c52 와 c53 양쪽의 모듈을 싣는다 — 번들의 플레인 텍스트 검색은 여전히 의미가 있다 (모듈 id `1371` 은 *main* 의 희소 모듈 배열에 있고, 어느 청크에도 없다).
 
-The main bundle is 3.39 MB (+115 KB vs the v4 build); the chunk map has 195 IDs (188 emitted, 7 known gaps).
+메인 번들은 3.39 MB (v4 빌드 대비 +115 KB). 청크 맵은 195개 ID (188 방출, 7개의 알려진 빈틈).
 
-## Past ledgers
+## 과거 대장
 
-- v4 (cnty9, 2026-10-27) → [Version History: v4](../history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Version History: v3](../history/v3.md)
+- v4 (cnty9, 2026-10-27) → [버전 히스토리: v4](../history/v4.md)
+- v3 (3ymzdd, 2026-10-19) → [버전 히스토리: v3](../history/v3.md)
 
-## Related
+## 관련 문서
 
-- [Research log](research-log.md) · [Engine header](engine-header.md) · [Policy](policy.md)
+- [리서치 로그](research-log.md) · [엔진 헤더](engine-header.md) · [정책](policy.md)

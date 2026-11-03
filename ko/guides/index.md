@@ -1,21 +1,21 @@
-# Guides
+# 가이드
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+「구조와 사고방식」을 설명하는 자료다. 애초에 무엇이 가능한지는 [셰이더 팩으로 되는 것과 안 되는 것](constraints.md) 에 정리되어 있다. 목적별 코드 예시는 [레시피](../recipes/) 로 나뉘어 있다.
 
-## Map
+## 구성
 
-| Page | Contents |
+| 페이지 | 내용 |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [라이팅의 구조](lighting.md) | 엔진 기본 조명이 하는 일과, 어디까지 재구축할 수 있는가 |
+| [그림자](shadows.md) | skyLight = 복셀 섀도맵이라는 사실과 리프트 역변환에 의한 투영 |
+| [물을 자연스럽게 보이게 하기](water.md) | 통합 레시피와 수중 3층 구조의 실상 |
+| [야간 룩 설계](night.md) | 「그림자는 어두운데 표면만 밝다」 문제의 구조 |
+| [모델과 텍스처](models.md) | Model 프로그램이 그리는 것과 읽는 것 |
+| [리얼화의 두 유파](realism.md) | 가산 수정과 전면 재조명의 두 유파 |
+| [셰이더 팩으로 되는 것과 안 되는 것](constraints.md) | 가능·불가능·조건부 목록과 그 이유 |
+| [퍼포먼스](performance.md) | 비용의 감과 실천적 지침 |
+| [실기기 테스트 체크리스트](testing.md) | 배포 전에 통과할 확인 절차 |
+| [텍스처팩과의 조합](combinations.md) | 텍스처팩과의 역할 분담 |
+| [디버깅 팁](debugging.md) | 증상 → 원인의 진단 가이드 |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인)

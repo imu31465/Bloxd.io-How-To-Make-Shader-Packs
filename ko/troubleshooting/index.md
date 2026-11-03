@@ -1,29 +1,29 @@
-# Troubleshooting
+# 문제 해결
 
-Errors and visual problems, findable **by symptom**. Pages follow the structure: symptom → cause → how to check → fix → prevention.
+오류와 외관 문제를 **증상으로** 찾는다. 페이지는 이 구조를 따른다: 증상 → 원인 → 확인 방법 → 해결 → 예방.
 
-## Symptom index
+## 증상 인덱스
 
-| Symptom | Page |
+| 증상 | 페이지 |
 |---|---|
-| Pack won't load / zip & pack.json errors | [Loading errors](loading.md) |
-| `apiVersion` messages / old packs not running | [API version errors](api-version.md) |
-| Won't compile / `must be declared as` / WGSL syntax | [Compilation errors](compilation.md) |
-| Validation errors (reserved names, strict contract, `reaches`) | [Validation errors](validation.md) |
-| Fails only in some variants / dropped in strict games | [Variant-specific issues](variants.md) |
-| Looks wrong (white haze, no shadows, odd night) | [Visual issues](visual.md) |
-| Texture-name errors / `did you mean` | [Texture issues](textures.md) |
-| Brightness / shadow / fog problems | [Lighting issues](lighting.md) |
-| Model / entity / enchant problems | [Model issues](models.md) |
-| Slow / dropped by the on-device check | [Performance](performance.md) |
-| Legal, safety, common questions | [FAQ](faq.md) |
+| 팩이 로드되지 않음 / zip·pack.json 오류 | [로드 오류](loading.md) |
+| `apiVersion` 메시지 / 구버전 팩이 안 돌음 | [API 버전 오류](api-version.md) |
+| 컴파일 안 됨 / `must be declared as` / WGSL 구문 | [컴파일 오류](compilation.md) |
+| 검증 오류 (예약명, strict 계약, `reaches`) | [검증 오류](validation.md) |
+| 일부 베리언트에서만 실패 / strict 게임에서 떨어짐 | [베리언트 고유 문제](variants.md) |
+| 이상해 보임 (흰 안개, 그림자 없음, 이상한 밤) | [외관 문제](visual.md) |
+| 텍스처 이름 오류 / `did you mean` | [텍스처 문제](textures.md) |
+| 밝기·그림자·포그 문제 | [라이팅 문제](lighting.md) |
+| 모델·엔티티·인챈트 문제 | [모델 문제](models.md) |
+| 느림 / 실기기 검사에서 탈락 | [퍼포먼스](performance.md) |
+| 법적·안전·자주 묻는 질문 | [FAQ](faq.md) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (messages recorded verbatim from the live validator & loader)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Verified (메시지는 라이브 검증기·로더에서 그대로 기록)
 
-## Where errors appear
+## 오류가 나타나는 곳
 
-1. **Settings → Shader Pack status line** — loader-stage errors (IDs are `shaderPack:load*`)
-2. **The loader screen's error list** — validation & compilation (file:line + variant)
-3. **Browser devtools console** — runtime & stage-2 (browser WGSL compiler) errors
+1. **설정 → Shader Pack 상태줄** — 로더 단계 오류 (ID 는 `shaderPack:load*`)
+2. **로더 화면의 오류 목록** — 검증·컴파일 (file:line + 베리언트)
+3. **브라우저 개발자 도구 콘솔** — 런타임·2단계 (브라우저 WGSL 컴파일러) 오류
 
-The 3-stage load check is detailed in [Getting Started: Validation](../getting-started/validation.md).
+3단계 로드 검사의 상세는 [시작하기: 검증](../getting-started/validation.md) 에 있다.

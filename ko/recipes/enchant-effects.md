@@ -1,12 +1,12 @@
-# Enchant effects
+# 인챈트 효과
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live header)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Analyzed (라이브 헤더에서 복원)
 
-v5 opened the enchant pipeline on both inputs and outputs. Recipes for controlling the glint of enchanted items and armour while preserving the engine's math.
+v5 는 인챈트 파이프라인을 입력과 출력 양쪽으로 열었다. 엔진의 수식을 보존하면서 인챈트 아이템과 방어구의 글린트를 제어하는 레시피.
 
-## Inputs & outputs
+## 입력과 출력
 
-**Inputs** (`BloxdSurfaceIn` / `BloxdLightIn` — enchanted items and armour only, all 0 otherwise):
+**입력** (`BloxdSurfaceIn` / `BloxdLightIn` — 인챈트 아이템과 방어구에만. 그 외에는 전부 0):
 
 ```wgsl
 enchantTier: u32,     // 1-5 for Tier 1-5.
@@ -14,21 +14,21 @@ enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
 enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
 ```
 
-**Output** (`BloxdSurface`):
+**출력** (`BloxdSurface`):
 
 ```wgsl
 enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
 ```
 
-The engine mixes it inside [`bloxdLitColour()`](../api/lighting.md) — right after shading, before world light. `bloxdDefaultSurface` passes the input through unchanged, so **the default look matches v4's engine-internal behavior**.
+엔진은 [`bloxdLitColour()`](../api/lighting.md) 안에서 — 셰이딩 직후, 월드 라이트 전 — 섞는다. `bloxdDefaultSurface` 은 입력을 그대로 통과시키므로, **기본 외관은 v4 의 엔진 내부 동작과 일치한다**.
 
-## Understanding the defaults
+## 기본값 이해
 
-Input `enchantColour.a` is an **animated** alpha — the engine animates the glint sweep, so reading `.a` per fragment yields a moving pattern for free. `enchantTier` and `enchantSpeed` are consistent by construction («faster at higher tiers»).
+입력 `enchantColour.a` 는 **애니메이션되는** alpha 다 — 엔진이 글린트 스윕을 움직이므로, 프래그먼트마다 `.a` 를 읽으면 움직이는 무늬가 공짜로 얻어진다. `enchantTier` 와 `enchantSpeed` 는 구성상 일관된다 («faster at higher tiers»).
 
-Unenchanted faces carry `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0`.
+인챈트 없는 면은 `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0` 을 실는다.
 
-## Recipe 1: no-glint realism (two lines)
+## 레시피 1: 무글린트 리얼 (두 줄)
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -38,9 +38,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 2: stronger glint by tier
+## 레시피 2: 티어별 강한 글린트
 
-`enchantTier` gives the classic "tier-scaled glint" without parsing colors:
+`enchantTier` 로 색을 파싱하지 않고도 고전적인 「티어 스케일 글린트」를 얻는다:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -54,7 +54,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 3: recoloring the glint
+## 레시피 3: 글린트 재색
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -69,9 +69,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 4: enchantSpeed-driven sweep
+## 레시피 4: enchantSpeed 구동 스윕
 
-Turn `enchantSpeed` into a phase for a custom sweep:
+`enchantSpeed` 를 위상으로 바꿔 커스텀 스윕을 만든다:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -87,9 +87,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 5: amplifying the hurt flash (overlayColour)
+## 레시피 5: 피격 플래시 증폭 (overlayColour)
 
-`overlayColour` (players/mobs only; hurt flash etc.) mixes before lighting in `bloxdLitColour`:
+`overlayColour` (플레이어/몹만. 피격 플래시 등) 은 `bloxdLitColour` 에서 라이팅 전에 섞인다:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -99,11 +99,11 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Harmless on non-entities (`overlayColour` is 0 there).
+비엔티티에서는 무해하다 (`overlayColour` 이 거기서는 0).
 
-## Combining with custom lighting
+## 커스텀 라이팅과의 조합
 
-Using `bloxdLitColour()` keeps the enchant/overlay mixing automatic:
+`bloxdLitColour()` 를 쓰면 인챈트/오버레이 혼합이 자동으로 유지된다:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -113,12 +113,12 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Notes
+## 비고
 
-- Enchant inputs arrive **only on enchanted items and armour** — all 0 on terrain, water and unenchanted faces
-- Changing the `enchantColour` output never touches `colour` directly — mixing happens in `bloxdLitColour` / `bloxdDefaultLight`
-- Outside the model pipeline the enchant inputs are always 0
+- 인챈트 입력은 **인챈트된 아이템과 방어구에만** 도착한다 — 지형, 물, 인챈트 없는 면에서는 전부 0
+- `enchantColour` 출력을 바꿔도 `colour` 에 직접 손대는 일은 없다 — 혼합은 `bloxdLitColour` / `bloxdDefaultLight` 안에서 일어난다
+- 모델 파이프라인 밖에서 인챈트 입력은 항상 0 이다
 
-## Related
+## 관련 문서
 
-- [Lighting](../api/lighting.md) · [Structures](../api/structures.md) · [Model shader recipes](model-shaders.md)
+- [라이팅](../api/lighting.md) · [구조체](../api/structures.md) · [모델 셰이더 레시피](model-shaders.md)

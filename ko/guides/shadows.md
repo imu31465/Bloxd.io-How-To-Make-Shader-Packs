@@ -1,48 +1,48 @@
-# Shadows
+# 그림자
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (LightEngine behavior unchanged since v4 measurement)
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
 
-The three ways to make "shadows" in a shader pack, and their limits.
+셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
 
-## Can / cannot
+## 가능 / 불가능
 
-| Effect | Possible? | How |
+| 효과 | 가능? | 방법 |
 |---|---|---|
-| Clearly darken under trees/roofs (projected-style) | ◎ | `skyLight` lift inversion + threshold cut (below) |
-| Shadows follow block edits in real time | ◎ | LightEngine recalculates immediately — automatic |
-| Color shadows cool / sunlit warm | ◎ | two-color shift |
-| Shadows rotating with the sun (shadow map) | ✕ | depth is liquid-only; light-ray occlusion is not an input |
-| Physical penumbra | ✕ | capped by voxel-resolution BFS spread |
-| Real-time AO (SSAO) | ✕ | only the AO baked into vertex colors |
+| 나무·지붕 밑을 뚜렷하게 어둡게 (투영형) | ◎ | `skyLight` 리프트 역변환 + 임계값 컷 (아래) |
+| 그림자가 블록 편집에 실시간 추종 | ◎ | LightEngine 이 즉시 재계산 — 자동 |
+| 그림자는 냉색 / 양지는 난색 | ◎ | 2색 시프트 |
+| 태양과 함께 도는 그림자 (섀도맵) | ✕ | 깊이는 액체 한정. 광선 가림은 입력이 아니다 |
+| 물리적 반음영 | ✕ | 복셀 분해능의 BFS 확산이 상한 |
+| 실시간 AO (SSAO) | ✕ | 버텍스 색에 구워진 AO 뿐 |
 
-## skyLight is a voxel shadow map
+## skyLight 은 복셀 섀도맵이다
 
-`l.skyLight` is not just a brightness parameter. The mesher's LightEngine computes Minecraft-style **"can this position see the sky" voxel occlusion data — a shadow map**:
+`l.skyLight` 은 단순한 밝기 파라미터가 아니다. 메셔의 LightEngine 이 마인크래프트식 **「이 장소에서 하늘이 보이는가」 복셀 가림 데이터 = 섀도맵** 을 계산한다:
 
-1. **Column scan**: each (x,z) column top-down; sky light starts at 15, hits 0 at opaque blocks, attenuates by `lightFilter` (air 1 / water 3 / opaque 15)
-2. **BFS flood fill**: spreads horizontally to 6 neighbors (-1 per block) — this softens shadow edges. Under an occluder of radius r the raw value is (15-r)/15
-3. blockLight (torches) is a separate RGB 3-channel (4-bit packed) BFS
+1. **종열 스캔**: 각 (x,z) 열을 위에서 아래로. 하늘빛은 15 에서 시작해 불투명 블록에서 0 이 되고, `lightFilter` (공기 1 / 물 3 / 불투명 15) 로 감광하며 내려간다
+2. **BFS 플러드필**: 6근방으로 옆으로 확산 (1블록에 −1) — 이것이 그림자 가장자리를 부드럽게 하는 정체. 반경 r 가림물 밑의 생값은 (15−r)/15 다
+3. blockLight (횃불 등) 는 RGB 3채널 (4bit 팩) 의 별도 BFS 다
 
-Under trees, roofs and inside buildings the value is already low and interpolates smoothly per-vertex. Placing or breaking a block recalculates immediately — **real-time-following shadows**.
+나무 밑, 지붕 밑, 실내에서는 값이 이미 낮고, 정점 보간으로 매끄럽게 도착한다. 블록을 놓거나 부수면 즉시 재계산 — **실시간 추종 그림자**.
 
-## The lift-curve trap
+## 리프트 곡선의 함정
 
-`l.skyLight` arrives **post-lift-curve** (`y = 1-(1-x/(3-2x))³`, an S-curve that lifts dark values):
+`l.skyLight` 은 **리프트 곡선 적용 후** 로 도착한다 (`y = 1-(1-x/(3-2x))³`, 어두운 값을 끌어올리는 S자 곡선):
 
-| Place | Raw voxel | Lifted (= l.skyLight) | pow(·, 5.0) |
+| 장소 | 생 복셀값 | 리프트 후 (= l.skyLight) | pow(·, 5.0) |
 |---|---|---|---|
-| open sky | 1.00 | 1.00 | 1.00 |
-| under tree (radius 2) | 0.87 | **0.97** | **0.86** ← nearly kept |
-| radius 3 | 0.80 | **0.92** | 0.66 |
-| radius 5 | 0.67 | 0.78 | 0.29 |
+| 옥외 | 1.00 | 1.00 | 1.00 |
+| 나무 밑 (반경 2) | 0.87 | **0.97** | **0.86** ← 거의 유지 |
+| 반경 3 | 0.80 | **0.92** | 0.66 |
+| 반경 5 | 0.67 | 0.78 | 0.29 |
 
-**This is the proven root cause of "gamma doesn't darken shadows"** — even γ=5 only takes under-tree 0.97 down to 0.86.
+**이것이 「감마로 그림자가 어두워지지 않는다」의 입증된 근본 원인이다** — γ=5 로도 나무 밑 0.97 은 0.86 까지밖에 내려가지 않는다.
 
-## The fix: lift inversion + threshold cut
+## 해법: 리프트 역변환 + 임계값 컷
 
-The curve is monotonic and inverts exactly: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Restore the raw value, then binarize with a **`smoothstep` threshold**. LightEngine's BFS spread is "-1 per adjacent block", so `th = 1 - r/15` is directly the "occlusion radius counted as shadow" dial.
+곡선은 단조증가이므로 정확히 역변환된다: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. 생값을 복원한 뒤, **`smoothstep` 임계값**으로 이값화한다. LightEngine 의 BFS 확산은 「인접 1블록에 −1」이므로, `th = 1 - r/15` 이 곧 「그림자로 간주하는 가림 반경」 다이얼이다.
 
-The complete implementation (sun gating + warm/cool split + blockLight passthrough) is in [realism recipes](../recipes/realism.md). Key steps:
+전체 구현 (태양 게이팅 + 난색/냉색 분리 + blockLight 통과) 은 [리얼화 레시피](../recipes/realism.md) 에 있다. 핵심 단계:
 
 ```wgsl
 // 1. restore the raw value (skipping this means shadows never appear)
@@ -53,14 +53,14 @@ let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
 let lit = sunL * sky;
 ```
 
-Dials: **area** = `shTh` (0.93→radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **edge softness** = `shSoft`; **core darkness** = the minimum ambient and sky-scatter two-point shift; long evening shadows ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
+다이얼: **면적** = `shTh` (0.93→반경 1.5 / 0.87→2 / 0.80→3 / 0.67→5). **가장자리 부드러움** = `shSoft`. **핵심 어두움** = 최저 앰비언트와 하늘 산란 2점 시프트. 저녁의 긴 그림자 ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-## Honest limits
+## 솔직한 한계
 
-- Shadows reference the **upward sky**, so they **do not rotate with the sun** (voxel resolution; soft edges come from BFS spread)
-- The engine's lighting template retains an unused `var shadow: f32 = 1.;` (always 1.0 = disabled) — a plausible "future plans" trace for pixel-accurate rotating shadows
-- Pixel-accurate rotating shadows are outside the current API ([Unreachable effects](constraints.md))
+- 그림자는 **위쪽 하늘** 기준이므로 **태양과 함께 돌지 않는다** (복셀 분해능. 부드러운 가장자리는 BFS 확산에 의한 것)
+- 엔진의 조명 템플릿에는 쓰이지 않는 `var shadow: f32 = 1.;` 이 남아 있다 (항상 1.0 = 무효) — 픽셀 정밀 회전 그림자의 「장래 계획」 흔적으로 보인다
+- 픽셀 정밀 회전 그림자는 현행 API 밖이다 ([도달할 수 없는 표현](constraints.md))
 
-## Related
+## 관련 문서
 
-- [realism recipes](../recipes/realism.md) (the full projected-shadow recipe) · [Lighting Internals](../internals/lighting-internals.md) · [Debugging tips](debugging.md)
+- [리얼화 레시피](../recipes/realism.md) (투영 그림자 전체 레시피) · [라이팅의 내부](../internals/lighting-internals.md) · [디버깅 팁](debugging.md)

@@ -1,34 +1,34 @@
-# Performance
+# 퍼포먼스
 
-> Target API: 5 · Status: Verified
+> 대상 API: 5 · 상태: Verified
 
-Speed problems and their fixes.
+속도 문제와 그 해결.
 
-## The on-device check never finishes and drops the pack
+## 실기기 검사가 끝나지 않고 팩을 떨어뜨린다
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **원인**: 검사에는 **60초 강제 타임아웃** 이 있다 (초과는 `skipped` 처리) — 저사양 기기와 무거운 월드에서 흔하다
+- **해결**: 무거운 버텍스 연산과 복잡한 루프를 줄이고 재시도한다
+- **예방**: [퍼포먼스 가이드](../guides/performance.md) 를 따른다
 
-## Frame rate drops
+## 프레임 레이트가 떨어진다
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **확인**: 팩 유무로 FPS 를 비교한다. 지형 위주 장면과 물을 따로 잰다
+- **전형 원인**: 플래그/거리 선택 없이 모든 면에 무거운 효과, 고주파 해시 노이즈, 큰 `pow` 지수
+- **해결** ([가이드](../guides/performance.md)):
+  - `flags` 로 효과가 필요한 면에만 건다
+  - 거리로 조기 탈출 (`distance(surface.position, bloxdEyePosition())`)
+  - 한 밉 위를 샘플해 `bloxdTexel` 비용을 줄인다
+- **예방**: 디테일을 조금씩 넣으며 FPS 를 비교한다 ([테스팅](../guides/testing.md))
 
-## Slow only on mobile
+## 모바일에서만 느리다
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **원인**: 팩은 WebGPU 렌더러 위에서 돈다. 모바일 GPU 는 데스크톱보다 수십 배 느릴 수 있다
+- **해결**: 효과 강도·빈도를 줄이고 거리 컬링을 강화한다 — 또는 모바일 미지원을 명시한다 ([요구 사항](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## 256 KB 팩 제한에 가까워진다
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **해결**: 주석을 다듬고, 공유 코드를 함수로 묶고, 안 쓰는 레시피를 버린다 ([팩 구조](../getting-started/pack-structure.md))
 
-## Related
+## 관련 문서
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [퍼포먼스 가이드](../guides/performance.md) · [테스팅](../guides/testing.md)

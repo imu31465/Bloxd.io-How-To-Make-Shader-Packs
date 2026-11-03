@@ -1,17 +1,17 @@
-# The engine header (v5, verbatim)
+# 엔진 헤더 (그대로)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
 
-The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere.
+로더가 모든 팩 앞에 붙이는 **정확한 텍스트**다. 라이브 프로덕션 번들 (`ab90qa`, 청크 c55, 템플릿을 6개의 라이브 보간 — `apiVersion` 과 `bloxdPackInputs` 경유의 uniform 읽기 5개 — 으로 렌더) 에서 복원했다. 디코드 후 8,954 바이트, 208행. 한 군데도 바꾸지 않았다.
 
-Reading guide:
-- Field-by-field explanations → [Structures](../api/structures.md)
-- Function-by-function → [Functions](../api/functions.md) / [Lighting](../api/lighting.md)
-- Flags (BloxdFlags) → [Flags](../api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](../api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](../api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](../history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](shader-validation.md)
+읽기용 가이드:
+- 필드별 해설 → [구조체](../api/structures.md)
+- 함수별 해설 → [함수](../api/functions.md) / [라이팅](../api/lighting.md)
+- 플래그 (BloxdFlags) → [플래그](../api/flags.md)
+- `bloxdTextureId*` 블록은 이 헤더에 **없다** — 참조된 이름에서 팩마다 생성된다 ([텍스처 API](../api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` 는 조건부 필드를 표시한다 ([전처리기](../api/preprocessor.md))
+- v4 헤더 (6,021B) 와의 차분 → [버전 히스토리: v5](../history/v5.md)
+- 헤더가 검증에 쓰이는 구조 (HEADER_VERSION) → [셰이더 검증](shader-validation.md)
 
 ```wgsl
 
@@ -223,8 +223,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## 관련 문서
 
-- [API Reference](../api/) — the annotated version of this header
-- [Shader Validation](shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](engine-data.md) — the measurement ledger
+- [API 레퍼런스](../api/) — 이 헤더의 주석 달린 버전
+- [셰이더 검증](shader-validation.md) — HEADER_VERSION 과 저장 팩 재검증
+- [엔진 데이터](engine-data.md) — 실측 대장

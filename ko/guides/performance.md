@@ -1,44 +1,44 @@
-# Performance-aware implementation
+# 퍼포먼스
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (measurement-based practice)
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Verified (실측 기반 실천)
 
-Pack hooks run on every fragment (all pixels of terrain / liquid / model), so style choices move frame rate significantly.
+팩의 훅은 모든 프래그먼트 (지형 / 액체 / 모델의 모든 픽셀) 에서 돌므로, 스타일 선택이 프레임 레이트를 크게 움직인다.
 
-## First facts
+## 먼저 알아둘 사실
 
-- **The light hook is the final stage**: it runs for every drawn pixel of terrain, liquid and model — most of the screen
-- **Packs run on WebGPU**: evaluate cost assuming a range of GPUs including mobile
-- The loader's size cap (256 KB of `.wgsl`) is also a practical **compile-time** ceiling
+- **light 훅이 최종 단계다**: 지형·액체·모델의 그려지는 모든 픽셀 — 화면 대부분 — 에서 돈다
+- **팩은 WebGPU 위에서 돈다**: 모바일을 포함한 다양한 GPU 를 상정해 비용을 평가하라
+- 로더의 크기 상한 (`.wgsl` 256 KB) 은 실질적인 **컴파일 시간** 상한이기도 하다
 
-## Cost ladder (cheap → expensive)
+## 비용 사다리 (저렴 → 고가)
 
-| Operation | Cost | Note |
+| 연산 | 비용 | 비고 |
 |---|---|---|
-| `mix` / `clamp` / arithmetic | ◎ minimal | |
-| input reads (`l.skyLight`…) | ◎ | uniform/vertex-attribute sourced |
-| `smoothstep` / `pow` | ○ | `pow` varies by exponent |
-| `sin` / `cos` | ○ | animation staple |
+| `mix` / `clamp` / 산술 | ◎ 최소 | |
+| 입력 읽기 (`l.skyLight`…) | ◎ | uniform/버텍스 속성 출처 |
+| `smoothstep` / `pow` | ○ | `pow` 는 지수에 따라 흔들린다 |
+| `sin` / `cos` | ○ | 애니메이션 단골 |
 | `dot` / `normalize` | ○ | |
-| `bloxdTexel()` (texture sample) | △ | cheaper at higher mips |
-| `dpdx` / `dpdy` / `fwidth` | △ | surface/light hooks only |
-| branching (`if`) | △ | WGSL may evaluate both sides; uniform-ish conditions (flag checks) are cheap |
-| hash noise (many `sin`/`fract`) | △ | gate micro-bump effects by distance |
+| `bloxdTexel()` (텍스처 샘플) | △ | 높은 밉에서 더 저렴 |
+| `dpdx` / `dpdy` / `fwidth` | △ | 서피스/light 훅만 |
+| 분기 (`if`) | △ | WGSL 은 양변을 평가할 수 있다. uniform 성 조건 (플래그 검사) 은 저렴 |
+| 해시 노이즈 (`sin`/`fract` 다수) | △ | 마이크로범프 효과는 거리로 게이트 |
 
-## Practice
+## 실천
 
-1. **Gate effects to the faces that need them** — `flags` selection beats "+20% everywhere"
-2. **Drop detail with distance** — early-out when `distance(surface.position, bloxdEyePosition())` exceeds a threshold
-3. **Use mips** — `bloxdTexel(id, uv, mipLevel + 1.0)` is a ¼-resolution average ([worked examples](../api/texture-api.md#worked-examples))
-4. **Prefer surface hooks for color tweaks** — the light hook is the all-pixels final stage
-5. **Add detail incrementally and compare FPS** ([testing](testing.md))
-6. **`#ifdef` guards don't save runtime** — variants are compile units; runtime savings come from flags and distance
+1. **필요한 면에만 효과를 건다** — `flags` 선택이 「전역 +20%」보다 낫다
+2. **거리와 함께 디테일을 떨어뜨린다** — `distance(surface.position, bloxdEyePosition())` 가 임계값을 넘으면 조기 탈출
+3. **밉을 쓴다** — `bloxdTexel(id, uv, mipLevel + 1.0)` 은 1/4 해상도 평균이다 ([작동 예시](../api/texture-api.md#worked-examples))
+4. **색 조정은 서피스 훅 우선** — light 훅은 전 픽셀 최종 단계다
+5. **디테일을 조금씩 넣고 FPS 를 비교한다** ([테스팅](testing.md))
+6. **`#ifdef` 가드는 런타임을 줄이지 않는다** — 베리언트는 컴파일 단위다. 런타임 절약은 플래그와 거리에서 나온다
 
-## Measuring
+## 측정
 
-- Compare FPS with/without the pack via browser devtools (performance panel / WebGPU stats)
-- Measure terrain-heavy scenes (shadow-rich forest) and water (liquid hooks) separately
-- Check mobile hardware — it can be tens of times slower
+- 브라우저 개발자 도구 (성능 패널 / WebGPU 통계) 로 팩 유무의 FPS 를 비교한다
+- 지형 위주 장면 (그림자 많은 숲) 과 물 (액체 훅) 을 따로 잰다
+- 모바일 하드웨어를 확인하라 — 수십 배 느릴 수 있다
 
-## Related
+## 관련 문서
 
-- [Testing](testing.md) · [Rendering Pipeline](../internals/rendering-pipeline.md) · [Texture API](../api/texture-api.md)
+- [테스팅](testing.md) · [렌더링 파이프라인](../internals/rendering-pipeline.md) · [텍스처 API](../api/texture-api.md)

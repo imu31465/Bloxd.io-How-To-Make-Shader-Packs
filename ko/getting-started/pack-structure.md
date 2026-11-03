@@ -1,26 +1,26 @@
-# Pack structure
+# 팩 구조
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Verified
 
-## Distribution format
+## 배포 형식
 
-- **Format**: a single `.zip`, or a folder (folder loading is desktop browsers only)
-- **Contents**: one `pack.json` (at the top level of the pack; case-insensitive) + 1–256 `.wgsl` files
-- Multiple `.wgsl` files are concatenated into one module, so splitting and subdirectories are free. No constraints on file names. Concatenation happens in **dictionary order by path name** (module-scope declarations are order-independent, so this only matters for code depending on `var` initialization order). Non-`.wgsl` files (READMEs etc.) are ignored
+- **형식**: 단일 `.zip`, 또는 폴더 (폴더 로드는 데스크톱 브라우저만)
+- **내용물**: `pack.json` 하나 (팩 최상위에. 대소문자 무구) + 1–256개 `.wgsl` 파일
+- 여러 `.wgsl` 파일은 하나의 모듈로 연결되므로, 분할과 서브디렉터리는 자유다. 파일명 제약도 없다. 연결은 **경로명의 사전 순**으로 일어난다 (모듈 스코프 선언은 순서 무관이므로, `var` 초기화 순서에 의존하는 코드에만 영향한다). `.wgsl` 이 아닌 파일 (README 등) 은 무시된다
 
-## Size and format limits
+## 크기·형식 제한
 
-| Item | Limit | Message when exceeded |
+| 항목 | 제한 | 초과 시 메시지 |
 |---|---|---|
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| `pack.json` size | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
-| `.wgsl` file count | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
-| zip shape | no zip64 / split / encrypted; store or deflate; no duplicate paths | each rejected with its own message |
+| zip 크기 | 32 MB | `The zip is over 32 MB.` |
+| zip 엔트리 수 | 1,024 | `The zip has more than 1024 entries.` |
+| `pack.json` 크기 | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
+| `.wgsl` 파일 수 | 256 | `The pack has more than 256 .wgsl files.` |
+| `.wgsl` 소스 총량 | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
+| zip 형태 | zip64 / 분할 / 암호화 금지. store 또는 deflate. 중복 경로 금지 | 각각 전용 메시지로 거부 |
 
-All files must be valid UTF-8.
+모든 파일은 유효한 UTF-8 이어야 한다.
 
-## Zipping tips
+## zip 묶기 팁
 
-A zip that stores everything under one common root folder has that prefix stripped automatically (macOS "Compress" works as-is; `__MACOSX`, `._`-prefixed files and `.DS_Store` are excluded automatically). Stray files at the root level break top-level detection, so the safest method is to zip `pack.json` and the `.wgsl` files directly (verify `pack.json` ends up at the zip root).
+모든 내용물을 한 공통 루트 폴더 아래에 저장한 zip 은 그 접두사가 자동으로 벗겨진다 (macOS 「Compress」 는 그대로 통한다. `__MACOSX`, `._` 접두 파일과 `.DS_Store` 는 자동 제외된다). 루트 레벨에 흩어진 파일은 최상위 탐지를 깨뜨리므로, 가장 안전한 방법은 `pack.json` 과 `.wgsl` 파일을 직접 zip 하는 것이다 (`pack.json` 이 zip 루트에 있는지 확인하라).

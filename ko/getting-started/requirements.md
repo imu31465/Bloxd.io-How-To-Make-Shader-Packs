@@ -1,33 +1,33 @@
-# Requirements
+# 요구 사항
 
-> Target API: 5 · Status: Verified
+> 대상 API: 5 · 상태: Verified
 
-## Browser
+## 브라우저
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+셰이더 팩은 WebGPU 렌더러 전용이다. WebGPU 지원 브라우저가 필요하다:
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- Chromium 계열 브라우저 (Chrome / Edge / Opera 등) — 데스크톱에서 안정
+- Safari 17+ / Firefox (WebGPU 지원은 시기에 따라 다르다)
+- **모바일**: iOS / Android 에서는 WebGPU 지원이 제한될 수 있다. 팩 릴리스 페이지에 이 점을 명시하라
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+팩이 설치되어 있는 동안, WebGPU 렌더러 게임 설정이 강제로 켜진다.
 
-## Development environment
+## 개발 환경
 
-No special tooling is required, though these help:
+특별한 도구는 필요 없지만, 다음이 도움이 된다:
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- 텍스트 편집기 (WGSL 구문 강조가 있으면 더 좋다)
+- 배포용 zip 도구. 개발 중에는 폴더 로드를 쓸 수 있다 (데스크톱 브라우저만)
+- 브라우저 개발자 도구 — 컴파일 오류는 게임 내 UI 에도, 콘솔에도 표시된다
 
-## On-device verification environments
+## 실기기 검증 환경
 
-Before distribution, verify on ([Validation](validation.md)):
+배포 전에 ([검증](validation.md)) 다음에서 확인하라:
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. allow 모드 게임 (정점 애니메이션을 쓴다면 필수)
+2. strict 모드 게임 (대부분의 게임이 strict)
+3. 페이지 새로고침 (저장 팩은 자동으로 재검증된다)
 
-## URL parameter caveat
+## URL 파라미터 주의
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+URL 파라미터나 localStorage 에 남은 렌더러 오버라이드는 팩의 기동을 거부시킨다 — 지우고 다시 불러라.

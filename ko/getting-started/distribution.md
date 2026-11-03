@@ -1,23 +1,23 @@
-# Distribution
+# 배포
 
-> Target API: 5 · Status: Verified
+> 대상 API: 5 · 상태: Verified
 
-## Release format
+## 릴리스 형식
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. `pack.json` 이 루트에 있는 zip, 크기 제한 이내 ([팩 구조](pack-structure.md))
+2. `pack.json` 이 zip 루트에 있는지 확인한다 (단일 공통 루트 폴더는 자동으로 벗겨진다)
+3. 릴리스용으로 `name` / `author` 를 다듬는다
 
-## Pre-release checklist
+## 릴리스 전 체크리스트
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (문자열이 아닌 숫자)
+- [ ] 6개 베리언트 전부 검증 통과 (로더 화면의 오류 목록이 비어 있음)
+- [ ] allow 게임과 strict 게임 양쪽에서 외관 확인
+- [ ] 정점 애니메이션 / `discard` 팩은 allow 한정임을 명확히 표기
+- [ ] 테스트한 게임과 날짜를 릴리스 노트에 기록 (빌드는 바뀐다)
 
-## After release
+## 릴리스 후
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- 플레이어가 저장한 팩은 게임 업데이트로 엔진 헤더나 텍스처 레지스트리가 바뀌면 자동 재검증된다
+- **v1–v4 로 배포된 팩은 v5 에서 조용히 비활성이 된다** ([pack.json](manifest.md) 참조) — 플레이어에게는 상태줄만 보이므로, 갱신 버전을 공개·공지하라
+- API 가 업데이트되면 [버전 히스토리](../history/) 의 이주 단계를 따라 올리고 재릴리스한다

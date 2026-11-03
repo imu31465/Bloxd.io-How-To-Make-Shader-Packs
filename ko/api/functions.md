@@ -1,12 +1,12 @@
-# Functions
+# 함수
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
-Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](texture-api.md), along with `bloxdOpaqueBehind`.
+헤더의 모든 함수이다. 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 와 `bloxdOpaqueBehind` 는 [텍스처 API](texture-api.md) 에서 다룬다.
 
-## Frame functions (same value for the entire frame)
+## 프레임 함수 (프레임 전체에서 같은 값)
 
-Header note: *"These functions return the same value for the entire frame."* They read the `bloxdPackInputs` uniform, so they are callable from vertex hooks and module-scope functions too.
+헤더 주석: *"These functions return the same value for the entire frame."* `bloxdPackInputs` uniform 을 읽으므로, 버텍스 훅과 모듈 스코프 함수에서도 호출할 수 있다.
 
 ### bloxdEyePosition
 
@@ -14,9 +14,9 @@ Header note: *"These functions return the same value for the entire frame."* The
 fn bloxdEyePosition() -> vec3f
 ```
 
-- **Returns**: the camera's render position
-- **Callable from**: all 9 hooks + module scope
-- **Uses**: view vectors (`normalize(l.position - bloxdEyePosition())`), rim light, distances
+- **반환값**: 카메라의 렌더 위치
+- **호출 가능 범위**: 전 9개 훅 + 모듈 스코프
+- **용도**: 시선 벡터 (`normalize(l.position - bloxdEyePosition())`), 림 라이트, 거리
 
 ### bloxdRenderOffset
 
@@ -24,9 +24,9 @@ fn bloxdEyePosition() -> vec3f
 fn bloxdRenderOffset() -> vec3i
 ```
 
-- **Returns**: integer block offset; **render position + this offset = world position**
-- Changes as the player travels (keeps render positions near 0,0,0)
-- Used internally by `bloxdWorldPosition()`
+- **반환값**: 정수 블록 오프셋. **렌더 위치 + 이 오프셋 = 월드 위치**
+- 플레이어가 이동하면 함께 변한다 (렌더 위치를 0,0,0 근처로 유지한다)
+- `bloxdWorldPosition()` 이 내부에서 사용한다
 
 ### bloxdSunDirection
 
@@ -34,12 +34,12 @@ fn bloxdRenderOffset() -> vec3i
 fn bloxdSunDirection() -> vec3f
 ```
 
-- **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
-- **Facts**:
-  - **the moon is always at `-bloxdSunDirection()`** (the engine places it opposite the sun)
-  - **never pass the zero vector to `normalize`** — guard with `dot(d, d) < 1e-8` and fall back to a constant direction
-  - the current build has no day-night cycle; sun, moon and stars do not move during a session (only opacity toggles). In the default earth sky the sun sits near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°)
-- **Uses**: color temperature, light direction, sun gating, pseudo moonlight
+- **반환값**: 월드 방향 기준으로 태양을 향하는 단위 벡터. **태양이 없을 때는 제로 벡터**
+- **사실**:
+  - **달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 태양의 반대쪽에 놓는다)
+  - **제로 벡터를 `normalize` 에 넘기지 마라** — `dot(d, d) < 1e-8` 으로 가드하고 상수 방향으로 폴백한다
+  - 현행 빌드에는 낮밤 사이클이 없다. 태양·달·별은 세션 동안 움직이지 않는다 (불투명도 토글만 있다). 기본 지구 하늘에서 태양은 `(−0.56, 0.81, −0.18)` 부근에 있다 (고도 ≈ 54°)
+- **용도**: 색 온도, 광원 방향, 태양 게이팅, 유사 달빛
 
 ### bloxdSeconds
 
@@ -47,9 +47,9 @@ fn bloxdSunDirection() -> vec3f
 fn bloxdSeconds() -> f32
 ```
 
-- **Returns**: seconds since the page loaded (no wrap — f32 keeps sub-millisecond precision for the first 4.5 hours)
-- **Uses**: animation; recurring timers via `bloxdSeconds() % period`
-- **Note**: unlike v2's `bloxdTime()` (which wrapped at 3600s), it does not wrap
+- **반환값**: 페이지 로드 후의 경과 초 (랩 없음 — f32 는 처음 4.5시간 동안 밀리초 미만 정밀도를 유지한다)
+- **용도**: 애니메이션. `bloxdSeconds() % period` 로 되풀이 타이머
+- **주의**: v2 의 `bloxdTime()` (3600초에서 랩) 과 달리 랩하지 않는다
 
 ### bloxdLit
 
@@ -59,10 +59,10 @@ fn bloxdSeconds() -> f32
 fn bloxdLit() -> bool
 ```
 
-- **Returns**: whether block & sky lighting is enabled
-- **New in v5**: replaces v4's `#ifdef BLOXD_LIGHTING` compile-time branch with a runtime check
-- **Guarantees when off** (header note): `blockLight` and `heldLight` are 0; `skyLight` and the light colors (`ambientLightColour` / `skyLightColour`) are 1
-- **Use**: gate lighting-dependent code:
+- **반환값**: 블록·하늘 라이팅이 켜져 있는지 여부
+- **v5 신규**: v4 의 `#ifdef BLOXD_LIGHTING` 컴파일 시점 분기를 런타임 검사로 대체한다
+- **꺼져 있을 때의 보증** (헤더 주석): `blockLight` 과 `heldLight` 는 0, `skyLight` 과 라이트 색 (`ambientLightColour` / `skyLightColour`) 은 1
+- **사용법**: 라이팅 의존 코드를 게이트한다:
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -73,9 +73,9 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-Using `BLOXD_LIGHTING` produces *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+`BLOXD_LIGHTING` 을 쓰면 *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* 가 나온다.
 
-## Coordinate conversion
+## 좌표 변환
 
 ### bloxdWorldPosition
 
@@ -84,14 +84,24 @@ Using `BLOXD_LIGHTING` produces *"BLOXD_LIGHTING was removed in apiVersion 5; te
 fn bloxdWorldPosition(position: vec3f) -> vec3f
 ```
 
-- **Returns**: `position + vec3f(bloxdRenderOffset())`
-- **Note**: f32 precision limits mean far coordinates can be inexact (header: *"with possible f32 inaccuracy"*)
+- **반환값**: `position + vec3f(bloxdRenderOffset())`
+- **주의**: f32 정밀도 한계로 먼 좌표는 부정확할 수 있다 (헤더: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — removed
+### bloxdFragmentBlockPosition — 문서화되지 않았지만 여전히 주입된다
 
-`bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i` (existed through v4) was **removed in v5 with no replacement**. It reconstructed a fragment's block position from position and normal, but nothing remained that needed it between `uv`, `flags` and the model inputs; continuous values are covered by `bloxdWorldPosition()`. Delete call sites.
+```wgsl
+fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
+```
 
-## Default functions (engine behavior)
+이 함수는 **더 이상 문서화된 헤더의 일부가 아니다** (v4 에서는 있었다). 그래도 엔진은 여전히 받아들이고 정의한다:
+
+- **검증기**: 라이브 시그니처 표에 여전히 실려 있어, 모든 훅 (버텍스 훅 포함) 에서 이름 검증을 통과한다
+- **런타임**: 코드 생성기가 terrain/liquid 모듈과 양쪽 모델 프로그램에 정의를 계속 주입한다 — terrain/liquid 는 `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()` 을 쓰고, 모델 파이프라인은 1/64 블록 오프셋을 써서 배치된 블록 모델의 셀에 스냅한다
+- **주의**: 문서화되지 않은 내부물이므로 예고 없이 미래 버전에서 사라질 수 있다 — 연속 좌표에는 `bloxdWorldPosition()` 을, 「어느 블록인가」에는 `flags` 를 쓰는 것이 낫다 (헤더에서의 제거 경위는 [버전 히스토리: v5](../history/v5.md))
+
+이것을 호출하는 v4 용 팩은 계속 동작한다. 새 팩에서 채택하지 마라.
+
+## 기본 함수 (엔진 동작)
 
 ### bloxdDefaultVertex
 
@@ -106,7 +116,7 @@ fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex
 fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface
 ```
 
-Passes `colour` through, passes `enchantColour` / `overlayColour` unchanged, zeroes `emission` (and passes `alpha` in `BLOXD_ALPHA` variants). **Output structs can only be built via this function.**
+`colour` 를 통과시키고, `enchantColour` / `overlayColour` 를 그대로 통과시키며, `emission` 을 0 으로 한다 (`BLOXD_ALPHA` 베리언트에서는 `alpha` 도 통과). **출력 구조체는 이 함수 경유로만 만들 수 있다.**
 
 ### bloxdDefaultLight
 
@@ -117,20 +127,20 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 //   return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
 ```
 
-Literally "apply the engine's recipe, then fog the emission-added result".
+말 그대로 「엔진의 레시피를 적용한 뒤, emission 을 더한 결과에 포그를 건다」.
 
-## Lighting recipe functions (published in v5)
+## 라이팅 레시피 함수
 
-What v4 authors kept re-deriving by hand is now documented as callable WGSL. Explanations and the flow diagram: [Lighting](lighting.md).
+엔진 자신의 라이팅 레시피를 호출 가능한 WGSL 로 문서화한 것이다 — 단계별로 조합하거나 덮어쓸 수 있다. 해설과 흐름도는 [라이팅](lighting.md).
 
-| Function | Signature | Role |
+| 함수 | 시그니처 | 역할 |
 |---|---|---|
-| `bloxdShading` | `(light: BloxdLightIn) -> vec3f` | how the face's material & angle light it (Lambert × diffuse + emissive + ambient, clamped 0–1) |
-| `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | the world's light here (brightest of block/sky/held, floored by `ambientLightColour`) |
-| `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | the surface's color lit as the engine does (before emission and fog) |
-| `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | apply this fragment's fog (`mix(colour, fogColour, fogAlpha)`) |
+| `bloxdShading` | `(light: BloxdLightIn) -> vec3f` | 면의 머티리얼과 각도가 어떻게 비추는가 (Lambert × diffuse + emissive + ambient, 0–1 클램프) |
+| `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | 이 장소의 월드 라이트 (block/sky/held 중 최광, `ambientLightColour` 가 바닥) |
+| `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | 면의 색을 엔진 방식으로 비춘 것 (emission·포그 이전) |
+| `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | 이 프래그먼트의 포그 적용 (`mix(colour, fogColour, fogAlpha)`) |
 
-## Special functions
+## 특수 함수
 
 ### bloxdOpaqueBehind
 
@@ -138,13 +148,13 @@ What v4 authors kept re-deriving by hand is now documented as callable WGSL. Exp
 fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ```
 
-- **Returns**: `BloxdOpaqueBehind` (`hit: bool`, `position: vec3f`, `distance: f32`)
-- **Callable from**: surface / light hooks only (the depth texture is FRAGMENT-only)
-- **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (defined in liquid variants)
-- **Meaning**: the opaque face behind this fragment (terrain seen through water); `hit == false` for sky
-- **Rename from v2**: `found` → `hit`
-- **Deep dive**: [Version History: v3](../history/v3.md) and [Engine Internals](../internals/rendering-pipeline.md)
+- **반환값**: `BloxdOpaqueBehind` (`hit: bool`, `position: vec3f`, `distance: f32`)
+- **호출 가능 범위**: 서피스 / light 훅만 (깊이 텍스처가 FRAGMENT 전용이다)
+- **가드**: `#ifdef BLOXD_SCENE_DEPTH` (액체 베리언트에서 정의)
+- **의미**: 이 프래그먼트 뒤의 불투명 면 (물 너머로 보이는 지형). 하늘일 때는 `hit == false`
+- **v2 에서의 개명**: `found` → `hit`
+- **심층 해설**: [버전 히스토리: v3](../history/v3.md) 및 [엔진 내부와 연구](../internals/rendering-pipeline.md)
 
-## Related
+## 관련 문서
 
-- [Lighting](lighting.md) · [Texture API](texture-api.md) · [Pack format](pack-format.md)
+- [라이팅](lighting.md) · [텍스처 API](texture-api.md) · [팩 형식](pack-format.md)

@@ -1,6 +1,6 @@
-# 좌표 레시피 (월드/블록/시선)
+# 좌표
 
-
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ## 월드 좌표
 
@@ -8,7 +8,7 @@
 let worldPos = bloxdWorldPosition(s.position);
 ```
 
-## 블록 좌표 (공식 레시피 — 헤더 주석 유래)
+## 블록 좌표
 
 ```wgsl
 let worldBlock = vec3i(floor(bloxdWorldPosition(l.position)));

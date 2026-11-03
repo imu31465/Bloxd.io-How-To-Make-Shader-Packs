@@ -1,38 +1,38 @@
-# Shader hooks
+# 셰이더 훅
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Verified
 
-Packs can define **9 hooks** — 3 render targets (programs) × 3 pipeline stages, all optional (undefined means engine default).
+팩은 **9개의 훅** — 3개의 렌더 대상 (프로그램) × 3개의 파이프라인 단계 — 을 정의할 수 있다. 모두 선택 사항이다 (정의하지 않으면 엔진 기본값).
 
-## 9-hook comparison
+## 9훅 비교
 
-| Hook | Program | Stage | Arguments | Returns | Run condition |
+| 훅 | 프로그램 | 단계 | 인수 | 반환 | 실행 조건 |
 |---|---|---|---|---|---|
-| `bloxdTerrainVertex` | Terrain | vertex | `BloxdVertexIn` | `BloxdVertex` | allow variants only (**defining it in strict is itself an error**) |
-| `bloxdTerrainSurface` | Terrain | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdTerrainLight` | Terrain | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdLiquidVertex` | Liquid | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdLiquidSurface` | Liquid | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdLiquidLight` | Liquid | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdModelVertex` | Model | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdModelSurface` | Model | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdModelLight` | Model | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
+| `bloxdTerrainVertex` | Terrain | 버텍스 | `BloxdVertexIn` | `BloxdVertex` | allow 베리언트만 (**strict 에서 정의 자체가 오류**) |
+| `bloxdTerrainSurface` | Terrain | 서피스 | `BloxdSurfaceIn` | `BloxdSurface` | 항상 |
+| `bloxdTerrainLight` | Terrain | 라이트 | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | 항상 |
+| `bloxdLiquidVertex` | Liquid | 버텍스 | `BloxdVertexIn` | `BloxdVertex` | allow 만 |
+| `bloxdLiquidSurface` | Liquid | 서피스 | `BloxdSurfaceIn` | `BloxdSurface` | 항상 |
+| `bloxdLiquidLight` | Liquid | 라이트 | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | 항상 |
+| `bloxdModelVertex` | Model | 버텍스 | `BloxdVertexIn` | `BloxdVertex` | allow 만 |
+| `bloxdModelSurface` | Model | 서피스 | `BloxdSurfaceIn` | `BloxdSurface` | 항상 |
+| `bloxdModelLight` | Model | 라이트 | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | 항상 |
 
-## What each program draws
+## 각 프로그램이 그리는 것
 
-| Program | Draws | Water when no Liquid hook exists |
+| 프로그램 | 그리는 것 | Liquid 훅이 없을 때의 물 |
 |---|---|---|
-| **Terrain** | every block except water and block models | — |
-| **Liquid** | water | **no Terrain hook runs on water either** (water keeps its default look) |
-| **Model** | block models (slabs, stairs, plants, crops, cobwebs), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics | — |
+| **Terrain** | 물과 블록 모델을 제외한 모든 블록 | — |
+| **Liquid** | 물 | **물 위에서는 Terrain 훅도 돌지 않는다** (물은 기본 외관을 유지) |
+| **Model** | 블록 모델 (반 블록, 계단, 식물, 작물, 거미줄), 손에 든/떨어진/던진 아이템, 플레이어, 몹, NPC, 방어구, 화장품 | — |
 
-## Stage roles
+## 단계의 역할
 
-- **Vertex** — move vertex positions (grass sway, waves). Vertex animation disables the whole pack in strict games, so `#ifndef BLOXD_STRICT` is mandatory
-- **Surface** — the material output: `colour` / `alpha` (conditional) / `emission` / `enchantColour` / `overlayColour`
-- **Light** — the final color; takes the surface output plus `BloxdLightIn`. Its return value is the on-screen color
+- **버텍스 (Vertex)** — 정점 위치를 움직인다 (풀 흔들림, 파도). 정점 애니메이션은 strict 게임에서 팩 전체를 비활성화하므로, `#ifndef BLOXD_STRICT` 이 필수다
+- **서피스 (Surface)** — 머티리얼 출력: `colour` / `alpha` (조건부) / `emission` / `enchantColour` / `overlayColour`
+- **라이트 (Light)** — 최종 색. 서피스 출력에 `BloxdLightIn` 이 더해져 들어온다. 반환값이 화면에 찍히는 색이다
 
-## Signatures
+## 시그니처
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
@@ -49,22 +49,22 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 // bloxdLiquid* / bloxdModel* take the same argument and return types
 ```
 
-## Special-function call restrictions
+## 특수 함수 호출 제한
 
-The engine's validator restricts which hooks may reach certain functions (violations fail with dedicated "reaches" diagnostics):
+엔진의 검증기는 어느 훅이 어느 함수에 도달할 수 있는지 제한한다 (위반은 전용 「reaches」 진단으로 실패한다):
 
-| Function | Callable from | Guard |
+| 함수 | 호출 가능 범위 | 가드 |
 |---|---|---|
-| `bloxdTexel` | surface / light hooks only | — |
-| `bloxdTextureSize` | surface / light hooks only | — |
-| `bloxdOpaqueBehind` | surface / light hooks (meaningful in liquid variants) | `#ifdef BLOXD_SCENE_DEPTH` |
+| `bloxdTexel` | 서피스 / light 훅만 | — |
+| `bloxdTextureSize` | 서피스 / light 훅만 | — |
+| `bloxdOpaqueBehind` | 서피스 / light 훅 (액체 베리언트에서 의미 있음) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` was removed in v5 (it was the only special function callable from vertex hooks through v4). There is no replacement — use `flags` when you need "which block is this".
+> `bloxdFragmentBlockPosition` 은 더 이상 문서화된 헤더에 없지만, 엔진은 여전히 주입하고 받아들인다 — [함수: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected) 참조. 버텍스 훅에서 호출 가능한 유일한 특수 함수였다. 새 코드에서는 「어느 블록인가」에 `flags` 를 쓰는 것이 낫다.
 
-## Fallbacks and sharing
+## 폴백과 공유
 
-- Undefined hook → that stage behaves as the engine default (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **Share processing across hooks** with a module-scope function called from both:
+- 정의하지 않은 훅 → 그 단계는 엔진 기본값으로 동작한다 (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
+- **훅 간 처리 공유**는 양쪽에서 호출하는 모듈 스코프 함수로 한다:
 
 ```wgsl
 fn sharedSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -82,8 +82,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Related
+## 관련 문서
 
-- Official 9-hook template → [Getting Started: Shader hooks](../getting-started/hooks.md)
-- Every struct field → [Structures](structures.md)
-- Hook invocation internals → [Engine Internals](../internals/hook-invocation.md)
+- 공식 9훅 템플릿 → [시작하기: 셰이더 훅](../getting-started/hooks.md)
+- 모든 구조체 필드 → [구조체](structures.md)
+- 훅 호출의 내부 → [엔진 내부와 연구](../internals/hook-invocation.md)

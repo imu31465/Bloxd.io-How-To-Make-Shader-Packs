@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Recipes",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "레시피",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "colors": "Colors",
-  "lighting": "Lighting",
-  "emission": "Emission",
-  "coordinates": "Coordinates",
-  "animation": "Time & animation",
-  "liquids": "Liquids",
-  "vertices": "Vertices (allow only)",
-  "math": "Math toolbox",
-  "realism": "Realism",
-  "model-shaders": "Model shaders",
-  "enchant-effects": "Enchant effects"
+  "colors": "색",
+  "lighting": "조명",
+  "emission": "발광",
+  "coordinates": "좌표",
+  "animation": "시간과 애니메이션",
+  "liquids": "액체",
+  "vertices": "버텍스 (allow 전용)",
+  "math": "수식 도구 상자",
+  "realism": "리얼화",
+  "model-shaders": "모델 셰이더",
+  "enchant-effects": "인챈트 효과"
 }

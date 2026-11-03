@@ -1,47 +1,47 @@
-# Texture registry internals
+# 텍스처 레지스트리의 내부
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+이름→id 해석 기구와 실측 레지스트리 드리프트. 사용자용 카탈로그: [텍스처 카탈로그](../api/texture-catalog.md).
 
-## Methodology
+## 방법론
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+이 빌드의 레지스트리 구축 모듈 (29833, 조정 모듈 1371 / 1391 / 1384 / 219) 을 미니 webpack 하네스 안에서 출하된 블록 레지스트리의 텍스처 데이터에 대해 실행하고 출력을 기록했다 — 이 숫자들은 **프로덕션 번들 자신의 계산**이지 재구현이 아니다.
 
-## Output structure
+## 출력 구조
 
-| Output | v5 measured | Meaning |
+| 출력 | v5 실측 | 의미 |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | `bloxdTextureId<Name>` 으로 참조 가능한 이름 |
+| `aliases` | 416 | 접힌 철자 — 프레임 별명 188 (`lava0`…) 과 회전 별명 228 (`chest_top[rot[1`…) |
+| `layers` | 228 | 레이어 표 — 미리 회전된 슬롯 171 (57 루트 × 4회전) 포함 |
 
-## Folding rules
+## 접기 규칙
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **애니메이션 계열** (42): 프레임 철자 (`lava0`–`lava7`) 는 기본명 (`lava`) 으로 접힌다. `bloxdTexel` 은 샘플 시점에 현재 프레임을 반환한다
+- **회전 계열** (57): 회전 슬롯 (`[rot[1..4`) 은 루트명으로 접힌다. `bloxdTexel` 은 면별 `textureRotation` 을 다시 적용한다
+- `radar_screen` 만이 양쪽 계열에 속한다 (미리 회전된 사본 4개가 각자의 4프레임 사다리를 가진다 — 그래서 아틀라스의 애니메이션 루트는 42가 아니라 45다)
 
-## Drift (cnty9 → ab90qa)
+## 드리프트 (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| 측정 | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| 아틀라스 엔트리 | 1,219 | **1,210** |
+| 회전 계열 (회전 철자) | 57 (228) | **57 (228) — 불변** |
+| 애니메이션 계열 (프레임 철자) | 42 (188) | **42 (188) — 불변** |
+| 사용 가능 이름 상수 | 905 | **896** |
+| 생존 이름 중 id 변화 | — | **905 중 334** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+드리프트 전체 (11 이름): 추가 (1) `scorpion_eggs`. 삭제 (10) 더블 체스트 텍스처 8개와 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (더블 체스트가 게임 데이터에서 떠났고, 스포너는 `mob_spawner_block_top` 을 유지).
 
-## Effect on HEADER_VERSION
+## HEADER_VERSION 에 미치는 영향
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+레지스트리 해시 접미사는 id 를 굽으므로, 이 드리프트는 **모든 저장 팩을 「재확인 필요」로 표시**한다 (페이지 로드 시 자동 재검증). 이름으로 쓴 팩은 재해석을 견디고, 원시 id 팩은 깨진다 ([호환성](../api/compatibility.md)).
 
-## Past drift records
+## 과거 드리프트 기록
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+10월의 두 빌드 비교 (sjr0p7 → cnty9, 10일): 엔트리 1200 → 1219 (98 추가, 79 삭제). 불변 이름 1121 중 779개가 id 를 바꿨다 (69%). 명명 규약 이동 (`_rot1..4` 접미사 → `[rot[1..4` 슬롯). 더블 체스트의 등장. 전체 기록은 [버전 히스토리: v4](../history/v4.md) 에 있다.
 
-## Related
+## 관련 문서
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [텍스처 카탈로그](../api/texture-catalog.md) · [셰이더 검증](shader-validation.md) · [리서치 로그](research-log.md)

@@ -1,68 +1,68 @@
-# Research log
+# 리서치 로그
 
-> Status: Verified — how this documentation's measurements were obtained
+> 상태: Verified — 이 문서의 실측이 어떻게 얻어졌는가
 
-The technical statements here rest not on official developer documentation but on **production-bundle analysis**. This page records methodology and evidence so future builds can be re-verified.
+여기의 기술적 서술은 공식 개발자 문서가 아니라 **프로덕션 번들 분석** 에 근거한다. 이 페이지는 방법론과 근거를 기록해, 미래의 빌드를 다시 검증할 수 있게 한다.
 
-## Core principles
+## 핵심 원칙
 
-1. **Direct production-bundle retrieval** — raw main.js and chunks fetched from both production and preprod, identity verified by md5
-2. **Verbatim respect** — headers, error messages and i18n strings are **quoted as-is**, never paraphrased
-3. **Reproduced measurement** — derived values like the registry are recomputed by running the engine's own modules in a harness (real output, not a lookalike re-implementation)
-4. **Named builds** — every measurement carries a build id and date
+1. **프로덕션 번들의 직접 회수** — 프로덕션과 preprod 양쪽에서 원시 main.js 와 청크를 받아, md5 로 동일성 확인
+2. **원문 존중** — 헤더, 오류 메시지, i18n 문자열은 **그대로 인용**하며 절대 바꿔 쓰지 않는다
+3. **재현된 측정** — 레지스트리 같은 파생값은 엔진 자신의 모듈을 하네스에서 돌려 재계산한다 (비슷하게 만든 재구현이 아니라 실제 출력)
+4. **이름 붙은 빌드** — 모든 측정에는 빌드 id 와 날짜가 붙는다
 
-## Build history referenced by this documentation
+## 이 문서가 참조하는 빌드 이력
 
-| Build | API | Date | Note |
+| 빌드 | API | 날짜 | 비고 |
 |---|---|---|---|
-| `szby6g` | v3-era | 2026-10-17 | first allow/strict static analysis (111 game definitions) |
-| `3ymzdd` | v3 | 2026-10-20 | the v3 guide's evidence build |
-| `sjr0p7` | v3-era | 2026-10-17 | drift-comparison baseline |
-| `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **current**; this documentation's baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `szby6g` | v3 시대 | 2026-10-17 | 최초의 allow/strict 정적 분석 (게임 정의 111건) |
+| `3ymzdd` | v3 | 2026-10-20 | v3 가이드의 근거 빌드 |
+| `sjr0p7` | v3 시대 | 2026-10-17 | 드리프트 비교 기준선 |
+| `cnty9` | v4 | 2026-10-27 | v4 가이드·905이름 카탈로그의 근거 |
+| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 동결 확인 (할로윈 이벤트 + 스카이블록 개편) |
+| `ab90qa` | **v5** | 2026-11-03 | **현행**. 이 문서의 기준선. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 
-## Key methodology
+## 핵심 방법론
 
-### Engine-header restoration
+### 엔진 헤더 복원
 
-Rendering the c55 header template with its live interpolations (`${vC}` = apiVersion, the 5 uniform reads via `${Gq.j}`) — 6 interpolations on v5 ([Engine header](engine-header.md)).
+c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유의 uniform 읽기 5개) 과 함께 렌더 — v5 에서 보간 6개 ([엔진 헤더](engine-header.md)).
 
-### Texture-registry recomputation
+### 텍스처 레지스트리 재계산
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 896 / aliases 416 / layers 228) ([Texture registry](texture-registry.md)).
+엔진의 레지스트리 구축 모듈 (29833 + 1371 + 1391 + 1384 + 219) 을 미니 webpack 하네스 안에서 출하된 블록 레지스트리의 텍스처 데이터에 대해 실행하고, 출력 (named 896 / aliases 416 / layers 228) 을 기록 ([텍스처 레지스트리](texture-registry.md)).
 
-Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
+애니메이션 간격은 `animDataPerTex` 식 표 (레이어별 `numAnimStates` / `animationInterval`) 에서 온다 — 간격값은 200 / 250 / 300 ms 세 종류뿐 ([카탈로그](../api/texture-catalog.md#animation-families-42-names)).
 
-### Error-message capture
+### 오류 메시지 캡처
 
-Loader messages verbatim from the live i18n dictionary; validator messages from the validation module's string literals.
+로더 메시지는 라이브 i18n 사전에서 그대로. 검증기 메시지는 검증 모듈의 문자열 리터럴에서.
 
-### allow / strict static analysis
+### allow / strict 정적 분석
 
-Statically analyzing all 111 game definitions: `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too ([Policy](policy.md)).
+게임 정의 111건 전부를 정적 분석: `shaderPackPolicy` 의 `"allow"` 리터럴 — 직접 8 + 기저 변수 4 = 12 타이틀 (26 엔트리). 스프레드 상속 (`{...tb,...}`) 도 추적 ([정책](policy.md)).
 
-### Uniform / pipeline restoration
+### uniform · 파이프라인 복원
 
-The `BloxdPackInputs` field layout from the uniform-layout module (29838); the texture 3-variant codegen from the WebGPU generator (c56) ([Texture sampling](texture-sampling.md)).
+`BloxdPackInputs` 필드 레이아웃은 uniform-레이아웃 모듈 (29838) 에서. 텍스처 3변형 코드젠은 WebGPU 생성기 (c56) 에서 ([텍스처 샘플링](texture-sampling.md)).
 
-## Drift observations
+## 드리프트 관찰
 
-| Comparison | Period | Result |
+| 비교 | 기간 | 결과 |
 |---|---|---|
-| sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
-| cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
+| sjr0p7 → cnty9 | 10일 | 98 추가, 79 삭제. 이름 1121 중 779가 id 변화 (69%) |
+| cnty9 → ab90qa | 7일 | +1 (scorpion_eggs), −10 (더블 체스트 ×8, 스포너 옆면 ×2). 이름 905 중 334가 id 변화 |
 
-## Unverified / speculative
+## 미검증 · 추정
 
-- Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
-- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
-- Why `bloxdFragmentBlockPosition` remains in the signature table (removed from v5's header) is unanalyzed — plausibly an un-cleaned leftover, but unconfirmed
+- 픽셀 정밀 섀도맵을 「장래 계획」으로 보는 것은 **해석**이다 (조명 템플릿의 미사용 `var shadow: f32 = 1.;` 에서 추론)
+- allow/strict 구분은 빌드마다 바뀔 수 있다 (12 타이틀 구성은 ab90qa 에서 재확인. 미래 게임은 미지)
+- `bloxdFragmentBlockPosition` (v5 헤더 제외): 시그니처 표 항목과 런타임 주입 모두 라이브 확인 — 호출은 검증·컴파일을 통과한다. 엔진 팀이 유지할 생각인지는 미지
 
-## When to re-verify
+## 재검증 시점
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above (c55 / c116 / c56) are the starting points.
+게임 업데이트 (새 main.js 해시) 감지 시: 헤더 (9,125B), apiVersion 상수를 재확인하고, 레지스트리를 재계산하고, allow/strict 목록을 재확인한다. 상세한 모니터링 방법론은 이 문서의 범위 밖이지만, 위의 모듈 위치 (c55 / c116 / c56) 가 출발점이다.
 
-## Related
+## 관련 문서
 
-- [Engine data](engine-data.md) · [Texture registry](texture-registry.md) · [Version History](../history/)
+- [엔진 데이터](engine-data.md) · [텍스처 레지스트리](texture-registry.md) · [버전 히스토리](../history/)

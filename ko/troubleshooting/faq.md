@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ와 법적 주석
 
-> Status: Verified
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션) · 상태: Verified
 
-## Frequently asked questions
+## 자주 묻는 질문
 
-### Q. Are shader packs an official feature?
+### Q. 셰이더 팩은 공식 기능인가?
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+셰이더 팩 기능은 게임 내 UI 에서 접근할 수 있고, 팩 제작은 의도된 활동으로 보인다. 다만 공식 문서는 확인되지 않았다 — 이 가이드는 비공식·분석 기반 문서다.
 
-### Q. Can packs do anything dangerous?
+### Q. 팩은 위험한 일을 할 수 있나?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+팩은 순수 WGSL 이다 — **JS 실행과 네트워크 접근은 설계상 불가능**하다. 검증과 컴파일을 통과한 코드만 돈다 ([제한과 예약명](../api/restrictions.md)).
 
-### Q. Which games do packs work in?
+### Q. 어떤 게임에서 동작하나?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+대부분의 게임은 strict 모드로 돈다 (정점 애니메이션 없음, `discard` 없음). 정점 애니메이션은 allow 목록 게임에서만 동작한다. 타이틀별 목록은 [엔진 내부와 연구: 정책](../internals/policy.md) 에 있다.
 
-### Q. Do packs work on mobile?
+### Q. 모바일에서 동작하나?
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+WebGPU 지원 환경에서만이다 ([요구 사항](../getting-started/requirements.md)).
 
-### Q. Can I ship my own textures?
+### Q. 자신의 텍스처를 배포할 수 있나?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+셰이더 팩으로는 안 된다 (아틀라스는 읽기 전용). 그것은 텍스처팩 시스템의 임무다 ([조합](../guides/combinations.md)).
 
-### Q. Can I keep using an old-version pack?
+### Q. 구버전 팩을 계속 쓸 수 있나?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+현행 게임은 `apiVersion: 5` 만 받는다. 구버전 팩은 조용히 비활성된다 ([호환성](../api/compatibility.md)). [버전 히스토리](../history/) 경유로 이주하라.
 
-### Q. Will the API change again?
+### Q. API 는 또 바뀌나?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+엔진 내부는 업데이트로 바뀔 수 있다 — 모든 페이지가 대상 빌드를 명시한다. 헤더나 레지스트리가 바뀌면 저장 팩은 자동 재검증된다 ([호환성](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
 
-### Q. What about "cinematic shader" distributions?
+### Q. 「시네마틱 셰이더」 배포물은 뭔가?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+분석한 커뮤니티 「시네마틱 셰이더」 배포물은 텍스처팩이었다 (128×128 텍스처, `pack.json` / `.wgsl` 없음). 「그림자지는 셰이더풍」 룩의 대부분은 텍스처 쪽 기법이다 ([조합](../guides/combinations.md)).
 
-## Legal & notes
+## 법적 주석과 비고
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- 이것은 비공식 가이드이며 개발사의 견해를 대변하지 않는다. API 는 예고 없이 바뀔 수 있다
+- AI 지원으로 작성되었으며 정확성은 보장되지 않는다. 실제 게임 동작으로 검증하라
+- 실측값 (텍스처 id 등) 은 특정 빌드의 스냅샷이며 빌드마다 바뀐다 ([이름이 API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
 
-## Related
+## 관련 문서
 
-- [Documentation entry](../) · [Version History](../history/)
+- [문서 입구](../) · [버전 히스토리](../history/)

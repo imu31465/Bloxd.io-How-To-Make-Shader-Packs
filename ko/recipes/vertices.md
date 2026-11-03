@@ -1,9 +1,8 @@
-# 정점 레시피 (allow 한정)
+# 버텍스 (allow 전용)
 
-
-
+> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
-> 실행 조건 (allow 타이틀 일람·Custom Games 는 strict) 의 상세는 본편 §30 참조 → [§30 게임별 적용 모드](../internals/)
+> 정확한 조건 (allow 타이틀 일람; Custom Games 는 strict) 은 [게임별 셰이더 팩 정책](../internals/policy.md) 참조
 
 ## 풀잎이 바람에 흔들린다 (위쪽만 움직인다)
 

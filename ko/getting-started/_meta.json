@@ -1,15 +1,18 @@
 {
   "index": {
-    "title": "Getting Started",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "시작하기",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "overview": "Overview & prerequisites",
-  "requirements": "Requirements",
-  "quick-start": "Quick start",
-  "pack-structure": "Pack structure",
-  "manifest": "pack.json",
-  "hooks": "Shader hooks",
-  "variants": "Variants and guards",
-  "validation": "Validation",
-  "distribution": "Distribution"
+  "overview": "개요와 전제",
+  "requirements": "요구 사항",
+  "quick-start": "퀵 스타트",
+  "pack-structure": "팩 구조",
+  "manifest": "pack.json (매니페스트)",
+  "hooks": "셰이더 훅",
+  "variants": "베리언트와 가드",
+  "validation": "검증",
+  "distribution": "배포"
 }

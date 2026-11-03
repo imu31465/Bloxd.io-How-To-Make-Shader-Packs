@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Guides",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "가이드",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "lighting": "How lighting works",
-  "shadows": "Shadows",
-  "water": "Making water look natural",
-  "night": "Designing night looks",
-  "models": "Models and textures",
-  "realism": "Realism: two schools",
-  "constraints": "Unreachable effects",
-  "performance": "Performance",
-  "testing": "On-device test checklist",
-  "combinations": "Combining with texture packs",
-  "debugging": "Debugging tips"
+  "lighting": "조명이 작동하는 방식",
+  "shadows": "그림자",
+  "water": "물을 자연스럽게 보이게 하기",
+  "night": "야간 표현 설계",
+  "models": "모델과 텍스처",
+  "realism": "리얼화의 두 유파",
+  "constraints": "셰이더 팩으로 가능한 것과 불가능한 것",
+  "performance": "퍼포먼스",
+  "testing": "게임 내 테스트 체크리스트",
+  "combinations": "텍스처 팩과의 조합",
+  "debugging": "디버깅 요령"
 }
