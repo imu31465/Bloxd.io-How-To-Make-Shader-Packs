@@ -1,0 +1,21 @@
+# リアル化ガイド — 2つの流派
+
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
+
+加算修正 (既定出力起点) と完全リライティング (アルベド起点) の使い分け。
+
+
+**流派 A: 加算修正 (defaultLight 起点)** — 既定の出力 (`bloxdDefaultLight` の完成色) を素地に、暖色グローや rim を足す。手軽で安全だが照明モデル自体は既定のまま。
+
+**流派 B: 完全リライティング (s.colour 起点)** — `out.colour` を放棄し、`s.colour` (アルベド) と LightIn の生データから照明を再計算する。リアル化の本命。以下の4点を遵守すること。
+
+1. **フォグをかけ直す**: light フックは最終段 (フォグの後) なので `bloxdApplyFog(col, l)` (または `mix(l.fogColour, col, 1.0 - l.fogAlpha)`) を自分で適用する (R9.10)。霧が濃すぎるときは `min(l.fogAlpha, 0.70)` のように下限を敷く。逆に既定出力起点のパックで更に霧色を混ぜると二重フォグで白濁する
+2. **ライティング無効時のフォールバック**: `if (!bloxdLit()) { return bloxdDefaultLight(s, l); }` で既定に流す (v5 ではコンパイル時分岐ではなく実行時判定)
+3. **共用関数の扱い**: v5 では `BLOXD_LIGHTING` マクロが無いため、共用関数をガードする必要はない。ライティング有無で値が変わる入力 (`blockLight` は無効時 0 など) の仕様は [ライティングAPI](../api/lighting.md#bloxdlit-lit) を参照
+4. **太陽方向が無いとき**: `bloxdSunDirection()` がゼロなら方向性スペキュラは計算しない。`l.directional` は光量のスカラーで方向ベクトルではないため、ハイライトの方向を復元する用途には使えない。必要なら方向性のない弱い環境光に切り替える。なお月の方向は `-bloxdSunDirection()` で得られる (昼夜サイクルのあるワールドでのみ動く。[Engine Internals: 太陽と月の正体](../internals/sun-and-moon.md))
+
+## 関連
+
+- [リアル系レシピ](../recipes/realism.md)
+- [ライティングの仕組み](lighting.md)
+- [パフォーマンス](performance.md)

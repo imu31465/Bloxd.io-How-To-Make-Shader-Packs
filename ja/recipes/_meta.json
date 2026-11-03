@@ -1,0 +1,17 @@
+{
+  "index": {
+    "title": "Recipes",
+    "theme": { "toc": false, "typesetting": "article" }
+  },
+  "colors": "色",
+  "lighting": "照明",
+  "emission": "発光",
+  "coordinates": "座標",
+  "animation": "時間とアニメーション",
+  "liquids": "液体",
+  "vertices": "頂点 (allow 限定)",
+  "math": "数式小技集",
+  "realism": "リアル系",
+  "model-shaders": "モデルシェーダー",
+  "enchant-effects": "エンチャント効果"
+}
