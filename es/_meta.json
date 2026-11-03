@@ -1,0 +1,9 @@
+{
+  "getting-started": "Getting Started",
+  "api": "API Reference",
+  "guides": "Guías",
+  "recipes": "Recetas",
+  "troubleshooting": "Solución de problemas",
+  "internals": "Engine Internals & Research",
+  "history": "Historial de versiones"
+}

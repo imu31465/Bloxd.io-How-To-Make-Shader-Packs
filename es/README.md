@@ -1,89 +1,48 @@
-# Cómo crear paquetes de sombreadores (shader packs) para Bloxd.io (Guía completa)
+# Documentación de shader packs de Bloxd.io
 
-Guía autocontenida para crear y distribuir paquetes de sombreadores para Bloxd.io (solo renderizador WebGPU).
-**La API actual es `apiVersion: 5` y se lanzó oficialmente el 2026-11-03.** El juego actual rechaza los paquetes v1, v2, v3 y v4 al cargarlos (mensaje de versión de API incorrecta). Las partes I–VII de esta guía siguen escritas sobre la base v2 y siguen siendo válidas como fundamento conceptual. Léelas con la base v2 y, antes de distribuir, aplica los cambios de la Parte IX (`09-apiv3.md`) y la Parte X (`10-apiv4.md`). La Parte X cubre la API de texturas de v4 (`bloxdTexel`, `bloxdTextureId*`), el cambio de nombre del niebla (`fogAlpha`, ¡significado invertido!) y el contrato de juegos estrictos. La guía está dividida en un archivo por parte (este README es el índice; el recetario está en `03-recipes.md`). La migración anterior de v1 a v2 está en la Parte VIII (`08-apiv2.md`). La Parte IX también cubre interioridades del motor restauradas del build de producción (§49–§54: invocación de hooks, función de niebla de cuatro modos, implementación de `bloxdOpaqueBehind()`, ruta de entrega de blockFlags y el pipeline de validación con el hash de cabecera medido). El paso de v4 → v5 es la [Parte XII](12-apiv5.md) (en vivo desde 2026-11-03).
+Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io — desde la creación, implementación, validación y distribución hasta la especificación de la API y la investigación de las interioridades del motor.
 
-> Esta es una guía no oficial y no representa la postura de los desarrolladores. La API puede cambiar sin aviso.  
-> Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifica con el comportamiento real en el juego.  
-> Última revisión: 2026-10-27 (despliegue de v4 confirmado — build `cnty9`, producción y preprod idénticas; ver Parte X. lanzamiento oficial de v3 confirmado contra el build de comparación; invocación de hooks, niebla, profundidad e interioridades de blockFlags restauradas del build de producción — Parte IX §49–§54). El material de referencia completo está incrustado como Parte XI (`11-reference.md`) — la cabecera del motor restaurada verbatim y el catálogo medido completo de los 905 nombres de textura utilizables; sigue verificando las recetas con la pantalla de carga y la compilación en el juego.  
-> La función de paquetes de sombreadores es una función oficial accesible desde la interfaz del juego, y los paquetes son WGSL puro  
-> (sin ejecución de JS ni red), así que nada peligroso ocurre con código normal.
+## Especificación vigente
 
-## Índice
+- API actual: **5** (`pack.json` debe declarar `apiVersion: 5`)
+- Objetivo: renderizador WebGPU
+- Última verificación: 2026-11-03
+- Build objetivo: `ab90qa.main.6188124c.js` (producción y preprod idénticos — verificado por md5 `fc3322212d15be2445c0e8dfc9733fcc`)
+- Hooks de sombreado: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-- [Guía completa en un solo archivo](00-full.md)
-- [Parte I: Crear paquetes](01-making.md)
-  - [1. Resumen y requisitos](01-making.md#1-resumen-y-requisitos)
-  - [2. Inicio rápido](01-making.md#2-inicio-rápido)
-  - [3. Estructura del paquete](01-making.md#3-estructura-del-paquete)
-  - [4. pack.json](01-making.md#4-packjson)
-  - [5. Plantilla mínima](01-making.md#5-plantilla-mínima)
-  - [6. Los 6 hooks](01-making.md#6-los-6-hooks)
-  - [7. 8 variantes y guardias](01-making.md#7-8-variantes-y-guardias)
-  - [8. Funciones del lenguaje disponibles y prohibiciones](01-making.md#8-funciones-del-lenguaje-disponibles-y-prohibiciones)
-  - [9. Validación, pruebas y distribución](01-making.md#9-validación-pruebas-y-distribución)
-- [Parte II: Referencia de la API](02-api.md)
-  - [10. Cabecera del motor (antepuesta automáticamente al código del paquete)](02-api.md#10-cabecera-del-motor-antepuesta-automáticamente-al-código-del-paquete)
-  - [11. Tabla de variantes](02-api.md#11-tabla-de-variantes)
-  - [12. Chuleta de esqueleto](02-api.md#12-chuleta-de-esqueleto)
-- [Parte III: Recetario](03-recipes.md)
-  - [R1. Recetas de color (surface)](03-recipes.md#r1-recetas-de-color-surface)
-  - [R2. Recetas de iluminación (light)](03-recipes.md#r2-recetas-de-iluminación-light)
-  - [R3. Recetas de emisión](03-recipes.md#r3-recetas-de-emisión)
-  - [R4. Recetas de coordenadas (mundo / bloque / vista)](03-recipes.md#r4-recetas-de-coordenadas-mundo--bloque--vista)
-  - [R5. Recetas de tiempo (animación)](03-recipes.md#r5-recetas-de-tiempo-animación)
-  - [R6. Recetas de líquidos](03-recipes.md#r6-recetas-de-líquidos)
-  - [R7. Recetas de vértices (solo allow)](03-recipes.md#r7-recetas-de-vértices-solo-allow)
-  - [R8. Trucos matemáticos](03-recipes.md#r8-trucos-matemáticos)
-  - [R9. Recetas realistas](03-recipes.md#r9-recetas-realistas)
-- [Parte IV: Guía de realismo](04-realism.md)
-  - [13. Iluminación por defecto del motor y margen para el realismo](04-realism.md#13-iluminación-por-defecto-del-motor-y-margen-para-el-realismo)
-  - [14. Dos escuelas de implementación](04-realism.md#14-dos-escuelas-de-implementación)
-  - [15. Looks inalcanzables (el "techo" del realismo)](04-realism.md#15-looks-inalcanzables-el-techo-del-realismo)
-  - [16. Consejos de depuración](04-realism.md#16-consejos-de-depuración)
-- [Parte V: Solución de problemas y notas](05-troubleshooting.md)
-  - [17. Errores comunes y soluciones](05-troubleshooting.md#17-errores-comunes-y-soluciones)
-  - [18. Derechos y notas](05-troubleshooting.md#18-derechos-y-notas)
-- [Parte VI: Notas importantes de implementación](06-implementation.md)
-  - [19. Corregir "sombras oscuras pero superficies brillantes" de noche](06-implementation.md#19-corregir-sombras-oscuras-pero-superficies-brillantes-de-noche)
-  - [20. Receta integrada para agua de aspecto natural](06-implementation.md#20-receta-integrada-para-agua-de-aspecto-natural)
-  - [21. Lista de pruebas en el juego](06-implementation.md#21-lista-de-pruebas-en-el-juego)
-  - [22. Combinar con otros paquetes cuando el sombreador solo llega a su límite](06-implementation.md#22-combinar-con-otros-paquetes-cuando-el-sombreador-solo-llega-a-su-límite)
-  - [23. Realidad submarina con paquetes de sombreadores](06-implementation.md#23-realidad-submarina-con-paquetes-de-sombreadores)
-- [Parte VII: Suplemento de interioridades](07-internals.md)
-  - [24. Identidad del sol y la luna](07-internals.md#24-identidad-del-sol-y-la-luna)
-  - [25. Interioridades de la niebla](07-internals.md#25-interioridades-de-la-niebla)
-  - [26. Interioridades de blockLight / heldLight](07-internals.md#26-interioridades-de-blocklight--heldlight)
-  - [27. Detalles de pipeline](07-internals.md#27-detalles-de-pipeline)
-  - [28. Qué cambia los valores visibles del paquete — lista de pruebas](07-internals.md#28-qué-cambia-los-valores-visibles-del-paquete--lista-de-pruebas)
-  - [29. Medios de depuración](07-internals.md#29-medios-de-depuración)
-  - [30. Modos de aplicación por juego (`shaderPackPolicy`)](07-internals.md#30-modos-de-aplicación-por-juego-shaderpackpolicy)
-- [Parte VIII: Guía de migración a API Version 2](08-apiv2.md)
-  - [31. Destino de los paquetes v1 (conclusión primero)](08-apiv2.md#31-destino-de-los-paquetes-v1-conclusión-primero)
-  - [32. Renombrado total de identificadores (tabla de correspondencia)](08-apiv2.md#32-renombrado-total-de-identificadores-tabla-de-correspondencia)
-  - [33. Destino de los campos eliminados](08-apiv2.md#33-destino-de-los-campos-eliminados)
-  - [34. Novedad ①: `blockId` (sombreado por bloque)](08-apiv2.md#34-novedad-①-blockid-sombreado-por-bloque)
-  - [35. Novedad ②: `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` (la principal)](08-apiv2.md#35-novedad-②-bloxd_scene_depth-y-bloxdopaquebehind-la-principal)
-  - [36. Otros cambios de v2](08-apiv2.md#36-otros-cambios-de-v2)
-  - [37. Lista de migración v1 → v2](08-apiv2.md#37-lista-de-migración-v1--v2)
-  - [38. Segunda etapa de validación — el compilador WGSL del navegador es más estricto que el analizador interno](08-apiv2.md#38-segunda-etapa-de-validación--el-compilador-wgsl-del-navegador-es-más-estricto-que-el-analizador-interno)
-  - [39. Sobre materiales independientemente similares](08-apiv2.md#39-sobre-materiales-independientemente-similares)
-- [Parte IX: Guía de migración a API Version 3](09-apiv3.md)
-  - [40. Destino de los paquetes v2 (conclusión primero)](09-apiv3.md#40-destino-de-los-paquetes-v2-conclusión-primero)
-  - [41. pack.json y el búfer uniform: lo que no cambia](09-apiv3.md#41-packjson-y-el-búfer-uniform-lo-que-no-cambia)
-  - [42. `blockId` pasa a `blockFlags`: materiales por bloque como bits (lo principal)](09-apiv3.md#42-blockid-pasa-a-blockflags-materiales-por-bloque-como-bits-lo-principal)
-  - [43. Renombrados de funciones y cambios semánticos](09-apiv3.md#43-renombrados-de-funciones-y-cambios-semánticos)
-  - [44. Nuevas constantes de cabecera: `BLOXD_PI` y `BLOXD_TAU`](09-apiv3.md#44-nuevas-constantes-de-cabecera-bloxdpi-y-bloxdtau)
-  - [45. La plantilla de seis hooks: hooks de líquido mostrados oficialmente](09-apiv3.md#45-la-plantilla-de-seis-hooks-hooks-de-líquido-mostrados-oficialmente)
-  - [46. Matriz de variantes: el eje de programa y los cambios de macros](09-apiv3.md#46-matriz-de-variantes-el-eje-de-programa-y-los-cambios-de-macros)
-  - [47. Lista de migración de v2 a v3](09-apiv3.md#47-lista-de-migración-de-v2-a-v3)
-  - [48. Otros cambios y notas de v3](09-apiv3.md#48-otros-cambios-y-notas-de-v3)
-  - [49. Interioridades del motor: cómo el renderizador Lite invoca tus hooks](09-apiv3.md#49-interioridades-del-motor-cómo-el-renderizador-lite-invoca-tus-hooks)
-  - [50. La función de niebla: cuatro modos, un campo](09-apiv3.md#50-la-función-de-niebla-cuatro-modos-un-campo)
-  - [51. `bloxdOpaqueBehind()`: la implementación exacta](09-apiv3.md#51-bloxdopaquebehind-la-implementación-exacta)
-  - [52. `blockFlags` de extremo a extremo: del registro a tu hook](09-apiv3.md#52-blockflags-de-extremo-a-extremo-del-registro-a-tu-hook)
-  - [53. Interioridades de la validación: `header_version`, firmas y nombres reservados](09-apiv3.md#53-interioridades-de-la-validación-header_version-firmas-y-nombres-reservados)
-  - [54. Constantes, límites y diseños confirmados](09-apiv3.md#54-constantes-límites-y-diseños-confirmados)
-- [Parte X: Guía de migración a API Version 4 (2026-10-26, resumen)](10-apiv4.md)
-- [Parte XI: Referencia completa — cabecera del motor y catálogo de texturas](11-reference.md)
-- [Parte XII: Guía de migración a API versión 5 (2026-11-03, resumen)](12-apiv5.md)
+¿Nuevo con los shader packs? Empieza por [Getting Started](getting-started/) (en inglés). ¿Consultas de API? Mira [API Reference](api/) (en inglés).
+
+> Esta documentación no es un recurso oficial de los desarrolladores. Las interioridades del motor pueden cambiar con las actualizaciones — comprueba el build objetivo y el estado de verificación de cada página.
+>
+> Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifícalo contra el comportamiento real del juego.
+>
+> La función de shader packs es una función oficial accesible desde la interfaz del juego, y los packs son WGSL puro (sin ejecución de JS ni red), así que nada peligroso ocurre con código normal.
+
+## Entradas por objetivo
+
+| Objetivo | Categoría | Público |
+|---|---|---|
+| Crear tu primer pack | [Getting Started](getting-started/) | principiantes |
+| Consultar funciones y campos de la API | [API Reference](api/) | autores en plena implementación |
+| Implementar un efecto (luz, agua, modelos…) | [Guides & Recipes](guides/) | cualquiera que construya un look |
+| Corregir un error | [Troubleshooting](troubleshooting/) | cualquiera con un pack roto |
+| Investigar interioridades del motor | [Engine Internals & Research](internals/) | analistas del motor |
+| Consultar versiones antiguas (v1–v5) | [Version History](history/) | quien migra packs antiguos |
+
+## Estructura de la documentación
+
+- **[Getting Started](getting-started/)** — visión general, inicio rápido, estructura del pack, pack.json, los 9 hooks, variantes, validación, distribución.
+- **[API Reference](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 896 nombres.
+- **[Guides](guides/)** · **[Recipes](recipes/)** · **[Troubleshooting](troubleshooting/)** · **[Engine Internals & Research](internals/)** · **[Version History](history/)**
+
+> Nota: Getting Started / API Reference / Troubleshooting y las páginas nuevas de v5 en Guides, Recipes e Internals se ofrecen actualmente **en inglés** (misma estructura que las páginas traducidas de esta edición). El contenido ya traducido se conserva íntegramente.
+
+## Estados de verificación
+
+| Etiqueta | Significado |
+|---|---|
+| Verified | verificado en el build objetivo |
+| Analyzed | confirmado analizando la implementación interna |
+| Partially Verified | confirmado solo parcialmente |
+| Experimental | experimental / sin consolidar |
+| Historical | material de una versión pasada |
