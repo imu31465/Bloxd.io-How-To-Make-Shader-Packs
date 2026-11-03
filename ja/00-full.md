@@ -923,11 +923,7 @@ struct BloxdLightIn {
 
 各フィールドの詳細な意味と照明計算での役割は [ライティング](api/lighting.md) を参照 (処理順序とともに解説)。
 
-**v4 との対比**:
-- `fogVisibility: f32` (1 = no fog) は **`fogAlpha: f32` (0 = no fog, 1 = only fog)** へ改名。意味は反転
-- `diffuse` / `emissive` は v5 の新設 (v4 は `directional` と `ambient` のみ) — `bloxdShading()` が材質応答を再構築できる
-- `engineColour` (v2〜v4) は削除され、`litColour` が «Lit and enchanted RGB colour, before emission and fog» に
-- 光レベルの文言は «0 without BLOXD_LIGHTING» から «0 when !bloxdLit()» へ (同じ事実の v5 語彙)
+**旧バージョンとの対比**: `fogVisibility` (v2〜v4) は意味が反転した `fogAlpha` (0 = フォグなし) に、`engineColour` は `litColour` に、軽レベルの文言は «0 when !bloxdLit()» になりました。バージョンごとの全フィールド変更は[バージョン履歴](history/)にあります。
 
 ### BloxdLight (light フックの出力)
 
@@ -3450,7 +3446,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 #### 既知の制約を前提にする
 
 - shader pack は terrain / liquid / model のフックに限定されており、空・UIを同じコードで処理する仕組みではない (エンティティは v5 のモデルフックで扱える)。
-- 影マップ、画面空間反射、屈折、ブルームなどを追加するための入力はこのAPIにない (シーン深度は液体限定の `bloxdOpaqueBehind()`)。
+- 影マップ、画面空間反射、屈折、ブルームなどを追加するための入力はこのAPIにない (シーン深度は液体限定の `bloxdOpaqueBehind()` — [関数](api/functions.md) 参照)。
 - `bloxdSeconds()` はアニメーション用の時間であり、ゲーム内の昼夜と連動する保証はない。
 - `bloxdSunDirection()` がゼロなら真の月方向ではなく、青い環境光を加える処理は雰囲気を作る近似。方向性のある月光は `-bloxdSunDirection()` で作れる (昼夜サイクルワールド限定。[エンジン内部: 太陽と月の正体](internals/sun-and-moon.md))。
 - `s.position` / `l.position` はローカル座標であるため、ワールド位置に依存する効果では `bloxdRenderOffset()` を加える。ブロック内ローカルの模様を作成する場合は、意図的にローカル座標を使用することもある。

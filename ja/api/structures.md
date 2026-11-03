@@ -129,11 +129,7 @@ struct BloxdLightIn {
 
 各フィールドの詳細な意味と照明計算での役割は [ライティング](lighting.md) を参照 (処理順序とともに解説)。
 
-**v4 との対比**:
-- `fogVisibility: f32` (1 = no fog) は **`fogAlpha: f32` (0 = no fog, 1 = only fog)** へ改名。意味は反転
-- `diffuse` / `emissive` は v5 の新設 (v4 は `directional` と `ambient` のみ) — `bloxdShading()` が材質応答を再構築できる
-- `engineColour` (v2〜v4) は削除され、`litColour` が «Lit and enchanted RGB colour, before emission and fog» に
-- 光レベルの文言は «0 without BLOXD_LIGHTING» から «0 when !bloxdLit()» へ (同じ事実の v5 語彙)
+**旧バージョンとの対比**: `fogVisibility` (v2〜v4) は意味が反転した `fogAlpha` (0 = フォグなし) に、`engineColour` は `litColour` に、軽レベルの文言は «0 when !bloxdLit()» になりました。バージョンごとの全フィールド変更は[バージョン履歴](../history/)にあります。
 
 ## BloxdLight (light フックの出力)
 
