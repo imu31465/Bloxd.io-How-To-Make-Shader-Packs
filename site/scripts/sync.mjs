@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 // md ソース (リポジトリ言語ディレクトリ) -> Nextra content (<lang>/...) への変換。
 //
-// 2026-11 再構築: 6 分類ディレクトリ構造 (getting-started / api / guides /
+// 2026-11 再構築: 7 分類ディレクトリ構造 (getting-started / api / guides /
 // recipes / troubleshooting / internals / history) に対応。
 //   - 言語ディレクトリ直下に加えサブディレクトリを再帰処理する
 //   - 各ディレクトリの _meta.json (リポジトリ側で管理) を尊重してコピーする
 //     (無いディレクトリは従来どおりファイル順で自動生成)
-//   - 旧 11 部構成の slug への訪問者を新配置へ案内するリダイレクトページを生成
+//   - .md リンクに加えディレクトリへの相対リンク (../history/ 等) も
+//     言語ルートからの絶対パスへ置き換える (trailingSlash 構成で
+//     相対リンクが一段深く解決されるのを防ぐ)
+//   - 旧 11 部構成 slug (01-making 等) へのリダイレクト案内ページは廃止
+//     (旧 URL は 404 扱い。サイトは現行 7 分類の URL だけを公開する)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,23 +32,6 @@ const EXCLUDED = new Set(['00-full.md'])
 // テーマ内蔵の prev/next ページネーションが担うため、サイト掲載時は剥がす
 const NAV_LINE = /^ *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\)(?: *[·・] *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\))* *$/
 
-// 旧 11 部構成の slug -> 新 URL (言語プレフィックスを除く)。
-// 旧 URL からの訪問者を新しい配置先へ案内するページを自動生成する。
-const REDIRECTS = {
-  '01-making': '/getting-started/',
-  '02-api': '/api/',
-  '03-recipes': '/recipes/',
-  '04-realism': '/guides/realism/',
-  '05-troubleshooting': '/troubleshooting/',
-  '06-implementation': '/guides/',
-  '07-internals': '/internals/',
-  '08-apiv2': '/history/v2/',
-  '09-apiv3': '/history/v3/',
-  '10-apiv4': '/history/v4/',
-  '11-reference': '/api/texture-catalog/',
-  '12-apiv5': '/history/v5/'
-}
-
 function titleOf(src, fallback) {
   const match = src.match(/^#\s+(.+)$/m)
   return match ? match[1].trim() : fallback
@@ -56,18 +43,33 @@ function yamlQuote(value) {
 
 // 同ファイル間の相対リンクは、ページの深さ (index と各部で階層が違う) に左右されない
 // 言語ルートからの絶対パスに置き換える (basePath は Next Link 側が付与するため含めない)
-function rewriteLinks(src, code) {
+// relDir: この md ファイルの言語ルートからの相対ディレクトリ ('' / 'api/' など)
+function rewriteLinks(src, code, relDir) {
   const prefix = `/${code}`
+  // ページ相対パス -> 言語ルート相対パスに解決 ('../history/' in api/index.md -> 'history/')
+  const resolveFromPage = target => {
+    const joined = path.posix.normalize(
+      path.posix.join(relDir ? relDir : '.', target)
+    )
+    return joined === '.' ? '' : joined
+  }
   return src
     // 掲載対象外の全文一括版 (00-full.md) へのリンクは、リンクだけ剥がして文字は残す
     .replace(/\[([^\]]*)\]\(0?0-full\.md(?:#[^\s()]*|)\)/g, '$1')
     .replace(/\]\(([^()\s]+\.md)(#[^\s()]*)?\)/g, (full, file, anchor = '') => {
     if (/^(https?:)?\/\//i.test(file) || file.startsWith('/')) return full
     // サブディレクトリ内からの相対リンク (../api/hooks.md 等) にも対応
-    const base = file === 'README.md'
-      ? ''
-      : file.replace(/\.md$/, '').replace(/^\.\.\//, '').replace(/^\.\//, '')
-    const slug = base === 'index' ? '' : `${base}/`
+    const resolved = resolveFromPage(file)
+    const base = resolved === 'README.md' ? '' : resolved.replace(/\.md$/, '')
+    const slug = base === '' || base === 'index' ? '' : `${base}/`
+    return `](${prefix}/${slug}${anchor})`
+  })
+    // ディレクトリへの相対リンク (../history/ / api/ / ../ など) も絶対パス化。
+    // trailingSlash: true のサイト URL では相対リンクが一段深く解決されてしまうため。
+    .replace(/\]\(([^()\s]*\/?\/)(#[^\s()]*)?\)/g, (full, dir, anchor = '') => {
+    if (/^(https?:)?\/\//i.test(dir) || dir.startsWith('/')) return full
+    const resolved = resolveFromPage(dir)
+    const slug = resolved === '' ? '' : `${resolved.replace(/\/$/, '')}/`
     return `](${prefix}/${slug}${anchor})`
   })
 }
@@ -181,7 +183,8 @@ for (const { code } of TARGET_LOCALES) {
       const isIndex = base === 'index'
       const outSub = path.join(outDir, dir)
       fs.mkdirSync(outSub, { recursive: true })
-      const text = withFrontmatter(rewriteLinks(transform(src), code), title)
+      const relDir = dir === '.' ? '' : `${dir.replace(/\/$/, '')}/`
+      const text = withFrontmatter(rewriteLinks(transform(src), code, relDir), title)
       fs.writeFileSync(path.join(outSub, outName), text)
       files++
       return { base, title, isIndex }
@@ -190,20 +193,6 @@ for (const { code } of TARGET_LOCALES) {
     fs.mkdirSync(path.join(outDir, dir), { recursive: true })
     fs.writeFileSync(path.join(outDir, dir, '_meta.json'), metaContent)
   }
-
-  // ---- 旧 11 部 slug のリダイレクト案内ページ ----
-  // 旧 URL /<lang>/01-making/ 等に来た訪問者を新配置へ導く。
-  // Nextra の frontmatter redirect が効けば即時遷移、効かなくても本文リンクで案内される。
-  for (const [slug, target] of Object.entries(REDIRECTS)) {
-    const outPath = path.join(outDir, `${slug}.md`)
-    if (fs.existsSync(outPath)) continue // 新構造で同名ページがある場合は上書きしない
-    const text = withFrontmatter(
-      `このページは移動しました。新しい場所: [${target}](${target})\n`,
-      `移動しました — ${slug}`,
-      { redirect: `${target}` }
-    )
-    fs.writeFileSync(outPath, text)
-    files++
-  }
 }
+
 console.log(`sync: wrote ${files} pages for ${TARGET_LOCALES.length} locales -> ${contentRoot}`)
