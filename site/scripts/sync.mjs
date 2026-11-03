@@ -4,8 +4,9 @@
 // 2026-11 再構築: 7 分類ディレクトリ構造 (getting-started / api / guides /
 // recipes / troubleshooting / internals / history) に対応。
 //   - 言語ディレクトリ直下に加えサブディレクトリを再帰処理する
-//   - 各ディレクトリの _meta.json (リポジトリ側で管理) を尊重してコピーする
-//     (無いディレクトリは従来どおりファイル順で自動生成)
+//   - 各ディレクトリの _meta.json (リポジトリ側で管理) を Nextra 4 が読める
+//     形式 (ESM の _meta.js) に変換して content 側へ書き出す
+//     (Nextra は _meta.json を収集しないため。順序・タイトルの権威はリポジトリ側)
 //   - .md リンクに加えディレクトリへの相対リンク (../history/ 等) も
 //     言語ルートからの絶対パスへ置き換える (trailingSlash 構成で
 //     相対リンクが一段深く解決されるのを防ぐ)
@@ -136,21 +137,48 @@ function walk(dir, base = '') {
 }
 
 // ディレクトリ直下の _meta.json (リポジトリ側管理) を解釈する:
-// 存在すればそのまま content 側へ渡す (順序・タイトルの権威はリポジトリ側)。
-// 無ければ収集したページから従来形式 (タイトル文字列) を自動生成する。
-function buildMeta(srcDir, pages) {
+// 順序・タイトルの権威はリポジトリ側。無ければ収集したページから
+// 従来形式 (タイトル文字列) を自動生成する。
+//
+// Nextra 4 の pageMap 構築が収集するのは _meta.{js,jsx,ts,tsx} のみで、
+// _meta.json は完全に無視される (サイドバーのカテゴリ名がディレクトリ名の
+// フォールバック「API」「Getting Started」…のまま英語になるのはこのため)。
+// そのため content 側には ESM モジュールの _meta.js として書き出す。
+function buildMeta(srcDir, pages, label) {
   const metaPath = path.join(srcDir, '_meta.json')
+  let meta
   if (fs.existsSync(metaPath)) {
-    return fs.readFileSync(metaPath, 'utf8')
+    meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'))
+  } else {
+    meta = {}
+    for (const { base, title, isIndex } of pages) {
+      meta[base] =
+        isIndex
+          ? { title, theme: { toc: false, typesetting: 'article' } }
+          : title
+    }
   }
-  const meta = {}
-  for (const { base, title, isIndex } of pages) {
-    meta[base] =
-      isIndex
-        ? { title, theme: { toc: false, typesetting: 'article' } }
-        : title
+  // 検証: メタの各キーは実在するページ/サブディレクトリを指す必要がある
+  // (Nextra の normalizePageMap は不明なキーでビルドを落とすため、
+  // ここで先に分かりやすいエラーを出す)
+  const existing = new Set(pages.map(p => p.base))
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    if (entry.isDirectory()) existing.add(entry.name)
   }
-  return JSON.stringify(meta, null, 2) + '\n'
+  for (const [key, value] of Object.entries(meta)) {
+    if (key === '*') continue
+    const isStructural =
+      typeof value === 'object' &&
+      value !== null &&
+      (('type' in value && (value.type === 'separator' || value.type === 'menu')) ||
+        'href' in value)
+    if (!isStructural && !existing.has(key)) {
+      throw new Error(
+        `[sync] ${label}_meta.json: key "${key}" does not match any page or subdirectory`
+      )
+    }
+  }
+  return `export default ${JSON.stringify(meta, null, 2)}\n`
 }
 
 fs.rmSync(contentRoot, { recursive: true, force: true })
@@ -189,9 +217,13 @@ for (const { code } of TARGET_LOCALES) {
       files++
       return { base, title, isIndex }
     })
-    const metaContent = buildMeta(path.join(srcDir, dir), pages)
+    const metaContent = buildMeta(
+      path.join(srcDir, dir),
+      pages,
+      `${code}/${dir === '.' ? '' : dir.replace(/\/$/, '') + '/'}`
+    )
     fs.mkdirSync(path.join(outDir, dir), { recursive: true })
-    fs.writeFileSync(path.join(outDir, dir, '_meta.json'), metaContent)
+    fs.writeFileSync(path.join(outDir, dir, '_meta.js'), metaContent)
   }
 }
 
