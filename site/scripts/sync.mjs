@@ -12,6 +12,12 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { LOCALES } from '../lib/langs.mjs'
 
+// BUILD_LANGS 環境変数 (カンマ区切り) があればその言語だけを対象にする
+// (バッチビルド用 — メモリ制約下で next build を言語分割する)
+const TARGET_LOCALES = process.env.BUILD_LANGS
+  ? LOCALES.filter(l => process.env.BUILD_LANGS.split(',').includes(l.code))
+  : LOCALES
+
 const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = path.resolve(siteRoot, '..')
 const contentRoot = path.join(siteRoot, 'content')
@@ -149,7 +155,7 @@ fs.rmSync(contentRoot, { recursive: true, force: true })
 fs.mkdirSync(contentRoot, { recursive: true })
 
 let files = 0
-for (const { code } of LOCALES) {
+for (const { code } of TARGET_LOCALES) {
   const srcDir = path.join(repoRoot, code)
   const outDir = path.join(contentRoot, code)
   if (!fs.existsSync(srcDir)) continue
@@ -200,4 +206,4 @@ for (const { code } of LOCALES) {
     files++
   }
 }
-console.log(`sync: wrote ${files} pages for ${LOCALES.length} locales -> ${contentRoot}`)
+console.log(`sync: wrote ${files} pages for ${TARGET_LOCALES.length} locales -> ${contentRoot}`)

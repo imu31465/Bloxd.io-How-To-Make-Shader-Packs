@@ -27,11 +27,9 @@ jobs:
       - name: Install
         working-directory: site
         run: npm ci
-      - name: Build
+      - name: Build (batched per language to stay within runner memory)
         working-directory: site
-        run: |
-          npm run sync
-          npm run build
+        run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

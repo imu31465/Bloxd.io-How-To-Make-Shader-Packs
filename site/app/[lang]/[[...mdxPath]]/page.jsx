@@ -4,6 +4,12 @@ import { importPage } from 'nextra/pages'
 import { LOCALES } from '../../../lib/langs.mjs'
 import { useMDXComponents as getMDXComponents } from '../../../mdx-components'
 
+// バッチビルドでは BUILD_LANGS で走査対象を絞る (content/<lang> が無い言語で
+// readdirSync が ENOENT を投げるのを防ぐ)
+const ACTIVE_LOCALES = process.env.BUILD_LANGS
+  ? LOCALES.filter(l => process.env.BUILD_LANGS.split(',').includes(l.code))
+  : LOCALES
+
 export function generateStaticParams() {
   const contentRoot = path.join(process.cwd(), 'content')
   const files = []
@@ -16,7 +22,7 @@ export function generateStaticParams() {
       }
     }
   }
-  for (const { code } of LOCALES) {
+  for (const { code } of ACTIVE_LOCALES) {
     walk(path.join(contentRoot, code))
   }
   return files.map(file => {

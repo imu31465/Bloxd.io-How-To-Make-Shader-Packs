@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "next --turbopack",
     "predev": "npm run sync",
-    "build": "next build --webpack",
-    "prebuild": "npm run sync",
+    "build": "node scripts/build-batched.mjs",
     "postbuild": "node scripts/fix-html-lang.mjs .next/server/app && node scripts/flatten-rsc.mjs out && node scripts/fix-html-lang.mjs out && pagefind --site .next/server/app --output-path out/_pagefind",
     "start": "next start",
-    "sync": "node scripts/sync.mjs"
+    "sync": "node scripts/sync.mjs",
+    "build:single": "node scripts/sync.mjs && next build --webpack"
   },
   "dependencies": {
     "next": "^16.0.7",
