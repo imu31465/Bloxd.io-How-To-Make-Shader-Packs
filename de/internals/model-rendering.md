@@ -20,7 +20,7 @@ Vor v5 konnten Pakete nur in Terrain / Liquid andocken; Block-Modelle (Stufen, T
 
 ## Enchant-Berechnung
 
-Die Engine animiert den Glint-Sweep und liefert ihn als `enchantColour.a` an die Surface-/Light-Hooks ([Enchant-Effekte](../recipes/enchant-effects.md)). Das Mischen geschieht innerhalb von `bloxdLitColour()` — direkt nach dem Shading, vor dem Weltlicht ([Beleuchtung](../api/lighting.md#the-full-pipeline)).
+Die Engine animiert den Glint-Sweep und liefert ihn als `enchantColour.a` an die Surface-/Light-Hooks ([Enchant-Effekte](../recipes/enchant-effects.md)). Das Mischen geschieht innerhalb von `bloxdLitColour()` — direkt nach dem Shading, vor dem Weltlicht ([Beleuchtung](../api/lighting.md#die-komplette-pipeline)).
 
 ## Das Overlay (Schadens-Blitz etc.)
 
@@ -28,11 +28,11 @@ Die Engine animiert den Glint-Sweep und liefert ihn als `enchantColour.a` an die
 
 ## Der Textur-Pfad
 
-Die meisten Modell-Flächen nutzen `textureId: 0` (keine Textur) — Spieler-Skins und Mob-Texturen liegen nicht im Namensraum des Block-Textur-Atlas. `surface.colour` kommt mit Skin × Tint gebacken an, die Modell-Flächen-Verarbeitung startet also bei `colour` ([modell-eigene Texturen](../api/texture-api.md#model-owned-textures-textureid-0)).
+Die meisten Modell-Flächen nutzen `textureId: 0` (keine Textur) — Spieler-Skins und Mob-Texturen liegen nicht im Namensraum des Block-Textur-Atlas. `surface.colour` kommt mit Skin × Tint gebacken an, die Modell-Flächen-Verarbeitung startet also bei `colour` ([modell-eigene Texturen](../api/texture-api.md#modell-eigene-texturen-textureid-0)).
 
 ## Varianten
 
-Das Model-Programm bildet eine Achse der Varianten-Matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` ist nur in allow.model definiert ([Präprozessor](../api/preprocessor.md#macro--variant-matrix)); strict.model hat keine Vertex-Hooks.
+Das Model-Programm bildet eine Achse der Varianten-Matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` ist nur in allow.model definiert ([Präprozessor](../api/preprocessor.md#makro--varianten-matrix)); strict.model hat keine Vertex-Hooks.
 
 ## Verwandte Seiten
 

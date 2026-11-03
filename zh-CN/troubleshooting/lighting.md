@@ -28,13 +28,13 @@
 
 ## 想原样保留引擎的世界光照
 
-- **v5 解法**: 调用 `bloxdWorldLight(light)` — 与引擎「方块/天空/手持取最亮、`ambientLightColour` 兜底」完全相同的数学 ([光照](../api/lighting.md#bloxdworldlight--the-worlds-light))
+- **v5 解法**: 调用 `bloxdWorldLight(light)` — 与引擎「方块/天空/手持取最亮、`ambientLightColour` 兜底」完全相同的数学 ([光照](../api/lighting.md#bloxdworldlight--世界光照))
 - **注意**: `!bloxdLit()` 时 `blockLight` / `heldLight` 为 0、天空相关字段为 1 (标头保证)
 
 ## 关闭光照的游戏中画面不对
 
 - **原因**: 光照专属输入 (`blockLight` 等) 未加守卫地使用。v5 没有 `#ifdef BLOXD_LIGHTING` — 请按**运行时 `bloxdLit()`** 分支
-- **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](../api/lighting.md#bloxdlit--the-gate))
+- **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](../api/lighting.md#bloxdlit--门控))
 
 ## 「LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk」
 

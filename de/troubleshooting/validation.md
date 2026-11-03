@@ -45,7 +45,7 @@ Fehler der statischen Validierung (Analyzer, Stufe 1) — meist reservierte Name
 
 | Meldung | Aktion |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` migrieren ([Beleuchtung](../api/lighting.md#bloxdlit--the-gate)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` migrieren ([Beleuchtung](../api/lighting.md#bloxdlit--das-gate)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | übrig gebliebene Bitkonstante → `flags.rock` ([Flags](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4-internes Symbol → die öffentliche `bloxdLitColour()` benutzen |
 

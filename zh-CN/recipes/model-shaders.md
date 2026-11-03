@@ -116,7 +116,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` 的面 (皮肤) 采样为白色 — 不报错 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))。
+`textureId: 0` 的面 (皮肤) 采样为白色 — 不报错 ([模型自带纹理](../api/texture-api.md#模型自带纹理-textureid-0))。
 
 ## 盔甲与其余部分
 
@@ -142,7 +142,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-共享函数模式正是默认包模板自己推荐的做法 ([钩子](../getting-started/hooks.md#fallbacks-and-code-sharing))。
+共享函数模式正是默认包模板自己推荐的做法 ([钩子](../getting-started/hooks.md#回退与代码共享))。
 
 ## 相关
 

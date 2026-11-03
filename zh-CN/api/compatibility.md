@@ -31,7 +31,7 @@
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 改名)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
+- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](functions.md#bloxdfragmentblockposition--未写入文档但仍在注入))
 - 把 `pack.json` 提升为 `"apiVersion": 5`
 
 这次的暗坑：继续读取 `blockFlags`、或把光照钩子包在 `#ifdef BLOXD_LIGHTING` 里的包会**以专用消息验证失败** (分析器现在会对两种情形分别说明)，因此不会有静默的错误行为 — 只是迁移完成前始终被拒绝。
@@ -51,7 +51,7 @@
 
 - **仅 WebGPU 渲染器**: 安装包会强制启用 WebGPU 渲染器
 - **移动端**: 受 WebGPU 限制的环境完全无法运行包 ([环境要求](../getting-started/requirements.md))
-- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](texture-api.md#where-the-texture-api-cant-go))
+- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](texture-api.md#纹理-api-到不了的地方))
 
 ## 版本支持一览
 

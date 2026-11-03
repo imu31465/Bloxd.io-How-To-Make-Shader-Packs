@@ -34,7 +34,7 @@ Errors that pass static validation but fail as WGSL, or fail only in the browser
 ## dpdy sign looks inverted
 
 - **This is by design**: the analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
+- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#automatic-rewrites))
 - `dpdx` and `fwidth` are untouched
 
 ## Pack gets dropped on game join / the on-device check never finishes

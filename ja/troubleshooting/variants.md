@@ -34,7 +34,7 @@
 - **症状**: terrain のフックを書いたのに水の見た目が変わらない
 - **原因**: **v5 では、パックに Liquid Hook がない場合、水には Terrain Hook は実行されません** (v4 以前の「liquid が無ければ terrain が代行」は廃止)
 - **確認方法**: パックに `bloxdLiquidSurface` / `bloxdLiquidLight` があるか
-- **解決方法**: Liquid フックを書く ([フックの分担](../api/hooks.md#描画対象の分担))
+- **解決方法**: Liquid フックを書く ([フックの分担](../api/hooks.md#各プログラムが描くもの))
 - **再発防止**: 水を変えるパックは必ず `bloxdLiquid*` を定義する
 
 ## モデル (エンティティ・ブロックモデル) に効かない

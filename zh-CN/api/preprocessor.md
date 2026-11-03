@@ -27,7 +27,7 @@ terrain / liquid / model 的差异是**独立程序，不是宏** — `#ifdef BL
 
 ## 已移除的宏
 
-- **`BLOXD_LIGHTING`** — v5 已移除。光照状态是 [`bloxdLit()`](lighting.md#bloxdlit--the-gate) 的运行时问题，不再是编译分支。使用它会使验证失败：
+- **`BLOXD_LIGHTING`** — v5 已移除。光照状态是 [`bloxdLit()`](lighting.md#bloxdlit--门控) 的运行时问题，不再是编译分支。使用它会使验证失败：
 
 > *「BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.」*
 
@@ -72,7 +72,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `BloxdSurface.alpha` 只在 `#ifdef BLOXD_ALPHA` 内存在
 - `bloxdOpaqueBehind()` 只在 `#ifdef BLOXD_SCENE_DEPTH` 内可调用
 
-见[结构体](structures.md#conditional-fields--macros)。
+见[结构体](structures.md#条件字段--宏)。
 
 ## 相关
 

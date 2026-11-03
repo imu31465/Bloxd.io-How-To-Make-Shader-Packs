@@ -8,7 +8,7 @@
 
 - **原因**: 雾叠了两层。默认 light 钩子输出**已带雾** (`bloxdApplyFog(lit + emission, light)`)，再往上混雾色就是双份
 - **修复**: 自定义雾保持克制；可考虑只做去饱和的大气透视 ([写实系配方](../recipes/realism.md))
-- **预防**: 写雾之前先理解 `fogAlpha` 语义 (0 = 无雾，1 = 只剩 fogColour) 与[管线](../api/lighting.md#the-full-pipeline)
+- **预防**: 写雾之前先理解 `fogAlpha` 语义 (0 = 无雾，1 = 只剩 fogColour) 与[管线](../api/lighting.md#完整管线)
 
 ## pow(l.skyLight, γ) 怎么也压不黑阴影
 
@@ -37,7 +37,7 @@
 
 ## 旋转面上的水面图样错位
 
-- **原因**: `bloxdTexel` 会把片段自身的 `textureRotation` 应用到你的 uv 上 ([旋转的微妙之处](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
+- **原因**: `bloxdTexel` 会把片段自身的 `textureRotation` 应用到你的 uv 上 ([旋转的微妙之处](../api/texture-api.md#旋转的微妙之处--中性采样器))
 - **修复**: 用 `texelNeutral` 辅助函数预旋转
 
 ## 附魔闪光 / 受伤红闪消失

@@ -22,7 +22,7 @@ Modell-Flächen tragen drei Dinge, die Terrain-Flächen nie haben:
 | Enchant-Zustand | `enchantTier` / `enchantColour` / `enchantSpeed` | alle 0 |
 | Entity-Overlay | `overlayColour` | 0 |
 
-Und **Texturen bedeuten etwas anderes**: Terrain-Flächen tragen Atlas-`textureId`s, aber **die meisten Modelle nutzen `textureId: 0`** („keine Textur“) — Spieler-Skins und Mob-Texturen liegen nicht im Atlas-Namensraum. `surface.colour` enthält bereits Skin × Tint, also davon ausgehend arbeiten ([modell-eigene Texturen](../api/texture-api.md#model-owned-textures-textureid-0)).
+Und **Texturen bedeuten etwas anderes**: Terrain-Flächen tragen Atlas-`textureId`s, aber **die meisten Modelle nutzen `textureId: 0`** („keine Textur“) — Spieler-Skins und Mob-Texturen liegen nicht im Atlas-Namensraum. `surface.colour` enthält bereits Skin × Tint, also davon ausgehend arbeiten ([modell-eigene Texturen](../api/texture-api.md#modell-eigene-texturen-textureid-0)).
 
 `flags`' `held` / `dropped` / `thrown` / `lifeform` / `placed` sind nur auf Modell-Flächen bedeutungstragend ([Flags](../api/flags.md)).
 

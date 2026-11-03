@@ -28,13 +28,13 @@ Helligkeits-, Schatten- und Fog-Probleme.
 
 ## Das Weltlicht der Engine exakt behalten wollen
 
-- **v5-Lösung**: `bloxdWorldLight(light)` aufrufen — identische Mathematik wie das „hellstes aus Block/Himmel/Hand, von ambientLightColour abgefloort“ der Engine ([Beleuchtung](../api/lighting.md#bloxdworldlight--the-worlds-light))
+- **v5-Lösung**: `bloxdWorldLight(light)` aufrufen — identische Mathematik wie das „hellstes aus Block/Himmel/Hand, von ambientLightColour abgefloort“ der Engine ([Beleuchtung](../api/lighting.md#bloxdworldlight--das-licht-der-welt))
 - **Hinweis**: `blockLight` / `heldLight` sind 0 und himmelsbezogene Felder sind 1, wenn `!bloxdLit()` (Header-Garantie)
 
 ## Sieht falsch aus in Spielen mit deaktivierter Beleuchtung
 
 - **Ursache**: beleuchtungsexklusive Eingaben (`blockLight` etc.) ungeschützt benutzt. v5 hat kein `#ifdef BLOXD_LIGHTING` — auf **Laufzeit-`bloxdLit()`** verzweigen
-- **Fix**: früh zurückgeben mit `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Beleuchtung](../api/lighting.md#bloxdlit--the-gate))
+- **Fix**: früh zurückgeben mit `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Beleuchtung](../api/lighting.md#bloxdlit--das-gate))
 
 ## „LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
 

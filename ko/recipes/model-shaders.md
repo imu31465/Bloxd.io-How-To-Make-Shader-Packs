@@ -116,7 +116,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` 면 (스킨) 은 흰색으로 샘플된다 — 오류 아님 ([모델 자체 텍스처](../api/texture-api.md#model-owned-textures-textureid-0)).
+`textureId: 0` 면 (스킨) 은 흰색으로 샘플된다 — 오류 아님 ([모델 자체 텍스처](../api/texture-api.md#모델-자체-텍스처-textureid-0)).
 
 ## 방어구와 나머지
 
@@ -142,7 +142,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-공유 함수 패턴은 기본 팩 템플릿 자신이 권하는 방식이다 ([훅](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+공유 함수 패턴은 기본 팩 템플릿 자신이 권하는 방식이다 ([훅](../getting-started/hooks.md#폴백과-코드-공유)).
 
 ## 관련 문서
 

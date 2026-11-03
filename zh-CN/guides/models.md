@@ -22,7 +22,7 @@ v5 新的 Model 钩子绘制与读取什么。
 | 附魔状态 | `enchantTier` / `enchantColour` / `enchantSpeed` | 全 0 |
 | 实体覆盖色 | `overlayColour` | 0 |
 
-而且**纹理的含义不同**: 地形面携带图集 `textureId`，但**大多数模型用 `textureId: 0`** («无纹理») — 玩家皮肤与生物纹理不在图集命名空间中。`surface.colour` 已含皮肤 × tint，请以它为起点 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))。
+而且**纹理的含义不同**: 地形面携带图集 `textureId`，但**大多数模型用 `textureId: 0`** («无纹理») — 玩家皮肤与生物纹理不在图集命名空间中。`surface.colour` 已含皮肤 × tint，请以它为起点 ([模型自带纹理](../api/texture-api.md#模型自带纹理-textureid-0))。
 
 `flags` 的 `held` / `dropped` / `thrown` / `lifeform` / `placed` 只在模型面上有意义 ([标志](../api/flags.md))。
 

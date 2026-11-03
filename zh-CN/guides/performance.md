@@ -28,7 +28,7 @@
 
 1. **把效果设门到需要它的面** — `flags` 选取胜过「到处 +20%」
 2. **随距离丢弃细节** — `distance(surface.position, bloxdEyePosition())` 超过阈值即提前返回
-3. **用 mip** — `bloxdTexel(id, uv, mipLevel + 1.0)` 是 ¼ 分辨率的平均 ([实战示例](../api/texture-api.md#worked-examples))
+3. **用 mip** — `bloxdTexel(id, uv, mipLevel + 1.0)` 是 ¼ 分辨率的平均 ([实战示例](../api/texture-api.md#实战示例))
 4. **调色优先用 surface 钩子** — light 钩子是全像素的最终阶段
 5. **增量添加细节并对比 FPS** ([测试](testing.md))
 6. **`#ifdef` 守卫不省运行时** — 变体是编译单元；运行时的节省来自标志与距离

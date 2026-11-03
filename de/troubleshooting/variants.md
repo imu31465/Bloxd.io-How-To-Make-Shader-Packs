@@ -14,7 +14,7 @@ Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liqu
 ## „.alpha is undefined"
 
 - **Ursache**: `alpha` existiert nur hinter `#ifdef BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model)
-- **Fix**: Alpha-berührenden Code in `#ifdef BLOXD_ALPHA` einpacken ([Präprozessor](../api/preprocessor.md#macro--variant-matrix))
+- **Fix**: Alpha-berührenden Code in `#ifdef BLOXD_ALPHA` einpacken ([Präprozessor](../api/preprocessor.md#makro--varianten-matrix))
 
 ## „BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
@@ -30,7 +30,7 @@ Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liqu
 
 - **Symptom**: Terrain-Hooks geschrieben, Wasser unverändert
 - **Ursache**: **in v5 läuft, wenn ein Paket keinen Liquid-Hook definiert, auch kein Terrain-Hook auf Wasser** (das Vor-v4-Verhalten „Liquid fällt auf Terrain zurück“ ist weg)
-- **Fix**: Liquid-Hooks schreiben ([Hook-Aufteilung](../api/hooks.md#what-each-program-draws))
+- **Fix**: Liquid-Hooks schreiben ([Hook-Aufteilung](../api/hooks.md#was-jedes-programm-zeichnet))
 
 ## Modelle (Entities, Block-Modelle) unbeeinflusst
 

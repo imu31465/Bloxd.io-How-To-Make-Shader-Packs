@@ -38,7 +38,7 @@ const Jq = new Map([
 
 ## 纹理名称解析与诊断
 
-`bloxdTextureId*` 的解析有专属路径 ([消息](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator))：
+`bloxdTextureId*` 的解析有专属路径 ([消息](../api/texture-api.md#名称解析错误-逐字取自验证器))：
 
 - **折叠**: 以非字母数字切分、驼峰化、加 `bloxdTextureId` 前缀；反向匹配不区分大小写与下划线
 - **拼写建议** (v5 新增): 未匹配的名称按莱文斯坦距离获得建议，阈值 `max(2, floor(len/4)) + 1`
@@ -52,7 +52,7 @@ const Jq = new Map([
 
 ## Y 导数改写
 
-分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](../api/restrictions.md#auto-rewrite-introduced-in-v5))。
+分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](../api/restrictions.md#自动改写))。
 
 ## 标头与纹理常量生成
 
@@ -61,7 +61,7 @@ const Jq = new Map([
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](../api/compatibility.md#saved-pack-re-validation-needs-re-check))。
+`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](../api/compatibility.md#已保存包的重验-需要重新检查))。
 
 ## 验证桩
 

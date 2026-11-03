@@ -27,7 +27,7 @@
 
 ## 廃止されたマクロ
 
-- **`BLOXD_LIGHTING`** — v5 で廃止。ライティング状態はコンパイル時ではなく実行時の [`bloxdLit()`](lighting.md#bloxdlit-lit) で判定します。使用すると検証時に専用メッセージが出ます:
+- **`BLOXD_LIGHTING`** — v5 で廃止。ライティング状態はコンパイル時ではなく実行時の [`bloxdLit()`](lighting.md#bloxdlit--ライティングのゲート) で判定します。使用すると検証時に専用メッセージが出ます:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 

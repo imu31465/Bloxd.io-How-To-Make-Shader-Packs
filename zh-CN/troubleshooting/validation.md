@@ -18,7 +18,7 @@
 ## 「bloxdPackInputs isn't part of the bloxd_ header」
 
 - **原因**: 直接引用了该 uniform
-- **修复**: 经标头函数使用 ([包格式](../api/pack-format.md#per-frame-uniform-bloxdpackinputs))
+- **修复**: 经标头函数使用 ([包格式](../api/pack-format.md#逐帧-uniform-bloxdpackinputs))
 
 ## 「... reaches bloxdTexel, which only surface and light hooks can use.」
 
@@ -45,7 +45,7 @@
 
 | 消息 | 处理 |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | 迁移 `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([光照](../api/lighting.md#bloxdlit--the-gate)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | 迁移 `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` ([光照](../api/lighting.md#bloxdlit--门控)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | 残留位常量 → `flags.rock` ([标志](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 内部符号 → 改用公开的 `bloxdLitColour()` |
 

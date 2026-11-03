@@ -59,7 +59,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `bloxdTextureSize` | 서피스 / light 훅만 | — |
 | `bloxdOpaqueBehind` | 서피스 / light 훅 (액체 베리언트에서 의미 있음) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` 은 더 이상 문서화된 헤더에 없지만, 엔진은 여전히 주입하고 받아들인다 — [함수: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected) 참조. 버텍스 훅에서 호출 가능한 유일한 특수 함수였다. 새 코드에서는 「어느 블록인가」에 `flags` 를 쓰는 것이 낫다.
+> `bloxdFragmentBlockPosition` 은 더 이상 문서화된 헤더에 없지만, 엔진은 여전히 주입하고 받아들인다 — [함수: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--문서화되지-않았지만-여전히-주입된다) 참조. 버텍스 훅에서 호출 가능한 유일한 특수 함수였다. 새 코드에서는 「어느 블록인가」에 `flags` 를 쓰는 것이 낫다.
 
 ## 폴백과 공유
 

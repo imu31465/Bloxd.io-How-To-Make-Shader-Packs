@@ -59,7 +59,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `bloxdTextureSize` | 仅 surface / light 钩子 | — |
 | `bloxdOpaqueBehind` | surface / light 钩子 (液体变体中才有意义) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` 已不在有文档的标头中，但引擎仍会注入并接受它 — 见[函数: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected)。它曾是唯一可从 vertex 钩子调用的特殊函数；新代码请改用 `flags` 判断「这是哪个方块」。
+> `bloxdFragmentBlockPosition` 已不在有文档的标头中，但引擎仍会注入并接受它 — 见[函数: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--未写入文档但仍在注入)。它曾是唯一可从 vertex 钩子调用的特殊函数；新代码请改用 `flags` 判断「这是哪个方块」。
 
 ## 回退与共享
 

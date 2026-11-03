@@ -45,7 +45,7 @@ Sie decken die Übergabe der Flag-Struktur (`bloxdSpFlags`), die Enchant- und Mo
 
 ### Texturnamen
 
-Bezeichner, die mit `bloxdTextureId` beginnen, werden als Textur-Namenskonstanten aufgelöst ([Textur-API](texture-api.md#bloxdtextureid-named-texture-constants)).
+Bezeichner, die mit `bloxdTextureId` beginnen, werden als Textur-Namenskonstanten aufgelöst ([Textur-API](texture-api.md#bloxdtextureid-benannte-texturkonstanten)).
 
 ## Automatische Umschreibungen
 

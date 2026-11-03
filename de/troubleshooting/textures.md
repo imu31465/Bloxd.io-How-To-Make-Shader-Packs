@@ -14,7 +14,7 @@ Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkata
 
 - **Ursache**: eine **Rahmennummer** auf einer animierten Textur geschrieben (`lava0` etc.)
 - **Fix**: den Basisnamen benutzen — Sampeln liefert automatisch den aktuellen Rahmen
-- **Vorbeugen**: für die 42 Animationsfamilien nie Rahmen-Suffixe schreiben ([Namensgebung](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **Vorbeugen**: für die 42 Animationsfamilien nie Rahmen-Suffixe schreiben ([Namensgebung](../api/texture-api.md#schreibregeln-und-namensfreiheit))
 
 ## „...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
@@ -33,12 +33,12 @@ Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkata
 
 ## „Case and underscores are not distinguished“ — wie koexistieren beide Regeln?
 
-Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top` und `bloxdTextureIdGrassTop` auf **dieselbe** Konstante auf. Nur wenn das Falten mehrere Kandidaten übrig lässt, feuert der eigene Mehrdeutigkeitsfehler ([Namensregeln](../api/texture-api.md#spelling-rules-and-naming-freedom)).
+Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top` und `bloxdTextureIdGrassTop` auf **dieselbe** Konstante auf. Nur wenn das Falten mehrere Kandidaten übrig lässt, feuert der eigene Mehrdeutigkeitsfehler ([Namensregeln](../api/texture-api.md#schreibregeln-und-namensfreiheit)).
 
 ## bloxdTexel liefert auf Modellen immer weiß
 
 - **Absicht**: die meisten Modelle nutzen `textureId: 0` (keine Textur — Spieler-Skins etc.); `bloxdTexel(0, ...)` liefert `vec4f(1.0)`
-- **Fix**: mit `surface.textureId != 0u` auswählen ([modell-eigene Texturen](../api/texture-api.md#model-owned-textures-textureid-0))
+- **Fix**: mit `surface.textureId != 0u` auswählen ([modell-eigene Texturen](../api/texture-api.md#modell-eigene-texturen-textureid-0))
 
 ## Texturen hinzufügen wollen
 
@@ -52,7 +52,7 @@ Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top
 ## Roh-ids brachen nach einem Spiel-Update
 
 - **Ursache**: **ids sind Momentaufnahmen** — gemessen änderten 334 von 905 überlebenden Namen die id zwischen zwei Builds
-- **Fix**: `bloxdTextureIdLava` schreiben, nicht `19` ([Namen sind die API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **Fix**: `bloxdTextureIdLava` schreiben, nicht `19` ([Namen sind die API](../api/texture-catalog.md#gemessener-drift-cnty9--ab90qa))
 
 ## Verwandte Seiten
 

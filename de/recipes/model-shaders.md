@@ -116,7 +116,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0`-Flächen (Skins) sampeln weiß — kein Fehler ([modell-eigene Texturen](../api/texture-api.md#model-owned-textures-textureid-0)).
+`textureId: 0`-Flächen (Skins) sampeln weiß — kein Fehler ([modell-eigene Texturen](../api/texture-api.md#modell-eigene-texturen-textureid-0)).
 
 ## Rüstung gegen den Rest
 
@@ -142,7 +142,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Das Muster der geteilten Funktion ist es, das die Standard-Pack-Vorlage selbst empfiehlt ([Hooks](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+Das Muster der geteilten Funktion ist es, das die Standard-Pack-Vorlage selbst empfiehlt ([Hooks](../getting-started/hooks.md#fallbacks-und-code-sharing)).
 
 ## Verwandte Seiten
 

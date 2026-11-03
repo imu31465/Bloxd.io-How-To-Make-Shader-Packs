@@ -29,13 +29,13 @@
 
 ## エンジンのワールド光を保ちたいのに結果が変わる
 
-- **v5 の解決策**: `bloxdWorldLight(light)` をそのまま呼ぶ — エンジン自身の「block/sky/held の最明値、ambientLightColour を下限」と同じ計算 ([ライティングAPI](../api/lighting.md#bloxdworldlight-ワールドの光))
+- **v5 の解決策**: `bloxdWorldLight(light)` をそのまま呼ぶ — エンジン自身の「block/sky/held の最明値、ambientLightColour を下限」と同じ計算 ([ライティングAPI](../api/lighting.md#bloxdworldlight--ワールドの光))
 - **注意**: `blockLight` / `heldLight` は `!bloxdLit()` で 0、`skyLight` と光の色は 1 になる (ヘッダー保証)
 
 ## ライティング無効のゲームで見た目がおかしい
 
 - **原因**: ライティング有効時だけ意味のある入力 (`blockLight` 等) をガードせず使っている。v5 では `#ifdef BLOXD_LIGHTING` は廃止 — **実行時の `bloxdLit()`** で分岐する
-- **解決方法**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` の早期 return を入れる ([ライティングAPI](../api/lighting.md#bloxdlit-lit))
+- **解決方法**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` の早期 return を入れる ([ライティングAPI](../api/lighting.md#bloxdlit--ライティングのゲート))
 
 ## `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 

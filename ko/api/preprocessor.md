@@ -27,7 +27,7 @@
 
 ## 제거된 매크로
 
-- **`BLOXD_LIGHTING`** — v5 에서 제거. 라이팅 상태는 컴파일 분기가 아니라 [`bloxdLit()`](lighting.md#bloxdlit--the-gate) 의 런타임 질문이다. 쓰면 다음과 함께 검증에 실패한다:
+- **`BLOXD_LIGHTING`** — v5 에서 제거. 라이팅 상태는 컴파일 분기가 아니라 [`bloxdLit()`](lighting.md#bloxdlit--게이트) 의 런타임 질문이다. 쓰면 다음과 함께 검증에 실패한다:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
@@ -72,7 +72,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `BloxdSurface.alpha` 는 `#ifdef BLOXD_ALPHA` 안에서만 존재한다
 - `bloxdOpaqueBehind()` 는 `#ifdef BLOXD_SCENE_DEPTH` 안에서만 호출할 수 있다
 
-[구조체](structures.md#conditional-fields--macros) 를 보라.
+[구조체](structures.md#조건부-필드--매크로) 를 보라.
 
 ## 관련 문서
 

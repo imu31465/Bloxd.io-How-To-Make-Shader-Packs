@@ -45,7 +45,7 @@
 
 ### 텍스처 이름
 
-`bloxdTextureId` 로 시작하는 식별자는 텍스처 이름 상수로 해석된다 ([텍스처 API](texture-api.md#bloxdtextureid-named-texture-constants)).
+`bloxdTextureId` 로 시작하는 식별자는 텍스처 이름 상수로 해석된다 ([텍스처 API](texture-api.md#bloxdtextureid-이름-붙은-텍스처-상수)).
 
 ## 자동 재작성
 

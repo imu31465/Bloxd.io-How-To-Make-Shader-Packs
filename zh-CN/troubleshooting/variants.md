@@ -14,7 +14,7 @@
 ## 「.alpha is undefined」
 
 - **原因**: `alpha` 只在 `#ifdef BLOXD_ALPHA` 之后存在 (全部 liquid + 非 strict 的 terrain/model)
-- **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](../api/preprocessor.md#macro--variant-matrix))
+- **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](../api/preprocessor.md#宏--变体矩阵))
 
 ## 「BloxdVertex only exists when BLOXD_STRICT isn't defined」
 
@@ -30,7 +30,7 @@
 
 - **症状**: 写了地形钩子，水却没变
 - **原因**: **v5 中，包若未定义任何 Liquid 钩子，任何 Terrain 钩子也不会在水上运行** (v4 之前「液体回退到地形」的行为已移除)
-- **修复**: 编写 Liquid 钩子 ([钩子划分](../api/hooks.md#what-each-program-draws))
+- **修复**: 编写 Liquid 钩子 ([钩子划分](../api/hooks.md#各程序绘制什么))
 
 ## 模型 (实体、方块模型) 不受影响
 

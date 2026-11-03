@@ -28,13 +28,13 @@
 
 ## 엔진의 월드 라이트를 정확히 유지하고 싶다
 
-- **v5 해법**: `bloxdWorldLight(light)` 를 호출한다 — 엔진의 「block/sky/held 중 최광, `ambientLightColour` 가 바닥」과 같은 수식이다 ([라이팅](../api/lighting.md#bloxdworldlight--the-worlds-light))
+- **v5 해법**: `bloxdWorldLight(light)` 를 호출한다 — 엔진의 「block/sky/held 중 최광, `ambientLightColour` 가 바닥」과 같은 수식이다 ([라이팅](../api/lighting.md#bloxdworldlight--월드의-빛))
 - **주의**: `!bloxdLit()` 일 때 `blockLight` / `heldLight` 은 0, 하늘 관련 필드는 1 이다 (헤더 보증)
 
 ## 라이팅 꺼진 게임에서 이상하다
 
 - **원인**: 라이팅 전용 입력 (`blockLight` 등) 을 가드 없이 씀. v5 에는 `#ifdef BLOXD_LIGHTING` 이 없다 — **런타임 `bloxdLit()`** 으로 분기한다
-- **해결**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` 로 조기 반환한다 ([라이팅](../api/lighting.md#bloxdlit--the-gate))
+- **해결**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` 로 조기 반환한다 ([라이팅](../api/lighting.md#bloxdlit--게이트))
 
 ## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
 

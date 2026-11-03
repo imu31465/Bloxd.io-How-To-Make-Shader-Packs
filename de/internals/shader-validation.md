@@ -38,7 +38,7 @@ Hinweis: `bloxdFragmentBlockPosition` ist aus der Header-Generierung verschwunde
 
 ## Texturnamen-Auflösung & Diagnosen
 
-Die `bloxdTextureId*`-Auflösung hat einen eigenen Pfad ([die Meldungen](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+Die `bloxdTextureId*`-Auflösung hat einen eigenen Pfad ([die Meldungen](../api/texture-api.md#fehler-der-namensauflösung-wortwörtlich-aus-dem-validator)):
 
 - **Falten**: an Nicht-Alphanumerisches splitten, CamelCase, `bloxdTextureId`-Präfix; das Rückwärts-Matching ist Case-/Unterstrich-insensitiv
 - **Schreibweisen-Vorschläge** (neu in v5): nicht gematchte Namen bekommen Levenshtein-Vorschläge an der Schwelle `max(2, floor(len/4)) + 1`
@@ -52,7 +52,7 @@ Die `bloxdTextureId*`-Auflösung hat einen eigenen Pfad ([die Meldungen](../api/
 
 ## Die Y-Ableitungs-Umschreibung
 
-Der Token-Rewrite-Pass des Analyzers schreibt jeden `dpdy` / `dpdyCoarse` / `dpdyFine`-Aufruf zu `(-dpdy(...))` um (die dpdy-Familie ist explizit als Inversionsmenge aufgeführt). `dpdx` und `fwidth` bleiben unberührt ([Einschränkungen](../api/restrictions.md#auto-rewrite-introduced-in-v5)).
+Der Token-Rewrite-Pass des Analyzers schreibt jeden `dpdy` / `dpdyCoarse` / `dpdyFine`-Aufruf zu `(-dpdy(...))` um (die dpdy-Familie ist explizit als Inversionsmenge aufgeführt). `dpdx` und `fwidth` bleiben unberührt ([Einschränkungen](../api/restrictions.md#automatische-umschreibungen)).
 
 ## Header- & Texturkonstanten-Generierung
 
@@ -61,7 +61,7 @@ Der Token-Rewrite-Pass des Analyzers schreibt jeden `dpdy` / `dpdyCoarse` / `dpd
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` ist `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (führende Ganzzahl 8 → 9 von v4). Die beiden fnv1a32-Suffixe fingerprinten das Header-Material und die sortierte Name-id-Registry. Die Re-Validierung gespeicherter Pakete entscheidet mit diesem Fingerprint über „muss erneut geprüft werden“ ([Kompatibilität](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` ist `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (führende Ganzzahl 8 → 9 von v4). Die beiden fnv1a32-Suffixe fingerprinten das Header-Material und die sortierte Name-id-Registry. Die Re-Validierung gespeicherter Pakete entscheidet mit diesem Fingerprint über „muss erneut geprüft werden“ ([Kompatibilität](../api/compatibility.md#re-validierung-gespeicherter-pakete-muss-erneut-geprüft-werden)).
 
 ## Validierungs-Stubs
 

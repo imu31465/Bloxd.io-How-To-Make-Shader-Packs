@@ -31,7 +31,7 @@
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 개명)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 호출 지점은 여전히 컴파일된다 (엔진이 주입한다). 다만 이제는 문서화되지 않았으므로, 여기서 벗어나 이주하는 것이 안전한 선택이다 ([함수](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
+- `bloxdFragmentBlockPosition` 호출 지점은 여전히 컴파일된다 (엔진이 주입한다). 다만 이제는 문서화되지 않았으므로, 여기서 벗어나 이주하는 것이 안전한 선택이다 ([함수](functions.md#bloxdfragmentblockposition--문서화되지-않았지만-여전히-주입된다))
 - `pack.json` 을 `"apiVersion": 5` 로 올린다
 
 이번 판의 조용한 함정: `blockFlags` 를 계속 읽거나 light 훅을 `#ifdef BLOXD_LIGHTING` 으로 감싼 채인 팩은 **전용 메시지와 함께 검증에 실패한다** (분석기가 이제 이 두 경우를 모두 설명한다). 즉 조용히 오동작하는 일은 없고, 이주할 때까지 계속 거부될 뿐이다.
@@ -51,7 +51,7 @@
 
 - **WebGPU 렌더러 전용**: 팩을 설치하면 WebGPU 렌더러가 강제로 켜진다
 - **모바일**: WebGPU가 제한된 환경에서는 팩을 아예 실행할 수 없다 ([요구 사항](../getting-started/requirements.md))
-- **비아틀라스 렌더러 구성**: `bloxdTexel` / `bloxdTextureSize` 는 스텁으로 퇴화한다 (흰 텍셀, 1×1). 코드 자체는 여전히 컴파일되고 실행된다 ([텍스처 API](texture-api.md#where-the-texture-api-cant-go))
+- **비아틀라스 렌더러 구성**: `bloxdTexel` / `bloxdTextureSize` 는 스텁으로 퇴화한다 (흰 텍셀, 1×1). 코드 자체는 여전히 컴파일되고 실행된다 ([텍스처 API](texture-api.md#텍스처-api-가-갈-수-없는-곳))
 
 ## 버전 지원 요약
 

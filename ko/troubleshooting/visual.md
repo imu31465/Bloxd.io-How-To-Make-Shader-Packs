@@ -8,7 +8,7 @@
 
 - **원인**: 포그 이중 적용. 기본 light 훅 출력은 **이미 포그가 적용**되어 있다 (`bloxdApplyFog(lit + emission, light)`). 그 위에 포그색을 더 섞으면 두 번이 된다
 - **해결**: 커스텀 포그는 은은하게. 채도만의 대기 원근법도 고려하라 ([리얼화 레시피](../recipes/realism.md))
-- **예방**: 포그를 쓰기 전에 `fogAlpha` 의 의미 (0 = 포그 없음, 1 = fogColour 뿐) 와 [파이프라인](../api/lighting.md#the-full-pipeline) 을 이해한다
+- **예방**: 포그를 쓰기 전에 `fogAlpha` 의 의미 (0 = 포그 없음, 1 = fogColour 뿐) 와 [파이프라인](../api/lighting.md#전체-파이프라인) 을 이해한다
 
 ## pow(l.skyLight, γ) 로 그림자가 절대 어두워지지 않는다
 
@@ -37,7 +37,7 @@
 
 ## 회전된 면에서 수면 무늬가 어긋난다
 
-- **원인**: `bloxdTexel` 이 프래그먼트 자신의 `textureRotation` 을 당신의 uv 에 적용한다 ([회전의 미묘함](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
+- **원인**: `bloxdTexel` 이 프래그먼트 자신의 `textureRotation` 을 당신의 uv 에 적용한다 ([회전의 미묘함](../api/texture-api.md#회전의-미묘함--중립-샘플러))
 - **해결**: `texelNeutral` 헬퍼로 미리 회전한다
 
 ## 인챈트 글린트 / 피격 플래시가 사라졌다

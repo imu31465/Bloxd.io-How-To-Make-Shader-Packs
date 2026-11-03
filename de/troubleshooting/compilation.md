@@ -19,7 +19,7 @@ Fehler, die die statische Validierung bestehen, aber als WGSL scheitern — oder
 
 - **Ursache**: `var x: BloxdSurface;` — nackte typ-annotierte Deklarationen werden abgelehnt, weil Header-Strukturen Felder gewinnen
 - **Fix**: `var out = bloxdDefaultSurface(s);` (oder `var out = s;` in Light-Hooks)
-- **Vorbeugen**: Ausgaben immer aus `bloxdDefault*` bauen ([Konventionen](../api/structures.md#writing-conventions-recap))
+- **Vorbeugen**: Ausgaben immer aus `bloxdDefault*` bauen ([Konventionen](../api/structures.md#schreibkonventionen-recap))
 
 ## „_ can only be the target of a phony assignment, as in _ = f();"
 
@@ -34,7 +34,7 @@ Fehler, die die statische Validierung bestehen, aber als WGSL scheitern — oder
 ## dpdy-Vorzeichen sieht invertiert aus
 
 - **Das ist Absicht**: der Analyzer schreibt jeden `dpdy` / `dpdyCoarse` / `dpdyFine`-Aufruf automatisch zu `(-dpdy(...))` um (Screen-Space-y zeigt nach unten)
-- **Fix**: nichts — `dpdy(h)` in der Bedeutung „wie ändert sich h nach oben“ schreiben, und der emittierte Code trägt den Flip ([Einschränkungen](../api/restrictions.md#auto-rewrite-introduced-in-v5))
+- **Fix**: nichts — `dpdy(h)` in der Bedeutung „wie ändert sich h nach oben“ schreiben, und der emittierte Code trägt den Flip ([Einschränkungen](../api/restrictions.md#automatische-umschreibungen))
 - `dpdx` und `fwidth` bleiben unberührt
 
 ## Paket wird beim Spiel-Beitritt rausgeworfen / die Geräte-Prüfung endet nie

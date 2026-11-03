@@ -28,7 +28,7 @@ Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model),
 
 1. **Effekte auf die Flächen gaten, die sie brauchen** — `flags`-Auswahl schlägt „+20 % überall“
 2. **Detail mit Distanz abwerfen** — früh aussteigen, wenn `distance(surface.position, bloxdEyePosition())` eine Schwelle überschreitet
-3. **Mips benutzen** — `bloxdTexel(id, uv, mipLevel + 1.0)` ist ein ¼-Auflösungs-Durchschnitt ([ausgearbeitete Beispiele](../api/texture-api.md#worked-examples))
+3. **Mips benutzen** — `bloxdTexel(id, uv, mipLevel + 1.0)` ist ein ¼-Auflösungs-Durchschnitt ([ausgearbeitete Beispiele](../api/texture-api.md#ausgearbeitete-beispiele))
 4. **Für Farb-Justierungen lieber Surface-Hooks** — der Light-Hook ist die Alle-Pixel-Finalstufe
 5. **Detail schrittweise dazugeben und FPS vergleichen** ([Testen](testing.md))
 6. **`#ifdef`-Guards sparen keine Laufzeit** — Varianten sind Compile-Einheiten; Laufzeit-Ersparnisse kommen aus Flags und Distanz

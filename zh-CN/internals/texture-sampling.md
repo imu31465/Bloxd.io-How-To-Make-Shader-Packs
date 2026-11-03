@@ -43,7 +43,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ## 动画帧阶梯
 
-动画纹理 (42 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](../api/texture-catalog.md#animation-families-42-names)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
+动画纹理 (42 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](../api/texture-catalog.md#动画族-42-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
 
 ## 采样器设置
 

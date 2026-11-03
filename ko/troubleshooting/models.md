@@ -26,7 +26,7 @@
 ## 플래그 검사가 의도대로 안 돈다
 
 - **짐후보 원인**:
-  1. **플래그를 단일 선택 enum 으로 다룸** — 자유롭게 조합된다 («sandstone is sand and rock», «possibly even none») ([플래그](../api/flags.md#flags-combine-freely))
+  1. **플래그를 단일 선택 enum 으로 다룸** — 자유롭게 조합된다 («sandstone is sand and rock», «possibly even none») ([플래그](../api/flags.md#플래그는-자유롭게-조합된다))
   2. `else` 를 「나머지 전부」로 읽음 — `flags.rock` 의 else 는 단지 「rock 아님」일 뿐, sand 일 수 있다
 - **해결**: 머티리얼 플래그 (`opaque`…) 와 형상·상태 플래그 (`slab`/`held`…) 를 독립적으로 조합한다
 

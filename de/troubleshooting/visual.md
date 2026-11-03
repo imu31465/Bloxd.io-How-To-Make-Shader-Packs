@@ -8,7 +8,7 @@ Kompiliert einwandfrei, sieht aber falsch aus.
 
 - **Ursache**: Doppel-Fog. Der Standard-Light-Hook-Output ist **bereits verfogt** (`bloxdApplyFog(lit + emission, light)`), weitere Fog-Farbe obendrauf zu mischen verdoppelt ihn
 - **Fix**: eigenen Fog subtil halten; eine nur entsättigende Luftperspektive erwägen ([Realismusrezepte](../recipes/realism.md))
-- **Vorbeugen**: die `fogAlpha`-Semantik verstehen (0 = kein Fog, 1 = nur fogColour) und die [Pipeline](../api/lighting.md#the-full-pipeline), bevor Fog geschrieben wird
+- **Vorbeugen**: die `fogAlpha`-Semantik verstehen (0 = kein Fog, 1 = nur fogColour) und die [Pipeline](../api/lighting.md#die-komplette-pipeline), bevor Fog geschrieben wird
 
 ## pow(l.skyLight, γ) dunkelt Schatten nie ab
 
@@ -37,7 +37,7 @@ Kompiliert einwandfrei, sieht aber falsch aus.
 
 ## Wasser-Oberflächenmuster stehen auf gedrehten Flächen schief
 
-- **Ursache**: `bloxdTexel` wendet das eigene `textureRotation` des Fragments auf deine uv an ([die Rotations-Subtilität](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
+- **Ursache**: `bloxdTexel` wendet das eigene `textureRotation` des Fragments auf deine uv an ([die Rotations-Subtilität](../api/texture-api.md#die-rotations-subtilität--ein-neutraler-sampler))
 - **Fix**: mit dem `texelNeutral`-Helfer vor-drehen
 
 ## Enchant-Glint / Schadens-Blitz verschwunden

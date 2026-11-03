@@ -22,7 +22,7 @@ v5 의 새 Model 훅이 그리는 것과 읽는 것.
 | 인챈트 상태 | `enchantTier` / `enchantColour` / `enchantSpeed` | 전부 0 |
 | 엔티티 오버레이 | `overlayColour` | 0 |
 
-그리고 **텍스처의 의미가 다르다**: 지형 면은 아틀라스 `textureId` 를 실지만, **대부분의 모델은 `textureId: 0`** (「텍스처 없음」) 이다 — 플레이어 스킨과 몹 텍스처는 아틀라스 네임스페이스에 없다. `surface.colour` 에는 이미 스킨 × tint 가 들어 있으므로 그것부터 쓴다 ([모델 자체 텍스처](../api/texture-api.md#model-owned-textures-textureid-0)).
+그리고 **텍스처의 의미가 다르다**: 지형 면은 아틀라스 `textureId` 를 실지만, **대부분의 모델은 `textureId: 0`** (「텍스처 없음」) 이다 — 플레이어 스킨과 몹 텍스처는 아틀라스 네임스페이스에 없다. `surface.colour` 에는 이미 스킨 × tint 가 들어 있으므로 그것부터 쓴다 ([모델 자체 텍스처](../api/texture-api.md#모델-자체-텍스처-textureid-0)).
 
 `flags` 의 `held` / `dropped` / `thrown` / `lifeform` / `placed` 는 모델 면에서만 의미가 있다 ([플래그](../api/flags.md)).
 

@@ -18,7 +18,7 @@
 ## "bloxdPackInputs isn't part of the bloxd_ header"
 
 - **원인**: uniform 을 직접 참조함
-- **해결**: 헤더 함수를 통해 쓴다 ([팩 형식](../api/pack-format.md#per-frame-uniform-bloxdpackinputs))
+- **해결**: 헤더 함수를 통해 쓴다 ([팩 형식](../api/pack-format.md#프레임별-uniform-bloxdpackinputs))
 
 ## "... reaches bloxdTexel, which only surface and light hooks can use."
 
@@ -45,7 +45,7 @@
 
 | 메시지 | 조치 |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` 이주 ([라이팅](../api/lighting.md#bloxdlit--the-gate)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` 이주 ([라이팅](../api/lighting.md#bloxdlit--게이트)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | 남은 비트 상수 → `flags.rock` ([플래그](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 내부 심볼 → 공개 `bloxdLitColour()` 를 쓴다 |
 

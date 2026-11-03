@@ -20,7 +20,7 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ## 附魔计算
 
-引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](../recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](../api/lighting.md#the-full-pipeline))。
+引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](../recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](../api/lighting.md#完整管线))。
 
 ## 覆盖色 (受伤红闪等)
 
@@ -28,11 +28,11 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ## 纹理路径
 
-大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))。
+大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](../api/texture-api.md#模型自带纹理-textureid-0))。
 
 ## 变体
 
-Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](../api/preprocessor.md#macro--variant-matrix))；strict.model 没有 vertex 钩子。
+Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](../api/preprocessor.md#宏--变体矩阵))；strict.model 没有 vertex 钩子。
 
 ## 相关
 

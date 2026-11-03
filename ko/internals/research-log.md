@@ -32,7 +32,7 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 
 엔진의 레지스트리 구축 모듈 (29833 + 1371 + 1391 + 1384 + 219) 을 미니 webpack 하네스 안에서 출하된 블록 레지스트리의 텍스처 데이터에 대해 실행하고, 출력 (named 896 / aliases 416 / layers 228) 을 기록 ([텍스처 레지스트리](texture-registry.md)).
 
-애니메이션 간격은 `animDataPerTex` 식 표 (레이어별 `numAnimStates` / `animationInterval`) 에서 온다 — 간격값은 200 / 250 / 300 ms 세 종류뿐 ([카탈로그](../api/texture-catalog.md#animation-families-42-names)).
+애니메이션 간격은 `animDataPerTex` 식 표 (레이어별 `numAnimStates` / `animationInterval`) 에서 온다 — 간격값은 200 / 250 / 300 ms 세 종류뿐 ([카탈로그](../api/texture-catalog.md#애니메이션-계열-42-이름)).
 
 ### 오류 메시지 캡처
 

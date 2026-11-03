@@ -38,7 +38,7 @@ const Jq = new Map([
 
 ## 텍스처명 해석과 진단
 
-`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](../api/texture-api.md#이름-해석-오류-검증기에서-그대로)):
 
 - **접기**: 비영숫자로 분할, CamelCase, `bloxdTextureId` 접두. 역방향 대조는 대소문자/언더스코어 무관
 - **철자 제안** (v5 신규): 일치하지 않는 이름에 임계값 `max(2, floor(len/4)) + 1` 의 레벤슈타인 제안
@@ -52,7 +52,7 @@ const Jq = new Map([
 
 ## Y 도함수 재작성
 
-분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](../api/restrictions.md#auto-rewrite-introduced-in-v5)).
+분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](../api/restrictions.md#자동-재작성)).
 
 ## 헤더·텍스처 상수 생성
 
@@ -61,7 +61,7 @@ const Jq = new Map([
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](../api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 ## 검증 스텁
 

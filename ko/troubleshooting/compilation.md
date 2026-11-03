@@ -19,7 +19,7 @@
 
 - **원인**: `var x: BloxdSurface;` — 형 주석만 붙은 선언은 거부된다. 헤더 구조체가 필드를 얻기 때문이다
 - **해결**: `var out = bloxdDefaultSurface(s);` (light 훅에서는 `var out = s;`)
-- **예방**: 출력은 항상 `bloxdDefault*` 에서 구축한다 ([작성 규칙](../api/structures.md#writing-conventions-recap))
+- **예방**: 출력은 항상 `bloxdDefault*` 에서 구축한다 ([작성 규칙](../api/structures.md#작성-규칙-재정리))
 
 ## "_ can only be the target of a phony assignment, as in _ = f();"
 
@@ -34,7 +34,7 @@
 ## dpdy 부호가 반전돼 보인다
 
 - **의도된 동작이다**: 분석기가 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 자동 재작성한다 (화면공간 y 는 아래를 향한다)
-- **해결**: 필요 없다 — 「위로 가며 h 는 어떻게 변하나」라는 의도로 `dpdy(h)` 를 쓰면 내보내는 코드가 반전을 싣는다 ([제한과 예약명](../api/restrictions.md#auto-rewrite-introduced-in-v5))
+- **해결**: 필요 없다 — 「위로 가며 h 는 어떻게 변하나」라는 의도로 `dpdy(h)` 를 쓰면 내보내는 코드가 반전을 싣는다 ([제한과 예약명](../api/restrictions.md#자동-재작성))
 - `dpdx` 와 `fwidth` 는 손대지 않는다
 
 ## 게임 참가 시 팩이 떨어진다 / 실기기 검사가 끝나지 않는다

@@ -19,7 +19,7 @@
 
 - **原因**: `var x: BloxdSurface;` — 裸的类型标注声明会被拒绝，因为标头结构体会增字段
 - **修复**: `var out = bloxdDefaultSurface(s);` (light 钩子里也可 `var out = s;`)
-- **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](../api/structures.md#writing-conventions-recap))
+- **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](../api/structures.md#书写惯例-回顾))
 
 ## 「_ can only be the target of a phony assignment, as in _ = f();」
 
@@ -34,7 +34,7 @@
 ## dpdy 的符号看起来反了
 
 - **这是有意为之**: 分析器自动把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (屏幕空间 y 向下)
-- **修复**: 无需处理 — 写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转 ([限制](../api/restrictions.md#auto-rewrite-introduced-in-v5))
+- **修复**: 无需处理 — 写 `dpdy(h)` 时按「往上走 h 怎么变」的意图理解即可，产出的代码自带翻转 ([限制](../api/restrictions.md#自动改写))
 - `dpdx` 与 `fwidth` 不受影响
 
 ## 加入游戏时包被弃用 / 实机检查一直跑不完

@@ -59,7 +59,7 @@ Der Validator der Engine beschränkt, welche Hooks bestimmte Funktionen erreiche
 | `bloxdTextureSize` | nur Surface-/Light-Hooks | — |
 | `bloxdOpaqueBehind` | Surface-/Light-Hooks (sinnvoll in Liquid-Varianten) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` steht nicht mehr im dokumentierten Header, aber die Engine injiziert und akzeptiert es weiterhin — siehe [Funktionen: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected). Es war die eine Spezialfunktion, die aus Vertex-Hooks aufrufbar war; für neuen Code lieber `flags` für „welcher Block ist das“ verwenden.
+> `bloxdFragmentBlockPosition` steht nicht mehr im dokumentierten Header, aber die Engine injiziert und akzeptiert es weiterhin — siehe [Funktionen: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--undokumentiert-aber-weiterhin-injiziert). Es war die eine Spezialfunktion, die aus Vertex-Hooks aufrufbar war; für neuen Code lieber `flags` für „welcher Block ist das“ verwenden.
 
 ## Fallbacks und gemeinsame Nutzung
 

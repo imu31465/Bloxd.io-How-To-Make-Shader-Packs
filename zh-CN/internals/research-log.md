@@ -32,7 +32,7 @@
 
 在微型 webpack harness 中，针对随包分发的方块注册表纹理数据运行引擎的注册表构建模块 (29833 + 1371 + 1391 + 1384 + 219)；记录输出 (具名 896 / 别名 416 / 层 228) ([纹理注册表](texture-registry.md))。
 
-动画间隔来自 `animDataPerTex` 式的表 (逐层 `numAnimStates` / `animationInterval`) — 只存在三种间隔值: 200 / 250 / 300 ms ([目录](../api/texture-catalog.md#animation-families-42-names))。
+动画间隔来自 `animDataPerTex` 式的表 (逐层 `numAnimStates` / `animationInterval`) — 只存在三种间隔值: 200 / 250 / 300 ms ([目录](../api/texture-catalog.md#动画族-42-个名称))。
 
 ### 错误消息采集
 

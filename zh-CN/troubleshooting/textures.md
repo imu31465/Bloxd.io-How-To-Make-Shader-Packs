@@ -14,7 +14,7 @@
 
 - **原因**: 给动画纹理写了**帧号** (`lava0` 等)
 - **修复**: 用基础名称 — 采样会自动返回当前帧
-- **预防**: 42 个动画族永远不要写帧号后缀 ([命名](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **预防**: 42 个动画族永远不要写帧号后缀 ([命名](../api/texture-api.md#拼写规则与命名自由度))
 
 ## 「...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...」
 
@@ -33,12 +33,12 @@
 
 ## 「Case and underscores are not distinguished」— 两条规则怎么共存？
 
-名称解析会折叠大小写与 `_`，因此 `bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析为**同一个**常量。只有当折叠后剩下多个候选时才会触发专属的歧义错误 ([命名规则](../api/texture-api.md#spelling-rules-and-naming-freedom))。
+名称解析会折叠大小写与 `_`，因此 `bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析为**同一个**常量。只有当折叠后剩下多个候选时才会触发专属的歧义错误 ([命名规则](../api/texture-api.md#拼写规则与命名自由度))。
 
 ## bloxdTexel 在模型上总是返回白色
 
 - **设计如此**: 大多数模型用 `textureId: 0` (无纹理 — 玩家皮肤等)；`bloxdTexel(0, ...)` 返回 `vec4f(1.0)`
-- **修复**: 用 `surface.textureId != 0u` 选取 ([模型自带纹理](../api/texture-api.md#model-owned-textures-textureid-0))
+- **修复**: 用 `surface.textureId != 0u` 选取 ([模型自带纹理](../api/texture-api.md#模型自带纹理-textureid-0))
 
 ## 想添加纹理
 
@@ -52,7 +52,7 @@
 ## 游戏更新后裸 id 失效了
 
 - **原因**: **id 是快照** — 实测两个构建之间 905 个幸存名称中 334 个改了 id
-- **修复**: 写 `bloxdTextureIdLava`，而不是 `19` ([名称即 API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **修复**: 写 `bloxdTextureIdLava`，而不是 `19` ([名称即 API](../api/texture-catalog.md#实测漂移-cnty9--ab90qa))
 
 ## 相关
 

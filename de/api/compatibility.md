@@ -31,7 +31,7 @@ Die Konvertierung ist größtenteils mechanisch (vollständige Checkliste im [v5
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (eine 1:1-Umbenennung)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition`-Aufrufstellen kompilieren weiterhin (die Engine injiziert die Funktion), sind aber jetzt undokumentiert — davon wegzumigrieren ist der sichere Weg ([Funktionen](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
+- `bloxdFragmentBlockPosition`-Aufrufstellen kompilieren weiterhin (die Engine injiziert die Funktion), sind aber jetzt undokumentiert — davon wegzumigrieren ist der sichere Weg ([Funktionen](functions.md#bloxdfragmentblockposition--undokumentiert-aber-weiterhin-injiziert))
 - `pack.json` auf `"apiVersion": 5` anheben
 
 Die stille Falle ist diesmal eine andere: Pakete, die weiterhin `blockFlags` lesen oder Light-Hooks in `#ifdef BLOXD_LIGHTING` verpacken, **scheitern mit eigenen Meldungen an der Validierung** (der Analyzer erklärt inzwischen beide Fälle) — nichts verhält sich also still falsch; sie bleiben bis zur Migration schlicht abgelehnt.
@@ -51,7 +51,7 @@ Details: [Engine-Interna: Textur-Registry](../internals/texture-registry.md).
 
 - **Nur WebGPU-Renderer**: Das Installieren eines Pakets erzwingt den WebGPU-Renderer
 - **Mobil**: In WebGPU-beschränkten Umgebungen laufen Pakete gar nicht ([Voraussetzungen](../getting-started/requirements.md))
-- **Nicht-Atlas-Renderer-Konfigurationen**: `bloxdTexel` / `bloxdTextureSize` fallen auf Stubs zurück (weiße Texel, 1×1); der Code kompiliert und läuft weiterhin ([Textur-API](texture-api.md#where-the-texture-api-cant-go))
+- **Nicht-Atlas-Renderer-Konfigurationen**: `bloxdTexel` / `bloxdTextureSize` fallen auf Stubs zurück (weiße Texel, 1×1); der Code kompiliert und läuft weiterhin ([Textur-API](texture-api.md#wohin-die-textur-api-nicht-gehen-kann))
 
 ## Zusammenfassung der Versionsunterstützung
 

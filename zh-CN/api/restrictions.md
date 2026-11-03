@@ -45,7 +45,7 @@
 
 ### 纹理名称
 
-以 `bloxdTextureId` 开头的标识符会被解析为纹理名称常量 ([纹理 API](texture-api.md#bloxdtextureid-named-texture-constants))。
+以 `bloxdTextureId` 开头的标识符会被解析为纹理名称常量 ([纹理 API](texture-api.md#bloxdtextureid-具名纹理常量))。
 
 ## 自动改写
 

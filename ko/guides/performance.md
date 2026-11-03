@@ -28,7 +28,7 @@
 
 1. **필요한 면에만 효과를 건다** — `flags` 선택이 「전역 +20%」보다 낫다
 2. **거리와 함께 디테일을 떨어뜨린다** — `distance(surface.position, bloxdEyePosition())` 가 임계값을 넘으면 조기 탈출
-3. **밉을 쓴다** — `bloxdTexel(id, uv, mipLevel + 1.0)` 은 1/4 해상도 평균이다 ([작동 예시](../api/texture-api.md#worked-examples))
+3. **밉을 쓴다** — `bloxdTexel(id, uv, mipLevel + 1.0)` 은 1/4 해상도 평균이다 ([작동 예시](../api/texture-api.md#작동-예시))
 4. **색 조정은 서피스 훅 우선** — light 훅은 전 픽셀 최종 단계다
 5. **디테일을 조금씩 넣고 FPS 를 비교한다** ([테스팅](testing.md))
 6. **`#ifdef` 가드는 런타임을 줄이지 않는다** — 베리언트는 컴파일 단위다. 런타임 절약은 플래그와 거리에서 나온다

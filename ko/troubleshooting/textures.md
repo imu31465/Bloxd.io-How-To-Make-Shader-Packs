@@ -14,7 +14,7 @@
 
 - **원인**: 애니메이션 텍스처에 **프레임 번호**를 씀 (`lava0` 등)
 - **해결**: 기본명을 쓴다 — 샘플이 현재 프레임을 자동으로 반환한다
-- **예방**: 42개 애니메이션 계열에는 프레임 접미사를 절대 쓰지 않는다 ([명명 규칙](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **예방**: 42개 애니메이션 계열에는 프레임 접미사를 절대 쓰지 않는다 ([명명 규칙](../api/texture-api.md#철자-규칙과-명명의-자유))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
@@ -33,12 +33,12 @@
 
 ## 「대소문자와 언더스코어는 구별되지 않는다」 — 두 규칙은 어떻게 공존하는가
 
-이름 해석은 대소문자와 `_` 를 접으므로, `bloxdTextureId_grass_top` 과 `bloxdTextureIdGrassTop` 은 **같은** 상수로 해석된다. 접기가 여러 후보를 남겼을 때만 전용 모호성 오류가 나간다 ([명명 규칙](../api/texture-api.md#spelling-rules-and-naming-freedom)).
+이름 해석은 대소문자와 `_` 를 접으므로, `bloxdTextureId_grass_top` 과 `bloxdTextureIdGrassTop` 은 **같은** 상수로 해석된다. 접기가 여러 후보를 남겼을 때만 전용 모호성 오류가 나간다 ([명명 규칙](../api/texture-api.md#철자-규칙과-명명의-자유)).
 
 ## 모델에서 bloxdTexel 이 항상 흰색을 반환
 
 - **설계상 그렇다**: 대부분의 모델은 `textureId: 0` (텍스처 없음 — 플레이어 스킨 등). `bloxdTexel(0, ...)` 은 `vec4f(1.0)` 을 반환한다
-- **해결**: `surface.textureId != 0u` 로 골라낸다 ([모델 자체 텍스처](../api/texture-api.md#model-owned-textures-textureid-0))
+- **해결**: `surface.textureId != 0u` 로 골라낸다 ([모델 자체 텍스처](../api/texture-api.md#모델-자체-텍스처-textureid-0))
 
 ## 텍스처를 추가하고 싶다
 
@@ -52,7 +52,7 @@
 ## 게임 업데이트 후 원시 id 가 깨졌다
 
 - **원인**: **id 는 스냅샷이다** — 실측으로, 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다
-- **해결**: `19` 이 아니라 `bloxdTextureIdLava` 를 쓴다 ([이름이 API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **해결**: `19` 이 아니라 `bloxdTextureIdLava` 를 쓴다 ([이름이 API](../api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ## 관련 문서
 

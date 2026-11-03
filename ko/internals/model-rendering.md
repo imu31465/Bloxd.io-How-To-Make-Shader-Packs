@@ -20,7 +20,7 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ## 인챈트 계산
 
-엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](../recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](../api/lighting.md#the-full-pipeline)).
+엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](../recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](../api/lighting.md#전체-파이프라인)).
 
 ## 오버레이 (피격 플래시 등)
 
@@ -28,11 +28,11 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ## 텍스처 경로
 
-대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](../api/texture-api.md#model-owned-textures-textureid-0)).
+대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](../api/texture-api.md#모델-자체-텍스처-textureid-0)).
 
 ## 베리언트
 
-Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](../api/preprocessor.md#macro--variant-matrix)). strict.model 에는 버텍스 훅이 없다.
+Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](../api/preprocessor.md#매크로--베리언트-매트릭스)). strict.model 에는 버텍스 훅이 없다.
 
 ## 관련 문서
 

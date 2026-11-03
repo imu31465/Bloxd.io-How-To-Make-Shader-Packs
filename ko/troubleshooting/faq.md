@@ -30,7 +30,7 @@ WebGPU 지원 환경에서만이다 ([요구 사항](../getting-started/requirem
 
 ### Q. API 는 또 바뀌나?
 
-엔진 내부는 업데이트로 바뀔 수 있다 — 모든 페이지가 대상 빌드를 명시한다. 헤더나 레지스트리가 바뀌면 저장 팩은 자동 재검증된다 ([호환성](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+엔진 내부는 업데이트로 바뀔 수 있다 — 모든 페이지가 대상 빌드를 명시한다. 헤더나 레지스트리가 바뀌면 저장 팩은 자동 재검증된다 ([호환성](../api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 ### Q. 「시네마틱 셰이더」 배포물은 뭔가?
 
@@ -40,7 +40,7 @@ WebGPU 지원 환경에서만이다 ([요구 사항](../getting-started/requirem
 
 - 이것은 비공식 가이드이며 개발사의 견해를 대변하지 않는다. API 는 예고 없이 바뀔 수 있다
 - AI 지원으로 작성되었으며 정확성은 보장되지 않는다. 실제 게임 동작으로 검증하라
-- 실측값 (텍스처 id 등) 은 특정 빌드의 스냅샷이며 빌드마다 바뀐다 ([이름이 API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- 실측값 (텍스처 id 등) 은 특정 빌드의 스냅샷이며 빌드마다 바뀐다 ([이름이 API](../api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ## 관련 문서
 

@@ -30,7 +30,7 @@ Das aktuelle Spiel akzeptiert nur `apiVersion: 5`; ältere Pakete werden still d
 
 ### F. Ändert sich die API nochmal?
 
-Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](../api/compatibility.md#re-validierung-gespeicherter-pakete-muss-erneut-geprüft-werden)).
 
 ### F. Was ist mit „Cinematic-Shader“-Distributionen?
 
@@ -40,7 +40,7 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 
 - Dies ist ein inoffizielles Handbuch und vertritt nicht die Sicht der Entwickler. Die API kann sich ohne Ankündigung ändern
 - Mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Am tatsächlichen In-Game-Verhalten verifizieren
-- Messwerte (Textur-ids etc.) sind Momentaufnahmen spezifischer Builds und ändern sich zwischen Builds ([Namen sind die API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- Messwerte (Textur-ids etc.) sind Momentaufnahmen spezifischer Builds und ändern sich zwischen Builds ([Namen sind die API](../api/texture-catalog.md#gemessener-drift-cnty9--ab90qa))
 
 ## Verwandte Seiten
 

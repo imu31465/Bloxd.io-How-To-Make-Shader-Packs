@@ -52,7 +52,7 @@ const Jq = new Map([
 
 ## Y 導関数の自動書き換え
 
-アナライザのトークン書き換えパスは `dpdy` / `dpdyCoarse` / `dpdyFine` のすべての呼び出しを `(-dpdy(...))` に書き換えます (反転セットとして明示列挙)。`dpdx` と `fwidth` 系は手つかずです ([制限と予約名](../api/restrictions.md#v5-で導入された自動書き換え))。
+アナライザのトークン書き換えパスは `dpdy` / `dpdyCoarse` / `dpdyFine` のすべての呼び出しを `(-dpdy(...))` に書き換えます (反転セットとして明示列挙)。`dpdx` と `fwidth` 系は手つかずです ([制限と予約名](../api/restrictions.md#自動書き換え))。
 
 ## ヘッダー・テクスチャ定数の生成
 

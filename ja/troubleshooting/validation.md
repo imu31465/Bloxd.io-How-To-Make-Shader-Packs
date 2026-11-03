@@ -47,7 +47,7 @@
 
 | メッセージ | 対応 |
 |---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` へ ([ライティングAPI](../api/lighting.md#bloxdlit-lit)) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` → `if (bloxdLit())` へ ([ライティングAPI](../api/lighting.md#bloxdlit--ライティングのゲート)) |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` | 旧ビット定数の残存。`flags.rock` へ ([フラグ](../api/flags.md)) |
 | `bloxdSpLitColour isn't part of the shader pack API...` | v4 の内部シンボル。公開の `bloxdLitColour()` を使う |
 

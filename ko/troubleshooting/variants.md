@@ -14,7 +14,7 @@
 ## ".alpha is undefined"
 
 - **원인**: `alpha` 는 `#ifdef BLOXD_ALPHA` (모든 액체 + 비strict 지형/모델) 뒤에만 존재한다
-- **해결**: alpha 를 만지는 코드를 `#ifdef BLOXD_ALPHA` 로 감싼다 ([전처리기](../api/preprocessor.md#macro--variant-matrix))
+- **해결**: alpha 를 만지는 코드를 `#ifdef BLOXD_ALPHA` 로 감싼다 ([전처리기](../api/preprocessor.md#매크로--베리언트-매트릭스))
 
 ## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
@@ -30,7 +30,7 @@
 
 - **증상**: 지형 훅을 썼는데 물이 그대로다
 - **원인**: **v5 에서는 팩이 Liquid 훅을 하나도 정의하지 않으면 물 위에서 Terrain 훅도 돌지 않는다** (v4 이전의 「액체가 terrain 으로 폴백」 동작은 없어졌다)
-- **해결**: Liquid 훅을 쓴다 ([훅 분할](../api/hooks.md#what-each-program-draws))
+- **해결**: Liquid 훅을 쓴다 ([훅 분할](../api/hooks.md#각-프로그램이-그리는-것))
 
 ## 모델 (엔티티, 블록 모델) 이 영향을 받지 않는다
 

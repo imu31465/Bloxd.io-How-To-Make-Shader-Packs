@@ -43,7 +43,7 @@ Code, der für den echten Atlas geschrieben ist, kompiliert und läuft auch hier
 
 ## Die Animationsrahmen-Leiter
 
-Animierte Texturen (42 Familien) rücken in festen pro-Familie-Intervallen (200 / 250 / 300 ms — die Intervall-Spalte im [Texturkatalog](../api/texture-catalog.md#animation-families-42-names)). Eine Animationsfamilien-id an `bloxdTexel` zu übergeben sampelt den aktuellen Rahmen.
+Animierte Texturen (42 Familien) rücken in festen pro-Familie-Intervallen (200 / 250 / 300 ms — die Intervall-Spalte im [Texturkatalog](../api/texture-catalog.md#animationsfamilien-42-namen)). Eine Animationsfamilien-id an `bloxdTexel` zu übergeben sampelt den aktuellen Rahmen.
 
 ## Sampler-Einstellungen
 

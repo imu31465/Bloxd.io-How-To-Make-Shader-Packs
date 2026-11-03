@@ -26,7 +26,7 @@ Probleme rund um die neuen v5-Model-Hooks.
 ## Flag-Prüfungen verhalten sich falsch
 
 - **Wahrscheinliche Ursachen**:
-  1. **Flags als Single-Choice-Enumeration behandelt** — sie kombinieren sich frei („sandstone is sand and rock“, „possibly even none“) ([Flags](../api/flags.md#flags-combine-freely))
+  1. **Flags als Single-Choice-Enumeration behandelt** — sie kombinieren sich frei („sandstone is sand and rock“, „possibly even none“) ([Flags](../api/flags.md#flags-kombinieren-sich-frei))
   2. `else` als „alles Übrige“ gelesen — das else von `flags.rock` ist bloß „kein Gestein“, möglicherweise weiterhin Sand
 - **Fix**: Material-Flags (`opaque`…) unabhängig von Form-/Zustands-Flags (`slab`/`held`…) kombinieren
 

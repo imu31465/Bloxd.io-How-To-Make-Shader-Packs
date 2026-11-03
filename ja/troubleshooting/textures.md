@@ -54,7 +54,7 @@
 ## id を直書きしたらゲーム更新で壊れた
 
 - **原因**: **id はスナップショット**。2ビルド間で 905 生存名のうち 334 名が id を変えた実測がある
-- **解決方法**: `bloxdTextureIdLava` と書け、`19` と書くな ([名前こそ API](../api/texture-catalog.md#ドリフト実測-cnty9-ab90qa))
+- **解決方法**: `bloxdTextureIdLava` と書け、`19` と書くな ([名前こそ API](../api/texture-catalog.md#ドリフト実測-cnty9--ab90qa))
 
 ## 関連
 

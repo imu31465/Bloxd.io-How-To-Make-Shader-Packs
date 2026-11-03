@@ -11,7 +11,7 @@
 
 1. **フォグをかけ直す**: light フックは最終段 (フォグの後) なので `bloxdApplyFog(col, l)` (または `mix(l.fogColour, col, 1.0 - l.fogAlpha)`) を自分で適用する (R9.10)。霧が濃すぎるときは `min(l.fogAlpha, 0.70)` のように下限を敷く。逆に既定出力起点のパックで更に霧色を混ぜると二重フォグで白濁する
 2. **ライティング無効時のフォールバック**: `if (!bloxdLit()) { return bloxdDefaultLight(s, l); }` で既定に流す (v5 ではコンパイル時分岐ではなく実行時判定)
-3. **共用関数の扱い**: v5 では `BLOXD_LIGHTING` マクロが無いため、共用関数をガードする必要はない。ライティング有無で値が変わる入力 (`blockLight` は無効時 0 など) の仕様は [ライティングAPI](../api/lighting.md#bloxdlit-lit) を参照
+3. **共用関数の扱い**: v5 では `BLOXD_LIGHTING` マクロが無いため、共用関数をガードする必要はない。ライティング有無で値が変わる入力 (`blockLight` は無効時 0 など) の仕様は [ライティングAPI](../api/lighting.md#bloxdlit--ライティングのゲート) を参照
 4. **太陽方向が無いとき**: `bloxdSunDirection()` がゼロなら方向性スペキュラは計算しない。`l.directional` は光量のスカラーで方向ベクトルではないため、ハイライトの方向を復元する用途には使えない。必要なら方向性のない弱い環境光に切り替える。なお月の方向は `-bloxdSunDirection()` で得られる (昼夜サイクルのあるワールドでのみ動く。[エンジン内部: 太陽と月の正体](../internals/sun-and-moon.md))
 
 ## 関連

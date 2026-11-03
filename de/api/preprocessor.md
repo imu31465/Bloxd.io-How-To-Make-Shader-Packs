@@ -27,7 +27,7 @@ Die Unterschiede Terrain / Liquid / Model sind **separate Programme, keine Makro
 
 ## Entfernte Makros
 
-- **`BLOXD_LIGHTING`** — in v5 entfernt. Der Beleuchtungszustand ist eine Laufzeitfrage für [`bloxdLit()`](lighting.md#bloxdlit--the-gate), kein Compile-Zweig. Die Verwendung scheitert an der Validierung mit:
+- **`BLOXD_LIGHTING`** — in v5 entfernt. Der Beleuchtungszustand ist eine Laufzeitfrage für [`bloxdLit()`](lighting.md#bloxdlit--das-gate), kein Compile-Zweig. Die Verwendung scheitert an der Validierung mit:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
@@ -72,7 +72,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `BloxdSurface.alpha` existiert nur innerhalb von `#ifdef BLOXD_ALPHA`
 - `bloxdOpaqueBehind()` ist nur innerhalb von `#ifdef BLOXD_SCENE_DEPTH` aufrufbar
 
-Siehe [Strukturen](structures.md#conditional-fields--macros).
+Siehe [Strukturen](structures.md#bedingte-felder--makros).
 
 ## Verwandte Seiten
 
