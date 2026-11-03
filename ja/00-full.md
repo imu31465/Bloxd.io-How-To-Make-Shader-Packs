@@ -802,7 +802,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### 関連
 
 - v4 `blockFlags` からの移行の全体手順 → [Version History: v5](../history/v5.md)
-- v3 時点の blockFlags 诞生時の仕様 → [Version History: v3](../history/v3.md)
+- v3 時点の blockFlags 誕生時の仕様 → [Version History: v3](../history/v3.md)
 - フラグの生成からフックへの受け渡しの内部 → [Engine Internals](../internals/rendering-pipeline.md)
 
 ---
@@ -3087,7 +3087,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 - 水が白っぽい / 明るすぎる場合: `fresnel * 0.38` の `0.38` とグリントの `0.55` を下げる。
 - 水が濃すぎる場合: `fakeSkyReflection` の混合率を少し上げる。ただし、上げすぎるとプラスチックのような質感になる。
 - 水面に線や規則的な縞が見える場合: 波の周波数やグリント強度を下げる。なお、水面メッシュ自体の頂点変位はこのコードには含まれていない。
-- 実際の景色を映したい: このAPIの入力には画面色がないため、色を混ぜるだけでは実反射にならない (深度は液体限定で取得可。[第八部](08-apiv2.md) R-E)。
+- 実際の景色を映したい: このAPIの入力には画面色がないため、色を混ぜるだけでは実反射にならない (深度は液体限定で取得可。[第八部](../history/v2.md) R-E)。
 
 このレシピは既存の `bloxdLiquidLight` を**置き換える**ものである。R9.7 の同名波法線関数や他の同名フックと重複して適用しないこと。
 
@@ -3103,7 +3103,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 実用上の要点: 水中でもパックは動作している / ヴェールは無効化できない / 水中かどうかを条件分岐できない (fogStart / fogEnd / fogColour は水中で変化せず、fogAlpha から推定する方法もない)。
 
-[← 前の部](05-troubleshooting.md)・[マニュアルに戻る](README.md)・[次の部 →](07-internals.md)
+[← 前の部](../troubleshooting/)・[マニュアルに戻る](../)・[次の部 →](../internals/)
 
 ### 関連
 
@@ -3272,7 +3272,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | PBR テクスチャ | テクスチャの参照が禁止されている。色の輝度から擬似的に推定するのみ |
 | 水中ヴェール (青色のティント) の除去・変更 | ヴェールは「カメラが入っている液体ブロックの定義された color/alpha」から生成されるエミッシブなフルスクリーンクワッドであり、フックのパイプライン外 (最前面) に描画されるため、パックからは色も濃度も変更できない |
 | 水中の直接検出 | カメラが水中にあるかどうかを示す入力がなく、水中でも fogStart / fogEnd / fogColour が変化しないため、fogAlpha などから水中を信頼できる形で推定する方法がない |
-| 水中屈折 | シーン色は取れない。液体限定の深度 (`bloxdOpaqueBehind()`) で厚み吸収・底面投影は可能 ([第八部](08-apiv2.md) R-E) |
+| 水中屈折 | シーン色は取れない。液体限定の深度 (`bloxdOpaqueBehind()`) で厚み吸収・底面投影は可能 ([第八部](../history/v2.md) R-E) |
 
 ### 影の真実 — 「木の影が落ちる」は作れる — 「木の影が落ちる」は作れる
 
@@ -3445,7 +3445,7 @@ v5 のモデルフックと新入力により、旧バージョンでは不可�
 - 加算が無いのに白い → fog の除算による un-fog 逆算が原因。un-fog を外し、再構築する場合は `s.colour` を起点とし、フォグは最後に一度だけ `mix` で適用
 - 発光ブロックが光らない → 再構築系で emission の再加算漏れ。`+ s.emission * (1.0 - l.fogAlpha)` を追加する
 
-[← 前の部](03-recipes.md)・[マニュアルに戻る](README.md)・[次の部 →](05-troubleshooting.md)
+[← 前の部](../recipes/)・[マニュアルに戻る](../)・[次の部 →](../troubleshooting/)
 
 ### 関連
 
@@ -3631,7 +3631,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 夜の青い環境光 (月の方向を使わない擬似表現)
 
-> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定。[第七部](07-internals.md) R-A)。
+> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定。[第七部](../internals/) R-A)。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -4353,7 +4353,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を足す (長い夕方の影の近似。  
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
-[← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
+[← 前の部](../api/)・[マニュアルに戻る](../)・[次の部 →](../guides/realism.md)
 
 ### 関連
 
@@ -6294,7 +6294,7 @@ strict 側で特に誤解しやすい点は以下の通りである。
 
 この一覧は上記ビルド時点の静的解析結果であり、エンジンの更新により allow/strict の配分は変更され得る。新版が公開された際は再確認されたい。
 
-[← 前の部](06-implementation.md)・[マニュアルに戻る](README.md)・[次の部 →](08-apiv2.md)
+[← 前の部](../guides/)・[マニュアルに戻る](../)・[次の部 →](../history/v2.md)
 
 ### 関連
 

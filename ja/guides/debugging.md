@@ -17,7 +17,7 @@
 - 加算が無いのに白い → fog の除算による un-fog 逆算が原因。un-fog を外し、再構築する場合は `s.colour` を起点とし、フォグは最後に一度だけ `mix` で適用
 - 発光ブロックが光らない → 再構築系で emission の再加算漏れ。`+ s.emission * (1.0 - l.fogAlpha)` を追加する
 
-[← 前の部](03-recipes.md)・[マニュアルに戻る](README.md)・[次の部 →](05-troubleshooting.md)
+[← 前の部](../recipes/)・[マニュアルに戻る](../)・[次の部 →](../troubleshooting/)
 
 ## 関連
 

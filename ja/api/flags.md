@@ -124,5 +124,5 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## 関連
 
 - v4 `blockFlags` からの移行の全体手順 → [Version History: v5](../history/v5.md)
-- v3 時点の blockFlags 诞生時の仕様 → [Version History: v3](../history/v3.md)
+- v3 時点の blockFlags 誕生時の仕様 → [Version History: v3](../history/v3.md)
 - フラグの生成からフックへの受け渡しの内部 → [Engine Internals](../internals/rendering-pipeline.md)

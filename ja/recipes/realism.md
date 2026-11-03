@@ -304,7 +304,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を足す (長い夕方の影の近似。  
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
-[← 前の部](02-api.md)・[マニュアルに戻る](README.md)・[次の部 →](04-realism.md)
+[← 前の部](../api/)・[マニュアルに戻る](../)・[次の部 →](../guides/realism.md)
 
 ## 関連
 
