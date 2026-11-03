@@ -1,19 +1,19 @@
-# Getting Started
+# Начало работы
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+Руководство с единым маршрутом для тех, кто впервые создаёт шейдер-паки, — от обзора до распространения. Оно сразу учит завершённой форме API v5 (заранее читать старые версии не нужно — это работа [Истории версий](../history/)).
 
-## The track
+## Маршрут
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [Обзор и предварительные требования](overview.md) — что могут и чего не могут шейдер-паки
+2. [Требования](requirements.md) — требования к браузеру и рендереру
+3. [Быстрый старт](quick-start.md) — ваш первый пак за 5 минут
+4. [Структура пака](pack-structure.md) — содержимое zip и лимиты размера
+5. [pack.json](manifest.md) — каждое поле манифеста
+6. [Шейдерные хуки](hooks.md) — роли 9 хуков
+7. [Варианты](variants.md) — 6 вариантов и макро-гарды
+8. [Валидация](validation.md) — трёхэтапная проверка при загрузке и тестирование на устройстве
+9. [Распространение](distribution.md) — запаковка в zip и гигиена релиза
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+Когда понадобится полная спецификация, продолжайте со [Справочника по API](../api/); готовые эффекты ищите в [Рецептах](../recipes/).

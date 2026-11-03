@@ -1,24 +1,24 @@
-# Validation
+# Валидация
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified
 
-## The 3-stage load check
+## Трёхэтапная проверка при загрузке
 
-1. **Loader limits** — size, shape, manifest validity (see [Pack structure](pack-structure.md))
-2. **Static validation (analyzer)** — syntax, types, reserved names, strict contract, across all 6 variants
-3. **Real WebGPU compilation in the browser** — static validation's type-checking is incomplete, so some mistakes only surface here
+1. **Лимиты загрузчика** — размер, форма, валидность манифеста (см. [Структура пака](pack-structure.md))
+2. **Статическая валидация (анализатор)** — синтаксис, типы, зарезервированные имена, strict-контракт, по всем 6 вариантам
+3. **Настоящая компиляция WebGPU в браузере** — проверка типов у статической валидации неполна, поэтому некоторые ошибки всплывают только здесь
 
-For reading each error, see [Troubleshooting](../troubleshooting/) (organized by symptom).
+О том, как читать каждую ошибку, см. [Устранение неполадок](../troubleshooting/) (сгруппировано по симптомам).
 
-## Procedure
+## Процедура
 
-1. Load the zip or folder from settings → Shader Pack
-2. Check status: "Ready. Reload the page to use it." right after selecting; **after a page reload**, "Ready to use" means success
-3. On "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
-4. Test in a permissive game first, then a strict-mode game (most games). Vertex animation works only in allow games
-5. Replacing a pack reloads from the same screen; changes need a page reload
-6. Remove with Remove Pack. After game updates, saved packs re-validate automatically on page load (header/registry changes mark them "needs re-check")
+1. Загрузите zip или папку из настроек → Shader Pack
+2. Проверьте статус: сразу после выбора — "Ready. Reload the page to use it."; **после перезагрузки страницы** "Ready to use" означает успех
+3. При "Saved, but it won't run until you fix these errors..." исправьте перечисленные ошибки (файл:строка + вариант) и перезагрузите страницу
+4. Сначала протестируйте в разрешающей игре, затем в strict-игре (большинство игр). Вершинная анимация работает только в allow-играх
+5. Замена пака перезагружает его с того же экрана; для изменений нужна перезагрузка страницы
+6. Удаление — через Remove Pack. После обновлений игры сохранённые паки автоматически проходят повторную валидацию при загрузке страницы (изменения заголовка/реестра помечают их как «нужна перепроверка»)
 
-## On-device test checklist
+## Чек-лист тестирования на устройстве
 
-See the [testing guide](../guides/testing.md) for the full checklist and the complete list of factors that change what a pack sees.
+Полный чек-лист и полный список факторов, меняющих то, что видит пак, — в [руководстве по тестированию](../guides/testing.md).

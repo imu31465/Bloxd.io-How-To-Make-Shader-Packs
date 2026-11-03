@@ -1,47 +1,47 @@
-# Compilation errors
+# Ошибки компиляции
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-Errors that pass static validation but fail as WGSL, or fail only in the browser's WGSL compiler (stage 2).
+Ошибки, которые проходят статическую валидацию, но не собираются как WGSL, или падают только в WGSL-компиляторе браузера (этап 2).
 
 ## "bloxdTerrainVertex must be declared as: fn ..."
 
-- **Cause**: hook signature mismatch (argument/return types)
-- **Fix**: rewrite to the declaration shown in the message (parameter names are free; types must match exactly)
-- **Prevention**: start from the [hook comparison table](../api/hooks.md)
+- **Причина**: несовпадение сигнатуры хука (типы аргументов/возврата)
+- **Исправление**: перепишите под объявление, показанное в сообщении (имена параметров свободные; типы должны совпадать точно)
+- **Профилактика**: начинайте от [таблицы сравнения хуков](../api/hooks.md)
 
 ## "mixing '*' and '^' requires parenthesis (only in ...)"
 
-- **Cause**: WGSL requires parentheses when mixing `^` `&` `|` `<<` `>>` with other operators
-- **Fix**: parenthesize the operands
+- **Причина**: WGSL требует скобок при смешивании `^` `&` `|` `<<` `>>` с другими операторами
+- **Исправление**: возьмите операнды в скобки
 
 ## "... can only be a function's parameter or return type, ..."
 
-- **Cause**: `var x: BloxdSurface;` — bare type-annotated declarations are rejected because header structs gain fields
-- **Fix**: `var out = bloxdDefaultSurface(s);` (or `var out = s;` in light hooks)
-- **Prevention**: always build outputs from `bloxdDefault*` ([conventions](../api/structures.md#writing-conventions-recap))
+- **Причина**: `var x: BloxdSurface;` — «голые» объявления с аннотацией типа отклоняются, потому что структуры заголовка обрастают полями
+- **Исправление**: `var out = bloxdDefaultSurface(s);` (или `var out = s;` в light-хуках)
+- **Профилактика**: всегда собирайте выходы из `bloxdDefault*` ([соглашения](../api/structures.md#соглашения-записи-повторение))
 
 ## "_ can only be the target of a phony assignment, as in _ = f();"
 
-- **Cause**: `let _ = f();` is invalid WGSL
-- **Fix**: write `_ = f();`
+- **Причина**: `let _ = f();` — невалидный WGSL
+- **Исправление**: пишите `_ = f();`
 
 ## "Lite: …reads scene depth on a page that didn't turn it on"
 
-- **Cause**: a depth-reading pack (`bloxdOpaqueBehind`) was active when the page was generated; depth availability is decided at page generation
-- **Fix**: reload the page with the pack active
+- **Причина**: пак, читающий глубину (`bloxdOpaqueBehind`), был активен в момент генерации страницы; доступность глубины решается при генерации страницы
+- **Исправление**: перезагрузите страницу с активным паком
 
-## dpdy sign looks inverted
+## Знак dpdy выглядит инвертированным
 
-- **This is by design**: v5's analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
-- `dpdx` and `fwidth` are untouched
+- **Так задумано**: анализатор автоматически переписывает каждый вызов `dpdy` / `dpdyCoarse` / `dpdyFine` в `(-dpdy(...))` (экранная ось y направлена вниз)
+- **Исправление**: ничего — пишите `dpdy(h)` с намерением «как меняется h при движении вверх», и генерируемый код несёт этот переворот сам ([Ограничения](../api/restrictions.md#автоматические-перезаписи))
+- `dpdx` и `fwidth` не затрагиваются
 
-## Pack gets dropped on game join / the on-device check never finishes
+## Пак отбрасывается при входе в игру / проверка на устройстве не завершается
 
-- **Cause**: the on-device check failed, or hit the 60-second forced timeout (`skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops; see [Performance](performance.md)
+- **Причина**: проверка на устройстве провалилась или упёрлась в принудительный таймаут 60 секунд (`skipped`) — частое на слабых устройствах и в тяжёлых мирах
+- **Исправление**: сократите тяжёлую вершинную работу и сложные циклы; см. [Производительность](performance.md)
 
-## Related
+## Смотрите также
 
-- [Validation errors](validation.md) · [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)
+- [Ошибки валидации](validation.md) · [Внутрянка движка: компиляция WGSL](../internals/wgsl-compilation.md) · [Ограничения](../api/restrictions.md)

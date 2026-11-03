@@ -1,46 +1,46 @@
-# Engine data ledger (v5 measurements)
+# Реестр данных движка
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03; production = preprod, byte-identical) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (2026-11-03; прод = препрод, побайтово идентичны) · Статус: Verified
 
-The documentation's v5 measurement ledger — every confirmed value, all measured on `ab90qa`.
+Реестр измерений этой документации — каждое подтверждённое значение, всё измерено на текущем целевом билде `ab90qa`.
 
-## The ledger
+## Реестр
 
-| Item | Value |
+| Пункт | Значение |
 |---|---|
-| `apiVersion` | `5` (strict `===`, number) |
-| engine header | 8,954 B decoded / 208 lines (9,125 B as shipped, 6 interpolations). First line `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — full text in [Engine header](engine-header.md) |
-| hooks | 9 (terrain/liquid/model × vertex/surface/light). Names unchanged; the default template bundles all 9 |
-| variants | 6 (strict × program). Names `strict\|allow.terrain\|liquid\|model` — the lighting axis is gone |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (all liquid + non-strict terrain/model) · `BLOXD_SCENE_DEPTH` (all liquid) · ~~`BLOXD_LIGHTING`~~ **removed** |
-| pack uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, new)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
-| flags | the `BloxdFlags` struct, 14 bools; v4's bit values retired |
-| loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 entries; UTF-8; one manifest; unique paths — all unchanged |
-| texture registry | 1,210 entries → **896 usable names**; drift vs cnty9 +1/−10 ([Texture registry](texture-registry.md)) |
-| light curve | 0–15 levels → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — in the header, unchanged |
-| lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged (currently chunk c9) |
-| directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged (chunk c9) |
-| fog color | `vec3f(183/255, 191/255, 195/255)` — unchanged |
-| reserved names | `/^bloxd/i` (case-insensitive) + the 46 `bloxdSp*` engine symbols ([Reserved identifiers](reserved-identifiers.md)) |
+| `apiVersion` | `5` (строгий `===`, число) |
+| Заголовок движка | 8 954 Б декодировано / 208 строк (9 125 Б как поставляется, 6 интерполяций). Первая строка `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — полный текст в [Заголовке движка](engine-header.md) |
+| Хуки | 9 (террейн/жидкость/модель × vertex/surface/light). Имена без изменений; дефолтный шаблон содержит все 9 |
+| Варианты | 6 (strict × программа). Имена `strict\|allow.terrain\|liquid\|model` — ось освещения исчезла |
+| Макросы | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (вся жидкость + не-strict террейн/модель) · `BLOXD_SCENE_DEPTH` (вся жидкость) · ~~`BLOXD_LIGHTING`~~ **удалён** |
+| Uniform пака | `@group(3) @binding(0)`, 64 Б: seconds@0, **lit@4 (u32, новое)**, renderOffset@16, sunDirection@32, eyePosition@48 |
+| Привязки пака | группа 3: 0 uniform · 1 глубина сцены (жидкость) · 2 storage `bloxdSpTextureLayers` |
+| Флаги | структура `BloxdFlags`, 14 bool; битовые значения v4 вышли в отставку |
+| Лимиты загрузчика | 256 `.wgsl` / 256 КБ кода / 64 КБ `pack.json` / 32 МБ zip / 1,024 записи; UTF-8; один манифест; уникальные пути — всё без изменений |
+| Реестр текстур | 1 210 записей → **896 пригодных имён**; дрейф против cnty9 +1/−10 ([Реестр текстур](texture-registry.md)) |
+| Кривая света | уровни 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — в заголовке, без изменений |
+| Кривая лифта | `1 - (1 - x / (3 - 2x))^3` — без изменений (сейчас чанк c9) |
+| Конус направленного света | `0.12 / 0.65 / 0.62 / 0.95` — без изменений (чанк c9) |
+| Цвет тумана | `vec3f(183/255, 191/255, 195/255)` — без изменений |
+| Зарезервированные имена | `/^bloxd/i` (без учёта регистра) + 46 символов `bloxdSp*` движка ([Зарезервированные идентификаторы](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict titles | everything except the 12 allow titles in [Policy](policy.md) (re-verified on ab90qa, unchanged) |
-| header/registry builders | chunk c55 (module 29833 + 1371 + 1391 + 1384 + 219 coordinating) |
-| default pack template | chunk c116 (moved from v4's c124), 1,683 B |
+| Строгие тайтлы | всё, кроме 12 allow-титулов из [Политики](policy.md) (перепроверено на ab90qa, без изменений) |
+| Сборщики заголовка/реестра | чанк c55 (модули 29833 + 1371 + 1391 + 1384 + 219 в координации) |
+| Шаблон дефолтного пака | чанк c116 (переехал с c124 из v4), 1 683 Б |
 
-## Bundle layout (for re-surveyors)
+## Компоновка бандла (для повторных исследователей)
 
-The shader-pipeline cluster: loader/persistence c51–c53, validator/header/registry builder c55, WebGPU/codegen c56, fog c9. **The default pack template is c116** (c124 in v4).
+Кластер шейдерного пайплайна: загрузчик/персистентность c51–c53, валидатор/заголовок/сборщик реестра c55, WebGPU/кодогенерация c56, туман c9. **Шаблон дефолтного пака — c116** (в v4 — c124).
 
-Chunk-format note: every chunk is an ES module (`export const modules = {...}`) — c53 carries both c52's and c53's modules — so plain-text search of the bundle remains meaningful (module id `1371` lives in *main*'s sparse module array, in no chunk).
+Заметка о формате чанков: каждый чанк — ES-модуль (`export const modules = {...}`) — c53 несёт и модули c52, и модули c53 — поэтому поиск по бандлу обычным текстом остаётся осмысленным (id модуля `1371` живёт в разреженном массиве модулей *main*, ни в одном чанке).
 
-The main bundle is 3.39 MB (+115 KB vs the v4 build); the chunk map has 195 IDs (188 emitted, 7 known gaps).
+Основной бандл — 3.39 МБ (+115 КБ к билду v4); карта чанков насчитывает 195 id (188 эмитировано, 7 известных дыр).
 
-## Past ledgers
+## Прошлые реестры
 
-- v4 (cnty9, 2026-10-27) → [Version History: v4](../history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Version History: v3](../history/v3.md)
+- v4 (cnty9, 2026-10-27) → [История версий: v4](../history/v4.md)
+- v3 (3ymzdd, 2026-10-19) → [История версий: v3](../history/v3.md)
 
-## Related
+## См. также
 
-- [Research log](research-log.md) · [Engine header](engine-header.md) · [Policy](policy.md)
+- [Журнал исследований](research-log.md) · [Заголовок движка](engine-header.md) · [Политика](policy.md)

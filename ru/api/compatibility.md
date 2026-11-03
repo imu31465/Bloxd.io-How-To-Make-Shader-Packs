@@ -1,68 +1,68 @@
-# Compatibility
+# Совместимость
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в продакшене 2026-11-03) · Статус: Verified
 
-How the current game and old-version packs interoperate.
+Как текущая игра и паки старых версий взаимодействуют друг с другом.
 
-## Accepted versions
+## Принимаемые версии
 
-**Only `apiVersion: 5`.** The loader compares `manifest.apiVersion !== 5` strictly and v1/v2/v3/v4 packs **fail at the instant of load**. No multi-version acceptance exists.
+**Только `apiVersion: 5`.** Загрузчик строго сравнивает `manifest.apiVersion !== 5`, и паки v1/v2/v3/v4 **проваливаются в самый момент загрузки**. Никакого приёма нескольких версий не существует.
 
-## Load-time messages (verbatim from the live i18n dictionary)
+## Сообщения при загрузке (дословно из живого словаря i18n)
 
-- `pack.json needs "apiVersion": {{version}}.` — the `apiVersion` key is missing
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — ключ `apiVersion` отсутствует
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — ключ есть, но не равен 5
 
-## Saved old packs (no exceptions — silent inactivation)
+## Сохранённые старые паки (без исключений — молчаливая деактивация)
 
-Previously-saved v1–v4 packs don't throw. The saved-pack result resolves to:
+Ранее сохранённые паки v1–v4 не выбрасывают ошибок. Результат для сохранённого пака разрешается в:
 
 ```
 {kind: "none", reason: "otherApiVersion"}
 ```
 
-and the pack becomes **silently inactive**. Only the shader-pack settings tab explains why:
+и пак становится **молча неактивным**. Почему — объясняет только вкладка настроек шейдер-паков:
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-## The nature of the v4 → v5 conversion
+## Природа конверсии v4 → v5
 
-The conversion is mostly mechanical (full checklist in [the v5 migration guide](../history/v5.md)):
+Конверсия по большей части механическая (полный чек-лист — в [руководстве по миграции на v5](../history/v5.md)):
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
+- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (переименование 1:1)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- delete `bloxdFragmentBlockPosition` call sites (no replacement)
-- bump `pack.json` to `"apiVersion": 5`
+- места вызовов `bloxdFragmentBlockPosition` по-прежнему компилируются (движок вставляет её), но теперь она не документирована — безопаснее всего с неё уйти ([Функции](functions.md#bloxdfragmentblockposition--не-документирована-но-всё-ещё-инжектится))
+- поднимите `pack.json` до `"apiVersion": 5`
 
-The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.
+Тихая ловушка на этот раз: паки, которые продолжают читать `blockFlags` или оборачивать световые хуки в `#ifdef BLOXD_LIGHTING`, **проваливают валидацию с персональными сообщениями** (анализатор теперь объясняет оба случая), так что ничего не ведёт себя плохо молча — они просто остаются отклонёнными до миграции.
 
-## Saved-pack re-validation ("needs re-check")
+## Перепроверка сохранённых паков («нужна перепроверка»)
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
+`HEADER_VERSION` — это `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (ведущее целое выросло с 8 у v4 до 9). Когда заголовок движка или реестр текстур меняется (обычное дело с обновлениями игры), сохранённые паки помечаются «нужна перепроверка» и автоматически перепроверяются при загрузке страницы.
 
-A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
+Измеренный пример движения реестра (два билда с разницей в 10 дней): записи 1200 → 1219 (98 добавлено, 79 удалено), и из имён, сохранивших написание, **779 из 1121 сменили id**. Иначе говоря:
 
-- **packs written with names (`bloxdTextureIdLava`) survive drift** (the loader re-resolves against the live registry)
-- **packs written with raw ids (`19`) break on re-validation**
+- **паки, написанные на именах (`bloxdTextureIdLava`), переживают дрейф** (загрузчик заново разрешает их по живому реестру)
+- **паки, написанные на сырых id (`19`), ломаются при перепроверке**
 
-Details: [Engine Internals: Texture Registry](../internals/texture-registry.md).
+Подробности: [Внутренности движка: реестр текстур](../internals/texture-registry.md).
 
-## Runtime environments
+## Среды выполнения
 
-- **WebGPU-renderer only**: installing a pack force-enables the WebGPU renderer
-- **Mobile**: WebGPU-limited environments can't run packs at all ([Requirements](../getting-started/requirements.md))
-- **Non-atlas renderer configurations**: `bloxdTexel` / `bloxdTextureSize` degrade to stubs (white texels, 1×1); code still compiles and runs ([Texture API](texture-api.md#where-the-texture-api-cant-go))
+- **Только WebGPU-рендерер**: установка пака принудительно включает WebGPU-рендерер
+- **Мобильные устройства**: в средах с урезанным WebGPU паки вообще не запускаются ([Требования](../getting-started/requirements.md))
+- **Конфигурации рендерера без атласа**: `bloxdTexel` / `bloxdTextureSize` деградируют до заглушек (белые тексели, 1×1); код по-прежнему компилируется и работает ([API текстур](texture-api.md#куда-не-дотягивается-текстурный-api))
 
-## Version support summary
+## Сводка поддержки версий
 
-| API version | Live since | Treatment by the current game |
+| Версия API | В продакшене с | Обращение текущей игры |
 |---|---|---|
-| v1 | — | rejected at load (migrate via [v2](../history/v2.md)) |
-| v2 | — | rejected at load |
-| v3 | 2026-10-19 | rejected at load |
-| v4 | 2026-10-26 | rejected at load |
-| **v5** | **2026-11-03** | **current** |
+| v1 | — | отклоняется при загрузке (мигрируйте через [v2](../history/v2.md)) |
+| v2 | — | отклоняется при загрузке |
+| v3 | 2026-10-19 | отклоняется при загрузке |
+| v4 | 2026-10-26 | отклоняется при загрузке |
+| **v5** | **2026-11-03** | **текущая** |
 
-## Related
+## См. также
 
-- [v5 migration checklist](../history/v5.md) · [Version History](../history/)
+- [Чек-лист миграции на v5](../history/v5.md) · [История версий](../history/)

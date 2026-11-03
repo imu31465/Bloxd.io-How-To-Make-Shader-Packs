@@ -1,18 +1,21 @@
 {
   "index": {
-    "title": "API Reference",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Справочник по API",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "pack-format": "Pack format",
-  "hooks": "Shader hooks",
-  "flags": "Flags (BloxdFlags)",
-  "structures": "Input & output structures",
-  "functions": "Functions",
-  "lighting": "Lighting",
-  "texture-api": "Texture API",
-  "constants": "Constants",
-  "preprocessor": "Preprocessor",
-  "restrictions": "Restrictions & reserved names",
-  "compatibility": "Compatibility",
-  "texture-catalog": "Texture catalog"
+  "pack-format": "Формат пака",
+  "hooks": "Хуки шейдеров",
+  "flags": "Флаги (BloxdFlags)",
+  "structures": "Входные и выходные структуры",
+  "functions": "Функции",
+  "lighting": "Освещение",
+  "texture-api": "API текстур",
+  "constants": "Константы",
+  "preprocessor": "Препроцессор",
+  "restrictions": "Ограничения и зарезервированные имена",
+  "compatibility": "Совместимость",
+  "texture-catalog": "Каталог текстур"
 }

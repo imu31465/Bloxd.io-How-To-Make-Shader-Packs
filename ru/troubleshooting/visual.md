@@ -1,55 +1,55 @@
-# Visual issues
+# Визуальные проблемы
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-Compiles fine but looks wrong.
+Компилируется нормально, но выглядит неправильно.
 
-## Distance turns white/hazy
+## Даль белеет/затуманивается
 
-- **Cause**: double fog. The default light-hook output is **already fogged** (`bloxdApplyFog(lit + emission, light)`), so mixing more fog color on top doubles it
-- **Fix**: keep custom fog subtle; consider saturation-only aerial perspective ([realism recipes](../recipes/realism.md))
-- **Prevention**: understand `fogAlpha` semantics (0 = no fog, 1 = only fogColour) and the [pipeline](../api/lighting.md#the-full-pipeline) before writing fog
+- **Причина**: двойной туман. Выход light-хука по умолчанию **уже затуманен** (`bloxdApplyFog(lit + emission, light)`), так что подмешивание ещё цвета тумана сверху удваивает его
+- **Исправление**: держите кастомный туман деликатным; рассмотрите воздушную перспективу только по насыщенности ([рецепты реализма](../recipes/realism.md))
+- **Профилактика**: прежде чем писать туман, разберитесь в семантике `fogAlpha` (0 = без тумана, 1 = только fogColour) и в [пайплайне](../api/lighting.md#полный-пайплайн)
 
-## pow(l.skyLight, γ) never darkens shadows
+## pow(l.skyLight, γ) никогда не затемняет тени
 
-- **Cause**: `skyLight` arrives post-lift-curve (raw 0.87 arrives as 0.97); gamma mathematically cannot compete
-- **Fix**: switch to lift inversion + threshold ([Shadows](../guides/shadows.md))
+- **Причина**: `skyLight` приходит после кривой лифта (сырой 0.87 приходит как 0.97); гамма математически не может конкурировать
+- **Исправление**: переходите на инверсию лифта + порог ([Тени](../guides/shadows.md))
 
-## Blocks turn almost pure white
+## Блоки становятся почти чисто белыми
 
-- **Cause**: the light-hook output exceeds 1.0 (no clamp exists past the output)
-- **Fix**: append `clamp(col, vec3f(0.0), vec3f(1.0))`
+- **Причина**: выход light-хука превышает 1.0 (за выходом clamp'а нет)
+- **Исправление**: добавьте в конец `clamp(col, vec3f(0.0), vec3f(1.0))`
 
-## White without additions
+## Бело без сложений
 
-- **Cause**: un-fog inversion by division
-- **Fix**: drop the un-fog; rebuild from `s.colour` and apply fog exactly once at the end (or via `bloxdApplyFog`)
+- **Причина**: un-fog инверсия делением
+- **Исправление**: уберите un-fog; пересоберите от `s.colour`, а туман примените ровно один раз в конце (или через `bloxdApplyFog`)
 
-## Glowing blocks don't glow (rebuilding packs)
+## Светящиеся блоки не светятся (паки с пересборкой)
 
-- **Cause**: missing emission re-add — dropping the default output means adding emission yourself
-- **Fix**: add `+ s.emission * (1.0 - l.fogAlpha)`; on v5 the `bloxdLitColour()` + emission + `bloxdApplyFog` composition is safest ([Lighting](../api/lighting.md))
+- **Причина**: пропущено досложение emission — отказ от дефолтного выхода означает, что emission добавляете сами
+- **Исправление**: добавьте `+ s.emission * (1.0 - l.fogAlpha)`; в v5 безопаснее всего композиция `bloxdLitColour()` + emission + `bloxdApplyFog` ([Освещение](../api/lighting.md))
 
-## Waves/patterns cut off at chunk or origin switches
+## Волны/узоры обрываются при смене чанков или origin
 
-- **Cause**: using render-space positions directly — the origin moves with the player
-- **Fix**: use `bloxdWorldPosition(position)` for world-dependent effects ([Coordinates](../recipes/coordinates.md)); note f32 precision limits far from origin
+- **Причина**: прямое использование позиций в пространстве рендера — origin двигается вместе с игроком
+- **Исправление**: используйте `bloxdWorldPosition(position)` для эффектов, зависящих от мира ([Координаты](../recipes/coordinates.md)); помните о пределах точности f32 вдали от origin
 
-## Water-surface patterns misalign on rotated faces
+## Узоры на поверхности воды съезжают на повёрнутых гранях
 
-- **Cause**: `bloxdTexel` applies the fragment's own `textureRotation` to your uv ([the rotation subtlety](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
-- **Fix**: pre-rotate with the `texelNeutral` helper
+- **Причина**: `bloxdTexel` применяет собственный `textureRotation` фрагмента к вашему uv ([тонкость с поворотами](../api/texture-api.md#тонкость-с-поворотом--нейтральный-сэмплер))
+- **Исправление**: поверните заранее хелпером `texelNeutral`
 
-## Enchant glint / hurt flash disappeared
+## Пропал блик зачарования / вспышка урона
 
-- **Cause**: custom lighting rebuilt without passing `enchantColour` / `overlayColour` through
-- **Fix**: pass them through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
-- **v5**: `bloxdDefaultSurface` passes both through unchanged, so defaults never lose them
+- **Причина**: кастомное освещение пересобрано без пропускания `enchantColour` / `overlayColour` дальше
+- **Исправление**: пропускайте их дальше или используйте `bloxdLitColour()` ([Эффекты зачарований](../recipes/enchant-effects.md))
+- **v5**: `bloxdDefaultSurface` пропускает оба без изменений, так что дефолты их не теряют
 
-## Sky, clouds or the sun disc unaffected
+## Небо, облака или диск солнца не затронуты
 
-- **By design**: hooks cover terrain / liquid / model only ([Unreachable effects](../guides/constraints.md))
+- **Так задумано**: хуки покрывают только террейн / жидкости / модели ([Недостижимые виды](../guides/constraints.md))
 
-## Related
+## Смотрите также
 
-- [Lighting issues](lighting.md) · [Debugging tips](../guides/debugging.md) · [Fog Internals](../internals/fog-internals.md)
+- [Проблемы освещения](lighting.md) · [Советы по отладке](../guides/debugging.md) · [Внутрянка тумана](../internals/fog-internals.md)

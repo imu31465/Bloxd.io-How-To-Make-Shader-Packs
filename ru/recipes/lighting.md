@@ -1,7 +1,6 @@
 # Рецепты освещения (light)
 
-
-
+> Целевой API: 5 · Целевой билд: `ab90qa` (2026-11-03, прод) · Статус: Verified (портировано на текущий API — рекомендуется перепроверка на устройстве)
 ## S-кривая контраста
 
 ```wgsl
@@ -17,7 +16,7 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let dist = distance(bloxdEyePosition(), l.position);
-    // 0..0.35 своего тумана с 64 до 192 блоков
+    // добавляем 0..0.35 своего тумана от 64 до 192 блоков
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
     return out;
@@ -39,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Пещеры впотьмах (дожимаем места без skyLight)
+## Пещеры впотьмах (ещё сильнее затемняем места без неба)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -53,11 +52,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-> `skyLight` приходит пост-лифт (раздел 10): лёгкое затенение (под деревьями: сырое 0.87 → поднятое 0.97) этим методом почти не темнеет. Годится для пещер (сырое 0). Чтобы подчеркнуть «тень деревьев», используйте инверсию лифта + порог из R9.12.
+> `skyLight` приходит пост-лифт (раздел 10), поэтому лёгкое затенение (напр. под деревьями: сырое 0.87 → поднятое 0.97) этим методом почти не темнеет. Для пещер он работает (сырое 0). Чтобы заострить «тень деревьев», используйте инверсию лифта + порог из R9.12.
 
 ## Синее ночное окружение (псевдо-вид без направления луны)
 
-> В этом API `bloxdSunDirection()` равен нулю, когда в небе нет солнца. Ниже — не направленный лунный свет, лишь слабое синее окружение, когда небо тёмное. Само лунное направление доступно через `-bloxdSunDirection()` (только миры с циклом день/ночь. [Часть VII](../internals/) R-A).
+> В этом API `bloxdSunDirection()` равен нулю, когда на небе нет солнца. Ниже — не направленный лунный свет, а лишь слабый синий ambient, добавляемый при тёмном небе. Само направление луны доступно через `-bloxdSunDirection()` (только миры с циклом день/ночь — [Солнце и луна](../internals/sun-and-moon.md)).
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -73,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Закатное тепло (оттенок по высоте солнца)
+## Закатное тепло (тинт по высоте солнца)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -99,9 +98,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let sky = clamp(l.skyLight, 0.0, 1.0);
         let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
         let level = clamp(sky * 0.7 + block, 0.0, 1.0);
-        // отбрасываем engineColour (результат освещения движка) и ставим «базовый цвет × своя яркость»
+        // отбрасываем engineColour (результат освещения движка) и берём «базовый цвет × своя яркость»
         var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
-        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // engineColour отброшен: туман заново обязателен
+        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // engineColour отброшен: туман нужно наложить заново
         out.colour = col + s.emission * (1.0 - l.fogAlpha);   // emission тоже добавьте сами (обязательно)
         return out;
 } else {

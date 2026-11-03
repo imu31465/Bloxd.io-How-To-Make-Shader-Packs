@@ -1,47 +1,47 @@
-# Variant-specific issues
+# Проблемы отдельных вариантов
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-Problems that occur in only some of the 6 variants (`strict|allow` × `terrain|liquid|model`). v5 removed the lighting axis (the old `BLOXD_LIGHTING`) and the loader validates **all 6 variants at once** on load.
+Проблемы, возникающие только в некоторых из 6 вариантов (`strict|allow` × `terrain|liquid|model`). v5 убрала ось освещения (старый `BLOXD_LIGHTING`), и загрузчик валидирует **все 6 вариантов разом** при загрузке.
 
-## Loads only in non-strict games / dropped in strict
+## Загружается только в не-strict играх / отключается в strict
 
-- **Cause**: an unguarded vertex hook or a reachable `discard`; strict games forbid both and violate = **whole-pack auto-disable** (`shaderPack:offInStrict`)
-- **Check**: the loader screen shows `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
-- **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT`
-- **Prevention**: always start vertex hooks from the guarded template ([Variants](../getting-started/variants.md))
+- **Причина**: незащищённый вершинный хук или достижимый `discard`; strict-игры запрещают и то и другое, и нарушение = **автоотключение пака целиком** (`shaderPack:offInStrict`)
+- **Проверка**: экран загрузчика показывает `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
+- **Исправление**: оберните вершинные хуки и `discard` в `#ifndef BLOXD_STRICT`
+- **Профилактика**: всегда начинайте вершинные хуки от защищённого шаблона ([Варианты](../getting-started/variants.md))
 
 ## ".alpha is undefined"
 
-- **Cause**: `alpha` exists only behind `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model)
-- **Fix**: wrap alpha-touching code in `#ifdef BLOXD_ALPHA` ([Preprocessor](../api/preprocessor.md#macro--variant-matrix))
+- **Причина**: `alpha` существует только за `#ifdef BLOXD_ALPHA` (все жидкостные + не-strict террейн/модели)
+- **Исправление**: оберните код, трогающий alpha, в `#ifdef BLOXD_ALPHA` ([Препроцессор](../api/preprocessor.md#матрица-макрос--вариант))
 
 ## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
-- **Cause**: strict variants have no vertex hooks at all, so no `BloxdVertex` either; vertex code is reachable from strict variants
-- **Fix**: guard the vertex hook
+- **Причина**: в strict-вариантах вершинных хуков нет вовсе, значит и `BloxdVertex` тоже; вершинный код достижим из strict-вариантов
+- **Исправление**: защитите вершинный хук
 
-## bloxdOpaqueBehind fails in only some variants
+## bloxdOpaqueBehind падает только в некоторых вариантах
 
-- **Cause**: `BLOXD_SCENE_DEPTH` is defined only in all-liquid variants
-- **Fix**: `#ifdef BLOXD_SCENE_DEPTH` ([Validation errors](validation.md))
+- **Причина**: `BLOXD_SCENE_DEPTH` определён только во всех жидкостных вариантах
+- **Исправление**: `#ifdef BLOXD_SCENE_DEPTH` ([Ошибки валидации](validation.md))
 
-## Water ignores the pack (Liquid)
+## Вода игнорирует пак (Liquid)
 
-- **Symptom**: terrain hooks written, water unchanged
-- **Cause**: **in v5, if a pack defines no Liquid hook, no Terrain hook runs on water either** (the pre-v4 "liquid falls back to terrain" behavior is gone)
-- **Fix**: write Liquid hooks ([hook split](../api/hooks.md#what-each-program-draws))
+- **Симптом**: террейн-хуки написаны, вода не изменилась
+- **Причина**: **в v5, если пак не объявил ни одного Liquid-хука, на воде не работает и Terrain-хук** (поведение до v4 «жидкость откатывается на террейн» исчезло)
+- **Исправление**: напишите Liquid-хуки ([разделение хуков](../api/hooks.md#что-рисует-каждая-программа))
 
-## Models (entities, block models) unaffected
+## Модели (сущности, блочные модели) не затронуты
 
-- **Cause**: out of scope before v5; now requires `bloxdModel*` hooks
-- **Fix**: define `bloxdModelSurface` / `bloxdModelLight` ([Models guide](../guides/models.md))
+- **Причина**: до v5 было вне области действия; теперь нужны хуки `bloxdModel*`
+- **Исправление**: объявите `bloxdModelSurface` / `bloxdModelLight` ([руководство по моделям](../guides/models.md))
 
-## About the 6-variant validation
+## О валидации 6 вариантов
 
-The loader validates **all 6 variants at once** at load (the lighting axis is no longer compiled separately). Even if a game uses only some conditions, distributed packs must anticipate all six.
+Загрузчик валидирует **все 6 вариантов разом** при загрузке (ось освещения больше не компилируется отдельно). Даже если игра использует лишь часть условий, распространяемые паки должны предусматривать все шесть.
 
-| Variant | Macros defined |
+| Вариант | Определённые макросы |
 |---|---|
 | `allow.terrain` | `BLOXD_ALPHA` |
 | `allow.liquid` | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
@@ -50,6 +50,6 @@ The loader validates **all 6 variants at once** at load (the lighting axis is no
 | `strict.liquid` | `BLOXD_SCENE_DEPTH` |
 | `strict.model` | — |
 
-## Related
+## Смотрите также
 
-- [Variants](../getting-started/variants.md) · [Preprocessor](../api/preprocessor.md) · [Policy](../internals/policy.md)
+- [Варианты](../getting-started/variants.md) · [Препроцессор](../api/preprocessor.md) · [Режимы применения по играм](../internals/policy.md)

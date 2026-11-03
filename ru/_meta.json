@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
+  "getting-started": "Начало работы",
+  "api": "Справочник по API",
   "guides": "Руководства",
   "recipes": "Рецепты",
   "troubleshooting": "Устранение неполадок",
-  "internals": "Engine Internals & Research",
+  "internals": "Внутренности движка и исследования",
   "history": "История версий"
 }

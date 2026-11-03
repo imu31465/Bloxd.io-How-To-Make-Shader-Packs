@@ -1,62 +1,62 @@
-# Lighting
+# Освещение
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Analyzed (восстановлен дословно из живого заголовка)
 
-v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
+В v5 опубликован API освещения. То, что движок делал внутри (построение `litColour`), теперь можно вызывать из паков. Эта страница описывает входные данные освещения, функции и порядок обработки как единую систему.
 
-## The full pipeline
+## Полный пайплайн
 
-The complete color chain, as the default light-stage implementation (`bloxdDefaultLight`) shows it:
+Полная цветовая цепочка, как её показывает дефолтная реализация light-стадии (`bloxdDefaultLight`):
 
 ```
 surface.colour
-    │  mix with overlayColour (mix(colour, overlay.rgb, overlay.a))
+    │  смешивание с overlayColour (mix(colour, overlay.rgb, overlay.a))
     ▼
 overlaid
-    │  multiply by bloxdShading(light) — material & angle response
+    │  умножение на bloxdShading(light) — отклик материала и угла
     ▼
 shaded
-    │  mix with enchantColour (mix(shaded, enchant.rgb, enchant.a))
+    │  смешивание с enchantColour (mix(shaded, enchant.rgb, enchant.a))
     ▼
 enchanted
-    │  multiply by bloxdWorldLight(light) — world light (brightest of block/sky/held)
+    │  умножение на bloxdWorldLight(light) — мировой свет (ярчайший из блочного/небесного/ручного)
     ▼
-lit = bloxdLitColour(surface, light)   ← the color "before emission and fog"
-    │  + surface.emission               ← emission added after lighting
+lit = bloxdLitColour(surface, light)   ← цвет «до эмиссии и тумана»
+    │  + surface.emission               ← эмиссия добавляется после освещения
     ▼
     │  bloxdApplyFog(colour, light)      ← mix(colour, fogColour, fogAlpha)
     ▼
-BloxdLight.colour (final color)
+BloxdLight.colour (итоговый цвет)
 ```
 
-`bloxdLitColour()` order (header summary: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
+Порядок `bloxdLitColour()` (резюме из заголовка: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
 
-1. apply `overlayColour`
-2. shade with `bloxdShading()`
-3. apply `enchantColour`
-4. apply world light with `bloxdWorldLight()`
+1. применить `overlayColour`
+2. затенить через `bloxdShading()`
+3. применить `enchantColour`
+4. применить мировой свет через `bloxdWorldLight()`
 
-Emission and fog order: **emission is added after lighting and before fog**, and fog sinks emission too (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
+Порядок эмиссии и тумана: **эмиссия добавляется после освещения и до тумана**, и туман тоже топит эмиссию (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
 
-## Functions
+## Функции
 
-### bloxdLit() — the gate
+### bloxdLit() — гейт
 
 ```wgsl
 fn bloxdLit() -> bool
 ```
 
-Whether block & sky lighting is on. **Guarantees when off**:
+Включено ли блочное и небесное освещение. **Гарантии при выключении**:
 
-| Field | Value when off |
+| Поле | Значение при выключении |
 |---|---|
 | `blockLight` / `heldLight` | `0` |
 | `skyLight` | `1` |
-| `ambientLightColour` / `skyLightColour` | `1` (white) |
+| `ambientLightColour` / `skyLightColour` | `1` (белый) |
 
-v4's `#ifdef BLOXD_LIGHTING` is gone. Replace with `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
+`#ifdef BLOXD_LIGHTING` из v4 исчез. Замените на `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
 
-### bloxdShading() — material & angle response
+### bloxdShading() — отклик материала и угла
 
 ```wgsl
 fn bloxdShading(light: BloxdLightIn) -> vec3f {
@@ -65,10 +65,10 @@ fn bloxdShading(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- multiplies `directional` (summed Lambert) by `diffuse` (material RGB response), adds `emissive` (material glow) and `ambient` (RGB ambient), clamps to 0–1
-- **the new v5 inputs `diffuse` / `emissive`** let you swap just the Lambert term while keeping the engine's material response
+- умножает `directional` (суммарный Ламберт) на `diffuse` (RGB-отклик материала), прибавляет `emissive` (свечение материала) и `ambient` (RGB-ambient), ограничивает до 0–1
+- **новые входы v5 `diffuse` / `emissive`** позволяют заменить только ламбертов член, сохранив отклик материала движка
 
-### bloxdWorldLight() — the world's light
+### bloxdWorldLight() — свет мира
 
 ```wgsl
 fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
@@ -80,10 +80,10 @@ fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- shapes each of the three channels (block / sky / held) with `ambientLightColour` as the floor, then takes the **brightest**
-- `skyLight` interpolates from `ambientLightColour` toward `skyLightColour` by the sky-light amount
+- формирует каждый из трёх каналов (блочный / небесный / ручной) с `ambientLightColour` в роли пола, затем берёт **ярчайший**
+- `skyLight` интерполируется от `ambientLightColour` к `skyLightColour` по величине небесного света
 
-### bloxdLitColour() — the engine recipe
+### bloxdLitColour() — рецепт движка
 
 ```wgsl
 fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
@@ -96,7 +96,7 @@ fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-### bloxdApplyFog() — fog
+### bloxdApplyFog() — туман
 
 ```wgsl
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -104,10 +104,10 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- `fogAlpha`: **0 = no fog, 1 = only fogColour** (inverted from v4's `fogVisibility`)
-- `fogColour` is the game's fog RGB; **`vec3f(0.0)` when the game has no fog**
+- `fogAlpha`: **0 = нет тумана, 1 = только fogColour** (инвертирован по сравнению с `fogVisibility` из v4)
+- `fogColour` — RGB тумана игры; **`vec3f(0.0)`, когда в игре нет тумана**
 
-### bloxdDefaultLight() — the whole default
+### bloxdDefaultLight() — дефолт целиком
 
 ```wgsl
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -116,38 +116,38 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Input fields (BloxdLightIn)
+## Входные поля (BloxdLightIn)
 
-| Field | Type | Meaning | Note |
+| Поле | Тип | Смысл | Примечание |
 |---|---|---|---|
-| `litColour` | `vec3f` | lit & enchanted RGB (before emission and fog) | a result value, not a source |
-| `directional` | `f32` | summed Lambert from directional lights | 0 when no directional lights |
-| `diffuse` | `vec3f` | material RGB response to directional light | new in v5 |
-| `emissive` | `vec3f` | material RGB glow (added to directional) | new in v5 |
-| `ambient` | `vec3f` | RGB ambient (added to directional) | |
-| `blockLight` | `vec3f` | RGB block light | 0 when `!bloxdLit()` |
-| `skyLight` | `f32` | sky light | 1 when `!bloxdLit()` |
-| `ambientLightColour` | `vec3f` | minimum RGB light (floor) | 1 when `!bloxdLit()` |
-| `skyLightColour` | `vec3f` | RGB color of skyLight | 1 when `!bloxdLit()` |
-| `heldLight` | `vec3f` | RGB held light | 0 when `!bloxdLit()` or nothing held |
-| `fogColour` | `vec3f` | game fog RGB | 0 with no fog |
-| `fogAlpha` | `f32` | 0 = no fog, 1 = only fogColour | inverted from v4 `fogVisibility` |
+| `litColour` | `vec3f` | освещённый и зачарованный RGB (до эмиссии и тумана) | результирующее значение, а не источник |
+| `directional` | `f32` | суммарный Ламберт от направленных светов | 0, когда направленных светов нет |
+| `diffuse` | `vec3f` | RGB-отклик материала на направленный свет | позволяет `bloxdShading()` восстановить отклик материала |
+| `emissive` | `vec3f` | RGB-свечение материала (прибавляется к направленному) | |
+| `ambient` | `vec3f` | RGB-ambient (прибавляется к направленному) | |
+| `blockLight` | `vec3f` | RGB блочного света | 0 при `!bloxdLit()` |
+| `skyLight` | `f32` | небесный свет | 1 при `!bloxdLit()` |
+| `ambientLightColour` | `vec3f` | минимальный RGB-свет (пол) | 1 при `!bloxdLit()` |
+| `skyLightColour` | `vec3f` | RGB-цвет skyLight | 1 при `!bloxdLit()` |
+| `heldLight` | `vec3f` | RGB ручного света | 0 при `!bloxdLit()` или когда в руках ничего нет |
+| `fogColour` | `vec3f` | RGB тумана игры | 0 без тумана |
+| `fogAlpha` | `f32` | 0 = нет тумана, 1 = только fogColour | инвертирован по сравнению с `fogVisibility` v4 |
 
-## Light-level physics (background, skippable)
+## Физика уровней света (фон, можно пропустить)
 
-- **`blockLight` / `skyLight` / `heldLight` arrive mapped to 0–1**: the 0–15 levels through an ease-out curve (e.g. `6 → 0.45`, `12 → 0.92`). All exclude `ambientLightColour`
-- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](../guides/realism.md))
-- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](../internals/fog-internals.md))
+- **`blockLight` / `skyLight` / `heldLight` приходят уже отображёнными в 0–1**: уровни 0–15 через ease-out-кривую (напр. `6 → 0.45`, `12 → 0.92`). Все исключают `ambientLightColour`
+- **Кривая лифта**: `skyLight` — на самом деле «видит ли эта позиция небо»: воксельные данные перекрытия, т.е. карта теней. Пороговому разделению солнца/тени может понадобиться обратное преобразование (см. [руководство по реализму](../guides/realism.md))
+- **Внутрянка тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутрянка движка: внутрянка тумана](../internals/fog-internals.md))
 
-## Recipes
+## Рецепты
 
-### Custom shading + the engine's world light
+### Своё затенение + мировой свет движка
 
-What v4 authors approximated by scaling `litColour` can now be written exactly:
+То, что авторы v4 приближали масштабированием `litColour`, теперь записывается точно:
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    let nDotL = light.directional; // already summed Lambert
+    let nDotL = light.directional; // уже суммарный Ламберт
     let wrapped = nDotL * 0.5 + 0.5;
     let shaded = saturate(wrapped * light.diffuse + light.emissive + light.ambient);
     let colour = max(shaded * bloxdWorldLight(light), vec3f(0.0));
@@ -155,7 +155,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Keep the engine's world light, boost emission only
+### Оставить мировой свет движка, усилить только эмиссию
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -164,7 +164,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Night blue shift (skyLight-driven)
+### Ночной синий сдвиг (управляется skyLight)
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -176,6 +176,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## См. также
 
-- [Functions](functions.md) · [Guides: lighting](../guides/lighting.md) · [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [Функции](functions.md) · [Руководства: освещение](../guides/lighting.md) · [Внутрянка движка: внутрянка освещения](../internals/lighting-internals.md)

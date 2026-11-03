@@ -1,21 +1,21 @@
-# Guides
+# Руководства
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+Материал категории «механизм и образ мышления». Что вообще возможно — описано в [Что умеют и не умеют шейдер-паки](constraints.md); примеры кода под конкретные цели живут в [Рецептах](../recipes/).
 
-## Map
+## Карта
 
-| Page | Contents |
+| Страница | Содержание |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [Как работает освещение](lighting.md) | что делает штатное освещение движка и как далеко его можно перестроить |
+| [Тени](shadows.md) | skyLight как воксельная карта теней; инверсия лифта |
+| [Естественно выглядящая вода](water.md) | интегрированный рецепт воды и трёхслойная подводная реальность |
+| [Дизайн ночных видов](night.md) | проблема «тёмные тени, но светлые поверхности» |
+| [Модели и текстуры](models.md) | что рисует и что читает программа Model |
+| [Реализм: две школы](realism.md) | школы аддитивных правок и полного переосвещения |
+| [Что умеют и не умеют шейдер-паки](constraints.md) | карта возможностей: достижимое, недостижимое, условное — и почему |
+| [Производительность](performance.md) | таблица стоимости и практические рекомендации |
+| [Чеклист тестов в игре](testing.md) | предрелизный чеклист |
+| [Комбинирование с текстурными паками](combinations.md) | сочетание с текстурными паками |
+| [Советы по отладке](debugging.md) | диагностика «симптом → причина» |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в проде 2026-11-03)

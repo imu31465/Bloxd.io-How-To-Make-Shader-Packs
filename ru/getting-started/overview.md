@@ -1,33 +1,33 @@
-# Overview & prerequisites
+# Обзор и предварительные требования
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified
 
-## What a shader pack is
+## Что такое шейдер-пак
 
-A Bloxd.io shader pack changes the look of the game's **WebGPU renderer only**. Packs are written in a **restricted subset of WGSL** and loaded from the in-game settings → Shader Pack screen as a zip or folder. While a pack is installed, the WebGPU renderer is force-enabled in settings.
+Шейдер-пак Bloxd.io меняет внешний вид игры — **только её WebGPU-рендерер**. Паки пишутся на **ограниченном подмножестве WGSL** и загружаются из внутриигровых настроек → экран Shader Pack в виде zip или папки. Пока пак установлен, WebGPU-рендерер принудительно включён в настройках.
 
-Packs are validated and compiled as pure WGSL — no JavaScript execution, no networking. Nothing dangerous can happen with normal code.
+Паки валидируются и компилируются как чистый WGSL — без исполнения JavaScript и без сети. С обычным кодом ничего опасного произойти не может.
 
-## What you can change (v5)
+## Что можно менять
 
-A pack plugs into the renderer's **3-stage per-face pipeline**. The render targets split into three programs with a total of **9 hooks**:
+Пак встраивается в **пайплайн рендерера из 3 этапов на каждую грань**. Цели рендера разбиваются на три программы — всего **9 хуков**:
 
-| Target | Hooks (Vertex / Surface / Light) | What is drawn |
+| Цель | Хуки (Vertex / Surface / Light) | Что рисуется |
 |---|---|---|
-| **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | All blocks except water and block models |
-| **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Water |
-| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block models (slabs, stairs, plants), items, players, mobs, NPCs, armour, cosmetics |
+| **Террейн** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | Все блоки, кроме воды и блочных моделей |
+| **Жидкость** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Вода |
+| **Модель** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Блочные модели (полублоки, ступени, растения), предметы, игроки, мобы, NPC, броня, косметика |
 
-- **Can do**: change colors, transparency and emission; rebuild lighting (published as the v5 [Lighting API](../api/lighting.md)); projected-style shadows (via `skyLight`); sample textures (`bloxdTexel` — reading the existing block-texture atlas); per-model effects (v5's `flags` tell you "this is a held item", "this is a player"); vertex animation (allow games only)
-- **Cannot do**: add your own textures (that is the texture-pack system's job); post-processing (bloom etc.); shadow-map shadows that rotate with the sun; true reflections (SSR); affect the sky, clouds or the sun disc itself
-- **Easy to miss but powerful**: **projected-style shadows using `skyLight` (voxel sky occlusion)** — clearly darken areas under trees and roofs. Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
+- **Можно**: менять цвета, прозрачность и emission; перестраивать освещение ([API освещения](../api/lighting.md)); тени в стиле проекции (через `skyLight`); сэмплить текстуры (`bloxdTexel` — чтение существующего атласа блочных текстур); эффекты отдельно по моделям (`flags` сообщают «это предмет в руке», «это игрок»); вершинную анимацию (только allow-игры)
+- **Нельзя**: добавлять собственные текстуры (это работа системы текстур-паков); пост-обработку (bloom и т.п.); тени по карте теней, вращающиеся вместе с солнцем; настоящие отражения (SSR); воздействовать на небо, облака или сам диск солнца
+- **Легко упустить, но мощно**: **тени в стиле проекции через `skyLight` (воксельное перекрытие неба)** — заметно темнеют области под деревьями и крышами. Ломание блоков заставляет LightEngine пересчитывать всё немедленно, поэтому тени следуют в реальном времени
 
-## strict and allow modes
+## Режимы strict и allow
 
-Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run in strict mode** (no vertex animation, no `discard`). Packs for general distribution must work in strict mode. See [Variants](variants.md) and the [policy reference](../internals/policy.md).
+У каждой игры есть политика шейдер-паков (`shaderPackPolicy`), и **большинство игр работает в strict-режиме** (без вершинной анимации, без `discard`). Паки для широкого распространения обязаны работать в strict-режиме. См. [Варианты](variants.md) и [справочник по политике](../internals/policy.md).
 
-## Assumptions in this documentation
+## Допущения в этой документации
 
-- The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](../api/compatibility.md))
-- Migrating a pack written for an older version? See [Version History](../history/)
-- Engine internals may change with updates, so every page names its target build
+- Текущая игра принимает только паки `apiVersion: 5`; паки v1–v4 отклоняются при загрузке (сохранённые паки молча становятся неактивными — [Совместимость](../api/compatibility.md))
+- Мигрируете пак, написанный под старую версию? См. [Историю версий](../history/)
+- Внутренности движка могут меняться с обновлениями, поэтому каждая страница называет свой целевой билд

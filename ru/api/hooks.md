@@ -1,38 +1,38 @@
-# Shader hooks
+# Хуки шейдеров
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Verified
 
-Packs can define **9 hooks** — 3 render targets (programs) × 3 pipeline stages, all optional (undefined means engine default).
+Паки могут определять **9 хуков** — 3 цели рендера (программы) × 3 стадии пайплайна, все опциональны (отсутствие определения означает дефолт движка).
 
-## 9-hook comparison
+## Сравнение 9 хуков
 
-| Hook | Program | Stage | Arguments | Returns | Run condition |
+| Хук | Программа | Стадия | Аргументы | Возвращает | Условие запуска |
 |---|---|---|---|---|---|
-| `bloxdTerrainVertex` | Terrain | vertex | `BloxdVertexIn` | `BloxdVertex` | allow variants only (**defining it in strict is itself an error**) |
-| `bloxdTerrainSurface` | Terrain | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdTerrainLight` | Terrain | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdLiquidVertex` | Liquid | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdLiquidSurface` | Liquid | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdLiquidLight` | Liquid | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdModelVertex` | Model | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdModelSurface` | Model | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdModelLight` | Model | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
+| `bloxdTerrainVertex` | Terrain | vertex | `BloxdVertexIn` | `BloxdVertex` | только allow-варианты (**определить его в strict — само по себе ошибка**) |
+| `bloxdTerrainSurface` | Terrain | surface | `BloxdSurfaceIn` | `BloxdSurface` | всегда |
+| `bloxdTerrainLight` | Terrain | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | всегда |
+| `bloxdLiquidVertex` | Liquid | vertex | `BloxdVertexIn` | `BloxdVertex` | только allow |
+| `bloxdLiquidSurface` | Liquid | surface | `BloxdSurfaceIn` | `BloxdSurface` | всегда |
+| `bloxdLiquidLight` | Liquid | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | всегда |
+| `bloxdModelVertex` | Model | vertex | `BloxdVertexIn` | `BloxdVertex` | только allow |
+| `bloxdModelSurface` | Model | surface | `BloxdSurfaceIn` | `BloxdSurface` | всегда |
+| `bloxdModelLight` | Model | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | всегда |
 
-## What each program draws
+## Что рисует каждая программа
 
-| Program | Draws | Water when no Liquid hook exists |
+| Программа | Рисует | Вода, когда нет ни одного хука Liquid |
 |---|---|---|
-| **Terrain** | every block except water and block models | — |
-| **Liquid** | water | **no Terrain hook runs on water either** (water keeps its default look) |
-| **Model** | block models (slabs, stairs, plants, crops, cobwebs), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics | — |
+| **Terrain** | каждый блок, кроме воды и блочных моделей | — |
+| **Liquid** | вода | **и на воде ни один хук Terrain не запускается** (вода сохраняет дефолтный вид) |
+| **Model** | блочные модели (полублоки, ступени, растения, посевы, паутина), предметы в руках / выпавшие / в полёте, игроки, мобы, NPC, броня, косметика | — |
 
-## Stage roles
+## Роли стадий
 
-- **Vertex** — move vertex positions (grass sway, waves). Vertex animation disables the whole pack in strict games, so `#ifndef BLOXD_STRICT` is mandatory
-- **Surface** — the material output: `colour` / `alpha` (conditional) / `emission` / `enchantColour` / `overlayColour`
-- **Light** — the final color; takes the surface output plus `BloxdLightIn`. Its return value is the on-screen color
+- **Vertex** — двигает позиции вершин (покачивание травы, волны). Вершинная анимация отключает весь пак в strict-играх, поэтому `#ifndef BLOXD_STRICT` обязателен
+- **Surface** — выход материала: `colour` / `alpha` (условное) / `emission` / `enchantColour` / `overlayColour`
+- **Light** — итоговый цвет; принимает выход surface плюс `BloxdLightIn`. Её возвращаемое значение — цвет на экране
 
-## Signatures
+## Сигнатуры
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
@@ -46,25 +46,25 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-// bloxdLiquid* / bloxdModel* take the same argument and return types
+// bloxdLiquid* / bloxdModel* принимают те же типы аргументов и возвращаемых значений
 ```
 
-## Special-function call restrictions
+## Ограничения вызовов специальных функций
 
-The engine's validator restricts which hooks may reach certain functions (violations fail with dedicated "reaches" diagnostics):
+Валидатор движка ограничивает, из каких хуков можно обращаться к определённым функциям (нарушения проваливают валидацию со специальными диагностиками «reaches»):
 
-| Function | Callable from | Guard |
+| Функция | Откуда вызывается | Guard |
 |---|---|---|
-| `bloxdTexel` | surface / light hooks only | — |
-| `bloxdTextureSize` | surface / light hooks only | — |
-| `bloxdOpaqueBehind` | surface / light hooks (meaningful in liquid variants) | `#ifdef BLOXD_SCENE_DEPTH` |
+| `bloxdTexel` | только surface/light-хуки | — |
+| `bloxdTextureSize` | только surface/light-хуки | — |
+| `bloxdOpaqueBehind` | surface/light-хуки (осмысленно в жидкостных вариантах) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` was removed in v5 (it was the only special function callable from vertex hooks through v4). There is no replacement — use `flags` when you need "which block is this".
+> `bloxdFragmentBlockPosition` больше нет в документированном заголовке, но движок по-прежнему вставляет и принимает её — см. [Функции: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--не-документирована-но-всё-ещё-инжектится). Это была единственная специальная функция, вызываемая из вершинных хуков; в новом коде для вопроса «что это за блок» предпочитайте `flags`.
 
-## Fallbacks and sharing
+## Fallback и совместное использование
 
-- Undefined hook → that stage behaves as the engine default (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **Share processing across hooks** with a module-scope function called from both:
+- Неопределённый хук → та стадия ведёт себя как дефолт движка (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
+- **Разделяйте обработку между хуками** функцией области модуля, вызываемой из обоих:
 
 ```wgsl
 fn sharedSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -82,8 +82,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Related
+## См. также
 
-- Official 9-hook template → [Getting Started: Shader hooks](../getting-started/hooks.md)
-- Every struct field → [Structures](structures.md)
-- Hook invocation internals → [Engine Internals](../internals/hook-invocation.md)
+- Официальный шаблон 9 хуков → [Начало работы: хуки шейдеров](../getting-started/hooks.md)
+- Каждое поле структур → [Структуры](structures.md)
+- Внутренности вызова хуков → [Внутренности движка](../internals/hook-invocation.md)

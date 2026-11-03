@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ и правовые заметки
 
-> Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (2026-11-03, прод) · Статус: Verified
 
-## Frequently asked questions
+## Часто задаваемые вопросы
 
-### Q. Are shader packs an official feature?
+### В. Шейдер-паки — официальная функция?
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+Функция шейдер-паков доступна из внутриигрового UI, а создание паков выглядит задуманной активностью. Однако публичной официальной документации не найдено — это руководство неофициальное и основано на анализе.
 
-### Q. Can packs do anything dangerous?
+### В. Могут ли паки сделать что-то опасное?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+Паки — чистый WGSL: **выполнение JS и доступ к сети невозможны по замыслу**. Запускается только код, прошедший валидацию и компиляцию ([Ограничения](../api/restrictions.md)).
 
-### Q. Which games do packs work in?
+### В. В каких играх работают паки?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+Большинство игр работает в strict-режиме (без вершинной анимации, без `discard`). Вершинная анимация работает только в allow-играх. Перечень по играм — в [Внутрянка движка: режимы применения по играм](../internals/policy.md).
 
-### Q. Do packs work on mobile?
+### В. Работают ли паки на мобильных?
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+Только в окружениях с поддержкой WebGPU ([Требования](../getting-started/requirements.md)).
 
-### Q. Can I ship my own textures?
+### В. Можно ли поставлять свои текстуры?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+Не в шейдер-паке (атлас только для чтения). Это дело системы текстурных паков ([комбинирование](../guides/combinations.md)).
 
-### Q. Can I keep using an old-version pack?
+### В. Можно ли продолжать использовать пак старой версии?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+Текущая игра принимает только `apiVersion: 5`; старые паки молча деактивируются ([Совместимость](../api/compatibility.md)). Мигрируйте через [Историю версий](../history/).
 
-### Q. Will the API change again?
+### В. Изменится ли API ещё раз?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+Внутрянка движка может меняться с обновлениями — каждая страница называет свой целевой билд. Сохранённые паки перепроверяются автоматически при изменениях заголовка или реестра ([Совместимость](../api/compatibility.md#перепроверка-сохранённых-паков-нужна-перепроверка)).
 
-### Q. What about "cinematic shader" distributions?
+### В. А как насчёт раздач «cinematic shader»?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+Разобранная нами «cinematic shader»-раздача сообщества оказалась текстурным паком (текстуры 128×128, без `pack.json` / `.wgsl`). Большая часть вида «шейдер с тенями» — ремесло на стороне текстур ([комбинирование](../guides/combinations.md)).
 
-## Legal & notes
+## Право и заметки
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- Это неофициальное руководство, не отражающее мнения разработчиков. API может измениться без предупреждения
+- Создано с помощью ИИ; точность не гарантируется. Проверяйте по фактическому поведению в игре
+- Измеренные значения (id текстур и т.п.) — снимки конкретных билдов и меняются между билдами ([имена — это API](../api/texture-catalog.md#измеренный-дрейф-cnty9--ab90qa))
 
-## Related
+## Смотрите также
 
-- [Documentation entry](../) · [Version History](../history/)
+- [Вход в документацию](../) · [История версий](../history/)

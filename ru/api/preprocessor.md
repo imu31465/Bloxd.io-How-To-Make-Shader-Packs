@@ -1,20 +1,20 @@
-# Preprocessor
+# Препроцессор
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Analyzed (восстановлено из живого валидатора)
 
-Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif`. The `#` goes at the start of a line (inside functions is fine). Flag-name matching is case-insensitive; a wrong `#ifdef` name makes the error message list the official set.
+Условная компиляция поддерживает только `#define NAME` (без значения) / `#ifdef` / `#ifndef` / `#else` / `#endif`. `#` ставится в начале строки (внутри функций — можно). Сопоставление имён флагов нечувствительно к регистру; при неверном имени в `#ifdef` сообщение об ошибке перечисляет официальный набор.
 
-## Defined macros (3)
+## Определённые макросы (3)
 
-| Macro | Defined in | Typical use |
+| Макрос | Где определён | Типичное применение |
 |---|---|---|
-| `BLOXD_STRICT` | strict-game variants (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` around whole vertex hooks and `discard` |
-| `BLOXD_ALPHA` | variants where `BloxdSurface.alpha` exists — all liquid + non-strict terrain/model | wrap alpha-touching code |
-| `BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `BLOXD_STRICT` | варианты strict-игр (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` вокруг целых вершинных хуков и `discard` |
+| `BLOXD_ALPHA` | варианты, где существует `BloxdSurface.alpha` — все жидкостные + не-strict террейн/модели | обёртка кода, трогающего alpha |
+| `BLOXD_SCENE_DEPTH` | все жидкостные варианты | обёртка вызовов `bloxdOpaqueBehind()` |
 
-## Macro × variant matrix
+## Матрица макрос × вариант
 
-| Variant | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
+| Вариант | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
 |---|---|---|---|
 | `allow.terrain` | – | ✓ | – |
 | `allow.liquid` | – | ✓ | ✓ |
@@ -23,42 +23,42 @@ Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#i
 | `strict.liquid` | ✓ | ✓ | ✓ |
 | `strict.model` | ✓ | – | – |
 
-Terrain / liquid / model differences are **separate programs, not macros** — `#ifdef BLOXD_TERRAIN` does not exist.
+Различия террейн / жидкость / модель — это **отдельные программы, а не макросы**: `#ifdef BLOXD_TERRAIN` не существует.
 
-## Removed macros
+## Удалённые макросы
 
-- **`BLOXD_LIGHTING`** — removed in v5. Lighting state is a runtime question for [`bloxdLit()`](lighting.md#bloxdlit--the-gate), not a compile branch. Using it fails validation with:
+- **`BLOXD_LIGHTING`** — удалён в v5. Состояние освещения — вопрос времени выполнения для [`bloxdLit()`](lighting.md#bloxdlit--гейт), а не ветка компиляции. Его использование проваливает валидацию с сообщением:
 
-> *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+> *«BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.»*
 
-v4 migration pattern:
+Паттерн миграции v4:
 
 ```wgsl
-// v4 (fails validation on v5)
+// v4 (проваливает валидацию на v5)
 #ifdef BLOXD_LIGHTING
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight { ... }
 #endif
 
-// v5 (migrated)
+// v5 (после миграции)
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }
-    // ... lighting-enabled processing
+    // ... обработка при включённом свете
 }
 ```
 
-## Example
+## Пример
 
 ```wgsl
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     out.colour = out.colour * vec3f(1.0, 0.9, 0.8);
-    #ifdef BLOXD_ALPHA                          // terrain has alpha only in allow
+    #ifdef BLOXD_ALPHA                          // террейн имеет alpha только в allow
     out.alpha = s.alpha;
     #endif
     return out;
 }
 
-#ifndef BLOXD_STRICT                            // vertex hooks always need this guard
+#ifndef BLOXD_STRICT                            // вершинным хукам этот guard нужен всегда
 fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
     var out = bloxdDefaultVertex(v);
     out.position.y += sin(bloxdSeconds()) * 0.05;
@@ -67,13 +67,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Macros shape the structs
+## Макросы формируют структуры
 
-- `BloxdSurface.alpha` exists only inside `#ifdef BLOXD_ALPHA`
-- `bloxdOpaqueBehind()` is callable only inside `#ifdef BLOXD_SCENE_DEPTH`
+- `BloxdSurface.alpha` существует только внутри `#ifdef BLOXD_ALPHA`
+- `bloxdOpaqueBehind()` вызываема только внутри `#ifdef BLOXD_SCENE_DEPTH`
 
-See [Structures](structures.md#conditional-fields--macros).
+См. [Структуры](structures.md#условные-поля--макросы).
 
-## Related
+## См. также
 
-- [Getting Started: Variants](../getting-started/variants.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [Начало работы: варианты](../getting-started/variants.md) · [Внутренности движка: валидация шейдеров](../internals/shader-validation.md)

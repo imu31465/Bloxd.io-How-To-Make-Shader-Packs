@@ -1,29 +1,29 @@
-# Reserved identifier internals
+# Внутрянка зарезервированных идентификаторов
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle's generators)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Analyzed (восстановлено из генераторов живого бандла)
 
-The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](../api/restrictions.md).
+Пространство имён `bloxdSp*` — символы, которые генераторы могут подставлять и которые паки поэтому не могут переобъявлять. Сводка для авторов паков: [Ограничения](../api/restrictions.md).
 
-## The 46 symbols
+## 46 символов
 
-Grown from v4's 27 to **46** (20 added, 1 retired — `bloxdSpLitColour`, promoted into the public `bloxdLitColour()`):
+Выросло с 27 в v4 до **46** (20 добавлено, 1 выбыл — `bloxdSpLitColour`, переведён в публичную `bloxdLitColour()`):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-## New names ↔ v5 features
+## Новые имена ↔ возможности v5
 
-- `bloxdSpFlags` — delivery of the `BloxdFlags` struct
-- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — the new inputs (enchant, model-local position)
-- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — the cell-sampling texture-pack path
-- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](texture-sampling.md))
-- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — extended-hook locals
+- `bloxdSpFlags` — доставка структуры `BloxdFlags`
+- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — новые входы (зачарование, локальная позиция модели)
+- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — путь текстурных паков с сэмплингом по ячейкам
+- `bloxdSpQuarterTurns` — цепочка поворотов ([Сэмплинг текстур](texture-sampling.md))
+- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — локальные переменные расширенных хуков
 
-## The pack-level rule
+## Правило на уровне пака
 
-Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](../troubleshooting/validation.md)).
+Шире, чем это пространство имён: **всё, что совпадает с `/^bloxd/i` (без учёта регистра)**. Объявлять можно только 9 имён хук-функций ([Ошибки валидации](../troubleshooting/validation.md)).
 
-`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](../troubleshooting/textures.md)).
+Идентификаторы с префиксом `bloxdTextureId` разрешаются как имена текстур — со своим отдельным семейством ошибок ([Проблемы текстур](../troubleshooting/textures.md)).
 
-## Related
+## См. также
 
-- [Restrictions](../api/restrictions.md) · [Texture sampling](texture-sampling.md) · [Version History: v5](../history/v5.md)
+- [Ограничения](../api/restrictions.md) · [Сэмплинг текстур](texture-sampling.md) · [История версий: v5](../history/v5.md)

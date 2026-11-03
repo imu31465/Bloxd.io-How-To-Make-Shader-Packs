@@ -1,47 +1,47 @@
-# Texture registry internals
+# Внутрянка реестра текстур
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в продакшене 2026-11-03) · Статус: Verified (извлечено повторным запуском собственного сборщика реестра движка)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+Механизм разрешения имя→id и измеренный дрейф реестра. Пользовательский каталог: [Каталог текстур](../api/texture-catalog.md).
 
-## Methodology
+## Методология
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+Мы запустили собственный модуль построения реестра движка (29833 в этом билде, координирующий модули 1371 / 1391 / 1384 / 219) против текстурных данных отгруженного реестра блоков внутри мини-стенда webpack и записали его вывод — эти числа — **собственные вычисления продакшн-бандла**, а не реимплементация.
 
-## Output structure
+## Структура вывода
 
-| Output | v5 measured | Meaning |
+| Вывод | Измерено в v5 | Значение |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | имена, на которые можно ссылаться как `bloxdTextureId<Name>` |
+| `aliases` | 416 | свёрнутые написания — 188 алиасов кадров (`lava0`…) и 228 алиасов поворотов (`chest_top[rot[1`…) |
+| `layers` | 228 | таблица слоёв — включая 171 заранее повёрнутый слот (57 корней × 4 поворота) |
 
-## Folding rules
+## Правила сворачивания
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **семейства анимаций** (42): написания кадров (`lava0`–`lava7`) сворачиваются к базовому имени (`lava`); `bloxdTexel` возвращает текущий кадр в момент сэмплинга
+- **семейства поворотов** (57): повёрнутые слоты (`[rot[1..4`) сворачиваются к корневому имени; `bloxdTexel` заново применяет `textureRotation` каждой грани
+- `radar_screen` — единственное имя в обоих семействах (его четыре заранее повёрнутые копии несут каждая собственную лестницу из 4 кадров — поэтому на атласе 45 корней анимации, а не 42)
 
-## Drift (cnty9 → ab90qa)
+## Дрейф (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| Измерение | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| записи атласа | 1,219 | **1,210** |
+| семейства поворотов (повёрнутые написания) | 57 (228) | **57 (228) — без изменений** |
+| семейства анимаций (кадровые написания) | 42 (188) | **42 (188) — без изменений** |
+| пригодные именованные константы | 905 | **896** |
+| изменения id среди выживших имён | — | **334 из 905** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+Полный дрейф (11 имён): добавлено (1) `scorpion_eggs`; удалено (10) — восемь текстур двойного сундука плюс `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (двойной сундук ушёл из данных игры; спавнеры сохраняют `mob_spawner_block_top`).
 
-## Effect on HEADER_VERSION
+## Влияние на HEADER_VERSION
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+Суффикс с хэшем реестра запекает id, поэтому этот дрейф помечает **каждый сохранённый пак как «нужна перепроверка»** (автоматически перепроверяется при загрузке страницы). Паки, написанные на именах, переживают повторное разрешение; паки на сырых id ломаются ([Совместимость](../api/compatibility.md)).
 
-## Past drift records
+## Прошлые записи дрейфа
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+Октябрьское сравнение двух билдов (sjr0p7 → cnty9, 10 дней): записи 1200 → 1219 (98 добавлено, 79 удалено); 779 из 1121 имён с неизменным написанием сменили id (69%); миграция соглашения об именовании (суффиксы `_rot1..4` → слоты `[rot[1..4`); появление двойного сундука. Полная запись живёт в [Истории версий: v4](../history/v4.md).
 
-## Related
+## См. также
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [Каталог текстур](../api/texture-catalog.md) · [Валидация шейдеров](shader-validation.md) · [Журнал исследований](research-log.md)

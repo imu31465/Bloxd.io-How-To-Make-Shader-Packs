@@ -1,64 +1,64 @@
-# Restrictions & reserved names
+# Ограничения и зарезервированные имена
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Verified (лимиты v4 переподтверждены байт-в-байт на v5)
 
-What packs may write, and the complete name-reservation rules.
+Что паки могут писать, и полные правила резервирования имён.
 
-## Allowed
+## Разрешено
 
-- WGSL built-ins (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select`, …)
-- your own `fn` / `struct` / `const` / `alias` / `var<private>`, in-function `let` and control flow (if/for/while/switch…)
-- derivatives (`dpdx` / `dpdy` / `fwidth`) in surface/light hooks (fragment stage) only — not in vertex hooks
-- `const` arrays (color LUTs etc.), pointers (`ptr<function, T>`), matrices (`mat3x3f` etc.)
-- flag definitions `#define NAME` (no value) + `#ifdef` conditionals
+- встроенные функции WGSL (`sin`, `mix`, `clamp`, `distance`, `smoothstep`, `reflect`, `select`, …)
+- собственные `fn` / `struct` / `const` / `alias` / `var<private>`, `let` внутри функций и управляющие конструкции (if/for/while/switch…)
+- производные (`dpdx` / `dpdy` / `fwidth`) только в surface/light-хуках (фрагментная стадия) — не в вершинных хуках
+- массивы `const` (цветовые LUT и т.п.), указатели (`ptr<function, T>`), матрицы (`mat3x3f` и т.п.)
+- определения флагов `#define NAME` (без значения) + условные конструкции `#ifdef`
 
-## Forbidden / caveats
+## Запрещено / предостережения
 
-- **No direct textures**: you cannot declare `texture_*` / `sampler` types; atlas reads go through [`bloxdTexel`](texture-api.md) only. *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
-- **`discard` is forbidden in strict** — wrap in `#ifndef BLOXD_STRICT`
-- `@attributes` / `enable` / `requires` / `override` are forbidden — no `enable f16;`, so **no f16 types**
-- no `@builtin`, so `fragCoord` / `vertex_index` are unreachable
-- **no module-scope `let`** — use `const` or `var`
-- no `atomic`
-- **never construct output structs directly**: `BloxdLight(...)` fails static validation; start from `bloxdDefault*`
-- a bare `var x: BloxdSurface;` is a validation error
-- hook parameters are read-only — copy before mutating
-- `#define` takes no value (names only)
+- **Никаких текстур напрямую**: объявлять типы `texture_*` / `sampler` нельзя; чтение атласа идёт только через [`bloxdTexel`](texture-api.md). *«Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel.»*
+- **`discard` запрещён в strict** — оберните в `#ifndef BLOXD_STRICT`
+- `@attributes` / `enable` / `requires` / `override` запрещены — нет `enable f16;`, поэтому **нет типов f16**
+- нет `@builtin`, поэтому `fragCoord` / `vertex_index` недоступны
+- **нет `let` области модуля** — используйте `const` или `var`
+- нет `atomic`
+- **никогда не конструируйте выходные структуры напрямую**: `BloxdLight(...)` проваливает статическую валидацию; начинайте от `bloxdDefault*`
+- голый `var x: BloxdSurface;` — ошибка валидации
+- параметры хуков доступны только на чтение — копируйте перед изменением
+- `#define` не принимает значения (только имена)
 
-## Reserved names
+## Зарезервированные имена
 
-### The bloxd prefix (general rule)
+### Префикс bloxd (общее правило)
 
-**Every identifier matching `/^bloxd/i` (case-insensitive) is reserved.** The only exceptions are the 9 hook function names.
+**Каждый идентификатор, совпадающий с `/^bloxd/i` (без учёта регистра), зарезервирован.** Единственные исключения — 9 имён хук-функций.
 
-Validator wording, verbatim:
+Формулировка валидатора, дословно:
 
-> *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
+> *«Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>»*
 
-### The bloxdSp* namespace (46 symbols)
+### Пространство имён bloxdSp* (46 символов)
 
-Symbols the code generator may inject and therefore cannot be redeclared (grown from 27 to 46 in v5):
+46 символов, которые генератор кода может вставить и которые поэтому нельзя переобъявлять:
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-The new names map directly to v5 features: `bloxdSpFlags` (flag struct delivery), `bloxdSpEnchant` / `bloxdSpItemLocalPosition` (new inputs), the cell-sampling texture-pack path, the rotation chain, and extended-hook locals. **The pack-level reservation rule is broader than this list** (everything matching `/^bloxd/i`), so you don't need to memorize it — just never start your own names with `bloxd`.
+Они покрывают доставку структуры флагов (`bloxdSpFlags`), входы зачарования и модельно-локальные входы (`bloxdSpEnchant` / `bloxdSpItemLocalPosition`), путь текстурного пака с сэмплированием по ячейкам, цепочку поворотов и локальные переменные расширенных хуков. **Правило резервирования на уровне пака шире этого списка** (всё, что совпадает с `/^bloxd/i`), так что запоминать его не нужно — просто никогда не начинайте собственные имена с `bloxd`.
 
-### Texture names
+### Имена текстур
 
-Identifiers starting `bloxdTextureId` are resolved as texture-name constants ([Texture API](texture-api.md#bloxdtextureid-named-texture-constants)).
+Идентификаторы, начинающиеся с `bloxdTextureId`, разрешаются как константы имён текстур ([API текстур](texture-api.md#bloxdtextureid-именованные-константы-текстур)).
 
-## Auto-rewrite introduced in v5
+## Автоматические перезаписи
 
-- **Y-derivative sign flip**: the analyzer rewrites every call to `dpdy`, `dpdyCoarse` and `dpdyFine` as `(-dpdy(...))` (measured in the validator's token-rewrite pass; the dpdy family is explicitly enumerated as the inversion set). Screen-space y points down, so this inversion makes "rate of change upward" match intuition. Write `dpdy(h)` with the intent "how does h change as I go up" and the emitted code carries the flip. `dpdx` and the `fwidth` family are untouched
+- **Инверсия знака Y-производной**: анализатор переписывает каждый вызов `dpdy`, `dpdyCoarse` и `dpdyFine` как `(-dpdy(...))` (семейство dpdy явно перечислено как множество инверсии в проходе перезаписи токенов валидатора). Y в экранных координатах направлена вниз, поэтому эта инверсия приводит «скорость изменения вверх» в соответствие с интуицией. Пишите `dpdy(h)` с намерением «как меняется h, когда я поднимаюсь» — и сгенерированный код понесёт эту инверсию. `dpdx` и семейство `fwidth` не затрагиваются
 
-## Diagnostics you'll actually see
+## Диагностики, которые вы реально увидите
 
-- *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
-- *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
-- *"X reaches bloxdTexel, which only surface and light hooks can use."*
-- *"X reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and Y doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
-- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+- *«Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>»*
+- *«Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel.»*
+- *«X reaches bloxdTexel, which only surface and light hooks can use.»*
+- *«X reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and Y doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH.»*
+- *«BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.»*
 
-## Related
+## См. также
 
-- [Troubleshooting: compilation](../troubleshooting/compilation.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [Устранение неполадок: компиляция](../troubleshooting/compilation.md) · [Внутренности движка: валидация шейдеров](../internals/shader-validation.md)

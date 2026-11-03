@@ -1,23 +1,23 @@
-# Distribution
+# Распространение
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-## Release format
+## Формат релиза
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. Zip с `pack.json` в корне, в пределах лимитов размера ([Структура пака](pack-structure.md))
+2. Проверьте, что `pack.json` лежит в корне zip (единственная общая корневая папка срезается автоматически)
+3. Отшлифуйте `name` / `author` для релиза
 
-## Pre-release checklist
+## Чек-лист перед релизом
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (число, не строка)
+- [ ] Все 6 вариантов проходят валидацию (пустой список ошибок на экране загрузчика)
+- [ ] Проверено визуально и в allow-игре, и в strict-игре
+- [ ] Паки с вершинной анимацией / `discard` ясно помечены как только-allow
+- [ ] Проверенные игры и дата указаны в примечаниях к релизу (билды меняются)
 
-## After release
+## После релиза
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- Сохранённые игроками паки автоматически проходят повторную валидацию, когда заголовок движка или реестр текстур меняются с обновлением игры
+- **Паки, распространявшиеся как v1–v4, на v5 молча становятся неактивными** (см. [pack.json](manifest.md)) — игроки видят только статусную строку, поэтому опубликуйте и анонсируйте обновлённую версию
+- Когда API обновится, выполните шаги миграции из [Истории версий](../history/), поднимите версию и выпустите релиз заново

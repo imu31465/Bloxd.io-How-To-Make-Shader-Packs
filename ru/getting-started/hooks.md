@@ -1,44 +1,44 @@
-# Shader hooks
+# Шейдерные хуки
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified
 
-A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
+Пак может встраиваться в **9 хуков**: 3 цели рендера (Terrain / Liquid / Model) × 3 этапа пайплайна (Vertex / Surface / Light). Все необязательны — неопределённый хук откатывается к дефолту движка.
 
-## The hooks
+## Хуки
 
-| Hook | Stage | What it does |
+| Хук | Этап | Что делает |
 |---|---|---|
-| `bloxdTerrainVertex` | terrain · vertex | Terrain vertex animation. **Cannot run in strict games** |
-| `bloxdTerrainSurface` | terrain · surface | Terrain color, alpha, emission, enchant, overlay |
-| `bloxdTerrainLight` | terrain · light | Terrain final color — the last stage of the fragment |
-| `bloxdLiquidVertex` | liquid · vertex | Water vertex animation. **strict-only guard required** |
-| `bloxdLiquidSurface` | liquid · surface | Water color, alpha, emission |
-| `bloxdLiquidLight` | liquid · light | Water final color |
-| `bloxdModelVertex` | model · vertex | Block models / items / entities vertex animation. **strict-only guard required** |
-| `bloxdModelSurface` | model · surface | Model color, alpha, emission, enchant, overlay |
-| `bloxdModelLight` | model · light | Model final color |
+| `bloxdTerrainVertex` | terrain · vertex | Вершинная анимация террейна. **Не может выполняться в strict-играх** |
+| `bloxdTerrainSurface` | terrain · surface | Цвет, альфа, emission, зачарование, оверлей террейна |
+| `bloxdTerrainLight` | terrain · light | Итоговый цвет террейна — последний этап фрагмента |
+| `bloxdLiquidVertex` | liquid · vertex | Вершинная анимация воды. **Требуется гард от strict** |
+| `bloxdLiquidSurface` | liquid · surface | Цвет, альфа, emission воды |
+| `bloxdLiquidLight` | liquid · light | Итоговый цвет воды |
+| `bloxdModelVertex` | model · vertex | Вершинная анимация блочных моделей / предметов / сущностей. **Требуется гард от strict** |
+| `bloxdModelSurface` | model · surface | Цвет, альфа, emission, зачарование, оверлей моделей |
+| `bloxdModelLight` | model · light | Итоговый цвет моделей |
 
-Signatures (types must match exactly; parameter names are free):
+Сигнатуры (типы должны совпадать точно; имена параметров произвольны):
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex;
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface;
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
-// bloxdLiquid* / bloxdModel* take the same types
+// bloxdLiquid* / bloxdModel* принимают те же типы
 ```
 
-## Render-target split
+## Разделение целей рендера
 
-- **Terrain** — every block except water and block models
-- **Liquid** — water
-- **Model** — block models (slabs, stairs, crossed-plane plants), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics
+- **Террейн** — все блоки, кроме воды и блочных моделей
+- **Жидкость** — вода
+- **Модель** — блочные модели (полублоки, ступени, растения из скрещённых плоскостей), предметы в руке / выпавшие / брошенные, игроки, мобы, NPC, броня, косметика
 
-**Important**: if a pack defines no Liquid hook, **no Terrain hook runs on water either** (water is handled by Liquid hooks alone). This differs from pre-v4 behavior where liquid fell back to terrain hooks.
+**Важно**: если пак не определяет ни одного хука Liquid, **на воде не работает ни один хук Террейна** (водой управляют исключительно хуки Liquid). Это отличается от поведения до v4, где жидкость откатывалась на хуки террейна.
 
-## Fallbacks and code sharing
+## Fallback и разделение кода
 
-- An undefined hook means that stage uses the engine default (same behavior as `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **To share code across hooks**, define a module-scope function and call it from both:
+- Неопределённый хук означает, что этап использует дефолт движка (то же поведение, что дают `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
+- **Чтобы разделить код между хуками**, объявите функцию на уровне модуля и вызывайте её из обоих:
 
 ```wgsl
 fn applyWarmth(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -56,9 +56,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## The default pack (official 9-hook template)
+## Дефолтный пак (официальный шаблон из 9 хуков)
 
-The starting template now includes the light hooks. 1,683 bytes as shipped, verbatim:
+Стартовый шаблон теперь включает light-хуки. 1 683 байта дословно, как поставляется:
 
 ```wgsl
 // Every hook here returns its engine default. Modify the return values to start
@@ -113,14 +113,14 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-The template's comments are the design guidance: modify return values to start building; deleting a hook restores the default; strict games keep terrain where it is; share code via functions.
+Комментарии шаблона — это проектное руководство: меняйте возвращаемые значения, чтобы начать строить пак; удаление хука восстанавливает дефолт; strict-игры держат террейн на месте; разделяйте код через функции.
 
-## Writing conventions
+## Соглашения при написании
 
-- **Never construct output structs directly** (`BloxdSurface(...)` fails validation). Always start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` and mutate fields. The light hook's first argument is already the output type, so `var out = s;` also works
-- A bare `var x: BloxdSurface;` (type annotation only) is also a validation error
-- Hook parameters are **read-only**. Copy first (`var sv = s;`)
-- You cannot use identifiers starting with `bloxd` (case-insensitive), except the 9 hook function names
-- Write constants as `const` (`#define` takes no value)
+- **Никогда не конструируйте выходные структуры напрямую** (`BloxdSurface(...)` не проходит валидацию). Всегда начинайте с `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` и изменяйте поля. Первый аргумент light-хука уже имеет выходной тип, поэтому `var out = s;` тоже работает
+- Голое `var x: BloxdSurface;` (только аннотация типа) — тоже ошибка валидации
+- Параметры хуков — **read-only**. Сначала скопируйте (`var sv = s;`)
+- Нельзя использовать идентификаторы, начинающиеся с `bloxd` (без учёта регистра), кроме 9 имён хук-функций
+- Константы пишите как `const` (`#define` не принимает значения)
 
-For every field each hook can read and write, see [Structures](../api/structures.md).
+Какие поля каждый хук может читать и писать — см. [Структуры](../api/structures.md).

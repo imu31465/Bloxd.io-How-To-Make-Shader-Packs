@@ -1,36 +1,36 @@
-# Variants and guards
+# Варианты и гарды
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Analyzed
 
-## 6 variants
+## 6 вариантов
 
-You write one body of code, but it must compile in all **6 variants**: `{strict, allow} × {terrain, liquid, model}`. The loader validates all six at load time.
+Вы пишете одно тело кода, но оно должно компилироваться во всех **6 вариантах**: `{strict, allow} × {terrain, liquid, model}`. Загрузчик валидирует все шесть в момент загрузки.
 
-The v4-and-earlier "lighting on/off" axis is gone (v4 had 8 variants). Lighting state is now a runtime question for [`bloxdLit()`](../api/lighting.md), not a compile-time branch.
+Ось «свет вкл/выкл» из v4 и более ранних версий исчезла (в v4 было 8 вариантов). Состояние освещения — теперь runtime-вопрос для [`bloxdLit()`](../api/lighting.md), а не ветвление на этапе компиляции.
 
-| Variant | Example | Macros defined |
+| Вариант | Пример | Определённые макросы |
 |---|---|---|
-| `allow.terrain` | terrain in an allow game | `BLOXD_ALPHA` |
-| `allow.liquid` | water in an allow game | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
-| `allow.model` | models in an allow game | `BLOXD_ALPHA` |
-| `strict.terrain` | terrain in a strict game | — |
-| `strict.liquid` | water in a strict game | `BLOXD_SCENE_DEPTH` |
-| `strict.model` | models in a strict game | — |
+| `allow.terrain` | террейн в allow-игре | `BLOXD_ALPHA` |
+| `allow.liquid` | вода в allow-игре | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
+| `allow.model` | модели в allow-игре | `BLOXD_ALPHA` |
+| `strict.terrain` | террейн в strict-игре | — |
+| `strict.liquid` | вода в strict-игре | `BLOXD_SCENE_DEPTH` |
+| `strict.model` | модели в strict-игре | — |
 
-## Conditionals
+## Условные директивы
 
-Only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif` are available. The `#` goes at the start of a line (inside functions is fine).
+Доступны только `#define NAME` (без значения) / `#ifdef` / `#ifndef` / `#else` / `#endif`. `#` ставится в начале строки (внутри функций — можно).
 
-| Guard | Meaning | Typical use |
+| Гард | Смысл | Типичное применение |
 |---|---|---|
-| `#ifndef BLOXD_STRICT` | non-strict (allow) variants only | wrap whole vertex hooks, wrap `discard` |
-| `#ifdef BLOXD_ALPHA` | variants where `alpha` exists (all liquid + non-strict terrain/model) | wrap alpha-touching code |
-| `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `#ifndef BLOXD_STRICT` | только не-strict (allow) варианты | оборачивать целиком vertex-хуки, оборачивать `discard` |
+| `#ifdef BLOXD_ALPHA` | варианты, где существует `alpha` (вся жидкость + не-strict террейн/модели) | оборачивать код, затрагивающий `alpha` |
+| `#ifdef BLOXD_SCENE_DEPTH` | все варианты жидкости | оборачивать вызовы `bloxdOpaqueBehind()` |
 
-`BLOXD_LIGHTING` was **removed in v5**. Using it fails validation with: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
+`BLOXD_LIGHTING` был **удалён в v5**. Его использование проваливает валидацию с сообщением: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## The strict-games contract
+## Контракт strict-игр
 
-Most games are strict (no vertex animation, no `discard`). An unguarded vertex hook reports `<hook> moves terrain, which strict games prevent.` and a reachable `discard` reports `discard makes terrain see-through, which strict games prevent.` — both disable **all hooks** in that strict game. Always wrap vertex hooks in `#ifndef BLOXD_STRICT`.
+Большинство игр — strict (без вершинной анимации, без `discard`). Неохраняемый vertex-хук сообщает `<hook> moves terrain, which strict games prevent.`, а достижимый `discard` — `discard makes terrain see-through, which strict games prevent.`; оба отключают **все хуки** в этой strict-игре. Всегда оборачивайте vertex-хуки в `#ifndef BLOXD_STRICT`.
 
-For per-game policy internals, see [Engine Internals: policy](../internals/policy.md).
+О внутренностях политики по играм см. [Внутренности движка: политика](../internals/policy.md).

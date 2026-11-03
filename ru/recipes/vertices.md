@@ -1,11 +1,10 @@
 # Рецепты вершин (только allow)
 
-
-
+> Целевой API: 5 · Целевой билд: `ab90qa` (2026-11-03, прод) · Статус: Verified (портировано на текущий API — рекомендуется перепроверка на устройстве)
 > Всё оборачивайте в `#ifndef BLOXD_STRICT`.
-> Подробности условий (список allow-игр; Custom Games — strict) в §30: [§30 Режимы применения по играм](../internals/)
+> Точные условия (список allow-игр; Custom Games — strict) см. [Режимы применения по играм](../internals/policy.md)
 
-## Трава на ветру (шевелим только верхушки)
+## Трава на ветру (двигаем только верхушки)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -19,7 +18,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Волны жидкости (только верхние грани)
+## Волны на поверхности жидкости (только верхние грани)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -36,7 +35,7 @@ fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Пульсирующий террейн
+## Дышащий террейн
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -49,7 +48,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Волнующийся террейн (гигантские синусы)
+## Волнистый террейн (гигантские синусоиды)
 
 ```wgsl
 #ifndef BLOXD_STRICT

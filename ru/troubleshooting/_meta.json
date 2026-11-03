@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Troubleshooting",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Решение проблем",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
-  "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "loading": "Ошибки загрузки",
+  "api-version": "Ошибки версии API",
+  "compilation": "Ошибки компиляции",
+  "validation": "Ошибки валидации",
+  "variants": "Проблемы отдельных вариантов",
+  "visual": "Визуальные проблемы",
+  "textures": "Проблемы текстур",
+  "lighting": "Проблемы освещения",
+  "models": "Проблемы моделей",
+  "performance": "Производительность",
+  "faq": "FAQ и правовые заметки"
 }

@@ -1,21 +1,21 @@
-# Recipes
+# Рецепты
 
-Goal-oriented code examples. The "how it works" side lives in [Guides](../guides/). Everything here is ported to v5 vocabulary (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) and guarded to pass the 6 variants (strict × terrain / liquid / model).
+Примеры кода, ориентированные на конкретные цели. Сторона «как это устроено» живёт в [Руководствах](../guides/). Всё здесь портировано на словарь v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) и защищено guard'ами, чтобы проходить 6 вариантов (strict × террейн / жидкость / модель).
 
-## Map
+## Карта
 
-| Page | Contents |
+| Страница | Содержание |
 |---|---|
-| [Color recipes](colors.md) | tint, saturation, color temperature, sepia, altitude gradients |
-| [Lighting recipes](lighting.md) | S-curves, custom fog, night, caves, sunset |
-| [Emission recipes](emission.md) | pulsing lights, glowing ores, fireflies |
-| [Coordinate recipes](coordinates.md) | world/block coords, checkers, hashes, view vectors |
-| [Animation recipes](animation.md) | day cycles, wobble, aurora |
-| [Liquid recipes](liquids.md) | ripples, alpha, underwater murk |
-| [Vertex recipes (allow only)](vertices.md) | grass sway, waves, pulsing terrain |
-| [Math toolbox](math.md) | smoothstep, triangle waves, luma |
-| [Realism recipes](realism.md) | warm×cool, specular, ACES, projected shadows |
-| [Model shaders](model-shaders.md) | v5 — held items, skins, plant sway |
-| [Enchant effects](enchant-effects.md) | v5 — removing, boosting, recoloring the glint |
+| [Рецепты цвета](colors.md) | тинт, насыщенность, цветовая температура, сепия, градиенты по высоте |
+| [Рецепты освещения](lighting.md) | S-кривые, свой туман, ночь, пещеры, закат |
+| [Рецепты свечения](emission.md) | пульсирующие огни, светящиеся руды, светлячки |
+| [Рецепты координат](coordinates.md) | координаты мира/блока, шахматка, хеши, векторы взгляда |
+| [Рецепты анимации](animation.md) | циклы дня, покачивание, аврора |
+| [Рецепты жидкостей](liquids.md) | рябь, альфа, подводная муть |
+| [Рецепты вершин (только allow)](vertices.md) | покачивание травы, волны, пульсирующий террейн |
+| [Математический инструментарий](math.md) | smoothstep, треугольные волны, luma |
+| [Реалистичные рецепты](realism.md) | тёплое×холодное, спекуляр, ACES, проекционные тени |
+| [Шейдеры моделей](model-shaders.md) | v5 — предметы в руках, скины, покачивание растений |
+| [Эффекты зачарования](enchant-effects.md) | v5 — удаление, усиление и перекраска блеска |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (v5 ports of the original recipes — still verify with in-game compilation before distributing)
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в проде 2026-11-03) · Статус: Verified (порты исходных рецептов на v5 — перед дистрибуцией всё же проверьте компиляцией в игре)

@@ -1,33 +1,33 @@
-# Requirements
+# Требования
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-## Browser
+## Браузер
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+Шейдер-паки работают только с WebGPU-рендерером. Вам нужен браузер с поддержкой WebGPU:
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- Браузеры на Chromium (Chrome / Edge / Opera и т.д.) — стабильны на десктопе
+- Safari 17+ / Firefox (поддержка WebGPU различается в зависимости от периода)
+- **Мобильные устройства**: поддержка WebGPU на iOS / Android может быть ограничена. Упомяните это на странице релиза вашего пака
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+Пока пак установлен, настройка игры, отвечающая за WebGPU-рендерер, принудительно включена.
 
-## Development environment
+## Среда разработки
 
-No special tooling is required, though these help:
+Особые инструменты не требуются, хотя эти помогают:
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- Текстовый редактор (подсветка синтаксиса WGSL — плюс)
+- Zip-инструмент для распространения; во время разработки можно обойтись загрузкой папки (только десктопные браузеры)
+- Инструменты разработчика браузера — ошибки компиляции показываются и в игровом UI, и в консоли
 
-## On-device verification environments
+## Окружения для проверки на устройстве
 
-Before distribution, verify on ([Validation](validation.md)):
+Перед распространением проверьте на ([Валидация](validation.md)):
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. allow-игра (обязательно, если используете вершинную анимацию)
+2. strict-игра (большинство игр — strict)
+3. Перезагрузка страницы (сохранённые паки автоматически проходят валидацию заново)
 
-## URL parameter caveat
+## Предостережение о параметрах URL
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+Оставшиеся переопределения рендерера в параметрах URL или в localStorage не дают пакам запуститься — очистите их и перезагрузите страницу.

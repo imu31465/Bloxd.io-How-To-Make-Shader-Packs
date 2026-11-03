@@ -1,8 +1,8 @@
-# pack.json (manifest)
+# pack.json (манифест)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified
 
-`pack.json` is the pack manifest — exactly one JSON object at the zip root.
+`pack.json` — это манифест пака: ровно один JSON-объект в корне zip.
 
 ```json
 {
@@ -12,25 +12,25 @@
 }
 ```
 
-## Fields
+## Поля
 
-| Field | Type | Required | Description |
+| Поле | Тип | Обязательное | Описание |
 |---|---|---|---|
-| `apiVersion` | number | required | Must **exactly equal `5`** (strict `===`). A string `"5"` or any other type fails, reported with the JSON spelling |
-| `name` | string | required | Non-empty after trimming. Shown in the settings UI |
-| `author` | string | optional | May be omitted; must be a string if present |
+| `apiVersion` | число | обязательно | Должно **точно равняться `5`** (строгое `===`). Строка `"5"` или значение любого другого типа проваливает проверку; в сообщении указывается его JSON-написание |
+| `name` | строка | обязательно | Непустое после обрезки пробелов. Показывается в UI настроек |
+| `author` | строка | необязательно | Может отсутствовать; если присутствует — должно быть строкой |
 
-All other fields are ignored by the loader.
+Все остальные поля игнорируются загрузчиком.
 
-## What happens on version mismatch
+## Что происходит при несовпадении версии
 
-The loader compares `manifest.apiVersion !== 5` strictly and **fails at the instant of load**. Messages, verbatim from the live i18n dictionary:
+Загрузчик строго сравнивает `manifest.apiVersion !== 5` и **проваливается в момент загрузки**. Сообщения, дословно из живого i18n-словаря:
 
-- `pack.json needs "apiVersion": {{version}}.` — the key is missing entirely
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — ключ отсутствует целиком
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — ключ существует, но не равен 5
 
-Previously-saved older packs don't throw exceptions; they resolve to `{kind: "none", reason: "otherApiVersion"}` and become **silently inactive**. The shader-pack settings tab explains why:
+Ранее сохранённые старые паки не бросают исключений; они разрешаются в `{kind: "none", reason: "otherApiVersion"}` и становятся **молча неактивными**. Вкладка настроек шейдер-паков объясняет, почему:
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-For migrating from v1–v4, see [Version History](../history/).
+Для миграции с v1–v4 см. [Историю версий](../history/).

@@ -1,26 +1,28 @@
-# Version History
+# История версий
 
-Changes, migration steps and removed APIs for v1 through v5. For migrating legacy packs and for the preserved per-era specifications.
+> Статус: Historical — записи версия за версией; каждое руководство называет свой целевой билд
 
-## Timeline
+Изменения, шаги миграции и удалённые API от v1 до v5. Для миграции старых паков и для сохранённых спецификаций каждой эпохи.
 
-| Version | Live since | Guide | Highlights |
+## Хронология
+
+| Версия | В проде с | Руководство | Главное |
 |---|---|---|---|
-| v1 | (initial) | [v1](v1.md) | first shader-pack API. 6 hooks (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` vocabulary |
-| v2 | — | [v2](v2.md) | full identifier rename, `blockId`, `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` bit flags, `bloxdPi` / `bloxdTau`, official liquid hooks, hook-invocation internals |
-| v4 | 2026-10-26 | [v4](v4.md) | texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), the strict contract, engine header & registry analysis |
-| **v5** | **2026-11-03** | [v5](v5.md) | **current** — `BloxdFlags` struct (14 bools), Model hooks (9 total), the `bloxdLit()` / `bloxdLitColour()` lighting API, `localPosition`, enchant/overlay inputs & outputs, 6 variants |
+| v1 | (начальная) | [v1](v1.md) | первый API шейдер-паков. 6 хуков (террейн/жидкость × vertex/surface); словарь `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
+| v2 | — | [v2](v2.md) | полное переименование идентификаторов, `blockId`, `BLOXD_SCENE_DEPTH` и `bloxdOpaqueBehind()` |
+| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` битовые флаги, `bloxdPi` / `bloxdTau`, официальные жидкостные хуки, внутрянка вызова хуков |
+| v4 | 2026-10-26 | [v4](v4.md) | текстурный API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict-контракт, анализ заголовка движка и реестра |
+| **v5** | **2026-11-03** | [v5](v5.md) | **текущая** — структура `BloxdFlags` (14 bool), хуки Model (всего 9), API освещения `bloxdLit()` / `bloxdLitColour()`, `localPosition`, входы и выходы зачарования/оверлея, 6 вариантов |
 
-## The shared preface
+## Общее предисловие
 
-The current game accepts only `apiVersion: 5` and **old-version packs fail at the instant of load** (saved packs are silently deactivated — [Compatibility](../api/compatibility.md)). Each guide covers "previous → next". Crossing several versions? Apply them oldest-first.
+Текущая игра принимает только `apiVersion: 5`, и **паки старых версий падают в момент загрузки** (сохранённые паки молча деактивируются — [Совместимость](../api/compatibility.md)). Каждое руководство покрывает переход «предыдущая → следующая». Пересекаете несколько версий? Применяйте их от старых к новым.
 
-## Fast path to a checklist
+## Быстрый путь к чек-листу
 
-- v4 pack → [v5 guide](v5.md) §77 (mostly mechanical)
-- v3 pack → [v4](v4.md) §61 → [v5](v5.md) §77
-- v2 pack → [v3](v3.md) §47 → v4 → v5
-- v1 pack → start at [v2](v2.md) §37
+- пак v4 → [руководство по v5](v5.md) §77 (почти всё механически)
+- пак v3 → [v4](v4.md) §61 → [v5](v5.md) §77
+- пак v2 → [v3](v3.md) §47 → v4 → v5
+- пак v1 → начните с [v2](v2.md) §37
 
-> For the current spec itself see [API Reference](../api/); for current-build internals see [Engine Internals](../internals/).
+> За самой актуальной спецификацией обращайтесь к [Справочнику API](../api/); за внутренностями текущего билда — к [Внутрянке движка](../internals/).

@@ -1,11 +1,14 @@
 {
   "index": {
-    "title": "Version History",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "История версий",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "v1": "API v1",
-  "v2": "API v2 migration guide",
-  "v3": "API v3 migration guide",
-  "v4": "API v4 migration guide",
-  "v5": "API v5 migration guide"
+  "v2": "Руководство по миграции на API v2",
+  "v3": "Руководство по миграции на API v3",
+  "v4": "Руководство по миграции на API v4",
+  "v5": "Руководство по миграции на API v5"
 }

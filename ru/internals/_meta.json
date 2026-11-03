@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Внутрянка движка и исследования",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "rendering-pipeline": "Rendering pipeline",
-  "hook-invocation": "Hook invocation internals",
-  "engine-header": "Engine header (verbatim)",
-  "shader-validation": "Shader validation",
-  "wgsl-compilation": "WGSL compilation",
-  "reserved-identifiers": "Reserved identifier internals",
-  "lighting-internals": "Lighting internals",
-  "fog-internals": "Fog internals",
-  "texture-sampling": "Texture sampling internals",
-  "texture-registry": "Texture registry internals",
-  "model-rendering": "Model rendering internals",
-  "engine-data": "Engine data ledger",
-  "testing-factors": "What changes pack-visible values",
-  "policy": "Per-game shader-pack policy",
-  "sun-and-moon": "The sun and the moon",
-  "debugging": "Debugging tools",
-  "research-log": "Research log"
+  "rendering-pipeline": "Пайплайн рендеринга",
+  "hook-invocation": "Внутрянка вызова хуков",
+  "engine-header": "Заголовок движка (дословно)",
+  "shader-validation": "Валидация шейдеров",
+  "wgsl-compilation": "Компиляция WGSL",
+  "reserved-identifiers": "Внутрянка зарезервированных идентификаторов",
+  "lighting-internals": "Внутрянка освещения",
+  "fog-internals": "Внутрянка тумана",
+  "texture-sampling": "Внутрянка сэмплинга текстур",
+  "texture-registry": "Внутрянка реестра текстур",
+  "model-rendering": "Внутрянка рендеринга моделей",
+  "engine-data": "Реестр данных движка",
+  "testing-factors": "Что меняет видимые паком значения",
+  "policy": "Политика шейдер-паков по играм",
+  "sun-and-moon": "Солнце и луна",
+  "debugging": "Средства отладки",
+  "research-log": "Журнал исследований"
 }

@@ -1,17 +1,17 @@
-# The engine header (v5, verbatim)
+# Заголовок движка (дословно)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в продакшене 2026-11-03) · Статус: Analyzed (восстановлено из живого продакшн-бандла)
 
-The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere.
+Точный текст, который загрузчик дописывает перед каждым паком. Восстановлен из живого продакшн-бандла (`ab90qa`, чанк c55, шаблон, отрендеренный с его 6 живыми интерполяциями — `apiVersion` и 5 чтениями uniform через `bloxdPackInputs`). 8 954 декодированных байта, 208 строк. Ничего не перефразировано.
 
-Reading guide:
-- Field-by-field explanations → [Structures](../api/structures.md)
-- Function-by-function → [Functions](../api/functions.md) / [Lighting](../api/lighting.md)
-- Flags (BloxdFlags) → [Flags](../api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](../api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](../api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](../history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](shader-validation.md)
+Как читать:
+- Пояснения по каждому полю → [Структуры](../api/structures.md)
+- По каждой функции → [Функции](../api/functions.md) / [Освещение](../api/lighting.md)
+- Флаги (BloxdFlags) → [Флаги](../api/flags.md)
+- Блока `bloxdTextureId*` в этом заголовке **нет** — он генерируется для каждого пака из упомянутых имён ([API текстур](../api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` помечает условные поля ([Препроцессор](../api/preprocessor.md))
+- Отличия от заголовка v4 (6 021 Б) → [История версий: v5](../history/v5.md)
+- Как валидируется заголовок (HEADER_VERSION) → [Валидация шейдеров](shader-validation.md)
 
 ```wgsl
 
@@ -223,8 +223,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## См. также
 
-- [API Reference](../api/) — the annotated version of this header
-- [Shader Validation](shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](engine-data.md) — the measurement ledger
+- [Справочник API](../api/) — аннотированная версия этого заголовка
+- [Валидация шейдеров](shader-validation.md) — HEADER_VERSION и перепроверка сохранённых паков
+- [Данные движка](engine-data.md) — реестр измерений

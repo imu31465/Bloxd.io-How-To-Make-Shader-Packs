@@ -1,12 +1,12 @@
-# Quick start
+# Быстрый старт
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверен в продакшене 2026-11-03) · Статус: Verified
 
-Your first pack in five minutes.
+Ваш первый пак за пять минут.
 
-## 1. Create the files
+## 1. Создайте файлы
 
-Make a folder with `pack.json` and `pack.wgsl`:
+Создайте папку с `pack.json` и `pack.wgsl`:
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@ Make a folder with `pack.json` and `pack.wgsl`:
 }
 ```
 
-**`pack.wgsl`** — a minimal warm-tint pack:
+**`pack.wgsl`** — минимальный пак с тёплым тинтом:
 
 ```wgsl
 const packWarmth = 0.18;
@@ -31,26 +31,26 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> The engine header (constants, structures, functions) is prepended to every pack automatically at load — you never write it yourself. The full header is reproduced in [Engine Internals](../internals/engine-header.md).
+> Заголовок движка (константы, структуры, функции) автоматически добавляется перед каждым паком при загрузке — вы никогда не пишете его сами. Полный заголовок воспроизведён в [Внутренностях движка](../internals/engine-header.md).
 
-## 2. Load it in the game
+## 2. Загрузите его в игре
 
-1. Open settings → Shader Pack and load the zip or folder (folder loading is desktop browsers only)
-2. Check the status: right after selecting it you'll see "Ready. Reload the page to use it." — after a **page reload**, "Ready to use" means success
-3. If you see "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+1. Откройте настройки → Shader Pack и загрузите zip или папку (загрузка папки — только десктопные браузеры)
+2. Проверьте статус: сразу после выбора вы увидите "Ready. Reload the page to use it." — после **перезагрузки страницы** "Ready to use" означает успех
+3. Если вы видите "Saved, but it won't run until you fix these errors...", исправьте перечисленные ошибки (файл:строка + вариант) и перезагрузите страницу
 
-## 3. Verify
+## 3. Проверьте
 
-1. Test in a permissive game first
-2. Then in a strict-mode game (most games are strict)
-3. Vertex animation only works in games marked allow
+1. Сначала протестируйте в разрешающей игре
+2. Затем в strict-игре (большинство игр — strict)
+3. Вершинная анимация работает только в играх, помеченных allow
 
-## 4. Distribute
+## 4. Распространите
 
-Zip it up — see [Distribution](distribution.md).
+Запакуйте в zip — см. [Распространение](distribution.md).
 
-## Stuck?
+## Застряли?
 
-- What errors mean → [Troubleshooting](../troubleshooting/)
-- How to write hooks → [Shader hooks](hooks.md)
-- The full 9-hook template is in the next page, [Shader hooks](hooks.md)
+- Что означают ошибки → [Устранение неполадок](../troubleshooting/)
+- Как писать хуки → [Шейдерные хуки](hooks.md)
+- Полный шаблон из 9 хуков — на следующей странице, [Шейдерные хуки](hooks.md)

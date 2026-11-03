@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Recipes",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Рецепты",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "colors": "Colors",
-  "lighting": "Lighting",
-  "emission": "Emission",
-  "coordinates": "Coordinates",
-  "animation": "Time & animation",
-  "liquids": "Liquids",
-  "vertices": "Vertices (allow only)",
-  "math": "Math toolbox",
-  "realism": "Realism",
-  "model-shaders": "Model shaders",
-  "enchant-effects": "Enchant effects"
+  "colors": "Цвета",
+  "lighting": "Освещение",
+  "emission": "Свечение",
+  "coordinates": "Координаты",
+  "animation": "Время и анимация",
+  "liquids": "Жидкости",
+  "vertices": "Вершины (только allow)",
+  "math": "Математический инструментарий",
+  "realism": "Реализм",
+  "model-shaders": "Шейдеры моделей",
+  "enchant-effects": "Эффекты зачарования"
 }

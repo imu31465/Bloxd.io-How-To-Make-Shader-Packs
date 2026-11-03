@@ -1,8 +1,8 @@
-# Texture API
+# API текстур
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (API unchanged since v4, re-confirmed on the v5 build)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Verified (API не изменился с v4, переподтверждён на билде v5)
 
-The API for reading the block-texture atlas, introduced in v4 and carried into v5 unchanged. Two functions, a named-constant family, and four input fields. The header's own one-liner: *"This face's texture. Compare with `bloxdTextureId*`."*
+API для чтения собственных текстур игры: две функции, семейство именованных констант и четыре входных поля. Однострочник от самого заголовка: *"This face's texture. Compare with `bloxdTextureId*`."*
 
 ## bloxdTexel
 
@@ -10,18 +10,38 @@ The API for reading the block-texture atlas, introduced in v4 and carried into v
 fn bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f
 ```
 
-- **Callable from**: **surface / light hooks only** (reaching it from a vertex hook fails with a "reaches" diagnostic)
+- **Вызов возможен только из**: **surface / light-хуков** (дотянуться до неё из вершинного хука не выйдет — падает с диагностикой «reaches»)
 
-Samples the block-texture atlas **exactly as the engine's own sampler does** — same `texture_2d_array<f32>` atlas, same sampler, `textureSampleLevel` at `round(mipLevel)` — so the texel you read structurally matches the texel the engine drew.
+Читает тексел **в точности так же, как собственный сэмплер движка** — тот же атлас `texture_2d_array<f32>`, тот же сэмплер, `textureSampleLevel` на `round(mipLevel)` — поэтому прочитанный тексел структурно совпадает с текселом, который нарисовал движок.
 
-Semantics:
+### Что читает `bloxdTexel`, зависит от пайплайна
 
-- **`textureId == 0` returns `vec4f(1.0)` (white).** That is the "no texture" id; texture-less faces carry 0 in all four input fields, so `bloxdTexel(surface.textureId, ...)` is always safe to call
-- **Animated textures automatically return the current frame.** Frames advance on the game's animation clock — you cannot stop or step them, and never need to
-- **`mipLevel` clamps exactly like the engine's own**: `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`; out-of-range mips saturate rather than error
-- **The fragment's own `textureRotation` is applied to the uv you pass** (see below)
+Движок генерирует отдельное определение `bloxdTexel` для каждого пайплайна, поэтому у одной функции три поведения:
 
-`textureId` is **1-based**: `bloxdTextureIdGrassTop` is the id, and the atlas layer the engine samples for it is `id - 1`. Ids are stable per texture *name*, not per atlas slot — the engine reshuffles the atlas across builds, but the named comparison keeps its meaning.
+| Пайплайн | `textureId == 0` | Ненулевой `textureId` | Примечания |
+|---|---|---|---|
+| **Атласные пайплайны** — террейн, жидкость и блочные модели, рисуемые из атласа блоков | `vec4f(1.0)` (белый — «нет текстуры») | сэмплит **эту запись атласа** | именованные константы применимы; анимация и поворот автоматические |
+| **Пайплайны с собственными текстурами** — модели, чей меш несёт собственную диффузную текстуру (скины игроков, текстуры мобов, спрайты предметов) | сэмплит **собственную текстуру меша** по переданному uv | `vec4f(1.0)` (белый) | в области видимости ровно одна текстура; именованные константы неприменимы |
+| **Пайплайны без текстур** | белый | белый | заглушка; `bloxdTextureSize() -> vec2u(1u)` |
+
+Семантика атласных пайплайнов подробно:
+
+- **`textureId == 0` возвращает `vec4f(1.0)` (белый).** Это id «нет текстуры»; грани без текстуры несут 0 во всех четырёх входных полях, поэтому вызов `bloxdTexel(surface.textureId, ...)` всегда безопасен
+- **Анимированные текстуры автоматически возвращают текущий кадр.** Кадры идут по игровому таймеру анимации — остановить их или шагать нельзя, да и не понадобится
+- **`mipLevel` клампится в точности как у движка**: `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`; мипы вне диапазона сатурируются, а не дают ошибку
+- **Собственный `textureRotation` фрагмента применяется к переданному uv** (см. ниже)
+
+`textureId` на атласных пайплайнах **1-based**: `bloxdTextureIdGrassTop` — это id, а слой атласа, который движок для него сэмплит, — `id - 1`. id стабильны по *имени* текстуры, а не по слоту атласа — движок перетасовывает атлас между билдами, но сравнение по имени сохраняет смысл.
+
+### Универсальный шаблон вызова
+
+```wgsl
+// Работает в каждом пайплайне: на атласных гранях сэмплит запись атласа;
+// на моделях с собственной текстурой textureId равен 0 — сэмплится собственная текстура модели.
+let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
+```
+
+`surface.colour` уже содержит `texture × tint × ambient occlusion` (скины и тинты включены), поэтому чтение текселов нужно для *дополнительной* детализации — оценок яркости, эффектов по конкретным текстурам, — а не для восстановления базового цвета.
 
 ## bloxdTextureSize
 
@@ -29,30 +49,33 @@ Semantics:
 fn bloxdTextureSize(mipLevel: f32) -> vec2u
 ```
 
-- **Callable from**: surface / light hooks only
+- **Вызов возможен только из**: surface / light-хуков
 
-`textureDimensions(textureAtlas0, <clamped mip>)`. Each texture occupies one array layer, so this is also *the texel size of any one texture at that mip* (all block textures in an atlas tier are the same square size).
+`textureDimensions(textureAtlas0, <клампнутый mip>)`. Каждая текстура занимает один слой массива, поэтому это ещё и *размер в текселах любой отдельной текстуры на этом мипе* (все блочные текстуры одного уровня атласа имеют одинаковый квадратный размер).
 
 ```wgsl
-// texel-aligned resampling for a "pixel-art" look
+// тексел-выровненный ресемплинг для вида «пиксель-арт»
 let size = bloxdTextureSize(surface.mipLevel);
 let uv = fract(surface.uv);
 let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 ```
 
-## Model-owned textures (textureId: 0)
+## Собственные текстуры моделей (textureId: 0)
 
-**`bloxdTexel()` can also read model-owned textures** — most notably via `textureId: 0`:
+Заметка из заголовка: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — у большинства модельных граней нет *атласной* текстуры, потому что их меши несут собственные текстуры:
 
-- **Player skins** and other non-atlas model textures (mobs etc.) use `textureId: 0`
-- Header note: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — most models bypass the atlas
-- Passing 0 to `bloxdTexel()` returns white `vec4f(1.0)`, never an error. Atlas-reading code takes effect only on faces with `textureId != 0u`:
+- **Скины игроков** и прочие неатласные текстуры моделей (мобы, спрайты предметов) приходят как `textureId: 0`
+- В этих пайплайнах `bloxdTexel(0u, uv, mip)` сэмплит **собственную текстуру меша** (см. таблицу выше); любой ненулевой id возвращает белый — атласа в области видимости нет
+- Поля из заголовка работают как задокументировано: `uv` покрывает текстуру модели от 0 до 1, `mipLevel` — мип грани
+- **`bloxdTextureSize()`** сообщает размер *той текстуры, которую сэмплит пайплайн*: атласа — в атласных пайплайнах, собственной текстуры модели — в пайплайнах с собственными текстурами
+
+Эффекты, имеющие смысл только на атласных гранях, стоит оберегать guard'ом:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if (surface.textureId != 0u) {
-        // only faces whose texture lives in the atlas (block models)
+        // только грани, чья текстура живёт в атласе блоков (блочные модели)
         let t = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
         out.colour = mix(out.colour, t.rgb, 0.2);
     }
@@ -60,68 +83,69 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-- **Skins vs the atlas**: the atlas maps texture *names* to layers and is comparable via `bloxdTextureId*`. Model-owned textures (skins) are not in that namespace and arrive as id 0. `surface.colour` already contains skin × tint, so work from it
-- **`bloxdTextureSize()`** still reports the *atlas* size on model faces (not the model texture's size)
+- **Скины против атласа**: атлас отображает *имена* текстур в слои и сравним через `bloxdTextureId*`. Собственные текстуры моделей (скины) в этом пространстве имён не живут и приходят с id 0. `surface.colour` уже содержит skin × tint — работайте от него
 
-## bloxdTextureId*: named texture constants
+## bloxdTextureId*: именованные константы текстур
 
-Every usable texture name becomes a comparable `const`. **Spelling is the file name CamelCased**:
+Каждое пригодное имя текстуры становится сравнимой `const`. **Правописание — имя файла в CamelCase**:
 
-| Texture file | Constant | Note |
+| Файл текстуры | Константа | Примечание |
 |---|---|---|
-| `grass_top.png` | `bloxdTextureIdGrassTop` | the engine's own example |
-| `lava0.png` (frames `lava0`–`lava7`) | `bloxdTextureIdLava` | animation family: frame suffixes drop from the canonical name |
-| `black_portal0.png` (frames 0–3) | `bloxdTextureIdBlackPortal` | same rule |
-| `radar_screen0` (turned copies `[rot[1`–`[rot[4`) | `bloxdTextureIdRadarScreen0` | rotation family: folds to the root name |
+| `grass_top.png` | `bloxdTextureIdGrassTop` | собственный пример движка |
+| `lava0.png` (кадры `lava0`–`lava7`) | `bloxdTextureIdLava` | семейство анимации: суффиксы кадров отпадают от канонического имени |
+| `black_portal0.png` (кадры 0–3) | `bloxdTextureIdBlackPortal` | то же правило |
+| `radar_screen0` (повёрнутые копии `[rot[1`–`[rot[4`) | `bloxdTextureIdRadarScreen0` | семейство поворотов: сворачивается к корневому имени |
 
-### Spelling rules and naming freedom
+### Правила правописания и свобода именования
 
-- **Generation rule** (restored from the validator): split the name on non-alphanumeric runs, capitalize each part, concatenate after the `bloxdTextureId` prefix
-- **Case and underscores are not distinguished**: reverse matching (the name a pack wrote → registry name) folds both your spelling and the engine's, so e.g. `bloxdTextureIdGrassTop` and `bloxdTextureId_grass_top` resolve to **the same constant**
-- **Animated textures take no frame number**: `lava` is the name; `lava0` is a dedicated error
-- **Rotation families use the root name**: writing a turned-copy spelling produces a dedicated message
+- **Правило генерации** (восстановлено из валидатора): разрежьте имя по не-буквенно-цифровым последовательностям, капитализируйте каждую часть и склейте после префикса `bloxdTextureId`
+- **Регистр и подчёркивания не различаются**: обратное сопоставление (имя, написанное паком, → имя в реестре) сворачивает и ваше написание, и написание движка, поэтому, напр., `bloxdTextureIdGrassTop` и `bloxdTextureId_grass_top` разрешаются в **одну и ту же константу**
+- **Анимированные текстуры не принимают номер кадра**: `lava` — имя; `lava0` — отдельная ошибка
+- **Семейства поворотов используют корневое имя**: написание варианта повёрнутой копии даёт специальное сообщение
 
-### Name-resolution errors (verbatim from the validator)
+### Ошибки разрешения имён (дословно из валидатора)
 
-> **Prefix misspelling / case:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
+> **Опечатка в префиксе / регистр:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >
-> **Animation frame:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
+> **Кадр анимации:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 >
-> **Turned copy:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
+> **Повёрнутая копия:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
 >
-> **Ambiguous after folding:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
+> **Неоднозначно после сворачивания:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 >
-> **Not found (with suggestion):** `There's no texture called X. Did you mean bloxdTextureIdY?` — suggestion threshold is Levenshtein distance `max(2, floor(len/4)) + 1` (new in v5)
+> **Не найдено (с подсказкой):** `There's no texture called X. Did you mean bloxdTextureIdY?` — порог подсказки — расстояние Левенштейна `max(2, floor(len/4)) + 1`
 >
-> **Not found (no suggestion):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
+> **Не найдено (без подсказки):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
-### Only referenced constants are emitted
+> `BLOCK_TEXTURES.md` в этом сообщении — собственный внутренний список имён текстур игры, на который ссылается валидатор движка; это не страница данного сайта. Эквивалент здесь — [Каталог текстур](texture-catalog.md).
 
-The header's `bloxdTextureId*` block is generated **per pack** from the names it actually references — a pack using 3 constants gets 3 `const` lines, not ~900.
+### Выдаются только константы, на которые есть ссылки
 
-## Input fields
+Блок `bloxdTextureId*` заголовка генерируется **на каждый пак** из имён, которые он реально использует, — пак с 3 константами получает 3 строки `const`, а не ~900.
 
-The four texture fields on `BloxdSurfaceIn` / `BloxdLightIn`:
+## Входные поля
 
-| Field | Type | Description |
+Четыре текстурных поля в `BloxdSurfaceIn` / `BloxdLightIn`:
+
+| Поле | Тип | Описание |
 |---|---|---|
-| `textureId` | `u32` | this face's texture; compare with `bloxdTextureId*`; 0 = none |
-| `textureRotation` | `u32` | quarter turns clockwise (0–3), applied by `bloxdTexel` |
-| `uv` | `vec2f` | the texture spans 0–1; `fract(uv)` is drawn |
-| `mipLevel` | `f32` | mip level: 0 = full size, 1 = half… |
+| `textureId` | `u32` | текстура этой грани; сравнивайте с `bloxdTextureId*`; 0 = нет |
+| `textureRotation` | `u32` | четверти оборота по часовой стрелке (0–3), применяются `bloxdTexel` |
+| `uv` | `vec2f` | текстура покрывает 0–1; рисуется `fract(uv)` |
+| `mipLevel` | `f32` | уровень мипа: 0 = полный размер, 1 = половина… |
 
-## The rotation subtlety — a neutral sampler
+## Тонкость с поворотом — нейтральный сэмплер
 
-`bloxdTexel` counter-rotates the uv you pass by the **current fragment's** `textureRotation` — regardless of which id you passed. Two common cases:
+`bloxdTexel` контр-вращает переданный вами uv на `textureRotation` **текущего фрагмента** — независимо от того, какой id вы передали. Два типичных случая:
 
-- **Re-sampling this face's own texture** with `surface.uv` — the uv is in the face's rotated frame and the counter-rotation maps back to atlas space; the intended primary use
-- **Sampling a different texture** with atlas-space uv while the face is rotated — the counter-rotation still fires and the sample lands rotated. That's the trap
+- **Ресемплинг собственной текстуры этой грани** с `surface.uv` — uv находится в повёрнутой системе координат грани, и контр-поворот возвращает его в пространство атласа; задуманное основное применение
+- **Сэмплинг другой текстуры** с uv в пространстве атласа, пока грань повёрнута, — контр-поворот всё равно срабатывает, и выборка попадает повёрнутой. В этом и ловушка
 
-The engine cannot look up per-texture rotation (rotation is face geometry data) and always uses the fragment's value. To sample another texture rotation-neutrally, pre-rotate the uv by the same quarter turn to cancel it:
+Движок не может узнать поворот конкретной текстуры (поворот — данные геометрии грани) и всегда использует значение фрагмента. Чтобы сэмплить другую текстуру нейтрально к повороту, поверните uv заранее на ту же четверть оборота, чтобы её погасить:
 
 ```wgsl
-// Rotation-neutral texel sampling: pre-rotate uv so bloxdTexel's counter-rotation
-// (by this face's textureRotation) cancels out. Pass surface.textureRotation as r.
+// Нейтральный к повороту сэмплинг тексела: заранее поверните uv, чтобы контр-поворот
+// bloxdTexel (на textureRotation этой грани) погасился. Передавайте surface.textureRotation как r.
 fn texelNeutral(id: u32, uv: vec2f, mip: f32, r: u32) -> vec4f {
     var turned = uv;
     if (r == 1u) {
@@ -135,13 +159,13 @@ fn texelNeutral(id: u32, uv: vec2f, mip: f32, r: u32) -> vec4f {
 }
 ```
 
-(`textureRotation == 0` needs no correction. Most faces carry 0, but distributed packs must not assume it.)
+(`textureRotation == 0` в коррекции не нуждается. Большинство граней несёт 0, но дистрибутивные паки не должны на это полагаться.)
 
-## Worked examples
+## Разобранные примеры
 
-### Emission from texel luminance
+### Эмиссия из яркости тексела
 
-Sample one mip above the face's for a distance-robust soft blocky average:
+Возьмите сэмпл на один мип выше мипа грани — мягкое «блочное» среднее, устойчивое к дистанции:
 
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -155,9 +179,9 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### Texture-specific effects
+### Эффекты для конкретных текстур
 
-Compare `textureId` to single out chosen textures (the official way to e.g. sparkle ores):
+Сравнивайте `textureId`, чтобы выделить избранные текстуры (официальный способ, напр., заставить руды искриться):
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -171,7 +195,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Depth-of-field-style distance blur
+### Дистанционное размытие в стиле глубины резкости
 
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -179,7 +203,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     let d = distance(surface.position, bloxdEyePosition());
     if (d > 40.0 && surface.textureId != 0u) {
         let own = bloxdTexel(surface.textureId, surface.uv, surface.mipLevel);
-        if (any(abs(own.rgb - vec3f(0.0)) > vec3f(1e-6))) {          // division guard
+        if (any(abs(own.rgb - vec3f(0.0)) > vec3f(1e-6))) {          // защита от деления
             let blur = clamp((d - 40.0) / 60.0, 0.0, 3.0);
             let t = bloxdTexel(surface.textureId, surface.uv, surface.mipLevel + blur);
             out.colour = t.rgb / own.rgb * out.colour;
@@ -189,15 +213,15 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-(The ratio trick preserves the engine's `colour = texture × tint × AO`: dividing the blended texel by the native one cancels the texture content, leaving only the blur factor to multiply back into `surface.colour`. White reads — texture-less faces — make the guard skip the effect.)
+(Трюк с отношением сохраняет движковое `colour = texture × tint × AO`: деление смешанного тексела на исходный отменяет содержимое текстуры, оставляя только коэффициент размытия, который перемножается обратно в `surface.colour`. Белые показания — грани без текстуры — заставляют проверку пропустить эффект.)
 
-## Where the texture API can't go
+## Куда не дотягивается текстурный API
 
-- **Not callable from vertex hooks** — "reaches" diagnostics reject it
-- **You cannot add textures** — the atlas is the engine's; the API only reads it. Custom textures remain the texture-pack system's job
-- **Non-atlas renderer configurations degrade to stubs** — `bloxdTextureSize() -> vec2u(1u)` and `bloxdTexel(...) -> vec4f(1.0)`, with the four inputs flowing `0u, 0u, vec2f(0.0), 0.0`. Code written for the real atlas still compiles and runs — it just sees white texels and a 1×1 size. Code that tolerates `textureId == 0` tolerates this too
+- **Из вершинных хуков вызвать нельзя** — диагностики «reaches» её отклоняют
+- **Добавить текстуры нельзя** — атлас принадлежит движку; API только читает его. Собственные текстуры остаются задачей системы текстур-паков
+- **Конфигурации рендерера без атласа деградируют до заглушек** — `bloxdTextureSize() -> vec2u(1u)` и `bloxdTexel(...) -> vec4f(1.0)`, при этом четыре входа несут `0u, 0u, vec2f(0.0), 0.0`. Код, написанный под настоящий атлас, по-прежнему компилируется и выполняется — он просто видит белые текселы и размер 1×1. Код, терпимый к `textureId == 0`, терпим и к этому
 
-## Related
+## См. также
 
-- **All 896 usable names** → [Texture catalog](texture-catalog.md)
-- [Engine Internals: Texture Registry](../internals/texture-registry.md) · [Texture Sampling](../internals/texture-sampling.md)
+- **Все 896 пригодных имён** → [Каталог текстур](texture-catalog.md)
+- [Внутрянка движка: реестр текстур](../internals/texture-registry.md) · [Сэмплинг текстур](../internals/texture-sampling.md)

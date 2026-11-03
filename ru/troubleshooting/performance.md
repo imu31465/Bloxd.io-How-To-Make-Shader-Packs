@@ -1,34 +1,34 @@
-# Performance
+# Производительность
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-Speed problems and their fixes.
+Проблемы скорости и их исправления.
 
-## The on-device check never finishes and drops the pack
+## Проверка на устройстве не завершается и отбрасывает пак
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **Причина**: у проверки есть **принудительный таймаут 60 секунд** (превышение считается `skipped`) — частое на слабых устройствах и в тяжёлых мирах
+- **Исправление**: сократите тяжёлую вершинную работу и сложные циклы, затем повторите
+- **Профилактика**: следуйте [руководству по производительности](../guides/performance.md)
 
-## Frame rate drops
+## Падает частота кадров
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **Проверка**: сравните FPS с паком и без; измеряйте сцены, богатые террейном, и воду по отдельности
+- **Типичные причины**: тяжёлые эффекты на каждой грани безусловно (без отбора по флагам/дистанции); высокочастотный hash-шум; большие показатели `pow`
+- **Исправления** ([руководство](../guides/performance.md)):
+  - привяжите эффекты к нуждающимся в них граням через `flags`
+  - ранний выход по дистанции (`distance(surface.position, bloxdEyePosition())`)
+  - сэмплите на мип выше для более дешёвых чтений `bloxdTexel`
+- **Профилактика**: добавляйте детализацию постепенно и сравнивайте FPS ([тестирование](../guides/testing.md))
 
-## Slow only on mobile
+## Медленно только на мобильных
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **Причина**: паки работают на WebGPU-рендерере; мобильные GPU могут быть в десятки раз медленнее настольных
+- **Исправление**: снизьте силу/частоту эффектов, усильте отсечение по дистанции — либо честно пометьте мобильные устройства как неподдерживаемые ([Требования](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## Приближение к лимиту пака в 256 КБ
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **Исправление**: сокращайте комментарии, выносите общий код в функции, выбрасывайте неиспользуемые рецепты ([Структура пака](../getting-started/pack-structure.md))
 
-## Related
+## Смотрите также
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [Руководство по производительности](../guides/performance.md) · [Тестирование](../guides/testing.md)

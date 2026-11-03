@@ -1,60 +1,60 @@
-# Loading errors
+# Ошибки загрузки
 
-> Target API: 5 · Status: Verified
+> Целевой API: 5 · Статус: Verified
 
-Errors rejected at the **loader stage** (the first gate), shown in the settings status line with `shaderPack:load*` IDs.
+Ошибки, на которых пак отклоняется на **этапе загрузчика** (первый рубеж); показываются в строке состояния настроек с id вида `shaderPack:load*`.
 
 ## "There's no pack.json at the top of the pack."
 
-- **Cause**: no `pack.json` at the zip root (e.g. the folder was zipped with an extra nesting level)
-- **Check**: open the zip — `pack.json` at the top level (or directly under one common root folder)
-- **Fix**: zip `pack.json` and the `.wgsl` files directly. A single common root folder is stripped automatically ([Pack structure](../getting-started/pack-structure.md))
-- **Prevention**: keep your zipping procedure fixed; macOS "Compress" works as-is (OS junk is auto-excluded)
+- **Причина**: в корне zip нет `pack.json` (например, папку запаковали с лишним уровнем вложенности)
+- **Проверка**: откройте zip — `pack.json` на верхнем уровне (или прямо под единой общей корневой папкой)
+- **Исправление**: запаковывайте `pack.json` и файлы `.wgsl` напрямую. Единственная общая корневая папка снимается автоматически ([Структура пака](../getting-started/pack-structure.md))
+- **Профилактика**: держите процедуру архивации неизменной; штатное «Compress» в macOS работает как есть (мусор ОС исключается автоматически)
 
-## `loadDuplicateManifest` on zip load
+## `loadDuplicateManifest` при загрузке zip
 
-- **Cause**: two `pack.json` files (including case differences)
-- **Fix**: keep exactly one
+- **Причина**: два файла `pack.json` (включая различия в регистре)
+- **Исправление**: оставьте ровно один
 
-## Size & count limits
+## Лимиты размера и количества
 
-| Message | Limit |
+| Сообщение | Лимит |
 |---|---|
-| `The zip is over 32 MB.` | zip 32 MB |
-| `The zip has more than 1024 entries.` | 1,024 entries |
-| `The pack has more than 256 .wgsl files.` | 256 `.wgsl` files |
-| `The pack's .wgsl files are over 256 KB in total.` | 256 KB total |
-| `pack.json is over 64 KB.` | 64 KB manifest |
+| `The zip is over 32 MB.` | zip 32 МБ |
+| `The zip has more than 1024 entries.` | 1 024 записи |
+| `The pack has more than 256 .wgsl files.` | 256 файлов `.wgsl` |
+| `The pack's .wgsl files are over 256 KB in total.` | 256 КБ суммарно |
+| `pack.json is over 64 KB.` | манифест 64 КБ |
 
-- **Fix**: drop unneeded `.wgsl` files / merge files / trim comments
-- **Prevention**: these limits are also practical compile-time ceilings — treat growth as a refactoring signal
+- **Исправление**: выбросьте ненужные файлы `.wgsl` / объединяйте файлы / сокращайте комментарии
+- **Профилактика**: эти лимиты — ещё и практические потолки времени компиляции; относитесь к росту как к сигналу на рефакторинг
 
-## Format problems
+## Проблемы формата
 
-Split zips, zip64, encrypted entries and unsupported compression are each rejected with dedicated messages. All files must be valid UTF-8.
+Разрезанные (split) zip, zip64, зашифрованные записи и неподдерживаемое сжатие отклоняются, причём для каждого случая — своё отдельное сообщение. Все файлы должны быть корректным UTF-8.
 
-## Loader error-ID reference
+## Справочник id ошибок загрузчика
 
-| ID | Meaning |
+| id | Значение |
 |---|---|
-| `loadZipTooBig` | zip over 32MB |
-| `loadTooManyZipEntries` | over 1024 entries |
-| `loadTooManyWgsl` | over 256 `.wgsl` |
-| `loadSourceTooBig` | over 256KB total (streamed per-file check) |
-| `loadManifestTooBig` | `pack.json` over 64KB |
-| `loadManifestNotJson` / `loadManifestNotObject` | not JSON / not an object |
-| `loadNoApiVersion` / `loadWrongApiVersion` | missing / not `5` ([API version errors](api-version.md)) |
-| `loadNoName` / `loadAuthorNotString` | missing `name` / non-string `author` |
-| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | unsupported compression / zip64 / split / encrypted |
-| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | duplicate path / non-UTF-8 / decompress failure / damaged zip |
-| `loadNoManifest` / `loadDuplicateManifest` | manifest position / duplication |
+| `loadZipTooBig` | zip больше 32 МБ |
+| `loadTooManyZipEntries` | больше 1 024 записей |
+| `loadTooManyWgsl` | больше 256 `.wgsl` |
+| `loadSourceTooBig` | больше 256 КБ суммарно (потоковая проверка по каждому файлу) |
+| `loadManifestTooBig` | `pack.json` больше 64 КБ |
+| `loadManifestNotJson` / `loadManifestNotObject` | не JSON / не объект |
+| `loadNoApiVersion` / `loadWrongApiVersion` | отсутствует / не `5` ([Ошибки версии API](api-version.md)) |
+| `loadNoName` / `loadAuthorNotString` | отсутствует `name` / `author` не строка |
+| `loadUnsupportedCompression` / `loadZip64` / `loadSplitZip` / `loadEncrypted` | неподдерживаемое сжатие / zip64 / split / шифрование |
+| `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | дублирующийся путь / не UTF-8 / ошибка распаковки / повреждённый zip |
+| `loadNoManifest` / `loadDuplicateManifest` | расположение манифеста / дублирование |
 
-## "Ready. Reload the page to use it." but nothing changes
+## "Ready. Reload the page to use it." но ничего не меняется
 
-- **Cause**: packs need a **page reload** to activate
-- **Fix**: reload after selecting; status should become `Ready to use`
-- **Note**: leftover renderer overrides (`?renderer=`, localStorage `bloxdRenderer`) make packs refuse to start — clear them and reload
+- **Причина**: пакам для активации нужна **перезагрузка страницы**
+- **Исправление**: перезагрузите страницу после выбора; статус должен стать `Ready to use`
+- **Заметка**: оставшиеся переопределения рендерера (`?renderer=`, localStorage `bloxdRenderer`) не дают пакам запуститься — удалите их и перезагрузите страницу
 
-## Related
+## Смотрите также
 
-- [API version errors](api-version.md) · [Pack structure](../getting-started/pack-structure.md) · [Pack format](../api/pack-format.md)
+- [Ошибки версии API](api-version.md) · [Структура пака](../getting-started/pack-structure.md) · [Формат пака](../api/pack-format.md)

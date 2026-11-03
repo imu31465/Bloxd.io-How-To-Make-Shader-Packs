@@ -1,24 +1,24 @@
-# API Reference
+# Справочник по API
 
-The systematic specification of the current API v5. Everything here is measured from target build `ab90qa` (2026-11-03; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
+Систематическая спецификация текущего API v5. Всё здесь измерено на целевом билде `ab90qa` (2026-11-03; продакшн и preprod идентичны). Первоисточник — заголовок движка, подставляемый перед каждым паком (воспроизведён в [Внутренностях движка](../internals/engine-header.md)).
 
-## Map
+## Карта
 
-| Page | Contents |
+| Страница | Содержимое |
 |---|---|
-| [Pack format](pack-format.md) | every `pack.json` field, loader limits, uniform layout |
-| [Shader hooks](hooks.md) | 9-hook comparison: signatures, targets, run conditions |
-| [Flags](flags.md) | all 14 `BloxdFlags` fields |
-| [Structures](structures.md) | every field of every struct (incl. conditional fields) |
-| [Functions](functions.md) | all frame/default/special function signatures |
-| [Lighting](lighting.md) | the lighting API and the processing order |
-| [Texture API](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` and naming |
-| [Constants](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
-| [Preprocessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
-| [Restrictions](restrictions.md) | language limits, reserved identifiers |
-| [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
+| [Формат пака](pack-format.md) | каждое поле `pack.json`, лимиты загрузчика, раскладка uniform |
+| [Хуки шейдеров](hooks.md) | сравнение 9 хуков: сигнатуры, цели, условия запуска |
+| [Флаги](flags.md) | все 14 полей `BloxdFlags` |
+| [Структуры](structures.md) | каждое поле каждой структуры (вкл. условные поля) |
+| [Функции](functions.md) | все сигнатуры кадровых/дефолтных/специальных функций |
+| [Освещение](lighting.md) | API освещения и порядок обработки |
+| [API текстур](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` и именование |
+| [Константы](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
+| [Препроцессор](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
+| [Ограничения](restrictions.md) | лимиты языка, зарезервированные идентификаторы |
+| [Совместимость](compatibility.md) | паки старых версий, перепроверка сохранённых паков |
+| [Каталог текстур](texture-catalog.md) | все 896 пригодных имён (с поиском) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored verbatim from header & validator)
+> Целевой API: 5 · Целевой билд: `ab90qa` (проверено в продакшене 2026-11-03) · Статус: Analyzed (восстановлено дословно из заголовка и валидатора)
 
-Migrating from v4? See [Version History: v5](../history/v5.md).
+Мигрируете с v4? См. [История версий: v5](../history/v5.md).

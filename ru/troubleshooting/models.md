@@ -1,58 +1,58 @@
-# Model issues
+# Проблемы моделей
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (new v5 territory)
+> Целевой API: 5 · Целевой билд: `ab90qa` · Статус: Analyzed (новая территория v5)
 
-Issues around the new v5 Model hooks.
+Вопросы вокруг новых модельных хуков v5.
 
-## Players/mobs unaffected
+## Игроки/мобы не затронуты
 
-- **Cause**: entities (players, mobs, NPCs, armour, cosmetics) are drawn by the **Model program** — terrain hooks don't touch them
-- **Fix**: add Model hooks ([the models guide](../guides/models.md))
+- **Причина**: сущности (игроки, мобы, NPC, броня, косметика) рисуются **программой Model** — террейн-хуки их не трогают
+- **Исправление**: добавьте Model-хуки ([руководство по моделям](../guides/models.md))
 
-## Slabs, stairs, plants unaffected
+## Плиты, ступени, растения не затронуты
 
-- **Cause**: block models (`slab` / `stairs` / `flat`) are also Model-program geometry, never terrain
-- **Fix**: use Model hooks with `flags.slab` / `flags.stairs` / `flags.flat` ([Flags](../api/flags.md))
+- **Причина**: блочные модели (`slab` / `stairs` / `flat`) — тоже геометрия программы Model, но не террейн
+- **Исправление**: используйте Model-хуки с `flags.slab` / `flags.stairs` / `flags.flat` ([Флаги](../api/flags.md))
 
-## Water unaffected
+## Вода не затронута
 
-- **Cause**: water is Liquid-hook-only; **without Liquid hooks, no Terrain hook runs on water either** (v5 change)
-- **Fix**: define `bloxdLiquidSurface` / `bloxdLiquidLight` ([Variant issues](variants.md))
+- **Причина**: вода — только Liquid-хуки; **без Liquid-хуков на воде не работает и Terrain-хук** (изменение v5)
+- **Исправление**: объявите `bloxdLiquidSurface` / `bloxdLiquidLight` ([Проблемы отдельных вариантов](variants.md))
 
-## Want to change only held items but everything changes
+## Хотите поменять только предметы в руках, а меняется всё
 
-- **Fix**: select with `surface.flags.held` ([model shader recipes](../recipes/model-shaders.md))
+- **Исправление**: отбирайте по `surface.flags.held` ([рецепты модельных шейдеров](../recipes/model-shaders.md))
 
-## Flag checks don't behave
+## Проверки флагов ведут себя не так
 
-- **Likely causes**:
-  1. **treating flags as a single-choice enum** — they combine freely («sandstone is sand and rock», «possibly even none») ([Flags](../api/flags.md#flags-combine-freely))
-  2. reading `else` as "everything else" — the else of `flags.rock` is merely "not rock", possibly still sand
-- **Fix**: combine material flags (`opaque`…) independently of shape/state flags (`slab`/`held`…)
+- **Вероятные причины**:
+  1. **обращение с флагами как с enum'ом единственного выбора** — они свободно сочетаются («песчаник — это sand и rock», «возможно, ни одного») ([Флаги](../api/flags.md#флаги-свободно-сочетаются))
+  2. прочтение `else` как «всего остального»: else от `flags.rock` — это лишь «не rock», возможно всё ещё sand
+- **Исправление**: комбинируйте материальные флаги (`opaque`…) независимо от флагов формы/состояния (`slab`/`held`…)
 
-## Enchant glint disappeared
+## Пропал блик зачарования
 
-- **Fix**: pass `enchantColour` through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
+- **Исправление**: пропускайте `enchantColour` дальше или используйте `bloxdLitColour()` ([Эффекты зачарований](../recipes/enchant-effects.md))
 
-## Hurt flash disappeared / too strong
+## Пропала вспышка урона / слишком сильная
 
-- **Fix**: pass `overlayColour` through or adjust `out.overlayColour.a` ([Enchant effects](../recipes/enchant-effects.md))
+- **Исправление**: пропускайте `overlayColour` дальше или настройте `out.overlayColour.a` ([Эффекты зачарований](../recipes/enchant-effects.md))
 
-## localPosition always reads 0
+## localPosition всегда читается как 0
 
-- **By design**: `localPosition` is `vec3f(0.0)` on terrain and liquid faces — **no model there**
-- **Fix**: read it in Model hooks ([model recipes](../recipes/model-shaders.md))
+- **Так задумано**: `localPosition` — это `vec3f(0.0)` на гранях террейна и жидкостей — **модели там нет**
+- **Исправление**: читайте его в Model-хуках ([рецепты моделей](../recipes/model-shaders.md))
 
-## bloxdTexel returns white on models
+## bloxdTexel возвращает белый на моделях
 
-- **By design**: `textureId: 0` (skins) samples as white
-- **Fix**: select with `surface.textureId != 0u` or work from `surface.colour` ([Texture issues](textures.md))
+- **Так задумано**: `textureId: 0` (скины) сэмплится как белый
+- **Исправление**: отбирайте условием `surface.textureId != 0u` или работайте от `surface.colour` ([Проблемы текстур](textures.md))
 
-## Want armour-only / cosmetics-only changes
+## Хотите изменения только для брони / только для косметики
 
-- **Limit**: no flag says "armour"; `flags.lifeform` includes armour and cosmetics
-- **Approximation**: combine with `localPosition` (placement) or the presence of `overlayColour` ([model recipes](../recipes/model-shaders.md))
+- **Предел**: флага «броня» нет; `flags.lifeform` включает и броню, и косметику
+- **Приближение**: комбинируйте с `localPosition` (размещение) или с наличием `overlayColour` ([рецепты моделей](../recipes/model-shaders.md))
 
-## Related
+## Смотрите также
 
-- [Models guide](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md)
+- [Руководство по моделям](../guides/models.md) · [Рецепты модельных шейдеров](../recipes/model-shaders.md) · [Флаги](../api/flags.md)
