@@ -1,0 +1,15 @@
+{
+  "index": {
+    "title": "Getting Started",
+    "theme": { "toc": false, "typesetting": "article" }
+  },
+  "overview": "概要と前提",
+  "requirements": "動作環境",
+  "quick-start": "最短手順",
+  "pack-structure": "パックの構成",
+  "manifest": "pack.json",
+  "hooks": "シェーダーフック",
+  "variants": "バリアントとガード",
+  "validation": "検証と動作確認",
+  "distribution": "配布"
+}

@@ -1,0 +1,22 @@
+{
+  "getting-started": "Getting Started",
+  "api": "API Reference",
+  "guides": "Guides",
+  "recipes": "Recipes",
+  "troubleshooting": "Troubleshooting",
+  "internals": "Engine Internals & Research",
+  "history": "Version History",
+  "---legacy": { "type": "separator", "title": "旧11部構成 (移行中)" },
+  "01-making": "第一部: 作り方",
+  "02-api": "第二部: API リファレンス",
+  "03-recipes": "第三部: レシピ集",
+  "04-realism": "第四部: リアル化ガイド",
+  "05-troubleshooting": "第五部: トラブルシューティング・注意",
+  "06-implementation": "第六部: 実装時の重要な補足",
+  "07-internals": "第七部: 内部仕様の補足",
+  "08-apiv2": "第八部: API Version 2 移行ガイド",
+  "09-apiv3": "第九部: API Version 3 移行ガイド",
+  "10-apiv4": "第十部: API Version 4 移行ガイド",
+  "11-reference": "第十一部: 完全リファレンス — エンジンヘッダとテクスチャカタログ",
+  "12-apiv5": "第十二部: API Version 5 移行ガイド"
+}

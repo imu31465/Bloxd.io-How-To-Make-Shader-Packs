@@ -1,0 +1,19 @@
+# Getting Started
+
+初めてシェーダーパックを作る人のための、概要から配布までの一本道チュートリアルです。API v5 の完成形を最初から説明します (旧バージョンの読み方や移行は必要ありません — それは [Version History](../history/) の仕事です)。
+
+## このカテゴリーの流れ
+
+1. [概要と前提](overview.md) — シェーダーパックで何ができて何ができないか
+2. [動作環境](requirements.md) — ブラウザ・レンダラーの要件
+3. [最短手順](quick-start.md) — 5分で最初のパックを動かす
+4. [パックの構成](pack-structure.md) — zip の中身とサイズ上限
+5. [pack.json](manifest.md) — マニフェストの全フィールド
+6. [シェーダーフック](hooks.md) — 9つのフックの役割分担
+7. [バリアント](variants.md) — 6バリアントとマクロガード
+8. [検証と動作確認](validation.md) — 読み込み時の3段階検証と実機チェック
+9. [配布](distribution.md) — zip の固め方と運用
+
+> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified/Analyzed
+
+API仕様を詳細に調べたくなったら [API Reference](../api/) へ、表現の実装例は [Recipes](../recipes/) へ進んでください。

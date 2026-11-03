@@ -23,7 +23,12 @@ export function generateStaticParams() {
     const rel = path.relative(contentRoot, file).split(/[\\/]/)
     const lang = rel[0]
     const base = rel.slice(1).join('/').replace(/\.(md|mdx)$/, '')
-    const mdxPath = base === 'index' || base === '' ? [] : base.split('/')
+    // README -> index 変換でできる各階層の index ページは、Nextra の慣習に従い
+    // パスから 'index' を除去してディレクトリ自身の URL にする
+    // (ja/getting-started/index -> /ja/getting-started/)
+    const parts = base.split('/')
+    if (parts[parts.length - 1] === 'index') parts.pop()
+    const mdxPath = parts.length === 0 || parts[0] === '' ? [] : parts
     return { lang, mdxPath }
   })
 }
