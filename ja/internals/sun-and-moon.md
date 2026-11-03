@@ -48,4 +48,4 @@ if (bloxdLit()) {
 
 - [関数](../api/functions.md) — `bloxdSunDirection`
 - [夜の青い環境光](../recipes/lighting.md) — 擬似月光表現
-- [Engine Data](engine-data.md)
+- [エンジンデータ台帳](engine-data.md)

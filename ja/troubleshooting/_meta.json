@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "Troubleshooting",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "トラブルシューティング",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "loading": "読み込みエラー",
   "api-version": "APIバージョンエラー",

@@ -2,7 +2,7 @@
 
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Verified (v4 から不変のAPIを v5 ビルドで再確認)
 
-v4 で導入され v5 でもそのまま使える、ブロックテクスチャアトラスを読むAPIです。関数2種 + 名前付き定数ファミリー + 入力フィールド4個で構成されます。ヘッダー自身の一行要約: *"This face's texture. Compare with `bloxdTextureId*`."*
+v4 から不変で、現在も同じ形で使える、ゲーム側テクスチャを読むAPIです。関数2種 + 名前付き定数ファミリー + 入力フィールド4個で構成されます。ヘッダー自身の一行要約: *"This face's texture. Compare with `bloxdTextureId*`."*
 
 ## bloxdTexel
 
@@ -14,16 +14,36 @@ fn bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f
 - **戻り値**: `vec4f` のテクセル色
 - **使用可能なフック**: **Surface / Light のみ** (vertex フックから到達すると "reaches" 診断で拒否)
 
-ブロックテクスチャアトラスを**エンジン自身のサンプラと完全に同じ方法**でサンプリングします — 同じ `texture_2d_array<f32>` アトラス、同じサンプラ、`round(mipLevel)` での `textureSampleLevel` — したがって自分が読んだテクセルとエンジンが描画したテクセルは構造的に一致します。
+ゲーム側テクスチャを**エンジン自身のサンプラと同じ仕組み**で読み取ります — 同じ `texture_2d_array<f32>` アトラス、同じサンプラ、`round(mipLevel)` での `textureSampleLevel` — したがって自分が読んだテクセルとエンジンが描画したテクセルは構造的に一致します。
 
-セマンティクス:
+### `bloxdTexel` が何を読むかはパイプラインで決まる
+
+エンジンはパイプラインごとに異なる `bloxdTexel` の定義を生成するため、1つの関数が3つの挙動を持ちます:
+
+| パイプライン | `textureId == 0` | 非 0 の `textureId` | 備考 |
+|---|---|---|---|
+| **アトラス系** — 地形・液体・ブロックアトラスから描かれるブロックモデル | `vec4f(1.0)` (白 =「テクスチャなし」) | その**アトラスエントリ**をサンプリング | 名前付き定数が有効。アニメーションと回転は自動 |
+| **モデル固有テクスチャ系** — メッシュ自身がディフューズテクスチャを持つモデル (プレイヤースキン・Mob テクスチャ・アイテムスプライト) | 渡した uv で**そのメッシュ固有のテクスチャ**をサンプリング | `vec4f(1.0)` (白) | スコープ内にテクスチャは1枚だけ。名前付き定数は対象外 |
+| **テクスチャなし** | 白 | 白 | スタブ。`bloxdTextureSize() -> vec2u(1u)` |
+
+アトラス系のセマンティクス詳細:
 
 - **`textureId == 0` は `vec4f(1.0)` (白) を返す。** これが「テクスチャなし」の id です。テクスチャを持たない面では4つの入力フィールドも 0 を運ぶため、`bloxdTexel(surface.textureId, ...)` は常に安全に呼べる
 - **アニメーションテクスチャは自動で現在フレームを返す。** フレームはゲームのアニメーションクロックで進み、停めたりステップしたりはできません。アニメーションテクスチャの id をサンプリングすることが*生きたフレーム*のサンプリングです
 - **`mipLevel` はエンジン自身と同じ方式でクランプされる**: `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`。範囲外の mip はエラーではなく飽和
 - **現在のフラグメントの `textureRotation` が渡した uv に適用される** (下記「回転の繊細さ」)
 
-`textureId` は**1 起点**: `bloxdTextureIdGrassTop` が id であり、エンジンがサンプリングするアトラスレイヤは `id - 1` です。id はアトラス配置ではなくテクスチャ**名**に対して安定 — エンジンはビルドをまたいでアトラスを自由に再配置しますが、名前定数の比較は「このテクスチャ」という意味を保ち続けます。
+`textureId` はアトラス系で**1 起点**: `bloxdTextureIdGrassTop` が id であり、エンジンがサンプリングするアトラスレイヤは `id - 1` です。id はアトラス配置ではなくテクスチャ**名**に対して安定 — エンジンはビルドをまたいでアトラスを自由に再配置しますが、名前定数の比較は「このテクスチャ」という意味を保ち続けます。
+
+### どのパイプラインでも成立する呼び方
+
+```wgsl
+// どのパイプラインでも動く: アトラス面ではアトラスエントリをサンプリングし、
+// モデル固有テクスチャでは textureId が 0 で、そのモデル固有のテクスチャをサンプリングする。
+let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
+```
+
+`surface.colour` には既に `テクスチャ × 色付け × AO` (スキンや色付けも含む) が反映済みです。テクセル読み取りは追加のディテール (輝度推定・テクスチャ固有の演出) 用であって、ベース色を作り直すためのものではありません。
 
 ## bloxdTextureSize
 
@@ -46,11 +66,14 @@ let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 
 ## モデル独自のテクスチャ (textureId: 0)
 
-**`bloxdTexel()` はモデル独自のテクスチャも読み取れます** — その代表が `textureId: 0` です:
+ヘッダーの注記: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — モデル面の多くは*アトラス*テクスチャを持ちません。メッシュ自身がテクスチャを運ぶからです:
 
-- **プレイヤーのスキン**をはじめ、Mob などアトラス外のテクスチャを持つモデルは `textureId: 0` を使います
-- ヘッダーの注記: *"These are all 0 if the face has no texture. **Most models use textureId 0.**"* — モデルの多くはアトラスを経由しません
-- `textureId: 0` を `bloxdTexel()` に渡すと `vec4f(1.0)` (白) が返るため、エラーにはなりません。モデル面で「アトラスのテクスチャを読む」コードは、`textureId != 0u` の場合にのみ効果を発揮します:
+- **プレイヤースキン**をはじめ、アトラス外のモデルテクスチャ (Mob・アイテムスプライト) は `textureId: 0` で届く
+- そうしたパイプラインでは `bloxdTexel(0u, uv, mip)` が**そのメッシュ固有のテクスチャ**をサンプリングする (上の表参照)。非 0 の id は白 — スコープ内にアトラスはない
+- ヘッダーのフィールドはそのまま有効: `uv` はモデルテクスチャの 0〜1、`mipLevel` はその面の mip
+- **`bloxdTextureSize()`** は*そのパイプラインがサンプリングするテクスチャ*のサイズを返す: アトラス系ならアトラス、モデル固有テクスチャ系ならそのモデルテクスチャ
+
+アトラス面でしか意味をなさない演出はガードすること:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -64,8 +87,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-- **プレイヤースキン/Mobテクスチャと通常のアトラスの違い**: アトラスは「ブロックテクスチャの名前→レイヤ」の辞書で、`bloxdTextureId*` で比較できます。モデル独自のテクスチャ (スキン等) は名前空間に登録されておらず、ID 0 という「テクスチャなし」表現で届きます。`surface.colour` には既にスキンのテクスチャ×色が反映済みのため、通常はそれを加工する形で使います
-- **`bloxdTextureSize()` との関係**: モデル面で `textureId: 0` でも `bloxdTextureSize()` はアトラスのサイズを返します (モデルテクスチャのサイズではありません)
+- **プレイヤースキン/Mobテクスチャと通常のアトラスの違い**: アトラスは「ブロックテクスチャの名前→レイヤ」の辞書で、`bloxdTextureId*` で比較できます。モデル独自のテクスチャ (スキン等) は名前空間に登録されておらず、ID 0 で届きます。`surface.colour` には既にスキンのテクスチャ×色が反映済みのため、通常はそれを加工する形で使います
 
 ## bloxdTextureId*: テクスチャ名定数
 
@@ -95,9 +117,11 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 >
 > **折り畳み後に曖昧:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 >
-> **未発見 (提案つき):** `There's no texture called X. Did you mean bloxdTextureIdY?` — 提案の閾値はレーベンシュタイン距離 `max(2, floor(len/4)) + 1` (v5 で追加されたスペル補正エンジン)
+> **未発見 (提案つき):** `There's no texture called X. Did you mean bloxdTextureIdY?` — 提案の閾値はレーベンシュタイン距離 `max(2, floor(len/4)) + 1`
 >
 > **未発見 (提案なし):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
+
+> メッセージ内の `BLOCK_TEXTURES.md` はエンジンのバリデータが参照するゲーム側内部のテクスチャ名一覧であり、本サイトのページではありません。本サイトでの相当物は[テクスチャカタログ](texture-catalog.md)です。
 
 ### 参照した定数だけが出力される
 
@@ -216,5 +240,5 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## 関連
 
 - **利用可能896名の全一覧** → [テクスチャカタログ](texture-catalog.md)
-- レジストリの内部 (畳み込み規則、ドリフト) → [Engine Internals: Texture Registry](../internals/texture-registry.md)
-- サンプリングの生成コード → [Engine Internals: Texture Sampling](../internals/texture-sampling.md)
+- レジストリの内部 (畳み込み規則、ドリフト) → [エンジン内部: Texture Registry](../internals/texture-registry.md)
+- サンプリングの生成コード → [エンジン内部: Texture Sampling](../internals/texture-sampling.md)

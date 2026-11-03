@@ -1,15 +1,18 @@
 {
   "index": {
-    "title": "Getting Started",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "はじめに",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "overview": "概要と前提",
   "requirements": "動作環境",
   "quick-start": "最短手順",
   "pack-structure": "パックの構成",
-  "manifest": "pack.json",
+  "manifest": "pack.json (マニフェスト)",
   "hooks": "シェーダーフック",
-  "variants": "バリアントとガード",
+  "variants": "バリアントとマクロガード",
   "validation": "検証と動作確認",
   "distribution": "配布"
 }

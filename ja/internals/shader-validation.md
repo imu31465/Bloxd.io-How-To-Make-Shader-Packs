@@ -1,4 +1,4 @@
-# シェーダー検証の内部 (Shader Validation)
+# シェーダー検証の内部
 
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブバリデータから復元)
 
@@ -8,7 +8,7 @@
 
 1. **ローダー制限** (zip / pack.json の形) → [パック形式](../api/pack-format.md)
 2. **静的検証 (アナライザ)** — このページ。6バリアントすべての構文・型・予約名・フック契約を検証
-3. **ブラウザ実コンパイル** → [WGSL Compilation](wgsl-compilation.md)
+3. **ブラウザ実コンパイル** → [WGSLコンパイルの内部](wgsl-compilation.md)
 4. **ゲーム参加時のランタイム再検証** — 実在する全地形マテリアルで実際にコンパイルする (設定画面の静的検証より厳しい)。失敗するとそのゲームで除外される
 
 ## 特殊関数のシグネチャ表
@@ -29,7 +29,7 @@ const Jq = new Map([
 - vertex フックから `vertex: true` 以外の特殊関数を呼ぶと *"X reaches Y, which only surface and light hooks can use."*
 - `symbol` が設定された関数 (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) は、そのマクロを定義しないバリアントから到達すると *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
 
-注記: `bloxdFragmentBlockPosition` は v5 のヘッダー生成からは削除済みですが、このシグネチャ表には旧定義が残存しています (v5 ビルドで観測)。呼び出しは検証で拒否されます。
+注記: `bloxdFragmentBlockPosition` はヘッダー生成からは削除済みですが、この生きたシグネチャ表にはまだ載っています — そして識別子検証が参照するのはこの表なので、呼び出しは今も検証を通ります。コードジェネレーターも定義を (地形/液体とモデル両プログラムに) 注入し続けるため、実際に呼び出し可能なままです。非公開となったため非推奨扱い: ドキュメントされておらず、将来の任意のバージョンで削除され得ます。
 
 ## 予約名の診断
 
@@ -65,11 +65,11 @@ const Jq = new Map([
 
 ## 検証スタブ
 
-静的検証を通したコードは、ブラウザ WGSL コンパイラでの実検証に回る前にスタブコードを合成されます: `var<private> bloxdValidationP: vec4f` と `bloxdValidateVertex` / `bloxdValidateFragment` — 型スタブ表 (`bool` → `p.x > 0.0`、`vec3f` → `p.xyz` 等) から入力構造体を構築してフックを実行します。詳細は [WGSL Compilation](wgsl-compilation.md)。
+静的検証を通したコードは、ブラウザ WGSL コンパイラでの実検証に回る前にスタブコードを合成されます: `var<private> bloxdValidationP: vec4f` と `bloxdValidateVertex` / `bloxdValidateFragment` — 型スタブ表 (`bool` → `p.x > 0.0`、`vec3f` → `p.xyz` 等) から入力構造体を構築してフックを実行します。詳細は [WGSLコンパイルの内部](wgsl-compilation.md)。
 
 ## 関連
 
 - [検証エラー](../troubleshooting/validation.md) — ユーザー向け対処
-- [WGSL Compilation](wgsl-compilation.md) — 第2段階の実装
-- [Texture Registry](texture-registry.md) — 名前解決とドリフト
-- [Engine Data](engine-data.md) — 定数台帳
+- [WGSLコンパイルの内部](wgsl-compilation.md) — 第2段階の実装
+- [テクスチャレジストリの内部](texture-registry.md) — 名前解決とドリフト
+- [エンジンデータ台帳](engine-data.md) — 定数台帳

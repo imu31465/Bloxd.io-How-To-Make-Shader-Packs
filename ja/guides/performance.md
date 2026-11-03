@@ -1,4 +1,4 @@
-# パフォーマンスを考慮した実装
+# パフォーマンス
 
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Verified (計測ベースの実践指針)
 
@@ -42,5 +42,5 @@
 ## 関連
 
 - [実機テストのチェックリスト](testing.md)
-- [Engine Internals: Rendering Pipeline](../internals/rendering-pipeline.md) — どの段階で何が呼ばれるか
+- [エンジン内部: Rendering Pipeline](../internals/rendering-pipeline.md) — どの段階で何が呼ばれるか
 - [テクスチャAPI](../api/texture-api.md) — サンプリングコストの詳細

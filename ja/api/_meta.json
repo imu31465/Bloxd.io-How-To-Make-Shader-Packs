@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "API Reference",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "APIリファレンス",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "pack-format": "パック形式",
   "hooks": "シェーダーフック",

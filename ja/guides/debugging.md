@@ -2,7 +2,7 @@
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
 
-見た目の問題を症状から原因へたどるガイド。エラー (検証・コンパイル) については [Troubleshooting](../troubleshooting/) を参照。
+見た目の問題を症状から原因へたどるガイド。エラー (検証・コンパイル) については [トラブルシューティング](../troubleshooting/) を参照。
 
 
 - 洞窟が明るすぎる → `skyLight` の非線形カーブが不足している ([洞窟の暗化](../recipes/lighting.md) / [非線形暗化](../recipes/realism.md))
@@ -21,6 +21,6 @@
 
 ## 関連
 
-- [Troubleshooting](../troubleshooting/) — 検証・コンパイルエラー
+- [トラブルシューティング](../troubleshooting/) — 検証・コンパイルエラー
 - [実機テストのチェックリスト](testing.md)
-- [Engine Internals: デバッグ手段](../internals/debugging.md)
+- [エンジン内部: デバッグ手段](../internals/debugging.md)

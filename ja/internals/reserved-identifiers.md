@@ -27,5 +27,5 @@ v4 の 27 から **46 シンボル**へ増えました (20 追加、1 引退 —
 ## 関連
 
 - [制限と予約名](../api/restrictions.md) — 利用者向けの要約
-- [Texture Sampling](texture-sampling.md) — これらのシンボルが使われる生成コード
-- [Version History: v5](../history/v5.md) — v4 の 27 シンボルとの差分
+- [テクスチャサンプリングの内部](texture-sampling.md) — これらのシンボルが使われる生成コード
+- [バージョン履歴: v5](../history/v5.md) — v4 の 27 シンボルとの差分

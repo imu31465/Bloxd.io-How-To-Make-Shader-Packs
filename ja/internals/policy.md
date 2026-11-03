@@ -1,4 +1,4 @@
-# ゲーム別の適用モード (shaderPackPolicy)
+# ゲーム別の適用ポリシー
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
 
@@ -34,4 +34,4 @@ strict 側で特に誤解しやすい点は以下の通りである。
 
 - [バリアントとガード](../getting-started/variants.md)
 - [バリアント固有の問題](../troubleshooting/variants.md)
-- [Research Log](research-log.md)
+- [リサーチログ](research-log.md)

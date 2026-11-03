@@ -1,9 +1,9 @@
 {
-  "getting-started": "Getting Started",
-  "api": "API Reference",
-  "guides": "Guides",
-  "recipes": "Recipes",
-  "troubleshooting": "Troubleshooting",
-  "internals": "Engine Internals & Research",
-  "history": "Version History"
+  "getting-started": "はじめに",
+  "api": "APIリファレンス",
+  "guides": "ガイド",
+  "recipes": "レシピ",
+  "troubleshooting": "トラブルシューティング",
+  "internals": "エンジン内部と研究",
+  "history": "バージョン履歴"
 }

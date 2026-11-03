@@ -5,7 +5,7 @@
 フレネル風の色ブレンドと太陽グリントによる疑似表現 (統合レシピ) と、水中の3層構造の実情。
 
 
-このAPIではシーン色をサンプリングできないため、**本物の反射・屈折ではなく、フレネル風の色ブレンドと太陽ハイライトによる疑似表現**になる (水深計算は液体限定の `bloxdOpaqueBehind()` で可能 ([API Reference: 関数](../api/functions.md#bloxdopaquebehind)))。以下は色のベースを残しながら、浅い視線角度で空色に近い色を少し混ぜ、太陽があるときだけ小さなグリントを足すサンプル。
+このAPIではシーン色をサンプリングできないため、**本物の反射・屈折ではなく、フレネル風の色ブレンドと太陽ハイライトによる疑似表現**になる (水深計算は液体限定の `bloxdOpaqueBehind()` で可能 ([APIリファレンス: 関数](../api/functions.md#bloxdopaquebehind)))。以下は色のベースを残しながら、浅い視線角度で空色に近い色を少し混ぜ、太陽があるときだけ小さなグリントを足すサンプル。
 
 ```wgsl
 fn pack_waterWaveNormal(p: vec3f, t: f32) -> vec3f {
@@ -47,7 +47,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 - 水が白っぽい / 明るすぎる場合: `fresnel * 0.38` の `0.38` とグリントの `0.55` を下げる。
 - 水が濃すぎる場合: `fakeSkyReflection` の混合率を少し上げる。ただし、上げすぎるとプラスチックのような質感になる。
 - 水面に線や規則的な縞が見える場合: 波の周波数やグリント強度を下げる。なお、水面メッシュ自体の頂点変位はこのコードには含まれていない。
-- 実際の景色を映したい: このAPIの入力には画面色がないため、色を混ぜるだけでは実反射にならない (深度は液体限定で取得可。[第八部](../history/v2.md) R-E)。
+- 実際の景色を映したい: このAPIの入力には画面色がないため、色を混ぜるだけでは実反射にならない (深度は液体限定で取得可 — [関数: bloxdOpaqueBehind](../api/functions.md) 参照)。
 
 このレシピは既存の `bloxdLiquidLight` を**置き換える**ものである。R9.7 の同名波法線関数や他の同名フックと重複して適用しないこと。
 
@@ -69,4 +69,4 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 - [液体のレシピ](../recipes/liquids.md)
 - [頂点のレシピ](../recipes/vertices.md) — 液面の波
-- [Engine Internals: Fog Internals](../internals/fog-internals.md)
+- [エンジン内部: Fog Internals](../internals/fog-internals.md)

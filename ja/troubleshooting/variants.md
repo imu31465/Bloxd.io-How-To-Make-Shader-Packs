@@ -60,4 +60,4 @@
 
 - [バリアントとガード](../getting-started/variants.md)
 - [プリプロセッサ](../api/preprocessor.md)
-- [Engine Internals: ゲーム別の適用モード](../internals/policy.md) — allow / strict のタイトル一覧
+- [エンジン内部: ゲーム別の適用モード](../internals/policy.md) — allow / strict のタイトル一覧

@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "Version History",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "バージョン履歴",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "v1": "API v1",
   "v2": "API v2 移行ガイド",

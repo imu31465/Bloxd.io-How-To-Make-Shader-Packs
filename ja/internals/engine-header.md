@@ -1,4 +1,4 @@
-# エンジンヘッダ (v5、逐語)
+# エンジンヘッダ (逐語)
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (ライブ本番バンドルから復元)
 
@@ -10,8 +10,8 @@
 - フラグ (BloxdFlags) の解説 → [フラグ](../api/flags.md)
 - テクスチャ名定数 (`bloxdTextureId*`) はこのヘッダーには含まれません — 参照された名前だけがパック毎に生成されます ([テクスチャAPI](../api/texture-api.md))
 - `#ifdef BLOXD_ALPHA` はバリアントにより存在が変わる条件付きフィールドです ([プリプロセッサ](../api/preprocessor.md))
-- v4 のヘッダー (6,021B) との差分 → [Version History: v5](../history/v5.md)
-- ヘッダーが検証に使われる仕組み (HEADER_VERSION) → [Shader Validation](shader-validation.md)
+- v4 のヘッダー (6,021B) との差分 → [バージョン履歴: v5](../history/v5.md)
+- ヘッダーが検証に使われる仕組み (HEADER_VERSION) → [シェーダー検証の内部](shader-validation.md)
 
 ```wgsl
 
@@ -225,6 +225,6 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ## 関連
 
-- [API Reference](../api/) — このヘッダーの解説
-- [Shader Validation](shader-validation.md) — HEADER_VERSION と保存パックの再検証
-- [Engine Data](engine-data.md) — 定数・制限・レイアウトの計測台帳
+- [APIリファレンス](../api/) — このヘッダーの解説
+- [シェーダー検証の内部](shader-validation.md) — HEADER_VERSION と保存パックの再検証
+- [エンジンデータ台帳](engine-data.md) — 定数・制限・レイアウトの計測台帳

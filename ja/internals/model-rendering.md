@@ -2,7 +2,7 @@
 
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブバンドルから復元)
 
-v5 で新設された Model プログラムの描画パイプラインの内部です。利用者向けの解説は [モデルの描画とテクスチャ](../guides/models.md) を参照。
+Model プログラムの描画パイプラインの内部です。利用者向けの解説は [モデルの描画とテクスチャ](../guides/models.md) を参照。
 
 ## Model プログラムとは何か
 
@@ -39,4 +39,4 @@ Model プログラムはバリアント行列の1軸を構成します: `strict.
 - [モデルの描画とテクスチャ](../guides/models.md) — 利用者向け解説
 - [モデルシェーダーのレシピ](../recipes/model-shaders.md)
 - [フラグ](../api/flags.md) — 8 個の新フィールド
-- [Rendering Pipeline](rendering-pipeline.md)
+- [レンダリングパイプライン](rendering-pipeline.md)

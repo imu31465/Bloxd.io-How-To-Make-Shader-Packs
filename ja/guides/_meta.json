@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Guides",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "ガイド",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "lighting": "ライティングの仕組み",
   "shadows": "影の表現",
   "water": "水を自然に見せる方法",
   "night": "夜間表現の設計",
   "models": "モデルの描画とテクスチャ",
-  "realism": "リアル化ガイド",
-  "constraints": "到達できない表現",
+  "realism": "リアル化の2つの流派",
+  "constraints": "シェーダーパックにできること・できないこと",
   "performance": "パフォーマンス",
   "testing": "実機テストのチェックリスト",
-  "combinations": "限界がある場合の組み合わせ",
+  "combinations": "テクスチャパックとの組み合わせ",
   "debugging": "デバッグのコツ"
 }

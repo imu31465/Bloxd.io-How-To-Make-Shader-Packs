@@ -31,7 +31,7 @@ v4 からの変換は**ほぼ機械的**です ([移行チェックリスト](..
 
 - `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1対1のリネーム)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` の呼び出し箇所を削除 (代替なし)
+- `bloxdFragmentBlockPosition` の呼び出し箇所は今もコンパイルが通る (エンジンが注入し続けている) が、非公開となったので移行が安全策 ([関数](functions.md#bloxdfragmentblockposition--非公開だが今も注入される))
 - `pack.json` を `"apiVersion": 5` へ
 
 今回の静かな罠: 旧ビット定数を名前で参照しているパックは**固有のメッセージ付きで検証に失敗**します (アナライザが両方の場合を説明するようになった) ので、暗黙に誤動作することはありません — ただし移植するまでロードを拒否され続けます。
@@ -45,7 +45,7 @@ v4 からの変換は**ほぼ機械的**です ([移行チェックリスト](..
 - **名前で書いたパック (`bloxdTextureIdLava`) はドリフトを生き延びる** (ローダが読み込み時に生レジストリへ再解決するため)
 - **生 id で書いたパック (`19` と書く) は再検証で壊れる**
 
-詳細は [Engine Internals: Texture Registry](../internals/texture-registry.md) を参照。
+詳細は [エンジン内部: Texture Registry](../internals/texture-registry.md) を参照。
 
 ## 実行環境との互換性
 
@@ -65,5 +65,5 @@ v4 からの変換は**ほぼ機械的**です ([移行チェックリスト](..
 
 ## 関連
 
-- v4 → v5 移行チェックリスト → [Version History: v5](../history/v5.md)
-- 各バージョンの変更点一覧 → [Version History](../history/)
+- v4 → v5 移行チェックリスト → [バージョン履歴: v5](../history/v5.md)
+- 各バージョンの変更点一覧 → [バージョン履歴](../history/)

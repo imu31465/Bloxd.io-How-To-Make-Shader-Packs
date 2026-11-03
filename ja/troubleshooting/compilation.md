@@ -55,5 +55,5 @@
 ## 関連
 
 - [検証エラー](validation.md) — 静的検証 (第1段階) のエラー
-- [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) — 2段階検証の内部
-- [API Reference: 制限と予約名](../api/restrictions.md)
+- [エンジン内部: WGSL Compilation](../internals/wgsl-compilation.md) — 2段階検証の内部
+- [APIリファレンス: 制限と予約名](../api/restrictions.md)

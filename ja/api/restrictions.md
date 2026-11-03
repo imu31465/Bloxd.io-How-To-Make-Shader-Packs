@@ -38,17 +38,17 @@
 
 ### bloxdSp* 名前空間 (46シンボル)
 
-生成器が注入でき、ゆえに再宣言できないシンボル群 (v5 で 27 から 46 へ増加):
+生成器が注入でき、ゆえに再宣言できない 46 個のシンボル群:
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-新しい名前は v5 の機能に直接対応します: `bloxdSpFlags` (フラグ構造体の経路)、`bloxdSpEnchant` / `bloxdSpItemLocalPosition` (新入力)、セル・サンプリングのテクスチャパック経路、回転連鎖、拡張フックの生成ローカルなど。**パックレベルの予約則はこのリストより広い** (`/^bloxd/i` に一致するすべて) なので、この一覧を暗記する必要はありません — `bloxd` で始まる名前を書かなければ安全です。
+フラグ構造体の経路 (`bloxdSpFlags`)、エンチャントとモデルローカルの入力 (`bloxdSpEnchant` / `bloxdSpItemLocalPosition`)、セル・サンプリングのテクスチャパック経路、回転連鎖、拡張フックの生成ローカルなどが該当します。**パックレベルの予約則はこのリストより広い** (`/^bloxd/i` に一致するすべて) なので、この一覧を暗記する必要はありません — `bloxd` で始まる名前を書かなければ安全です。
 
 ### テクスチャ名
 
 `bloxdTextureId` で始まる識別子はテクスチャ名定数として解決を試みられます (詳細は [テクスチャAPI](texture-api.md#bloxdtextureid-テクスチャ名定数))。
 
-## v5 で導入された自動書き換え
+## 自動書き換え
 
 - **Y 導関数の自動符号反転**: アナライザは `dpdy`、`dpdyCoarse`、`dpdyFine` のすべての呼び出しを `(-dpdy(...))` に書き換えます (バリデータのトークン書き換えパスで計測。dpdy 系が反転セットとして明示列挙)。スクリーン空間の y 軸は下向きのため、この反転によって «上方向への変化率» が直観と一致します。`dpdy(h)` は «h は上へ行くとどう変わるか» という意図で書けばよく、出力コードが反転を引き受けます。`dpdx` と `fwidth` 系は手つかずです
 
@@ -64,5 +64,5 @@
 
 ## 関連
 
-- エラーからの復帰手順 → [Troubleshooting](../troubleshooting/compilation.md)
-- バリデータの内部 → [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- エラーからの復帰手順 → [トラブルシューティング](../troubleshooting/compilation.md)
+- バリデータの内部 → [エンジン内部: Shader Validation](../internals/shader-validation.md)

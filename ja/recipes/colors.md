@@ -1,8 +1,8 @@
-# 色のレシピ
+# 色
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
 
-surface フックで色を加工する基本レシピ集。すべて [API Reference: 構造体](../api/structures.md) の `colour` 出力を書き換える形で動きます。
+surface フックで色を加工する基本レシピ集。すべて [APIリファレンス: 構造体](../api/structures.md) の `colour` 出力を書き換える形で動きます。
 
 
 ## 単色ティント (最も基本)
@@ -84,4 +84,4 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 
 - [ライティングのレシピ](lighting.md) — light フック側の色調整
 - [数式小技集](math.md) — 彩度・色温度の計算部品
-- [API Reference: 入出力構造体](../api/structures.md)
+- [APIリファレンス: 入出力構造体](../api/structures.md)

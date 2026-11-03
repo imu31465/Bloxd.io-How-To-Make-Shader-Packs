@@ -1,23 +1,26 @@
 {
   "index": {
-    "title": "Engine Internals & Research",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "エンジン内部と研究",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "rendering-pipeline": "レンダリングパイプライン",
   "hook-invocation": "フック呼び出しの内部",
   "engine-header": "エンジンヘッダ (逐語)",
-  "shader-validation": "Shader Validation",
-  "wgsl-compilation": "WGSL Compilation",
+  "shader-validation": "シェーダー検証の内部",
+  "wgsl-compilation": "WGSL コンパイルの内部",
   "reserved-identifiers": "予約識別子の内部",
-  "lighting-internals": "Lighting Internals",
-  "fog-internals": "Fog Internals",
+  "lighting-internals": "ライティングの内部",
+  "fog-internals": "フォグの内部仕様",
   "texture-sampling": "テクスチャサンプリングの内部",
   "texture-registry": "テクスチャレジストリの内部",
   "model-rendering": "モデル描画の内部",
   "engine-data": "エンジンデータ台帳",
   "testing-factors": "パックに見える値を変えるもの",
-  "policy": "ゲーム別の適用モード",
+  "policy": "ゲーム別の適用ポリシー",
   "sun-and-moon": "太陽と月の正体",
-  "debugging": "デバッグ手段",
+  "debugging": "デバッグツール",
   "research-log": "リサーチログ"
 }

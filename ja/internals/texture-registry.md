@@ -47,10 +47,10 @@
 
 ## 過去のドリフト記録
 
-10月の2ビルド比較 (sjr0p7 → cnty9、10日間): エントリ 1200 → 1219 (98 追加・79 削除)、改名されなかった 1121 名中 **779 名が id を変更** (69%)、命名規約の移行 (`_rot1..4` 接尾辞 → `[rot[1..4` スロット)、ダブルチェストの登場。詳細な経緯は [Version History: v4](../history/v4.md) に当時の記録があります。
+10月の2ビルド比較 (sjr0p7 → cnty9、10日間): エントリ 1200 → 1219 (98 追加・79 削除)、改名されなかった 1121 名中 **779 名が id を変更** (69%)、命名規約の移行 (`_rot1..4` 接尾辞 → `[rot[1..4` スロット)、ダブルチェストの登場。詳細な経緯は [バージョン履歴: v4](../history/v4.md) に当時の記録があります。
 
 ## 関連
 
 - [テクスチャカタログ](../api/texture-catalog.md) — 896名の一覧
-- [Shader Validation](shader-validation.md) — HEADER_VERSION
-- [Research Log](research-log.md) — 計測手法の記録
+- [シェーダー検証の内部](shader-validation.md) — HEADER_VERSION
+- [リサーチログ](research-log.md) — 計測手法の記録

@@ -1,4 +1,4 @@
-# 頂点のレシピ (allow 限定)
+# 頂点 (allow 限定)
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
 
@@ -6,7 +6,7 @@ vertex フックによる頂点移動。**すべて `#ifndef BLOXD_STRICT` で�
 
 
 > すべて `#ifndef BLOXD_STRICT` で囲むこと。
-> 実行条件の詳細 (allow のタイトル一覧・Custom Games は strict) は [Engine Internals: ゲーム別の適用モード](../internals/policy.md) を参照
+> 実行条件の詳細 (allow のタイトル一覧・Custom Games は strict) は [エンジン内部: ゲーム別の適用モード](../internals/policy.md) を参照
 
 ## 草が風に揺れる (上端だけ動かす)
 
@@ -68,4 +68,4 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ## 関連
 
 - [バリアントとガード](../getting-started/variants.md)
-- [Engine Internals: ゲーム別の適用モード](../internals/policy.md)
+- [エンジン内部: ゲーム別の適用モード](../internals/policy.md)

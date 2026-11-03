@@ -1,8 +1,8 @@
-# エンジンデータ台帳 (v5 計測値)
+# エンジンデータ台帳
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03、本番 = preprod、バイト同一) · 検証状況: Verified
 
-本ドキュメントの計測台帳の v5 行 — すべて `ab90qa` で計測した確定値の一覧です。
+本ドキュメントの計測台帳 — 現行対象ビルド `ab90qa` で計測した確定値の一覧です。
 
 ## 台帳
 
@@ -17,7 +17,7 @@
 | パックバインディング | group 3: 0 uniform · 1 シーン深度 (liquid) · 2 `bloxdSpTextureLayers` ストレージ |
 | フラグ | `BloxdFlags` 構造体、14 bool。v4 のビット値は引退 |
 | ローダ制限 | 256 `.wgsl` / 256 KB ソース / 64 KB `pack.json` / 32 MB zip / 1,024 エントリ。UTF-8、マニフェスト 1 つ、パス一意 — すべて不変 |
-| テクスチャレジストリ | 1,210 エントリ → **896 利用可能名**。cnty9 比ドリフト +1/−10 ([Texture Registry](texture-registry.md)) |
+| テクスチャレジストリ | 1,210 エントリ → **896 利用可能名**。cnty9 比ドリフト +1/−10 ([テクスチャレジストリの内部](texture-registry.md)) |
 | 光カーブ | 0〜15 レベル → 0〜1、ease-out カーブ (`6 → 0.45`、`12 → 0.92`) — ヘッダー内、不変 |
 | リフトカーブ | `1 - (1 - x / (3 - 2x))^3` — 不変 (現在チャンク c9) |
 | 方向性コーン | `0.12 / 0.65 / 0.62 / 0.95` — 不変 (チャンク c9) |
@@ -38,11 +38,11 @@
 
 ## 過去バージョンの台帳
 
-- v4 (cnty9、2026-10-27) の台帳 → [Version History: v4](../history/v4.md)
-- v3 (3ymzdd、2026-10-19) の確定値 → [Version History: v3](../history/v3.md)
+- v4 (cnty9、2026-10-27) の台帳 → [バージョン履歴: v4](../history/v4.md)
+- v3 (3ymzdd、2026-10-19) の確定値 → [バージョン履歴: v3](../history/v3.md)
 
 ## 関連
 
-- [Research Log](research-log.md) — 計測手法
+- [リサーチログ](research-log.md) — 計測手法
 - [Engine Header](engine-header.md) — ヘッダー全文
 - [Policy](policy.md) — allow/strict タイトル

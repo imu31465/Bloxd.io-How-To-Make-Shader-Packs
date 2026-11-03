@@ -64,5 +64,5 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ## 関連
 
 - [コンパイルエラー](../troubleshooting/compilation.md) — ユーザー向け対処
-- [Shader Validation](shader-validation.md) — 第1段階 (静的検証)
+- [シェーダー検証の内部](shader-validation.md) — 第1段階 (静的検証)
 - [Getting Started: 検証](../getting-started/validation.md) — 検証の流れ

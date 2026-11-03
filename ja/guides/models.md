@@ -71,4 +71,4 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 内部のしくみ
 
-モデルがどうレンダリングされ、フラグやエンチャント入力がどう流れるかは [Engine Internals: Model Rendering](../internals/model-rendering.md) に、生成コードに現れる `bloxdSpItemLocalPosition` や `bloxdSpEnchant` といった内部シンボルは [予約識別子](../api/restrictions.md) を参照。
+モデルがどうレンダリングされ、フラグやエンチャント入力がどう流れるかは [エンジン内部: Model Rendering](../internals/model-rendering.md) に、生成コードに現れる `bloxdSpItemLocalPosition` や `bloxdSpEnchant` といった内部シンボルは [予約識別子](../api/restrictions.md) を参照。

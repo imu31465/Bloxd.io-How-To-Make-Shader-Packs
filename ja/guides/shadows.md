@@ -69,5 +69,5 @@ let lit = sunL * sky;
 ## 関連
 
 - [リアル系レシピ](../recipes/realism.md) — 投影風シャドウの完全実装 (R9.12)
-- [Engine Internals: Lighting Internals](../internals/lighting-internals.md) — blockLight / skyLight の内部構造
+- [エンジン内部: Lighting Internals](../internals/lighting-internals.md) — blockLight / skyLight の内部構造
 - [デバッグのコツ](debugging.md) — 「影が濃くならない」系の問題の診断

@@ -46,10 +46,10 @@
 ## 影・フォグの原理を確認したい
 
 - 影: [影の表現](../guides/shadows.md) — skyLight = ボクセル影マップ
-- フォグ: [Engine Internals: Fog Internals](../internals/fog-internals.md) — linear 固定・地平線専用の実測
+- フォグ: [エンジン内部: Fog Internals](../internals/fog-internals.md) — linear 固定・地平線専用の実測
 
 ## 関連
 
 - [ライティングAPI](../api/lighting.md) — 入力の保証と処理順序
 - [視覚の問題](visual.md) — 白濁・白飛び系
-- [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [エンジン内部: Lighting Internals](../internals/lighting-internals.md)

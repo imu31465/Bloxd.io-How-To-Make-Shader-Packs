@@ -18,7 +18,7 @@ const bloxdChunkSize: i32 = 32;
 |---|---|---|---|
 | `bloxdPi` | `f32` | 3.1415926535898 | 円周率 |
 | `bloxdTau` | `f32` | 6.2831853071796 | 2π (周期計算に便利) |
-| `bloxdChunkSize` | `i32` | 32 | チャンクの1辺のブロック数 (**v5 で新設**) |
+| `bloxdChunkSize` | `i32` | 32 | チャンクの1辺のブロック数 |
 
 ## 使い方
 
@@ -33,7 +33,7 @@ fn sway(worldPos: vec3f, time: f32) -> f32 {
 }
 ```
 
-### bloxdChunkSize — v5 の新設
+### bloxdChunkSize
 
 以前はエンジン側のマジックナンバーだった「チャンクは 32 ブロック角」が、分岐に使える名前付き定数になりました。チャンク周期の効果 (市松模様、チャンク境界の演出) に使えます:
 
@@ -55,4 +55,4 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ## 関連
 
 - 定数以外のヘッダー関数 → [関数](functions.md)
-- v3 で `bloxdPi` / `bloxdTau` が導入された経緯 → [Version History: v3](../history/v3.md)
+- v3 で `bloxdPi` / `bloxdTau` が導入された経緯 → [バージョン履歴: v3](../history/v3.md)

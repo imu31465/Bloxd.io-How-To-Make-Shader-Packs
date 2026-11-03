@@ -31,7 +31,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> エンジンヘッダー (定数・構造体・関数の宣言一式) は読み込み時にパックの先頭へ自動付与されるため、自分で書く必要はありません。ヘッダー全文は [Engine Internals](../internals/engine-header.md) で確認できます。
+> エンジンヘッダー (定数・構造体・関数の宣言一式) は読み込み時にパックの先頭へ自動付与されるため、自分で書く必要はありません。ヘッダー全文は [エンジン内部と研究](../internals/engine-header.md) で確認できます。
 
 ## 2. ゲームに読み込ませる
 
@@ -51,6 +51,6 @@ zip に固めて配布します。詳細は [配布](distribution.md) を参照�
 
 ## つまずいたら
 
-- エラーの意味と直し方 → [Troubleshooting](../troubleshooting/)
+- エラーの意味と直し方 → [トラブルシューティング](../troubleshooting/)
 - フックの書き方 → [シェーダーフック](hooks.md)
 - 最初から全部の9フックを含むテンプレート → 次の [シェーダーフック](hooks.md) に全文があります

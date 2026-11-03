@@ -33,4 +33,4 @@
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-v1〜v4 からの移行手順は [Version History](../history/) を参照してください。
+v1〜v4 からの移行手順は [バージョン履歴](../history/) を参照してください。

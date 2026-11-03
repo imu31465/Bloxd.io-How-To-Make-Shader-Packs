@@ -43,7 +43,7 @@
 - **重要**: これはエラー表示ではなく **strict ゲームでの自動無効化** (`shaderPack:offInStrict`)。該当 strict ゲームで**全フック**が無効になる
 - **解決方法**: vertex フック全体と `discard` を `#ifndef BLOXD_STRICT` で囲む ([バリアントとガード](../getting-started/variants.md))
 
-## v5 で追加・変更された検証メッセージ
+## 現行バージョンの検証メッセージ
 
 | メッセージ | 対応 |
 |---|---|
@@ -59,6 +59,6 @@ v5 のアナライザは `blockFlags` を読み続けるパックや light フ�
 
 ## 関連
 
-- [API Reference: 制限と予約名](../api/restrictions.md) — 予約則の全体と `bloxdSp*` 46シンボル
-- [Engine Internals: Shader Validation](../internals/shader-validation.md) — バリデータの内部動作
+- [APIリファレンス: 制限と予約名](../api/restrictions.md) — 予約則の全体と `bloxdSp*` 46シンボル
+- [エンジン内部: Shader Validation](../internals/shader-validation.md) — バリデータの内部動作
 - [バリアント固有の問題](variants.md)

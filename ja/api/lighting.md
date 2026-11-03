@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` は 0〜1 にマップ済み**: 0〜15 の光レベルを ease-out カーブで写した値 (例: `6 → 0.45`、`12 → 0.92`)。3つとも `ambientLightColour` を含まない
 - **リフト曲線**: `skyLight` の実体は「その場所から空が見えるか」のボクセル遮蔽データ (= 影マップ)。しきい値で日向/影を分離したい場合は逆変換が必要な場合がある ([リアル化ガイド](../guides/realism.md) 参照)
-- **フォグの内部**: linear モードでは `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (0..1 クランプ)。ビュー空間距離は頂点単位で計算・補間。現行ビルドは linear 固定 (詳細は [Engine Internals: Fog Internals](../internals/fog-internals.md))
+- **フォグの内部**: linear モードでは `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (0..1 クランプ)。ビュー空間距離は頂点単位で計算・補間。現行ビルドは linear 固定 (詳細は [エンジン内部: Fog Internals](../internals/fog-internals.md))
 
 ## 実装例
 
@@ -187,4 +187,4 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - 関数のシグネチャ一覧 → [関数](functions.md)
 - ライティングの作り方・影・夜間の設計 → [Guides](../guides/lighting.md)
-- blockLight / heldLight の内部構造、リフト曲線 → [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- blockLight / heldLight の内部構造、リフト曲線 → [エンジン内部: Lighting Internals](../internals/lighting-internals.md)

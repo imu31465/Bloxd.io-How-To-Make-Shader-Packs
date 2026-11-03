@@ -60,4 +60,4 @@
 
 - [テクスチャAPI](../api/texture-api.md) — 仕様の全体
 - [テクスチャカタログ](../api/texture-catalog.md) — 896名の検索可能な一覧
-- [Engine Internals: Texture Registry](../internals/texture-registry.md) — レジストリとドリフトの内部
+- [エンジン内部: Texture Registry](../internals/texture-registry.md) — レジストリとドリフトの内部

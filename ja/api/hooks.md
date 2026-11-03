@@ -63,7 +63,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `bloxdTextureSize` | Surface / Light のみ | — |
 | `bloxdOpaqueBehind` | Surface / Light のみ (Liquid バリアントで意味を持つ) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` は v5 で削除されました (v4 までは Vertex フックからも呼べる唯一の特殊関数でした)。代替はありません — 「どのブロックか」が必要なら `flags` を検査します。
+> `bloxdFragmentBlockPosition` はドキュメントされたヘッダーから外れましたが、エンジンは今も注入して受け入れています — [関数: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--非公開だが今も注入される) を参照。Vertex フックから呼べる唯一の特殊関数でした。新規コードでは「どのブロックか」に `flags` を使ってください。
 
 ## フォールバックとコード共有
 
@@ -90,4 +90,4 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - 9フックを同梱した公式デフォルトテンプレート → [Getting Started: シェーダーフック](../getting-started/hooks.md)
 - 各構造体の全フィールド → [入出力構造体](structures.md)
-- フック呼び出しの内部処理 → [Engine Internals: Hook Invocation](../internals/hook-invocation.md)
+- フック呼び出しの内部処理 → [エンジン内部: Hook Invocation](../internals/hook-invocation.md)

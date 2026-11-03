@@ -2,7 +2,7 @@
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (ライブローダから再計測)
 
-パックモデルの全体像 — マニフェスト、ローダ制限、per-frame uniform — を1ページにまとめます。入門向きの手順は [Getting Started](../getting-started/manifest.md) を参照。
+パックモデルの全体像 — マニフェスト、ローダ制限、per-frame uniform — を1ページにまとめます。入門向きの手順は [はじめに](../getting-started/manifest.md) を参照。
 
 ## pack.json
 
@@ -72,5 +72,5 @@ group 3 のバインディングは:
 ## 関連
 
 - 読み込み時の検証パイプライン → [Getting Started: 検証](../getting-started/validation.md)
-- uniform の内部 → [Engine Internals: Engine Data](../internals/engine-data.md)
-- 旧バージョンの uniform (v2〜v4) → [Version History](../history/)
+- uniform の内部 → [エンジン内部: Engine Data](../internals/engine-data.md)
+- 旧バージョンの uniform (v2〜v4) → [バージョン履歴](../history/)

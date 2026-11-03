@@ -24,6 +24,6 @@
 
 ## 関連
 
-- [ライティングAPI](../api/lighting.md) — v5 で公開された照明関数
+- [ライティングAPI](../api/lighting.md) — 公開されている照明関数
 - [リアル系レシピ](../recipes/realism.md) — 実装例
-- [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [エンジン内部: Lighting Internals](../internals/lighting-internals.md)

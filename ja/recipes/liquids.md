@@ -1,4 +1,4 @@
-# 液体のレシピ
+# 液体
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
 
@@ -23,7 +23,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 高度を使った透明度の疑似変化 (本当の浅瀬判定ではない)
 
-> 液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れます (`#ifdef BLOXD_SCENE_DEPTH` ガード付き、[API Reference](../api/functions.md#bloxdopaquebehind))。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
+> 液体限定で `bloxdOpaqueBehind()` により奥の不透明面までの厚みが測れます (`#ifdef BLOXD_SCENE_DEPTH` ガード付き、[APIリファレンス](../api/functions.md#bloxdopaquebehind))。以下はそれを使わない旧来の疑似演出で、`s.position.y` はローカル座標なので、そのまま使うと座標原点の変化で効果がずれる。ワールド高度を使う場合は `bloxdWorldPosition()` で変換する。以下はワールド高度を使ってアルファを変えるだけの疑似演出で、海岸線や水底に沿った浅瀬表現ではない。`packWaterReferenceY` はワールド高度に合わせて調整する。
 
 ```wgsl
 const packWaterReferenceY: f32 = 0.0;
@@ -65,4 +65,4 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 - [水を自然に見せる方法](../guides/water.md) — 統合レシピ
 - [頂点のレシピ](vertices.md) — 液面の波 (allow 限定)
-- [API Reference: シェーダーフック](../api/hooks.md)
+- [APIリファレンス: シェーダーフック](../api/hooks.md)

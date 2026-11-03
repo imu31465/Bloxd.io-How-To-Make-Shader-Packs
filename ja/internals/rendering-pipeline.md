@@ -1,4 +1,4 @@
-# レンダリングパイプラインの細部
+# レンダリングパイプライン
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
 
@@ -75,5 +75,5 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ## 関連
 
 - [パック形式](../api/pack-format.md)
-- [Engine Data](engine-data.md)
-- [Shader Validation](shader-validation.md)
+- [エンジンデータ台帳](engine-data.md)
+- [シェーダー検証の内部](shader-validation.md)

@@ -1,4 +1,4 @@
-# 照明のレシピ
+# 照明
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Verified (v5 移植済み — 動作は同一ビルドで実機確認を推奨)
 
@@ -60,7 +60,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 夜の青い環境光 (月の方向を使わない擬似表現)
 
-> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定。[第七部](../internals/) R-A)。
+> このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定 — [太陽と月の正体](../internals/sun-and-moon.md))。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -115,6 +115,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## 関連
 
-- [ライティングAPI](../api/lighting.md) — v5 で公開されたエンジンの照明レシピ
+- [ライティングAPI](../api/lighting.md) — エンジンの照明レシピ
 - [リアル系レシピ](realism.md) — 物理ベースの再照明
 - [夜間表現の設計](../guides/night.md)

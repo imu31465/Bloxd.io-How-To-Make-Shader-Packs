@@ -1,4 +1,4 @@
-# blockLight / heldLight の内部構造
+# ライティングの内部
 
 > 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
 
@@ -19,4 +19,4 @@
 
 - [影の表現](../guides/shadows.md) — skyLight = ボクセル影マップ
 - [ライティングAPI](../api/lighting.md)
-- [Engine Data](engine-data.md)
+- [エンジンデータ台帳](engine-data.md)

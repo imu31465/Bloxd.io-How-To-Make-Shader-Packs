@@ -16,5 +16,5 @@
 ## 関連
 
 - [実機テストのチェックリスト](../guides/testing.md)
-- [Engine Data](engine-data.md)
+- [エンジンデータ台帳](engine-data.md)
 - [デバッグ手段](debugging.md)

@@ -2,7 +2,7 @@
 
 > 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
-パックから読み書きできる構造体は7つです。すべてのフィールドを以下に掲載します (`#ifdef` で囲まれたフィールドはバリアントにより存在が変わる条件付きフィールド)。ヘッダー全文は [Engine Internals: Engine Header](../internals/engine-header.md) を参照。
+パックから読み書きできる構造体は7つです。すべてのフィールドを以下に掲載します (`#ifdef` で囲まれたフィールドはバリアントにより存在が変わる条件付きフィールド)。ヘッダー全文は [エンジン内部: Engine Header](../internals/engine-header.md) を参照。
 
 ## BloxdVertexIn (頂点フックの入力)
 

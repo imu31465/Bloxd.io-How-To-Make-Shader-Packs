@@ -1,4 +1,4 @@
-# リサーチログ (Research Log)
+# リサーチログ
 
 > 検証状況: Verified — 本ドキュメントの実測値がどう得られたかの記録
 
@@ -30,7 +30,7 @@ c55 のヘッダーテンプレート文字列から、ライブ補間 (`${vC}` 
 
 ### テクスチャレジストリの再計算
 
-出荷ブロックレジストリのテクスチャデータに対して、エンジンのレジストリ構築モジュール (29833 + 1371 + 1391 + 1384 + 219) をミニ webpack ハーネスで実行。出力 (named 896 / aliases 416 / layers 228) を記録 ([Texture Registry](texture-registry.md))。
+出荷ブロックレジストリのテクスチャデータに対して、エンジンのレジストリ構築モジュール (29833 + 1371 + 1391 + 1384 + 219) をミニ webpack ハーネスで実行。出力 (named 896 / aliases 416 / layers 228) を記録 ([テクスチャレジストリの内部](texture-registry.md))。
 
 アニメーション間隔は `animDataPerTex` 形式のテーブル (レイヤーごとの `numAnimStates` / `animationInterval`) から抽出 — 間隔は 200 / 250 / 300 ms の 3 値のみ ([テクスチャカタログ](../api/texture-catalog.md#アニメ族-42-名))。
 
@@ -44,7 +44,7 @@ c55 のヘッダーテンプレート文字列から、ライブ補間 (`${vC}` 
 
 ### uniform / パイプラインの復元
 
-uniform レイアウトモジュール (29838) から `BloxdPackInputs` のフィールド・オフセット・型を復元。WebGPU コード生成器 (c56) からテクスチャ 3 バリアントの生成 WGSL を復元 ([Texture Sampling](texture-sampling.md))。
+uniform レイアウトモジュール (29838) から `BloxdPackInputs` のフィールド・オフセット・型を復元。WebGPU コード生成器 (c56) からテクスチャ 3 バリアントの生成 WGSL を復元 ([テクスチャサンプリングの内部](texture-sampling.md))。
 
 ## ドリフトの観測履歴
 
@@ -57,7 +57,7 @@ uniform レイアウトモジュール (29838) から `BloxdPackInputs` のフ�
 
 - ピクセル精度のシャドウマップは「将来の実装予定」の**解釈**である (照明テンプレートの未使用 `var shadow: f32 = 1.;` からの推論)
 - allow/strict の配分はビルドごとに変わりうる (ab90qa で 12 タイトルの同一性を再確認済みだが、将来の追加ゲームは未知)
-- `bloxdFragmentBlockPosition` がシグネチャ表に残存している理由 (v5 でヘッダーからは削除済み) は未分析 — 単なる掃除忘れと推測されるが確認していない
+- `bloxdFragmentBlockPosition` (v5 のヘッダーからは外れた): シグネチャ表のエントリとランタイム注入の両方が現行ビルドで生存していることを確認済み — 呼び出しは検証もコンパイルも通る。エンジン側が維持する意図を持つかは不明
 
 ## 再検証の推奨タイミング
 
@@ -66,6 +66,6 @@ uniform レイアウトモジュール (29838) から `BloxdPackInputs` のフ�
 
 ## 関連
 
-- [Engine Data](engine-data.md) — v5 の確定値台帳
-- [Texture Registry](texture-registry.md)
-- [Version History](../history/) — 各バージョンの移行ガイド (当時の計測を記録)
+- [エンジンデータ台帳](engine-data.md) — 現行ビルドの確定値台帳
+- [テクスチャレジストリの内部](texture-registry.md)
+- [バージョン履歴](../history/) — 各バージョンの移行ガイド (当時の計測を記録)

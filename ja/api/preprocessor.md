@@ -79,4 +79,4 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ## 関連
 
 - バリアントの数と意味 → [Getting Started: バリアントとガード](../getting-started/variants.md)
-- バリデータがマクロを検証する仕組み → [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- バリデータがマクロを検証する仕組み → [エンジン内部: Shader Validation](../internals/shader-validation.md)

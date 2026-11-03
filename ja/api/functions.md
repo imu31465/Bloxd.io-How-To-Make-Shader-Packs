@@ -89,9 +89,19 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **戻り値**: ワールド座標 (`position + vec3f(bloxdRenderOffset())`)
 - **注意**: f32 の精度限界があるため、遠くの座標では誤差が出うる (ヘッダー注記: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — 削除
+### bloxdFragmentBlockPosition — 非公開だが今も注入される
 
-v4 まで存在した `bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i` は **v5 で代替なしで削除**されました。フラグメントの位置と法線からブロックの世界位置を復元するための関数でしたが、`flags` と `uv` とモデル入力の間に残された利用者はなく、連続値なら `bloxdWorldPosition()` がカバーします。呼び出し箇所は削除してください。
+```wgsl
+fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
+```
+
+この関数は**ドキュメントされたヘッダーにはもう含まれません** (v4 までは含まれていた) が、エンジンは今も受け入れ、定義も注入し続けています:
+
+- **バリデータ**: 生きたシグネチャ表にまだ載っているため、名前検証は全フック (Vertex フックを含む) で通る
+- **ランタイム**: コードジェネレーターは地形/液体モジュールとモデル両プログラムに今も定義を注入する — 地形/液体は `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`、モデルは 1/64 ブロックオフセットで設置済みブロックモデルはセルにスナップする変種
+- **注意**: 非公開の内部関数なので、将来のバージョンで予告なく消える可能性がある — 連続値には `bloxdWorldPosition()`、「どのブロックか」には `flags` を使うこと (ヘッダーからの除外の経緯: [バージョン履歴: v5](../history/v5.md))
+
+v4 向けに書いて呼び出しているパックはそのまま動きます。新規コードでは採用しないでください。
 
 ## デフォルト関数 (エンジンの既定挙動)
 
@@ -121,7 +131,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 文字通り «エンジンのレシピを適用し、emission 加算の結果にフォグをかける»。
 
-## ライティングレシピ関数 (v5 で公開)
+## ライティングレシピ関数
 
 v4 作者が手で再導出し続けてきたエンジン自身のライティングが、呼び出し可能な WGSL として文書化されました。各関数の解説と処理フロー図は [ライティング](lighting.md) を参照。
 
@@ -145,7 +155,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **ガード**: `#ifdef BLOXD_SCENE_DEPTH` で囲む (Liquid バリアントでのみ定義)
 - **意味**: このフラグメントの奥にある不透明な面 (水越しの地形)。空 (何もない) では `hit == false`
 - **v2 からの改名**: `found` → `hit`
-- **詳説**: [Version History: v3](../history/v3.md) の "bloxdOpaqueBehind: 正確な実装" と [Engine Internals](../internals/rendering-pipeline.md)
+- **詳説**: [バージョン履歴: v3](../history/v3.md) の "bloxdOpaqueBehind: 正確な実装" と [エンジン内部と研究](../internals/rendering-pipeline.md)
 
 ## 関連
 

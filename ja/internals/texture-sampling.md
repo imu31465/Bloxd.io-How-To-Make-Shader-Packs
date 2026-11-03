@@ -60,5 +60,5 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ## 関連
 
 - [テクスチャAPI](../api/texture-api.md) — 公開仕様の側
-- [Texture Registry](texture-registry.md) — 名前→id の解決
-- [Rendering Pipeline](rendering-pipeline.md) — 頂点フォーマットとアトラス
+- [テクスチャレジストリの内部](texture-registry.md) — 名前→id の解決
+- [レンダリングパイプライン](rendering-pipeline.md) — 頂点フォーマットとアトラス

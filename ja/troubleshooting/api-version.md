@@ -16,8 +16,8 @@
 
 - **症状**: `loadWrongApiVersion`
 - **原因**: `apiVersion` はあるが `5` に等しくない (v1〜v4 のパック)
-- **解決方法**: 対象バージョンに応じた移行手順を適用する ([Version History](../history/)):
-  - v4 → v5: [v5 移行ガイド](../history/v5.md) — ほぼ機械的 (flags・`bloxdLit()`・`bloxdFragmentBlockPosition` 削除)
+- **解決方法**: 対象バージョンに応じた移行手順を適用する ([バージョン履歴](../history/)):
+  - v4 → v5: [v5 移行ガイド](../history/v5.md) — ほぼ機械的 (flags・`bloxdLit()`・`bloxdFragmentBlockPosition` の注意点)
   - v3 → v5: v4 の変更 ([v4](../history/v4.md)) を経由
   - v2 以前 → v5: v3 ([v3](../history/v3.md)) → v4 → v5 と段階適用
 - **再発防止**: API が更新されたらドキュメントの [互換性](../api/compatibility.md) と該当バージョンの移行ガイドを確認する
@@ -44,10 +44,10 @@
 |---|---|---|
 | `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` の使用 | `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` に書き換え |
 | `bloxdBlockFlagRock isn't part of the shader pack API...` (予約名診断) | 旧ビット定数の残存参照 | `surface.flags.rock` 等へ (1対1対応表は [フラグ](../api/flags.md)) |
-| `bloxdFragmentBlockPosition` が無い | v5 で削除済み | 呼び出し箇所を削除 (代替なし — 必要なら `flags` で判定) |
+| `bloxdFragmentBlockPosition` が無い | v5 からはドキュメントされたヘッダーにない (注入と受け入れは継続 — [関数](../api/functions.md) 参照) | 修正不要: コンパイルは通る。新規コードには `flags` / `bloxdWorldPosition()` を推奨 |
 
 ## 関連
 
 - [互換性](../api/compatibility.md) — バージョン間運用の全体
-- [Version History](../history/) — v1〜v5 の移行ガイド
+- [バージョン履歴](../history/) — v1〜v5 の移行ガイド
 - [pack.json](../getting-started/manifest.md) — マニフェストの全フィールド
