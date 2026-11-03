@@ -1,23 +1,23 @@
-# Distribution
+# वितरण
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-## Release format
+## रिलीज़ प्रारूप
 
-1. Zip with `pack.json` at the root, within the size limits ([Pack structure](pack-structure.md))
-2. Verify `pack.json` sits at the zip root (a single common root folder is stripped automatically)
-3. Polish `name` / `author` for release
+1. `pack.json` रूट में रखकर zip बनाएँ, आकार सीमाओं के भीतर ([पैक संरचना](pack-structure.md))
+2. जाँचें कि `pack.json` zip के रूट में ही है (एक ही साझा रूट फ़ोल्डर अपने आप हट जाता है)
+3. रिलीज़ के लिए `name` / `author` को निखारें
 
-## Pre-release checklist
+## रिलीज़-पूर्व चेकलिस्ट
 
-- [ ] `apiVersion: 5` (number, not string)
-- [ ] All 6 variants pass validation (empty error list on the loader screen)
-- [ ] Verified visually in both an allow game and a strict game
-- [ ] Vertex-animation / `discard` packs clearly marked allow-only
-- [ ] Tested games and date noted in the release notes (builds change)
+- [ ] `apiVersion: 5` (संख्या, स्ट्रिंग नहीं)
+- [ ] सभी 6 वेरिएंट सत्यापन पास करते हैं (लोडर स्क्रीन पर खाली त्रुटि सूची)
+- [ ] allow गेम और strict गेम दोनों में दृश्य सत्यापन पूरा
+- [ ] vertex-एनिमेशन / `discard` वाले पैक साफ़ तौर पर allow-only चिह्नित
+- [ ] टेस्ट किए गए गेम और तारीख़ रिलीज़ नोट्स में दर्ज (बिल्ड बदलते रहते हैं)
 
-## After release
+## रिलीज़ के बाद
 
-- Player-saved packs re-validate automatically when engine header or texture registry change with a game update
-- **Packs distributed as v1–v4 become silently inactive** on v5 (see [pack.json](manifest.md)) — players only see the status line, so publish and announce an updated version
-- When the API updates, follow [Version History](../history/) migration steps, bump, and re-release
+- गेम अपडेट के साथ इंजन हेडर या टेक्सचर रजिस्ट्री बदलने पर प्लेयर के सेव किए पैक अपने आप दोबारा सत्यापित होते हैं
+- **v1–v4 के रूप में वितरित पैक v5 पर चुपचाप निष्क्रिय हो जाते हैं** (देखें [pack.json](manifest.md)) — प्लेयर को केवल स्थिति-पंक्ति दिखती है, इसलिए अपडेट किया हुआ संस्करण प्रकाशित करके घोषित भी करें
+- API अपडेट होने पर [संस्करण इतिहास](../history/) के माइग्रेशन चरण अपनाएँ, संस्करण बढ़ाएँ, और दोबारा रिलीज़ करें

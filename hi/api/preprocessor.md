@@ -1,20 +1,20 @@
-# Preprocessor
+# प्रीप्रोसेसर
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
 
-Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#ifndef` / `#else` / `#endif`. The `#` goes at the start of a line (inside functions is fine). Flag-name matching is case-insensitive; a wrong `#ifdef` name makes the error message list the official set.
+कंडीशनल कंपाइलेशन केवल `#define NAME` (बिना मान) / `#ifdef` / `#ifndef` / `#else` / `#endif` को समर्थन देता है। `#` पंक्ति की शुरुआत में लगता है (फ़ंक्शन के भीतर होना भी ठीक है)। फ़्लैग-नाम मिलान केस-असंवेदनशील है; ग़लत `#ifdef` नाम लिखने पर त्रुटि संदेश आधिकारिक सेट की सूची दिखाता है।
 
-## Defined macros (3)
+## परिभाषित मैक्रो (3)
 
-| Macro | Defined in | Typical use |
+| मैक्रो | कहाँ परिभाषित | सामान्य उपयोग |
 |---|---|---|
-| `BLOXD_STRICT` | strict-game variants (strict.terrain / strict.liquid / strict.model) | `#ifndef BLOXD_STRICT` around whole vertex hooks and `discard` |
-| `BLOXD_ALPHA` | variants where `BloxdSurface.alpha` exists — all liquid + non-strict terrain/model | wrap alpha-touching code |
-| `BLOXD_SCENE_DEPTH` | all liquid variants | wrap `bloxdOpaqueBehind()` calls |
+| `BLOXD_STRICT` | strict-गेम वेरिएंट (strict.terrain / strict.liquid / strict.model) | पूरे वर्टेक्स हुकों और `discard` के चारों ओर `#ifndef BLOXD_STRICT` |
+| `BLOXD_ALPHA` | वे वेरिएंट जहाँ `BloxdSurface.alpha` मौजूद है — सभी लिक्विड + नॉन-strict टेरेन/मॉडल | alpha छूने वाले कोड को रैप करें |
+| `BLOXD_SCENE_DEPTH` | सभी लिक्विड वेरिएंट | `bloxdOpaqueBehind()` कॉल को रैप करें |
 
-## Macro × variant matrix
+## मैक्रो × वेरिएंट मैट्रिक्स
 
-| Variant | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
+| वेरिएंट | `BLOXD_STRICT` | `BLOXD_ALPHA` | `BLOXD_SCENE_DEPTH` |
 |---|---|---|---|
 | `allow.terrain` | – | ✓ | – |
 | `allow.liquid` | – | ✓ | ✓ |
@@ -23,42 +23,42 @@ Conditional compilation supports only `#define NAME` (no value) / `#ifdef` / `#i
 | `strict.liquid` | ✓ | ✓ | ✓ |
 | `strict.model` | ✓ | – | – |
 
-Terrain / liquid / model differences are **separate programs, not macros** — `#ifdef BLOXD_TERRAIN` does not exist.
+टेरेन / लिक्विड / मॉडल के अंतर **अलग प्रोग्राम हैं, मैक्रो नहीं** — `#ifdef BLOXD_TERRAIN` मौजूद नहीं है।
 
-## Removed macros
+## हटाए गए मैक्रो
 
-- **`BLOXD_LIGHTING`** — removed in v5. Lighting state is a runtime question for [`bloxdLit()`](lighting.md#bloxdlit--the-gate), not a compile branch. Using it fails validation with:
+- **`BLOXD_LIGHTING`** — v5 में हटा दिया गया। लाइटिंग की स्थिति [`bloxdLit()`](lighting.md#bloxdlit--गट) के लिए रनटाइम का प्रश्न है, कंपाइल ब्रांच नहीं। इसका उपयोग करने पर सत्यापन इसके साथ विफल हो जाता है:
 
 > *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-v4 migration pattern:
+v4 माइग्रेशन पैटर्न:
 
 ```wgsl
-// v4 (fails validation on v5)
+// v4 (v5 पर सत्यापन में विफल)
 #ifdef BLOXD_LIGHTING
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight { ... }
 #endif
 
-// v5 (migrated)
+// v5 (माइग्रेट किया हुआ)
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }
-    // ... lighting-enabled processing
+    // ... लाइटिंग-सक्रिय प्रोसेसिंग
 }
 ```
 
-## Example
+## उदाहरण
 
 ```wgsl
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     out.colour = out.colour * vec3f(1.0, 0.9, 0.8);
-    #ifdef BLOXD_ALPHA                          // terrain has alpha only in allow
+    #ifdef BLOXD_ALPHA                          // टेरेन में alpha केवल allow में होता है
     out.alpha = s.alpha;
     #endif
     return out;
 }
 
-#ifndef BLOXD_STRICT                            // vertex hooks always need this guard
+#ifndef BLOXD_STRICT                            // वर्टेक्स हुकों को हमेशा यह गार्ड चाहिए
 fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
     var out = bloxdDefaultVertex(v);
     out.position.y += sin(bloxdSeconds()) * 0.05;
@@ -67,13 +67,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## Macros shape the structs
+## मैक्रो स्ट्रक्ट को आकार देते हैं
 
-- `BloxdSurface.alpha` exists only inside `#ifdef BLOXD_ALPHA`
-- `bloxdOpaqueBehind()` is callable only inside `#ifdef BLOXD_SCENE_DEPTH`
+- `BloxdSurface.alpha` केवल `#ifdef BLOXD_ALPHA` के भीतर मौजूद है
+- `bloxdOpaqueBehind()` केवल `#ifdef BLOXD_SCENE_DEPTH` के भीतर कॉल किया जा सकता है
 
-See [Structures](structures.md#conditional-fields--macros).
+देखें [स्ट्रक्चर](structures.md#सशरत-फलड--मकर)।
 
-## Related
+## संबंधित
 
-- [Getting Started: Variants](../getting-started/variants.md) · [Engine Internals: Shader Validation](../internals/shader-validation.md)
+- [शुरुआत: वेरिएंट](../getting-started/variants.md) · [इंजन इंटरनल्स: शेडर सत्यापन](../internals/shader-validation.md)

@@ -1,47 +1,47 @@
-# Compilation errors
+# कंपाइलेशन त्रुटियाँ
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-Errors that pass static validation but fail as WGSL, or fail only in the browser's WGSL compiler (stage 2).
+वे त्रुटियाँ जो स्थैतिक सत्यापन पास कर लेती हैं पर WGSL के रूप में विफल होती हैं, या केवल ब्राउज़र के WGSL कंपाइलर (चरण 2) में विफल होती हैं।
 
 ## "bloxdTerrainVertex must be declared as: fn ..."
 
-- **Cause**: hook signature mismatch (argument/return types)
-- **Fix**: rewrite to the declaration shown in the message (parameter names are free; types must match exactly)
-- **Prevention**: start from the [hook comparison table](../api/hooks.md)
+- **कारण**: हुक सिग्नेचर का बेमेल (आर्ग्युमेंट/रिटर्न टाइप)
+- **समाधान**: संदेश में दिखाई गई घोषणा के अनुसार दोबारा लिखें (पैरामीटर के नाम आज़ाद हैं; टाइप बिल्कुल मेल खाने चाहिए)
+- **रोकथाम**: [हुक तुलना तालिका](../api/hooks.md) से शुरू करें
 
 ## "mixing '*' and '^' requires parenthesis (only in ...)"
 
-- **Cause**: WGSL requires parentheses when mixing `^` `&` `|` `<<` `>>` with other operators
-- **Fix**: parenthesize the operands
+- **कारण**: `^` `&` `|` `<<` `>>` को दूसरे ऑपरेटरों के साथ मिलाने पर WGSL कोष्ठक माँगता है
+- **समाधान**: ऑपरेंड पर कोष्ठक लगाएँ
 
 ## "... can only be a function's parameter or return type, ..."
 
-- **Cause**: `var x: BloxdSurface;` — bare type-annotated declarations are rejected because header structs gain fields
-- **Fix**: `var out = bloxdDefaultSurface(s);` (or `var out = s;` in light hooks)
-- **Prevention**: always build outputs from `bloxdDefault*` ([conventions](../api/structures.md#writing-conventions-recap))
+- **कारण**: `var x: BloxdSurface;` — सिर्फ़ टाइप-एनोटेटेत कच्ची घोषणाएँ अस्वीकृत होती हैं, क्योंकि हेडर स्ट्रक्चरों में फ़ील्ड जुड़ते रहते हैं
+- **समाधान**: `var out = bloxdDefaultSurface(s);` (या light हुक में `var out = s;`)
+- **रोकथाम**: आउटपुट हमेशा `bloxdDefault*` से बनाएँ ([लेखन-प्रथाएँ](../api/structures.md#लखन-परथए-पनरवतत))
 
 ## "_ can only be the target of a phony assignment, as in _ = f();"
 
-- **Cause**: `let _ = f();` is invalid WGSL
-- **Fix**: write `_ = f();`
+- **कारण**: `let _ = f();` अमान्य WGSL है
+- **समाधान**: `_ = f();` लिखें
 
 ## "Lite: …reads scene depth on a page that didn't turn it on"
 
-- **Cause**: a depth-reading pack (`bloxdOpaqueBehind`) was active when the page was generated; depth availability is decided at page generation
-- **Fix**: reload the page with the pack active
+- **कारण**: पेज बनते समय कोई डेप्थ-पढ़ने वाला पैक (`bloxdOpaqueBehind`) सक्रिय था; डेप्थ की उपलब्धता पेज बनने के समय पर तय होती है
+- **समाधान**: पैक सक्रिय रखकर पेज रीलोड करें
 
-## dpdy sign looks inverted
+## dpdy का चिह्न उल्टा दिखता है
 
-- **This is by design**: v5's analyzer auto-rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (screen-space y points down)
-- **Fix**: nothing — write `dpdy(h)` with the intent "how does h change going up" and the emitted code carries the flip ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5))
-- `dpdx` and `fwidth` are untouched
+- **यह जानबूझकर है**: एनालाइज़र हर `dpdy` / `dpdyCoarse` / `dpdyFine` कॉल को `(-dpdy(...))` में अपने आप दोबारा लिख देता है (स्क्रीन-स्पेस का y नीचे की ओर इशारा करता है)
+- **समाधान**: कुछ नहीं — `dpdy(h)` को इस मंशा से लिखें कि "h ऊपर जाने पर कैसे बदलता है", और उत्सर्जित कोड वह उलटाव अपने साथ रखता है ([प्रतिबंध](../api/restrictions.md#सवचलत-ररइट))
+- `dpdx` और `fwidth` अछूते रहते हैं
 
-## Pack gets dropped on game join / the on-device check never finishes
+## गेम जॉइन पर पैक ड्रॉप हो जाता है / ऑन-डिवाइस जाँच कभी पूरी नहीं होती
 
-- **Cause**: the on-device check failed, or hit the 60-second forced timeout (`skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops; see [Performance](performance.md)
+- **कारण**: ऑन-डिवाइस जाँच विफल हुई, या 60-सेकंड के ज़बरदस्ती टाइमआउट (`skipped`) में पकड़ी गई — कम-स्पेक डिवाइसों और भारी दुनियाओं पर आम
+- **समाधान**: भारी vertex काम और जटिल लूप घटाएँ; देखें [प्रदर्शन](performance.md)
 
-## Related
+## संबंधित
 
-- [Validation errors](validation.md) · [Engine Internals: WGSL Compilation](../internals/wgsl-compilation.md) · [Restrictions](../api/restrictions.md)
+- [सत्यापन त्रुटियाँ](validation.md) · [इंजन इंटर्नल्स: WGSL कंपाइलेशन](../internals/wgsl-compilation.md) · [प्रतिबंध](../api/restrictions.md)

@@ -1,26 +1,28 @@
-# Version History
+# संस्करण इतिहास
 
-Changes, migration steps and removed APIs for v1 through v5. For migrating legacy packs and for the preserved per-era specifications.
+> स्थिति: Historical — संस्करण-दर-संस्करण अभिलेख; हर गाइड अपना लक्ष्य बिल्ड स्वयं नाम देती है
 
-## Timeline
+v1 से v5 तक के बदलाव, माइग्रेशन चरण और हटाए गए API। पुराने पैक माइग्रेट करने के लिए, और संरक्षित प्रति-दौर स्पेसिफ़िकेशन के लिए।
 
-| Version | Live since | Guide | Highlights |
+## टाइमलाइन
+
+| संस्करण | कब से लाइव | गाइड | मुख्य बातें |
 |---|---|---|---|
-| v1 | (initial) | [v1](v1.md) | first shader-pack API. 6 hooks (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` vocabulary |
-| v2 | — | [v2](v2.md) | full identifier rename, `blockId`, `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` bit flags, `bloxdPi` / `bloxdTau`, official liquid hooks, hook-invocation internals |
-| v4 | 2026-10-26 | [v4](v4.md) | texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), the strict contract, engine header & registry analysis |
-| **v5** | **2026-11-03** | [v5](v5.md) | **current** — `BloxdFlags` struct (14 bools), Model hooks (9 total), the `bloxdLit()` / `bloxdLitColour()` lighting API, `localPosition`, enchant/overlay inputs & outputs, 6 variants |
+| v1 | (प्रारंभिक) | [v1](v1.md) | पहला शेडर-पैक API। 6 हुक (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` शब्दावली |
+| v2 | — | [v2](v2.md) | पूर्ण पहचानकर्ता पुनर्नामकरण, `blockId`, `BLOXD_SCENE_DEPTH` और `bloxdOpaqueBehind()` |
+| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` बिट फ़्लैग, `bloxdPi` / `bloxdTau`, आधिकारिक तरल हुक, हुक-आह्वान इंटरनल्स |
+| v4 | 2026-10-26 | [v4](v4.md) | टेक्सचर API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict अनुबंध, इंजन हेडर व रजिस्ट्री विश्लेषण |
+| **v5** | **2026-11-03** | [v5](v5.md) | **मौजूदा** — `BloxdFlags` संरचना (14 bool), मॉडल हुक (कुल 9), `bloxdLit()` / `bloxdLitColour()` लाइटिंग API, `localPosition`, एनचांट/ओवरले इनपुट व आउटपुट, 6 वेरिएंट |
 
-## The shared preface
+## साझा प्रस्तावना
 
-The current game accepts only `apiVersion: 5` and **old-version packs fail at the instant of load** (saved packs are silently deactivated — [Compatibility](../api/compatibility.md)). Each guide covers "previous → next". Crossing several versions? Apply them oldest-first.
+मौजूदा गेम केवल `apiVersion: 5` स्वीकार करता है और **पुराने-संस्करण के पैक लोड होते ही विफल** हो जाते हैं (सहेजे गए पैक मौन रूप से निष्क्रिय हो जाते हैं — [कम्पैटिबिलिटी](../api/compatibility.md))। हर गाइड "पिछला → अगला" कवर करती है। कई संस्करण पार कर रहे हैं? उन्हें सबसे पुराने पहले लागू करें।
 
-## Fast path to a checklist
+## चेकलिस्ट तक फ़ास्ट पथ
 
-- v4 pack → [v5 guide](v5.md) §77 (mostly mechanical)
-- v3 pack → [v4](v4.md) §61 → [v5](v5.md) §77
-- v2 pack → [v3](v3.md) §47 → v4 → v5
-- v1 pack → start at [v2](v2.md) §37
+- v4 पैक → [v5 गाइड](v5.md) §77 (अधिकतर यांत्रिक)
+- v3 पैक → [v4](v4.md) §61 → [v5](v5.md) §77
+- v2 पैक → [v3](v3.md) §47 → v4 → v5
+- v1 पैक → [v2](v2.md) §37 से शुरू करें
 
-> For the current spec itself see [API Reference](../api/); for current-build internals see [Engine Internals](../internals/).
+> मौजूदा स्पेसिफ़िकेशन के लिए देखें [API रेफ़रेंस](../api/); मौजूदा-बिल्ड इंटरनल्स के लिए देखें [इंजन इंटरनल्स](../internals/)।

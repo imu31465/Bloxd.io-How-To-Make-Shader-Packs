@@ -1,44 +1,44 @@
-# Performance-aware implementation
+# प्रदर्शन
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (measurement-based practice)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (माप-आधारित अभ्यास)
 
-Pack hooks run on every fragment (all pixels of terrain / liquid / model), so style choices move frame rate significantly.
+पैक हुक हर फ्रैगमेंट (टेरेन/तरल/मॉडल के सभी पिक्सेल) पर चलते हैं, इसलिए स्टाइल चुनाव फ़्रेम दर को काफ़ी हिलाते हैं।
 
-## First facts
+## पहले तथ्य
 
-- **The light hook is the final stage**: it runs for every drawn pixel of terrain, liquid and model — most of the screen
-- **Packs run on WebGPU**: evaluate cost assuming a range of GPUs including mobile
-- The loader's size cap (256 KB of `.wgsl`) is also a practical **compile-time** ceiling
+- **लाइट हुक अंतिम चरण है**: यह टेरेन, तरल और मॉडल के हर बने पिक्सेल पर चलता है — स्क्रीन का अधिकांश हिस्सा
+- **पैक WebGPU पर चलते हैं**: लागत का मूल्यांकन मोबाइल सहित विभिन्न GPU जैसा मानकर करें
+- लोडर की आकार-सीमा (256 KB `.wgsl`) भी एक व्यावहारिक **संकलन-समय** की ऊपरी सीमा है
 
-## Cost ladder (cheap → expensive)
+## लागत सीढ़ी (सस्ता → महँगा)
 
-| Operation | Cost | Note |
+| संक्रिया | लागत | टिप्पणी |
 |---|---|---|
-| `mix` / `clamp` / arithmetic | ◎ minimal | |
-| input reads (`l.skyLight`…) | ◎ | uniform/vertex-attribute sourced |
-| `smoothstep` / `pow` | ○ | `pow` varies by exponent |
-| `sin` / `cos` | ○ | animation staple |
+| `mix` / `clamp` / अंकगणित | ◎ न्यूनतम | |
+| इनपुट पढ़ना (`l.skyLight`…) | ◎ | uniform/शीर्ष-एट्रिब्यूट स्रोत से |
+| `smoothstep` / `pow` | ○ | `pow` घातांक के अनुसार बदलता है |
+| `sin` / `cos` | ○ | एनिमेशन का मूल सामान |
 | `dot` / `normalize` | ○ | |
-| `bloxdTexel()` (texture sample) | △ | cheaper at higher mips |
-| `dpdx` / `dpdy` / `fwidth` | △ | surface/light hooks only |
-| branching (`if`) | △ | WGSL may evaluate both sides; uniform-ish conditions (flag checks) are cheap |
-| hash noise (many `sin`/`fract`) | △ | gate micro-bump effects by distance |
+| `bloxdTexel()` (टेक्सचर सैंपल) | △ | उच्च mips पर सस्ता |
+| `dpdx` / `dpdy` / `fwidth` | △ | केवल surface/light हुक |
+| ब्रांचिंग (`if`) | △ | WGSL दोनों पक्ष गणना कर सकता है; uniform-जैसी शर्तें (फ़्लैग जाँचें) सस्ती हैं |
+| हैश शोर (बहुत सारे `sin`/`fract`) | △ | सूक्ष्म-उभार प्रभावों को दूरी से गेट करें |
 
-## Practice
+## अभ्यास
 
-1. **Gate effects to the faces that need them** — `flags` selection beats "+20% everywhere"
-2. **Drop detail with distance** — early-out when `distance(surface.position, bloxdEyePosition())` exceeds a threshold
-3. **Use mips** — `bloxdTexel(id, uv, mipLevel + 1.0)` is a ¼-resolution average ([worked examples](../api/texture-api.md#worked-examples))
-4. **Prefer surface hooks for color tweaks** — the light hook is the all-pixels final stage
-5. **Add detail incrementally and compare FPS** ([testing](testing.md))
-6. **`#ifdef` guards don't save runtime** — variants are compile units; runtime savings come from flags and distance
+1. **प्रभावों को केवल ज़रूरत वाले फलकों तक सीमित करें** — `flags` चयन "हर जगह +20%" से बेहतर है
+2. **दूरी के साथ विवरण घटाएँ** — जब `distance(surface.position, bloxdEyePosition())` किसी देहली से अधिक हो जाए, तो जल्दी बाहर निकलें
+3. **mips प्रयोग करें** — `bloxdTexel(id, uv, mipLevel + 1.0)` एक ¼-विभेदन औसत है ([कार्य उदाहरण](../api/texture-api.md#हल-सहत-उदहरण))
+4. **रंग बारीकियों के लिए surface हुक प्राथमिकता दें** — लाइट हुक सभी-पिक्सेल वाला अंतिम चरण है
+5. **विवरण बढ़ते-बढ़ते जोड़ें और FPS की तुलना करें** ([परीक्षण](testing.md))
+6. **`#ifdef` गार्ड रनटाइम नहीं बचाते** — वेरिएंट संकलन इकाइयाँ हैं; रनटाइम की बचत फ़्लैग और दूरी से आती है
 
-## Measuring
+## मापन
 
-- Compare FPS with/without the pack via browser devtools (performance panel / WebGPU stats)
-- Measure terrain-heavy scenes (shadow-rich forest) and water (liquid hooks) separately
-- Check mobile hardware — it can be tens of times slower
+- ब्राउज़र devtools (performance पैनल / WebGPU आँकड़े) से पैक के साथ/बिना FPS की तुलना करें
+- टेरेन-भारी दृश्य (छाया-समृद्ध वन) और पानी (तरल हुक) को अलग-अलग मापें
+- मोबाइल हार्डवेयर जाँचें — वह दसियों गुना धीमा हो सकता है
 
-## Related
+## संबंधित
 
-- [Testing](testing.md) · [Rendering Pipeline](../internals/rendering-pipeline.md) · [Texture API](../api/texture-api.md)
+- [परीक्षण](testing.md) · [रेंडरिंग पाइपलाइन](../internals/rendering-pipeline.md) · [टेक्सचर API](../api/texture-api.md)

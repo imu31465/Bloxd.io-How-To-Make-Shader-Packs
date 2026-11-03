@@ -1,62 +1,62 @@
-# Lighting
+# लाइटिंग
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
 
-v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
+v5 ने लाइटिंग API प्रकाशित किया। जो काम इंजन आंतरिक रूप से करता था (`litColour` बनाना), वह अब पैकों से कॉल किया जा सकता है। यह पेज लाइटिंग के इनपुट, फ़ंक्शन और प्रोसेसिंग क्रम को एक पूरे तंत्र के रूप में कवर करता है।
 
-## The full pipeline
+## पूरी पाइपलाइन
 
-The complete color chain, as the default light-stage implementation (`bloxdDefaultLight`) shows it:
+रंगों की पूरी श्रृंखला, जैसी कि डिफ़ॉल्ट लाइट-स्टेज इम्प्लीमेंटेशन (`bloxdDefaultLight`) उसे दिखाती है:
 
 ```
 surface.colour
-    │  mix with overlayColour (mix(colour, overlay.rgb, overlay.a))
+    │  overlayColour के साथ मिलाया जाता है (mix(colour, overlay.rgb, overlay.a))
     ▼
 overlaid
-    │  multiply by bloxdShading(light) — material & angle response
+    │  bloxdShading(light) से गुणा — सामग्री और कोण की प्रतिक्रिया
     ▼
 shaded
-    │  mix with enchantColour (mix(shaded, enchant.rgb, enchant.a))
+    │  enchantColour के साथ मिलाया जाता है (mix(shaded, enchant.rgb, enchant.a))
     ▼
 enchanted
-    │  multiply by bloxdWorldLight(light) — world light (brightest of block/sky/held)
+    │  bloxdWorldLight(light) से गुणा — वर्ल्ड लाइट (ब्लॉक/स्काई/हेल्ड में सबसे चमकीला)
     ▼
-lit = bloxdLitColour(surface, light)   ← the color "before emission and fog"
-    │  + surface.emission               ← emission added after lighting
+lit = bloxdLitColour(surface, light)   ← "उत्सर्जन और कोहरे से पहले" वाला रंग
+    │  + surface.emission               ← उत्सर्जन लाइटिंग के बाद जोड़ा जाता है
     ▼
     │  bloxdApplyFog(colour, light)      ← mix(colour, fogColour, fogAlpha)
     ▼
-BloxdLight.colour (final color)
+BloxdLight.colour (अंतिम रंग)
 ```
 
-`bloxdLitColour()` order (header summary: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
+`bloxdLitColour()` का क्रम (हेडर सारांश: *"mixed with overlayColour, then bloxdShading, then mixed with enchantColour, then bloxdWorldLight"*):
 
-1. apply `overlayColour`
-2. shade with `bloxdShading()`
-3. apply `enchantColour`
-4. apply world light with `bloxdWorldLight()`
+1. `overlayColour` लगाएँ
+2. `bloxdShading()` से शेड करें
+3. `enchantColour` लगाएँ
+4. `bloxdWorldLight()` से वर्ल्ड लाइट लगाएँ
 
-Emission and fog order: **emission is added after lighting and before fog**, and fog sinks emission too (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`).
+उत्सर्जन और कोहरे का क्रम: **उत्सर्जन लाइटिंग के बाद और कोहरे से पहले जोड़ा जाता है**, और कोहरा उत्सर्जन को भी डुबो देता है (`bloxdDefaultLight` = `bloxdApplyFog(lit + emission, light)`)।
 
-## Functions
+## फ़ंक्शन
 
-### bloxdLit() — the gate
+### bloxdLit() — गेट
 
 ```wgsl
 fn bloxdLit() -> bool
 ```
 
-Whether block & sky lighting is on. **Guarantees when off**:
+क्या ब्लॉक और स्काई लाइटिंग चालू है। **बंद होने पर गारंटी**:
 
-| Field | Value when off |
+| फ़ील्ड | बंद होने पर मान |
 |---|---|
 | `blockLight` / `heldLight` | `0` |
 | `skyLight` | `1` |
-| `ambientLightColour` / `skyLightColour` | `1` (white) |
+| `ambientLightColour` / `skyLightColour` | `1` (सफ़ेद) |
 
-v4's `#ifdef BLOXD_LIGHTING` is gone. Replace with `if (!bloxdLit()) { return bloxdDefaultLight(...); }`.
+v4 का `#ifdef BLOXD_LIGHTING` हटा दिया गया है। इसे `if (!bloxdLit()) { return bloxdDefaultLight(...); }` से बदलें।
 
-### bloxdShading() — material & angle response
+### bloxdShading() — सामग्री और कोण की प्रतिक्रिया
 
 ```wgsl
 fn bloxdShading(light: BloxdLightIn) -> vec3f {
@@ -65,10 +65,10 @@ fn bloxdShading(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- multiplies `directional` (summed Lambert) by `diffuse` (material RGB response), adds `emissive` (material glow) and `ambient` (RGB ambient), clamps to 0–1
-- **the new v5 inputs `diffuse` / `emissive`** let you swap just the Lambert term while keeping the engine's material response
+- `directional` (जोड़ा हुआ Lambert) को `diffuse` (सामग्री की RGB प्रतिक्रिया) से गुणा करता है, `emissive` (सामग्री की चमक) और `ambient` (RGB एम्बिएंट) जोड़ता है, 0–1 पर क्लैंप करता है
+- **नए v5 इनपुट `diffuse` / `emissive`** से आप केवल Lambert पद बदल सकते हैं, इंजन की सामग्री-प्रतिक्रिया को बनाए रखते हुए
 
-### bloxdWorldLight() — the world's light
+### bloxdWorldLight() — वर्ल्ड का प्रकाश
 
 ```wgsl
 fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
@@ -80,10 +80,10 @@ fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- shapes each of the three channels (block / sky / held) with `ambientLightColour` as the floor, then takes the **brightest**
-- `skyLight` interpolates from `ambientLightColour` toward `skyLightColour` by the sky-light amount
+- तीनों चैनलों (ब्लॉक / स्काई / हेल्ड) को `ambientLightColour` को फ़्लोर बनाकर आकार देता है, फिर उनमें **सबसे चमकीले** को चुनता है
+- `skyLight` स्काई-लाइट की मात्रा के अनुसार `ambientLightColour` से `skyLightColour` की ओर इंटरपोलेट करता है
 
-### bloxdLitColour() — the engine recipe
+### bloxdLitColour() — इंजन रेसिपी
 
 ```wgsl
 fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
@@ -96,7 +96,7 @@ fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-### bloxdApplyFog() — fog
+### bloxdApplyFog() — कोहरा
 
 ```wgsl
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -104,10 +104,10 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 }
 ```
 
-- `fogAlpha`: **0 = no fog, 1 = only fogColour** (inverted from v4's `fogVisibility`)
-- `fogColour` is the game's fog RGB; **`vec3f(0.0)` when the game has no fog**
+- `fogAlpha`: **0 = कोई कोहरा नहीं, 1 = केवल fogColour** (v4 के `fogVisibility` से उलटा)
+- `fogColour` गेम के कोहरे का RGB है; **गेम में कोहरा न होने पर `vec3f(0.0)`**
 
-### bloxdDefaultLight() — the whole default
+### bloxdDefaultLight() — पूरा डिफ़ॉल्ट
 
 ```wgsl
 fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -116,38 +116,38 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Input fields (BloxdLightIn)
+## इनपुट फ़ील्ड (BloxdLightIn)
 
-| Field | Type | Meaning | Note |
+| फ़ील्ड | टाइप | अर्थ | टिप्पणी |
 |---|---|---|---|
-| `litColour` | `vec3f` | lit & enchanted RGB (before emission and fog) | a result value, not a source |
-| `directional` | `f32` | summed Lambert from directional lights | 0 when no directional lights |
-| `diffuse` | `vec3f` | material RGB response to directional light | new in v5 |
-| `emissive` | `vec3f` | material RGB glow (added to directional) | new in v5 |
-| `ambient` | `vec3f` | RGB ambient (added to directional) | |
-| `blockLight` | `vec3f` | RGB block light | 0 when `!bloxdLit()` |
-| `skyLight` | `f32` | sky light | 1 when `!bloxdLit()` |
-| `ambientLightColour` | `vec3f` | minimum RGB light (floor) | 1 when `!bloxdLit()` |
-| `skyLightColour` | `vec3f` | RGB color of skyLight | 1 when `!bloxdLit()` |
-| `heldLight` | `vec3f` | RGB held light | 0 when `!bloxdLit()` or nothing held |
-| `fogColour` | `vec3f` | game fog RGB | 0 with no fog |
-| `fogAlpha` | `f32` | 0 = no fog, 1 = only fogColour | inverted from v4 `fogVisibility` |
+| `litColour` | `vec3f` | रोशन और एनचैंट किया हुआ RGB (उत्सर्जन और कोहरे से पहले) | परिणामी मान है, स्रोत नहीं |
+| `directional` | `f32` | डायरेक्शनल लाइटों से जोड़ा गया Lambert | डायरेक्शनल लाइटें न हों तो 0 |
+| `diffuse` | `vec3f` | डायरेक्शनल प्रकाश के प्रति सामग्री की RGB प्रतिक्रिया | `bloxdShading()` को सामग्री-प्रतिक्रिया फिर से बनाने देता है |
+| `emissive` | `vec3f` | सामग्री की RGB चमक (डायरेक्शनल में जुड़ती है) | |
+| `ambient` | `vec3f` | RGB एम्बिएंट (डायरेक्शनल में जुड़ता है) | |
+| `blockLight` | `vec3f` | RGB ब्लॉक लाइट | `!bloxdLit()` पर 0 |
+| `skyLight` | `f32` | स्काई लाइट | `!bloxdLit()` पर 1 |
+| `ambientLightColour` | `vec3f` | न्यूनतम RGB प्रकाश (फ़्लोर) | `!bloxdLit()` पर 1 |
+| `skyLightColour` | `vec3f` | skyLight का RGB रंग | `!bloxdLit()` पर 1 |
+| `heldLight` | `vec3f` | RGB हेल्ड लाइट | `!bloxdLit()` पर या हाथ में कुछ न होने पर 0 |
+| `fogColour` | `vec3f` | गेम के कोहरे का RGB | कोहरा न होने पर 0 |
+| `fogAlpha` | `f32` | 0 = कोई कोहरा नहीं, 1 = केवल fogColour | v4 के `fogVisibility` से उलटा |
 
-## Light-level physics (background, skippable)
+## लाइट-लेवल का फ़िज़िक्स (पृष्ठभूमि, छोड़ा जा सकता है)
 
-- **`blockLight` / `skyLight` / `heldLight` arrive mapped to 0–1**: the 0–15 levels through an ease-out curve (e.g. `6 → 0.45`, `12 → 0.92`). All exclude `ambientLightColour`
-- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](../guides/realism.md))
-- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](../internals/fog-internals.md))
+- **`blockLight` / `skyLight` / `heldLight` 0–1 पर मैप होकर आते हैं**: 0–15 के लेवल एक ईज़-आउट वक्र से गुज़रते हैं (जैसे `6 → 0.45`, `12 → 0.92`)। तीनों में `ambientLightColour` शामिल नहीं होता
+- **लिफ़्ट वक्र**: `skyLight` असल में "क्या इस स्थिति से आसमान दिखता है" है — वॉक्सेल ऑक्लूज़न डेटा, यानी एक शैडो मानचित्र। थ्रेशोल्ड-आधारित धूप/छाया अलग करने के लिए व्युत्क्रम ट्रांसफ़ॉर्म की ज़रूरत पड़ सकती है ([रियलिज़्म गाइड](../guides/realism.md) देखें)
+- **कोहरे की आंतरिक कार्यप्रणाली**: लीनियर मोड में `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (0..1 पर क्लैंप), व्यू स्पेस में प्रति वर्टेक्स गणना होती है। मौजूदा बिल्ड केवल लीनियर है (विवरण [इंजन इंटरनल्स: फ़ॉग इंटरनल्स](../internals/fog-internals.md) में)
 
-## Recipes
+## रेसिपी
 
-### Custom shading + the engine's world light
+### कस्टम शेडिंग + इंजन की वर्ल्ड लाइट
 
-What v4 authors approximated by scaling `litColour` can now be written exactly:
+जिसे v4 के लेखक `litColour` को स्केल करके सन्निकट बनाते थे, वह अब यथार्थ रूप में लिखा जा सकता है:
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    let nDotL = light.directional; // already summed Lambert
+    let nDotL = light.directional; // पहले से जोड़ा हुआ Lambert
     let wrapped = nDotL * 0.5 + 0.5;
     let shaded = saturate(wrapped * light.diffuse + light.emissive + light.ambient);
     let colour = max(shaded * bloxdWorldLight(light), vec3f(0.0));
@@ -155,7 +155,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Keep the engine's world light, boost emission only
+### इंजन की वर्ल्ड लाइट रखें, केवल उत्सर्जन बढ़ाएँ
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -164,7 +164,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Night blue shift (skyLight-driven)
+### रात का नीला शिफ़्ट (skyLight-संचालित)
 
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -176,6 +176,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## संबंधित
 
-- [Functions](functions.md) · [Guides: lighting](../guides/lighting.md) · [Engine Internals: Lighting Internals](../internals/lighting-internals.md)
+- [फ़ंक्शन](functions.md) · [गाइड: लाइटिंग](../guides/lighting.md) · [इंजन इंटरनल्स: लाइटिंग इंटरनल्स](../internals/lighting-internals.md)

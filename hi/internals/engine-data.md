@@ -1,46 +1,46 @@
-# Engine data ledger (v5 measurements)
+# इंजन डेटा लेजर
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03; production = preprod, byte-identical) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03; प्रोडक्शन = प्रीप्रोड, बाइट-समान) · स्थिति: Verified
 
-The documentation's v5 measurement ledger — every confirmed value, all measured on `ab90qa`.
+इस दस्तावेज़ीकरण का माप-लेजर — हर पुष्ट किया गया मान, सब मौजूदा लक्ष्य बिल्ड `ab90qa` पर मापा गया।
 
-## The ledger
+## लेजर
 
-| Item | Value |
+| मद | मान |
 |---|---|
 | `apiVersion` | `5` (strict `===`, number) |
-| engine header | 8,954 B decoded / 208 lines (9,125 B as shipped, 6 interpolations). First line `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — full text in [Engine header](engine-header.md) |
-| hooks | 9 (terrain/liquid/model × vertex/surface/light). Names unchanged; the default template bundles all 9 |
-| variants | 6 (strict × program). Names `strict\|allow.terrain\|liquid\|model` — the lighting axis is gone |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (all liquid + non-strict terrain/model) · `BLOXD_SCENE_DEPTH` (all liquid) · ~~`BLOXD_LIGHTING`~~ **removed** |
-| pack uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, new)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
-| flags | the `BloxdFlags` struct, 14 bools; v4's bit values retired |
-| loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 entries; UTF-8; one manifest; unique paths — all unchanged |
-| texture registry | 1,210 entries → **896 usable names**; drift vs cnty9 +1/−10 ([Texture registry](texture-registry.md)) |
-| light curve | 0–15 levels → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — in the header, unchanged |
-| lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged (currently chunk c9) |
-| directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged (chunk c9) |
-| fog color | `vec3f(183/255, 191/255, 195/255)` — unchanged |
-| reserved names | `/^bloxd/i` (case-insensitive) + the 46 `bloxdSp*` engine symbols ([Reserved identifiers](reserved-identifiers.md)) |
+| इंजन हेडर | 8,954 B डिकोडेड / 208 पंक्तियाँ (9,125 B जैसा भेजा गया, 6 इंटरपोलेशन)। पहली पंक्ति `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — पूरा पाठ [इंजन हेडर](engine-header.md) में |
+| हुक | 9 (terrain/liquid/model × vertex/surface/light)। नाम अपरिवर्तित; डिफ़ॉल्ट टेम्पलेट सभी 9 को बंडल करता है |
+| वेरिएंट | 6 (strict × program)। नाम `strict\|allow.terrain\|liquid\|model` — लाइटिंग अक्ष हट गया |
+| मैक्रो | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (सारा liquid + ग़ैर-strict terrain/model) · `BLOXD_SCENE_DEPTH` (सारा liquid) · ~~`BLOXD_LIGHTING`~~ **हटाया गया** |
+| पैक uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, नया)**, renderOffset@16, sunDirection@32, eyePosition@48 |
+| पैक बाइंडिंग | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
+| फ़्लैग | `BloxdFlags` स्ट्रक्चर, 14 bool; v4 के बिट मान सेवानिवृत्त |
+| लोडर सीमाएँ | 256 `.wgsl` / 256 KB स्रोत / 64 KB `pack.json` / 32 MB zip / 1,024 प्रविष्टियाँ; UTF-8; एक मैनिफ़ेस्ट; अद्वितीय पथ — सब अपरिवर्तित |
+| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 ([टेक्सचर रजिस्ट्री](texture-registry.md)) |
+| लाइट वक्र | 0–15 स्तर → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — हेडर में, अपरिवर्तित |
+| लिफ़्ट वक्र | `1 - (1 - x / (3 - 2x))^3` — अपरिवर्तित (वर्तमान में चंक c9) |
+| डायरेक्शनल शंकु | `0.12 / 0.65 / 0.62 / 0.95` — अपरिवर्तित (चंक c9) |
+| फ़ॉग रंग | `vec3f(183/255, 191/255, 195/255)` — अपरिवर्तित |
+| आरक्षित नाम | `/^bloxd/i` (केस-असंवेदनशील) + 46 `bloxdSp*` इंजन प्रतीक ([आरक्षित पहचानकर्ता](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict titles | everything except the 12 allow titles in [Policy](policy.md) (re-verified on ab90qa, unchanged) |
-| header/registry builders | chunk c55 (module 29833 + 1371 + 1391 + 1384 + 219 coordinating) |
-| default pack template | chunk c116 (moved from v4's c124), 1,683 B |
+| strict शीर्षक | [नीति](policy.md) के 12 allow शीर्षकों के अतिरिक्त सब कुछ (ab90qa पर पुनः-सत्यापित, अपरिवर्तित) |
+| हेडर/रजिस्ट्री बिल्डर | चंक c55 (मॉड्यूल 29833 + 1371 + 1391 + 1384 + 219 मिलकर समन्वय) |
+| डिफ़ॉल्ट पैक टेम्पलेट | चंक c116 (v4 के c124 से स्थानांतरित), 1,683 B |
 
-## Bundle layout (for re-surveyors)
+## बंडल लेआउट (पुनः-सर्वेक्षकों के लिए)
 
-The shader-pipeline cluster: loader/persistence c51–c53, validator/header/registry builder c55, WebGPU/codegen c56, fog c9. **The default pack template is c116** (c124 in v4).
+शेडर-पाइपलाइन क्लस्टर: लोडर/परसिस्टेंस c51–c53, वैलिडेटर/हेडर/रजिस्ट्री बिल्डर c55, WebGPU/कोडजन c56, फ़ॉग c9। **डिफ़ॉल्ट पैक टेम्पलेट c116 है** (v4 में c124)।
 
-Chunk-format note: every chunk is an ES module (`export const modules = {...}`) — c53 carries both c52's and c53's modules — so plain-text search of the bundle remains meaningful (module id `1371` lives in *main*'s sparse module array, in no chunk).
+चंक-फ़ॉर्मैट टिप्पणी: हर चंक एक ES मॉड्यूल है (`export const modules = {...}`) — c53 में c52 और c53 दोनों के मॉड्यूल रहते हैं — इसलिए बंडल की सादा-पाठ खोज अर्थपूर्ण बनी रहती है (मॉड्यूल id `1371` *main* के विरल मॉड्यूल सरणी में रहता है, किसी चंक में नहीं)।
 
-The main bundle is 3.39 MB (+115 KB vs the v4 build); the chunk map has 195 IDs (188 emitted, 7 known gaps).
+मुख्य बंडल 3.39 MB है (v4 बिल्ड के मुक़ाबले +115 KB); चंक मैप में 195 ID हैं (188 एमिटेड, 7 ज्ञात अंतराल)।
 
-## Past ledgers
+## पिछले लेजर
 
-- v4 (cnty9, 2026-10-27) → [Version History: v4](../history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Version History: v3](../history/v3.md)
+- v4 (cnty9, 2026-10-27) → [संस्करण इतिहास: v4](../history/v4.md)
+- v3 (3ymzdd, 2026-10-19) → [संस्करण इतिहास: v3](../history/v3.md)
 
-## Related
+## संबंधित
 
-- [Research log](research-log.md) · [Engine header](engine-header.md) · [Policy](policy.md)
+- [रिसर्च लॉग](research-log.md) · [इंजन हेडर](engine-header.md) · [नीति](policy.md)

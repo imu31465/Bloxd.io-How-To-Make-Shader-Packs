@@ -1,26 +1,26 @@
-# Pack structure
+# पैक संरचना
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified
 
-## Distribution format
+## वितरण प्रारूप
 
-- **Format**: a single `.zip`, or a folder (folder loading is desktop browsers only)
-- **Contents**: one `pack.json` (at the top level of the pack; case-insensitive) + 1–256 `.wgsl` files
-- Multiple `.wgsl` files are concatenated into one module, so splitting and subdirectories are free. No constraints on file names. Concatenation happens in **dictionary order by path name** (module-scope declarations are order-independent, so this only matters for code depending on `var` initialization order). Non-`.wgsl` files (READMEs etc.) are ignored
+- **प्रारूप**: एक `.zip`, या एक फ़ोल्डर (फ़ोल्डर लोडिंग केवल डेस्कटॉप ब्राउज़र में)
+- **सामग्री**: एक `pack.json` (पैक के टॉप लेवल पर; केस-असंवेदनशील) + 1–256 `.wgsl` फ़ाइलें
+- कई `.wgsl` फ़ाइलें एक ही मॉड्यूल में जुड़ जाती हैं, इसलिए कोड बाँटना और सबडायरेक्टरी बनाना बेधड़क संभव है। फ़ाइल नामों पर कोई रोक-टोक नहीं। जुड़वाना **पाथ नाम के शब्दकोश क्रम में** होता है (मॉड्यूल-स्तरीय घोषणाएँ क्रम-से-स्वतंत्र होती हैं, इसलिए यह केवल उस कोड के लिए मायने रखता है जो `var` इनिशियलाइज़ेशन क्रम पर निर्भर हो)। ग़ैर-`.wgsl` फ़ाइलें (README आदि) नज़रअंदाज़ कर दी जाती हैं
 
-## Size and format limits
+## आकार और प्रारूप की सीमाएँ
 
-| Item | Limit | Message when exceeded |
+| वस्तु | सीमा | पार होने पर संदेश |
 |---|---|---|
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| `pack.json` size | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
-| `.wgsl` file count | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
-| zip shape | no zip64 / split / encrypted; store or deflate; no duplicate paths | each rejected with its own message |
+| zip आकार | 32 MB | `The zip is over 32 MB.` |
+| zip प्रविष्टियाँ | 1,024 | `The zip has more than 1024 entries.` |
+| `pack.json` आकार | 64 KB (UTF-8) | `pack.json is over 64 KB.` |
+| `.wgsl` फ़ाइल संख्या | 256 | `The pack has more than 256 .wgsl files.` |
+| कुल `.wgsl` स्रोत | 256 KB (UTF-8) | `The pack's .wgsl files are over 256 KB in total.` |
+| zip आकृति | कोई zip64 / split / एन्क्रिप्टेड नहीं; store या deflate; कोई डुप्लिकेट पाथ नहीं | हर एक अपने अलग संदेश के साथ अस्वीकृत |
 
-All files must be valid UTF-8.
+सभी फ़ाइलें वैध UTF-8 होनी चाहिए।
 
-## Zipping tips
+## Zip बनाने की युक्तियाँ
 
-A zip that stores everything under one common root folder has that prefix stripped automatically (macOS "Compress" works as-is; `__MACOSX`, `._`-prefixed files and `.DS_Store` are excluded automatically). Stray files at the root level break top-level detection, so the safest method is to zip `pack.json` and the `.wgsl` files directly (verify `pack.json` ends up at the zip root).
+जो zip सब कुछ एक साझा रूट फ़ोल्डर के नीचे रखता है, उसका वह उपसर्ग अपने आप हट जाता है (macOS का "Compress" जैसा-का-तैसा चलता है; `__MACOSX`, `._`-उपसर्ग वाली फ़ाइलें और `.DS_Store` अपने आप बाहर रह जाते हैं)। रूट लेवल पर पड़ी अनजान फ़ाइलें टॉप-लेवल पहचान बिगाड़ देती हैं, इसलिए सबसे सुरक्षित तरीका यही है कि `pack.json` और `.wgsl` फ़ाइलों को सीधे zip करें (जाँच लें कि `pack.json` zip के रूट में ही पहुँचे)।

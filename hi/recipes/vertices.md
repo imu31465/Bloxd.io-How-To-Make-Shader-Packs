@@ -1,25 +1,24 @@
-# वर्टेक्स रेसिपी (केवल allow)
+# शीर्ष (केवल allow)
 
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> सब कुछ `#ifndef BLOXD_STRICT` में लपेटें।
+> सटीक शर्तों (allow शीर्षक सूची; Custom Games का strict होना) के लिए देखें [गेम-अनुसार शेडर-पैक नीति](../internals/policy.md)
 
-
-> सब `#ifndef BLOXD_STRICT` से लपेटें।
-> सटीक शर्तों (allow शीर्षक सूची; Custom Games strict है) के लिए §30 देखें: [§30 गेम-अनुसार अनुप्रयोग मोड](../internals/)
-
-## घास पवन दोलन (शीर्ष ही हिलाएँ)
+## हवा में डोलती घास (केवल ऊपरी हिस्से हिलाएँ)
 
 ```wgsl
 #ifndef BLOXD_STRICT
 fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
     var out = bloxdDefaultVertex(v);
     let sway = sin(bloxdSeconds() * 1.7 + v.position.x * 0.6 + v.position.z * 0.5);
-    let sideFactor = max(0.0, 1.0 - abs(v.normal.y));   // लंब फलक ही
+    let sideFactor = max(0.0, 1.0 - abs(v.normal.y));   // केवल ऊर्ध्वाधर फलक
     out.position.y += sway * 0.05 * sideFactor;
     return out;
 }
 #endif
 ```
 
-## द्रव पृष्ठ तरंग (शीर्ष फलक ही)
+## तरल सतह की तरंगें (केवल ऊपरी फलक)
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -36,20 +35,20 @@ fn bloxdLiquidVertex(v: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-## स्पंदित टेरेन
+## साँस लेता टेरेन
 
 ```wgsl
 #ifndef BLOXD_STRICT
 fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
     var out = bloxdDefaultVertex(v);
     let pulse = sin(bloxdSeconds() * 0.8 + v.position.x * 0.2 + v.position.z * 0.2);
-    out.position += v.normal * pulse * 0.03;   // अभिलंब दिशा में हल्का फैलाव-सिकुड़न
+    out.position += v.normal * pulse * 0.03;   // अभिलंब की दिशा में हल्का फैलाव-सिकुड़ाव
     return out;
 }
 #endif
 ```
 
-## लहराता टेरेन (विशाल sin तरंग)
+## लहराता टेरेन (विशाल sin तरंगें)
 
 ```wgsl
 #ifndef BLOXD_STRICT

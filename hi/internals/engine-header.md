@@ -1,17 +1,17 @@
-# The engine header (v5, verbatim)
+# इंजन हेडर (शब्दशः)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live production bundle)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (लाइव प्रोडक्शन बंडल से बहाल)
 
-The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere.
+वह सटीक पाठ जो लोडर हर पैक के आगे जोड़ता है। लाइव प्रोडक्शन बंडल (`ab90qa`, चंक c55, टेम्पलेट को उसके 6 लाइव इंटरपोलेशन के साथ रेंडर करके — `apiVersion` और `bloxdPackInputs` के ज़रिए 5 uniform पठन) से बहाल किया गया। 8,954 बाइट डिकोडेड, 208 पंक्तियाँ। कहीं भी कोई पेराफ़्रेज़ नहीं।
 
-Reading guide:
-- Field-by-field explanations → [Structures](../api/structures.md)
-- Function-by-function → [Functions](../api/functions.md) / [Lighting](../api/lighting.md)
-- Flags (BloxdFlags) → [Flags](../api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](../api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](../api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](../history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](shader-validation.md)
+पठन गाइड:
+- फ़ील्ड-दर-फ़ील्ड व्याख्याएँ → [स्ट्रक्चर](../api/structures.md)
+- फ़ंक्शन-दर-फ़ंक्शन → [फ़ंक्शन](../api/functions.md) / [लाइटिंग](../api/lighting.md)
+- फ़्लैग (BloxdFlags) → [फ़्लैग](../api/flags.md)
+- `bloxdTextureId*` ब्लॉक इस हेडर में **नहीं** है — यह संदर्भित नामों से प्रति पैक जनरेट होता है ([टेक्सचर API](../api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` सशर्त फ़ील्ड चिह्नित करता है ([प्रीप्रोसेसर](../api/preprocessor.md))
+- v4 हेडर (6,021B) से अंतर → [संस्करण इतिहास: v5](../history/v5.md)
+- हेडर का सत्यापन कैसे होता है (HEADER_VERSION) → [शेडर सत्यापन](shader-validation.md)
 
 ```wgsl
 
@@ -223,8 +223,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Related
+## संबंधित
 
-- [API Reference](../api/) — the annotated version of this header
-- [Shader Validation](shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](engine-data.md) — the measurement ledger
+- [API रेफ़रेंस](../api/) — इस हेडर का टिप्पणी-सहित संस्करण
+- [शेडर सत्यापन](shader-validation.md) — HEADER_VERSION और सेव-किए-पैक का पुनः-सत्यापन
+- [इंजन डेटा](engine-data.md) — माप-लेजर

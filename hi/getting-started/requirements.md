@@ -1,33 +1,33 @@
-# Requirements
+# आवश्यकताएँ
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-## Browser
+## ब्राउज़र
 
-Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
+शेडर पैक केवल WebGPU-रेंडरर के लिए हैं। आपको WebGPU-सक्षम ब्राउज़र चाहिए:
 
-- Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
-- **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
+- Chromium-आधारित ब्राउज़र (Chrome / Edge / Opera आदि) — डेस्कटॉप पर स्थिर
+- Safari 17+ / Firefox (WebGPU समर्थन अवधि के साथ बदलता रहता है)
+- **मोबाइल**: iOS / Android पर WebGPU समर्थन सीमित हो सकता है। अपने पैक के रिलीज़ पेज पर यह ज़रूर लिखें
 
-While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
+पैक इंस्टॉल रहने के दौरान WebGPU रेंडरर की गेम सेटिंग ज़बरदस्ती चालू रहती है।
 
-## Development environment
+## डेवलपमेंट एनवायरनमेंट
 
-No special tooling is required, though these help:
+किसी ख़ास टूलिंग की ज़रूरत नहीं, पर ये मददगार हैं:
 
-- A text editor (WGSL syntax highlighting is a plus)
-- A zip tool for distribution; during development you can use folder loading (desktop browsers only)
-- Browser developer tools — compile errors show in the in-game UI and also in the console
+- एक टेक्स्ट एडिटर (WGSL सिंटैक्स हाइलाइटिंग हो तो और भी अच्छा)
+- वितरण के लिए एक zip टूल; डेवलपमेंट के दौरान फ़ोल्डर लोडिंग का इस्तेमाल कर सकते हैं (केवल डेस्कटॉप ब्राउज़र)
+- ब्राउज़र डेवलपर टूल्स — कंपाइल त्रुटियाँ इन-गेम UI में भी दिखती हैं और कंसोल में भी
 
-## On-device verification environments
+## ऑन-डिवाइस सत्यापन वातावरण
 
-Before distribution, verify on ([Validation](validation.md)):
+वितरण से पहले इन पर जाँचें ([सत्यापन](validation.md)):
 
-1. An allow-mode game (mandatory if you use vertex animation)
-2. A strict-mode game (most games are strict)
-3. A page reload (saved packs re-validate automatically)
+1. एक allow-मोड गेम (vertex एनिमेशन इस्तेमाल करते हैं तो अनिवार्य)
+2. एक strict-मोड गेम (ज़्यादातर गेम strict होते हैं)
+3. एक पेज रीलोड (सेव किए गए पैक अपने आप दोबारा सत्यापित होते हैं)
 
-## URL parameter caveat
+## URL पैरामीटर की सावधानी
 
-Leftover renderer overrides in URL parameters or localStorage make packs refuse to start — clear them and reload.
+URL पैरामीटर या localStorage में छूटा हुआ रेंडरर ओवरराइड पैक को चालू होने से रोक देता है — उन्हें हटाकर पेज रीलोड करें।

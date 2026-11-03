@@ -1,29 +1,29 @@
-# Reserved identifier internals
+# आरक्षित पहचानकर्ता इंटर्नल्स
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle's generators)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल के जनरेटरों से बहाल)
 
-The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](../api/restrictions.md).
+`bloxdSp*` नेमस्पेस — वे प्रतीक जो जनरेटर इंजेक्ट कर सकते हैं और जिन्हें पैक इसीलिए पुनः घोषित नहीं कर सकते। पैक-लेखकों के लिए सारांश: [प्रतिबंध](../api/restrictions.md)।
 
-## The 46 symbols
+## 46 प्रतीक
 
-Grown from v4's 27 to **46** (20 added, 1 retired — `bloxdSpLitColour`, promoted into the public `bloxdLitColour()`):
+v4 के 27 से बढ़कर **46** (20 जोड़े गए, 1 सेवानिवृत्त — `bloxdSpLitColour`, जिसे सार्वजनिक `bloxdLitColour()` में पदोन्नत किया गया):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
 
-## New names ↔ v5 features
+## नए नाम ↔ v5 सुविधाएँ
 
-- `bloxdSpFlags` — delivery of the `BloxdFlags` struct
-- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — the new inputs (enchant, model-local position)
-- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — the cell-sampling texture-pack path
-- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](texture-sampling.md))
-- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — extended-hook locals
+- `bloxdSpFlags` — `BloxdFlags` स्ट्रक्चर की डिलीवरी
+- `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — नए इनपुट (एनचैंट, मॉडल-स्थानीय स्थिति)
+- `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — सेल-सैंपलिंग टेक्सचर-पैक पथ
+- `bloxdSpQuarterTurns` — रोटेशन श्रृंखला ([टेक्सचर सैंपलिंग](texture-sampling.md))
+- `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — विस्तारित-हुक लोकल
 
-## The pack-level rule
+## पैक-स्तरीय नियम
 
-Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](../troubleshooting/validation.md)).
+इस नेमस्पेस से भी व्यापक: **`/^bloxd/i` से मेल खाता सब कुछ (केस-असंवेदनशील)**। केवल 9 हुक फ़ंक्शन नाम ही घोषित किए जा सकते हैं ([सत्यापन त्रुटियाँ](../troubleshooting/validation.md))।
 
-`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](../troubleshooting/textures.md)).
+`bloxdTextureId`-उपसर्गी पहचानकर्ता टेक्सचर नामों के रूप में रिज़ॉल्व होते हैं, जिनका अपना समर्पित त्रुटि-परिवार है ([टेक्सचर समस्याएँ](../troubleshooting/textures.md))।
 
-## Related
+## संबंधित
 
-- [Restrictions](../api/restrictions.md) · [Texture sampling](texture-sampling.md) · [Version History: v5](../history/v5.md)
+- [प्रतिबंध](../api/restrictions.md) · [टेक्सचर सैंपलिंग](texture-sampling.md) · [संस्करण इतिहास: v5](../history/v5.md)

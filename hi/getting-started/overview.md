@@ -1,33 +1,33 @@
-# Overview & prerequisites
+# अवलोकन व पूर्व-आवश्यकताएँ
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
-## What a shader pack is
+## शेडर पैक क्या है
 
-A Bloxd.io shader pack changes the look of the game's **WebGPU renderer only**. Packs are written in a **restricted subset of WGSL** and loaded from the in-game settings → Shader Pack screen as a zip or folder. While a pack is installed, the WebGPU renderer is force-enabled in settings.
+Bloxd.io शेडर पैक गेम के **केवल WebGPU रेंडरर** का लुक बदलता है। पैक **WGSL के प्रतिबंधित उपसमुच्चय** में लिखे जाते हैं और इन-गेम सेटिंग्स → Shader Pack स्क्रीन से zip या फ़ोल्डर के रूप में लोड होते हैं। पैक इंस्टॉल रहने पर सेटिंग्स में WebGPU रेंडरर ज़बरदस्ती चालू रहता है।
 
-Packs are validated and compiled as pure WGSL — no JavaScript execution, no networking. Nothing dangerous can happen with normal code.
+पैक सत्यापित होकर शुद्ध WGSL के रूप में कंपाइल होते हैं — कोई JavaScript निष्पादन नहीं, कोई नेटवर्किंग नहीं। सामान्य कोड से कुछ ख़तरनाक नहीं हो सकता।
 
-## What you can change (v5)
+## आप क्या बदल सकते हैं
 
-A pack plugs into the renderer's **3-stage per-face pipeline**. The render targets split into three programs with a total of **9 hooks**:
+पैक रेंडरर की **हर फलक वाली 3-चरणीय पाइपलाइन** में जुड़ता है। रेंडर लक्ष्य तीन प्रोग्रामों में बँटते हैं, कुल **9 हुक**:
 
-| Target | Hooks (Vertex / Surface / Light) | What is drawn |
+| लक्ष्य | हुक (Vertex / Surface / Light) | क्या ड्रॉ होता है |
 |---|---|---|
-| **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | All blocks except water and block models |
-| **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Water |
-| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block models (slabs, stairs, plants), items, players, mobs, NPCs, armour, cosmetics |
+| **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | पानी और ब्लॉक मॉडल के अलावा सभी ब्लॉक |
+| **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | पानी |
+| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | ब्लॉक मॉडल (स्लैब, सीढ़ियाँ, पौधे), आइटम, प्लेयर, मॉब, NPC, कवच, कॉस्मेटिक्स |
 
-- **Can do**: change colors, transparency and emission; rebuild lighting (published as the v5 [Lighting API](../api/lighting.md)); projected-style shadows (via `skyLight`); sample textures (`bloxdTexel` — reading the existing block-texture atlas); per-model effects (v5's `flags` tell you "this is a held item", "this is a player"); vertex animation (allow games only)
-- **Cannot do**: add your own textures (that is the texture-pack system's job); post-processing (bloom etc.); shadow-map shadows that rotate with the sun; true reflections (SSR); affect the sky, clouds or the sun disc itself
-- **Easy to miss but powerful**: **projected-style shadows using `skyLight` (voxel sky occlusion)** — clearly darken areas under trees and roofs. Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
+- **कर सकते हैं**: रंग, पारदर्शिता और उत्सर्जन बदलना; लाइटिंग फिर से खड़ी करना ([लाइटिंग API](../api/lighting.md)); प्रोजेक्टेड-शैली की छाया (`skyLight` से); टेक्सचर सैंपल करना (`bloxdTexel` — मौजूदा ब्लॉक-टेक्सचर एटलस पढ़ना); प्रति-मॉडल इफ़ेक्ट (`flags` बताते हैं "यह हाथ में पकड़ा हुआ आइटम है", "यह प्लेयर है"); vertex एनिमेशन (केवल allow गेम)
+- **नहीं कर सकते**: अपने टेक्सचर जोड़ना (वह टेक्सचर-पैक सिस्टम का काम है); पोस्ट-प्रोसेसिंग (ब्लूम आदि); सूर्य के साथ घूमती shadow-map छाया; सच्चा परावर्तन (SSR); आकाश, बादल या सूर्य की डिस्क पर असर
+- **आसानी से छूट जाता है पर ताक़तवर**: **`skyLight` (वोक्सेल आकाश-अवरोध) से बनी प्रोजेक्टेड-शैली छाया** — पेड़ों और छतों के नीचे के इलाक़ों को साफ़ तौर पर काला कर देती है। ब्लॉक तोड़ने पर LightEngine तुरंत पुनर्गणना कर देता है, इसलिए छाया असली वक़्त में साथ चलती रहती है
 
-## strict and allow modes
+## strict और allow मोड
 
-Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run in strict mode** (no vertex animation, no `discard`). Packs for general distribution must work in strict mode. See [Variants](variants.md) and the [policy reference](../internals/policy.md).
+हर गेम की एक शेडर-पैक नीति (`shaderPackPolicy`) होती है, और **ज़्यादातर गेम strict मोड में चलते हैं** (कोई vertex एनिमेशन नहीं, कोई `discard` नहीं)। आम वितरण के लिए बने पैकों को strict मोड में काम करना चाहिए। देखें [वेरिएंट](variants.md) और [नीति रेफ़रेंस](../internals/policy.md)।
 
-## Assumptions in this documentation
+## इस प्रलेखन की मान्यताएँ
 
-- The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](../api/compatibility.md))
-- Migrating a pack written for an older version? See [Version History](../history/)
-- Engine internals may change with updates, so every page names its target build
+- मौजूदा गेम केवल `apiVersion: 5` वाले पैक स्वीकार करता है; v1–v4 पैक लोड पर अस्वीकृत हो जाते हैं (सेव किए गए पैक चुपचाप निष्क्रिय हो जाते हैं — [कम्पैटिबिलिटी](../api/compatibility.md))
+- किसी पुराने संस्करण के लिए लिखा पैक माइग्रेट कर रहे हैं? देखें [संस्करण इतिहास](../history/)
+- इंजन के आंतरिक हिस्से अपडेट के साथ बदल सकते हैं, इसलिए हर पेज अपना लक्ष्य बिल्ड बताता है

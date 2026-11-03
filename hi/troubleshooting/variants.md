@@ -1,47 +1,47 @@
-# Variant-specific issues
+# वेरिएंट-विशिष्ट समस्याएँ
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-Problems that occur in only some of the 6 variants (`strict|allow` × `terrain|liquid|model`). v5 removed the lighting axis (the old `BLOXD_LIGHTING`) and the loader validates **all 6 variants at once** on load.
+वे समस्याएँ जो 6 में से केवल कुछ वेरिएंट (`strict|allow` × `terrain|liquid|model`) में घटित होती हैं। v5 ने लाइटिंग अक्ष (पुराना `BLOXD_LIGHTING`) हटा दिया और लोडर लोड के समय **सभी 6 वेरिएंट एक साथ** सत्यापित करता है।
 
-## Loads only in non-strict games / dropped in strict
+## केवल ग़ैर-strict गेमों में लोड होता है / strict में ड्रॉप
 
-- **Cause**: an unguarded vertex hook or a reachable `discard`; strict games forbid both and violate = **whole-pack auto-disable** (`shaderPack:offInStrict`)
-- **Check**: the loader screen shows `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
-- **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT`
-- **Prevention**: always start vertex hooks from the guarded template ([Variants](../getting-started/variants.md))
+- **कारण**: बिना गार्ड का vertex हुक या पहुँच योग्य `discard`; strict गेम दोनों पर रोक लगाते हैं और उल्लंघन = **पूरे पैक का स्वतः निष्क्रिय होना** (`shaderPack:offInStrict`)
+- **जाँच**: लोडर स्क्रीन पर `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.` दिखता है
+- **समाधान**: vertex हुकों और `discard` को `#ifndef BLOXD_STRICT` में लपेटें
+- **रोकथाम**: vertex हुक हमेशा गार्डेड टेम्पलेट से शुरू करें ([वेरिएंट](../getting-started/variants.md))
 
 ## ".alpha is undefined"
 
-- **Cause**: `alpha` exists only behind `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model)
-- **Fix**: wrap alpha-touching code in `#ifdef BLOXD_ALPHA` ([Preprocessor](../api/preprocessor.md#macro--variant-matrix))
+- **कारण**: `alpha` केवल `#ifdef BLOXD_ALPHA` के पीछे मौजूद है (सभी liquid + ग़ैर-strict terrain/model)
+- **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](../api/preprocessor.md#मकर--वरएट-मटरकस))
 
 ## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
 
-- **Cause**: strict variants have no vertex hooks at all, so no `BloxdVertex` either; vertex code is reachable from strict variants
-- **Fix**: guard the vertex hook
+- **कारण**: strict वेरिएंट में vertex हुक होते ही नहीं, इसलिए `BloxdVertex` भी नहीं; vertex कोड strict वेरिएंट से पहुँच योग्य है
+- **समाधान**: vertex हुक पर गार्ड लगाएँ
 
-## bloxdOpaqueBehind fails in only some variants
+## bloxdOpaqueBehind केवल कुछ वेरिएंट में विफल होता है
 
-- **Cause**: `BLOXD_SCENE_DEPTH` is defined only in all-liquid variants
-- **Fix**: `#ifdef BLOXD_SCENE_DEPTH` ([Validation errors](validation.md))
+- **कारण**: `BLOXD_SCENE_DEPTH` केवल सभी-liquid वेरिएंट में परिभाषित होता है
+- **समाधान**: `#ifdef BLOXD_SCENE_DEPTH` ([सत्यापन त्रुटियाँ](validation.md))
 
-## Water ignores the pack (Liquid)
+## पानी पैक को नज़रअंदाज़ करता है (Liquid)
 
-- **Symptom**: terrain hooks written, water unchanged
-- **Cause**: **in v5, if a pack defines no Liquid hook, no Terrain hook runs on water either** (the pre-v4 "liquid falls back to terrain" behavior is gone)
-- **Fix**: write Liquid hooks ([hook split](../api/hooks.md#what-each-program-draws))
+- **लक्षण**: terrain हुक लिखे हैं, पानी जैसा था वैसा ही है
+- **कारण**: **v5 में, यदि पैक कोई Liquid हुक परिभाषित नहीं करता, तो पानी पर कोई Terrain हुक भी नहीं चलता** (pre-v4 का "liquid, terrain पर गिर जाता है" व्यवहार जा चुका है)
+- **समाधान**: Liquid हुक लिखें ([हुक विभाजन](../api/hooks.md#हर-परगरम-कय-डर-करत-ह))
 
-## Models (entities, block models) unaffected
+## मॉडल (एंटिटी, ब्लॉक मॉडल) अछूते
 
-- **Cause**: out of scope before v5; now requires `bloxdModel*` hooks
-- **Fix**: define `bloxdModelSurface` / `bloxdModelLight` ([Models guide](../guides/models.md))
+- **कारण**: v5 से पहले दायरे से बाहर; अब `bloxdModel*` हुक चाहिए
+- **समाधान**: `bloxdModelSurface` / `bloxdModelLight` परिभाषित करें ([मॉडल गाइड](../guides/models.md))
 
-## About the 6-variant validation
+## 6-वेरिएंट सत्यापन के बारे में
 
-The loader validates **all 6 variants at once** at load (the lighting axis is no longer compiled separately). Even if a game uses only some conditions, distributed packs must anticipate all six.
+लोडर लोड पर **सभी 6 वेरिएंट एक साथ** सत्यापित करता है (लाइटिंग अक्ष अब अलग से कंपाइल नहीं होता)। भले ही कोई गेम केवल कुछ शर्तें उपयोग करता हो, वितरित पैकों को छहों की अपेक्षा रखनी चाहिए।
 
-| Variant | Macros defined |
+| वेरिएंट | परिभाषित मैक्रो |
 |---|---|
 | `allow.terrain` | `BLOXD_ALPHA` |
 | `allow.liquid` | `BLOXD_ALPHA` · `BLOXD_SCENE_DEPTH` |
@@ -50,6 +50,6 @@ The loader validates **all 6 variants at once** at load (the lighting axis is no
 | `strict.liquid` | `BLOXD_SCENE_DEPTH` |
 | `strict.model` | — |
 
-## Related
+## संबंधित
 
-- [Variants](../getting-started/variants.md) · [Preprocessor](../api/preprocessor.md) · [Policy](../internals/policy.md)
+- [वेरिएंट](../getting-started/variants.md) · [प्रीप्रोसेसर](../api/preprocessor.md) · [नीति](../internals/policy.md)

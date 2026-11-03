@@ -1,49 +1,49 @@
-# API version errors
+# API संस्करण त्रुटियाँ
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (verbatim from the live i18n dictionary)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव i18n डिक्शनरी से अक्षरशः)
 
-Errors around `apiVersion`. The current game accepts **only `5`**.
+`apiVersion` के आसपास की त्रुटियाँ। मौजूदा गेम **केवल `5`** स्वीकार करता है।
 
 ## "pack.json needs "apiVersion": {{version}}."
 
-- **Symptom**: this message right after load (`loadNoApiVersion`)
-- **Cause**: the `apiVersion` key is missing entirely
-- **Fix**: add `"apiVersion": 5` — a **number** (the string `"5"` fails)
-- **Prevention**: start from the [pack.json](../getting-started/manifest.md) template
+- **लक्षण**: लोड के तुरंत बाद यही संदेश (`loadNoApiVersion`)
+- **कारण**: `apiVersion` कुंजी पूरी तरह गायब है
+- **समाधान**: `"apiVersion": 5` जोड़ें — एक **संख्या** (स्ट्रिंग `"5"` विफल होती है)
+- **रोकथाम**: [pack.json](../getting-started/manifest.md) टेम्पलेट से शुरू करें
 
 ## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
 
-- **Symptom**: `loadWrongApiVersion`
-- **Cause**: `apiVersion` exists but isn't 5 (a v1–v4 pack)
-- **Fix**: apply the matching migration ([Version History](../history/)):
-  - v4 → v5: [the v5 guide](../history/v5.md) — mostly mechanical (flags · `bloxdLit()` · removing `bloxdFragmentBlockPosition`)
-  - v3 → v5: apply [v4](../history/v4.md) first
-  - v2 or earlier → v5: step through v3 → v4 → v5
-- **Prevention**: after any API update, check [Compatibility](../api/compatibility.md) and the matching migration guide
+- **लक्षण**: `loadWrongApiVersion`
+- **कारण**: `apiVersion` मौजूद है पर 5 नहीं है (कोई v1–v4 पैक)
+- **समाधान**: मिलता-जुलता माइग्रेशन लागू करें ([संस्करण इतिहास](../history/)):
+  - v4 → v5: [v5 गाइड](../history/v5.md) — ज़्यादातर यांत्रिक (flags · `bloxdLit()` · `bloxdFragmentBlockPosition` की चेतावनी)
+  - v3 → v5: पहले [v4](../history/v4.md) लागू करें
+  - v2 या उससे पुराना → v5: v3 → v4 → v5 क्रम से गुज़रें
+- **रोकथाम**: किसी भी API अपडेट के बाद [कम्पैटिबिलिटी](../api/compatibility.md) और मिलता-जुलता माइग्रेशन गाइड देखें
 
-## The string "5" is rejected
+## स्ट्रिंग "5" अस्वीकृत होती है
 
-- **Cause**: the loader compares `manifest.apiVersion !== 5` **strictly** (`===`); a JSON string `"5"` is not the number 5
-- **Fix**: `"apiVersion": 5` (unquoted)
+- **कारण**: लोडर `manifest.apiVersion !== 5` की तुलना **सख़्ती से** (`===`) करता है; JSON स्ट्रिंग `"5"` संख्या 5 नहीं होती
+- **समाधान**: `"apiVersion": 5` (बिना कोट्स)
 
-## A saved old pack silently stopped working
+## सहेजा गया पुराना पैक चुपचाप काम करना बंद कर देता है
 
-- **Symptom**: a previously-working v1–v4 pack is unresponsive, with no exception
-- **Cause**: saved packs resolve to `{kind: "none", reason: "otherApiVersion"}` and become **silently inactive**
-- **Check**: the settings-tab status line: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-- **Fix**: load a migrated replacement from the same screen
-- **Prevention**: after API updates, re-release a bumped version and announce it ([Distribution](../getting-started/distribution.md))
+- **लक्षण**: पहले ठीक चलता हुआ v1–v4 पैक बिना किसी अपवाद के निष्क्रिय पड़ा रहता है
+- **कारण**: सहेजे गए पैक `{kind: "none", reason: "otherApiVersion"}` पर रिज़ॉल्व होकर **मौन रूप से निष्क्रिय** हो जाते हैं
+- **जाँच**: सेटिंग्स-टैब की स्थिति पंक्ति: `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+- **समाधान**: उसी स्क्रीन से माइग्रेट किया हुआ विकल्प लोड करें
+- **रोकथाम**: API अपडेट के बाद बढ़ा हुआ संस्करण दोबारा जारी करें और घोषणा करें ([वितरण](../getting-started/distribution.md))
 
-## A migrated v4 pack fails validation
+## माइग्रेट किया हुआ v4 पैक सत्यापन में विफल होता है
 
-The three typical patterns (full steps in the [v5 migration guide](../history/v5.md)):
+तीन आम पैटर्न (पूरे चरण [v5 माइग्रेशन गाइड](../history/v5.md) में):
 
-| Validation message | Cause | Fix |
+| सत्यापन संदेश | कारण | समाधान |
 |---|---|---|
-| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` usage | rewrite as `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` |
-| `bloxdBlockFlagRock isn't part of the shader pack API...` (reserved-name diagnostic) | leftover bit-constant references | use `surface.flags.rock` etc. (1:1 table in [Flags](../api/flags.md)) |
-| `bloxdFragmentBlockPosition` missing | removed in v5 | delete call sites (no replacement — use `flags`) |
+| `BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.` | `#ifdef BLOXD_LIGHTING` का उपयोग | इस रूप में दोबारा लिखें: `if (bloxdLit()) { ... } else { return bloxdDefaultLight(s, l); }` |
+| `bloxdBlockFlagRock isn't part of the shader pack API...` (आरक्षित-नाम निदान) | छूटे हुए बिट-कॉन्स्टैंट संदर्भ | `surface.flags.rock` आदि का उपयोग करें ([फ़्लैग](../api/flags.md) में 1:1 तालिका) |
+| `bloxdFragmentBlockPosition` गायब | v5 से डॉक्यूमेंटेड हेडर से बाहर (फिर भी इंजेक्ट और स्वीकृत — देखें [फ़ंक्शन](../api/functions.md)) | ठीक करने योग्य त्रुटि नहीं: यह कंपाइल होता है; नए कोड में `flags` / `bloxdWorldPosition()` को प्राथमिकता दें |
 
-## Related
+## संबंधित
 
-- [Compatibility](../api/compatibility.md) · [Version History](../history/) · [pack.json](../getting-started/manifest.md)
+- [कम्पैटिबिलिटी](../api/compatibility.md) · [संस्करण इतिहास](../history/) · [pack.json](../getting-started/manifest.md)

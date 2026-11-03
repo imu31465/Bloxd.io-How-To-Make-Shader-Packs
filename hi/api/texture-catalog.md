@@ -1,30 +1,42 @@
-# Texture catalog
+# टेक्सचर कैटलॉग
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-03) · स्थिति: Verified (इंजन के अपने रजिस्ट्री बिल्डर को दोबारा चलाकर निकाला गया)
 
-The complete catalog of usable texture-name constants (`bloxdTextureId*`). **896 names**, alphabetical.
+प्रयोग-योग्य टेक्सचर-नाम स्थिरांकों (`bloxdTextureId*`) का पूरा कैटलॉग। **896 नाम**, वर्णनिक्रम में।
 
-## How to read
+## कैसे पढ़ें
 
-The **name** column is the registry name — the handle you actually write. Constant spelling CamelCases the file name: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Case and underscores are not distinguished** (`bloxdTextureId_grass_top` resolves identically to `bloxdTextureIdGrassTop`). Names are the API — the loader re-resolves them against the live registry at load, so names survive registry drift ([Texture API](texture-api.md)).
+**नाम** कॉलम रजिस्ट्री का नाम है — वह हैंडल जो आप वास्तव में लिखते हैं। स्थिरांक की स्पेलिंग फ़ाइल नाम का CamelCase रूप है: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`। **केस और अंडरस्कोर का भेद नहीं किया जाता** (`bloxdTextureId_grass_top` वैसे ही रिज़ॉल्व होता है जैसे `bloxdTextureIdGrassTop`)। नाम ही API हैं — लोडर लोड के समय इन्हें लाइव रजिस्ट्री के मुकाबले दोबारा रिज़ॉल्व करता है, इसलिए नाम रजिस्ट्री के ड्रिफ़्ट से बच निकलते हैं ([टेक्सचर API](texture-api.md))।
 
-The **id** column is the value the constant compares against — measured on `ab90qa` (atlas layer + 1). Use it to decode `surface.textureId` dumps and to cross-check debug output against the day's build. **Never write ids into WGSL** — they are a snapshot of one build's atlas order (see the drift measurements below).
+**id** कॉलम वह मान है जिससे स्थिरांक की तुलना होती है — `ab90qa` पर मापा गया (एटलस लेयर + 1)। इसे `surface.textureId` डंप्स को डिकोड करने और डिबग आउटपुट को उस दिन के बिल्ड से मिलाने के लिए उपयोग करें। **WGSL में कभी id न लिखें** — वे एक बिल्ड के एटलस क्रम का स्नैपशॉट हैं (नीचे ड्रिफ़्ट माप देखें)।
 
-The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
+**टिप्पणियाँ** कॉलम दो फ़ोल्डिंग परिवारों को चिह्नित करता है। "anim (N फ़्रेम)" का अर्थ है कि इस नाम को सैंपल करने पर मौजूदा एनीमेशन फ़्रेम अपने आप लौट आता है — **फ़्रेम सफ़िक्स कभी न लिखें** (`lava0` एक ज्ञात उपनाम है जिसके लिए समर्पित डायग्नोस्टिक मिलता है)। "रोटेशन परिवार (4 प्रतियाँ)" का अर्थ है कि टेक्सचर केवल पहले से घुमाई हुई स्लॉटों के रूप में मौजूद है — नाम मूल की ओर इशारा करता है और `bloxdTexel` रोटेशन दोबारा लगाता है। ठीक एक नाम (`radar_screen`) दोनों टिप्पणियाँ ले चलता है।
 
-Deliberately **not** listed: the remaining registry spellings — 188 frame aliases and 228 rotation aliases — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,210-row layer table (including 171 pre-rotated slots) is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
+जान-बूझकर **नहीं** सूचीबद्ध: रजिस्ट्री की बाकी स्पेलिंग — 188 फ़्रेम उपनाम और 228 रोटेशन उपनाम — जो प्रयोग-योग्य स्थिरांक नहीं हैं; इन्हें लिखने पर समर्पित इंजन त्रुटि संदेश मिलते हैं। इसके नीचे पड़ी 1,210-पंक्तियों की लेयर टेबल (171 पहले-घुमाई स्लॉट सहित) इंजन-आंतरिक है और [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](../internals/texture-registry.md) में कवर की गई है।
 
-## The catalog
+### ये संख्याएँ आपस में कैसे जुड़ती हैं
 
-All usable names, alphabetically. The id column is the `bloxdTextureId*` value — measured on `ab90qa` (2026-11-03). **Ids are snapshots; treat names as the API**: even between the v4 build (cnty9) and this build, 334 of the names that kept their spelling changed id (see the drift measurements below).
+ये संख्याएँ अलग-अलग समुच्चयों को नाम देती हैं, इसलिए इनका सीधा-सादा योग नहीं बैठता:
 
-| Name | id (ab90qa) | Notes |
+| संख्या | यह क्या गिनती है |
+|---|---|
+| **896** | प्रयोग-योग्य नामित स्थिरांक — टेक्सचर नाम जिन्हें आप `bloxdTextureId*` के रूप में लिख सकते हैं |
+| **416** | उपनाम नाम (188 फ़्रेम + 228 रोटेशन) — पहचानी जाने वाली स्पेलिंग जो *अस्वीकृत* होकर मूल नाम की ओर राह दिखाती हैं; वे नाम हैं, स्थिरांक नहीं, और कोई id नहीं जोड़तीं |
+| **1,210** | एटलस प्रविष्टियाँ — टेक्सचर एटलस के असली स्लॉट (ids 1–1210) |
+
+896 में से हर नाम एक अलग एटलस प्रविष्टि पर मैप होता है। बची हुई **314 प्रविष्टियाँ** बिना प्रयोग-योग्य नाम वाले अतिरिक्त एनीमेशन फ़्रेम (143) और पहले-घुमाई प्रतियाँ (171) हैं — पैक कभी उन्हें सीधे संदर्भित नहीं करते, क्योंकि `bloxdTexel` फ़्रेम चलाता है और रोटेशन अपने आप लगाता है। हर एनीमेशन परिवार का पहला फ़्रेम और हर रोटेशन परिवार का मूल *नाम रखते हैं*, इसीलिए कुछ प्रविष्टियाँ "नामित" और "फ़्रेम/रोटेशन आधार" दोनों गिनती में आती हैं। पिछले बिल्ड से तुलना के लिए: v4 में 905 प्रयोग-योग्य नाम थे; इस बिल्ड में 896 हैं (+1 `scorpion_eggs`, −10 डबल-चेस्ट ×8 और मॉब-स्पॉनर साइड ×2), और बचे रह गए नामों में से 334 का id बदल गया।
+
+## कैटलॉग
+
+सभी प्रयोग-योग्य नाम, वर्णनिक्रम में। id कॉलम `bloxdTextureId*` का मान है — `ab90qa` (2026-11-03) पर मापा गया। **Id स्नैपशॉट हैं; नामों को ही API मानें**: v4 बिल्ड (cnty9) और इस बिल्ड के बीच भी, अपनी स्पेलिंग बचाए रखने वाले नामों में से 334 का id बदल गया (नीचे ड्रिफ़्ट माप देखें)।
+
+| नाम | id (ab90qa) | टिप्पणियाँ |
 |---|---|---|
 | `alloy_kiln_back` | 1089 |  |
 | `alloy_kiln_front` | 1083 |  |
 | `alloy_kiln_side` | 1084 |  |
-| `alloy_kiln_side_running` | 33 | anim (4 frames) |
-| `alloy_kiln_top` | 1085 | rotation family (4 copies) |
+| `alloy_kiln_side_running` | 33 | anim (4 फ़्रेम) |
+| `alloy_kiln_top` | 1085 | रोटेशन परिवार (4 प्रतियाँ) |
 | `andesite_brick` | 465 |  |
 | `apple_block_bottom` | 441 |  |
 | `apple_block_side` | 439 |  |
@@ -38,8 +50,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `auto_bench_back` | 1104 |  |
 | `auto_bench_front` | 1098 |  |
 | `auto_bench_side` | 1099 |  |
-| `auto_bench_side_running` | 35 | anim (4 frames) |
-| `auto_bench_top` | 1100 | rotation family (4 copies) |
+| `auto_bench_side_running` | 35 | anim (4 फ़्रेम) |
+| `auto_bench_top` | 1100 | रोटेशन परिवार (4 प्रतियाँ) |
 | `autocrafter_bottom` | 960 |  |
 | `autocrafter_lunite_bottom` | 971 |  |
 | `autocrafter_lunite_side` | 970 |  |
@@ -58,30 +70,30 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `belt_loader_slab_front` | 1108 |  |
 | `belt_loader_top` | 1107 |  |
 | `belt_tunnel_back` | 1197 |  |
-| `belt_tunnel_exit_top` | 1198 | rotation family (4 copies) |
+| `belt_tunnel_exit_top` | 1198 | रोटेशन परिवार (4 प्रतियाँ) |
 | `belt_tunnel_mouth` | 1191 |  |
 | `belt_tunnel_side` | 1192 |  |
-| `belt_tunnel_top` | 1193 | rotation family (4 copies) |
+| `belt_tunnel_top` | 1193 | रोटेशन परिवार (4 प्रतियाँ) |
 | `black_concrete` | 273 |  |
-| `black_glazed_terracotta` | 429 | rotation family (4 copies) |
+| `black_glazed_terracotta` | 429 | रोटेशन परिवार (4 प्रतियाँ) |
 | `black_planks` | 366 |  |
-| `black_portal` | 2 | anim (4 frames) |
+| `black_portal` | 2 | anim (4 फ़्रेम) |
 | `black_spawn_block_side` | 760 |  |
-| `black_spawn_block_top` | 756 | rotation family (4 copies) |
+| `black_spawn_block_top` | 756 | रोटेशन परिवार (4 प्रतियाँ) |
 | `block_destroyer_tnt_side` | 1015 |  |
 | `block_destroyer_tnt_top` | 1016 |  |
 | `blue_concrete` | 274 |  |
 | `blue_gen_spawn_coal` | 774 |  |
 | `blue_gen_spawn_iron` | 775 |  |
 | `blue_gen_spawn_top` | 773 |  |
-| `blue_glazed_terracotta` | 413 | rotation family (4 copies) |
+| `blue_glazed_terracotta` | 413 | रोटेशन परिवार (4 प्रतियाँ) |
 | `blue_lucky_block` | 992 |  |
 | `blue_lucky_block_rare` | 994 |  |
 | `blue_lucky_block_super` | 996 |  |
 | `blue_planks` | 362 |  |
-| `blue_portal` | 3 | anim (4 frames) |
+| `blue_portal` | 3 | anim (4 फ़्रेम) |
 | `blue_spawn_block_side` | 755 |  |
-| `blue_spawn_block_top` | 751 | rotation family (4 copies) |
+| `blue_spawn_block_top` | 751 | रोटेशन परिवार (4 प्रतियाँ) |
 | `bone_block_side` | 818 |  |
 | `bone_block_top` | 819 |  |
 | `bookshelf` | 564 |  |
@@ -99,12 +111,12 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `bread_block_top` | 437 |  |
 | `brick` | 315 |  |
 | `brown_concrete` | 275 |  |
-| `brown_glazed_terracotta` | 417 | rotation family (4 copies) |
+| `brown_glazed_terracotta` | 417 | रोटेशन परिवार (4 प्रतियाँ) |
 | `brown_mushroom_block` | 536 |  |
 | `brown_planks` | 363 |  |
-| `brown_portal` | 4 | anim (4 frames) |
+| `brown_portal` | 4 | anim (4 फ़्रेम) |
 | `brown_spawn_block_side` | 750 |  |
-| `brown_spawn_block_top` | 746 | rotation family (4 copies) |
+| `brown_spawn_block_top` | 746 | रोटेशन परिवार (4 प्रतियाँ) |
 | `building_lucky_block` | 987 |  |
 | `building_lucky_block_rare` | 989 |  |
 | `building_lucky_block_super` | 991 |  |
@@ -112,8 +124,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `burner_drill_bottom` | 1045 |  |
 | `burner_drill_front` | 1039 |  |
 | `burner_drill_side` | 1040 |  |
-| `burner_drill_side_running` | 27 | anim (4 frames) |
-| `burner_drill_top` | 1041 | rotation family (4 copies) |
+| `burner_drill_side_running` | 27 | anim (4 फ़्रेम) |
+| `burner_drill_top` | 1041 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cactus_dry` | 350 |  |
 | `cactus_top` | 349 |  |
 | `carrot_block_bottom` | 919 |  |
@@ -174,14 +186,14 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `charge_vault_top` | 1111 |  |
 | `charging_pad_side` | 1157 |  |
 | `charging_pad_top` | 1156 |  |
-| `checkpoint_block` | 761 | rotation family (4 copies) |
+| `checkpoint_block` | 761 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cherry_block_bottom` | 590 |  |
 | `cherry_block_side` | 588 |  |
 | `cherry_block_top` | 589 |  |
 | `chest_back` | 347 |  |
 | `chest_front` | 341 |  |
 | `chest_side` | 342 |  |
-| `chest_top` | 343 | rotation family (4 copies) |
+| `chest_top` | 343 | रोटेशन परिवार (4 प्रतियाँ) |
 | `chili_pepper_block_bottom` | 678 |  |
 | `chili_pepper_block_side` | 676 |  |
 | `chili_pepper_block_top` | 677 |  |
@@ -213,35 +225,35 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `crafting_table_top` | 339 |  |
 | `crate` | 916 |  |
 | `crop_harvester_back` | 1190 |  |
-| `crop_harvester_back_running` | 45 | anim (4 frames) |
+| `crop_harvester_back_running` | 45 | anim (4 फ़्रेम) |
 | `crop_harvester_front` | 1184 |  |
 | `crop_harvester_side` | 1185 |  |
-| `crop_harvester_side_running` | 44 | anim (4 frames) |
-| `crop_harvester_top` | 1186 | rotation family (4 copies) |
+| `crop_harvester_side_running` | 44 | anim (4 फ़्रेम) |
+| `crop_harvester_top` | 1186 | रोटेशन परिवार (4 प्रतियाँ) |
 | `crusher_back` | 1053 |  |
 | `crusher_front` | 1047 |  |
 | `crusher_side` | 1048 |  |
-| `crusher_side_running` | 28 | anim (4 frames) |
-| `crusher_top` | 1049 | rotation family (4 copies) |
+| `crusher_side_running` | 28 | anim (4 फ़्रेम) |
+| `crusher_top` | 1049 | रोटेशन परिवार (4 प्रतियाँ) |
 | `crystal_block` | 1027 |  |
 | `crystal_vat_back` | 1164 |  |
 | `crystal_vat_front` | 1158 |  |
 | `crystal_vat_side` | 1159 |  |
-| `crystal_vat_side_running` | 42 | anim (4 frames) |
-| `crystal_vat_top` | 1160 | rotation family (4 copies) |
+| `crystal_vat_side_running` | 42 | anim (4 फ़्रेम) |
+| `crystal_vat_top` | 1160 | रोटेशन परिवार (4 प्रतियाँ) |
 | `custom_lobby_block_side` | 769 |  |
-| `custom_lobby_block_top` | 765 | rotation family (4 copies) |
+| `custom_lobby_block_top` | 765 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cut_red_sandstone` | 457 |  |
 | `cut_sandstone` | 453 |  |
 | `cyan_concrete` | 276 |  |
 | `cyan_gen_spawn_coal` | 783 |  |
 | `cyan_gen_spawn_iron` | 784 |  |
 | `cyan_gen_spawn_top` | 782 |  |
-| `cyan_glazed_terracotta` | 405 | rotation family (4 copies) |
+| `cyan_glazed_terracotta` | 405 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cyan_planks` | 360 |  |
-| `cyan_portal` | 5 | anim (4 frames) |
+| `cyan_portal` | 5 | anim (4 फ़्रेम) |
 | `cyan_spawn_block_side` | 745 |  |
-| `cyan_spawn_block_top` | 741 | rotation family (4 copies) |
+| `cyan_spawn_block_top` | 741 | रोटेशन परिवार (4 प्रतियाँ) |
 | `dark_green_bricks` | 460 |  |
 | `darkstone` | 1204 |  |
 | `darkstone_bricks` | 1205 |  |
@@ -253,8 +265,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `deep_drill_bottom` | 1137 |  |
 | `deep_drill_front` | 1131 |  |
 | `deep_drill_side` | 1132 |  |
-| `deep_drill_side_running` | 39 | anim (4 frames) |
-| `deep_drill_top` | 1133 | rotation family (4 copies) |
+| `deep_drill_side_running` | 39 | anim (4 फ़्रेम) |
+| `deep_drill_top` | 1133 | रोटेशन परिवार (4 प्रतियाँ) |
 | `diamond_block` | 340 |  |
 | `diamond_gen_spawn_side` | 807 |  |
 | `diamond_gen_spawn_top` | 806 |  |
@@ -270,8 +282,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `electric_drill_bottom` | 1096 |  |
 | `electric_drill_front` | 1090 |  |
 | `electric_drill_side` | 1091 |  |
-| `electric_drill_side_running` | 34 | anim (4 frames) |
-| `electric_drill_top` | 1092 | rotation family (4 copies) |
+| `electric_drill_side_running` | 34 | anim (4 फ़्रेम) |
+| `electric_drill_top` | 1092 | रोटेशन परिवार (4 प्रतियाँ) |
 | `emerald_block` | 237 |  |
 | `emerald_ore` | 231 |  |
 | `end_stone` | 226 |  |
@@ -379,7 +391,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `furnace_side` | 336 |  |
 | `furnace_top` | 337 |  |
 | `generator_side` | 1061 |  |
-| `generator_side_running` | 30 | anim (4 frames) |
+| `generator_side_running` | 30 | anim (4 फ़्रेम) |
 | `generator_top` | 1062 |  |
 | `ghost_chest_back` | 954 |  |
 | `ghost_chest_front` | 951 |  |
@@ -417,24 +429,24 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `gray_gen_spawn_coal` | 792 |  |
 | `gray_gen_spawn_iron` | 793 |  |
 | `gray_gen_spawn_top` | 791 |  |
-| `gray_glazed_terracotta` | 397 | rotation family (4 copies) |
+| `gray_glazed_terracotta` | 397 | रोटेशन परिवार (4 प्रतियाँ) |
 | `gray_planks` | 358 |  |
-| `gray_portal` | 6 | anim (4 frames) |
+| `gray_portal` | 6 | anim (4 फ़्रेम) |
 | `gray_spawn_block_side` | 740 |  |
-| `gray_spawn_block_top` | 736 | rotation family (4 copies) |
+| `gray_spawn_block_top` | 736 | रोटेशन परिवार (4 प्रतियाँ) |
 | `green_bricks` | 459 |  |
 | `green_concrete` | 285 |  |
-| `green_glazed_terracotta` | 421 | rotation family (4 copies) |
+| `green_glazed_terracotta` | 421 | रोटेशन परिवार (4 प्रतियाँ) |
 | `green_lucky_block` | 1004 |  |
 | `green_lucky_block_rare` | 1006 |  |
 | `green_lucky_block_super` | 1008 |  |
 | `green_planks` | 364 |  |
-| `green_portal` | 7 | anim (4 frames) |
+| `green_portal` | 7 | anim (4 फ़्रेम) |
 | `green_spawn_block_side` | 735 |  |
-| `green_spawn_block_top` | 731 | rotation family (4 copies) |
+| `green_spawn_block_top` | 731 | रोटेशन परिवार (4 प्रतियाँ) |
 | `green_stone` | 458 |  |
 | `grenade_block` | 581 |  |
-| `grey_portal` | 8 | anim (4 frames) |
+| `grey_portal` | 8 | anim (4 फ़्रेम) |
 | `gun_lucky_block` | 950 |  |
 | `hardened_clay` | 254 |  |
 | `hardened_clay_stained_black` | 270 |  |
@@ -465,7 +477,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `homestead_core` | 1035 |  |
 | `homestead_core_cap` | 1120 |  |
 | `homestead_core_crown` | 1119 |  |
-| `homestead_core_mid` | 26 | anim (4 frames) |
+| `homestead_core_mid` | 26 | anim (4 फ़्रेम) |
 | `hyper_compressed_messy_stone` | 533 |  |
 | `ice` | 326 |  |
 | `ice_brick` | 468 |  |
@@ -475,7 +487,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `iron_chest_back` | 915 |  |
 | `iron_chest_front` | 909 |  |
 | `iron_chest_side` | 910 |  |
-| `iron_chest_top` | 911 | rotation family (4 copies) |
+| `iron_chest_top` | 911 | रोटेशन परिवार (4 प्रतियाँ) |
 | `iron_deposit` | 1031 |  |
 | `iron_ore` | 228 |  |
 | `iron_watermelon_side` | 546 |  |
@@ -484,7 +496,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `jungle_grass_block_side` | 886 |  |
 | `lapis_block` | 236 |  |
 | `lapis_ore` | 230 |  |
-| `lava` | 1 | anim (8 frames) |
+| `lava` | 1 | anim (8 फ़्रेम) |
 | `leather_block_side` | 906 |  |
 | `leather_block_top` | 907 |  |
 | `leaves_aspen` | 288 |  |
@@ -508,27 +520,27 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `leaves_plum_fruity` | 901 |  |
 | `leaves_spectral` | 830 |  |
 | `light_blue_concrete` | 277 |  |
-| `light_blue_glazed_terracotta` | 381 | rotation family (4 copies) |
+| `light_blue_glazed_terracotta` | 381 | रोटेशन परिवार (4 प्रतियाँ) |
 | `light_blue_lucky_block` | 931 |  |
 | `light_blue_planks` | 354 |  |
 | `light_blue_spawn_block_side` | 730 |  |
-| `light_blue_spawn_block_top` | 726 | rotation family (4 copies) |
+| `light_blue_spawn_block_top` | 726 | रोटेशन परिवार (4 प्रतियाँ) |
 | `light_gray_concrete` | 272 |  |
-| `light_gray_glazed_terracotta` | 401 | rotation family (4 copies) |
+| `light_gray_glazed_terracotta` | 401 | रोटेशन परिवार (4 प्रतियाँ) |
 | `light_gray_planks` | 359 |  |
 | `light_gray_spawn_block_side` | 725 |  |
-| `light_gray_spawn_block_top` | 721 | rotation family (4 copies) |
-| `lightblue_portal` | 9 | anim (4 frames) |
-| `lightgray_portal` | 10 | anim (4 frames) |
+| `light_gray_spawn_block_top` | 721 | रोटेशन परिवार (4 प्रतियाँ) |
+| `lightblue_portal` | 9 | anim (4 फ़्रेम) |
+| `lightgray_portal` | 10 | anim (4 फ़्रेम) |
 | `lime_concrete` | 278 |  |
 | `lime_gen_spawn_coal` | 777 |  |
 | `lime_gen_spawn_iron` | 778 |  |
 | `lime_gen_spawn_top` | 776 |  |
-| `lime_glazed_terracotta` | 389 | rotation family (4 copies) |
+| `lime_glazed_terracotta` | 389 | रोटेशन परिवार (4 प्रतियाँ) |
 | `lime_planks` | 356 |  |
-| `lime_portal` | 11 | anim (4 frames) |
+| `lime_portal` | 11 | anim (4 फ़्रेम) |
 | `lime_spawn_block_side` | 720 |  |
-| `lime_spawn_block_top` | 716 | rotation family (4 copies) |
+| `lime_spawn_block_top` | 716 | रोटेशन परिवार (4 प्रतियाँ) |
 | `log_ancient_maple` | 1019 |  |
 | `log_aspen` | 202 |  |
 | `log_cedar` | 201 |  |
@@ -550,11 +562,11 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `machine_bench_top` | 1114 |  |
 | `machine_side` | 1037 |  |
 | `magenta_concrete` | 279 |  |
-| `magenta_glazed_terracotta` | 377 | rotation family (4 copies) |
+| `magenta_glazed_terracotta` | 377 | रोटेशन परिवार (4 प्रतियाँ) |
 | `magenta_planks` | 353 |  |
-| `magenta_portal` | 12 | anim (4 frames) |
+| `magenta_portal` | 12 | anim (4 फ़्रेम) |
 | `magenta_spawn_block_side` | 715 |  |
-| `magenta_spawn_block_top` | 711 | rotation family (4 copies) |
+| `magenta_spawn_block_top` | 711 | रोटेशन परिवार (4 प्रतियाँ) |
 | `magma` | 451 |  |
 | `mailbox_front` | 571 |  |
 | `mailbox_front_full` | 573 |  |
@@ -574,7 +586,7 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `moonstone_chest_back` | 449 |  |
 | `moonstone_chest_front` | 443 |  |
 | `moonstone_chest_side` | 444 |  |
-| `moonstone_chest_top` | 445 | rotation family (4 copies) |
+| `moonstone_chest_top` | 445 | रोटेशन परिवार (4 प्रतियाँ) |
 | `moonstone_explosive_side` | 332 |  |
 | `moonstone_explosive_top` | 333 |  |
 | `moonstone_gen_spawn_side` | 809 |  |
@@ -606,14 +618,14 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `obby_death_block` | 815 |  |
 | `obsidian` | 327 |  |
 | `orange_concrete` | 280 |  |
-| `orange_glazed_terracotta` | 373 | rotation family (4 copies) |
+| `orange_glazed_terracotta` | 373 | रोटेशन परिवार (4 प्रतियाँ) |
 | `orange_lucky_block` | 998 |  |
 | `orange_lucky_block_rare` | 1000 |  |
 | `orange_lucky_block_super` | 1002 |  |
 | `orange_planks` | 352 |  |
-| `orange_portal` | 13 | anim (4 frames) |
+| `orange_portal` | 13 | anim (4 फ़्रेम) |
 | `orange_spawn_block_side` | 710 |  |
-| `orange_spawn_block_top` | 706 | rotation family (4 copies) |
+| `orange_spawn_block_top` | 706 | रोटेशन परिवार (4 प्रतियाँ) |
 | `ore_gen_spawn_side` | 811 |  |
 | `ore_gen_spawn_top` | 810 |  |
 | `packed_snow` | 825 |  |
@@ -647,11 +659,11 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `pink_gen_spawn_coal` | 789 |  |
 | `pink_gen_spawn_iron` | 790 |  |
 | `pink_gen_spawn_top` | 788 |  |
-| `pink_glazed_terracotta` | 393 | rotation family (4 copies) |
+| `pink_glazed_terracotta` | 393 | रोटेशन परिवार (4 प्रतियाँ) |
 | `pink_planks` | 357 |  |
-| `pink_portal` | 14 | anim (4 frames) |
+| `pink_portal` | 14 | anim (4 फ़्रेम) |
 | `pink_spawn_block_side` | 705 |  |
-| `pink_spawn_block_top` | 701 | rotation family (4 copies) |
+| `pink_spawn_block_top` | 701 | रोटेशन परिवार (4 प्रतियाँ) |
 | `planks_aspen` | 205 |  |
 | `planks_cedar` | 209 |  |
 | `planks_cherry` | 584 |  |
@@ -674,8 +686,8 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `press_back` | 1069 |  |
 | `press_front` | 1063 |  |
 | `press_side` | 1064 |  |
-| `press_side_running` | 31 | anim (4 frames) |
-| `press_top` | 1065 | rotation family (4 copies) |
+| `press_side_running` | 31 | anim (4 फ़्रेम) |
+| `press_top` | 1065 | रोटेशन परिवार (4 प्रतियाँ) |
 | `protector` | 348 |  |
 | `protector_faction` | 575 |  |
 | `protector_tribe` | 574 |  |
@@ -690,18 +702,18 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `pure_moonstone_ore` | 1026 |  |
 | `pure_voltite_ore` | 1203 |  |
 | `purple_concrete` | 282 |  |
-| `purple_glazed_terracotta` | 409 | rotation family (4 copies) |
+| `purple_glazed_terracotta` | 409 | रोटेशन परिवार (4 प्रतियाँ) |
 | `purple_lucky_block` | 986 |  |
 | `purple_lucky_block_rare` | 988 |  |
 | `purple_lucky_block_super` | 990 |  |
 | `purple_planks` | 361 |  |
-| `purple_portal` | 15 | anim (4 frames) |
+| `purple_portal` | 15 | anim (4 फ़्रेम) |
 | `purple_spawn_block_side` | 700 |  |
-| `purple_spawn_block_top` | 696 | rotation family (4 copies) |
+| `purple_spawn_block_top` | 696 | रोटेशन परिवार (4 प्रतियाँ) |
 | `quartz_block_chiseled` | 320 |  |
 | `quartz_block_side` | 319 |  |
 | `radar_bottom` | 927 |  |
-| `radar_screen` | 19 | anim (4 frames) rotation family (4 copies) |
+| `radar_screen` | 19 | anim (4 फ़्रेम) रोटेशन परिवार (4 प्रतियाँ) |
 | `radar_side_active` | 925 |  |
 | `radar_side_inactive` | 928 |  |
 | `radar_top_active` | 926 |  |
@@ -709,25 +721,25 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `recycler_back` | 1179 |  |
 | `recycler_front` | 1173 |  |
 | `recycler_side` | 1174 |  |
-| `recycler_side_running` | 43 | anim (4 frames) |
-| `recycler_top` | 1175 | rotation family (4 copies) |
+| `recycler_side_running` | 43 | anim (4 फ़्रेम) |
+| `recycler_top` | 1175 | रोटेशन परिवार (4 प्रतियाँ) |
 | `red_concrete` | 283 |  |
 | `red_gen_spawn_coal` | 771 |  |
 | `red_gen_spawn_iron` | 772 |  |
 | `red_gen_spawn_top` | 770 |  |
-| `red_glazed_terracotta` | 425 | rotation family (4 copies) |
+| `red_glazed_terracotta` | 425 | रोटेशन परिवार (4 प्रतियाँ) |
 | `red_lucky_block` | 932 |  |
 | `red_lucky_block_rare` | 982 |  |
 | `red_lucky_block_super` | 984 |  |
 | `red_mushroom_block` | 537 |  |
 | `red_planks` | 365 |  |
-| `red_portal` | 16 | anim (4 frames) |
+| `red_portal` | 16 | anim (4 फ़्रेम) |
 | `red_sand` | 474 |  |
 | `red_sandstone` | 454 |  |
 | `red_sandstone_brick` | 475 |  |
 | `red_sandstone_top` | 455 |  |
 | `red_spawn_block_side` | 695 |  |
-| `red_spawn_block_top` | 691 | rotation family (4 copies) |
+| `red_spawn_block_top` | 691 | रोटेशन परिवार (4 प्रतियाँ) |
 | `redstone_lamp_off` | 313 |  |
 | `redstone_lamp_on` | 312 |  |
 | `rocket_block` | 579 |  |
@@ -741,20 +753,20 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `shatter_mill_back` | 1145 |  |
 | `shatter_mill_front` | 1139 |  |
 | `shatter_mill_side` | 1140 |  |
-| `shatter_mill_side_running` | 40 | anim (4 frames) |
-| `shatter_mill_top` | 1141 | rotation family (4 copies) |
+| `shatter_mill_side_running` | 40 | anim (4 फ़्रेम) |
+| `shatter_mill_top` | 1141 | रोटेशन परिवार (4 प्रतियाँ) |
 | `shop_trader_spawn_face` | 799 |  |
 | `shop_trader_spawn_side` | 798 |  |
-| `shop_trader_spawn_top` | 794 | rotation family (4 copies) |
+| `shop_trader_spawn_top` | 794 | रोटेशन परिवार (4 प्रतियाँ) |
 | `shop_wizard_spawn_face` | 805 |  |
 | `shop_wizard_spawn_side` | 804 |  |
-| `shop_wizard_spawn_top` | 800 | rotation family (4 copies) |
+| `shop_wizard_spawn_top` | 800 | रोटेशन परिवार (4 प्रतियाँ) |
 | `sky_tap_back` | 1153 |  |
 | `sky_tap_bottom` | 1152 |  |
 | `sky_tap_front` | 1146 |  |
 | `sky_tap_side` | 1147 |  |
-| `sky_tap_side_running` | 41 | anim (4 frames) |
-| `sky_tap_top` | 1148 | rotation family (4 copies) |
+| `sky_tap_side_running` | 41 | anim (4 फ़्रेम) |
+| `sky_tap_top` | 1148 | रोटेशन परिवार (4 प्रतियाँ) |
 | `slab_andesite_brick_side` | 498 |  |
 | `slab_aspen_side` | 483 |  |
 | `slab_brick_side` | 515 |  |
@@ -803,9 +815,9 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `smelter_back` | 1060 |  |
 | `smelter_front` | 1054 |  |
 | `smelter_side` | 1055 |  |
-| `smelter_side_running` | 29 | anim (4 frames) |
-| `smelter_top` | 1056 | rotation family (4 copies) |
-| `smoke` | 23 | anim (4 frames) |
+| `smelter_side_running` | 29 | anim (4 फ़्रेम) |
+| `smelter_top` | 1056 | रोटेशन परिवार (4 प्रतियाँ) |
+| `smoke` | 23 | anim (4 फ़्रेम) |
 | `smooth_stone` | 218 |  |
 | `snow` | 197 |  |
 | `snowy_messy_stone` | 823 |  |
@@ -851,21 +863,21 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `tools_lucky_block` | 999 |  |
 | `tools_lucky_block_rare` | 1001 |  |
 | `tools_lucky_block_super` | 1003 |  |
-| `toxic_waste` | 25 | anim (8 frames) |
+| `toxic_waste` | 25 | anim (8 फ़्रेम) |
 | `toxic_waste_barrel_bottom` | 1018 |  |
 | `toxic_waste_barrel_side` | 1017 |  |
-| `toxic_waste_barrel_top` | 24 | anim (4 frames) |
+| `toxic_waste_barrel_top` | 24 | anim (4 फ़्रेम) |
 | `toxin_ball_block` | 680 |  |
 | `tree_cutter_back` | 1127 |  |
-| `tree_cutter_back_running` | 37 | anim (4 frames) |
+| `tree_cutter_back_running` | 37 | anim (4 फ़्रेम) |
 | `tree_cutter_front` | 1121 |  |
 | `tree_cutter_side` | 1122 |  |
-| `tree_cutter_side_running` | 36 | anim (4 frames) |
-| `tree_cutter_top` | 1123 | rotation family (4 copies) |
+| `tree_cutter_side_running` | 36 | anim (4 फ़्रेम) |
+| `tree_cutter_top` | 1123 | रोटेशन परिवार (4 प्रतियाँ) |
 | `ultra_compressed_messy_stone` | 534 |  |
 | `unloaded` | 189 |  |
 | `volt_engine_side` | 1129 |  |
-| `volt_engine_side_running` | 38 | anim (4 frames) |
+| `volt_engine_side_running` | 38 | anim (4 फ़्रेम) |
 | `volt_engine_top` | 1130 |  |
 | `voltite_deposit` | 1128 |  |
 | `voltite_ore` | 1082 |  |
@@ -878,16 +890,16 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `white_gen_spawn_coal` | 786 |  |
 | `white_gen_spawn_iron` | 787 |  |
 | `white_gen_spawn_top` | 785 |  |
-| `white_glazed_terracotta` | 369 | rotation family (4 copies) |
+| `white_glazed_terracotta` | 369 | रोटेशन परिवार (4 प्रतियाँ) |
 | `white_planks` | 351 |  |
-| `white_portal` | 17 | anim (4 frames) |
+| `white_portal` | 17 | anim (4 फ़्रेम) |
 | `white_spawn_block_side` | 690 |  |
-| `white_spawn_block_top` | 686 | rotation family (4 copies) |
+| `white_spawn_block_top` | 686 | रोटेशन परिवार (4 प्रतियाँ) |
 | `wire_mill_back` | 1076 |  |
 | `wire_mill_front` | 1070 |  |
 | `wire_mill_side` | 1071 |  |
-| `wire_mill_side_running` | 32 | anim (4 frames) |
-| `wire_mill_top` | 1072 | rotation family (4 copies) |
+| `wire_mill_side_running` | 32 | anim (4 फ़्रेम) |
+| `wire_mill_top` | 1072 | रोटेशन परिवार (4 प्रतियाँ) |
 | `wool_colored_black` | 253 |  |
 | `wool_colored_blue` | 249 |  |
 | `wool_colored_brown` | 250 |  |
@@ -908,18 +920,18 @@ All usable names, alphabetically. The id column is the `bloxdTextureId*` value �
 | `yellow_gen_spawn_coal` | 780 |  |
 | `yellow_gen_spawn_iron` | 781 |  |
 | `yellow_gen_spawn_top` | 779 |  |
-| `yellow_glazed_terracotta` | 385 | rotation family (4 copies) |
+| `yellow_glazed_terracotta` | 385 | रोटेशन परिवार (4 प्रतियाँ) |
 | `yellow_lucky_block` | 930 |  |
 | `yellow_lucky_block_rare` | 980 |  |
 | `yellow_lucky_block_super` | 981 |  |
 | `yellow_planks` | 355 |  |
-| `yellow_portal` | 18 | anim (4 frames) |
+| `yellow_portal` | 18 | anim (4 फ़्रेम) |
 | `yellow_spawn_block_side` | 685 |  |
-| `yellow_spawn_block_top` | 681 | rotation family (4 copies) |
+| `yellow_spawn_block_top` | 681 | रोटेशन परिवार (4 प्रतियाँ) |
 
-### Rotation families (57 roots)
+### रोटेशन परिवार (57 मूल)
 
-These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry folds them to the root below, and `bloxdTexel` re-applies the rotation at sample time — reference the root, never the copies. Writing a `[rot[N` spelling draws the dedicated rotation diagnostic.
+ये टेक्सचर केवल पहले-घुमाई प्रतियों (`name[rot[1..4`) के रूप में मौजूद हैं। रजिस्ट्री उन्हें नीचे दिए मूल पर फ़ोल्ड करता है, और `bloxdTexel` सैंपल के समय रोटेशन दोबारा लगाता है — मूल को संदर्भित करें, प्रतियों को कभी नहीं। कोई `[rot[N` स्पेलिंग लिखने पर समर्पित रोटेशन डायग्नोस्टिक मिलता है।
 
 - `alloy_kiln_top` (id 1085)
 - `auto_bench_top` (id 1100)
@@ -979,11 +991,11 @@ These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry 
 - `yellow_glazed_terracotta` (id 385)
 - `yellow_spawn_block_top` (id 681)
 
-### Animation families (42 names)
+### एनीमेशन परिवार (42 नाम)
 
-Sampling these names automatically returns the current animation frame. The engine advances frames at a fixed interval per family — measured values are only 3: **200 ms** (3 families), **250 ms** (21 families), **300 ms** (18 families). Packs never write frame suffixes (`lava0` is an error; `lava` is the name).
+इन नामों को सैंपल करने पर मौजूदा एनीमेशन फ़्रेम अपने आप लौट आता है। इंजन प्रत्येक परिवार के लिए एक निश्चित अंतराल पर फ़्रेम बढ़ाता है — मापे गए मान केवल 3 हैं: **200 ms** (3 परिवार), **250 ms** (21 परिवार), **300 ms** (18 परिवार)। पैक कभी फ़्रेम सफ़िक्स नहीं लिखते (`lava0` त्रुटि है; `lava` नाम है)।
 
-| Name | Frames | Interval |
+| नाम | फ़्रेम | अंतराल |
 |---|---|---|
 | `alloy_kiln_side_running` | 4 | 250 ms |
 | `auto_bench_side_running` | 4 | 250 ms |
@@ -1028,26 +1040,26 @@ Sampling these names automatically returns the current animation frame. The engi
 | `wire_mill_side_running` | 4 | 250 ms |
 | `yellow_portal` | 4 | 300 ms |
 
-Structural note visible in the raw data: the atlas holds 45 animation roots, not 42 — `radar_screen`'s four pre-rotated copies each carry their own 4-frame ladder, which is also why `radar_screen` is the only name carrying both family notes.
+कच्चे डेटा में दिखने वाली संरचनात्मक टिप्पणी: एटलस में 45 एनीमेशन मूल हैं, 42 नहीं — `radar_screen` की चारों पहले-घुमाई प्रतियाँ अपनी-अपनी 4-फ़्रेम सीढ़ी ले चलती हैं, यही वजह भी है कि `radar_screen` एकमात्र नाम है जो दोनों परिवार-टिप्पणियाँ ले चलता है।
 
-## Measured drift (cnty9 → ab90qa)
+## मापा गया ड्रिफ़्ट (cnty9 → ab90qa)
 
-The registry is build-shipped content and moves with every block update. v4 build (`cnty9`, 2026-10-27) → v5 build (`ab90qa`, 2026-11-03):
+रजिस्ट्री बिल्ड के साथ भेजा गया कंटेंट है और हर ब्लॉक अपडेट के साथ खिसकता है। v4 बिल्ड (`cnty9`, 2026-10-27) → v5 बिल्ड (`ab90qa`, 2026-11-03):
 
-- atlas entries: 1,219 → 1,210
-- rotation families (turned spellings): 57 (228) → 57 (228) — **unchanged**
-- animation families (frame spellings): 42 (188) → 42 (188) — **unchanged**
-- usable named constants: 905 → **896**
-- id changes among surviving names: **334 of 905**
+- एटलस प्रविष्टियाँ: 1,219 → 1,210
+- रोटेशन परिवार (टर्न्ड स्पेलिंग): 57 (228) → 57 (228) — **अपरिवर्तित**
+- एनीमेशन परिवार (फ़्रेम स्पेलिंग): 42 (188) → 42 (188) — **अपरिवर्तित**
+- प्रयोग-योग्य नामित स्थिरांक: 905 → **896**
+- बचे नामों में id परिवर्तन: **905 में से 334**
 
-The complete drift (11 names):
+पूरा ड्रिफ़्ट (11 नाम):
 
-- **added (1):** `scorpion_eggs`.
-- **removed (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — the double chest (8 faces) left the game data (the single-chest `chest_*` family survives intact), and spawners keep `mob_spawner_block_top` while the variant side textures are gone.
+- **जोड़े गए (1):** `scorpion_eggs`।
+- **हटाए गए (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — डबल चेस्ट (8 फ़ेस) गेम डेटा से चला गया (सिंगल-चेस्ट `chest_*` परिवार सुरक्षित बचा है), और स्पॉनर `mob_spawner_block_top` रखते हैं जबकि वेरिएंट साइड टेक्सचर चले गए हैं।
 
-**Names are the API; ids are snapshots.** Between the two builds, 334 of 905 surviving names changed id — write `bloxdTextureIdStone`, not `351`. The engine resolves names at validation, so name-written packs survive drift; raw-id packs do not.
+**नाम ही API हैं; id स्नैपशॉट हैं।** दोनों बिल्डों के बीच, बचे हुए 905 नामों में से 334 का id बदल गया — `351` नहीं, `bloxdTextureIdStone` लिखें। इंजन सत्यापन के समय नाम रिज़ॉल्व करता है, इसलिए नाम से लिखे गए पैक ड्रिफ़्ट से बच निकलते हैं; कच्चे-id वाले पैक नहीं।
 
-## Related
+## संबंधित
 
-- [Texture API](texture-api.md) · [Engine Internals: Texture Registry](../internals/texture-registry.md) · [Version History: v4](../history/v4.md)
+- [टेक्सचर API](texture-api.md) · [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](../internals/texture-registry.md) · [वर्शन हिस्ट्री: v4](../history/v4.md)
 

@@ -1,8 +1,8 @@
-# Pack format
+# पैक फ़ॉर्मैट
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (re-measured on the live loader)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव लोडर पर पुनः मापा गया)
 
-The whole pack model on one page — manifest, loader limits, per-frame uniform. For the step-by-step version see [Getting Started](../getting-started/manifest.md).
+पूरा पैक मॉडल एक ही पेज पर — मैनिफ़ेस्ट, लोडर सीमाएँ, प्रति-फ़्रेम uniform। कदम-दर-कदम संस्करण के लिए देखें [शुरुआत करें](../getting-started/manifest.md)।
 
 ## pack.json
 
@@ -14,55 +14,55 @@ The whole pack model on one page — manifest, loader limits, per-frame uniform.
 }
 ```
 
-| Field | Type | Required | Description |
+| फ़ील्ड | प्रकार | आवश्यक | विवरण |
 |---|---|---|---|
-| `apiVersion` | number | required | **must strictly equal `5`** (`===`). A string `"5"` fails and is reported with its JSON spelling |
-| `name` | string | required | non-empty after trimming; shown in settings |
-| `author` | string | optional | must be a string if present |
+| `apiVersion` | number | आवश्यक | **कड़ाई से ठीक `5` होना चाहिए** (`===`)। स्ट्रिंग `"5"` असफल होती है और उसकी JSON वर्तनी सहित रिपोर्ट होती है |
+| `name` | string | आवश्यक | ट्रिम करने के बाद ग़ैर-खाली; सेटिंग्स में दिखता है |
+| `author` | string | वैकल्पिक | मौजूद हो तो स्ट्रिंग होना चाहिए |
 
-Everything else in the manifest is ignored. `pack.json` must be exactly one JSON object at the zip root.
+मैनिफ़ेस्ट की बाकी सब चीज़ें नज़रअंदाज़ कर दी जाती हैं। `pack.json` zip के रूट में ठीक एक JSON ऑब्जेक्ट होना चाहिए।
 
-## Loader limits (re-measured on live c53)
+## लोडर सीमाएँ (लाइव c53 पर पुनः मापी गई)
 
-| Limit | Value | Message when exceeded |
+| सीमा | मान | पार होने पर संदेश |
 |---|---|---|
-| `.wgsl` files per pack | 256 | `The pack has more than 256 .wgsl files.` |
-| total `.wgsl` source | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` size | 64 KB | `pack.json is over 64 KB.` |
-| zip size | 32 MB | `The zip is over 32 MB.` |
-| zip entries | 1,024 | `The zip has more than 1024 entries.` |
-| zip shape | — | split zip / zip64 / encrypted / unsupported compression each rejected with its own message; all files valid UTF-8; exactly one `pack.json`; no duplicate paths |
+| प्रति पैक `.wgsl` फ़ाइलें | 256 | `The pack has more than 256 .wgsl files.` |
+| कुल `.wgsl` स्रोत | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
+| `pack.json` आकार | 64 KB | `pack.json is over 64 KB.` |
+| zip आकार | 32 MB | `The zip is over 32 MB.` |
+| zip प्रविष्टियाँ | 1,024 | `The zip has more than 1024 entries.` |
+| zip आकृति | — | split zip / zip64 / एन्क्रिप्टेड / असमर्थित कंप्रेशन — हर एक अपने अलग संदेश के साथ अस्वीकृत; सभी फ़ाइलें वैध UTF-8; ठीक एक `pack.json`; कोई डुप्लिकेट पाथ नहीं |
 
-## API-version check
+## API-संस्करण जाँच
 
-The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. The version constant `5` and the header template live in the same module (c55 / module 29836), so validation and the header it assumes move together. Mismatch messages: see [Compatibility](compatibility.md).
+लोडर `manifest.apiVersion !== 5` की तुलना JavaScript के strict `!==` से करता है। संस्करण कॉन्स्टैंट `5` और हेडर टेम्पलेट एक ही मॉड्यूल में रहते हैं (c55 / मॉड्यूल 29836), इसलिए सत्यापन और वह हेडर जिसे वह मान लेता है, साथ-साथ चलते हैं। बेमेल के संदेश: देखें [कम्पैटिबिलिटी](compatibility.md)।
 
-## Per-frame uniform: bloxdPackInputs
+## प्रति-फ़्रेम uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — still 64 bytes, but v5 added one member (from the live uniform-layout module):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — अब भी 64 बाइट, पर v5 ने एक सदस्य जोड़ा है (लाइव uniform-लेआउट मॉड्यूल से):
 
-| Offset | Field | Type | Note |
+| ऑफ़सेट | फ़ील्ड | प्रकार | टिप्पणी |
 |---|---|---|---|
-| 0 | `seconds` | `f32` | backs `bloxdSeconds()` |
-| 4 | `lit` | `u32` | **new in v5** — 1 when block/sky lighting is on; backs `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
+| 0 | `seconds` | `f32` | `bloxdSeconds()` का आधार |
+| 4 | `lit` | `u32` | ब्लॉक/आकाश लाइटिंग चालू होने पर 1; `bloxdLit()` का आधार |
+| 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` का आधार |
+| 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` का आधार |
+| 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` का आधार |
 
-`lit` fit into the padding v4 already had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16). Total size and all other offsets are unchanged. The engine writes it with a single `setUint32(4, lit ? 1 : 0)` — it is a flag, not a light level (v4's JS-side names `terrainLightLevels` / `terrainHeldLight` are gone from the bundle entirely).
+`lit` को v4 की `seconds` और `renderOffset` के बीच पहले से मौजूद पैडिंग में फिट करा गया (ऑफ़सेट 4–15 अलाइनमेंट के अंतराल थे; `vec3i` को 16-बाइट अलाइनमेंट चाहिए, इसलिए `renderOffset` 16 पर ही रहा)। कुल आकार और बाकी सभी ऑफ़सेट अपरिवर्तित हैं। इंजन इसे एक ही `setUint32(4, lit ? 1 : 0)` से लिखता है — यह एक फ़्लैग है, लाइट लेवल नहीं (v4 के JS-पक्ष के नाम `terrainLightLevels` / `terrainHeldLight` बंडल से पूरी तरह ग़ायब हैं)।
 
-**Never reference the uniform directly from a pack.** Use it through the header functions (`bloxdSeconds()` etc.). Stage visibility is VERTEX|FRAGMENT, so header functions work from module-scope functions and vertex hooks too.
+**uniform को पैक से कभी सीधे संदर्भित न करें।** इसे हेडर फ़ंक्शनों (`bloxdSeconds()` आदि) के ज़रिए इस्तेमाल करें। स्टेज विज़िबिलिटी VERTEX|FRAGMENT है, इसलिए हेडर फ़ंक्शन मॉड्यूल-स्तरीय फ़ंक्शनों और vertex हुकों से भी चलते हैं।
 
-## Bind-group layout
+## बाइंड-ग्रुप लेआउट
 
-| binding | Contents |
+| binding | सामग्री |
 |---|---|
 | 0 | `bloxdPackInputs` uniform (64 B) |
-| 1 | scene-depth texture (liquid variants) |
-| 2 | `bloxdSpTextureLayers` storage buffer |
+| 1 | scene-depth टेक्सचर (liquid वेरिएंट) |
+| 2 | `bloxdSpTextureLayers` स्टोरेज बफ़र |
 
-`minBindingSize` remains 64. The depth texture (binding 1) is FRAGMENT-only, which is why `bloxdOpaqueBehind()` is surface/light-hook only.
+`minBindingSize` 64 ही रहता है। डेप्थ टेक्सचर (binding 1) केवल FRAGMENT के लिए है, इसीलिए `bloxdOpaqueBehind()` केवल surface/light हुकों तक सीमित है।
 
-## wgsl concatenation
+## wgsl संयोजन
 
-Multiple `.wgsl` files are concatenated into one module in **dictionary order by path name**. Module-scope declarations are order-independent; only `var` initialization order can matter. Non-`.wgsl` files are ignored.
+कई `.wgsl` फ़ाइलें **पाथ नाम के शब्दकोश क्रम में** एक मॉड्यूल में जुड़ जाती हैं। मॉड्यूल-स्तरीय घोषणाएँ क्रम-से-स्वतंत्र होती हैं; केवल `var` इनिशियलाइज़ेशन का क्रम मायने रख सकता है। ग़ैर-`.wgsl` फ़ाइलें नज़रअंदाज़ कर दी जाती हैं।

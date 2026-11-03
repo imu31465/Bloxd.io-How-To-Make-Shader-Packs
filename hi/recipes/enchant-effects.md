@@ -1,12 +1,12 @@
-# Enchant effects
+# एनचैंट प्रभाव
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from the live header)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (लाइव हेडर से पुनर्प्राप्त)
 
-v5 opened the enchant pipeline on both inputs and outputs. Recipes for controlling the glint of enchanted items and armour while preserving the engine's math.
+v5 ने एनचैंट पाइपलाइन को इनपुट और आउटपुट दोनों ओर खोल दिया है। इंजन का गणित बनाए रखते हुए एनचैंटेड आइटम और कवच की चमक नियंत्रित करने की रेसिपियाँ।
 
-## Inputs & outputs
+## इनपुट और आउटपुट
 
-**Inputs** (`BloxdSurfaceIn` / `BloxdLightIn` — enchanted items and armour only, all 0 otherwise):
+**इनपुट** (`BloxdSurfaceIn` / `BloxdLightIn` — केवल एनचैंटेड आइटम और कवच पर, अन्यथा सब 0):
 
 ```wgsl
 enchantTier: u32,     // 1-5 for Tier 1-5.
@@ -14,21 +14,21 @@ enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
 enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
 ```
 
-**Output** (`BloxdSurface`):
+**आउटपुट** (`BloxdSurface`):
 
 ```wgsl
 enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
 ```
 
-The engine mixes it inside [`bloxdLitColour()`](../api/lighting.md) — right after shading, before world light. `bloxdDefaultSurface` passes the input through unchanged, so **the default look matches v4's engine-internal behavior**.
+इंजन इसे [`bloxdLitColour()`](../api/lighting.md) के भीतर मिलाता है — शेडिंग के ठीक बाद, विश्व प्रकाश से पहले। `bloxdDefaultSurface` इनपुट को बिना बदले पास कर देता है, इसलिए **डिफ़ॉल्ट रूप v4 के इंजन-आंतरिक व्यवहार से मेल खाता है**।
 
-## Understanding the defaults
+## डिफ़ॉल्ट को समझना
 
-Input `enchantColour.a` is an **animated** alpha — the engine animates the glint sweep, so reading `.a` per fragment yields a moving pattern for free. `enchantTier` and `enchantSpeed` are consistent by construction («faster at higher tiers»).
+इनपुट `enchantColour.a` एक **एनिमेटेड** अल्फा है — इंजन चमक की स्वीप को एनिमेट करता है, इसलिए प्रति-फ्रैगमेंट `.a` पढ़ने से चलता हुआ पैटर्न मुफ़्त में मिल जाता है। `enchantTier` और `enchantSpeed` निर्माण से ही संगत हैं («faster at higher tiers»)।
 
-Unenchanted faces carry `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0`.
+अनएनचैंटेड फलक `enchantTier == 0`, `enchantColour == vec4f(0.0)`, `enchantSpeed == 0.0` ले जाते हैं।
 
-## Recipe 1: no-glint realism (two lines)
+## रेसिपी 1: बिना-चमक यथार्थवाद (दो पंक्तियाँ)
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -38,9 +38,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 2: stronger glint by tier
+## रेसिपी 2: टियर के अनुसार प्रबल चमक
 
-`enchantTier` gives the classic "tier-scaled glint" without parsing colors:
+`enchantTier` रंग पार्स किए बिना क्लासिक "टियर-स्केल्ड चमक" देता है:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -54,7 +54,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 3: recoloring the glint
+## रेसिपी 3: चमक का रंग बदलना
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -62,16 +62,16 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     if (surface.enchantTier > 0u) {
         var e = surface.enchantColour;
         e.rgb = mix(vec3f(0.35, 0.8, 1.0), vec3f(0.9, 0.5, 1.0),
-                    f32(surface.enchantTier) / 5.0);   // low tiers blue, high purple
+                    f32(surface.enchantTier) / 5.0);   // निम्न टियर नीले, उच्च बैंगनी
         out.enchantColour = e;
     }
     return out;
 }
 ```
 
-## Recipe 4: enchantSpeed-driven sweep
+## रेसिपी 4: enchantSpeed-संचालित स्वीप
 
-Turn `enchantSpeed` into a phase for a custom sweep:
+`enchantSpeed` को कस्टम स्वीप के लिए फ़ेज़ में बदलें:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -87,9 +87,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Recipe 5: amplifying the hurt flash (overlayColour)
+## रेसिपी 5: हर्ट फ़्लैश को बढ़ाना (overlayColour)
 
-`overlayColour` (players/mobs only; hurt flash etc.) mixes before lighting in `bloxdLitColour`:
+`overlayColour` (केवल खिलाड़ी/मॉब; हर्ट फ़्लैश आदि) `bloxdLitColour` में प्रकाश से पहले मिलता है:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -99,11 +99,11 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Harmless on non-entities (`overlayColour` is 0 there).
+गैर-एंटिटी पर निर्दोष (`overlayColour` वहाँ 0 है)।
 
-## Combining with custom lighting
+## कस्टम प्रकाश के साथ संयोजन
 
-Using `bloxdLitColour()` keeps the enchant/overlay mixing automatic:
+`bloxdLitColour()` प्रयोग करने से एनचैंट/ओवरले मिश्रण स्वतः बना रहता है:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -113,12 +113,12 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Notes
+## टिप्पणियाँ
 
-- Enchant inputs arrive **only on enchanted items and armour** — all 0 on terrain, water and unenchanted faces
-- Changing the `enchantColour` output never touches `colour` directly — mixing happens in `bloxdLitColour` / `bloxdDefaultLight`
-- Outside the model pipeline the enchant inputs are always 0
+- एनचैंट इनपुट **केवल एनचैंटेड आइटम और कवच पर आते हैं** — टेरेन, पानी और अनएनचैंटेड फलकों पर सब 0
+- `enchantColour` आउटपुट बदलना `colour` को सीधे कभी नहीं छूता — मिश्रण `bloxdLitColour` / `bloxdDefaultLight` में होता है
+- मॉडल पाइपलाइन के बाहर एनचैंट इनपुट सदा 0 होते हैं
 
-## Related
+## संबंधित
 
-- [Lighting](../api/lighting.md) · [Structures](../api/structures.md) · [Model shader recipes](model-shaders.md)
+- [प्रकाश](../api/lighting.md) · [स्ट्रक्चर](../api/structures.md) · [मॉडल शेडर रेसिपियाँ](model-shaders.md)

@@ -1,66 +1,66 @@
-# Shadows
+# छायाएँ
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (LightEngine behavior unchanged since v4 measurement)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (v4 के माप के बाद से LightEngine का व्यवहार अपरिवर्तित)
 
-The three ways to make "shadows" in a shader pack, and their limits.
+शेडर पैक में "छाया" बनाने के तीन तरीके, और उनकी सीमाएँ।
 
-## Can / cannot
+## संभव / असंभव
 
-| Effect | Possible? | How |
+| प्रभाव | संभव? | कैसे |
 |---|---|---|
-| Clearly darken under trees/roofs (projected-style) | ◎ | `skyLight` lift inversion + threshold cut (below) |
-| Shadows follow block edits in real time | ◎ | LightEngine recalculates immediately — automatic |
-| Color shadows cool / sunlit warm | ◎ | two-color shift |
-| Shadows rotating with the sun (shadow map) | ✕ | depth is liquid-only; light-ray occlusion is not an input |
-| Physical penumbra | ✕ | capped by voxel-resolution BFS spread |
-| Real-time AO (SSAO) | ✕ | only the AO baked into vertex colors |
+| पेड़ों/छतों के नीचे साफ़ गहराई (प्रक्षेपण-शैली) | ◎ | `skyLight` लिफ्ट व्युत्क्रम + देहली कट (नीचे) |
+| छायाएँ ब्लॉक संपादनों का पालन वास्तविक समय में करें | ◎ | LightEngine तुरंत पुनर्गणना करता है — स्वतः |
+| छायाओं को ठंडा / धूप वाली जगहों को गर्म रंग देना | ◎ | दो-रंग स्थानांतरण |
+| सूर्य के साथ घूमती छायाएँ (shadow map) | ✕ | गहराई केवल तरल के लिए है; प्रकाश-किरण अवरोध कोई इनपुट नहीं है |
+| भौतिक पेनम्ब्रा | ✕ | वॉक्सेल-विभेदन BFS प्रसार की ऊपरी सीमा |
+| वास्तविक-समय AO (SSAO) | ✕ | केवल शीर्ष रंगों में बेक हुआ AO |
 
-## skyLight is a voxel shadow map
+## skyLight एक वॉक्सेल शैडो मैप है
 
-`l.skyLight` is not just a brightness parameter. The mesher's LightEngine computes Minecraft-style **"can this position see the sky" voxel occlusion data — a shadow map**:
+`l.skyLight` केवल एक चमक पैरामीटर नहीं है। मेशर का LightEngine Minecraft-शैली में **"क्या यह स्थान आकाश देख सकता है" — इस तरह का वॉक्सेल अवरोध डेटा, यानी एक शैडो मैप** गणना करता है:
 
-1. **Column scan**: each (x,z) column top-down; sky light starts at 15, hits 0 at opaque blocks, attenuates by `lightFilter` (air 1 / water 3 / opaque 15)
-2. **BFS flood fill**: spreads horizontally to 6 neighbors (-1 per block) — this softens shadow edges. Under an occluder of radius r the raw value is (15-r)/15
-3. blockLight (torches) is a separate RGB 3-channel (4-bit packed) BFS
+1. **स्तंभ स्कैन**: प्रत्येक (x,z) स्तंभ को ऊपर से नीचे; आकाश-प्रकाश 15 से शुरू होकर अपारदर्शी ब्लॉकों पर 0 हो जाता है और `lightFilter` (हवा 1 / पानी 3 / अपारदर्शी 15) से क्षीण होता है
+2. **BFS फ़्लड फ़िल**: 6 पड़ोसियों तक क्षैतिज रूप से फैलता है (प्रति ब्लॉक -1) — यही छाया किनारों को नरम करता है। त्रिज्या r के अवरोधक के नीचे कच्चा मान (15-r)/15 होता है
+3. blockLight (मशालें) एक अलग RGB 3-चैनल (4-बिट पैक) BFS है
 
-Under trees, roofs and inside buildings the value is already low and interpolates smoothly per-vertex. Placing or breaking a block recalculates immediately — **real-time-following shadows**.
+पेड़ों, छतों और इमारतों के भीतर यह मान पहले से निम्न होता है और प्रति-शीर्ष धीरे-धीरे इंटरपोलेट होता है। ब्लॉक रखने या तोड़ने पर तुरंत पुनर्गणना होती है — **वास्तविक-समय में पालन करने वाली छायाएँ**।
 
-## The lift-curve trap
+## लिफ्ट-वक्र का जाल
 
-`l.skyLight` arrives **post-lift-curve** (`y = 1-(1-x/(3-2x))³`, an S-curve that lifts dark values):
+`l.skyLight` **लिफ्ट-वक्र लागू होने के बाद का मान** आता है (`y = 1-(1-x/(3-2x))³`, एक S-वक्र जो गहरे मानों को ऊपर उठाता है):
 
-| Place | Raw voxel | Lifted (= l.skyLight) | pow(·, 5.0) |
+| स्थान | कच्चा वॉक्सेल | लिफ्ट किया (= l.skyLight) | pow(·, 5.0) |
 |---|---|---|---|
-| open sky | 1.00 | 1.00 | 1.00 |
-| under tree (radius 2) | 0.87 | **0.97** | **0.86** ← nearly kept |
-| radius 3 | 0.80 | **0.92** | 0.66 |
-| radius 5 | 0.67 | 0.78 | 0.29 |
+| खुला आकाश | 1.00 | 1.00 | 1.00 |
+| पेड़ के नीचे (त्रिज्या 2) | 0.87 | **0.97** | **0.86** ← लगभग बना रहता है |
+| त्रिज्या 3 | 0.80 | **0.92** | 0.66 |
+| त्रिज्या 5 | 0.67 | 0.78 | 0.29 |
 
-**This is the proven root cause of "gamma doesn't darken shadows"** — even γ=5 only takes under-tree 0.97 down to 0.86.
+**यही "गामा छायाएँ गहरी नहीं करता" का सिद्ध मूल कारण है** — γ=5 भी पेड़ के नीचे के 0.97 को केवल 0.86 तक ही ले जाता है।
 
-## The fix: lift inversion + threshold cut
+## समाधान: लिफ्ट व्युत्क्रम + देहली कट
 
-The curve is monotonic and inverts exactly: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Restore the raw value, then binarize with a **`smoothstep` threshold**. LightEngine's BFS spread is "-1 per adjacent block", so `th = 1 - r/15` is directly the "occlusion radius counted as shadow" dial.
+वक्र एकदिष्ट है और ठीक-ठीक व्युत्क्रमित हो जाता है: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`। कच्चा मान बहाल करें, फिर **`smoothstep` देहली** से द्विमानीकृत करें। LightEngine का BFS प्रसार "-1 प्रति सन्निकट ब्लॉक" है, इसलिए `th = 1 - r/15` सीधे "छाया मानी जाने वाली अवरोध त्रिज्या" का डायल है।
 
-The complete implementation (sun gating + warm/cool split + blockLight passthrough) is in [realism recipes](../recipes/realism.md). Key steps:
+पूरा कार्यान्वयन (सूर्य गेटिंग + उष्ण/शीत विभाजन + blockLight पासथ्रू) [यथार्थवाद रेसिपियाँ](../recipes/realism.md) में है। मुख्य चरण:
 
 ```wgsl
-// 1. restore the raw value (skipping this means shadows never appear)
+// 1. कच्चा मान बहाल करें (इसे छोड़ने का अर्थ है — छायाएँ कभी दिखेंगी ही नहीं)
 let skyRaw = sh_unlift(l.skyLight);
-// 2. threshold-cut — sunlit 1 / shadow 0
+// 2. देहली कट — धूप 1 / छाया 0
 let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
-// the essence of projection: direct sun only reaches places that see the sky
+// प्रक्षेपण का सार: सीधी धूप केवल उन्हीं स्थानों तक पहुँचती है जो आकाश देखते हैं
 let lit = sunL * sky;
 ```
 
-Dials: **area** = `shTh` (0.93→radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **edge softness** = `shSoft`; **core darkness** = the minimum ambient and sky-scatter two-point shift; long evening shadows ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
+डायल: **क्षेत्रफल** = `shTh` (0.93→त्रिज्या 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **किनारे की नरमी** = `shSoft`; **क्रोड की गहराई** = न्यूनतम परिवेश और आकाश-प्रकीर्णन का दो-बिंदु स्थानांतरण; लंबी शाम की छायाएँ ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`।
 
-## Honest limits
+## ईमानदार सीमाएँ
 
-- Shadows reference the **upward sky**, so they **do not rotate with the sun** (voxel resolution; soft edges come from BFS spread)
-- The engine's lighting template retains an unused `var shadow: f32 = 1.;` (always 1.0 = disabled) — a plausible "future plans" trace for pixel-accurate rotating shadows
-- Pixel-accurate rotating shadows are outside the current API ([Unreachable effects](constraints.md))
+- छायाएँ **ऊपरी आकाश** को संदर्भित करती हैं, इसलिए वे **सूर्य के साथ नहीं घूमतीं** (वॉक्सेल विभेदन; नरम किनारे BFS प्रसार से आते हैं)
+- इंजन का प्रकाश टेम्पलेट एक अप्रयुक्त `var shadow: f32 = 1.;` (सदा 1.0 = निष्क्रिय) रखता है — पिक्सेल-सटीक घूमती छायाओं के लिए "भविष्य की योजनाओं" का एक संभावित निशान
+- पिक्सेल-सटीक घूमती छायाएँ वर्तमान API के दायरे से बाहर हैं ([अप्राप्य प्रभाव](constraints.md))
 
-## Related
+## संबंधित
 
-- [realism recipes](../recipes/realism.md) (the full projected-shadow recipe) · [Lighting Internals](../internals/lighting-internals.md) · [Debugging tips](debugging.md)
+- [यथार्थवाद रेसिपियाँ](../recipes/realism.md) (पूरी प्रक्षेपित-छाया रेसिपी) · [प्रकाश इंटर्नल्स](../internals/lighting-internals.md) · [दोषमार्जन युक्तियाँ](debugging.md)

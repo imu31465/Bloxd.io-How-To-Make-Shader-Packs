@@ -1,47 +1,47 @@
-# FAQ & legal notes
+# FAQ और कानूनी टिप्पणियाँ
 
-> Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified
 
-## Frequently asked questions
+## अक्सर पूछे जाने वाले प्रश्न
 
-### Q. Are shader packs an official feature?
+### प्र. क्या शेडर पैक कोई आधिकारिक सुविधा हैं?
 
-The shader-pack feature is accessible from the in-game UI and pack-making appears to be an intended activity. No public official documentation has been found, though — this guide is an unofficial, analysis-based document.
+शेडर-पैक सुविधा इन-गेम UI से पहुँच योग्य है और पैक-निर्माण एक अभीष्ट गतिविधि जैसा प्रतीत होता है। पर कोई सार्वजनिक आधिकारिक दस्तावेज़ नहीं मिला है — यह गाइड एक अनौपचारिक, विश्लेषण-आधारित दस्तावेज़ है।
 
-### Q. Can packs do anything dangerous?
+### प्र. क्या पैक कुछ ख़तरनाक कर सकते हैं?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](../api/restrictions.md)).
+पैक शुद्ध WGSL हैं — **JS निष्पादन और नेटवर्क पहुँच डिज़ाइन से ही असंभव हैं**। केवल वही कोड चलता है जो सत्यापन और कंपाइलेशन पास करता है ([प्रतिबंध](../api/restrictions.md))।
 
-### Q. Which games do packs work in?
+### प्र. पैक किन गेमों में चलते हैं?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](../internals/policy.md).
+ज़्यादातर गेम strict मोड में चलते हैं (कोई vertex एनीमेशन नहीं, कोई `discard` नहीं)। Vertex एनीमेशन केवल allow-सूचीबद्ध गेमों में चलता है। प्रति-शीर्षक सूची [इंजन इंटर्नल्स: पॉलिसी](../internals/policy.md) में है।
 
-### Q. Do packs work on mobile?
+### प्र. क्या पैक मोबाइल पर चलते हैं?
 
-Only on WebGPU-capable environments ([Requirements](../getting-started/requirements.md)).
+केवल WebGPU-सक्षम वातावरणों पर ([आवश्यकताएँ](../getting-started/requirements.md))।
 
-### Q. Can I ship my own textures?
+### प्र. क्या मैं अपने टेक्सचर भेज सकता हूँ?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](../guides/combinations.md)).
+शेडर पैक में नहीं (एटलस केवल-पढ़ने-योग्य है)। वह टेक्सचर-पैक सिस्टम का काम है ([संयोजन](../guides/combinations.md))।
 
-### Q. Can I keep using an old-version pack?
+### प्र. क्या मैं पुराने संस्करण का पैक चलाता रह सकता हूँ?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](../api/compatibility.md)). Migrate via [Version History](../history/).
+मौजूदा गेम केवल `apiVersion: 5` स्वीकार करता है; पुराने पैक मौन रूप से निष्क्रिय हो जाते हैं ([कम्पैटिबिलिटी](../api/compatibility.md))। [संस्करण इतिहास](../history/) से होकर माइग्रेट करें।
 
-### Q. Will the API change again?
+### प्र. क्या API फिर बदलेगा?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+इंजन की आंतरिक व्यवस्थाएँ अपडेट के साथ बदल सकती हैं — हर पेज अपना लक्ष्य बिल्ड बताता है। हेडर या रजिस्ट्री बदलने पर सहेजे गए पैक अपने आप दोबारा सत्यापित होते हैं ([कम्पैटिबिलिटी](../api/compatibility.md#सवड-पक-क-पन-सतयपन-needs-re-check))।
 
-### Q. What about "cinematic shader" distributions?
+### प्र. "सिनेमैटिक शेडर" वितरणों का क्या?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](../guides/combinations.md)).
+हमने एक कम्युनिटी "सिनेमैटिक शेडर" वितरण का विश्लेषण किया — वह निकला एक टेक्सचर पैक (128×128 टेक्सचर, कोई `pack.json` / `.wgsl` नहीं)। ज़्यादातर "छायादार शेडर-जैसे" रूप टेक्सचर-पक्ष की कारीगरी हैं ([संयोजन](../guides/combinations.md))।
 
-## Legal & notes
+## कानूनी बातें और टिप्पणियाँ
 
-- This is an unofficial guide and does not represent the developers' views. The API may change without notice
-- Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- यह एक अनौपचारिक गाइड है और डेवलपर्स के विचारों का प्रतिनिधित्व नहीं करता। API बिना सूचना बदल सकता है
+- AI सहायता से बनाया गया; सटीकता की गारंटी नहीं है। वास्तविक इन-गेम व्यवहार से सत्यापित करें
+- मापे गए मान (टेक्सचर id आदि) विशिष्ट बिल्डों के स्नैपशॉट हैं और बिल्डों के बीच बदलते रहते हैं ([नाम ही API है](../api/texture-catalog.md#मप-गय-डरफट-cnty9--ab90qa))
 
-## Related
+## संबंधित
 
-- [Documentation entry](../) · [Version History](../history/)
+- [दस्तावेज़ प्रवेश](../) · [संस्करण इतिहास](../history/)

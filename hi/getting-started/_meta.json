@@ -1,15 +1,18 @@
 {
   "index": {
-    "title": "Getting Started",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "शुरुआत कैसे करें",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "overview": "Overview & prerequisites",
-  "requirements": "Requirements",
-  "quick-start": "Quick start",
-  "pack-structure": "Pack structure",
-  "manifest": "pack.json",
-  "hooks": "Shader hooks",
-  "variants": "Variants and guards",
-  "validation": "Validation",
-  "distribution": "Distribution"
+  "overview": "अवलोकन व पूर्व-आवश्यकताएँ",
+  "requirements": "आवश्यकताएँ",
+  "quick-start": "क्विक स्टार्ट",
+  "pack-structure": "पैक संरचना",
+  "manifest": "pack.json (मैनिफ़ेस्ट)",
+  "hooks": "शेडर हुक",
+  "variants": "वेरिएंट और गार्ड",
+  "validation": "सत्यापन",
+  "distribution": "वितरण"
 }

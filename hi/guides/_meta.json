@@ -1,17 +1,20 @@
 {
   "index": {
-    "title": "Guides",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "गाइड",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
-  "lighting": "How lighting works",
-  "shadows": "Shadows",
-  "water": "Making water look natural",
-  "night": "Designing night looks",
-  "models": "Models and textures",
-  "realism": "Realism: two schools",
-  "constraints": "Unreachable effects",
-  "performance": "Performance",
-  "testing": "On-device test checklist",
-  "combinations": "Combining with texture packs",
-  "debugging": "Debugging tips"
+  "lighting": "प्रकाश कैसे काम करता है",
+  "shadows": "छायाएँ",
+  "water": "पानी को प्राकृतिक दिखाना",
+  "night": "रात के रूप डिज़ाइन करना",
+  "models": "मॉडल और टेक्सचर",
+  "realism": "यथार्थवाद: दो स्कूल",
+  "constraints": "शेडर पैक क्या कर सकते हैं और क्या नहीं",
+  "performance": "प्रदर्शन",
+  "testing": "खेल-भीतर परीक्षण जाँच-सूची",
+  "combinations": "टेक्सचर पैकों के साथ संयोजन",
+  "debugging": "दोषमार्जन युक्तियाँ"
 }

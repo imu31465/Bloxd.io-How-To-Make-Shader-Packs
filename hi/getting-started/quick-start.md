@@ -1,12 +1,12 @@
-# Quick start
+# क्विक स्टार्ट
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
-Your first pack in five minutes.
+पाँच मिनट में आपका पहला पैक।
 
-## 1. Create the files
+## 1. फ़ाइलें बनाएँ
 
-Make a folder with `pack.json` and `pack.wgsl`:
+`pack.json` और `pack.wgsl` के साथ एक फ़ोल्डर बनाएँ:
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@ Make a folder with `pack.json` and `pack.wgsl`:
 }
 ```
 
-**`pack.wgsl`** — a minimal warm-tint pack:
+**`pack.wgsl`** — एक न्यूनतम गर्म-रंगत (warm-tint) पैक:
 
 ```wgsl
 const packWarmth = 0.18;
@@ -31,26 +31,26 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> The engine header (constants, structures, functions) is prepended to every pack automatically at load — you never write it yourself. The full header is reproduced in [Engine Internals](../internals/engine-header.md).
+> इंजन हेडर (कॉन्स्टैंट, स्ट्रक्चर, फ़ंक्शन) लोड के समय हर पैक के आगे अपने आप जुड़ जाता है — आप उसे कभी ख़ुद नहीं लिखते। पूरा हेडर [इंजन-आंतरिक](../internals/engine-header.md) में जैसा-का-तैसा दिया गया है।
 
-## 2. Load it in the game
+## 2. गेम में लोड करें
 
-1. Open settings → Shader Pack and load the zip or folder (folder loading is desktop browsers only)
-2. Check the status: right after selecting it you'll see "Ready. Reload the page to use it." — after a **page reload**, "Ready to use" means success
-3. If you see "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
+1. सेटिंग्स → Shader Pack खोलकर zip या फ़ोल्डर लोड करें (फ़ोल्डर लोडिंग केवल डेस्कटॉप ब्राउज़र में)
+2. स्थिति देखें: चुनते ही आपको "Ready. Reload the page to use it." दिखेगा — **पेज रीलोड के बाद** "Ready to use" का मतलब है कि सब कुछ सही है
+3. "Saved, but it won't run until you fix these errors..." दिखे तो सूचीबद्ध त्रुटियाँ (file:line + variant) ठीक करके रीलोड करें
 
-## 3. Verify
+## 3. सत्यापित करें
 
-1. Test in a permissive game first
-2. Then in a strict-mode game (most games are strict)
-3. Vertex animation only works in games marked allow
+1. पहले किसी allow गेम में टेस्ट करें
+2. फिर किसी strict-मोड गेम में (ज़्यादातर गेम strict होते हैं)
+3. vertex एनिमेशन केवल allow चिह्नित गेमों में चलता है
 
-## 4. Distribute
+## 4. वितरित करें
 
-Zip it up — see [Distribution](distribution.md).
+zip बना दें — देखें [वितरण](distribution.md)।
 
-## Stuck?
+## अटक गए?
 
-- What errors mean → [Troubleshooting](../troubleshooting/)
-- How to write hooks → [Shader hooks](hooks.md)
-- The full 9-hook template is in the next page, [Shader hooks](hooks.md)
+- त्रुटियों का अर्थ → [ट्रबलशूटिंग](../troubleshooting/)
+- हुक कैसे लिखें → [शेडर हुक](hooks.md)
+- पूरा 9-हुक टेम्पलेट अगले पेज पर है — [शेडर हुक](hooks.md)

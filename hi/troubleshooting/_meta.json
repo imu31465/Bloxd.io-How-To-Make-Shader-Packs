@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Troubleshooting",
+    "title": "समस्या निवारण",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "loading": "Loading errors",
-  "api-version": "API version errors",
-  "compilation": "Compilation errors",
-  "validation": "Validation errors",
-  "variants": "Variant-specific issues",
-  "visual": "Visual issues",
-  "textures": "Texture issues",
-  "lighting": "Lighting issues",
-  "models": "Model issues",
-  "performance": "Performance",
-  "faq": "FAQ & legal notes"
+  "loading": "लोडिंग त्रुटियाँ",
+  "api-version": "API संस्करण त्रुटियाँ",
+  "compilation": "कंपाइलेशन त्रुटियाँ",
+  "validation": "सत्यापन त्रुटियाँ",
+  "variants": "वेरिएंट-विशिष्ट समस्याएँ",
+  "visual": "विज़ुअल समस्याएँ",
+  "textures": "टेक्सचर समस्याएँ",
+  "lighting": "लाइटिंग समस्याएँ",
+  "models": "मॉडल समस्याएँ",
+  "performance": "प्रदर्शन",
+  "faq": "FAQ और कानूनी टिप्पणियाँ"
 }

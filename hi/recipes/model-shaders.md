@@ -1,12 +1,12 @@
-# Model shader recipes
+# मॉडल शेडर
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (v5 हेडर विनिर्देश के अनुसार लिखा गया)
 
-Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
+v5 के मॉडल हुक और नए फ़्लैग से बनी रेसिपियाँ — **v5 से पहले असंभव रहे "मैं किस चीज़ को देख रहा हूँ" वाले चयनों** के लिए। बुनियादी बातें: [मॉडल और टेक्सचर](../guides/models.md)।
 
-## Held-item glow
+## पकड़े-आइटम की चमक
 
-What first-person shader authors wanted since v1, in two lines:
+वही जो v1 से फ़र्स्ट-पर्सन शेडर लेखक चाहते रहे, दो पंक्तियों में:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -18,7 +18,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Splitting the world from the hand
+## दुनिया को हाथ से अलग करना
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -33,9 +33,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Glowing blade tips (localPosition)
+## चमकते ब्लेड-सिरे (localPosition)
 
-`localPosition` rotates with the model — "where on the model am I" without world-space guesswork:
+`localPosition` मॉडल के साथ घूमता है — विश्व-स्पेस के अंदाज़े के बिना "मैं मॉडल पर कहाँ पर हूँ":
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -48,9 +48,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-Note: actual `localPosition` ranges vary per model — verify on-device and `clamp` defensively.
+टिप्पणी: `localPosition` की वास्तविक सीमाएँ मॉडल-दर-मॉडल बदलती हैं — डिवाइस पर सत्यापित करें और बचाव के लिए `clamp` लगाएँ।
 
-## Highlighting dropped items
+## गिराए हुए आइटम हाइलाइट करना
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -64,9 +64,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Cool rim on player skins (lifeform)
+## प्लेयर स्किन पर ठंडा रिम (lifeform)
 
-Most models use `textureId: 0` (skins); `surface.colour` already has skin × tint:
+अधिकांश मॉडल `textureId: 0` (स्किन) प्रयोग करते हैं; `surface.colour` में पहले से स्किन × रंजन शामिल है:
 
 ```wgsl
 fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
@@ -80,9 +80,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Swaying plants in the wind (allow only)
+## हवा में डोलते पौधे (केवल allow)
 
-Plants (`flags.flat`) are drawn as models — sway via the vertex hook:
+पौधे (`flags.flat`) मॉडल की तरह बनाए जाते हैं — शीर्ष हुक से डुलाएँ:
 
 ```wgsl
 #ifndef BLOXD_STRICT
@@ -99,11 +99,11 @@ fn bloxdModelVertex(vertex: BloxdVertexIn) -> BloxdVertex {
 #endif
 ```
 
-(Vegetation is also `flags.vegetation`: `flat` = "drawn as a crossed plane", `vegetation` = "is a plant" — grass and flowers are both.)
+(वनस्पति भी `flags.vegetation` है: `flat` = "क्रॉस-प्लेन के रूप में बनाया गया", `vegetation` = "पौधा है" — घास और फूल दोनों।)
 
-## Atlas-textured model faces only
+## केवल एटलस-टेक्सचर वाले मॉडल फलक
 
-Block-model faces (slabs, stairs…) carry atlas `textureId`s; select with `textureId != 0u`:
+ब्लॉक-मॉडल फलक (स्लैब, सीढ़ियाँ…) एटलस `textureId` ले जाते हैं; `textureId != 0u` से चुनें:
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -116,15 +116,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-`textureId: 0` faces (skins) sample as white — no error ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+`textureId: 0` फलक (स्किन) सफ़ेद सैंपल होते हैं — कोई त्रुटि नहीं ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मडल-सवमतव-टकसचर-textureid-0))।
 
-## Armour vs the rest
+## कवच बनाम बाकी सब
 
-`flags.lifeform` includes armour and cosmetics ([Flags](../api/flags.md)). No finer-grained input exists; combine `localPosition` (placement) or `overlayColour` presence as practical approximations.
+`flags.lifeform` में कवच और कॉस्मेटिक्स शामिल हैं ([Flags](../api/flags.md))। इससे बारीक-दर-बारीक कोई इनपुट नहीं है; व्यावहारिक सन्निकटन के रूप में `localPosition` (स्थापन) या `overlayColour` की उपस्थिति को जोड़ें।
 
-## Sharing with terrain
+## टेरेन के साथ साझा करना
 
-Uniform grading across full blocks and block models:
+पूरे ब्लॉक और ब्लॉक-मॉडल पर एकसमान ग्रेडिंग:
 
 ```wgsl
 fn applyGrade(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -142,8 +142,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-The shared-function pattern is what the default pack template itself recommends ([hooks](../getting-started/hooks.md#fallbacks-and-code-sharing)).
+साझा-फ़ंक्शन पैटर्न वही है जो डिफ़ॉल्ट पैक टेम्पलेट स्वयं सुझाता है ([hooks](../getting-started/hooks.md#फलबक-और-कड-सझ-करन))।
 
-## Related
+## संबंधित
 
-- [Models and textures](../guides/models.md) · [Enchant effects](enchant-effects.md) · [Flags](../api/flags.md) · [Structures](../api/structures.md)
+- [मॉडल और टेक्सचर](../guides/models.md) · [एनचैंट प्रभाव](enchant-effects.md) · [Flags](../api/flags.md) · [स्ट्रक्चर](../api/structures.md)

@@ -1,59 +1,59 @@
-# Texture issues
+# टेक्सचर समस्याएँ
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (messages recorded verbatim from the live validator)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (संदेश लाइव वैलिडेटर से अक्षरशः दर्ज किए गए)
 
-Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
+`bloxdTextureId*` / `bloxdTexel` के आसपास की समस्याएँ। सभी 896 नाम [टेक्सचर कैटलॉग](../api/texture-catalog.md) में खोजें।
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
-- **Cause**: a misspelling; v5's validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
-- **Fix**: accept the suggestion; cross-check the [catalog](../api/texture-catalog.md)
-- **Prevention**: copy-paste names from the catalog
+- **कारण**: स्पेलिंग की ग़लती; वैलिडेटर में **Levenshtein सुझाव** हैं (देहली `max(2, floor(len/4)) + 1`)
+- **समाधान**: सुझाव स्वीकार करें; [कैटलॉग](../api/texture-catalog.md) से मिलाकर देखें
+- **रोकथाम**: नाम कैटलॉग से कॉपी-पेस्ट करें
 
 ## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
 
-- **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
-- **Fix**: use the base name — sampling returns the current frame automatically
-- **Prevention**: never write frame suffixes for the 42 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **कारण**: किसी एनिमेटेड टेक्सचर पर **फ़्रेम नंबर** लिखना (`lava0` आदि)
+- **समाधान**: बेस नाम का उपयोग करें — सैंपलिंग मौजूदा फ़्रेम अपने आप लौटाती है
+- **रोकथाम**: 42 एनीमेशन फ़ैमिलियों के लिए फ़्रेम सफ़िक्स कभी न लिखें ([नामकरण](../api/texture-api.md#सपलग-नयम-और-नमकरण-सवततरत))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
-- **Cause**: writing a rotation-family turned-copy spelling (`[rot[N`)
-- **Fix**: use the root name — `bloxdTexel` re-applies the rotation
+- **कारण**: किसी रोटेशन-फ़ैमिली की घुमाई-हुई-प्रति की स्पेलिंग लिखना (`[rot[N`)
+- **समाधान**: रूट नाम का उपयोग करें — `bloxdTexel` रोटेशन दोबारा लगा देता है
 
 ## "...could name X and Y, which differ only by case or underscores, so it can't be used."
 
-- **Cause**: the case/underscore-insensitive fold left the name **ambiguous**
-- **Fix**: disambiguate the spelling
+- **कारण**: केस/अंडरस्कोर-असंवेदनशील फ़ोल्ड नाम को **अस्पष्ट** छोड़ देता है
+- **समाधान**: स्पेलिंग स्पष्ट करें
 
 ## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
 
-- **Cause**: prefix misspelling (e.g. `bloxdTextureID`, `bloxdtextureid`)
-- **Fix**: start names with exactly `bloxdTextureId`
+- **कारण**: उपसर्ग की ग़लत स्पेलिंग (जैसे `bloxdTextureID`, `bloxdtextureid`)
+- **समाधान**: नाम हमेशा ठीक `bloxdTextureId` से शुरू करें
 
-## "Case and underscores are not distinguished" — how do both rules coexist?
+## "Case and underscores are not distinguished" — दोनों नियम साथ कैसे चलते हैं?
 
-Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](../api/texture-api.md#spelling-rules-and-naming-freedom)).
+नाम-रिज़ॉल्यूशन केस और `_` को मिला देता है, इसलिए `bloxdTextureId_grass_top` और `bloxdTextureIdGrassTop` **एक ही** कॉन्स्टैंट पर रिज़ॉल्व होते हैं। केवल जब फ़ोल्ड कई उम्मीदवार छोड़ दे, तभी समर्पित अस्पष्टता त्रुटि चलती है ([नामकरण नियम](../api/texture-api.md#सपलग-नयम-और-नमकरण-सवततरत))।
 
-## bloxdTexel always returns white on models
+## bloxdTexel मॉडल पर हमेशा सफ़ेद लौटाता है
 
-- **By design**: most models use `textureId: 0` (no texture — player skins etc.); `bloxdTexel(0, ...)` returns `vec4f(1.0)`
-- **Fix**: select with `surface.textureId != 0u` ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0))
+- **डिज़ाइन के अनुसार**: ज़्यादातर मॉडल `textureId: 0` (कोई टेक्सचर नहीं — प्लेयर स्किन आदि) उपयोग करते हैं; `bloxdTexel(0, ...)` `vec4f(1.0)` लौटाता है
+- **समाधान**: `surface.textureId != 0u` से चुनें ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मडल-सवमतव-टकसचर-textureid-0))
 
-## Wanting to add textures
+## टेक्सचर जोड़ना चाहना
 
-- **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](../guides/combinations.md))
+- **सीमा**: शेडर-पैक API एटलस को केवल **पढ़ता** है; टेक्सचर जोड़ना टेक्सचर-पैक सिस्टम का काम है ([संयोजन](../guides/combinations.md))
 
 ## "Packs can't use X: the engine binds every texture and sampler..."
 
-- **Cause**: declaring `texture_*` / `sampler` types directly
-- **Fix**: go through `bloxdTexel()` ([Restrictions](../api/restrictions.md))
+- **कारण**: `texture_*` / `sampler` टाइप सीधे घोषित करना
+- **समाधान**: `bloxdTexel()` से होकर जाएँ ([प्रतिबंध](../api/restrictions.md))
 
-## Raw ids broke after a game update
+## गेम अपडेट के बाद कच्चे id टूट गए
 
-- **Cause**: **ids are snapshots** — measured, 334 of 905 surviving names changed id between two builds
-- **Fix**: write `bloxdTextureIdLava`, not `19` ([names are the API](../api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **कारण**: **id स्नैपशॉट हैं** — मापा गया, दो बिल्डों के बीच बचे नामों 905 में से 334 का id बदल गया
+- **समाधान**: `19` नहीं, `bloxdTextureIdLava` लिखें ([नाम ही API है](../api/texture-catalog.md#मप-गय-डरफट-cnty9--ab90qa))
 
-## Related
+## संबंधित
 
-- [Texture API](../api/texture-api.md) · [Texture catalog](../api/texture-catalog.md) · [Texture Registry internals](../internals/texture-registry.md)
+- [टेक्सचर API](../api/texture-api.md) · [टेक्सचर कैटलॉग](../api/texture-catalog.md) · [टेक्सचर रजिस्ट्री इंटर्नल्स](../internals/texture-registry.md)

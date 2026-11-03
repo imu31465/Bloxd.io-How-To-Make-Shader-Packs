@@ -1,44 +1,44 @@
-# Shader hooks
+# शेडर हुक
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
-A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
+एक पैक **9 हुक** प्लग कर सकता है: 3 रेंडर लक्ष्य (Terrain / Liquid / Model) × 3 पाइपलाइन चरण (Vertex / Surface / Light)। सभी वैकल्पिक हैं — अपरिभाषित छूटा हुक इंजन डिफ़ॉल्ट पर लौट जाता है।
 
-## The hooks
+## हुक
 
-| Hook | Stage | What it does |
+| हुक | चरण | क्या करता है |
 |---|---|---|
-| `bloxdTerrainVertex` | terrain · vertex | Terrain vertex animation. **Cannot run in strict games** |
-| `bloxdTerrainSurface` | terrain · surface | Terrain color, alpha, emission, enchant, overlay |
-| `bloxdTerrainLight` | terrain · light | Terrain final color — the last stage of the fragment |
-| `bloxdLiquidVertex` | liquid · vertex | Water vertex animation. **strict-only guard required** |
-| `bloxdLiquidSurface` | liquid · surface | Water color, alpha, emission |
-| `bloxdLiquidLight` | liquid · light | Water final color |
-| `bloxdModelVertex` | model · vertex | Block models / items / entities vertex animation. **strict-only guard required** |
-| `bloxdModelSurface` | model · surface | Model color, alpha, emission, enchant, overlay |
-| `bloxdModelLight` | model · light | Model final color |
+| `bloxdTerrainVertex` | terrain · vertex | terrain का vertex एनिमेशन। **strict गेम में नहीं चल सकता** |
+| `bloxdTerrainSurface` | terrain · surface | terrain का रंग, alpha, emission, enchant, overlay |
+| `bloxdTerrainLight` | terrain · light | terrain का अंतिम रंग — फ़्रैगमेंट का आख़िरी चरण |
+| `bloxdLiquidVertex` | liquid · vertex | पानी का vertex एनिमेशन। **strict गेमों के विरुद्ध गार्ड अनिवार्य** |
+| `bloxdLiquidSurface` | liquid · surface | पानी का रंग, alpha, emission |
+| `bloxdLiquidLight` | liquid · light | पानी का अंतिम रंग |
+| `bloxdModelVertex` | model · vertex | ब्लॉक मॉडल / आइटम / एंटिटी का vertex एनिमेशन। **strict गेमों के विरुद्ध गार्ड अनिवार्य** |
+| `bloxdModelSurface` | model · surface | मॉडल का रंग, alpha, emission, enchant, overlay |
+| `bloxdModelLight` | model · light | मॉडल का अंतिम रंग |
 
-Signatures (types must match exactly; parameter names are free):
+हस्ताक्षर (प्रकार ठीक-ठीक मेल खाने चाहिए; पैरामीटर के नाम आपकी मर्ज़ी के):
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex;
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface;
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
-// bloxdLiquid* / bloxdModel* take the same types
+// bloxdLiquid* / bloxdModel* वही प्रकार लेते हैं
 ```
 
-## Render-target split
+## रेंडर-लक्ष्य विभाजन
 
-- **Terrain** — every block except water and block models
-- **Liquid** — water
-- **Model** — block models (slabs, stairs, crossed-plane plants), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics
+- **Terrain** — पानी और ब्लॉक मॉडल के अलावा हर ब्लॉक
+- **Liquid** — पानी
+- **Model** — ब्लॉक मॉडल (स्लैब, सीढ़ियाँ, क्रॉस्ड-प्लेन पौधे), हाथ में पकड़े/गिरे/फेंके गए आइटम, प्लेयर, मॉब, NPC, कवच, कॉस्मेटिक्स
 
-**Important**: if a pack defines no Liquid hook, **no Terrain hook runs on water either** (water is handled by Liquid hooks alone). This differs from pre-v4 behavior where liquid fell back to terrain hooks.
+**महत्वपूर्ण**: अगर पैक कोई Liquid हुक परिभाषित नहीं करता, तो **पानी पर कोई Terrain हुक भी नहीं चलता** (पानी केवल Liquid हुकों से ही संभाला जाता है)। यह pre-v4 व्यवहार से अलग है, जिसमें तरल terrain हुकों पर गिर जाता था।
 
-## Fallbacks and code sharing
+## फ़ॉलबैक और कोड साझा करना
 
-- An undefined hook means that stage uses the engine default (same behavior as `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **To share code across hooks**, define a module-scope function and call it from both:
+- अपरिभाषित हुक का मतलब है कि वह चरण इंजन डिफ़ॉल्ट इस्तेमाल करता है (वही व्यवहार जो `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` का है)
+- **हुकों के बीच कोड साझा करने के लिए** एक मॉड्यूल-स्तरीय फ़ंक्शन परिभाषित करें और दोनों ओर से उसे बुलाएँ:
 
 ```wgsl
 fn applyWarmth(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -56,9 +56,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## The default pack (official 9-hook template)
+## डिफ़ॉल्ट पैक (आधिकारिक 9-हुक टेम्पलेट)
 
-The starting template now includes the light hooks. 1,683 bytes as shipped, verbatim:
+शुरुआती टेम्पलेट में अब light हुक भी शामिल हैं। जैसा भेजा गया है वैसा ही 1,683 बाइट, शब्दशः:
 
 ```wgsl
 // Every hook here returns its engine default. Modify the return values to start
@@ -113,14 +113,14 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-The template's comments are the design guidance: modify return values to start building; deleting a hook restores the default; strict games keep terrain where it is; share code via functions.
+टेम्पलेट की टिप्पणियाँ ही डिज़ाइन-मार्गदर्शन हैं: बनाना शुरू करने के लिए रिटर्न वैल्यू बदलें; हुक मिटाने पर डिफ़ॉल्ट लौट आता है; strict गेम terrain को अपनी जगह पर रखते हैं; कोड फ़ंक्शनों के ज़रिए साझा करें।
 
-## Writing conventions
+## लेखन प्रथाएँ
 
-- **Never construct output structs directly** (`BloxdSurface(...)` fails validation). Always start from `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` and mutate fields. The light hook's first argument is already the output type, so `var out = s;` also works
-- A bare `var x: BloxdSurface;` (type annotation only) is also a validation error
-- Hook parameters are **read-only**. Copy first (`var sv = s;`)
-- You cannot use identifiers starting with `bloxd` (case-insensitive), except the 9 hook function names
-- Write constants as `const` (`#define` takes no value)
+- **आउटपुट स्ट्रक्चर कभी सीधे न बनाएँ** (`BloxdSurface(...)` सत्यापन में असफल होता है)। हमेशा `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` / `bloxdDefaultVertex(v)` से शुरू करके फ़ील्ड बदलें। light हुक का पहला तर्क पहले से ही आउटपुट प्रकार का होता है, इसलिए `var out = s;` भी चलता है
+- ही `var x: BloxdSurface;` (सिर्फ़ टाइप एनोटेशन) भी एक सत्यापन त्रुटि है
+- हुक के पैरामीटर **रीड-ओनली** होते हैं। पहले कॉपी करें (`var sv = s;`)
+- `bloxd` से शुरू होने वाले पहचानकर्ता इस्तेमाल नहीं कर सकते (केस-असंवेदनशील), केवल 9 हुक फ़ंक्शन नामों को छोड़कर
+- कॉन्स्टैंट `const` से लिखें (`#define` कोई वैल्यू नहीं लेता)
 
-For every field each hook can read and write, see [Structures](../api/structures.md).
+हर हुक कौन-से फ़ील्ड पढ़ और लिख सकता है — इसके लिए [स्ट्रक्चर](../api/structures.md) देखें।

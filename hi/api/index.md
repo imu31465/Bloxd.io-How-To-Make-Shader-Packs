@@ -1,24 +1,24 @@
-# API Reference
+# API रेफ़रेंस
 
-The systematic specification of the current API v5. Everything here is measured from target build `ab90qa` (2026-11-03; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
+मौजूदा API v5 की व्यवस्थित स्पेसिफ़िकेशन। यहाँ का सब कुछ लक्ष्य बिल्ड `ab90qa` (2026-11-03; प्रोडक्शन और प्रीप्रोड एक जैसे) से मापा गया है। हर पैक के आगे जुड़ने वाला इंजन हेडर ([इंजन-आंतरिक](../internals/engine-header.md) में पुनरुत्पादित) प्राथमिक स्रोत है।
 
-## Map
+## नक़्शा
 
-| Page | Contents |
+| पेज | सामग्री |
 |---|---|
-| [Pack format](pack-format.md) | every `pack.json` field, loader limits, uniform layout |
-| [Shader hooks](hooks.md) | 9-hook comparison: signatures, targets, run conditions |
-| [Flags](flags.md) | all 14 `BloxdFlags` fields |
-| [Structures](structures.md) | every field of every struct (incl. conditional fields) |
-| [Functions](functions.md) | all frame/default/special function signatures |
-| [Lighting](lighting.md) | the lighting API and the processing order |
-| [Texture API](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` and naming |
-| [Constants](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
-| [Preprocessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
-| [Restrictions](restrictions.md) | language limits, reserved identifiers |
-| [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
+| [पैक फ़ॉर्मैट](pack-format.md) | `pack.json` का हर फ़ील्ड, लोडर सीमाएँ, uniform लेआउट |
+| [शेडर हुक](hooks.md) | 9-हुक तुलना: हस्ताक्षर, लक्ष्य, चलने की शर्तें |
+| [फ़्लैग](flags.md) | `BloxdFlags` के सभी 14 फ़ील्ड |
+| [स्ट्रक्चर](structures.md) | हर स्ट्रक्चर का हर फ़ील्ड (सशर्त फ़ील्ड सहित) |
+| [फ़ंक्शन्स](functions.md) | सभी frame/default/special फ़ंक्शन हस्ताक्षर |
+| [लाइटिंग](lighting.md) | लाइटिंग API और प्रोसेसिंग का क्रम |
+| [टेक्सचर API](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` और नामकरण |
+| [कॉन्स्टैंट्स](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
+| [प्रीप्रोसेसर](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
+| [प्रतिबंध](restrictions.md) | भाषा की सीमाएँ, आरक्षित पहचानकर्ता |
+| [कम्पैटिबिलिटी](compatibility.md) | पुराने-संस्करण के पैक, सेव-पैक का पुनः-सत्यापन |
+| [टेक्सचर कैटलॉग](texture-catalog.md) | इस्तेमाल-योग्य सभी 896 नाम (खोजने-योग्य) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored verbatim from header & validator)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर व वैलिडेटर से शब्दशः बहाल)
 
-Migrating from v4? See [Version History: v5](../history/v5.md).
+v4 से माइग्रेट कर रहे हैं? देखें [संस्करण इतिहास: v5](../history/v5.md)।

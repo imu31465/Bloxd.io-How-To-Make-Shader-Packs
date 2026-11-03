@@ -1,10 +1,10 @@
-# Input & output structures
+# इनपुट व आउटपुट स्ट्रक्चर
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से शब्दशः बहाल)
 
-Seven structs are readable/writable by packs. Every field is listed below (`#ifdef` fields are conditional). The full header is in [Engine Internals](../internals/engine-header.md).
+सात स्ट्रक्चर पैक से पढ़े/लिखे जा सकते हैं। हर फ़ील्ड नीचे सूचीबद्ध है (`#ifdef` वाले फ़ील्ड सशर्त हैं)। पूरा हेडर [इंजन-आंतरिक](../internals/engine-header.md) में है।
 
-## BloxdVertexIn (vertex hook input)
+## BloxdVertexIn (vertex हुक इनपुट)
 
 ```wgsl
 struct BloxdVertexIn {
@@ -15,14 +15,14 @@ struct BloxdVertexIn {
 }
 ```
 
-| Field | Type | Description |
+| फ़ील्ड | प्रकार | विवरण |
 |---|---|---|
-| `position` | `vec3f` | render-space position (world space via `bloxdWorldPosition()`) |
-| `normal` | `vec3f` | unit vector pointing away from the face |
-| `localPosition` | `vec3f` | model-local coordinates; **`vec3f(0.0)` for terrain and liquid**; for a player's arm, a held sword or windmill blades this rotates with the model |
-| `flags` | `BloxdFlags` | face kind ([Flags](flags.md)) |
+| `position` | `vec3f` | रेंडर-स्पेस स्थिति (विश्व स्पेस `bloxdWorldPosition()` से) |
+| `normal` | `vec3f` | फलक से बाहर की ओर इशारा करता यूनिट वेक्टर |
+| `localPosition` | `vec3f` | मॉडल-लोकल निर्देशांक; **terrain और liquid के लिए `vec3f(0.0)`**; प्लेयर की बाँह, हाथ में पकड़ी तलवार या पवन-चक्की के ब्लेड के लिए यह मॉडल के साथ घूमता है |
+| `flags` | `BloxdFlags` | फलक की क़िस्म ([फ़्लैग](flags.md)) |
 
-## BloxdVertex (vertex hook output)
+## BloxdVertex (vertex हुक आउटपुट)
 
 ```wgsl
 struct BloxdVertex {
@@ -30,7 +30,7 @@ struct BloxdVertex {
 }
 ```
 
-## BloxdSurfaceIn (surface hook input)
+## BloxdSurfaceIn (surface हुक इनपुट)
 
 ```wgsl
 struct BloxdSurfaceIn {
@@ -60,21 +60,21 @@ struct BloxdSurfaceIn {
 }
 ```
 
-| Field | Type | Description |
+| फ़ील्ड | प्रकार | विवरण |
 |---|---|---|
-| `colour` | `vec3f` | RGB = texture × tint × AO, baked by the mesher |
-| `alpha` | `f32` | opacity |
-| `enchantTier` | `u32` | enchant tier 1–5; 0 for anything not enchanted |
-| `enchantColour` | `vec4f` | enchant RGB plus an **animated** alpha (`.a`) — reading `.a` per fragment gives a moving pattern for free; all zero on unenchanted faces |
-| `enchantSpeed` | `f32` | enchant pattern speed («faster at higher tiers») |
-| `overlayColour` | `vec4f` | entity overlay (hurt flash etc.) RGB + alpha; 0 outside players/mobs; mixed in by `bloxdLitColour` before lighting |
-| `position` / `normal` / `localPosition` / `flags` | — | same meanings as `BloxdVertexIn`, **after the vertex hook** (they follow moved vertices) |
-| `textureId` | `u32` | this face's texture; compare with `bloxdTextureId*`; **0 when the face has no texture** — most models use textureId 0 (model-owned textures, player skins) |
-| `textureRotation` | `u32` | quarter turns clockwise (0–3), applied by `bloxdTexel` |
-| `uv` | `vec2f` | the texture spans 0–1; `fract(uv)` is drawn (integer steps tile) |
-| `mipLevel` | `f32` | mipmap level: 0 = full size, 1 = half… |
+| `colour` | `vec3f` | RGB = texture × tint × AO, mesher द्वारा बेक किया हुआ |
+| `alpha` | `f32` | अपारदर्शिता |
+| `enchantTier` | `u32` | enchant टियर 1–5; जो enchant नहीं है उसके लिए 0 |
+| `enchantColour` | `vec4f` | enchant का RGB और एक **एनिमेटेड** अल्फ़ा (`.a`) — प्रति-फ़्रैगमेंट `.a` पढ़ने पर चलता हुआ पैटर्न बिना किसी मेहनत के मिल जाता है; enchant न होने वाले फलकों पर पूरा शून्य |
+| `enchantSpeed` | `f32` | enchant पैटर्न की रफ़्तार («faster at higher tiers») |
+| `overlayColour` | `vec4f` | एंटिटी ओवरले (चोट की लाल झलक आदि) का RGB + अल्फ़ा; प्लेयर/मॉब के बाहर 0; लाइटिंग से पहले `bloxdLitColour` इसे मिला देता है |
+| `position` / `normal` / `localPosition` / `flags` | — | वही अर्थ जो `BloxdVertexIn` के हैं, पर **vertex हुक के बाद** (हिलाए गए vertex के साथ-साथ चलते हैं) |
+| `textureId` | `u32` | इस फलक का टेक्सचर; `bloxdTextureId*` से तुलना करें; **फलक पर टेक्सचर न होने पर 0** — ज़्यादातर मॉडल textureId 0 इस्तेमाल करते हैं (मॉडल के अपने टेक्सचर, प्लेयर स्किन) |
+| `textureRotation` | `u32` | घड़ी की दिशा में चौथाई घूमाव (0–3), `bloxdTexel` लागू करता है |
+| `uv` | `vec2f` | टेक्सचर 0–1 पर फैला हुआ; `fract(uv)` ड्रॉ होता है (पूर्णांक क़दम टाइलिंग बनाते हैं) |
+| `mipLevel` | `f32` | mip लेवल: 0 = पूरा आकार, 1 = आधा… |
 
-## BloxdSurface (surface hook output)
+## BloxdSurface (surface हुक आउटपुट)
 
 ```wgsl
 struct BloxdSurface {
@@ -88,17 +88,17 @@ struct BloxdSurface {
 }
 ```
 
-| Field | Type | Condition | Description |
+| फ़ील्ड | प्रकार | शर्त | विवरण |
 |---|---|---|---|
-| `colour` | `vec3f` | always | RGB output |
-| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model) | opacity output |
-| `emission` | `vec3f` | always | emissive RGB — **added after lighting, before fog** |
-| `enchantColour` | `vec4f` | always | enchant output, mixed in by `bloxdLitColour` |
-| `overlayColour` | `vec4f` | always | overlay output, mixed in by `bloxdLitColour` |
+| `colour` | `vec3f` | हमेशा | RGB आउटपुट |
+| `alpha` | `f32` | `#ifdef BLOXD_ALPHA` (सभी liquid + ग़ैर-strict terrain/model) | अपारदर्शिता आउटपुट |
+| `emission` | `vec3f` | हमेशा | emissive RGB — **लाइटिंग के बाद, फ़ॉग से पहले जुड़ता है** |
+| `enchantColour` | `vec4f` | हमेशा | enchant आउटपुट, `bloxdLitColour` मिला देता है |
+| `overlayColour` | `vec4f` | हमेशा | ओवरले आउटपुट, `bloxdLitColour` मिला देता है |
 
-`bloxdDefaultSurface` passes `enchantColour` / `overlayColour` through unchanged, so the default look matches v4's engine-internal behavior. Zero `out.enchantColour` to remove the glint under custom lighting; amplify `out.overlayColour.a` to emphasize the hurt flash.
+`bloxdDefaultSurface` `enchantColour` / `overlayColour` को बिना बदलाए पार जाने देता है, इसलिए डिफ़ॉल्ट रूप v4 के इंजन-आंतरिक आचरण से मेल खाता है। कस्टम लाइटिंग में चमक (glint) हटाने के लिए `out.enchantColour` शून्य कर दें; चोट की झलक उभारने के लिए `out.overlayColour.a` बढ़ा दें।
 
-## BloxdLightIn (light hook input)
+## BloxdLightIn (light हुक इनपुट)
 
 ```wgsl
 struct BloxdLightIn {
@@ -127,16 +127,11 @@ struct BloxdLightIn {
 }
 ```
 
-Field-by-field meaning and role in lighting math: see [Lighting](lighting.md).
+फ़ील्ड-दर-फ़ील्ड अर्थ और लाइटिंग गणित में भूमिका: देखें [लाइटिंग](lighting.md)।
 
-**Versus v4**:
+**पुराने API संस्करणों के मुक़ाबले**: `fogVisibility` (v2–v4) अब `fogAlpha` है, उलटे अर्थों के साथ (0 = कोई फ़ॉग नहीं); `engineColour` अब `litColour` है; लाइट-लेवल का शब्द-प्रयोग है «0 when !bloxdLit()»। संस्करण-दर-संस्करण फ़ील्ड बदलावों की पूरी सूची: [संस्करण इतिहास](../history/)।
 
-- `fogVisibility: f32` (1 = no fog) was renamed **`fogAlpha: f32` (0 = no fog, 1 = only fogColour)** — semantics inverted
-- `diffuse` / `emissive` are new in v5 (v4 had only `directional` and `ambient`) — `bloxdShading()` can now rebuild the material response
-- `engineColour` (v2–v4) is gone; `litColour` is «Lit and enchanted RGB colour, before emission and fog»
-- light-level wording changed from «0 without BLOXD_LIGHTING» to «0 when !bloxdLit()» — the same facts in v5 vocabulary
-
-## BloxdLight (light hook output)
+## BloxdLight (light हुक आउटपुट)
 
 ```wgsl
 struct BloxdLight {
@@ -144,7 +139,7 @@ struct BloxdLight {
 }
 ```
 
-## BloxdOpaqueBehind (special-function return)
+## BloxdOpaqueBehind (स्पेशल-फ़ंक्शन रिटर्न)
 
 ```wgsl
 struct BloxdOpaqueBehind {
@@ -154,23 +149,23 @@ struct BloxdOpaqueBehind {
 }
 ```
 
-Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef BLOXD_SCENE_DEPTH` guard (the field was `found: bool` in v2).
+`bloxdOpaqueBehind()` की रिटर्न वैल्यू। liquid वेरिएंट में `#ifdef BLOXD_SCENE_DEPTH` गार्ड के पीछे इस्तेमाल करें (v2 में यह फ़ील्ड `found: bool` था)।
 
-## Conditional fields ↔ macros
+## सशर्त फ़ील्ड ↔ मैक्रो
 
-| Field | Exists when | Note |
+| फ़ील्ड | कब मौजूद | टिप्पणी |
 |---|---|---|
-| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | all liquid variants + non-strict terrain/model |
-| `bloxdOpaqueBehind()` call | `#ifdef BLOXD_SCENE_DEPTH` | all liquid variants |
+| `BloxdSurface.alpha` | `#ifdef BLOXD_ALPHA` | सभी liquid वेरिएंट + ग़ैर-strict terrain/model |
+| `bloxdOpaqueBehind()` कॉल | `#ifdef BLOXD_SCENE_DEPTH` | सभी liquid वेरिएंट |
 
-`BLOXD_STRICT` controls **hook existence** (vertex hooks), not struct shape. See [Preprocessor](preprocessor.md).
+`BLOXD_STRICT` **हुकों की मौजूदगी** (vertex हुक) तय करता है, स्ट्रक्चर का आकार नहीं। देखें [प्रीप्रोसेसर](preprocessor.md)।
 
-## Writing conventions (recap)
+## लेखन प्रथाएँ (पुनरावृत्ति)
 
-- Never construct output structs directly — start from `bloxdDefault*`; in light hooks `var out = s;` also works
-- A bare `var x: BloxdSurface;` is a validation error
-- Hook parameters are read-only — copy before mutating
+- आउटपुट स्ट्रक्चर कभी सीधे न बनाएँ — `bloxdDefault*` से शुरू करें; light हुक में `var out = s;` भी चलता है
+- ही `var x: BloxdSurface;` एक सत्यापन त्रुटि है
+- हुक के पैरामीटर रीड-ओनली होते हैं — बदलने से पहले कॉपी करें
 
-## Related
+## संबंधित
 
-- [Lighting](lighting.md) · [Flags](flags.md) · [Texture API](texture-api.md)
+- [लाइटिंग](lighting.md) · [फ़्लैग](flags.md) · [टेक्सचर API](texture-api.md)

@@ -1,18 +1,18 @@
 {
   "index": {
-    "title": "API Reference",
+    "title": "API रेफ़रेंस",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "pack-format": "Pack format",
-  "hooks": "Shader hooks",
-  "flags": "Flags (BloxdFlags)",
-  "structures": "Input & output structures",
-  "functions": "Functions",
-  "lighting": "Lighting",
-  "texture-api": "Texture API",
-  "constants": "Constants",
-  "preprocessor": "Preprocessor",
-  "restrictions": "Restrictions & reserved names",
-  "compatibility": "Compatibility",
-  "texture-catalog": "Texture catalog"
+  "pack-format": "पैक फ़ॉर्मैट",
+  "hooks": "शेडर हुक",
+  "flags": "फ़्लैग (BloxdFlags)",
+  "structures": "इनपुट व आउटपुट स्ट्रक्चर",
+  "functions": "फ़ंक्शन",
+  "lighting": "लाइटिंग",
+  "texture-api": "टेक्सचर API",
+  "constants": "कॉन्स्टैंट",
+  "preprocessor": "प्रीप्रोसेसर",
+  "restrictions": "प्रतिबंध और आरक्षित नाम",
+  "compatibility": "कम्पैटिबिलिटी",
+  "texture-catalog": "टेक्सचर कैटलॉग"
 }

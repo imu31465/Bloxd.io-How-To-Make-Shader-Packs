@@ -1,55 +1,55 @@
-# Visual issues
+# विज़ुअल समस्याएँ
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-Compiles fine but looks wrong.
+कंपाइल ठीक चलता है पर दिखना ग़लत।
 
-## Distance turns white/hazy
+## दूरी के साथ सफ़ेद/धुंधला हो जाना
 
-- **Cause**: double fog. The default light-hook output is **already fogged** (`bloxdApplyFog(lit + emission, light)`), so mixing more fog color on top doubles it
-- **Fix**: keep custom fog subtle; consider saturation-only aerial perspective ([realism recipes](../recipes/realism.md))
-- **Prevention**: understand `fogAlpha` semantics (0 = no fog, 1 = only fogColour) and the [pipeline](../api/lighting.md#the-full-pipeline) before writing fog
+- **कारण**: दोहरी फ़ॉग। डिफ़ॉल्ट light-हुक आउटपुट **पहले से फ़ॉगयुक्त** होता है (`bloxdApplyFog(lit + emission, light)`), इसलिए ऊपर से और फ़ॉग रंग मिलाने से वह दोगुना हो जाता है
+- **समाधान**: कस्टम फ़ॉग हल्का रखें; केवल-सैचुरेशन वायुमंडलीय परिप्रेक्ष्य पर विचार करें ([यथार्थवाद रेसिपी](../recipes/realism.md))
+- **रोकथाम**: फ़ॉग लिखने से पहले `fogAlpha` की अर्थव्यवस्था (0 = कोई फ़ॉग नहीं, 1 = केवल fogColour) और [पाइपलाइन](../api/lighting.md#पर-पइपलइन) समझें
 
-## pow(l.skyLight, γ) never darkens shadows
+## pow(l.skyLight, γ) से छाया कभी गहरी नहीं होती
 
-- **Cause**: `skyLight` arrives post-lift-curve (raw 0.87 arrives as 0.97); gamma mathematically cannot compete
-- **Fix**: switch to lift inversion + threshold ([Shadows](../guides/shadows.md))
+- **कारण**: `skyLight` लिफ़्ट-बाद का मान लेकर आता है (कच्चा 0.87, 0.97 बनकर आता है); गामा गणितीय रूप से उससे मुक़ाबला नहीं कर सकता
+- **समाधान**: लिफ़्ट इनवर्ज़न + देहली पर जाएँ ([छायाएँ](../guides/shadows.md))
 
-## Blocks turn almost pure white
+## ब्लॉक लगभग बिल्कुल सफ़ेद हो जाते हैं
 
-- **Cause**: the light-hook output exceeds 1.0 (no clamp exists past the output)
-- **Fix**: append `clamp(col, vec3f(0.0), vec3f(1.0))`
+- **कारण**: light-हुक का आउटपुट 1.0 पार कर जाता है (आउटपुट के आगे कोई clamp नहीं है)
+- **समाधान**: अंत में `clamp(col, vec3f(0.0), vec3f(1.0))` लगाएँ
 
-## White without additions
+## बिना किसी जोड़ के सफ़ेद
 
-- **Cause**: un-fog inversion by division
-- **Fix**: drop the un-fog; rebuild from `s.colour` and apply fog exactly once at the end (or via `bloxdApplyFog`)
+- **कारण**: विभाजन से un-fog व्युत्क्रमण
+- **समाधान**: un-fog हटाएँ; `s.colour` से पुनर्निर्माण करें और फ़ॉग अंत में ठीक एक बार लगाएँ (या `bloxdApplyFog` से)
 
-## Glowing blocks don't glow (rebuilding packs)
+## चमकते ब्लॉक नहीं चमकते (पुनर्निर्माण करते पैक)
 
-- **Cause**: missing emission re-add — dropping the default output means adding emission yourself
-- **Fix**: add `+ s.emission * (1.0 - l.fogAlpha)`; on v5 the `bloxdLitColour()` + emission + `bloxdApplyFog` composition is safest ([Lighting](../api/lighting.md))
+- **कारण**: emission का दोबारा योग छूट गया — डिफ़ॉल्ट आउटपुट गिराने का मतलब है emission ख़ुद जोड़ना
+- **समाधान**: `+ s.emission * (1.0 - l.fogAlpha)` जोड़ें; v5 पर `bloxdLitColour()` + emission + `bloxdApplyFog` संयोजन सबसे सुरक्षित है ([लाइटिंग](../api/lighting.md))
 
-## Waves/patterns cut off at chunk or origin switches
+## खंड या मूल-बिंदु बदलने पर तरंगें/पैटर्न कट जाना
 
-- **Cause**: using render-space positions directly — the origin moves with the player
-- **Fix**: use `bloxdWorldPosition(position)` for world-dependent effects ([Coordinates](../recipes/coordinates.md)); note f32 precision limits far from origin
+- **कारण**: रेंडर-स्पेस स्थितियों का सीधे उपयोग — मूल-बिंदु खिलाड़ी के साथ खिसकता है
+- **समाधान**: दुनिया-निर्भर प्रभावों के लिए `bloxdWorldPosition(position)` का उपयोग करें ([कोऑर्डिनेट](../recipes/coordinates.md)); मूल-बिंदु से दूर f32 सटीकता की सीमाएँ नोट करें
 
-## Water-surface patterns misalign on rotated faces
+## घूर्णित फ़ेस पर पानी-सतह के पैटर्न बेमेल
 
-- **Cause**: `bloxdTexel` applies the fragment's own `textureRotation` to your uv ([the rotation subtlety](../api/texture-api.md#the-rotation-subtlety--a-neutral-sampler))
-- **Fix**: pre-rotate with the `texelNeutral` helper
+- **कारण**: `bloxdTexel` आपके uv पर फ़्रैगमेंट का अपना `textureRotation` लगा देता है ([रोटेशन की बारीकी](../api/texture-api.md#रटशन-क-बरक--एक-नयटरल-सपलर))
+- **समाधान**: `texelNeutral` हेल्पर से पहले से घुमाएँ
 
-## Enchant glint / hurt flash disappeared
+## एनचैंट झिलमिल / चोट-फ़्लैश ग़ायब
 
-- **Cause**: custom lighting rebuilt without passing `enchantColour` / `overlayColour` through
-- **Fix**: pass them through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
-- **v5**: `bloxdDefaultSurface` passes both through unchanged, so defaults never lose them
+- **कारण**: कस्टम लाइटिंग बिना `enchantColour` / `overlayColour` पार पहुँचाए फिर से बनाई गई
+- **समाधान**: उन्हें पार पहुँचाएँ या `bloxdLitColour()` का उपयोग करें ([एनचैंट प्रभाव](../recipes/enchant-effects.md))
+- **v5**: `bloxdDefaultSurface` दोनों को बिना बदले पार कर देता है, इसलिए डिफ़ॉल्ट उन्हें कभी नहीं खोते
 
-## Sky, clouds or the sun disc unaffected
+## आसमान, बादल या सूर्य-चकती अछूते
 
-- **By design**: hooks cover terrain / liquid / model only ([Unreachable effects](../guides/constraints.md))
+- **डिज़ाइन के अनुसार**: हुक केवल terrain / liquid / model को छूते हैं ([पहुँच से बाहर प्रभाव](../guides/constraints.md))
 
-## Related
+## संबंधित
 
-- [Lighting issues](lighting.md) · [Debugging tips](../guides/debugging.md) · [Fog Internals](../internals/fog-internals.md)
+- [लाइटिंग समस्याएँ](lighting.md) · [दोषमार्जन युक्तियाँ](../guides/debugging.md) · [फ़ॉग इंटर्नल्स](../internals/fog-internals.md)

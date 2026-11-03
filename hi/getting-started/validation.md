@@ -1,24 +1,24 @@
-# Validation
+# सत्यापन
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
-## The 3-stage load check
+## 3-चरणीय लोड जाँच
 
-1. **Loader limits** — size, shape, manifest validity (see [Pack structure](pack-structure.md))
-2. **Static validation (analyzer)** — syntax, types, reserved names, strict contract, across all 6 variants
-3. **Real WebGPU compilation in the browser** — static validation's type-checking is incomplete, so some mistakes only surface here
+1. **लोडर सीमाएँ** — आकार, आकृति, मैनिफ़ेस्ट की वैधता (देखें [पैक संरचना](pack-structure.md))
+2. **स्थैतिक सत्यापन (एनालाइज़र)** — वाक्यरचना, प्रकार, आरक्षित नाम, strict अनुबंध, सभी 6 वेरिएंटों में
+3. **ब्राउज़र में असली WebGPU कंपाइल** — स्थैतिक सत्यापन की टाइप-जाँच अपूर्ण होती है, इसलिए कुछ ग़लतियाँ केवल यहीं सामने आती हैं
 
-For reading each error, see [Troubleshooting](../troubleshooting/) (organized by symptom).
+हर त्रुटि को पढ़ने-समझने के लिए देखें [ट्रबलशूटिंग](../troubleshooting/) (लक्षण के अनुसार क्रमबद्ध)।
 
-## Procedure
+## प्रक्रिया
 
-1. Load the zip or folder from settings → Shader Pack
-2. Check status: "Ready. Reload the page to use it." right after selecting; **after a page reload**, "Ready to use" means success
-3. On "Saved, but it won't run until you fix these errors...", fix the listed errors (file:line + variant) and reload
-4. Test in a permissive game first, then a strict-mode game (most games). Vertex animation works only in allow games
-5. Replacing a pack reloads from the same screen; changes need a page reload
-6. Remove with Remove Pack. After game updates, saved packs re-validate automatically on page load (header/registry changes mark them "needs re-check")
+1. सेटिंग्स → Shader Pack से zip या फ़ोल्डर लोड करें
+2. स्थिति देखें: चुनते ही "Ready. Reload the page to use it." दिखेगा; **पेज रीलोड के बाद** "Ready to use" का मतलब है सफलता
+3. "Saved, but it won't run until you fix these errors..." आने पर सूचीबद्ध त्रुटियाँ (file:line + variant) ठीक करके रीलोड करें
+4. पहले किसी allow गेम में टेस्ट करें, फिर किसी strict-मोड गेम में (ज़्यादातर गेम)। vertex एनिमेशन केवल allow गेमों में चलता है
+5. पैक बदलने पर वही स्क्रीन दोबारा लोड करती है; बदलाव लागू होने के लिए पेज रीलोड चाहिए
+6. Remove Pack से हटाएँ। गेम अपडेट के बाद सेव किए गए पैक पेज लोड पर अपने आप दोबारा सत्यापित होते हैं (हेडर/रजिस्ट्री के बदलाव उन्हें "needs re-check" चिह्नित कर देते हैं)
 
-## On-device test checklist
+## ऑन-डिवाइस टेस्ट चेकलिस्ट
 
-See the [testing guide](../guides/testing.md) for the full checklist and the complete list of factors that change what a pack sees.
+पूरी चेकलिस्ट और उन सभी कारकों की पूरी सूची के लिए जो पैक को जो दिखता है वह बदल देते हैं, [टेस्टिंग गाइड](../guides/testing.md) देखें।

@@ -1,10 +1,9 @@
-# उत्सर्जन रेसिपी (emission)
+# उत्सर्जन
 
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> `emission` प्रकाश गणना के बाद जोड़ा जाता है, पर डिफ़ॉल्ट प्रक्रिया **इसे फ़ॉग मात्रा (`fogAlpha`) से क्षीण कर देती है। पूरी तरह फ़ॉग-युक्त दूरी में उत्सर्जन भी गायब हो जाता है। दूर तक चमकते रहना हो तो emission में न जोड़ें — लाइट हुक के भीतर सीधे `out.colour += ...` करें** (डिफ़ॉल्ट निर्गम पहले से फ़ॉग-युक्त है, इसलिए दूरी पर प्रकाश फ़ॉग रंग के ऊपर बैठता है)
 
-
-> `emission` प्रकाश गणना बाद जुड़ता है, पर डिफ़ॉल्ट प्रक्रिया **`fogVisibility` से क्षीण करती है। पूर्णतः धुंधली दूरी में उत्सर्जन भी लुप्त होता है। दूर भी चमकाने घटक emission में न जोड़ें, light हुक भीतर `out.colour += ...` सीधे जोड़ें** (engineColour फ़ॉग लगा हुआ अतः दूर धुंध वर्ण ऊपर प्रकाश चढ़ता है)
-
-## दीया स्पंदन (मशाल श्वास)
+## स्पंदित दीये (साँस लेती मशालें)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -18,10 +17,10 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## प्रदीप्त अयस्क भाव (उजली सामग्री चमके)
+## चमकते-अयस्क रूप (उजली सामग्री उत्सर्जित करती हैं)
 
 ```wgsl
-// surface पक्ष: सामग्री जितनी उजली (श्वेत) emission उतना चढ़ाएँ
+// surface पक्ष: सामग्री जितनी उजली (सफ़ेद), उतना अधिक emission
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(s);
     let luma = dot(out.colour, vec3f(0.299, 0.587, 0.114));
@@ -31,13 +30,13 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## जुगनू समूह भाव (काल से अंतरिक्ष तैरते प्रकाश बिंदु)
+## जुगनू-झुंड रूप (समय के साथ तैरते प्रकाश बिंदु)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let world = bloxdWorldPosition(l.position);
-    // कुछ 「प्रकाश गोल」 धीमे तैरते हैं। दूरी व्युत्क्रम से चमकाएँ
+    // कुछ "प्रकाश गोले" धीरे-धीरे तैरते हैं; दूरी के व्युत्क्रम से चमक
     let t = bloxdSeconds() * 0.15;
     let p1 = vec3f(sin(t) * 40.0, 20.0 + sin(t * 1.3) * 6.0, cos(t * 0.7) * 40.0);
     let d1 = distance(world, p1);

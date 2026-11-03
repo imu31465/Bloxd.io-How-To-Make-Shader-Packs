@@ -1,34 +1,34 @@
-# Performance
+# प्रदर्शन
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-Speed problems and their fixes.
+गति की समस्याएँ और उनके समाधान।
 
-## The on-device check never finishes and drops the pack
+## ऑन-डिवाइस जाँच कभी पूरी नहीं होती और पैक ड्रॉप कर देती है
 
-- **Cause**: the check has a **60-second forced timeout** (excess is treated as `skipped`) — common on low-spec devices and heavy worlds
-- **Fix**: reduce heavy vertex work and complex loops, then retry
-- **Prevention**: follow the [performance guide](../guides/performance.md)
+- **कारण**: जाँच में **60-सेकंड का ज़बरदस्ती टाइमआउट** है (सीमा पार होने पर `skipped` माना जाता है) — कम-स्पेक डिवाइसों और भारी दुनियाओं पर आम
+- **समाधान**: भारी vertex काम और जटिल लूप घटाएँ, फिर दोबारा कोशिश करें
+- **रोकथाम**: [प्रदर्शन गाइड](../guides/performance.md) का पालन करें
 
-## Frame rate drops
+## फ़्रेम दर गिरना
 
-- **Check**: compare FPS with and without the pack; measure terrain-heavy scenes and water separately
-- **Typical causes**: heavy effects on every face unconditionally (no flag/distance selection); high-frequency hash noise; large `pow` exponents
-- **Fixes** ([the guide](../guides/performance.md)):
-  - gate effects to the faces that need them via `flags`
-  - early-out by distance (`distance(surface.position, bloxdEyePosition())`)
-  - sample one mip up for cheaper `bloxdTexel` reads
-- **Prevention**: add detail incrementally and compare FPS ([testing](../guides/testing.md))
+- **जाँच**: पैक के साथ और बिना FPS की तुलना करें; terrain-भारी दृश्य और पानी को अलग-अलग मापें
+- **आम कारण**: हर फ़ेस पर बिना शर्त भारी प्रभाव (कोई फ़्लैग/दूरी चयन नहीं); उच्च-आवृत्ति हैश शोर; बड़े `pow` घातांक
+- **समाधान** ([गाइड](../guides/performance.md)):
+  - प्रभावों को `flags` के ज़रिए केवल ज़रूरतमंद फ़ेसों तक सीमित करें
+  - दूरी से जल्दी बाहर निकलें (`distance(surface.position, bloxdEyePosition())`)
+  - सस्ते `bloxdTexel` पढ़ने के लिए एक mip ऊपर सैंपल करें
+- **रोकथाम**: विवरण थोड़ा-थोड़ा जोड़ें और FPS की तुलना करें ([परीक्षण](../guides/testing.md))
 
-## Slow only on mobile
+## केवल मोबाइल पर धीमा
 
-- **Cause**: packs run on the WebGPU renderer; mobile GPUs can be tens of times slower than desktop
-- **Fix**: reduce effect strength/frequency, strengthen distance culling — or clearly mark mobile as unsupported ([Requirements](../getting-started/requirements.md))
+- **कारण**: पैक WebGPU रेंडरर पर चलते हैं; मोबाइल GPU डेस्कटॉप से दसियों गुना धीमे हो सकते हैं
+- **समाधान**: प्रभाव की ताक़त/आवृत्ति घटाएँ, दूरी-कलिंग मज़बूत करें — या साफ़ लिख दें कि मोबाइल असमर्थित है ([आवश्यकताएँ](../getting-started/requirements.md))
 
-## Approaching the 256 KB pack limit
+## 256 KB पैक सीमा के पास पहुँचना
 
-- **Fix**: trim comments, factor shared code into functions, drop unused recipes ([Pack structure](../getting-started/pack-structure.md))
+- **समाधान**: टिप्पणियाँ छाँटें, साझा कोड को फ़ंक्शनों में बाँधें, बेकार रेसिपी हटाएँ ([पैक संरचना](../getting-started/pack-structure.md))
 
-## Related
+## संबंधित
 
-- [Performance guide](../guides/performance.md) · [Testing](../guides/testing.md)
+- [प्रदर्शन गाइड](../guides/performance.md) · [परीक्षण](../guides/testing.md)

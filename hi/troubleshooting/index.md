@@ -1,29 +1,29 @@
-# Troubleshooting
+# समस्या निवारण
 
-Errors and visual problems, findable **by symptom**. Pages follow the structure: symptom → cause → how to check → fix → prevention.
+त्रुटियाँ और दृश्य समस्याएँ, **लक्षण के आधार पर** खोजी जा सकने वाली। हर पेज इस ढाँचे पर चलता है: लक्षण → कारण → जाँच का तरीक़ा → समाधान → रोकथाम।
 
-## Symptom index
+## लक्षण सूचकांक
 
-| Symptom | Page |
+| लक्षण | पेज |
 |---|---|
-| Pack won't load / zip & pack.json errors | [Loading errors](loading.md) |
-| `apiVersion` messages / old packs not running | [API version errors](api-version.md) |
-| Won't compile / `must be declared as` / WGSL syntax | [Compilation errors](compilation.md) |
-| Validation errors (reserved names, strict contract, `reaches`) | [Validation errors](validation.md) |
-| Fails only in some variants / dropped in strict games | [Variant-specific issues](variants.md) |
-| Looks wrong (white haze, no shadows, odd night) | [Visual issues](visual.md) |
-| Texture-name errors / `did you mean` | [Texture issues](textures.md) |
-| Brightness / shadow / fog problems | [Lighting issues](lighting.md) |
-| Model / entity / enchant problems | [Model issues](models.md) |
-| Slow / dropped by the on-device check | [Performance](performance.md) |
-| Legal, safety, common questions | [FAQ](faq.md) |
+| पैक लोड नहीं होता / zip और pack.json की त्रुटियाँ | [लोडिंग त्रुटियाँ](loading.md) |
+| `apiVersion` संदेश / पुराने पैक नहीं चलते | [API संस्करण त्रुटियाँ](api-version.md) |
+| कंपाइल नहीं होता / `must be declared as` / WGSL वाक्यरचना | [कंपाइलेशन त्रुटियाँ](compilation.md) |
+| सत्यापन त्रुटियाँ (आरक्षित नाम, strict अनुबंध, `reaches`) | [सत्यापन त्रुटियाँ](validation.md) |
+| केवल कुछ वेरिएंट में विफल / strict गेमों में ड्रॉप हो जाता है | [वेरिएंट-विशिष्ट समस्याएँ](variants.md) |
+| ग़लत दिखता है (सफ़ेद धुंध, छाया नहीं, अजीब रात) | [विज़ुअल समस्याएँ](visual.md) |
+| टेक्सचर-नाम त्रुटियाँ / `did you mean` | [टेक्सचर समस्याएँ](textures.md) |
+| चमक / छाया / फ़ॉग की समस्याएँ | [लाइटिंग समस्याएँ](lighting.md) |
+| मॉडल / एंटिटी / एनचैंट की समस्याएँ | [मॉडल समस्याएँ](models.md) |
+| धीमा / ऑन-डिवाइस जाँच में ड्रॉप हो जाता है | [प्रदर्शन](performance.md) |
+| कानूनी, सुरक्षा, सामान्य प्रश्न | [FAQ](faq.md) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (messages recorded verbatim from the live validator & loader)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (संदेश लाइव वैलिडेटर और लोडर से अक्षरशः दर्ज किए गए)
 
-## Where errors appear
+## त्रुटियाँ कहाँ दिखती हैं
 
-1. **Settings → Shader Pack status line** — loader-stage errors (IDs are `shaderPack:load*`)
-2. **The loader screen's error list** — validation & compilation (file:line + variant)
-3. **Browser devtools console** — runtime & stage-2 (browser WGSL compiler) errors
+1. **Settings → Shader Pack की स्थिति पंक्ति** — लोडर-चरण की त्रुटियाँ (ID `shaderPack:load*` होते हैं)
+2. **लोडर स्क्रीन की त्रुटि सूची** — सत्यापन और कंपाइलेशन (file:line + variant)
+3. **ब्राउज़र devtools कंसोल** — रनटाइम और चरण-2 (ब्राउज़र के WGSL कंपाइलर) की त्रुटियाँ
 
-The 3-stage load check is detailed in [Getting Started: Validation](../getting-started/validation.md).
+3-चरणीय लोड जाँच का पूरा विवरण [शुरुआत करें: सत्यापन](../getting-started/validation.md) में है।

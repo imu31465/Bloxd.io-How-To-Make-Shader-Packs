@@ -1,19 +1,19 @@
-# Getting Started
+# शुरुआत कैसे करें
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+पहली बार शेडर पैक बनाने वाले लेखकों के लिए एक ही पटरी का ट्यूटोरियल — अवलोकन से वितरण तक। यह पूरे हो चुके API v5 रूप को सीधे सिखाता है (पुराने संस्करण पहले पढ़ने की ज़रूरत नहीं — वह [संस्करण इतिहास](../history/) का काम है)।
 
-## The track
+## पटरी
 
-1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
-2. [Requirements](requirements.md) — browser and renderer requirements
-3. [Quick start](quick-start.md) — your first pack in 5 minutes
-4. [Pack structure](pack-structure.md) — zip contents and size limits
-5. [pack.json](manifest.md) — every manifest field
-6. [Shader hooks](hooks.md) — the roles of the 9 hooks
-7. [Variants](variants.md) — the 6 variants and macro guards
-8. [Validation](validation.md) — the 3-stage load check and on-device testing
-9. [Distribution](distribution.md) — zipping and release hygiene
+1. [अवलोकन व पूर्व-आवश्यकताएँ](overview.md) — शेडर पैक क्या कर सकते हैं और क्या नहीं
+2. [आवश्यकताएँ](requirements.md) — ब्राउज़र और रेंडरर संबंधी आवश्यकताएँ
+3. [क्विक स्टार्ट](quick-start.md) — 5 मिनट में आपका पहला पैक
+4. [पैक संरचना](pack-structure.md) — zip की सामग्री और आकार सीमाएँ
+5. [pack.json](manifest.md) — मैनिफ़ेस्ट का हर फ़ील्ड
+6. [शेडर हुक](hooks.md) — 9 हुकों की भूमिकाएँ
+7. [वेरिएंट](variants.md) — 6 वेरिएंट और मैक्रो गार्ड
+8. [सत्यापन](validation.md) — 3-चरणीय लोड जाँच और ऑन-डिवाइस टेस्टिंग
+9. [वितरण](distribution.md) — zip बनाना और रिलीज़ की सफ़ाई
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified/Analyzed
 
-When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
+पूरी स्पेसिफ़िकेशन चाहिए तो [API रेफ़रेंस](../api/) पर आगे बढ़ें; तैयार बने-बनाए इफ़ेक्ट के लिए [रेसिपी](../recipes/) देखें।

@@ -1,68 +1,68 @@
-# Research log
+# रिसर्च लॉग
 
-> Status: Verified — how this documentation's measurements were obtained
+> स्थिति: Verified — इस दस्तावेज़ीकरण के माप कैसे प्राप्त किए गए
 
-The technical statements here rest not on official developer documentation but on **production-bundle analysis**. This page records methodology and evidence so future builds can be re-verified.
+यहाँ के तकनीकी कथन आधिकारिक डेवलपर दस्तावेज़ों पर नहीं, बल्कि **प्रोडक्शन-बंडल विश्लेषण** पर टिके हैं। यह पृष्ठ पद्धति और साक्ष्य दर्ज करता है ताकि भविष्य के बिल्डों को पुनः-सत्यापित किया जा सके।
 
-## Core principles
+## मूल सिद्धांत
 
-1. **Direct production-bundle retrieval** — raw main.js and chunks fetched from both production and preprod, identity verified by md5
-2. **Verbatim respect** — headers, error messages and i18n strings are **quoted as-is**, never paraphrased
-3. **Reproduced measurement** — derived values like the registry are recomputed by running the engine's own modules in a harness (real output, not a lookalike re-implementation)
-4. **Named builds** — every measurement carries a build id and date
+1. **प्रत्यक्ष प्रोडक्शन-बंडल पुनर्प्राप्ति** — raw main.js और चंक दोनों प्रोडक्शन और प्रीप्रोड से लाए गए, पहचान md5 से सत्यापित
+2. **शब्दशः निष्ठा** — हेडर, त्रुटि संदेश और i18n स्ट्रिंग **जैसे हैं वैसे ही उद्धृत** होते हैं, कभी पेराफ़्रेज़ नहीं
+3. **पुनरुत्पादित माप** — रजिस्ट्री जैसे व्युत्पन्न मान इंजन के अपने मॉड्यूलों को एक हार्नेस में चलाकर पुनः गणना किए जाते हैं (असली आउटपुट, दिखने में-जैसा पुनर्कार्यान्वयन नहीं)
+4. **नामित बिल्ड** — हर माप के साथ बिल्ड id और तिथि रहती है
 
-## Build history referenced by this documentation
+## इस दस्तावेज़ीकरण द्वारा संदर्भित बिल्ड इतिहास
 
-| Build | API | Date | Note |
+| बिल्ड | API | तिथि | टिप्पणी |
 |---|---|---|---|
-| `szby6g` | v3-era | 2026-10-17 | first allow/strict static analysis (111 game definitions) |
-| `3ymzdd` | v3 | 2026-10-20 | the v3 guide's evidence build |
-| `sjr0p7` | v3-era | 2026-10-17 | drift-comparison baseline |
-| `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **current**; this documentation's baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `szby6g` | v3-era | 2026-10-17 | पहला allow/strict स्थैतिक विश्लेषण (111 गेम-परिभाषाएँ) |
+| `3ymzdd` | v3 | 2026-10-20 | v3 गाइड का साक्ष्य बिल्ड |
+| `sjr0p7` | v3-era | 2026-10-17 | ड्रिफ़्ट-तुलना आधाररेखा |
+| `cnty9` | v4 | 2026-10-27 | v4 गाइड और 905-नाम कैटलॉग का साक्ष्य |
+| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 फ़्रीज़ की पुष्टि (Halloween इवेंट + Skyblock रीवर्क) |
+| `ab90qa` | **v5** | 2026-11-03 | **वर्तमान**; इस दस्तावेज़ीकरण की आधाररेखा। prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 
-## Key methodology
+## प्रमुख पद्धति
 
-### Engine-header restoration
+### इंजन-हेडर पुनर्स्थापना
 
-Rendering the c55 header template with its live interpolations (`${vC}` = apiVersion, the 5 uniform reads via `${Gq.j}`) — 6 interpolations on v5 ([Engine header](engine-header.md)).
+c55 हेडर टेम्पलेट को उसके लाइव इंटरपोलेशन के साथ रेंडर करना (`${vC}` = apiVersion, `${Gq.j}` से 5 uniform पठन) — v5 पर 6 इंटरपोलेशन ([इंजन हेडर](engine-header.md))।
 
-### Texture-registry recomputation
+### टेक्सचर-रजिस्ट्री पुनर्गणना
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 896 / aliases 416 / layers 228) ([Texture registry](texture-registry.md)).
+इंजन के रजिस्ट्री-बिल्डिंग मॉड्यूलों (29833 + 1371 + 1391 + 1384 + 219) को भेजे गए ब्लॉक रजिस्ट्री के टेक्सचर डेटा पर एक मिनी webpack हार्नेस में चलाना; आउटपुट दर्ज करना (नामित 896 / उपनाम 416 / लेयर 228) ([टेक्सचर रजिस्ट्री](texture-registry.md))।
 
-Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
+एनीमेशन अंतराल `animDataPerTex`-शैली की तालिका से आते हैं (प्रति-लेयर `numAnimStates` / `animationInterval`) — केवल तीन अंतराल मान मौजूद हैं: 200 / 250 / 300 ms ([कैटलॉग](../api/texture-catalog.md#एनमशन-परवर-42-नम))।
 
-### Error-message capture
+### त्रुटि-संदेश संग्रह
 
-Loader messages verbatim from the live i18n dictionary; validator messages from the validation module's string literals.
+लोडर संदेश लाइव i18n डिक्शनरी से शब्दशः; वैलिडेटर संदेश सत्यापन मॉड्यूल के स्ट्रिंग लिटरल से।
 
-### allow / strict static analysis
+### allow / strict स्थैतिक विश्लेषण
 
-Statically analyzing all 111 game definitions: `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too ([Policy](policy.md)).
+सभी 111 गेम-परिभाषाओं का स्थैतिक विश्लेषण: `shaderPackPolicy` के `"allow"` लिटरल — 8 सीधे + 4 आधार-चर = 12 शीर्षक (26 प्रविष्टियाँ), स्प्रेड-इनहेरिटेंस (`{...tb,...}`) भी ट्रैक किया गया ([नीति](policy.md))।
 
-### Uniform / pipeline restoration
+### Uniform / पाइपलाइन पुनर्स्थापना
 
-The `BloxdPackInputs` field layout from the uniform-layout module (29838); the texture 3-variant codegen from the WebGPU generator (c56) ([Texture sampling](texture-sampling.md)).
+uniform-लेआउट मॉड्यूल (29838) से `BloxdPackInputs` का फ़ील्ड लेआउट; WebGPU जनरेटर (c56) से टेक्सचर का 3-वेरिएंट कोडजन ([टेक्सचर सैंपलिंग](texture-sampling.md))।
 
-## Drift observations
+## ड्रिफ़्ट अवलोकन
 
-| Comparison | Period | Result |
+| तुलना | अवधि | परिणाम |
 |---|---|---|
-| sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
-| cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
+| sjr0p7 → cnty9 | 10 दिन | 98 जोड़े, 79 हटाए; 779/1121 नामों का id बदला (69%) |
+| cnty9 → ab90qa | 7 दिन | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 नामों का id बदला |
 
-## Unverified / speculative
+## असत्यापित / अनुमान-आधारित
 
-- Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
-- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
-- Why `bloxdFragmentBlockPosition` remains in the signature table (removed from v5's header) is unanalyzed — plausibly an un-cleaned leftover, but unconfirmed
+- पिक्सेल-सटीक शैडो मैप्स का "भविष्य की योजना" होना एक **व्याख्या** है (लाइटिंग टेम्पलेट के अप्रयुक्त `var shadow: f32 = 1.;` से अनुमित)
+- allow/strict विभाजन बिल्ड-दर-बिल्ड बदल सकता है (12-शीर्षक पहचान ab90qa पर पुनः-पुष्ट; भविष्य के गेम अज्ञात)
+- `bloxdFragmentBlockPosition` (v5 हेडर से बाहर): हस्ताक्षर-तालिका प्रविष्टि और रनटाइम इंजेक्शन दोनों लाइव पुष्ट — कॉल सत्यापित और संकलित होते हैं; इंजन टीम इसे रखने का इरादा रखती है या नहीं, अज्ञात है
 
-## When to re-verify
+## कब पुनः-सत्यापित करें
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above (c55 / c116 / c56) are the starting points.
+गेम अपडेट पकड़ में आने पर (नया main.js हैश): हेडर (9,125B) दोबारा जाँचें, apiVersion स्थिरांक, रजिस्ट्री पुनः गणना करें, और allow/strict सूची पुनः पुष्ट करें। विस्तृत निगरानी पद्धति इस दस्तावेज़ीकरण के दायरे से बाहर है, पर ऊपर दिए गए मॉड्यूल स्थान (c55 / c116 / c56) ही शुरुआती बिंदु हैं।
 
-## Related
+## संबंधित
 
-- [Engine data](engine-data.md) · [Texture registry](texture-registry.md) · [Version History](../history/)
+- [इंजन डेटा](engine-data.md) · [टेक्सचर रजिस्ट्री](texture-registry.md) · [संस्करण इतिहास](../history/)

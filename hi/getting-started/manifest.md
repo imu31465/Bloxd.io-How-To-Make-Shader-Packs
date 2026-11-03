@@ -1,8 +1,8 @@
-# pack.json (manifest)
+# pack.json (मैनिफ़ेस्ट)
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
-`pack.json` is the pack manifest — exactly one JSON object at the zip root.
+`pack.json` पैक का मैनिफ़ेस्ट है — zip के रूट में ठीक एक JSON ऑब्जेक्ट।
 
 ```json
 {
@@ -12,25 +12,25 @@
 }
 ```
 
-## Fields
+## फ़ील्ड
 
-| Field | Type | Required | Description |
+| फ़ील्ड | प्रकार | आवश्यक | विवरण |
 |---|---|---|---|
-| `apiVersion` | number | required | Must **exactly equal `5`** (strict `===`). A string `"5"` or any other type fails, reported with the JSON spelling |
-| `name` | string | required | Non-empty after trimming. Shown in the settings UI |
-| `author` | string | optional | May be omitted; must be a string if present |
+| `apiVersion` | number | आवश्यक | **ठीक `5` के बराबर** होना चाहिए (strict `===`)। स्ट्रिंग `"5"` या कोई और प्रकार असफल होता है, और रिपोर्ट में उसकी JSON वर्तनी साथ आती है |
+| `name` | string | आवश्यक | ट्रिम करने के बाद ग़ैर-खाली। सेटिंग्स UI में दिखता है |
+| `author` | string | वैकल्पिक | छोड़ा जा सकता है; मौजूद हो तो स्ट्रिंग होना चाहिए |
 
-All other fields are ignored by the loader.
+बाकी सभी फ़ील्ड लोडर नज़रअंदाज़ कर देता है।
 
-## What happens on version mismatch
+## संस्करण बेमेल होने पर क्या होता है
 
-The loader compares `manifest.apiVersion !== 5` strictly and **fails at the instant of load**. Messages, verbatim from the live i18n dictionary:
+लोडर `manifest.apiVersion !== 5` की कड़ी तुलना करता है और **लोड होते ही असफल** हो जाता है। संदेश, लाइव i18n डिक्शनरी से शब्दशः:
 
-- `pack.json needs "apiVersion": {{version}}.` — the key is missing entirely
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — कुंजी पूरी तरह ग़ायब है
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — कुंजी मौजूद है पर 5 नहीं है
 
-Previously-saved older packs don't throw exceptions; they resolve to `{kind: "none", reason: "otherApiVersion"}` and become **silently inactive**. The shader-pack settings tab explains why:
+पहले से सेव किए गए पुराने पैक एक्सेप्शन नहीं फेंकते; वे `{kind: "none", reason: "otherApiVersion"}` में निपट जाते हैं और **चुपचाप निष्क्रिय** हो जाते हैं। शेडर-पैक सेटिंग्स टैब कारण बताता है:
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-For migrating from v1–v4, see [Version History](../history/).
+v1–v4 से माइग्रेट करने के लिए देखें [संस्करण इतिहास](../history/)।

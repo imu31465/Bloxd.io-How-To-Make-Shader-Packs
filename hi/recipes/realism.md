@@ -1,15 +1,14 @@
-# यथार्थवादी रेसिपी
+# यथार्थवाद
 
-
-
-> "वैनिला रूप सामग्री से पुनर्गठन" भौतिक रेसिपी संग्रह। आधार शर्तें:
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> "वैनिला के रूप को सामग्री से दोबारा बनाने" की भौतिक रेसिपियाँ। पहले ये प्राकल्पनाएँ पढ़ें:
 >
-> 1. **light हुक फ्रैगमेंट अंतिम चरण में बुलाया जाता है**। लौटाया colour ज्यों का त्यों अंतिम रंग। **स्वयं फ़ॉग दोबारा लगाना आवश्यक** (R9.10)  
-> 2. **इंजन मूल प्रकाश केवल गुणन** है। स्पेक्युलर / फ्रेनेल / उष्ण-शीत पृथक्करण / अर्धगोल परिवेश शून्य से बनाएँ  
-> 3. `l.engineColour` पूर्ण रंग (फ़ॉग लगा हुआ) है। त्यागकर `s.colour` (एल्बिडो) से पुनर्गठन ही प्रामाणिक मार्ग है  
-> 4. टेक्सचर निषिद्ध → विवरण सब **प्रक्रियात्मक** (हैश/शोर) डालें (R9.8)
+> 1. **लाइट हुक अंतिम फ्रैगमेंट चरण पर बुलाया जाता है**। इसका लौटाया colour वैसा ही अंतिम रंग बन जाता है। **फ़ॉग आपको स्वयं दोबारा लगाना ही होगा** (R9.10)  
+> 2. **इंजन का डिफ़ॉल्ट प्रकाश केवल गुणन है**। स्पेक्युलर / फ्रेनेल / उष्ण-शीत पृथक्करण / अर्धगोल परिवेश सभी शून्य से बनाए जा सकते हैं  
+> 3. `l.engineColour` पूर्ण रंग (पहले से फ़ॉग-युक्त) है। `s.colour` (एल्बिडो) से पुनर्निर्माण ही पूर्ण-स्तरीय दृष्टिकोण है  
+> 4. टेक्सचर निषिद्ध हैं → सारा विवरण **प्रक्रियात्मक** (हैश/शोर) होना चाहिए (R9.8)
 
-## R9.1 उष्ण मशाल × शीत आकाशप्रकाश
+## R9.1 उष्ण मशालें × शीत आकाशप्रकाश
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -20,8 +19,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let sky     = mix(l.ambientLightColour, l.skyLightColour, l.skyLight) * vec3f(0.90, 0.95, 1.08);
         let voxel   = max(torch, sky);
         var col = clamp(s.colour * voxel, vec3f(0.0), vec3f(1.0));   // मध्यवर्ती clamp
-        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));                    // फ़ॉग पुनः लगाएँ
-        out.colour = col + s.emission * (1.0 - l.fogAlpha);                 // emission पुनः जोड़ें
+        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));                    // फ़ॉग दोबारा
+        out.colour = col + s.emission * (1.0 - l.fogAlpha);                 // emission पुनः योग
 }
     return out;
 }
@@ -67,7 +66,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 अर्धगोल परिवेश (ऊपर=आकाश / नीचे=भूमि उछाल)
+## R9.4 अर्धगोल परिवेश (ऊपर आकाश / नीचे भूमि प्रतिक्षेप)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -75,13 +74,13 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     if (bloxdLit()) {
         let n = normalize(l.normal);
         let upness = n.y * 0.5 + 0.5;
-        let ground = l.ambientLightColour * 0.55;                          // नीचे: उछाल
+        let ground = l.ambientLightColour * 0.55;                          // नीचे: प्रतिक्षेप
         let skyH   = l.ambientLightColour * 0.30 + l.skyLightColour * 0.45 * l.skyLight; // ऊपर: आकाशप्रकाश
         let hemi = vec3f(0.25) + mix(ground, skyH, upness);
         let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
         var col = clamp(s.colour * voxel * hemi, vec3f(0.0), vec3f(1.0));   // मध्यवर्ती clamp
-        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));                           // फ़ॉग पुनः लगाएँ
-        out.colour = col + s.emission * (1.0 - l.fogAlpha);                        // emission पुनः जोड़ें
+        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));                           // फ़ॉग दोबारा
+        out.colour = col + s.emission * (1.0 - l.fogAlpha);                        // emission पुनः योग
 }
     return out;
 }
@@ -97,29 +96,29 @@ fn pack_aces(x: vec3f) -> vec3f {
 }
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
-    out.colour = pack_aces(out.colour * 1.2);   // 1.2 = अनावृति
+    out.colour = pack_aces(out.colour * 1.2);   // 1.2 = एक्सपोज़र
     return out;
 }
 ```
 
-## R9.6 वायुमंडलीय परिप्रेक्ष्य (दूरी से संतृप्ति गिरने की 「हवा भावना」)
+## R9.6 वायुमंडलीय परिप्रेक्ष्य (दूरी-विसंतृप्ति से "वायुरूप")
 
-> ध्यान: धुंध वर्ण पर चमक बढ़ाने वाली प्रक्रिया (`normalize` आदि) लगाने से गाढ़े दृश्य में "चमकीली श्वेत धुंध" तैरती है,  
-> और engineColour (फ़ॉग-युक्त) में फिर धुंध वर्ण जोड़ने से दोहरा फ़ॉग श्वेत कर देता है। **वायु भावना केवल संतृप्ति घटाकर** दिखाना सुरक्षित है।
+> फ़ॉग (रंग प्रतिस्थापन) के विपरीत, "दूरी से विसंतृप्ति" की परत चढ़ाने से दूर के दृश्य कहीं अधिक यथार्थवादी बनते हैं।  
+> सावधानी: केवल संतृप्ति घटाएँ — चमक को कभी न छुएँ।
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let dist = distance(bloxdEyePosition(), l.position);
-    let aerial = 1.0 - exp(-dist * 0.0035);        // दूरी क्षय (100blk≈30%/400blk≈75%)
+    let aerial = 1.0 - exp(-dist * 0.0035);        // पतन (~100blk पर ~30% / ~400blk पर ~75%)
     let luma = dot(out.colour, vec3f(0.2126, 0.7152, 0.0722));
-    let hazy = mix(vec3f(luma), out.colour, 0.5);  // संतृप्ति ही घटाएँ (चमक अपरिवर्तित)
+    let hazy = mix(vec3f(luma), out.colour, 0.5);  // केवल संतृप्ति घटाएँ (चमक अपरिवर्तित)
     out.colour = mix(out.colour, hazy, aerial * 0.16);
     return out;
 }
 ```
 
-## R9.7 तरंग अभिलंब + सूर्य चमक (जल पर 「सूर्य मार्ग」)
+## R9.7 तरंग अभिलंब + सूर्य चमक (जल पर "सूर्य-पथ")
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -127,8 +126,8 @@ fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
     let c1 = cos(p.x * 1.00 + t * 1.60);
     let c2 = cos(p.z * 1.35 + t * 1.28);
     let c3 = cos((p.x + p.z) * 0.70 - t * 1.76);
-    let dhdx = 0.50 * c1 + 0.15 * 0.70 * c3;      // ∂h/∂x
-    let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // ∂h/∂z
+    let dhdx = 0.50 * c1 + 0.15 * 0.70 * c3;      // dh/dx
+    let dhdz = 0.35 * 1.35 * c2 + 0.15 * 0.70 * c3; // dh/dz
     return normalize(vec3f(-dhdx * 0.55, 1.0, -dhdz * 0.55));
 }
 fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -150,7 +149,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 प्रक्रियात्मक सूक्ष्म उभार (टेक्सचर निषेध चकमा)
+## R9.8 प्रक्रियात्मक सूक्ष्म-उभार (टेक्सचर-प्रतिबंध का विकल्प)
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -168,7 +167,7 @@ fn pack_bumpNormal(p: vec3f, n: vec3f, strength: f32) -> vec3f {
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        let local = fract(l.position - l.normal * 0.5);   // ब्लॉक भीतर स्थानीय निर्देशांक
+        let local = fract(l.position - l.normal * 0.5);   // ब्लॉक-भीतर स्थानीय निर्देशांक
         let n = pack_bumpNormal(local * 16.0, normalize(l.normal), 0.35);
         let sunLen = length(bloxdSunDirection());
         if (sunLen > 0.5) {
@@ -182,7 +181,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 गुफा अरैखिक अंधेरा + दीया रक्षा
+## R9.9 अरैखिक गुफ़ा-अंधेरा + दीया रक्षा
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -191,19 +190,19 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let sky = clamp(l.skyLight, 0.0, 1.0);
         let underground = 1.0 - sky;
         let blockInt = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
-        let keep = 0.12 + 0.88 * blockInt;          // दीये वाली जगह उठाएँ
-        out.colour *= mix(keep, 1.0, sky * sky);     // अंधेरा अरैखिक (वर्ग)
+        let keep = 0.12 + 0.88 * blockInt;          // दीये-प्रकाशित स्थान उठाएँ
+        out.colour *= mix(keep, 1.0, sky * sky);     // अरैखिक (वर्ग) अंधेरा
 }
     return out;
 }
 ```
 
-## R9.10 फ़ॉग पुनः लगाना (engineColour त्याग पर आवश्यक)
+## R9.10 फ़ॉग दोबारा लगाना (engineColour त्यागने पर आवश्यक)
 
-> `(1.0 - l.fogAlpha)` को `min(l.fogAlpha, 0.75)` निम्नसीमा सहित प्रयोग से "इससे सघन नहीं" समायोजन बनता है  
-> (0.0 = इंजन अनुरूप / 0.3–0.5 = दूर स्पष्ट)।  
-> ध्यान रहे इंजन फ़ॉग क्षितिज समर्पित linear फ़ॉग (आरेखन दूरी समीप ही) है, मध्य दूरी धुंध पैक पक्ष बनाएँ।
-> वास्तविक फ़ॉग सेटिंग (कार्यान्वयन मिलान अद्यतित): linear स्थिर / `fogStart` = आरेखन खंड दूरी / `fogEnd` = +1 खंड / फ़ॉग बंद सेटिंग में 100–101 खंड व्यावहारिक अमान्य / डिफ़ॉल्ट फ़ॉग वर्ण RGB(183, 191, 195)।
+> `min(l.fogAlpha, 0.75)` जैसी निम्नसीमा लगाने से "इससे सघन नहीं" की टोपी बैठती है
+> (0.0 = इंजन-अनुरूप / 0.3–0.5 = साफ़ दूरी)।
+> ध्यान दें: इंजन फ़ॉग केवल-क्षितिज linear फ़ॉग है (केवल आरेखन दूरी के समीप); मध्य-दूरी की धुंध पैक-पक्ष बनानी होगी।
+> वास्तविक फ़ॉग सेटिंग (कार्यान्वयन-सत्यापित): linear स्थिर / `fogStart` = खंड आरेखन दूरी / `fogEnd` = +1 खंड / फ़ॉग बंद होने पर 100–101 खंड पर व्यावहारिक रूप से निष्क्रिय / डिफ़ॉल्ट रंग RGB(183, 191, 195)।
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -212,15 +211,15 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let voxel = mix(l.ambientLightColour, l.skyLightColour, l.skyLight);
         var col = s.colour * (voxel * 1.1 + vec3f(0.05));
         col = clamp(col, vec3f(0.0), vec3f(1.0));
-        col = mix(l.fogColour, col, min(l.fogAlpha, 0.85));  // फ़ॉग पुनरुत्पादन (0.15=हल्की निम्नसीमा)
-        col += s.emission * (1.0 - l.fogAlpha);            // emission भी फ़ॉग सहित
+        col = mix(l.fogColour, col, min(l.fogAlpha, 0.85));  // फ़ॉग दोबारा (0.15 = हल्की निम्नसीमा)
+        col += s.emission * (1.0 - l.fogAlpha);            // emission भी फ़ॉग-युक्त
         out.colour = col;
 }
     return out;
 }
 ```
 
-## R9.11 सिनेमा-ग्रेड (छाया शीत / हाइलाइट उष्ण / रात विसंतृप्त)
+## R9.11 सिनेमा-ग्रेड (शीत छायाएँ / उष्ण हाइलाइट / रात विसंतृप्ति)
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -230,73 +229,73 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let lum = pack_luma(out.colour);
         out.colour *= mix(vec3f(0.93, 1.00, 1.06), vec3f(1.06, 1.00, 0.93), lum);
         let sunPresent = smoothstep(0.0, 0.5, length(bloxdSunDirection()));
-        let night = 1.0 - sunPresent;  // सूर्य दिशा शून्य पर ही रात। संध्या सतत परिवर्तन अभिव्यक्त नहीं
+        let night = 1.0 - sunPresent;  // रात केवल तब जब सूर्य दिशा शून्य हो; संध्या प्रवणता नहीं
         out.colour = mix(out.colour, vec3f(pack_luma(out.colour)), night * 0.28);
 }
     return out;
 }
 ```
 
-## R9.12 प्रक्षेपण छाया —— लिफ्ट व्युत्क्रम + देहली कट (निर्णायक)
+## R9.12 प्रक्षेपित छायाएँ — लिफ्ट व्युत्क्रम + देहली कट (निर्णायक)
 
-> **आधार पुनःपुष्टि (अध्याय 10)**: `l.skyLight` कच्चा voxel मान (n/15) नहीं, बल्कि इंजन "लिफ्ट वक्र"  
-> `y = 1-(1-x/(3-2x))³` (अंधेरी जगह उठाने वाला S वक्र) पार करने के बाद का मान।
+> **प्राकल्पना पुनः जाँच (अध्याय 10)**: `l.skyLight` कच्चा वॉक्सेल मान (n/15) नहीं, बल्कि इंजन के "लिफ्ट वक्र"  
+> `y = 1-(1-x/(3-2x))³` (अंधेरे क्षेत्रों को उठाने वाला S-वक्र) के बाद का मान है।
 >
-> | स्थान | voxel कच्चा | लिफ्ट बाद (= l.skyLight) | pow(·, 5.0) |  
+> | स्थान | कच्चा वॉक्सेल | लिफ्ट किया (= l.skyLight) | pow(·, 5.0) |  
 > |---|---|---|---|  
 > | खुला आकाश | 1.00 | 1.00 | 1.00 |  
-> | पेड़ नीचे (त्रिज्या2) | 0.87 | **0.97** | **0.86** ← लगभग अक्षत |  
-> | त्रिज्या3 | 0.80 | **0.92** | 0.66 |  
-> | त्रिज्या5 | 0.67 | 0.78 | 0.29 |
+> | पेड़ के नीचे (त्रिज्या 2) | 0.87 | **0.97** | **0.86** ← लगभग अछुता |  
+> | त्रिज्या 3 | 0.80 | **0.92** | 0.66 |  
+> | त्रिज्या 5 | 0.67 | 0.78 | 0.29 |
 >
-> **यही "गामा उठाकर भी छाया सघन नहीं" का सिद्ध कारण** है (संख्यात्मक प्रमाण)। पर वक्र एकदिष्ट है अतः बीजीय कठोर व्युत्क्रमण संभव:  
-> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`। कच्चा मान पुनः प्राप्त कर, बाद **देहली कट** (`smoothstep`) से द्विमानीकरण मात्र।  
-> LightEngine BFS पाश्व प्रसार "सन्निकट 1 ब्लॉक = -1" अतः देहली `th = 1 - r/15` सीधे  
-> "r ब्लॉक व अधिक अवरोध छाया मानो" डायल बनता है। ब्लॉक तोड़ते ही छाया चलती है (LightEngine वास्तविक-समय पुनर्गणना)।  
-> सीमा: छाया "ऊपरी आकाश" आधार अतः सूर्य गति से घूमती नहीं (अध्याय 15 "छाया का सत्य")।
+> **यही "गामा कितना भी बढ़ाएँ, छायाएँ गहरी नहीं होतीं" का सिद्ध मूल कारण है**। पर वक्र एकदिष्ट है, इसलिए इसे बीजीय रूप से व्युत्क्रमित किया जा सकता है:  
+> `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`। कच्चे मान बहाल करने के बाद, बस देहली कट (`smoothstep`) से द्विमानीकृत करें।  
+> LightEngine का BFS पार्श्व प्रसार "1 ब्लॉक = -1" है, इसलिए देहली `th = 1 - r/15` सीधे  
+> "त्रिज्या r या अधिक का अवरोध छाया मानो" — यह डायल घुमाती है। ब्लॉक तोड़ते ही छायाएँ तुरंत हिल जाती हैं (LightEngine वास्तविक समय में पुनर्गणना करता है)।  
+> सीमा: छायाएँ "ऊपरी आकाश" आधारित हैं, इसलिए सूर्य के साथ नहीं घूमतीं (अध्याय 15, "छाया का सत्य")।
 
 ```wgsl
-// ★इंजन लिफ्ट कठोर व्युत्क्रमण, कच्चा voxel skyLight (n/15) पुनः प्राप्त
+// इंजन लिफ्ट को ठीक-ठीक व्युत्क्रमित करके कच्चा वॉक्सेल skyLight (n/15) बहाल करें
 fn sh_unlift(y: f32) -> f32 {
     let t = clamp(1.0 - clamp(y, 0.0, 1.0), 0.0, 1.0);
-    let c = pow(t, 1.0 / 3.0);               // WGSL में cbrt नहीं अतः pow
+    let c = pow(t, 1.0 / 3.0);               // WGSL में cbrt नहीं है, pow प्रयोग करें
     return clamp(3.0 * (1.0 - c) / (3.0 - 2.0 * c), 0.0, 1.0);
 }
-const shTh   = 0.87;   // ★छाया त्रिज्या डायल: th = 1 - r/15 (0.87→त्रिज्या2 व अधिक छाया)
-const shSoft = 0.04;   // किनारा कोमलता (0.02=कठोर / 0.08=कोमल)
+const shTh   = 0.87;   // छाया त्रिज्या डायल: th = 1 - r/15 (0.87 = त्रिज्या 2+ छाया है)
+const shSoft = 0.04;   // किनारे की नरमी (0.02 = कठोर / 0.08 = नरम)
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // 1. कच्चा मान पुनः प्राप्त (छूटा तो कभी छाया नहीं)
+        // 1. कच्चे मान बहाल करें (इसे छोड़ने से छायाएँ कभी नहीं बनतीं)
         let skyRaw = sh_unlift(l.skyLight);
-        // 2. देहली कट — धूप=1 / छाया=0 निश्चयपूर्वक पृथक् करें
+        // 2. देहली कट — धूप=1 / छाया=0 को साफ़ अलग करता है
         let sky = smoothstep(shTh - shSoft, shTh + shSoft, skyRaw);
-        // सूर्य Lambert (सूर्य न होने पर l.directional पर फॉलबैक)
+        // सूर्य Lambert (सूर्य न होने पर l.directional पर फ़ॉलबैक)
         let sunLen = length(bloxdSunDirection());
         let sunL = select(clamp(l.directional, 0.0, 1.0),
                           clamp(dot(normalize(l.normal), bloxdSunDirection() / sunLen), 0.0, 1.0),
                           sunLen > 0.5);
-        // ★प्रक्षेपण सार: सूर्य सीधी धूप "आकाश दिखने वाली जगह" पर ही पहुँचती है
+        // प्रक्षेपण का सार: सीधी धूप केवल आकाश दिखने वाली जगह तक पहुँचती है
         let lit = sunL * sky;
-        // छायापक्ष: काला नहीं, आकाश-रंजित + न्यून परिवेश
+        // छाया पक्ष: काला नहीं, आकाश-नीला रंजित + न्यूनतम परिवेश
         let shade = 0.09 + 0.16 * sky * vec3f(0.72, 0.82, 1.05);
         var col = s.colour * (shade + lit * vec3f(1.00, 0.90, 0.72) * 1.18);
-        // मशाल प्रकाश छाया भेदता है (blockLight भी लिफ्ट बाद अतः साथ पुनः प्राप्त)
+        // मशाल प्रकाश छाया भेदता है (blockLight भी लिफ्ट-युक्त है, साथ बहाल करें)
         let blockRaw = vec3f(sh_unlift(l.blockLight.r),
                              sh_unlift(l.blockLight.g),
                              sh_unlift(l.blockLight.b));
         let blockInt = max(blockRaw.r, max(blockRaw.g, blockRaw.b));
         col = max(col, s.colour * mix(blockRaw, blockInt * vec3f(1.0, 0.7, 0.4), 0.6) * 1.40);
-        // फ़ॉग पुनः लगाएँ (engineColour त्याग अंश)
+        // फ़ॉग दोबारा लगाएँ (त्यागे गए engineColour का हिस्सा)
         col = mix(l.fogColour, col, min(l.fogAlpha, 0.85));
-        out.colour = clamp(col + s.emission * (1.0 - l.fogAlpha), vec3f(0.0), vec3f(1.0));   // emission भी न भूलें (फ़ॉग-युक्त में जोड़ें)
+        out.colour = clamp(col + s.emission * (1.0 - l.fogAlpha), vec3f(0.0), vec3f(1.0));   // emission मत भूलें (फ़ॉग-युक्त)
 }
     return out;
 }
 ```
 
-> समायोजन मार्गदर्शिका: **छाया क्षेत्रफल `shTh` ही निर्धारित** — `0.93`=त्रिज्या1.5 ऊपर / `0.87`=त्रिज्या2 / `0.80`=त्रिज्या3 / `0.67`=त्रिज्या5।  
-> छाया किनारा कठोरता `shSoft` (0.02=कठोर / 0.08=कोमल)। छाया क्रोड अंधेरा `0.09` (न्यूनतम परिवेश) व `0.16` (आकाश प्रकीर्ण प्रकाश)  
-> 2-बिंदु स्थानांतरण से तय होता है। संध्या में छाया फैलानी हो तो  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें (लंबी संध्या छाया सन्निकटन।  
-> `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। छाया नीलापन हेतु `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
+> समायोजन मार्गदर्शिका: **छाया क्षेत्रफल केवल `shTh` से तय होता है** — `0.93` = त्रिज्या 1.5+ / `0.87` = त्रिज्या 2 / `0.80` = त्रिज्या 3 / `0.67` = त्रिज्या 5।  
+> किनारे की कठोरता `shSoft` (0.02 = कठोर / 0.08 = नरम) है। छाया-क्रोड का अंधेरा `0.09` (न्यूनतम परिवेश) और `0.16` (आकाश प्रकीर्णन) के दो-बिंदु स्थानांतरण से तय होता है।  
+> संध्या में छायाएँ फैलानी हों तो `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें (लंबी-संध्या-छाया सन्निकटन।  
+> `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। ज़्यादा नीली छायाओं के लिए `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
+>

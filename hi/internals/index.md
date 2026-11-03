@@ -1,29 +1,29 @@
-# Engine Internals & Research
+# इंजन इंटर्नल्स और रिसर्च
 
-Internal specifications restored by analyzing the engine's implementation. Everything here was recovered directly from the JavaScript of the current production build (`ab90qa`). Separated from the public-API documentation ([API Reference](../api/)) to preserve exact internal behavior and analysis results.
+इंजन के कार्यान्वयन का विश्लेषण करके बहाल की गई आंतरिक विनिर्देश। यहाँ की हर बात मौजूदा प्रोडक्शन बिल्ड (`ab90qa`) के JavaScript से सीधे बहाल की गई है। सटीक आंतरिक व्यवहार और विश्लेषण परिणामों को बचाए रखने के लिए इसे सार्वजनिक-API दस्तावेज़ीकरण ([API रेफ़रेंस](../api/)) से अलग रखा गया है।
 
-## Map
+## नक्शा
 
-| Page | Contents |
+| पेज | विषय-वस्तु |
 |---|---|
-| [Rendering pipeline](rendering-pipeline.md) | alphaTest position, 2-light setup, uniform reality, greedy meshing |
-| [Hook invocation](hook-invocation.md) | how hooks are spliced into the engine's WGSL |
-| [Engine header](engine-header.md) | the full v5 header (verbatim, 8,954B) |
-| [Shader validation](shader-validation.md) | analyzer internals, the signature table, HEADER_VERSION |
-| [WGSL compilation](wgsl-compilation.md) | the stage-2 real compilation and validation stubs |
-| [Reserved identifiers](reserved-identifiers.md) | the 46 `bloxdSp*` symbols |
-| [Lighting internals](lighting-internals.md) | blockLight / heldLight structure |
-| [Fog internals](fog-internals.md) | linear-only, the 32-block gradient band |
-| [Texture sampling](texture-sampling.md) | the 3-variant texture codegen |
-| [Texture registry](texture-registry.md) | name→id resolution, 896 names, measured drift |
-| [Model rendering](model-rendering.md) | the v5 Model program |
-| [Engine data](engine-data.md) | the v5 constants/limits/layout ledger |
-| [Testing factors](testing-factors.md) | what world/player settings change pack-visible values |
-| [Policy](policy.md) | shaderPackPolicy — the 12 allow titles |
-| [Sun & moon](sun-and-moon.md) | what feeds bloxdSunDirection |
-| [Debugging](debugging.md) | URL parameters, stats panels |
-| [Research log](research-log.md) | methodology, build history, unverified items |
+| [रेंडरिंग पाइपलाइन](rendering-pipeline.md) | alphaTest की स्थिति, 2-प्रकाश सेटअप, uniform की हक़ीक़त, greedy meshing |
+| [हुक इनवोकेशन](hook-invocation.md) | हुक इंजन के WGSL में कैसे जोड़े जाते हैं |
+| [इंजन हेडर](engine-header.md) | पूरा v5 हेडर (verbatim, 8,954B) |
+| [शेडर सत्यापन](shader-validation.md) | एनालाइज़र की आंतरिक बनावट, सिग्नेचर तालिका, HEADER_VERSION |
+| [WGSL कंपाइलेशन](wgsl-compilation.md) | चरण-2 का असली कंपाइलेशन और सत्यापन स्टब |
+| [आरक्षित पहचानकर्ता](reserved-identifiers.md) | 46 `bloxdSp*` प्रतीक |
+| [प्रकाश इंटर्नल्स](lighting-internals.md) | blockLight / heldLight की संरचना |
+| [फ़ॉग इंटर्नल्स](fog-internals.md) | केवल-रैखिक, 32-ब्लॉक प्रवणता पट्टी |
+| [टेक्सचर सैंपलिंग](texture-sampling.md) | 3-वेरिएंट टेक्सचर कोडजेन |
+| [टेक्सचर रजिस्ट्री](texture-registry.md) | name→id रिज़ॉल्यूशन, 896 नाम, मापी गई ड्रिफ़्ट |
+| [मॉडल रेंडरिंग](model-rendering.md) | v5 का Model प्रोग्राम |
+| [इंजन डेटा](engine-data.md) | v5 के कॉन्स्टैंट/सीमा/लेआउट का लेजर |
+| [परीक्षण कारक](testing-factors.md) | कौन-सी दुनिया/खिलाड़ी सेटिंग पैक-दृश्य मान बदलती हैं |
+| [नीति](policy.md) | shaderPackPolicy — 12 allow शीर्षक |
+| [सूर्य और चंद्र](sun-and-moon.md) | bloxdSunDirection को क्या खिलाता है |
+| [दोषमार्जन](debugging.md) | URL पैरामीटर, आँकड़ा पैनल |
+| [रिसर्च लॉग](research-log.md) | पद्धति, बिल्ड इतिहास, असत्यापित मदें |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित)
 
-Internals are not a stable API contract — they may change with engine updates, and each page names its evidence build ([research log](research-log.md)).
+इंटर्नल्स स्थिर API-अनुबंध नहीं हैं — इंजन अपडेट के साथ वे बदल सकते हैं, और हर पेज अपना साक्ष्य-बिल्ड नाम बताता है ([रिसर्च लॉग](research-log.md))।

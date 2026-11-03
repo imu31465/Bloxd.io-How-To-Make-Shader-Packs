@@ -1,31 +1,31 @@
-# WGSL compilation internals
+# WGSL कंपाइलेशन
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल से बहाल)
 
-The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
+सत्यापन का दूसरा चरण — ब्राउज़र के WGSL कंपाइलर से होने वाला असली संकलन — और v5 के सत्यापन स्टब।
 
-## Why two stages
+## दो चरण क्यों
 
-Static validation's type-checking is incomplete, so some mistakes only surface here (e.g. WGSL operator-precedence requirements like `mixing '*' and '^' requires parenthesis`). Errors surface in-game with the variant name ([Compilation errors](../troubleshooting/compilation.md)).
+स्थैतिक सत्यापन की टाइप-जाँच अपूर्ण होती है, इसलिए कुछ ग़लतियाँ केवल यहीं सामने आती हैं (उदाहरण: `mixing '*' and '^' requires parenthesis` जैसी WGSL ऑपरेटर-प्राथमिकता की अपेक्षाएँ)। त्रुटियाँ खेल के भीतर वेरिएंट नाम के साथ सामने आती हैं ([कंपाइलेशन त्रुटियाँ](../troubleshooting/compilation.md))।
 
-## Validation-stub generation
+## सत्यापन-स्टब जनरेशन
 
-The engine synthesizes stubs for code that passed static validation (restored from module 29866):
+इंजन स्थैतिक सत्यापन पास करने वाले कोड के लिए स्टब संश्लेषित करता है (मॉड्यूल 29866 से बहाल):
 
-- the type-stub table:
+- टाइप-स्टब तालिका:
 
-| Type | Stub value |
+| प्रकार | स्टब मान |
 |---|---|
 | `bool` | `p.x > 0.0` |
 | `f32` | `p.x` |
 | `vec2f` | `p.xy` |
 | `vec3f` | `p.xyz` |
 | `vec4f` | `p` |
-| `i32` / `vec2i` / `vec3i` / `vec4i` | `i32(p.x)` etc. |
-| `u32` / `vec2u` / `vec3u` / `vec4u` | `u32(p.x)` etc. |
+| `i32` / `vec2i` / `vec3i` / `vec4i` | `i32(p.x)` आदि |
+| `u32` / `vec2u` / `vec3u` / `vec4u` | `u32(p.x)` आदि |
 
-- structs build recursively — each field filled with stub values (nested structs recurse)
-- the synthesized entry points:
+- स्ट्रक्चर पुनरावर्ती रूप से बनते हैं — हर फ़ील्ड स्टब मानों से भरा जाता है (नेस्टेड स्ट्रक्चर पुनरावृत्ति करते हैं)
+- संश्लेषित एंट्री पॉइंट:
 
 ```wgsl
 var<private> bloxdValidationP: vec4f;
@@ -51,16 +51,16 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 }
 ```
 
-Validation literally compiles "WGSL that calls your hooks with stub inputs" in the browser, surfacing syntax, type and language-feature violations.
+सत्यापन ब्राउज़र में वास्तव में "आपके हुकों को स्टब इनपुट देकर बुलाने वाला WGSL" संकलित करता है, जिससे वाक्यरचना, प्रकार और भाषा-सुविधा के उल्लंघन सामने आ जाते हैं।
 
-## Error-message name restoration
+## त्रुटि-संदेश नाम-बहाली
 
-When splicing hook calls the engine keeps an identifier mapping (`originalNames`). Identifiers in browser errors are mapped **back to your original names**, and `sourceOf(lineNum)` maps spliced line numbers back to (file, line) — you read errors against your own code, not the transformed text.
+हुक कॉल स्प्लिस करते समय इंजन एक पहचानकर्ता मैपिंग (`originalNames`) रखता है। ब्राउज़र त्रुटियों के पहचानकर्ता **आपके मूल नामों पर वापस मैप** होते हैं, और `sourceOf(lineNum)` स्प्लिस की गई पंक्ति-संख्याओं को (फ़ाइल, पंक्ति) पर वापस ले जाता है — आप त्रुटियाँ बदले हुए पाठ के बजाय अपने ही कोड के मुक़ाबले पढ़ते हैं।
 
-## Runtime re-validation on join
+## जॉइन पर रनटाइम पुनः-सत्यापन
 
-`checkCompilation` runs per game join and actually compiles every existing terrain material (stricter than the settings-screen check). Failing drops the pack for that game. The check has a 60-second forced timeout ([Performance](../troubleshooting/performance.md)).
+`checkCompilation` हर गेम-जॉइन पर चलता है और हर मौजूदा टेरेन सामग्री को वास्तव में संकलित करता है (सेटिंग्स-स्क्रीन जाँच से सख़्त)। विफल होने पर पैक उस गेम के लिए हटा दिया जाता है। जाँच का एक 60-सेकंड का बलात् टाइमआउट है ([परफ़ॉर्मेंस](../troubleshooting/performance.md))।
 
-## Related
+## संबंधित
 
-- [Compilation errors](../troubleshooting/compilation.md) · [Shader validation](shader-validation.md) · [Getting Started: Validation](../getting-started/validation.md)
+- [कंपाइलेशन त्रुटियाँ](../troubleshooting/compilation.md) · [शेडर सत्यापन](shader-validation.md) · [शुरुआत: सत्यापन](../getting-started/validation.md)

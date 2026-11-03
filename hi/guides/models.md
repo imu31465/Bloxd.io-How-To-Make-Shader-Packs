@@ -1,72 +1,72 @@
-# Models and textures
+# मॉडल और टेक्सचर
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from header & validator)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर और सत्यापक से पुनर्प्राप्त)
 
-What the new v5 Model hooks draw and read.
+नए v5 मॉडल हुक क्या बनाते और पढ़ते हैं।
 
-## What the Model program draws
+## मॉडल प्रोग्राम क्या बनाता है
 
-- **Block models**: half blocks (`slab`), stairs (`stairs`), crossed-plane plants — tall grass, flowers, crops, cobwebs (`flat`)
-- **Items**: held (`held`), dropped (`dropped`), thrown (`thrown` — snowballs, arrows, rockets)
-- **Entities**: players, mobs, NPCs (`lifeform`) — **including armour and cosmetics**
+- **ब्लॉक मॉडल**: आधे ब्लॉक (`slab`), सीढ़ियाँ (`stairs`), क्रॉस-प्लेन पौधे — लंबी घास, फूल, फ़सलें, मकड़जाले (`flat`)
+- **आइटम**: हाथ में पकड़े हुए (`held`), गिराए हुए (`dropped`), फेंके हुए (`thrown` — स्नोबॉल, तीर, रॉकेट)
+- **एंटिटी**: खिलाड़ी, मॉब, NPC (`lifeform`) — **कवच और कॉस्मेटिक्स सहित**
 
-Terrain (full blocks) and Liquid (water) never enter this program.
+टेरेन (पूरे ब्लॉक) और तरल (पानी) इस प्रोग्राम में कभी नहीं आते।
 
-## What reads differently
+## क्या अलग तरह से पढ़ा जाता है
 
-Model faces carry three things terrain faces never have:
+मॉडल फलक तीन चीज़ें ले जाते हैं जो टेरेन फलकों में कभी नहीं होतीं:
 
-| Information | Field | Value on terrain |
+| सूचना | फ़ील्ड | टेरेन पर मान |
 |---|---|---|
-| model-local coordinates | `localPosition: vec3f` | `vec3f(0.0)` (no model) |
-| enchant state | `enchantTier` / `enchantColour` / `enchantSpeed` | all 0 |
-| entity overlay | `overlayColour` | 0 |
+| मॉडल-स्थानीय निर्देशांक | `localPosition: vec3f` | `vec3f(0.0)` (कोई मॉडल नहीं) |
+| एनचैंट अवस्था | `enchantTier` / `enchantColour` / `enchantSpeed` | सभी 0 |
+| एंटिटी ओवरले | `overlayColour` | 0 |
 
-And **textures mean something different**: terrain faces carry atlas `textureId`s, but **most models use `textureId: 0`** ("no texture") — player skins and mob textures are not in the atlas namespace. `surface.colour` already contains skin × tint, so work from it ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+और **टेक्सचर का अर्थ भी अलग है**: टेरेन फलक एटलस `textureId` ले जाते हैं, पर **अधिकांश मॉडल `textureId: 0`** ("कोई टेक्सचर नहीं") प्रयोग करते हैं — प्लेयर स्किन और मॉब टेक्सचर एटलस नेमस्पेस में नहीं होते। `surface.colour` में पहले से स्किन × रंगत शामिल है, इसलिए इसी से काम करें ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मडल-सवमतव-टकसचर-textureid-0))।
 
-`flags`'s `held` / `dropped` / `thrown` / `lifeform` / `placed` are meaningful only on model faces ([Flags](../api/flags.md)).
+`flags` के `held` / `dropped` / `thrown` / `lifeform` / `placed` केवल मॉडल फलकों पर अर्थ रखते हैं ([Flags](../api/flags.md))।
 
 ## localPosition
 
-The model-instance-local position **before** world placement; `vec3f(0.0)` for terrain/liquid.
+विश्व में रखे जाने से **पहले** की मॉडल-इंस्टेंस-स्थानीय स्थिति; टेरेन/तरल के लिए `vec3f(0.0)`।
 
-- For a player's arm, a held sword or windmill blades it rotates with the model
-- **Keyed per-part animation and bending effects** become a one-field write — "how far up the blade am I" is directly `localPosition.y`
-- In light structs it is the **post-vertex-hook** value (header: *"the same as in BloxdVertexIn, after the vertex hook"*)
+- खिलाड़ी की भुजा, हाथ की तलवार या पवनचक्की के ब्लेड के लिए यह मॉडल के साथ घूमता है
+- **भाग-दर-भाग कुंजीबद्ध एनिमेशन और झुकाव प्रभाव** एक-फ़ील्ड लेखन बन जाते हैं — "मैं ब्लेड पर कितना ऊपर हूँ" सीधे `localPosition.y` है
+- लाइट स्ट्रक्ट में यह **शीर्ष-हुक-के-बाद का मान** है (हेडर: *"the same as in BloxdVertexIn, after the vertex hook"*)
 
-## Selection patterns
+## चयन पैटर्न
 
 ```wgsl
 fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if (surface.flags.lifeform && !surface.flags.held) {
-        out.colour *= 1.05;   // lift world entities, exclude the hand
+        out.colour *= 1.05;   // विश्व की एंटिटी उठाएँ, हाथ को छोड़ें
     }
     if (surface.flags.held) {
-        out.colour *= 1.15;   // brighten the local player's held items
+        out.colour *= 1.15;   // स्थानीय खिलाड़ी के पकड़े हुए आइटम उजले करें
     }
     return out;
 }
 ```
 
-Full examples: [model shader recipes](../recipes/model-shaders.md) and [enchant effects](../recipes/enchant-effects.md).
+पूरे उदाहरण: [मॉडल शेडर रेसिपियाँ](../recipes/model-shaders.md) और [एनचैंट प्रभाव](../recipes/enchant-effects.md)।
 
-## Terrain / Liquid / Model cheat sheet
+## टेरेन / तरल / मॉडल चीट-शीट
 
-| Want to affect | Hooks | Selection fields |
+| किस पर असर चाहिए | हुक | चयन फ़ील्ड |
 |---|---|---|
-| full-block look | `bloxdTerrain*` | material flags (`opaque` / `rock`…) |
-| water | `bloxdLiquid*` | always Liquid (no Liquid hooks = water untouched) |
-| plants, slabs, stairs | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
-| held items | `bloxdModel*` | `flags.held` |
-| dropped items | `bloxdModel*` | `flags.dropped` |
-| thrown items | `bloxdModel*` | `flags.thrown` |
-| players & mobs | `bloxdModel*` | `flags.lifeform` |
+| पूरे-ब्लॉक का रूप | `bloxdTerrain*` | सामग्री फ़्लैग (`opaque` / `rock`…) |
+| पानी | `bloxdLiquid*` | सदा तरल (कोई Liquid हुक नहीं = पानी अछुता) |
+| पौधे, स्लैब, सीढ़ियाँ | `bloxdModel*` | `flags.flat` / `slab` / `stairs` |
+| पकड़े हुए आइटम | `bloxdModel*` | `flags.held` |
+| गिराए हुए आइटम | `bloxdModel*` | `flags.dropped` |
+| फेंके हुए आइटम | `bloxdModel*` | `flags.thrown` |
+| खिलाड़ी और मॉब | `bloxdModel*` | `flags.lifeform` |
 
-## Lighting
+## प्रकाश
 
-`bloxdModelLight` takes the same `BloxdSurface` / `BloxdLightIn` and works with `bloxdDefaultLight` / `bloxdLitColour()`. The enchant glint (`enchantColour`) and hurt flash (`overlayColour`) mix inside `bloxdLitColour`, so **defaults preserve both looks automatically**; to control them see [enchant effects](../recipes/enchant-effects.md).
+`bloxdModelLight` वही `BloxdSurface` / `BloxdLightIn` लेता है और `bloxdDefaultLight` / `bloxdLitColour()` के साथ काम करता है। एनचैंट चमक (`enchantColour`) और हर्ट फ़्लैश (`overlayColour`) `bloxdLitColour` के भीतर मिलते हैं, इसलिए **डिफ़ॉल्ट दोनों रूप अपने आप बनाए रखते हैं**; इन्हें नियंत्रित करने के लिए [एनचैंट प्रभाव](../recipes/enchant-effects.md) देखें।
 
-## Internals
+## इंटर्नल्स
 
-How models render and how flags/enchant inputs flow: [Engine Internals: Model Rendering](../internals/model-rendering.md); generated symbols like `bloxdSpItemLocalPosition` and `bloxdSpEnchant` are listed in [restrictions](../api/restrictions.md).
+मॉडल कैसे रेंडर होते हैं और फ़्लैग/एनचैंट इनपुट कैसे बहते हैं: [इंजन इंटर्नल्स: मॉडल रेंडरिंग](../internals/model-rendering.md); `bloxdSpItemLocalPosition` और `bloxdSpEnchant` जैसे जनरेटेड प्रतीक [प्रतिबंधों](../api/restrictions.md) में सूचीबद्ध हैं।

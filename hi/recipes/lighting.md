@@ -1,8 +1,7 @@
-# प्रकाश रेसिपी (light)
+# प्रकाश
 
-
-
-## कंट्रास्ट S वक्र
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+## कंट्रास्ट S-वक्र
 
 ```wgsl
 fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
@@ -11,20 +10,20 @@ fn pack_scurve(c: vec3f, strength: f32) -> vec3f {
 }
 ```
 
-## दूरी धुंध (स्वनिर्मित फ़ॉग)
+## दूरी की धुंध (स्वनिर्मित फ़ॉग)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     let dist = distance(bloxdEyePosition(), l.position);
-    // 64 ब्लॉक से 192 ब्लॉक पर 0..0.35 स्वनिर्मित फ़ॉग जोड़ना
+    // 64 से 192 ब्लॉक के बीच 0..0.35 स्वनिर्मित फ़ॉग जोड़ें
     let haze = clamp((dist - 64.0) / 128.0, 0.0, 1.0) * 0.35;
     out.colour = mix(out.colour, l.fogColour, haze);
     return out;
 }
 ```
 
-## रात (skyLight नीला झुकाव + दीया रक्षा)
+## रात (skyLight-संचालित नीला झुकाव + दीया रक्षा)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -39,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## गुफा अंधेरा (skyLight-हीन और गाढ़ा)
+## पूर्ण-अंधेरी गुफ़ाएँ (आकाशहीन क्षेत्र और भी गहरे करना)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -53,11 +52,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-> `skyLight` लिफ्ट बाद का मान है (अध्याय 10), हल्का अवरोध (पेड़ नीचे: कच्चा 0.87 → लिफ्ट बाद 0.97) इस विधि से लगभग गाढ़ा नहीं होता। गुफा (कच्चा 0) पर असर करता है। "वनछाया" स्पष्ट चाहिए तो R9.12 लिफ्ट व्युत्क्रम + देहली विधि प्रयोग करें।
+> `skyLight` लिफ्ट-बाद का मान आता है (अध्याय 10), इसलिए हल्का अवरोध (जैसे पेड़ के नीचे: कच्चा 0.87 → लिफ्ट के बाद 0.97) इस विधि से लगभग गहरा नहीं होता। यह गुफ़ाओं (कच्चा 0) पर काम करता है। "पेड़ की छाया" को तेज़ करने के लिए R9.12 की लिफ्ट-व्युत्क्रम + देहली विधि प्रयोग करें।
 
-## रात का नीला परिवेश (चंद्र दिशा बिना छद्म अभिव्यक्ति)
+## रात का नीला परिवेश (चंद्र दिशा के बिना छद्म रूप)
 
-> इस API में सूर्यहीन आकाश का `bloxdSunDirection()` शून्य है। नीचे दिशात्मक चांदनी नहीं, मात्र अंधेरे आकाश में क्षीण नीला परिवेश। चंद्र दिशा स्वयं `-bloxdSunDirection()` से उपलब्ध (केवल दिन-रात चक्र दुनियाएँ। [भाग VII](../internals/) R-A)।
+> इस API में आकाश में सूर्य न होने पर `bloxdSunDirection()` शून्य हो जाता है। नीचे दिया गया दिशात्मक चांदनी नहीं है, बस अंधेरे आकाश पर जोड़ा गया क्षीण नीला परिवेश है। चंद्र दिशा स्वयं `-bloxdSunDirection()` से उपलब्ध है (केवल दिन-रात-चक्र वाली दुनियाएँ — [सूर्य और चंद्र](../internals/sun-and-moon.md))।
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -73,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## संध्या ताप (सूर्य ऊँचाई से रंग झुकाव)
+## संध्या की उष्णता (सूर्य की ऊँचाई से रंजन)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -81,7 +80,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     let sunLen = length(bloxdSunDirection());
     if (sunLen > 0.5) {
         let sunDir = bloxdSunDirection() / sunLen;
-        let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // क्षितिज 1 / ठीक ऊपर 0
+        let lowness = clamp(1.0 - sunDir.y, 0.0, 1.0);   // क्षितिज पर 1 / ठीक ऊपर 0
         let sunset = lowness * lowness;
         out.colour = mix(out.colour, out.colour * vec3f(1.12, 0.88, 0.72), sunset * 0.55);
     }
@@ -89,19 +88,19 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## इंजन निर्गम पूर्ण प्रतिस्थापन (सरलतम पुनःप्रकाशन)
+## इंजन-निर्गम का पूर्ण प्रतिस्थापन (सरलतम पुनःप्रकाशन)
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     if (bloxdLit()) {
-        // ※ BloxdLight(...) सीधा निर्माण निषिद्ध। default से बनाकर colour बदलें
+        // NOTE: BloxdLight(...) का सीधा निर्माण निषिद्ध है; default से बनाकर colour बदलें
         var out = bloxdDefaultLight(s, l);
         let sky = clamp(l.skyLight, 0.0, 1.0);
         let block = max(l.blockLight.r, max(l.blockLight.g, l.blockLight.b));
         let level = clamp(sky * 0.7 + block, 0.0, 1.0);
-        // engineColour (इंजन प्रकाश परिणाम) त्यागकर 「सामग्री रंग × स्वयं संगणित चमक」 रखें
+        // engineColour (इंजन प्रकाश परिणाम) त्यागकर "आधार रंग × स्वयं संगणित चमक" प्रयोग करें
         var col = clamp(s.colour, vec3f(0.0), vec3f(1.0)) * level;
-        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // engineColour छोड़ा, अतः फ़ॉग पुनः लगाएँ (आवश्यक)
+        col = mix(l.fogColour, col, (1.0 - l.fogAlpha));   // engineColour त्यागा गया, इसलिए फ़ॉग दोबारा लगाना आवश्यक
         out.colour = col + s.emission * (1.0 - l.fogAlpha);   // emission भी स्वयं जोड़ें (आवश्यक)
         return out;
 } else {

@@ -1,38 +1,38 @@
-# Shader hooks
+# शेडर हुक
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified
 
-Packs can define **9 hooks** — 3 render targets (programs) × 3 pipeline stages, all optional (undefined means engine default).
+पैक **9 हुक** परिभाषित कर सकते हैं — 3 रेंडर लक्ष्य (प्रोग्राम) × 3 पाइपलाइन चरण, सभी वैकल्पिक (अपरिभाषित का मतलब इंजन डिफ़ॉल्ट)।
 
-## 9-hook comparison
+## 9-हुक तुलना
 
-| Hook | Program | Stage | Arguments | Returns | Run condition |
+| हुक | प्रोग्राम | चरण | तर्क | रिटर्न | चलने की शर्त |
 |---|---|---|---|---|---|
-| `bloxdTerrainVertex` | Terrain | vertex | `BloxdVertexIn` | `BloxdVertex` | allow variants only (**defining it in strict is itself an error**) |
-| `bloxdTerrainSurface` | Terrain | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdTerrainLight` | Terrain | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdLiquidVertex` | Liquid | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdLiquidSurface` | Liquid | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdLiquidLight` | Liquid | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
-| `bloxdModelVertex` | Model | vertex | `BloxdVertexIn` | `BloxdVertex` | allow only |
-| `bloxdModelSurface` | Model | surface | `BloxdSurfaceIn` | `BloxdSurface` | always |
-| `bloxdModelLight` | Model | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | always |
+| `bloxdTerrainVertex` | Terrain | vertex | `BloxdVertexIn` | `BloxdVertex` | केवल allow वेरिएंट (**strict में इसे परिभाषित करना ही एक त्रुटि है**) |
+| `bloxdTerrainSurface` | Terrain | surface | `BloxdSurfaceIn` | `BloxdSurface` | हमेशा |
+| `bloxdTerrainLight` | Terrain | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | हमेशा |
+| `bloxdLiquidVertex` | Liquid | vertex | `BloxdVertexIn` | `BloxdVertex` | केवल allow |
+| `bloxdLiquidSurface` | Liquid | surface | `BloxdSurfaceIn` | `BloxdSurface` | हमेशा |
+| `bloxdLiquidLight` | Liquid | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | हमेशा |
+| `bloxdModelVertex` | Model | vertex | `BloxdVertexIn` | `BloxdVertex` | केवल allow |
+| `bloxdModelSurface` | Model | surface | `BloxdSurfaceIn` | `BloxdSurface` | हमेशा |
+| `bloxdModelLight` | Model | light | `BloxdSurface`, `BloxdLightIn` | `BloxdLight` | हमेशा |
 
-## What each program draws
+## हर प्रोग्राम क्या ड्रॉ करता है
 
-| Program | Draws | Water when no Liquid hook exists |
+| प्रोग्राम | ड्रॉ करता है | Liquid हुक न होने पर पानी |
 |---|---|---|
-| **Terrain** | every block except water and block models | — |
-| **Liquid** | water | **no Terrain hook runs on water either** (water keeps its default look) |
-| **Model** | block models (slabs, stairs, plants, crops, cobwebs), held/dropped/thrown items, players, mobs, NPCs, armour, cosmetics | — |
+| **Terrain** | पानी और ब्लॉक मॉडल के अलावा हर ब्लॉक | — |
+| **Liquid** | पानी | **पानी पर कोई Terrain हुक भी नहीं चलता** (पानी अपना डिफ़ॉल्ट रूप रखता है) |
+| **Model** | ब्लॉक मॉडल (स्लैब, सीढ़ियाँ, पौधे, फ़सलें, मकड़जाल), हाथ में पकड़े/गिरे/फेंके गए आइटम, प्लेयर, मॉब, NPC, कवच, कॉस्मेटिक्स | — |
 
-## Stage roles
+## चरणों की भूमिकाएँ
 
-- **Vertex** — move vertex positions (grass sway, waves). Vertex animation disables the whole pack in strict games, so `#ifndef BLOXD_STRICT` is mandatory
-- **Surface** — the material output: `colour` / `alpha` (conditional) / `emission` / `enchantColour` / `overlayColour`
-- **Light** — the final color; takes the surface output plus `BloxdLightIn`. Its return value is the on-screen color
+- **Vertex** — vertex की जगहें हिलाना (घास का दुलना, लहरें)। vertex एनिमेशन strict गेम में पूरा पैक बंद कर देता है, इसलिए `#ifndef BLOXD_STRICT` अनिवार्य है
+- **Surface** — सामग्री का आउटपुट: `colour` / `alpha` (सशर्त) / `emission` / `enchantColour` / `overlayColour`
+- **Light** — अंतिम रंग; surface के आउटपुट के साथ `BloxdLightIn` लेता है। इसकी रिटर्न वैल्यू ही स्क्रीन पर दिखने वाला रंग है
 
-## Signatures
+## हस्ताक्षर
 
 ```wgsl
 fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
@@ -46,25 +46,25 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-// bloxdLiquid* / bloxdModel* take the same argument and return types
+// bloxdLiquid* / bloxdModel* वही तर्क व रिटर्न प्रकार लेते हैं
 ```
 
-## Special-function call restrictions
+## स्पेशल-फ़ंक्शन कॉल प्रतिबंध
 
-The engine's validator restricts which hooks may reach certain functions (violations fail with dedicated "reaches" diagnostics):
+इंजन का वैलिडेटर तय करता है कि कौन-से हुक कुछ फ़ंक्शनों तक पहुँच सकते हैं (उल्लंघन पर विशेष "reaches" डायग्नॉस्टिक्स के साथ असफलता मिलती है):
 
-| Function | Callable from | Guard |
+| फ़ंक्शन | कहाँ से बुलाने-योग्य | गार्ड |
 |---|---|---|
-| `bloxdTexel` | surface / light hooks only | — |
-| `bloxdTextureSize` | surface / light hooks only | — |
-| `bloxdOpaqueBehind` | surface / light hooks (meaningful in liquid variants) | `#ifdef BLOXD_SCENE_DEPTH` |
+| `bloxdTexel` | केवल surface / light हुक | — |
+| `bloxdTextureSize` | केवल surface / light हुक | — |
+| `bloxdOpaqueBehind` | surface / light हुक (liquid वेरिएंट में अर्थपूर्ण) | `#ifdef BLOXD_SCENE_DEPTH` |
 
-> `bloxdFragmentBlockPosition` was removed in v5 (it was the only special function callable from vertex hooks through v4). There is no replacement — use `flags` when you need "which block is this".
+> `bloxdFragmentBlockPosition` अब प्रलेखित हेडर में नहीं है, पर इंजन इसे अब भी इंजेक्ट करता और स्वीकार करता है — देखें [फ़ंक्शन्स: bloxdFragmentBlockPosition](functions.md#bloxdfragmentblockposition--अनडकयमटड-पर-अब-भ-इजकट-हत-ह)। यह इकलौता स्पेशल फ़ंक्शन था जो vertex हुकों से बुलाया जा सकता था; नए कोड में "यह कौन-सा ब्लॉक है" के लिए `flags` को तरजीह दें।
 
-## Fallbacks and sharing
+## फ़ॉलबैक और साझा करना
 
-- Undefined hook → that stage behaves as the engine default (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
-- **Share processing across hooks** with a module-scope function called from both:
+- अपरिभाषित हुक → वह चरण इंजन डिफ़ॉल्ट जैसा आचरण करता है (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
+- **हुकों के बीच प्रोसेसिंग साझा करें** एक मॉड्यूल-स्तरीय फ़ंक्शन के ज़रिए, जिसे दोनों ओर से बुलाया जाए:
 
 ```wgsl
 fn sharedSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -82,8 +82,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Related
+## संबंधित
 
-- Official 9-hook template → [Getting Started: Shader hooks](../getting-started/hooks.md)
-- Every struct field → [Structures](structures.md)
-- Hook invocation internals → [Engine Internals](../internals/hook-invocation.md)
+- आधिकारिक 9-हुक टेम्पलेट → [शुरुआत करें: शेडर हुक](../getting-started/hooks.md)
+- हर स्ट्रक्चर का हर फ़ील्ड → [स्ट्रक्चर](structures.md)
+- हुक बुलाने की आंतरिकी → [इंजन-आंतरिक](../internals/hook-invocation.md)

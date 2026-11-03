@@ -1,17 +1,17 @@
 {
   "index": {
-    "title": "Recipes",
+    "title": "रेसिपी",
     "theme": { "toc": false, "typesetting": "article" }
   },
-  "colors": "Colors",
-  "lighting": "Lighting",
-  "emission": "Emission",
-  "coordinates": "Coordinates",
-  "animation": "Time & animation",
-  "liquids": "Liquids",
-  "vertices": "Vertices (allow only)",
-  "math": "Math toolbox",
-  "realism": "Realism",
-  "model-shaders": "Model shaders",
-  "enchant-effects": "Enchant effects"
+  "colors": "रंग",
+  "lighting": "प्रकाश",
+  "emission": "उत्सर्जन",
+  "coordinates": "निर्देशांक",
+  "animation": "समय और एनिमेशन",
+  "liquids": "तरल",
+  "vertices": "शीर्ष (केवल allow)",
+  "math": "गणित टूलबॉक्स",
+  "realism": "यथार्थवाद",
+  "model-shaders": "मॉडल शेडर",
+  "enchant-effects": "एनचैंट प्रभाव"
 }

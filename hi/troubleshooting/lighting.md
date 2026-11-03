@@ -1,51 +1,51 @@
-# Lighting issues
+# लाइटिंग समस्याएँ
 
-> Target API: 5 · Status: Verified
+> लक्ष्य API: 5 · स्थिति: Verified
 
-Brightness, shadow and fog problems.
+चमक, छाया और फ़ॉग की समस्याएँ।
 
-## Caves too bright
+## गुफ़ाएँ बहुत उजली
 
-- **Cause**: insufficient non-linearity on `skyLight`
-- **Fix**: the cave-darkening recipes in [lighting recipes](../recipes/lighting.md) and [realism recipes](../recipes/realism.md)
+- **कारण**: `skyLight` पर अपर्याप्त अरैखिकता
+- **समाधान**: [लाइटिंग रेसिपी](../recipes/lighting.md) और [यथार्थवाद रेसिपी](../recipes/realism.md) की गुफ़ा-गहरी करने वाली रेसिपी
 
-## Lit faces too bright at night
+## रात में प्रकाशित फलक बहुत उजले
 
-- **Cause**: only shadow colors were darkened — the finished color keeps its daytime brightness
-- **Fix**: attenuate the whole finished color at night and relax only local light (`blockLight` / `heldLight`) — [the night guide](../guides/night.md)
+- **कारण**: केवल छाया रंग गहराए गए — पूर्ण रंग अपनी दिन की चमक बनाए रखता है
+- **समाधान**: रात में पूरे पूर्ण रंग को क्षय करें और केवल स्थानीय प्रकाश (`blockLight` / `heldLight`) को ढीला छोड़ें — [रात की गाइड](../guides/night.md)
 
-## Night too dark
+## रात बहुत अंधेरी
 
-- **Fix**: guarantee a minimum ambient; with a zero `bloxdSunDirection()` the true moon direction is unknown, so use pseudo blue ambient ([the night recipe](../recipes/lighting.md)). The moon direction itself is `-bloxdSunDirection()` (day-night-cycle worlds only)
+- **समाधान**: न्यूनतम परिवेश सुनिश्चित करें; शून्य `bloxdSunDirection()` पर सही चंद्र दिशा अज्ञात रहती है, इसलिए छद्म नीला परिवेश उपयोग करें ([रात की रेसिपी](../recipes/lighting.md))। चंद्र दिशा स्वयं `-bloxdSunDirection()` है (केवल दिन-रात-चक्र दुनियाएँ)
 
-## Daytime blows out
+## दिन का दृश्य फट जाता है
 
-- **Fix**: lower the exposure before ACES ([ACES](../recipes/realism.md))
+- **समाधान**: ACES से पहले एक्सपोज़र घटाएँ ([ACES](../recipes/realism.md))
 
-## Torch surroundings saturated orange
+## मशाल के आसपास सब संतृप्त नारंगी
 
-- **Fix**: lower the warm blend ratio ([warm torch × cool sky](../recipes/realism.md))
+- **समाधान**: उष्ण मिश्रण अनुपात घटाएँ ([उष्ण मशाल × शीतल आकाश](../recipes/realism.md))
 
-## Want to keep the engine's world light exactly
+## इंजन की दुनिया-प्रकाश को बिल्कुल वैसा ही रखना चाहते हैं
 
-- **v5 solution**: call `bloxdWorldLight(light)` — identical math to the engine's "brightest of block/sky/held, floored by ambientLightColour" ([Lighting](../api/lighting.md#bloxdworldlight--the-worlds-light))
-- **Note**: `blockLight` / `heldLight` are 0 and sky-related fields are 1 when `!bloxdLit()` (header guarantee)
+- **v5 समाधान**: `bloxdWorldLight(light)` को कॉल करें — इंजन के "block/sky/held में सबसे चमकीला, ambientLightColour से फ़्लोर" से बिल्कुल वही गणित ([लाइटिंग](../api/lighting.md#bloxdworldlight--वरलड-क-परकश))
+- **टिप्पणी**: `!bloxdLit()` पर `blockLight` / `heldLight` 0 और आकाश-संबंधी फ़ील्ड 1 होते हैं (हेडर गारंटी)
 
-## Looks wrong in lighting-disabled games
+## लाइटिंग-बंद गेमों में ग़लत दिखना
 
-- **Cause**: lighting-only inputs (`blockLight` etc.) used unguarded. v5 has no `#ifdef BLOXD_LIGHTING` — branch on **runtime `bloxdLit()`**
-- **Fix**: early return `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Lighting](../api/lighting.md#bloxdlit--the-gate))
+- **कारण**: केवल-लाइटिंग इनपुट (`blockLight` आदि) बिना गार्ड उपयोग किए गए। v5 में कोई `#ifdef BLOXD_LIGHTING` नहीं — **रनटाइम `bloxdLit()`** पर शाखा बनाएँ
+- **समाधान**: जल्दी वापसी `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([लाइटिंग](../api/lighting.md#bloxdlit--गट))
 
 ## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
 
-- **Cause**: dense glowing-block regions overflow the light seed queue and the chunk's light computation is cut short. **Not pack-caused**, but light gaps near glowing clusters trace to this
-- **Fix**: spread light sources in the world
+- **कारण**: सघन चमकते-ब्लॉक क्षेत्र प्रकाश-सीड क़्यू को उफ़ान दे देते हैं और खंड का प्रकाश-परिकलन बीच में कट जाता है। **पैक-कारित नहीं**, पर चमकते गुच्छों के पास के प्रकाश-अंतराल इसी तक पहुँचते हैं
+- **समाधान**: दुनिया में प्रकाश स्रोत फैलाएँ
 
-## Want the theory?
+## सिद्धांत चाहिए?
 
-- Shadows: [Shadows](../guides/shadows.md) (skyLight = voxel shadow map)
-- Fog: [Engine Internals: Fog Internals](../internals/fog-internals.md)
+- छाया: [छायाएँ](../guides/shadows.md) (skyLight = वॉक्सेल छाया-नक्शा)
+- फ़ॉग: [इंजन इंटर्नल्स: फ़ॉग इंटर्नल्स](../internals/fog-internals.md)
 
-## Related
+## संबंधित
 
-- [Lighting](../api/lighting.md) · [Visual issues](visual.md) · [Lighting Internals](../internals/lighting-internals.md)
+- [लाइटिंग](../api/lighting.md) · [विज़ुअल समस्याएँ](visual.md) · [प्रकाश इंटर्नल्स](../internals/lighting-internals.md)

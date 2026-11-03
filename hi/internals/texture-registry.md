@@ -1,47 +1,47 @@
-# Texture registry internals
+# टेक्सचर रजिस्ट्री इंटर्नल्स
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (इंजन के अपने रजिस्ट्री-बिल्डर को दोबारा चलाकर निकाला गया)
 
-The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
+name→id रिज़ॉल्यूशन की मशीनरी और मापी गई रजिस्ट्री-ड्रिफ़्ट। उपयोगकर्ता-सामने का कैटलॉग: [टेक्सचर कैटलॉग](../api/texture-catalog.md)।
 
-## Methodology
+## पद्धति
 
-We ran the engine's own registry-building module (29833 on this build, coordinating modules 1371 / 1391 / 1384 / 219) against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation.
+हमने इंजन का अपना रजिस्ट्री-बनाने वाला मॉड्यूल (इस बिल्ड पर 29833, समन्वयक मॉड्यूल 1371 / 1391 / 1384 / 219) एक मिनी webpack हार्नेस में, भेजे गए ब्लॉक-रजिस्ट्री के टेक्सचर डेटा के विरुद्ध चलाया और उसका आउटपुट दर्ज किया — ये संख्याएँ **प्रोडक्शन बंडल की अपनी गणना** हैं, कोई पुनः-कार्यान्वयन नहीं।
 
-## Output structure
+## आउटपुट संरचना
 
-| Output | v5 measured | Meaning |
+| आउटपुट | v5 माप | अर्थ |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
+| `named` | **896** | `bloxdTextureId<Name>` के रूप में संदर्भण-योग्य नाम |
+| `aliases` | 416 | फ़ोल्ड की गई स्पेलिंग — 188 फ़्रेम उपनाम (`lava0`…) और 228 रोटेशन उपनाम (`chest_top[rot[1`…) |
+| `layers` | 228 | लेयर तालिका — 171 पूर्व-घूर्णित स्लॉट सहित (57 रूट × 4 रोटेशन) |
 
-## Folding rules
+## फ़ोल्डिंग नियम
 
-- **animation families** (42): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 45 animation roots on the atlas, not 42)
+- **एनीमेशन फ़ैमिलियाँ** (42): फ़्रेम स्पेलिंग (`lava0`–`lava7`) बेस नाम (`lava`) पर फ़ोल्ड होती हैं; `bloxdTexel` सैंपल-समय पर मौजूदा फ़्रेम लौटाता है
+- **रोटेशन फ़ैमिलियाँ** (57): घुमाए गए स्लॉट (`[rot[1..4`) रूट नाम पर फ़ोल्ड होते हैं; `bloxdTexel` प्रति-फ़ेस `textureRotation` दोबारा लगाता है
+- `radar_screen` दोनों फ़ैमिलियों में एकमात्र नाम है (उसकी चारों पूर्व-घूर्णित प्रतियों में से हर एक अपनी 4-फ़्रेम सीढ़ी लिए रहती है — इसीलिए एटलस पर 45 एनीमेशन रूट, 42 नहीं)
 
-## Drift (cnty9 → ab90qa)
+## ड्रिफ़्ट (cnty9 → ab90qa)
 
-| Measurement | cnty9 (v4) | ab90qa (v5) |
+| माप | cnty9 (v4) | ab90qa (v5) |
 |---|---|---|
-| atlas entries | 1,219 | **1,210** |
-| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
-| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
-| usable named constants | 905 | **896** |
-| id changes among surviving names | — | **334 of 905** |
+| एटलस प्रविष्टियाँ | 1,219 | **1,210** |
+| रोटेशन फ़ैमिलियाँ (घुमाई स्पेलिंग) | 57 (228) | **57 (228) — अपरिवर्तित** |
+| एनीमेशन फ़ैमिलियाँ (फ़्रेम स्पेलिंग) | 42 (188) | **42 (188) — अपरिवर्तित** |
+| उपयोग योग्य नामित कॉन्स्टैंट | 905 | **896** |
+| बचे नामों में id-बदलाव | — | **905 में से 334** |
 
-The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
+पूरी ड्रिफ़्ट (11 नाम): जोड़े गए (1) `scorpion_eggs`; हटाए गए (10) आठ डबल-चेस्ट टेक्सचर और साथ में `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (डबल चेस्ट गेम डेटा से निकल गया; स्पॉनर `mob_spawner_block_top` रखते रहते हैं)।
 
-## Effect on HEADER_VERSION
+## HEADER_VERSION पर प्रभाव
 
-The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
+रजिस्ट्री-हैश सफ़िक्स में id पके हुए आते हैं, इसलिए यह ड्रिफ़्ट **हर सहेजे गए पैक को "needs re-check"** चिह्नित करती है (पेज लोड पर स्वतः पुनः सत्यापन)। नाम से लिखे पैक पुनः-रिज़ॉल्यूशन से बच निकलते हैं; कच्चे-id वाले पैक टूट जाते हैं ([कम्पैटिबिलिटी](../api/compatibility.md))।
 
-## Past drift records
+## पिछले ड्रिफ़्ट रिकॉर्ड
 
-October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+अक्टूबर की दो-बिल्ड तुलना (sjr0p7 → cnty9, 10 दिन): प्रविष्टियाँ 1200 → 1219 (98 जोड़ी गईं, 79 हटाई गईं); अपरिवर्तित नामों 1121 में से 779 का id बदल गया (69%); एक नामकरण-प्रथा माइग्रेशन (`_rot1..4` सफ़िक्स → `[rot[1..4` स्लॉट); डबल चेस्ट का आगमन। पूरा रिकॉर्ड [संस्करण इतिहास: v4](../history/v4.md) में है।
 
-## Related
+## संबंधित
 
-- [Texture catalog](../api/texture-catalog.md) · [Shader validation](shader-validation.md) · [Research log](research-log.md)
+- [टेक्सचर कैटलॉग](../api/texture-catalog.md) · [शेडर सत्यापन](shader-validation.md) · [रिसर्च लॉग](research-log.md)

@@ -1,58 +1,58 @@
-# Model issues
+# मॉडल समस्याएँ
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (new v5 territory)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (नया v5 क्षेत्र)
 
-Issues around the new v5 Model hooks.
+नए v5 Model हुकों के आसपास की समस्याएँ।
 
-## Players/mobs unaffected
+## प्लेयर/मॉब अछूते
 
-- **Cause**: entities (players, mobs, NPCs, armour, cosmetics) are drawn by the **Model program** — terrain hooks don't touch them
-- **Fix**: add Model hooks ([the models guide](../guides/models.md))
+- **कारण**: एंटिटी (प्लेयर, मॉब, NPC, कवच, कॉस्मेटिक) **Model प्रोग्राम** से बनती हैं — terrain हुक उन्हें छूते नहीं
+- **समाधान**: Model हुक जोड़ें ([मॉडल गाइड](../guides/models.md))
 
-## Slabs, stairs, plants unaffected
+## स्लैब, सीढ़ियाँ, पौधे अछूते
 
-- **Cause**: block models (`slab` / `stairs` / `flat`) are also Model-program geometry, never terrain
-- **Fix**: use Model hooks with `flags.slab` / `flags.stairs` / `flags.flat` ([Flags](../api/flags.md))
+- **कारण**: ब्लॉक मॉडल (`slab` / `stairs` / `flat`) भी Model-प्रोग्राम की ज्यामिति हैं, terrain कभी नहीं
+- **समाधान**: `flags.slab` / `flags.stairs` / `flags.flat` के साथ Model हुक उपयोग करें ([फ़्लैग](../api/flags.md))
 
-## Water unaffected
+## पानी अछूता
 
-- **Cause**: water is Liquid-hook-only; **without Liquid hooks, no Terrain hook runs on water either** (v5 change)
-- **Fix**: define `bloxdLiquidSurface` / `bloxdLiquidLight` ([Variant issues](variants.md))
+- **कारण**: पानी केवल-Liquid-हुक है; **Liquid हुकों के बिना पानी पर कोई Terrain हुक भी नहीं चलता** (v5 बदलाव)
+- **समाधान**: `bloxdLiquidSurface` / `bloxdLiquidLight` परिभाषित करें ([वेरिएंट समस्याएँ](variants.md))
 
-## Want to change only held items but everything changes
+## केवल हाथ में पकड़े आइटम बदलने हैं पर सब कुछ बदलता है
 
-- **Fix**: select with `surface.flags.held` ([model shader recipes](../recipes/model-shaders.md))
+- **समाधान**: `surface.flags.held` से चुनें ([मॉडल शेडर रेसिपी](../recipes/model-shaders.md))
 
-## Flag checks don't behave
+## फ़्लैग जाँचें सही नहीं चलतीं
 
-- **Likely causes**:
-  1. **treating flags as a single-choice enum** — they combine freely («sandstone is sand and rock», «possibly even none») ([Flags](../api/flags.md#flags-combine-freely))
-  2. reading `else` as "everything else" — the else of `flags.rock` is merely "not rock", possibly still sand
-- **Fix**: combine material flags (`opaque`…) independently of shape/state flags (`slab`/`held`…)
+- **संभावित कारण**:
+  1. **फ़्लैग को एक-विकल्प एनम मानना** — वे आज़ादी से जुड़ते हैं («बलुआ पत्थर रेत और चट्टान दोनों है», «शायद कुछ भी नहीं भी हो सकता») ([फ़्लैग](../api/flags.md#फलग-आजद-स-जडत-ह))
+  2. `else` को "बाक़ी सब" पढ़ना — `flags.rock` का else बस "चट्टान नहीं" है, जो अब भी रेत हो सकती है
+- **समाधान**: सामग्री फ़्लैग (`opaque`…) को आकार/स्थिति फ़्लैग (`slab`/`held`…) से स्वतंत्र रूप से जोड़ें
 
-## Enchant glint disappeared
+## एनचैंट झिलमिल ग़ायब
 
-- **Fix**: pass `enchantColour` through or use `bloxdLitColour()` ([Enchant effects](../recipes/enchant-effects.md))
+- **समाधान**: `enchantColour` पार पहुँचाएँ या `bloxdLitColour()` का उपयोग करें ([एनचैंट प्रभाव](../recipes/enchant-effects.md))
 
-## Hurt flash disappeared / too strong
+## चोट-फ़्लैश ग़ायब / बहुत तेज़
 
-- **Fix**: pass `overlayColour` through or adjust `out.overlayColour.a` ([Enchant effects](../recipes/enchant-effects.md))
+- **समाधान**: `overlayColour` पार पहुँचाएँ या `out.overlayColour.a` समायोजित करें ([एनचैंट प्रभाव](../recipes/enchant-effects.md))
 
-## localPosition always reads 0
+## localPosition हमेशा 0 पढ़ता है
 
-- **By design**: `localPosition` is `vec3f(0.0)` on terrain and liquid faces — **no model there**
-- **Fix**: read it in Model hooks ([model recipes](../recipes/model-shaders.md))
+- **डिज़ाइन के अनुसार**: terrain और liquid फ़ेस पर `localPosition` `vec3f(0.0)` है — **वहाँ कोई मॉडल नहीं होता**
+- **समाधान**: इसे Model हुकों में पढ़ें ([मॉडल रेसिपी](../recipes/model-shaders.md))
 
-## bloxdTexel returns white on models
+## bloxdTexel मॉडल पर सफ़ेद लौटाता है
 
-- **By design**: `textureId: 0` (skins) samples as white
-- **Fix**: select with `surface.textureId != 0u` or work from `surface.colour` ([Texture issues](textures.md))
+- **डिज़ाइन के अनुसार**: `textureId: 0` (स्किन) सफ़ेद सैंपल होता है
+- **समाधान**: `surface.textureId != 0u` से चुनें या `surface.colour` से काम करें ([टेक्सचर समस्याएँ](textures.md))
 
-## Want armour-only / cosmetics-only changes
+## केवल-कवच / केवल-कॉस्मेटिक बदलाव चाहना
 
-- **Limit**: no flag says "armour"; `flags.lifeform` includes armour and cosmetics
-- **Approximation**: combine with `localPosition` (placement) or the presence of `overlayColour` ([model recipes](../recipes/model-shaders.md))
+- **सीमा**: कोई फ़्लैग "कवच" नहीं कहता; `flags.lifeform` में कवच और कॉस्मेटिक दोनों शामिल हैं
+- **सन्निकटन**: `localPosition` (स्थापना) या `overlayColour` की मौजूदगी के साथ जोड़ें ([मॉडल रेसिपी](../recipes/model-shaders.md))
 
-## Related
+## संबंधित
 
-- [Models guide](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md)
+- [मॉडल गाइड](../guides/models.md) · [मॉडल शेडर रेसिपी](../recipes/model-shaders.md) · [फ़्लैग](../api/flags.md)

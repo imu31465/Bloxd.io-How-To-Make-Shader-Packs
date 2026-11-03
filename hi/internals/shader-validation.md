@@ -1,19 +1,19 @@
-# Shader validation internals
+# शेडर सत्यापन
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live validator)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
 
-The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](../troubleshooting/validation.md).
+स्थैतिक सत्यापन (एनालाइज़र, लोड जाँच का चरण 1)। उपयोगकर्ता के लिए सुधार: [सत्यापन त्रुटियाँ](../troubleshooting/validation.md)।
 
-## The stages
+## चरण
 
-1. **Loader limits** (zip / pack.json shape) → [Pack format](../api/pack-format.md)
-2. **Static validation (analyzer)** — this page; syntax, types, reserved names, hook contracts across all 6 variants
-3. **Real browser compilation** → [WGSL compilation](wgsl-compilation.md)
-4. **Runtime re-validation on game join** — actually compiles every existing terrain material (stricter than the settings-screen check); failing it drops the pack for that game
+1. **लोडर सीमाएँ** (zip / pack.json का आकार) → [पैक फ़ॉर्मैट](../api/pack-format.md)
+2. **स्थैतिक सत्यापन (एनालाइज़र)** — यह पृष्ठ; वाक्यरचना, प्रकार, आरक्षित नाम, सभी 6 वेरिएंटों में हुक अनुबंध
+3. **ब्राउज़र में असली संकलन** → [WGSL कंपाइलेशन](wgsl-compilation.md)
+4. **गेम-जॉइन पर रनटाइम पुनः-सत्यापन** — हर मौजूदा टेरेन सामग्री को वास्तव में संकलित करता है (सेटिंग्स-स्क्रीन जाँच से सख़्त); इसमें विफल होने पर पैक उस गेम के लिए हटा दिया जाता है
 
-## The special-function signature table
+## स्पेशल-फ़ंक्शन हस्ताक्षर तालिका
 
-The validator keeps a table in module 29849 and checks cross-hook call restrictions:
+वैलिडेटर मॉड्यूल 29849 में एक तालिका रखता है और हुकों के बीच कॉल-प्रतिबंध जाँचता है:
 
 ```js
 const Jq = new Map([
@@ -24,49 +24,49 @@ const Jq = new Map([
 ]);
 ```
 
-Restored logic:
+बहाल तर्क:
 
-- calling a non-`vertex: true` special function from a vertex hook → *"X reaches Y, which only surface and light hooks can use."*
-- a function with a `symbol` (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) reached from a variant that doesn't define that macro → *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
+- `vertex: true` न होने वाले स्पेशल फ़ंक्शन को vertex हुक से कॉल करना → *"X reaches Y, which only surface and light hooks can use."*
+- किसी `symbol` वाले फ़ंक्शन (`bloxdOpaqueBehind` → `BLOXD_SCENE_DEPTH`) को उस मैक्रो को परिभाषित न करने वाले वेरिएंट से पहुँचाना → *"X reaches Y, which needs BLOXD_SCENE_DEPTH, and Z doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH."*
 
-Note: `bloxdFragmentBlockPosition` is gone from v5's header generation but its old definition remains in this table (observed on the v5 build). Calls are rejected by validation.
+टिप्पणी: `bloxdFragmentBlockPosition` हेडर जनरेशन से गायब है, पर उसकी प्रविष्टि इस लाइव तालिका में बनी हुई है — और पहचानकर्ता जाँच इसी तालिका से पूछताछ करती है, इसलिए कॉल अब भी सत्यापन पास कर लेते हैं। कोड जनरेटर भी परिभाषा आज तक इंजेक्ट करता है (terrain/liquid और दोनों मॉडल प्रोग्राम), इसलिए फ़ंक्शन व्यवहार में कॉल-योग्य बना हुआ है। इसे अप्रचलित माना गया है: अप्रलेखित है, और किसी भी भविष्य संस्करण में हटाया जा सकता है।
 
-## Reserved-name diagnostics
+## आरक्षित-नाम डायग्नोस्टिक्स
 
-- **the `/^bloxd/i` general rule**: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
-- **direct texture/sampler declarations**: *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
+- **सामान्य नियम `/^bloxd/i`**: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*
+- **सीधी texture/sampler घोषणाएँ**: *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 
-## Texture-name resolution & diagnostics
+## टेक्सचर-नाम रिज़ॉल्यूशन और डायग्नोस्टिक्स
 
-`bloxdTextureId*` resolution has a dedicated path ([the messages](../api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+`bloxdTextureId*` रिज़ॉल्यूशन का एक समर्पित पथ है ([संदेश](../api/texture-api.md#नम-रजलयशन-तरटय-वलडटर-स-अकषरश)):
 
-- **folding**: split on non-alphanumerics, CamelCase, prefix with `bloxdTextureId`; reverse matching is case/underscore-insensitive
-- **spelling suggestions** (new in v5): unmatched names get Levenshtein proposals at threshold `max(2, floor(len/4)) + 1`
-- dedicated messages for frame spellings and turned-copy spellings
-- post-fold ambiguous names are unusable
+- **फ़ोल्डिंग**: गैर-अल्फ़ान्यूमेरिक और CamelCase पर विभाजित करके `bloxdTextureId` उपसर्ग लगाना; रिवर्स मैचिंग केस/अंडरस्कोर-असंवेदनशील है
+- **स्पेलिंग सुझाव** (v5 में नया): बिना मेल खाए नामों को देहली `max(2, floor(len/4)) + 1` पर Levenshtein प्रस्ताव मिलते हैं
+- फ़्रेम स्पेलिंगों और टर्न्ड-प्रति स्पेलिंगों के लिए समर्पित संदेश
+- फ़ोल्ड के बाद अस्पष्ट नाम अप्रयोग्य हैं
 
-## v5's new diagnostics
+## v5 के नए डायग्नोस्टिक्स
 
-- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* — names the removed macro
-- packs reading `blockFlags` or referencing `bloxdBlockFlag*` fail the reserved-name diagnostic — **no pack misbehaves silently**
+- *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* — हटाए गए मैक्रो का नाम बताता है
+- `blockFlags` पढ़ने या `bloxdBlockFlag*` को संदर्भित करने वाले पैक आरक्षित-नाम डायग्नोस्टिक पर विफल हो जाते हैं — **कोई पैक चुपचाप ग़लत व्यवहार नहीं करता**
 
-## The Y-derivative rewrite
+## Y-डिरिवेटिव रीराइट
 
-The analyzer's token-rewrite pass rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (the dpdy family is explicitly enumerated as the inversion set). `dpdx` and `fwidth` are untouched ([Restrictions](../api/restrictions.md#auto-rewrite-introduced-in-v5)).
+एनालाइज़र का टोकन-रीराइट पास `dpdy` / `dpdyCoarse` / `dpdyFine` की हर कॉल को `(-dpdy(...))` के रूप में रीराइट कर देता है (dpdy परिवार को उलटाव-सेट के रूप में स्पष्ट रूप से गिना गया है)। `dpdx` और `fwidth` अछूते रहते हैं ([प्रतिबंध](../api/restrictions.md#सवचलत-ररइट))।
 
-## Header & texture-constant generation
+## हेडर और टेक्सचर-स्थिरांक जनरेशन
 
-- the header is prepended read-only ([Engine header](engine-header.md))
-- the `bloxdTextureId*` block is generated **per pack** from referenced names
+- हेडर रीड-ओनली रूप में आगे जोड़ा जाता है ([इंजन हेडर](engine-header.md))
+- `bloxdTextureId*` ब्लॉक संदर्भित नामों से **प्रति पैक** जनरेट होता है
 
 ## HEADER_VERSION
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (leading integer 8 → 9 from v4). The two fnv1a32 suffixes fingerprint the header material and the sorted name-id registry. Saved-pack re-validation uses this fingerprint to decide "needs re-check" ([Compatibility](../api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` का रूप `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` है (अग्र पूर्णांक v4 से 8 → 9)। दोनों fnv1a32 प्रत्यय हेडर सामग्री और क्रमबद्ध नाम-id रजिस्ट्री की फ़िंगरप्रिंट बनाते हैं। सेव-किए-पैक का पुनः-सत्यापन यही फ़िंगरप्रिंट लेकर "needs re-check" का निर्णय करता है ([कम्पैटिबिलिटी](../api/compatibility.md#सवड-पक-क-पन-सतयपन-needs-re-check))।
 
-## Validation stubs
+## सत्यापन स्टब
 
-Code that passes static validation gets stub code synthesized before the real browser-WGSL check: `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — the type-stub table (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) builds input structs and invokes the hooks. Details: [WGSL compilation](wgsl-compilation.md).
+स्थैतिक सत्यापन पास करने वाले कोड के लिए असली ब्राउज़र-WGSL जाँच से पहले स्टब कोड संश्लेषित किया जाता है: `var<private> bloxdValidationP: vec4f` सहित `bloxdValidateVertex` / `bloxdValidateFragment` — टाइप-स्टब तालिका (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) इनपुट स्ट्रक्चर बनाती है और हुकों को बुलाती है। विवरण: [WGSL कंपाइलेशन](wgsl-compilation.md)।
 
-## Related
+## संबंधित
 
-- [Validation errors](../troubleshooting/validation.md) · [WGSL compilation](wgsl-compilation.md) · [Texture registry](texture-registry.md) · [Engine data](engine-data.md)
+- [सत्यापन त्रुटियाँ](../troubleshooting/validation.md) · [WGSL कंपाइलेशन](wgsl-compilation.md) · [टेक्सचर रजिस्ट्री](texture-registry.md) · [इंजन डेटा](engine-data.md)

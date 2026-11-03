@@ -1,68 +1,68 @@
-# Compatibility
+# कम्पैटिबिलिटी
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-03) · स्थिति: Verified
 
-How the current game and old-version packs interoperate.
+मौजूदा गेम और पुराने-वर्शन के पैक आपस में कैसे काम करते हैं।
 
-## Accepted versions
+## स्वीकार किए जाने वाले वर्शन
 
-**Only `apiVersion: 5`.** The loader compares `manifest.apiVersion !== 5` strictly and v1/v2/v3/v4 packs **fail at the instant of load**. No multi-version acceptance exists.
+**केवल `apiVersion: 5`।** लोडर `manifest.apiVersion !== 5` की सख़्त तुलना करता है और v1/v2/v3/v4 पैक **लोड होते ही विफल** हो जाते हैं। कोई मल्टी-वर्शन स्वीकृति मौजूद नहीं है।
 
-## Load-time messages (verbatim from the live i18n dictionary)
+## लोड-टाइम संदेश (लाइव i18n डिक्शनरी से अक्षरशः)
 
-- `pack.json needs "apiVersion": {{version}}.` — the `apiVersion` key is missing
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `pack.json needs "apiVersion": {{version}}.` — `apiVersion` कुंजी गायब है
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — कुंजी मौजूद है पर उसका मान 5 नहीं है
 
-## Saved old packs (no exceptions — silent inactivation)
+## सहेजे गए पुराने पैक (कोई अपवाद नहीं — मौन निष्क्रियता)
 
-Previously-saved v1–v4 packs don't throw. The saved-pack result resolves to:
+पहले से सहेजे गए v1–v4 पैक कोई त्रुटि नहीं फेंकते। सेव्ड-पैक परिणाम इस पर रिज़ॉल्व होता है:
 
 ```
 {kind: "none", reason: "otherApiVersion"}
 ```
 
-and the pack becomes **silently inactive**. Only the shader-pack settings tab explains why:
+और पैक **मौन रूप से निष्क्रिय** हो जाता है। क्यों, यह केवल शेडर-पैक सेटिंग टैब बताता है:
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-## The nature of the v4 → v5 conversion
+## v4 → v5 रूपांतरण का स्वभाव
 
-The conversion is mostly mechanical (full checklist in [the v5 migration guide](../history/v5.md)):
+रूपांतरण अधिकांशतः यांत्रिक है (पूरी चेकलिस्ट [v5 माइग्रेशन गाइड](../history/v5.md) में):
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
+- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (एक 1:1 रीनेम)
 - `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- delete `bloxdFragmentBlockPosition` call sites (no replacement)
-- bump `pack.json` to `"apiVersion": 5`
+- `bloxdFragmentBlockPosition` की कॉल-साइटें अब भी कंपाइल होती हैं (इंजन इसे इंजेक्ट करता है), पर यह अब अनडॉक्यूमेंटेड है — इससे हट जाना ही सुरक्षित चाल है ([फ़ंक्शन](functions.md#bloxdfragmentblockposition--अनडकयमटड-पर-अब-भ-इजकट-हत-ह))
+- `pack.json` को `"apiVersion": 5` पर बढ़ाएँ
 
-The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.
+इस बार का चुप जाल: जो पैक `blockFlags` पढ़ते रहते हैं या अपने लाइट हुकों को `#ifdef BLOXD_LIGHTING` में लपेटते हैं, वे **समर्पित संदेशों के साथ सत्यापन में विफल** होते हैं (एनालाइज़र अब दोनों स्थितियों की व्याख्या करता है), इसलिए कुछ भी चुपचाप ग़लत व्यवहार नहीं करता — वे बस माइग्रेट होने तक अस्वीकृत पड़े रहते हैं।
 
-## Saved-pack re-validation ("needs re-check")
+## सेव्ड-पैक का पुनः सत्यापन ("needs re-check")
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
+`HEADER_VERSION` का रूप है `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (अग्रणी पूर्णांक v4 के 8 से 9 हो गया)। जब इंजन का हेडर या टेक्सचर रजिस्ट्री बदलता है (गेम अपडेट के साथ यह आम है), तो सेव्ड पैक "needs re-check" चिह्नित हो जाते हैं और पेज लोड होते ही स्वतः पुनः सत्यापित होते हैं।
 
-A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
+रजिस्ट्री की गति का एक मापा उदाहरण (दो बिल्ड, 10 दिन के अंतर पर): प्रविष्टियाँ 1200 → 1219 (98 जोड़ी गईं, 79 हटाई गईं), और जिन नामों की स्पेलिंग बनी रही उनमें से **1121 में से 779 का id बदल गया**। दूसरे शब्दों में:
 
-- **packs written with names (`bloxdTextureIdLava`) survive drift** (the loader re-resolves against the live registry)
-- **packs written with raw ids (`19`) break on re-validation**
+- **नामों से लिखे गए पैक (`bloxdTextureIdLava`) ड्रिफ़्ट से बच निकलते हैं** (लोडर लाइव रजिस्ट्री के मुकाबले उन्हें पुनः रिज़ॉल्व करता है)
+- **कच्चे id से लिखे गए पैक (`19`) पुनः सत्यापन पर टूट जाते हैं**
 
-Details: [Engine Internals: Texture Registry](../internals/texture-registry.md).
+विवरण: [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](../internals/texture-registry.md)।
 
-## Runtime environments
+## रनटाइम वातावरण
 
-- **WebGPU-renderer only**: installing a pack force-enables the WebGPU renderer
-- **Mobile**: WebGPU-limited environments can't run packs at all ([Requirements](../getting-started/requirements.md))
-- **Non-atlas renderer configurations**: `bloxdTexel` / `bloxdTextureSize` degrade to stubs (white texels, 1×1); code still compiles and runs ([Texture API](texture-api.md#where-the-texture-api-cant-go))
+- **केवल WebGPU-रेंडरर**: पैक इंस्टॉल करना WebGPU रेंडरर को ज़बरदस्ती सक्रिय कर देता है
+- **मोबाइल**: WebGPU-सीमित वातावरण पैक को बिल्कुल नहीं चला सकते ([आवश्यकताएँ](../getting-started/requirements.md))
+- **नॉन-एटलस रेंडरर कॉन्फ़िगरेशन**: `bloxdTexel` / `bloxdTextureSize` स्टब में घट जाते हैं (सफ़ेद टेक्सल, 1×1); कोड फिर भी कंपाइल होकर चलता है ([टेक्सचर API](texture-api.md#जह-टकसचर-api-नह-पहच-सकत))
 
-## Version support summary
+## वर्शन समर्थन सारांश
 
-| API version | Live since | Treatment by the current game |
+| API वर्शन | कब से लाइव | मौजूदा गेम का व्यवहार |
 |---|---|---|
-| v1 | — | rejected at load (migrate via [v2](../history/v2.md)) |
-| v2 | — | rejected at load |
-| v3 | 2026-10-19 | rejected at load |
-| v4 | 2026-10-26 | rejected at load |
-| **v5** | **2026-11-03** | **current** |
+| v1 | — | लोड पर अस्वीकृत ([v2](../history/v2.md) से माइग्रेट करें) |
+| v2 | — | लोड पर अस्वीकृत |
+| v3 | 2026-10-19 | लोड पर अस्वीकृत |
+| v4 | 2026-10-26 | लोड पर अस्वीकृत |
+| **v5** | **2026-11-03** | **मौजूदा** |
 
-## Related
+## संबंधित
 
-- [v5 migration checklist](../history/v5.md) · [Version History](../history/)
+- [v5 माइग्रेशन चेकलिस्ट](../history/v5.md) · [वर्शन हिस्ट्री](../history/)

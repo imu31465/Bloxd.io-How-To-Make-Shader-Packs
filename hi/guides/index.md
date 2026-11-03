@@ -1,21 +1,21 @@
-# Guides
+# गाइड
 
-"Mechanism and mindset" material. Goal-oriented code examples live in [Recipes](../recipes/).
+"तंत्र और मानसिकता" वाली सामग्री। मूल रूप से क्या संभव है, यह [शेडर पैक क्या कर सकते हैं और क्या नहीं](constraints.md) में है; लक्ष्य-उन्मुख कोड उदाहरण [रेसिपियाँ](../recipes/) में रहते हैं।
 
-## Map
+## नक्शा
 
-| Page | Contents |
+| पृष्ठ | विषय-सामग्री |
 |---|---|
-| [How lighting works](lighting.md) | what the engine's default lighting does, and how far you can rebuild it |
-| [Shadows](shadows.md) | skyLight as a voxel shadow map; the lift inversion |
-| [Water](water.md) | the integrated water recipe and the 3-layer underwater reality |
-| [Night](night.md) | the "dark shadows but bright surfaces" problem |
-| [Models](models.md) | what the v5 Model program draws and reads |
-| [Realism](realism.md) | the additive and full-re-lighting schools |
-| [Unreachable effects](constraints.md) | v5's ceilings, plus what v5 newly unlocked |
-| [Performance](performance.md) | cost table and practical guidance |
-| [Testing](testing.md) | the pre-release checklist |
-| [Combinations](combinations.md) | pairing with texture packs |
-| [Debugging tips](debugging.md) | symptom → cause diagnostics |
+| [प्रकाश कैसे काम करता है](lighting.md) | इंजन का डिफ़ॉल्ट प्रकाश क्या करता है, और आप इसे कहाँ तक दोबारा बना सकते हैं |
+| [छायाएँ](shadows.md) | skyLight एक वॉक्सेल शैडो मैप के रूप में; लिफ्ट व्युत्क्रम |
+| [पानी को प्राकृतिक दिखाना](water.md) | एकीकृत जल रेसिपी और 3-परत वाली जलमग्न वास्तविकता |
+| [रात के रूप डिज़ाइन करना](night.md) | "गहरी छायाएँ पर उजली सतहें" वाली समस्या |
+| [मॉडल और टेक्सचर](models.md) | मॉडल प्रोग्राम क्या बनाता और पढ़ता है |
+| [यथार्थवाद: दो स्कूल](realism.md) | योगात्मक और पूर्ण-पुनःप्रकाशन स्कूल |
+| [शेडर पैक क्या कर सकते हैं और क्या नहीं](constraints.md) | क्षमता-नक्शा: प्राप्य, अप्राप्य, सशर्त — और क्यों |
+| [प्रदर्शन](performance.md) | लागत-सारणी और व्यावहारिक मार्गदर्शन |
+| [खेल-भीतर परीक्षण जाँच-सूची](testing.md) | वितरण-पूर्व जाँच-सूची |
+| [टेक्सचर पैकों के साथ संयोजन](combinations.md) | टेक्सचर पैकों के साथ जोड़ी |
+| [दोषमार्जन युक्तियाँ](debugging.md) | लक्षण → कारण निदान |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित)

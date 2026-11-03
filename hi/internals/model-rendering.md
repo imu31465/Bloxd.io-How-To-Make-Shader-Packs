@@ -1,39 +1,39 @@
-# Model rendering internals
+# मॉडल रेंडरिंग इंटर्नल्स
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल से बहाल)
 
-The internals of the v5 Model program. The user-facing guide: [Models and textures](../guides/models.md).
+v5 Model प्रोग्राम की आंतरिक बनावट। उपयोगकर्ता-सामने की गाइड: [मॉडल और टेक्सचर](../guides/models.md)।
 
-## What the Model program is
+## Model प्रोग्राम क्या है
 
-Before v5, packs could only plug into terrain / liquid; block models (slabs, stairs, plants) and entities (players, mobs, items) were **outside pack jurisdiction**. v5 added model as the third program, drawing:
+v5 से पहले पैक केवल terrain / liquid में जुड़ सकते थे; ब्लॉक मॉडल (स्लैब, सीढ़ियाँ, पौधे) और एंटिटी (प्लेयर, मॉब, आइटम) **पैक के अधिकार-क्षेत्र से बाहर** थे। v5 ने model को तीसरे प्रोग्राम के रूप में जोड़ा, जो ये बनाता है:
 
-- blocks drawn as block models (header note: *"Drawn as block models, so never part of terrain or flagged as opaque"*)
-- held / dropped / thrown items
-- players, mobs, NPCs (armour and cosmetics included)
+- ब्लॉक मॉडल के रूप में बनाए जाने वाले ब्लॉक (हेडर टिप्पणी: *"Drawn as block models, so never part of terrain or flagged as opaque"*)
+- हाथ में पकड़े / गिराए / फेंके गए आइटम
+- प्लेयर, मॉब, NPC (कवच और कॉस्मेटिक सहित)
 
-## Flag & input delivery
+## फ़्लैग और इनपुट डिलीवरी
 
-- **`bloxdSpFlags`** — the delivery path for the `BloxdFlags` struct; the 8 new fields (`slab` / `stairs` / `flat` / `placed` / `held` / `dropped` / `thrown` / `lifeform`) carry values meaningful only on model faces
-- **`bloxdSpItemLocalPosition`** — delivery of `localPosition`; `vec3f(0.0)` on terrain/liquid
-- **`bloxdSpEnchant`** — delivery of the enchant inputs (`enchantTier` / `enchantColour` / `enchantSpeed`)
+- **`bloxdSpFlags`** — `BloxdFlags` स्ट्रक्चर का डिलीवरी-पथ; 8 नए फ़ील्ड (`slab` / `stairs` / `flat` / `placed` / `held` / `dropped` / `thrown` / `lifeform`) केवल मॉडल फ़ेस पर अर्थपूर्ण मान ले जाते हैं
+- **`bloxdSpItemLocalPosition`** — `localPosition` की डिलीवरी; terrain/liquid पर `vec3f(0.0)`
+- **`bloxdSpEnchant`** — एनचैंट इनपुट (`enchantTier` / `enchantColour` / `enchantSpeed`) की डिलीवरी
 
-## Enchant computation
+## एनचैंट गणना
 
-The engine animates the glint sweep and delivers it as `enchantColour.a` to the surface/light hooks ([Enchant effects](../recipes/enchant-effects.md)). The mixing happens inside `bloxdLitColour()` — right after shading, before world light ([Lighting](../api/lighting.md#the-full-pipeline)).
+इंजन झिलमिल-स्वीप को एनिमेट करके `enchantColour.a` के रूप में surface/light हुकों तक पहुँचाता है ([एनचैंट प्रभाव](../recipes/enchant-effects.md))। मिश्रण `bloxdLitColour()` के भीतर होता है — शेडिंग के ठीक बाद, दुनिया-प्रकाश से पहले ([लाइटिंग](../api/lighting.md#पर-पइपलइन))।
 
-## The overlay (hurt flash etc.)
+## ओवरले (चोट-फ़्लैश आदि)
 
-`overlayColour` carries entity state color (damage flash etc.) as RGB + alpha. `bloxdLitColour` mixes it **before lighting**, so state expression rides without breaking the base color. The processing existed internally in v4 and was opened to inputs/outputs in v5.
+`overlayColour` एंटिटी-स्थिति के रंग (चोट-फ़्लैश आदि) को RGB + alpha के रूप में ले जाता है। `bloxdLitColour` उसे **लाइटिंग से पहले** मिलाता है, इसलिए स्थिति-अभिव्यक्ति बेस रंग तोड़े बिना सवार हो जाती है। यह प्रोसेसिंग v4 में आंतरिक रूप से मौजूद थी और v5 में इनपुट/आउटपुट के लिए खोल दी गई।
 
-## The texture path
+## टेक्सचर पथ
 
-Most model faces use `textureId: 0` (no texture) — player skins and mob textures are not in the block-texture-atlas namespace. `surface.colour` arrives with skin × tint baked in, so model-face processing starts from `colour` ([model-owned textures](../api/texture-api.md#model-owned-textures-textureid-0)).
+ज़्यादातर मॉडल फ़ेस `textureId: 0` (कोई टेक्सचर नहीं) उपयोग करते हैं — प्लेयर स्किन और मॉब टेक्सचर ब्लॉक-टेक्सचर-एटलस नेमस्पेस में नहीं होते। `surface.colour` में स्किन × tint बेक हुआ आता है, इसलिए मॉडल-फ़ेस प्रोसेसिंग `colour` से शुरू होती है ([मॉडल-स्वामित्व टेक्सचर](../api/texture-api.md#मडल-सवमतव-टकसचर-textureid-0))।
 
-## Variants
+## वेरिएंट
 
-The Model program forms one axis of the variant matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` is defined only in allow.model ([Preprocessor](../api/preprocessor.md#macro--variant-matrix)); strict.model has no vertex hooks.
+Model प्रोग्राम वेरिएंट-मैट्रिक्स का एक अक्ष बनाता है: `strict.model` / `allow.model`। `BLOXD_ALPHA` केवल allow.model में परिभाषित होता है ([प्रीप्रोसेसर](../api/preprocessor.md#मकर--वरएट-मटरकस)); strict.model में कोई vertex हुक नहीं होते।
 
-## Related
+## संबंधित
 
-- [Models and textures](../guides/models.md) · [Model shader recipes](../recipes/model-shaders.md) · [Flags](../api/flags.md) · [Rendering pipeline](rendering-pipeline.md)
+- [मॉडल और टेक्सचर](../guides/models.md) · [मॉडल शेडर रेसिपी](../recipes/model-shaders.md) · [फ़्लैग](../api/flags.md) · [रेंडरिंग पाइपलाइन](rendering-pipeline.md)

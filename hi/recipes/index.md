@@ -1,21 +1,21 @@
-# Recipes
+# रेसिपी
 
-Goal-oriented code examples. The "how it works" side lives in [Guides](../guides/). Everything here is ported to v5 vocabulary (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) and guarded to pass the 6 variants (strict × terrain / liquid / model).
+लक्ष्य-उन्मुख कोड उदाहरण। "यह कैसे काम करता है" वाला पक्ष [गाइड](../guides/) में है। यहाँ की हर चीज़ v5 शब्दावली (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) पर पोर्ट की गई है और 6 वेरिएंट (strict × terrain / liquid / model) पास करने के लिए गार्ड की गई है।
 
-## Map
+## नक्शा
 
-| Page | Contents |
+| पृष्ठ | विषय-सामग्री |
 |---|---|
-| [Color recipes](colors.md) | tint, saturation, color temperature, sepia, altitude gradients |
-| [Lighting recipes](lighting.md) | S-curves, custom fog, night, caves, sunset |
-| [Emission recipes](emission.md) | pulsing lights, glowing ores, fireflies |
-| [Coordinate recipes](coordinates.md) | world/block coords, checkers, hashes, view vectors |
-| [Animation recipes](animation.md) | day cycles, wobble, aurora |
-| [Liquid recipes](liquids.md) | ripples, alpha, underwater murk |
-| [Vertex recipes (allow only)](vertices.md) | grass sway, waves, pulsing terrain |
-| [Math toolbox](math.md) | smoothstep, triangle waves, luma |
-| [Realism recipes](realism.md) | warm×cool, specular, ACES, projected shadows |
-| [Model shaders](model-shaders.md) | v5 — held items, skins, plant sway |
-| [Enchant effects](enchant-effects.md) | v5 — removing, boosting, recoloring the glint |
+| [रंग रेसिपियाँ](colors.md) | रंजन, संतृप्ति, वर्ण तापमान, सेपिया, ऊँचाई प्रवणता |
+| [प्रकाश रेसिपियाँ](lighting.md) | S-वक्र, स्वनिर्मित फ़ॉग, रात, गुफ़ाएँ, संध्या |
+| [उत्सर्जन रेसिपियाँ](emission.md) | स्पंदित लाइटें, चमकते अयस्क, जुगनू |
+| [निर्देशांक रेसिपियाँ](coordinates.md) | विश्व/ब्लॉक निर्देशांक, शतरंजी पैटर्न, हैश, दृष्टि सदिश |
+| [एनिमेशन रेसिपियाँ](animation.md) | दिन-रात चक्र, डोलन, अरोरा |
+| [तरल रेसिपियाँ](liquids.md) | लहरें, अल्फा, जलमग्न धुंधलापन |
+| [शीर्ष रेसिपियाँ (केवल allow)](vertices.md) | घास का दोलन, तरंगें, स्पंदित टेरेन |
+| [गणित टूलबॉक्स](math.md) | smoothstep, त्रिभुज तरंगें, लूमा |
+| [यथार्थवाद रेसिपियाँ](realism.md) | उष्ण×शीत, स्पेक्युलर, ACES, प्रक्षेपित छायाएँ |
+| [मॉडल शेडर](model-shaders.md) | v5 — पकड़े हुए आइटम, स्किन, पौधों का दोलन |
+| [एनचैंट प्रभाव](enchant-effects.md) | v5 — चमक हटाना, बढ़ाना, रंगना |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (v5 ports of the original recipes — still verify with in-game compilation before distributing)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (मूल रेसिपियों के v5 पोर्ट — वितरण से पहले खेल-भीतर संकलन से अभी भी सत्यापित करें)
