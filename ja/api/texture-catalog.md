@@ -1,6 +1,6 @@
 # テクスチャカタログ
 
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-04 本番確認) · 検証状況: Verified (エンジンのレジストリ構築器を再現実行して抽出)
+> 対象API: 5 · 対象ビルド: `xkg8x` (2026-11-04 本番確認) · 検証状況: Verified (エンジンのレジストリ構築器を再現実行して抽出)
 
 利用可能なテクスチャ名定数 (`bloxdTextureId*`) の完全カタログです。**906 名**、アルファベット順。
 
@@ -1068,6 +1068,23 @@
 - **削除 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — ダブルチェスト (8 面) がゲームデータから消え、シングルチェストの `chest_*` ファミリは無傷で生存。スポナーは `mob_spawner_block_top` を維持し、バリアント側面テクスチャが消滅しました。
 
 **名前こそ API、id はスナップショット。** 2 ビルド間で 905 生存名のうち 334 名が id を変えました — `bloxdTextureIdStone` と書け、`351` と書くな。エンジンは検証時に名前を解決するため、名前で書いたパックはレジストリの drift を生き延びますが、生 id で書いたパックはそうなりません。
+
+## ドリフト実測 (ab90qa → xkg8x)
+
+レジストリは v5 開始の翌日に再び動きました — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04、本番稼働。preprod `2lcqcl` はシェーダーパック関連の全表面で同一と実測):
+
+- アトラスエントリ: 1,210 → 1,220
+- 回転族 (回転綴り): 57 (228) → 57 (228) — **変化なし**
+- アニメーション族 (フレーム綴り): 42 (188) → 42 (188) — **変化なし**
+- 利用可能な名前付き定数: 896 → **906**
+- 生存名の id 変化: **896 名中 376 名**
+
+完全なドリフト (10 名 — v5 初回の除去がすべて復活):
+
+- **追加 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — double chest がゲームデータに復帰し、スポナー側面のバリアントも戻りました。
+- **削除:** なし。
+
+上と同じ原理がさらに強く当てはまります: この 1 ステップだけで生存 896 名中 376 名が id を変えました。
 
 ## 関連
 

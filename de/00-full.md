@@ -1721,7 +1721,7 @@ Bezeichner, die mit `bloxdTextureId` beginnen, werden als Textur-Namenskonstante
 ---
 
 ## Kompatibilität
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 Wie das aktuelle Spiel und Pakete alter Versionen zusammenwirken.
 
@@ -1792,7 +1792,7 @@ Details: [Engine-Interna: Textur-Registry](internals/texture-registry.md).
 ---
 
 ## Texturkatalog
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
 Der vollständige Katalog der benutzbaren Textur-Namenskonstanten (`bloxdTextureId*`). **906 Namen**, alphabetisch.
 
@@ -2861,6 +2861,23 @@ Der vollständige Drift (11 Namen):
 - **entfernt (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — die Doppel-Truhe (8 Flächen) hat die Spieldaten verlassen (die `chest_*`-Familie der einzelnen Truhe überlebt intakt), und Spawner behalten `mob_spawner_block_top`, während die Varianten-Seitentexturen weg sind.
 
 **Namen sind die API; ids sind Momentaufnahmen.** Zwischen den beiden Builds änderten 334 von 905 überlebenden Namen die id — schreibe `bloxdTextureIdStone`, nicht `351`. Die Engine löst Namen bei der Validierung auf, daher überstehen namens-geschriebene Pakete den Drift; Roh-id-Pakete nicht.
+
+### Gemessener Drift (ab90qa → xkg8x)
+
+Die Registry bewegte sich erneut einen Tag nach dem v5-Start — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, live in Produktion; Preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen):
+
+- Atlas-Einträge: 1,210 → 1,220
+- Rotationsfamilien (gedrehte Schreibweisen): 57 (228) → 57 (228) — **unverändert**
+- Animationsfamilien (Bild-Schreibweisen): 42 (188) → 42 (188) — **unverändert**
+- benutzbare benannte Konstanten: 896 → **906**
+- id-Änderungen unter überlebenden Namen: **376 von 896**
+
+Die vollständige Drift (10 Namen — jede v5-Start-Entfernung ist zurück):
+
+- **hinzu (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — die Double-Chest ist in die Spieldaten zurückgekehrt und die Spawner-Seitenvarianten sind wieder da.
+- **entfernt:** keine.
+
+Dieselbe Doktrin gilt mit Nachdruck: allein in diesem Schritt änderten 376 der 896 Überlebenden die id.
 
 ### Verwandte Seiten
 
@@ -5280,7 +5297,7 @@ Die Spleiß-Architektur existierte schon im v2-Renderer und blieb über v2 → v
 ---
 
 ## Engine-Header (wortwörtlich)
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
 
 Der exakte Text, den der Loader jedem Paket voranstellt. Aus dem Live-Produktions-Bundle restauriert (`ab90qa`, Chunk c55, die Vorlage mit ihren 6 Live-Interpolationen rendernd — `apiVersion` und die 5 Uniform-Lesezugriffe über `bloxdPackInputs`). 8.954 Byte dekodiert, 208 Zeilen. Keinerlei Paraphrase. Auf dem aktuellen Produktions-Build (`xkg8x`, Chunk c55, 2026-11-04) byte-identisch nachverifiziert — dieselben 8.954 dekodierten Bytes, 208 Zeilen.
 
@@ -5793,7 +5810,7 @@ Der Mesher verschmilzt Flächen mit gleichem Material/AO/Licht zu einzelnen Rech
 ---
 
 ## Textur-Registry-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
 Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](api/texture-catalog.md).
 
@@ -5827,6 +5844,19 @@ Wir haben das eigene Registry-Bau-Modul der Engine (29833 auf diesem Build, koor
 
 Der vollständige Drift (11 Namen): hinzu (1) `scorpion_eggs`; entfernt (10) die acht Doppel-Truhentexturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (die Doppel-Truhe hat die Spieldaten verlassen; Spawner behalten `mob_spawner_block_top`).
 
+### Drift (ab90qa → xkg8x)
+
+| Messung | ab90qa (v5-Start) | xkg8x (v5, aktuell) |
+|---|---|---|
+| Atlas-Einträge | 1,210 | **1,220** |
+| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
+| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
+| benutzbare benannte Konstanten | 896 | **906** |
+| id-Änderungen unter überlebenden Namen | — | **376 von 896** |
+
+Die vollständige Drift (10 Namen): hinzu (10) die acht Double-Chest-Texturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — jeder beim v5-Start entfernte Name ist zurück (die Double-Chest kehrte in die Spieldaten zurück, die Spawner-Seitenvarianten gleich mit). Nichts wurde entfernt.
+
+
 ### Wirkung auf HEADER_VERSION
 
 Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes gespeicherte Paket als „muss erneut geprüft werden“** (beim Seitenladen automatisch revalidiert). Namens-geschriebene Pakete überstehen die Neuauflösung; Roh-id-Pakete brechen ([Kompatibilität](api/compatibility.md)).
@@ -5834,6 +5864,8 @@ Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes ges
 ### Frühere Drift-Aufzeichnungen
 
 Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt); 779 von 1121 unveränderten Namen änderten die id (69 %); eine Namenskonventions-Migration (Suffixe `_rot1..4` → Slots `[rot[1..4`); das Auftauchen der Doppel-Truhe. Die vollständige Aufzeichnung lebt in [Versionsgeschichte: v4](history/v4.md).
+
+4. November (ab90qa → xkg8x, 1 Tag): Einträge 1,210 → 1,220 (+10, alles Rückkehrer — die v5-Start-Entfernungen kehrten sich um); 376 von 896 Namen änderten die id (42 %); keine Entfernungen; beide Faltfamilien unverändert. Die Double-Chest ist zurück.
 
 ### Verwandte Seiten
 
@@ -5902,7 +5934,7 @@ Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuel
 | Paket-Bindings | Gruppe 3: 0 Uniform · 1 Szenentiefe (Liquid) · 2 `bloxdSpTextureLayers`-Storage |
 | Flags | die `BloxdFlags`-Struktur, 14 Bools; die Bitwerte von v4 sind ausgemustert |
 | Loader-Limits | 256 `.wgsl` / 256 KB Quelltext / 64 KB `pack.json` / 32 MB Zip / 1.024 Einträge; UTF-8; ein Manifest; eindeutige Pfade — alles unverändert |
-| Textur-Registry | 1.210 Einträge → **896 benutzbare Namen**; Drift gegenüber cnty9 +1/−10 ([Textur-Registry](internals/texture-registry.md)) |
+| Textur-Registry | 1.210 Einträge → **896 benutzbare Namen**; Drift gegenüber cnty9 +1/−10 ([Textur-Registry](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906 nutzbare Namen** — alle 10 Entfernungen rückgängig, 376 id-Änderungen |
 | Lichtkurve | Stufen 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — im Header, unverändert |
 | Lift-Kurve | `1 - (1 - x / (3 - 2x))^3` — unverändert (aktuell Chunk c9) |
 | Richtlicht-Kegel | `0.12 / 0.65 / 0.62 / 0.95` — unverändert (Chunk c9) |
@@ -6056,7 +6088,7 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 | `sjr0p7` | v3-Ära | 2026-10-17 | Drift-Vergleichsbasis |
 | `cnty9` | v4 | 2026-10-27 | Evidenz des v4-Leitfadens & des 905-Namen-Katalogs |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **aktuell**; die Basislinie dieser Dokumentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | v5-Start-Build; ursprüngliche v5-Basislinie. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **aktuell**; Baseline dieser Dokumentation. prod-Haupt-Bundle ≠ preprod (`2lcqcl`), aber jede Shader-Pack-Oberfläche identisch gemessen |
 
 ### Kern-Methodik
@@ -6094,7 +6126,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 ### Unverifiziert / spekulativ
 
 - Pixelgenaue Shadow-Maps als „geplante Zukunft“ sind eine **Interpretation** (abgeleitet aus dem unbenutzten `var shadow: f32 = 1.;` in der Beleuchtungs-Vorlage)
-- Die allow/strict-Aufteilung kann sich pro Build ändern (12-Titel-Identität auf ab90qa nachbestätigt; künftige Spiele unbekannt)
+- Die allow/strict-Aufteilung kann sich pro Build ändern (12-Titel-Identität auf ab90qa und xkg8x nachbestätigt; künftige Spiele unbekannt)
 - `bloxdFragmentBlockPosition` (aus dem v5-Header): Signaturentabellen-Eintrag und Laufzeit-Injektion beide live bestätigt — Aufrufe validieren und kompilieren; ob das Engine-Team ihn behalten will, ist unbekannt
 
 ### Wann neu zu verifizieren ist

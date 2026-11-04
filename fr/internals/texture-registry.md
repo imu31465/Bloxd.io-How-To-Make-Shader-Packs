@@ -1,6 +1,6 @@
 # Intérieurs du registre des textures
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
 
 La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](../api/texture-catalog.md).
 
@@ -34,6 +34,19 @@ Nous avons exécuté le propre module de construction du registre du moteur (298
 
 La dérive complète (11 noms) : ajouté (1) `scorpion_eggs` ; retirés (10) les huit textures de coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (le coffre double a quitté les données du jeu ; les générateurs conservent `mob_spawner_block_top`).
 
+## Dérive (ab90qa → xkg8x)
+
+| Mesure | ab90qa (lancement v5) | xkg8x (v5, actuel) |
+|---|---|---|
+| entrées d'atlas | 1,210 | **1,220** |
+| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
+| familles d'animation (orthographes d'image) | 42 (188) | **42 (188) — inchangé** |
+| constantes nommées utilisables | 896 | **906** |
+| changements d'id parmi les survivants | — | **376 sur 896** |
+
+La dérive complète (10 noms) : ajoutés (10) les huit textures du coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — chaque nom retiré au lancement de la v5 est revenu (le coffre double est retourné dans les données du jeu ; les variantes latérales du générateur avec lui). Rien n'a été retiré.
+
+
 ## Effet sur HEADER_VERSION
 
 Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive marque **chaque pack sauvegardé « à revérifier »** (revalidé automatiquement au chargement de la page). Les packs écrits avec des noms survivent à la re-résolution ; les packs à ids bruts cassent ([Compatibilité](../api/compatibility.md)).
@@ -41,6 +54,8 @@ Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive 
 ## Anciens relevés de dérive
 
 La comparaison d'octobre entre deux builds (sjr0p7 → cnty9, 10 jours) : entrées 1200 → 1219 (98 ajoutées, 79 retirées) ; 779 des 1121 noms inchangés ont changé d'id (69 %) ; une migration de convention de nommage (suffixes `_rot1..4` → emplacements `[rot[1..4`) ; l'apparition du coffre double. Le relevé complet se trouve dans [Historique des versions : v4](../history/v4.md).
+
+4 novembre (ab90qa → xkg8x, 1 jour) : entrées 1,210 → 1,220 (+10, toutes des retours — les retraits du lancement de la v5 se sont inversés) ; 376 noms sur 896 ont changé d'id (42 %) ; aucun retrait ; les deux familles de pliage inchangées. Le coffre double est de retour.
 
 ## Voir aussi
 

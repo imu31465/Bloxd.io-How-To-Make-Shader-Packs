@@ -1,6 +1,6 @@
 # Textur-Registry-Interna
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
 Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](../api/texture-catalog.md).
 
@@ -34,6 +34,19 @@ Wir haben das eigene Registry-Bau-Modul der Engine (29833 auf diesem Build, koor
 
 Der vollständige Drift (11 Namen): hinzu (1) `scorpion_eggs`; entfernt (10) die acht Doppel-Truhentexturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (die Doppel-Truhe hat die Spieldaten verlassen; Spawner behalten `mob_spawner_block_top`).
 
+## Drift (ab90qa → xkg8x)
+
+| Messung | ab90qa (v5-Start) | xkg8x (v5, aktuell) |
+|---|---|---|
+| Atlas-Einträge | 1,210 | **1,220** |
+| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
+| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
+| benutzbare benannte Konstanten | 896 | **906** |
+| id-Änderungen unter überlebenden Namen | — | **376 von 896** |
+
+Die vollständige Drift (10 Namen): hinzu (10) die acht Double-Chest-Texturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — jeder beim v5-Start entfernte Name ist zurück (die Double-Chest kehrte in die Spieldaten zurück, die Spawner-Seitenvarianten gleich mit). Nichts wurde entfernt.
+
+
 ## Wirkung auf HEADER_VERSION
 
 Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes gespeicherte Paket als „muss erneut geprüft werden“** (beim Seitenladen automatisch revalidiert). Namens-geschriebene Pakete überstehen die Neuauflösung; Roh-id-Pakete brechen ([Kompatibilität](../api/compatibility.md)).
@@ -41,6 +54,8 @@ Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes ges
 ## Frühere Drift-Aufzeichnungen
 
 Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt); 779 von 1121 unveränderten Namen änderten die id (69 %); eine Namenskonventions-Migration (Suffixe `_rot1..4` → Slots `[rot[1..4`); das Auftauchen der Doppel-Truhe. Die vollständige Aufzeichnung lebt in [Versionsgeschichte: v4](../history/v4.md).
+
+4. November (ab90qa → xkg8x, 1 Tag): Einträge 1,210 → 1,220 (+10, alles Rückkehrer — die v5-Start-Entfernungen kehrten sich um); 376 von 896 Namen änderten die id (42 %); keine Entfernungen; beide Faltfamilien unverändert. Die Double-Chest ist zurück.
 
 ## Verwandte Seiten
 

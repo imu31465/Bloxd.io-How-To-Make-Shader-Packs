@@ -1721,7 +1721,7 @@ Les identifiants commençant par `bloxdTextureId` sont résolus comme des consta
 ---
 
 ## Compatibilité
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified
 
 Comment le jeu actuel et les packs d'anciennes versions interopèrent.
 
@@ -1792,7 +1792,7 @@ Détails : [Intérieurs du moteur : Registre de textures](internals/texture-regi
 ---
 
 ## Catalogue de textures
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified (extrait en relançant le constructeur de registre du moteur lui-même)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (extrait en relançant le constructeur de registre du moteur lui-même)
 
 Le catalogue complet des constantes de nom de texture utilisables (`bloxdTextureId*`). **906 noms**, par ordre alphabétique.
 
@@ -2860,6 +2860,23 @@ La dérive complète (11 noms) :
 - **supprimés (10) :** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — le coffre double (8 faces) a quitté les données du jeu (la famille `chest_*` du coffre simple survit intacte), et les générateurs conservent `mob_spawner_block_top` tandis que les textures de côté des variantes ont disparu.
 
 **Les noms sont l'API ; les ids sont des instantanés.** Entre les deux builds, 334 des 905 noms survivants ont changé d'id — écrivez `bloxdTextureIdStone`, pas `351`. Le moteur résout les noms à la validation, donc les packs écrits avec des noms survivent à la dérive ; les packs à ids bruts, non.
+
+### Dérive mesurée (ab90qa → xkg8x)
+
+Le registre a bougé à nouveau un jour après le lancement de la v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, en production ; preprod `2lcqcl` mesurée identique sur chaque surface de shader pack) :
+
+- entrées d'atlas : 1,210 → 1,220
+- familles de rotation (orthographes tournées) : 57 (228) → 57 (228) — **inchangé**
+- familles d'animation (orthographes d'image) : 42 (188) → 42 (188) — **inchangé**
+- constantes nommées utilisables : 896 → **906**
+- changements d'id parmi les noms survivants : **376 sur 896**
+
+La dérive complète (10 noms — chaque retrait du lancement de la v5 est de retour) :
+
+- **ajoutés (10) :** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — le coffre double est revenu dans les données du jeu et les variantes latérales du générateur de mobs sont de retour.
+- **retirés :** aucun.
+
+La même doctrine s'applique avec plus de force : 376 des 896 survivants ont changé d'id rien qu'à cette étape.
 
 ### Voir aussi
 
@@ -5262,7 +5279,7 @@ L'architecture de greffe existait dans le renderer v2 et est restée stable de v
 ---
 
 ## En-tête du moteur (verbatim)
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Analyzed (restauré depuis le bundle de production en direct)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Analyzed (restauré depuis le bundle de production en direct)
 
 Le texte exact que le chargeur préfixe à chaque pack. Restauré depuis le bundle de production en direct (`ab90qa`, chunk c55, en évaluant le template avec ses 6 interpolations réelles — `apiVersion` et les 5 lectures d'uniform via `bloxdPackInputs`). 8 954 octets décodés, 208 lignes. Aucune paraphrase nulle part. Reverifié identique octet par octet sur le build de production actuel (`xkg8x`, chunk c55, 2026-11-04) — mêmes 8,954 octets décodés, 208 lignes.
 
@@ -5774,7 +5791,7 @@ Le mesher fusionne les faces au matériau/AO/lumière identiques en rectangles u
 ---
 
 ## Intérieurs du registre des textures
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
 
 La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](api/texture-catalog.md).
 
@@ -5808,6 +5825,19 @@ Nous avons exécuté le propre module de construction du registre du moteur (298
 
 La dérive complète (11 noms) : ajouté (1) `scorpion_eggs` ; retirés (10) les huit textures de coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (le coffre double a quitté les données du jeu ; les générateurs conservent `mob_spawner_block_top`).
 
+### Dérive (ab90qa → xkg8x)
+
+| Mesure | ab90qa (lancement v5) | xkg8x (v5, actuel) |
+|---|---|---|
+| entrées d'atlas | 1,210 | **1,220** |
+| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
+| familles d'animation (orthographes d'image) | 42 (188) | **42 (188) — inchangé** |
+| constantes nommées utilisables | 896 | **906** |
+| changements d'id parmi les survivants | — | **376 sur 896** |
+
+La dérive complète (10 noms) : ajoutés (10) les huit textures du coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — chaque nom retiré au lancement de la v5 est revenu (le coffre double est retourné dans les données du jeu ; les variantes latérales du générateur avec lui). Rien n'a été retiré.
+
+
 ### Effet sur HEADER_VERSION
 
 Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive marque **chaque pack sauvegardé « à revérifier »** (revalidé automatiquement au chargement de la page). Les packs écrits avec des noms survivent à la re-résolution ; les packs à ids bruts cassent ([Compatibilité](api/compatibility.md)).
@@ -5815,6 +5845,8 @@ Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive 
 ### Anciens relevés de dérive
 
 La comparaison d'octobre entre deux builds (sjr0p7 → cnty9, 10 jours) : entrées 1200 → 1219 (98 ajoutées, 79 retirées) ; 779 des 1121 noms inchangés ont changé d'id (69 %) ; une migration de convention de nommage (suffixes `_rot1..4` → emplacements `[rot[1..4`) ; l'apparition du coffre double. Le relevé complet se trouve dans [Historique des versions : v4](history/v4.md).
+
+4 novembre (ab90qa → xkg8x, 1 jour) : entrées 1,210 → 1,220 (+10, toutes des retours — les retraits du lancement de la v5 se sont inversés) ; 376 noms sur 896 ont changé d'id (42 %) ; aucun retrait ; les deux familles de pliage inchangées. Le coffre double est de retour.
 
 ### Voir aussi
 
@@ -5883,7 +5915,7 @@ Le relevé de mesures de la documentation — chaque valeur confirmée, toutes m
 | bindings du pack | groupe 3 : 0 uniform · 1 profondeur de scène (liquide) · 2 storage `bloxdSpTextureLayers` |
 | flags | la struct `BloxdFlags`, 14 booléens ; les valeurs de bits de la v4 retirées |
 | limites du chargeur | 256 `.wgsl` / 256 Ko de source / 64 Ko `pack.json` / 32 Mo de zip / 1 024 entrées ; UTF-8 ; un seul manifeste ; chemins uniques — tout inchangé |
-| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](internals/texture-registry.md)) |
+| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](internals/texture-registry.md)) → `xkg8x` (2026-11-04) : 1 220 / **906 noms utilisables** — les 10 retraits inversés, 376 changements d'id |
 | courbe de lumière | niveaux 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — dans l'en-tête, inchangée |
 | courbe de lift | `1 - (1 - x / (3 - 2x))^3` — inchangée (actuellement chunk c9) |
 | cône directionnel | `0.12 / 0.65 / 0.62 / 0.95` — inchangé (chunk c9) |
@@ -6034,7 +6066,7 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 | `sjr0p7` | ère v3 | 2026-10-17 | base de comparaison de dérive |
 | `cnty9` | v4 | 2026-10-27 | preuve du guide v4 & du catalogue à 905 noms |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmation du gel de la v4 (événement Halloween + refonte de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **actuel** ; la base de référence de cette documentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lancement de la v5 ; base de référence d'origine de la v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **actuel** ; référence de cette documentation. main de prod ≠ main de preprod (`2lcqcl`), mais chaque surface de shader pack mesurée identique |
 
 ### Méthodologie clé
@@ -6072,7 +6104,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 ### Non vérifié / spéculatif
 
 - Présenter les cartes d'ombres au pixel près comme « plans futurs » est une **interprétation** (déduite de la `var shadow: f32 = 1.;` inutilisée dans le template d'éclairage)
-- La répartition allow/strict peut changer à chaque build (identité des 12 titres reconfirmée sur ab90qa ; jeux futurs inconnus)
+- La répartition allow/strict peut changer à chaque build (identité des 12 titres reconfirmée sur ab90qa et xkg8x ; jeux futurs inconnus)
 - `bloxdFragmentBlockPosition` (absent de l'en-tête v5) : entrée dans la table des signatures et injection à l'exécution toutes deux confirmées en production — les appels valident et compilent ; on ne sait pas si l'équipe moteur a l'intention de le garder
 
 ### Quand revérifier

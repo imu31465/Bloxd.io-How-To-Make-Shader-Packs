@@ -1,6 +1,6 @@
 # 텍스처 카탈로그
 
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 사용 가능한 텍스처 이름 상수 (`bloxdTextureId*`) 의 완전한 카탈로그. **906 이름**, 알파벳순.
 
@@ -1068,6 +1068,23 @@
 - **삭제 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트 (8면) 가 게임 데이터에서 떠났고 (싱글 체스트 `chest_*` 계열은 온전히 생존), 스포너는 `mob_spawner_block_top` 을 유지한 채 변형 옆면 텍스처가 사라졌다.
 
 **이름이 API, id 는 스냅샷이다.** 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다 — `351` 이 아니라 `bloxdTextureIdStone` 을 써라. 엔진은 검증 시점에 이름을 해석하므로, 이름으로 쓴 팩은 드리프트를 견디고 원시 id 팩은 그렇지 못하다.
+
+## 실측 드리프트 (ab90qa → xkg8x)
+
+레지스트리는 v5 출시 다음 날 다시 움직였다 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, 프로덕션 라이브; preprod `2lcqcl` 은 셰이더 팩의 모든 표면에서 동일하게 실측됨):
+
+- 아틀라스 엔트리: 1,210 → 1,220
+- 회전 계열 (회전 철자): 57 (228) → 57 (228) — **변화 없음**
+- 애니메이션 계열 (프레임 철자): 42 (188) → 42 (188) — **변화 없음**
+- 사용 가능 이름 상수: 896 → **906**
+- 생존 이름의 id 변화: **896개 중 376개**
+
+전체 드리프트 (10 이름 — v5 출시 때의 제거가 전부 복귀):
+
+- **추가 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트가 게임 데이터로 돌아왔고 몹 스포너 옆면 변형도 함께 복귀했다.
+- **제거:** 없음.
+
+같은 원칙이 더 큰 힘으로 적용된다: 이 한 단계에서만 생존 896개 중 376개가 id 를 바꿨다.
 
 ## 관련 문서
 

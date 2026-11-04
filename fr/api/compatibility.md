@@ -1,6 +1,6 @@
 # Compatibilité
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified
 
 Comment le jeu actuel et les packs d'anciennes versions interopèrent.
 

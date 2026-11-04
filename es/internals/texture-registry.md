@@ -1,6 +1,6 @@
 # Internas del registro de texturas
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 La maquinaria de resolución nombre→id y la deriva medida del registro. El catálogo orientado al usuario: [Catálogo de texturas](../api/texture-catalog.md).
 
@@ -34,6 +34,19 @@ Ejecutamos el módulo constructor de registro del propio motor (29833 en este bu
 
 La deriva completa (11 nombres): añadido (1) `scorpion_eggs`; eliminados (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (el cofre doble salió de los datos del juego; los generadores conservan `mob_spawner_block_top`).
 
+## Deriva (ab90qa → xkg8x)
+
+| Medición | ab90qa (lanzamiento de v5) | xkg8x (v5, actual) |
+|---|---|---|
+| entradas del atlas | 1,210 | **1,220** |
+| familias de rotación (grafías giradas) | 57 (228) | **57 (228) — sin cambios** |
+| familias de animación (grafías de fotograma) | 42 (188) | **42 (188) — sin cambios** |
+| constantes con nombre utilizables | 896 | **906** |
+| cambios de id entre nombres supervivientes | — | **376 de 896** |
+
+La deriva completa (10 nombres): añadidos (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — cada nombre eliminado en el lanzamiento de v5 ha vuelto (el cofre doble regresó a los datos del juego; las variantes laterales del generador volvieron con él). No se eliminó nada.
+
+
 ## Efecto sobre HEADER_VERSION
 
 El sufijo de hash del registro hornea los ids, así que esta deriva marca **cada paquete guardado como «necesita revisión»** (revalidado automáticamente al cargar la página). Los paquetes escritos con nombres sobreviven a la re-resolución; los de ids crudos se rompen ([Compatibilidad](../api/compatibility.md)).
@@ -41,6 +54,8 @@ El sufijo de hash del registro hornea los ids, así que esta deriva marca **cada
 ## Registros de deriva pasados
 
 La comparación de dos builds de octubre (sjr0p7 → cnty9, 10 días): entradas 1200 → 1219 (98 añadidas, 79 eliminadas); 779 de 1121 nombres con grafía sin cambios cambiaron de id (69 %); una migración de convención de nombres (sufijos `_rot1..4` → ranuras `[rot[1..4`); la aparición del cofre doble. El registro completo vive en [Historial de versiones: v4](../history/v4.md).
+
+4 de noviembre (ab90qa → xkg8x, 1 día): entradas 1,210 → 1,220 (+10, todas nombres que vuelven — las eliminaciones del lanzamiento de v5 se revirtieron); 376 de 896 nombres cambiaron de id (42 %); sin eliminaciones; ambas familias de plegado sin cambios. El cofre doble está de vuelta.
 
 ## Relacionado
 

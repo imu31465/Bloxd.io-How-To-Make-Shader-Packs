@@ -20,7 +20,7 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 | `sjr0p7` | era v3 | 2026-10-17 | linha de base para comparação de deriva |
 | `cnty9` | v4 | 2026-10-27 | evidência do guia da v4 e do catálogo de 905 nomes |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **atual**; linha de base desta documentação. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lançamento da v5; linha de base original da v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **atual**; linha de base desta documentação. main de prod ≠ main de preprod (`2lcqcl`), mas toda superfície de shader packs medida idêntica |
 
 ## Metodologia chave
@@ -31,7 +31,7 @@ Renderizando o template de cabeçalho do c55 com suas interpolações reais (`${
 
 ### Recomputação do registro de texturas
 
-Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (896 nomes / 416 aliases / 228 camadas) ([Registro de texturas](texture-registry.md)).
+Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (906 nomes / 416 aliases / 228 camadas no build atual `xkg8x`, 2026-11-04 — módulos 30093 + 1391; 896 no lançamento da v5) ([Registro de texturas](texture-registry.md)).
 
 Os intervalos de animação vêm da tabela no estilo `animDataPerTex` (`numAnimStates` / `animationInterval` por camada) — só existem três valores de intervalo: 200 / 250 / 300 ms ([o catálogo](../api/texture-catalog.md#famílias-de-animação-42-nomes)).
 
@@ -58,7 +58,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 ## Não verificado / especulativo
 
 - Mapas de sombra precisos ao pixel como "planos futuros" é uma **interpretação** (inferida do `var shadow: f32 = 1.;` não usado no template de iluminação)
-- A divisão allow/strict pode mudar por build (identidade dos 12 títulos reconfirmada em ab90qa; jogos futuros desconhecidos)
+- A divisão allow/strict pode mudar por build (identidade dos 12 títulos reconfirmada em ab90qa e xkg8x; jogos futuros desconhecidos)
 - `bloxdFragmentBlockPosition` (fora do cabeçalho da v5): entrada na tabela de assinaturas e injeção em tempo de execução, ambas confirmadas no bundle em execução — as chamadas validam e compilam; se a equipe do motor pretende mantê-la é desconhecido
 
 ## Quando reverificar

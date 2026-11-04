@@ -17,7 +17,7 @@ Le relevé de mesures de la documentation — chaque valeur confirmée, toutes m
 | bindings du pack | groupe 3 : 0 uniform · 1 profondeur de scène (liquide) · 2 storage `bloxdSpTextureLayers` |
 | flags | la struct `BloxdFlags`, 14 booléens ; les valeurs de bits de la v4 retirées |
 | limites du chargeur | 256 `.wgsl` / 256 Ko de source / 64 Ko `pack.json` / 32 Mo de zip / 1 024 entrées ; UTF-8 ; un seul manifeste ; chemins uniques — tout inchangé |
-| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](texture-registry.md)) |
+| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](texture-registry.md)) → `xkg8x` (2026-11-04) : 1 220 / **906 noms utilisables** — les 10 retraits inversés, 376 changements d'id |
 | courbe de lumière | niveaux 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — dans l'en-tête, inchangée |
 | courbe de lift | `1 - (1 - x / (3 - 2x))^3` — inchangée (actuellement chunk c9) |
 | cône directionnel | `0.12 / 0.65 / 0.62 / 0.95` — inchangé (chunk c9) |

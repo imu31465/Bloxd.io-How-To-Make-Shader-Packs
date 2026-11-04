@@ -1,6 +1,6 @@
 # Catálogo de texturas
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 El catálogo completo de las constantes de nombre de textura utilizables (`bloxdTextureId*`). **906 nombres**, en orden alfabético.
 
@@ -1068,6 +1068,23 @@ La deriva completa (11 nombres):
 - **eliminados (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — el cofre doble (8 caras) salió de los datos del juego (la familia `chest_*` del cofre simple sobrevive intacta), y los generadores conservan `mob_spawner_block_top` mientras las texturas laterales de las variantes desaparecen.
 
 **Los nombres son la API; los ids son instantáneas.** Entre los dos builds, 334 de los 905 nombres supervivientes cambiaron de id — escribe `bloxdTextureIdStone`, no `351`. El motor resuelve los nombres en la validación, así que los paquetes escritos con nombres sobreviven a la deriva; los de ids crudos no.
+
+## Deriva medida (ab90qa → xkg8x)
+
+El registro volvió a moverse un día después del lanzamiento de v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, en producción; preprod `2lcqcl` medido idéntico en todas las superficies de shader packs):
+
+- entradas del atlas: 1,210 → 1,220
+- familias de rotación (grafías giradas): 57 (228) → 57 (228) — **sin cambios**
+- familias de animación (grafías de fotograma): 42 (188) → 42 (188) — **sin cambios**
+- constantes con nombre utilizables: 896 → **906**
+- cambios de id entre nombres supervivientes: **376 de 896**
+
+La deriva completa (10 nombres — todas las eliminaciones del lanzamiento de v5 han vuelto):
+
+- **añadidos (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — el cofre doble volvió a los datos del juego y las variantes laterales del generador de mobs están de vuelta.
+- **eliminados:** ninguno.
+
+La misma doctrina aplica con más fuerza: 376 de los 896 supervivientes cambiaron de id solo en este paso.
 
 ## Relacionado
 

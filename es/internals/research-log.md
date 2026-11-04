@@ -20,7 +20,7 @@ Las afirmaciones técnicas de aquí no descansan en documentación oficial de lo
 | `sjr0p7` | era v3 | 2026-10-17 | línea base de comparación de deriva |
 | `cnty9` | v4 | 2026-10-27 | evidencia de la guía v4 y del catálogo de 905 nombres |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmación de la congelación de v4 (evento de Halloween + rework de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **actual**; línea base de esta documentación. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lanzamiento de v5; línea base original de v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **actual**; línea base de esta documentación. main de prod ≠ main de preprod (`2lcqcl`), pero toda superficie de shader packs medida idéntica |
 
 ## Metodología clave
@@ -31,7 +31,7 @@ Renderizando la plantilla de cabecera de c55 con sus interpolaciones en vivo (`$
 
 ### Recómputo del registro de texturas
 
-Ejecutando los módulos constructores del registro del motor (29833 + 1371 + 1391 + 1384 + 219) contra los datos de textura del registro de bloques distribuido en un mini arnés de webpack; registrando la salida (896 con nombre / 416 alias / 228 capas) ([Registro de texturas](texture-registry.md)).
+Ejecutando los módulos constructores del registro del motor (29833 + 1371 + 1391 + 1384 + 219) contra los datos de textura del registro de bloques distribuido en un mini arnés de webpack; registrando la salida (906 con nombre / 416 alias / 228 capas en el build actual `xkg8x`, 2026-11-04 — módulos 30093 + 1391; 896 en el lanzamiento de v5) ([Registro de texturas](texture-registry.md)).
 
 Los intervalos de animación provienen de la tabla tipo `animDataPerTex` (por capa `numAnimStates` / `animationInterval`) — solo existen tres valores de intervalo: 200 / 250 / 300 ms ([el catálogo](../api/texture-catalog.md#familias-de-animación-42-nombres)).
 
@@ -58,7 +58,7 @@ El diseño de campos de `BloxdPackInputs` desde el módulo de diseño de uniform
 ## Sin verificar / especulativo
 
 - Los mapas de sombras precisos al píxel como «planes futuros» son una **interpretación** (inferida del `var shadow: f32 = 1.;` sin usar en la plantilla de iluminación)
-- El reparto allow/strict puede cambiar por build (identidad de 12 títulos reconfirmada en ab90qa; juegos futuros desconocidos)
+- El reparto allow/strict puede cambiar por build (identidad de 12 títulos reconfirmada en ab90qa y xkg8x; juegos futuros desconocidos)
 - `bloxdFragmentBlockPosition` (fuera de la cabecera v5): entrada en la tabla de firmas e inyección en ejecución ambas confirmadas en vivo — las llamadas validan y compilan; si el equipo del motor pretende conservarla es desconocido
 
 ## Cuándo reverificar

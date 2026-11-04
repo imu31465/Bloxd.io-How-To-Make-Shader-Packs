@@ -1,6 +1,6 @@
 # Catalogue de textures
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified (extrait en relançant le constructeur de registre du moteur lui-même)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (extrait en relançant le constructeur de registre du moteur lui-même)
 
 Le catalogue complet des constantes de nom de texture utilisables (`bloxdTextureId*`). **906 noms**, par ordre alphabétique.
 
@@ -1068,6 +1068,23 @@ La dérive complète (11 noms) :
 - **supprimés (10) :** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — le coffre double (8 faces) a quitté les données du jeu (la famille `chest_*` du coffre simple survit intacte), et les générateurs conservent `mob_spawner_block_top` tandis que les textures de côté des variantes ont disparu.
 
 **Les noms sont l'API ; les ids sont des instantanés.** Entre les deux builds, 334 des 905 noms survivants ont changé d'id — écrivez `bloxdTextureIdStone`, pas `351`. Le moteur résout les noms à la validation, donc les packs écrits avec des noms survivent à la dérive ; les packs à ids bruts, non.
+
+## Dérive mesurée (ab90qa → xkg8x)
+
+Le registre a bougé à nouveau un jour après le lancement de la v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, en production ; preprod `2lcqcl` mesurée identique sur chaque surface de shader pack) :
+
+- entrées d'atlas : 1,210 → 1,220
+- familles de rotation (orthographes tournées) : 57 (228) → 57 (228) — **inchangé**
+- familles d'animation (orthographes d'image) : 42 (188) → 42 (188) — **inchangé**
+- constantes nommées utilisables : 896 → **906**
+- changements d'id parmi les noms survivants : **376 sur 896**
+
+La dérive complète (10 noms — chaque retrait du lancement de la v5 est de retour) :
+
+- **ajoutés (10) :** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — le coffre double est revenu dans les données du jeu et les variantes latérales du générateur de mobs sont de retour.
+- **retirés :** aucun.
+
+La même doctrine s'applique avec plus de force : 376 des 896 survivants ont changé d'id rien qu'à cette étape.
 
 ## Voir aussi
 

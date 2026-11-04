@@ -1721,7 +1721,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 兼容性
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 当前游戏与旧版本包如何互操作。
 
@@ -1792,7 +1792,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 纹理目录
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**906 个名称**，按字母序排列。
 
@@ -2860,6 +2860,23 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - **移除 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 双箱 (8 个面) 离开了游戏数据 (单箱 `chest_*` 族完好幸存)，刷怪笼保留 `mob_spawner_block_top`，变体侧面纹理则已消失。
 
 **名称即 API；id 只是快照。** 两个构建之间，905 个幸存名称中 334 个改了 id — 请写 `bloxdTextureIdStone`，而不是 `351`。引擎在验证时解析名称，因此按名称编写的包能在漂移中幸存；裸 id 包不能。
+
+### 实测漂移 (ab90qa → xkg8x)
+
+注册表在 v5 首发次日又一次变动 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04，生产环境在线；preprod `2lcqcl` 在着色器包的每个表面上实测一致):
+
+- 图集条目: 1,210 → 1,220
+- 旋转族 (旋转拼写): 57 (228) → 57 (228) — **不变**
+- 动画族 (帧拼写): 42 (188) → 42 (188) — **不变**
+- 可用具名常量: 896 → **906**
+- 幸存名称的 id 变化: **896 个中的 376 个**
+
+完整漂移 (10 个名称 — v5 首发时的每项移除都已回归):
+
+- **新增 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 双箱回到了游戏数据，刷怪笼侧面变体也一并回归。
+- **移除:** 无。
+
+同一原则更加有力地适用: 仅这一步就有 896 个幸存名称中的 376 个改了 id。
 
 ### 相关
 
@@ -5281,7 +5298,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 引擎标头 (v5, 逐字)
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Analyzed (从现行生产包复原)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (从现行生产包复原)
 
 加载器拼在每个包前面的精确文本。复原自现行生产包 (`ab90qa`，chunk c55，以 6 处现行插值渲染模板 — `apiVersion` 与经 `bloxdPackInputs` 的 5 个 uniform 读取)。解码后 8,954 字节、208 行。没有任何转述。已在当前生产构建 (`xkg8x`，分块 c55，2026-11-04) 上复核字节一致 — 同样的 8,954 解码字节、208 行。
 
@@ -5794,7 +5811,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 纹理注册表内部机制
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 名称→id 的解析机制与实测的注册表漂移。面向用户的目录: [纹理目录](api/texture-catalog.md)。
 
@@ -5828,6 +5845,19 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 完整漂移 (11 个名称): 新增 (1) `scorpion_eggs`；移除 (10) 八个双箱纹理加 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (双箱离开了游戏数据；刷怪笼保留 `mob_spawner_block_top`)。
 
+### 漂移 (ab90qa → xkg8x)
+
+| 计量 | ab90qa (v5 首发) | xkg8x (v5 现行) |
+|---|---|---|
+| 图集条目 | 1,210 | **1,220** |
+| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
+| 动画族 (帧拼写) | 42 (188) | **42 (188) — 不变** |
+| 可用具名常量 | 896 | **906** |
+| 幸存名称的 id 变化 | — | **896 个中的 376 个** |
+
+完整漂移 (10 个名称): 新增 (10) — 双箱的 8 个纹理加上 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side`。v5 首发时移除的名称全部回归 (双箱回到了游戏数据；刷怪笼侧面变体一并回归)。没有移除任何名称。
+
+
 ### 对 HEADER_VERSION 的影响
 
 注册表哈希后缀烘焙了 id，因此这次漂移会把**每个已保存的包标记为「需要重新检查」** (页面加载时自动重验)。按名称编写的包经得起重新解析；裸 id 包会损坏 ([兼容性](api/compatibility.md))。
@@ -5835,6 +5865,8 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ### 过往漂移记录
 
 十月的双构建对比 (sjr0p7 → cnty9，10 天): 条目 1200 → 1219 (新增 98、移除 79)；1121 个未改名名称中 779 个改了 id (69%)；一次命名约定迁移 (`_rot1..4` 后缀 → `[rot[1..4` 槽位)；双箱出现。完整记录见[版本历史: v4](history/v4.md)。
+
+11月4日 (ab90qa → xkg8x，1天): 条目 1,210 → 1,220 (+10，全部为回归名称 — v5 首发时的移除被逆转)；896 个名称中 376 个改 id (42%)；无移除；两个折叠族不变。双箱回归。
 
 ### 相关
 
@@ -5949,7 +5981,7 @@ chunk 格式说明: 每个 chunk 都是一个 ES 模块 (`export const modules =
 ---
 
 ## 各游戏的着色器适用策略
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 本页把 `allow / strict` 在标题层面的语义确定下来。只有游戏定义中显式写着 `shaderPackPolicy: "allow"` 的标题才以完整模式运行 (vertex 钩子、`discard`、地形 `alpha`)；未指定 (或 allow 以外的值) 的标题视为 strict — 定义 `BLOXD_STRICT`，守卫内的代码自动失效。这个判定不在包一侧可控，因此弄清哪些标题跑什么内容是发布的前提。
 
@@ -6057,7 +6089,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `sjr0p7` | v3 时期 | 2026-10-17 | 漂移对比基线 |
 | `cnty9` | v4 | 2026-10-27 | v4 指南与 905 名称目录的证据 |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 冻结确认 (万圣节活动 + Skyblock 改版) |
-| `ab90qa` | **v5** | 2026-11-03 | **现行**；本文档的基线。prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | v5 首发构建；最初的 v5 基线。prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **现行**；本文档基线。prod 主包 ≠ preprod (`2lcqcl`) 主包，但着色器包各表面实测一致 |
 
 ### 关键方法论
@@ -6068,7 +6100,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 #### 纹理注册表重算
 
-在微型 webpack harness 中，针对随包分发的方块注册表纹理数据运行引擎的注册表构建模块 (29833 + 1371 + 1391 + 1384 + 219)；记录输出 (具名 896 / 别名 416 / 层 228) ([纹理注册表](internals/texture-registry.md))。
+在微型 webpack harness 中，针对随包分发的方块注册表纹理数据运行引擎的注册表构建模块 (29833 + 1371 + 1391 + 1384 + 219)；记录输出 (现行构建 `xkg8x` (2026-11-04) 上为具名 906 / 别名 416 / 层 228 — 模块 30093 + 1391；v5 首发时为 896) ([纹理注册表](internals/texture-registry.md))。
 
 动画间隔来自 `animDataPerTex` 式的表 (逐层 `numAnimStates` / `animationInterval`) — 只存在三种间隔值: 200 / 250 / 300 ms ([目录](api/texture-catalog.md#动画族-42-个名称))。
 
@@ -6095,7 +6127,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ### 未验证 / 推测
 
 - 像素级阴影贴图属于「未来计划」是一种**解读** (由光照模板中未使用的 `var shadow: f32 = 1.;` 推得)
-- allow/strict 划分可能逐构建变化 (12 标题同一性已在 ab90qa 上复确认；未来游戏未知)
+- allow/strict 划分可能逐构建变化 (12 标题同一性已在 ab90qa 与 xkg8x 上复确认；未来游戏未知)
 - `bloxdFragmentBlockPosition` (不在 v5 标头中): 签名表条目与运行时注入均已在现行环境确认 — 调用可通过验证并编译；引擎团队是否有意保留未知
 
 ### 何时重新验证

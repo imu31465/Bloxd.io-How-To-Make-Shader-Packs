@@ -20,7 +20,7 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 | `sjr0p7` | ère v3 | 2026-10-17 | base de comparaison de dérive |
 | `cnty9` | v4 | 2026-10-27 | preuve du guide v4 & du catalogue à 905 noms |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmation du gel de la v4 (événement Halloween + refonte de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **actuel** ; la base de référence de cette documentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lancement de la v5 ; base de référence d'origine de la v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **actuel** ; référence de cette documentation. main de prod ≠ main de preprod (`2lcqcl`), mais chaque surface de shader pack mesurée identique |
 
 ## Méthodologie clé
@@ -58,7 +58,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 ## Non vérifié / spéculatif
 
 - Présenter les cartes d'ombres au pixel près comme « plans futurs » est une **interprétation** (déduite de la `var shadow: f32 = 1.;` inutilisée dans le template d'éclairage)
-- La répartition allow/strict peut changer à chaque build (identité des 12 titres reconfirmée sur ab90qa ; jeux futurs inconnus)
+- La répartition allow/strict peut changer à chaque build (identité des 12 titres reconfirmée sur ab90qa et xkg8x ; jeux futurs inconnus)
 - `bloxdFragmentBlockPosition` (absent de l'en-tête v5) : entrée dans la table des signatures et injection à l'exécution toutes deux confirmées en production — les appels valident et compilent ; on ne sait pas si l'équipe moteur a l'intention de le garder
 
 ## Quand revérifier

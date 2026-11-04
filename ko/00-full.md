@@ -1721,7 +1721,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 호환성
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-04, 프로덕션 확인) · 상태: Verified
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified
 
 현행 게임과 구버전 팩이 서로 어떻게 맞물리는지에 대한 설명이다.
 
@@ -1792,7 +1792,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 텍스처 카탈로그
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 사용 가능한 텍스처 이름 상수 (`bloxdTextureId*`) 의 완전한 카탈로그. **906 이름**, 알파벳순.
 
@@ -2860,6 +2860,23 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - **삭제 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트 (8면) 가 게임 데이터에서 떠났고 (싱글 체스트 `chest_*` 계열은 온전히 생존), 스포너는 `mob_spawner_block_top` 을 유지한 채 변형 옆면 텍스처가 사라졌다.
 
 **이름이 API, id 는 스냅샷이다.** 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다 — `351` 이 아니라 `bloxdTextureIdStone` 을 써라. 엔진은 검증 시점에 이름을 해석하므로, 이름으로 쓴 팩은 드리프트를 견디고 원시 id 팩은 그렇지 못하다.
+
+### 실측 드리프트 (ab90qa → xkg8x)
+
+레지스트리는 v5 출시 다음 날 다시 움직였다 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, 프로덕션 라이브; preprod `2lcqcl` 은 셰이더 팩의 모든 표면에서 동일하게 실측됨):
+
+- 아틀라스 엔트리: 1,210 → 1,220
+- 회전 계열 (회전 철자): 57 (228) → 57 (228) — **변화 없음**
+- 애니메이션 계열 (프레임 철자): 42 (188) → 42 (188) — **변화 없음**
+- 사용 가능 이름 상수: 896 → **906**
+- 생존 이름의 id 변화: **896개 중 376개**
+
+전체 드리프트 (10 이름 — v5 출시 때의 제거가 전부 복귀):
+
+- **추가 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트가 게임 데이터로 돌아왔고 몹 스포너 옆면 변형도 함께 복귀했다.
+- **제거:** 없음.
+
+같은 원칙이 더 큰 힘으로 적용된다: 이 한 단계에서만 생존 896개 중 376개가 id 를 바꿨다.
 
 ### 관련 문서
 
@@ -5276,9 +5293,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 엔진 헤더 (그대로)
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-04, 프로덕션 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
 
-로더가 모든 팩 앞에 붙이는 **정확한 텍스트**다. 라이브 프로덕션 번들 (`ab90qa`, 청크 c55, 템플릿을 6개의 라이브 보간 — `apiVersion` 과 `bloxdPackInputs` 경유의 uniform 읽기 5개 — 으로 렌더) 에서 복원했다. 디코드 후 8,954 바이트, 208행. 한 군데도 바꾸지 않았다.
+로더가 모든 팩 앞에 붙이는 **정확한 텍스트**다. 라이브 프로덕션 번들 (`ab90qa`, 청크 c55, 템플릿을 6개의 라이브 보간 — `apiVersion` 과 `bloxdPackInputs` 경유의 uniform 읽기 5개 — 으로 렌더) 에서 복원했다. 디코드 후 8,954 바이트, 208행. 한 군데도 바꾸지 않았다. 현재 프로덕션 빌드 (`xkg8x`, 청크 c55, 2026-11-04) 에서 바이트 동일로 재검증 — 같은 디코딩 후 8,954 바이트, 208행.
 
 읽기용 가이드:
 - 필드별 해설 → [구조체](api/structures.md)
@@ -5789,7 +5806,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 텍스처 레지스트리의 내부
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 이름→id 해석 기구와 실측 레지스트리 드리프트. 사용자용 카탈로그: [텍스처 카탈로그](api/texture-catalog.md).
 
@@ -5823,6 +5840,19 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 드리프트 전체 (11 이름): 추가 (1) `scorpion_eggs`. 삭제 (10) 더블 체스트 텍스처 8개와 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (더블 체스트가 게임 데이터에서 떠났고, 스포너는 `mob_spawner_block_top` 을 유지).
 
+### 드리프트 (ab90qa → xkg8x)
+
+| 실측 | ab90qa (v5 출시) | xkg8x (v5 현행) |
+|---|---|---|
+| 아틀라스 엔트리 | 1,210 | **1,220** |
+| 회전 계열 (회전 철자) | 57 (228) | **57 (228) — 변화 없음** |
+| 애니메이션 계열 (프레임 철자) | 42 (188) | **42 (188) — 변화 없음** |
+| 사용 가능 이름 상수 | 896 | **906** |
+| 생존 이름의 id 변화 | — | **896개 중 376개** |
+
+전체 드리프트 (10 이름): 추가 (10) — 더블 체스트 텍스처 8개와 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side`. v5 출시 때 제거된 이름이 모두 돌아왔다 (더블 체스트가 게임 데이터로 복귀했고 스포너 옆면 변형도 함께). 제거된 것은 없다.
+
+
 ### HEADER_VERSION 에 미치는 영향
 
 레지스트리 해시 접미사는 id 를 굽으므로, 이 드리프트는 **모든 저장 팩을 「재확인 필요」로 표시**한다 (페이지 로드 시 자동 재검증). 이름으로 쓴 팩은 재해석을 견디고, 원시 id 팩은 깨진다 ([호환성](api/compatibility.md)).
@@ -5830,6 +5860,8 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ### 과거 드리프트 기록
 
 10월의 두 빌드 비교 (sjr0p7 → cnty9, 10일): 엔트리 1200 → 1219 (98 추가, 79 삭제). 불변 이름 1121 중 779개가 id 를 바꿨다 (69%). 명명 규약 이동 (`_rot1..4` 접미사 → `[rot[1..4` 슬롯). 더블 체스트의 등장. 전체 기록은 [버전 히스토리: v4](history/v4.md) 에 있다.
+
+11월 4일 (ab90qa → xkg8x, 1일): 엔트리 1,210 → 1,220 (+10, 전부 복귀 이름 — v5 출시 때의 제거가 뒤집힘); 896개 중 376개 이름이 id 변경 (42%); 제거 없음; 두 접기 계열 모두 불변. 더블 체스트가 돌아왔다.
 
 ### 관련 문서
 
@@ -5944,7 +5976,7 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 게임별 셰이더 팩 정책
-> 대상 API: 5 · 대상 빌드: `ab90qa` (2026-11-03, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
 
@@ -6052,7 +6084,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `sjr0p7` | v3 시대 | 2026-10-17 | 드리프트 비교 기준선 |
 | `cnty9` | v4 | 2026-10-27 | v4 가이드·905이름 카탈로그의 근거 |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 동결 확인 (할로윈 이벤트 + 스카이블록 개편) |
-| `ab90qa` | **v5** | 2026-11-03 | **현행**. 이 문서의 기준선. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | v5 출시 빌드. 원래 v5 기준선. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **현행**; 이 문서의 베이스라인. prod 메인 ≠ preprod (`2lcqcl`) 메인이지만 셰이더 팩의 모든 표면이 동일하게 실측됨 |
 
 ### 핵심 방법론
@@ -6090,7 +6122,7 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 ### 미검증 · 추정
 
 - 픽셀 정밀 섀도맵을 「장래 계획」으로 보는 것은 **해석**이다 (조명 템플릿의 미사용 `var shadow: f32 = 1.;` 에서 추론)
-- allow/strict 구분은 빌드마다 바뀔 수 있다 (12 타이틀 구성은 ab90qa 에서 재확인. 미래 게임은 미지)
+- allow/strict 구분은 빌드마다 바뀔 수 있다 (12 타이틀 구성은 ab90qa 와 xkg8x 에서 재확인. 미래 게임은 미지)
 - `bloxdFragmentBlockPosition` (v5 헤더 제외): 시그니처 표 항목과 런타임 주입 모두 라이브 확인 — 호출은 검증·컴파일을 통과한다. 엔진 팀이 유지할 생각인지는 미지
 
 ### 재검증 시점

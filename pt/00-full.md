@@ -1721,7 +1721,7 @@ Identificadores que começam com `bloxdTextureId` são resolvidos como constante
 ---
 
 ## Compatibilidade
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Verified
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified
 
 Como o jogo atual e os pacotes de versões antigas interoperam.
 
@@ -1792,7 +1792,7 @@ Detalhes: [Interior do motor: Registro de texturas](internals/texture-registry.m
 ---
 
 ## Catálogo de texturas
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Verified (extraído ao reexecutar o construtor de registro do próprio motor)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified (extraído ao reexecutar o construtor de registro do próprio motor)
 
 O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdTextureId*`). **906 nomes**, em ordem alfabética.
 
@@ -2860,6 +2860,23 @@ A deriva completa (11 nomes):
 - **removidos (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — o baú duplo (8 faces) saiu dos dados do jogo (a família `chest_*` do baú simples sobrevive intacta), e os spawners mantêm `mob_spawner_block_top` enquanto as texturas laterais das variantes desapareceram.
 
 **Os nomes são a API; os ids são instantâneos.** Entre os dois builds, 334 dos 905 nomes sobreviventes mudaram de id — escreva `bloxdTextureIdStone`, não `351`. O motor resolve os nomes na validação, então pacotes escritos com nomes sobrevivem à deriva; pacotes com ids crus, não.
+
+### Deriva medida (ab90qa → xkg8x)
+
+O registro mudou novamente um dia após o lançamento da v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, em produção; preprod `2lcqcl` medido idêntico em todas as superfícies de shader packs):
+
+- entradas do atlas: 1,210 → 1,220
+- famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **inalteradas**
+- famílias de animação (grafias de quadro): 42 (188) → 42 (188) — **inalteradas**
+- constantes nomeadas utilizáveis: 896 → **906**
+- mudanças de id entre nomes sobreviventes: **376 de 896**
+
+A deriva completa (10 nomes — toda remoção do lançamento da v5 voltou):
+
+- **adicionados (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — o baú duplo voltou aos dados do jogo e as variantes laterais do spawner de mobs estão de volta.
+- **removidos:** nenhum.
+
+A mesma doutrina vale com mais força: 376 dos 896 sobreviventes mudaram de id só nesta etapa.
 
 ### Relacionados
 
@@ -5260,9 +5277,9 @@ A arquitetura de injeção existia no renderizador da v2 e permaneceu estável n
 ---
 
 ## Cabeçalho do motor (verbatim)
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Analyzed (restaurado do bundle de produção em execução)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Analyzed (restaurado do bundle de produção em execução)
 
-O texto exato que o carregador antepõe a cada pacote. Restaurado do bundle de produção em execução (`ab90qa`, chunk c55, renderizando o template com suas 6 interpolações reais — `apiVersion` e as 5 leituras de uniform via `bloxdPackInputs`). 8.954 bytes decodificados, 208 linhas. Nenhuma paráfrase em nenhum ponto.
+O texto exato que o carregador antepõe a cada pacote. Restaurado do bundle de produção em execução (`ab90qa`, chunk c55, renderizando o template com suas 6 interpolações reais — `apiVersion` e as 5 leituras de uniform via `bloxdPackInputs`). 8.954 bytes decodificados, 208 linhas. Nenhuma paráfrase em nenhum ponto. Reverificado idêntico byte a byte no build de produção atual (`xkg8x`, chunk c55, 2026-11-04) — os mesmos 8,954 bytes decodificados, 208 linhas.
 
 Guia de leitura:
 - Explicações campo por campo → [Estruturas](api/structures.md)
@@ -5771,7 +5788,7 @@ O mesher funde faces com material/AO/luz correspondentes num único retângulo (
 ---
 
 ## Interioridades do registro de texturas
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
 
 A maquinaria de resolução nome→id e a deriva medida do registro. O catálogo voltado ao usuário: [Catálogo de texturas](api/texture-catalog.md).
 
@@ -5805,6 +5822,19 @@ Executamos o próprio módulo de construção de registro do motor (29833 nesta 
 
 A deriva completa (11 nomes): adicionado (1) `scorpion_eggs`; removidas (10) as oito texturas de baú duplo mais `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (o baú duplo saiu dos dados do jogo; os spawners mantêm `mob_spawner_block_top`).
 
+### Deriva (ab90qa → xkg8x)
+
+| Medição | ab90qa (lançamento v5) | xkg8x (v5, atual) |
+|---|---|---|
+| entradas do atlas | 1,210 | **1,220** |
+| famílias de rotação (grafias giradas) | 57 (228) | **57 (228) — inalteradas** |
+| famílias de animação (grafias de quadro) | 42 (188) | **42 (188) — inalteradas** |
+| constantes nomeadas utilizáveis | 896 | **906** |
+| mudanças de id entre sobreviventes | — | **376 de 896** |
+
+A deriva completa (10 nomes): adicionados (10) as oito texturas do baú duplo mais `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — todo nome removido no lançamento da v5 voltou (o baú duplo retornou aos dados do jogo; as variantes laterais do spawner junto com ele). Nada foi removido.
+
+
 ### Efeito sobre HEADER_VERSION
 
 O sufixo de hash do registro cozinha os ids, então esta deriva marca **cada pacote salvo "precisa de nova verificação"** (revalidado automaticamente ao carregar a página). Pacotes escritos com nomes sobrevivem à re-resolução; pacotes com ids crus quebram ([Compatibilidade](api/compatibility.md)).
@@ -5812,6 +5842,8 @@ O sufixo de hash do registro cozinha os ids, então esta deriva marca **cada pac
 ### Registros de deriva anteriores
 
 A comparação de duas builds de outubro (sjr0p7 → cnty9, 10 dias): entradas 1200 → 1219 (98 adicionadas, 79 removidas); 779 dos 1121 nomes de grafia inalterada mudaram de id (69%); uma migração de convenção de nomes (sufixos `_rot1..4` → slots `[rot[1..4`); o surgimento do baú duplo. O registro completo vive em [Histórico de versões: v4](history/v4.md).
+
+4 de novembro (ab90qa → xkg8x, 1 dia): entradas 1,210 → 1,220 (+10, todas nomes que retornam — as remoções do lançamento da v5 se reverteram); 376 de 896 nomes mudaram de id (42%); sem remoções; ambas as famílias de dobragem inalteradas. O baú duplo está de volta.
 
 ### Relacionado
 
@@ -5880,7 +5912,7 @@ O ledger de medições desta documentação — cada valor confirmado, todos med
 | bindings do pacote | group 3: 0 uniform · 1 profundidade de cena (líquido) · 2 storage `bloxdSpTextureLayers` |
 | flags | a struct `BloxdFlags`, 14 bools; os valores de bits da v4 retirados |
 | limites do carregador | 256 `.wgsl` / 256 KB de fonte / 64 KB `pack.json` / 32 MB de zip / 1.024 entradas; UTF-8; um manifesto; caminhos únicos — tudo inalterado |
-| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](internals/texture-registry.md)) |
+| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906 nomes utilizáveis** — as 10 remoções revertidas, 376 mudanças de id |
 | curva de luz | níveis 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — no cabeçalho, inalterada |
 | curva de lift | `1 - (1 - x / (3 - 2x))^3` — inalterada (atualmente chunk c9) |
 | cone direcional | `0.12 / 0.65 / 0.62 / 0.95` — inalterado (chunk c9) |
@@ -5924,7 +5956,7 @@ Fontes principais de variação: `lightingOverride` (iluminação forçada) / `s
 ---
 
 ## Política de pacotes de shaders por jogo
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
 Esta página fixa o que `allow / strict` significa no nível de título. Somente títulos cuja definição de jogo carrega explicitamente `shaderPackPolicy: "allow"` rodam em modo completo (hooks de vértice, `discard`, `alpha` de terreno); títulos sem o ajuste (ou com qualquer valor diferente de allow) são estritos — `BLOXD_STRICT` fica definido e o código protegido por guardas é desativado automaticamente. O lado do pacote não pode escolher isso, então saber quais títulos rodam o quê é um pré-requisito para a distribuição.
 
 - Build de referência: `szby6g.main.94a7596c.js` (deploy de produção em 2026-10-17). A enumeração estática das 111 definições de jogo dá **26 entradas allow (12 títulos) / 85 entradas estritas**. Os mesmos 12 literais allow nos mesmos 12 títulos foram reconfirmados sem alteração no bundle de produção da v3 (`3ymzdd`, 2026-10-20) e de novo no bundle da v4 (`cnty9`, 2026-10-27) — a lista abaixo se transporta literalmente para a v3 e a v4. E nos builds v5, novamente sem alterações: reconfirmado em `ab90qa` (2026-11-03) e `xkg8x` (2026-11-04, 12 literais allow recontados) — a lista abaixo vale literalmente também para a v5.
@@ -6029,7 +6061,7 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 | `sjr0p7` | era v3 | 2026-10-17 | linha de base para comparação de deriva |
 | `cnty9` | v4 | 2026-10-27 | evidência do guia da v4 e do catálogo de 905 nomes |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **atual**; linha de base desta documentação. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lançamento da v5; linha de base original da v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **atual**; linha de base desta documentação. main de prod ≠ main de preprod (`2lcqcl`), mas toda superfície de shader packs medida idêntica |
 
 ### Metodologia chave
@@ -6040,7 +6072,7 @@ Renderizando o template de cabeçalho do c55 com suas interpolações reais (`${
 
 #### Recomputação do registro de texturas
 
-Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (896 nomes / 416 aliases / 228 camadas) ([Registro de texturas](internals/texture-registry.md)).
+Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (906 nomes / 416 aliases / 228 camadas no build atual `xkg8x`, 2026-11-04 — módulos 30093 + 1391; 896 no lançamento da v5) ([Registro de texturas](internals/texture-registry.md)).
 
 Os intervalos de animação vêm da tabela no estilo `animDataPerTex` (`numAnimStates` / `animationInterval` por camada) — só existem três valores de intervalo: 200 / 250 / 300 ms ([o catálogo](api/texture-catalog.md#famílias-de-animação-42-nomes)).
 
@@ -6067,7 +6099,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 ### Não verificado / especulativo
 
 - Mapas de sombra precisos ao pixel como "planos futuros" é uma **interpretação** (inferida do `var shadow: f32 = 1.;` não usado no template de iluminação)
-- A divisão allow/strict pode mudar por build (identidade dos 12 títulos reconfirmada em ab90qa; jogos futuros desconhecidos)
+- A divisão allow/strict pode mudar por build (identidade dos 12 títulos reconfirmada em ab90qa e xkg8x; jogos futuros desconhecidos)
 - `bloxdFragmentBlockPosition` (fora do cabeçalho da v5): entrada na tabela de assinaturas e injeção em tempo de execução, ambas confirmadas no bundle em execução — as chamadas validam e compilam; se a equipe do motor pretende mantê-la é desconhecido
 
 ### Quando reverificar

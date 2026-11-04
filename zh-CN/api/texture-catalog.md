@@ -1,6 +1,6 @@
 # 纹理目录
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**906 个名称**，按字母序排列。
 
@@ -1068,6 +1068,23 @@
 - **移除 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 双箱 (8 个面) 离开了游戏数据 (单箱 `chest_*` 族完好幸存)，刷怪笼保留 `mob_spawner_block_top`，变体侧面纹理则已消失。
 
 **名称即 API；id 只是快照。** 两个构建之间，905 个幸存名称中 334 个改了 id — 请写 `bloxdTextureIdStone`，而不是 `351`。引擎在验证时解析名称，因此按名称编写的包能在漂移中幸存；裸 id 包不能。
+
+## 实测漂移 (ab90qa → xkg8x)
+
+注册表在 v5 首发次日又一次变动 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04，生产环境在线；preprod `2lcqcl` 在着色器包的每个表面上实测一致):
+
+- 图集条目: 1,210 → 1,220
+- 旋转族 (旋转拼写): 57 (228) → 57 (228) — **不变**
+- 动画族 (帧拼写): 42 (188) → 42 (188) — **不变**
+- 可用具名常量: 896 → **906**
+- 幸存名称的 id 变化: **896 个中的 376 个**
+
+完整漂移 (10 个名称 — v5 首发时的每项移除都已回归):
+
+- **新增 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 双箱回到了游戏数据，刷怪笼侧面变体也一并回归。
+- **移除:** 无。
+
+同一原则更加有力地适用: 仅这一步就有 896 个幸存名称中的 376 个改了 id。
 
 ## 相关
 

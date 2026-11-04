@@ -1,6 +1,6 @@
 # En-tête du moteur (verbatim)
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Analyzed (restauré depuis le bundle de production en direct)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Analyzed (restauré depuis le bundle de production en direct)
 
 Le texte exact que le chargeur préfixe à chaque pack. Restauré depuis le bundle de production en direct (`ab90qa`, chunk c55, en évaluant le template avec ses 6 interpolations réelles — `apiVersion` et les 5 lectures d'uniform via `bloxdPackInputs`). 8 954 octets décodés, 208 lignes. Aucune paraphrase nulle part. Reverifié identique octet par octet sur le build de production actuel (`xkg8x`, chunk c55, 2026-11-04) — mêmes 8,954 octets décodés, 208 lignes.
 

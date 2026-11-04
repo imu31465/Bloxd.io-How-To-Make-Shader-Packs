@@ -1721,7 +1721,7 @@ Los identificadores que empiezan por `bloxdTextureId` se resuelven como constant
 ---
 
 ## Compatibilidad
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified
 
 Cómo interoperan el juego actual y los paquetes de versiones antiguas.
 
@@ -1792,7 +1792,7 @@ Detalles: [Interior del motor: registro de texturas](internals/texture-registry.
 ---
 
 ## Catálogo de texturas
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 El catálogo completo de las constantes de nombre de textura utilizables (`bloxdTextureId*`). **906 nombres**, en orden alfabético.
 
@@ -2860,6 +2860,23 @@ La deriva completa (11 nombres):
 - **eliminados (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — el cofre doble (8 caras) salió de los datos del juego (la familia `chest_*` del cofre simple sobrevive intacta), y los generadores conservan `mob_spawner_block_top` mientras las texturas laterales de las variantes desaparecen.
 
 **Los nombres son la API; los ids son instantáneas.** Entre los dos builds, 334 de los 905 nombres supervivientes cambiaron de id — escribe `bloxdTextureIdStone`, no `351`. El motor resuelve los nombres en la validación, así que los paquetes escritos con nombres sobreviven a la deriva; los de ids crudos no.
+
+### Deriva medida (ab90qa → xkg8x)
+
+El registro volvió a moverse un día después del lanzamiento de v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, en producción; preprod `2lcqcl` medido idéntico en todas las superficies de shader packs):
+
+- entradas del atlas: 1,210 → 1,220
+- familias de rotación (grafías giradas): 57 (228) → 57 (228) — **sin cambios**
+- familias de animación (grafías de fotograma): 42 (188) → 42 (188) — **sin cambios**
+- constantes con nombre utilizables: 896 → **906**
+- cambios de id entre nombres supervivientes: **376 de 896**
+
+La deriva completa (10 nombres — todas las eliminaciones del lanzamiento de v5 han vuelto):
+
+- **añadidos (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — el cofre doble volvió a los datos del juego y las variantes laterales del generador de mobs están de vuelta.
+- **eliminados:** ninguno.
+
+La misma doctrina aplica con más fuerza: 376 de los 896 supervivientes cambiaron de id solo en este paso.
 
 ### Relacionado
 
@@ -5279,9 +5296,9 @@ La arquitectura de empalme existía en el renderizador de v2 y se mantuvo establ
 ---
 
 ## Cabecera del motor (literal)
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
 
-El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto.
+El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto. Reverificado idéntico byte a byte en el build de producción actual (`xkg8x`, chunk c55, 2026-11-04) — los mismos 8,954 bytes decodificados, 208 líneas.
 
 Guía de lectura:
 - Explicaciones campo por campo → [Estructuras](api/structures.md)
@@ -5791,7 +5808,7 @@ El mesher fusiona caras con material/AO/luz coincidentes en rectángulos únicos
 ---
 
 ## Internas del registro de texturas
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 La maquinaria de resolución nombre→id y la deriva medida del registro. El catálogo orientado al usuario: [Catálogo de texturas](api/texture-catalog.md).
 
@@ -5825,6 +5842,19 @@ Ejecutamos el módulo constructor de registro del propio motor (29833 en este bu
 
 La deriva completa (11 nombres): añadido (1) `scorpion_eggs`; eliminados (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (el cofre doble salió de los datos del juego; los generadores conservan `mob_spawner_block_top`).
 
+### Deriva (ab90qa → xkg8x)
+
+| Medición | ab90qa (lanzamiento de v5) | xkg8x (v5, actual) |
+|---|---|---|
+| entradas del atlas | 1,210 | **1,220** |
+| familias de rotación (grafías giradas) | 57 (228) | **57 (228) — sin cambios** |
+| familias de animación (grafías de fotograma) | 42 (188) | **42 (188) — sin cambios** |
+| constantes con nombre utilizables | 896 | **906** |
+| cambios de id entre nombres supervivientes | — | **376 de 896** |
+
+La deriva completa (10 nombres): añadidos (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — cada nombre eliminado en el lanzamiento de v5 ha vuelto (el cofre doble regresó a los datos del juego; las variantes laterales del generador volvieron con él). No se eliminó nada.
+
+
 ### Efecto sobre HEADER_VERSION
 
 El sufijo de hash del registro hornea los ids, así que esta deriva marca **cada paquete guardado como «necesita revisión»** (revalidado automáticamente al cargar la página). Los paquetes escritos con nombres sobreviven a la re-resolución; los de ids crudos se rompen ([Compatibilidad](api/compatibility.md)).
@@ -5832,6 +5862,8 @@ El sufijo de hash del registro hornea los ids, así que esta deriva marca **cada
 ### Registros de deriva pasados
 
 La comparación de dos builds de octubre (sjr0p7 → cnty9, 10 días): entradas 1200 → 1219 (98 añadidas, 79 eliminadas); 779 de 1121 nombres con grafía sin cambios cambiaron de id (69 %); una migración de convención de nombres (sufijos `_rot1..4` → ranuras `[rot[1..4`); la aparición del cofre doble. El registro completo vive en [Historial de versiones: v4](history/v4.md).
+
+4 de noviembre (ab90qa → xkg8x, 1 día): entradas 1,210 → 1,220 (+10, todas nombres que vuelven — las eliminaciones del lanzamiento de v5 se revirtieron); 376 de 896 nombres cambiaron de id (42 %); sin eliminaciones; ambas familias de plegado sin cambios. El cofre doble está de vuelta.
 
 ### Relacionado
 
@@ -5900,7 +5932,7 @@ El ledger de mediciones de esta documentación — cada valor confirmado, todo m
 | bindings del paquete | group 3: 0 uniform · 1 profundidad de escena (líquido) · 2 almacenamiento `bloxdSpTextureLayers` |
 | flags | la estructura `BloxdFlags`, 14 bools; los valores de bits de v4 retirados |
 | límites del cargador | 256 `.wgsl` / 256 KB de fuente / 64 KB `pack.json` / 32 MB zip / 1.024 entradas; UTF-8; un manifiesto; rutas únicas — todo sin cambios |
-| registro de texturas | 1.210 entradas → **896 nombres utilizables**; deriva frente a cnty9 +1/−10 ([Registro de texturas](internals/texture-registry.md)) |
+| registro de texturas | 1.210 entradas → **896 nombres utilizables**; deriva frente a cnty9 +1/−10 ([Registro de texturas](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906 nombres utilizables** — las 10 eliminaciones revertidas, 376 cambios de id |
 | curva de luz | niveles 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — en la cabecera, sin cambios |
 | curva de realce | `1 - (1 - x / (3 - 2x))^3` — sin cambios (actualmente chunk c9) |
 | cono direccional | `0.12 / 0.65 / 0.62 / 0.95` — sin cambios (chunk c9) |
@@ -6054,7 +6086,7 @@ Las afirmaciones técnicas de aquí no descansan en documentación oficial de lo
 | `sjr0p7` | era v3 | 2026-10-17 | línea base de comparación de deriva |
 | `cnty9` | v4 | 2026-10-27 | evidencia de la guía v4 y del catálogo de 905 nombres |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmación de la congelación de v4 (evento de Halloween + rework de Skyblock) |
-| `ab90qa` | **v5** | 2026-11-03 | **actual**; línea base de esta documentación. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | build de lanzamiento de v5; línea base original de v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | **actual**; línea base de esta documentación. main de prod ≠ main de preprod (`2lcqcl`), pero toda superficie de shader packs medida idéntica |
 
 ### Metodología clave
@@ -6065,7 +6097,7 @@ Renderizando la plantilla de cabecera de c55 con sus interpolaciones en vivo (`$
 
 #### Recómputo del registro de texturas
 
-Ejecutando los módulos constructores del registro del motor (29833 + 1371 + 1391 + 1384 + 219) contra los datos de textura del registro de bloques distribuido en un mini arnés de webpack; registrando la salida (896 con nombre / 416 alias / 228 capas) ([Registro de texturas](internals/texture-registry.md)).
+Ejecutando los módulos constructores del registro del motor (29833 + 1371 + 1391 + 1384 + 219) contra los datos de textura del registro de bloques distribuido en un mini arnés de webpack; registrando la salida (906 con nombre / 416 alias / 228 capas en el build actual `xkg8x`, 2026-11-04 — módulos 30093 + 1391; 896 en el lanzamiento de v5) ([Registro de texturas](internals/texture-registry.md)).
 
 Los intervalos de animación provienen de la tabla tipo `animDataPerTex` (por capa `numAnimStates` / `animationInterval`) — solo existen tres valores de intervalo: 200 / 250 / 300 ms ([el catálogo](api/texture-catalog.md#familias-de-animación-42-nombres)).
 
@@ -6092,7 +6124,7 @@ El diseño de campos de `BloxdPackInputs` desde el módulo de diseño de uniform
 ### Sin verificar / especulativo
 
 - Los mapas de sombras precisos al píxel como «planes futuros» son una **interpretación** (inferida del `var shadow: f32 = 1.;` sin usar en la plantilla de iluminación)
-- El reparto allow/strict puede cambiar por build (identidad de 12 títulos reconfirmada en ab90qa; juegos futuros desconocidos)
+- El reparto allow/strict puede cambiar por build (identidad de 12 títulos reconfirmada en ab90qa y xkg8x; juegos futuros desconocidos)
 - `bloxdFragmentBlockPosition` (fuera de la cabecera v5): entrada en la tabla de firmas e inyección en ejecución ambas confirmadas en vivo — las llamadas validan y compilan; si el equipo del motor pretende conservarla es desconocido
 
 ### Cuándo reverificar

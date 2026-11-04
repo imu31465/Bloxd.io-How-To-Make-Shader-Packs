@@ -1,6 +1,6 @@
 # Catálogo de texturas
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Verified (extraído ao reexecutar o construtor de registro do próprio motor)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified (extraído ao reexecutar o construtor de registro do próprio motor)
 
 O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdTextureId*`). **906 nomes**, em ordem alfabética.
 
@@ -1068,6 +1068,23 @@ A deriva completa (11 nomes):
 - **removidos (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — o baú duplo (8 faces) saiu dos dados do jogo (a família `chest_*` do baú simples sobrevive intacta), e os spawners mantêm `mob_spawner_block_top` enquanto as texturas laterais das variantes desapareceram.
 
 **Os nomes são a API; os ids são instantâneos.** Entre os dois builds, 334 dos 905 nomes sobreviventes mudaram de id — escreva `bloxdTextureIdStone`, não `351`. O motor resolve os nomes na validação, então pacotes escritos com nomes sobrevivem à deriva; pacotes com ids crus, não.
+
+## Deriva medida (ab90qa → xkg8x)
+
+O registro mudou novamente um dia após o lançamento da v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, em produção; preprod `2lcqcl` medido idêntico em todas as superfícies de shader packs):
+
+- entradas do atlas: 1,210 → 1,220
+- famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **inalteradas**
+- famílias de animação (grafias de quadro): 42 (188) → 42 (188) — **inalteradas**
+- constantes nomeadas utilizáveis: 896 → **906**
+- mudanças de id entre nomes sobreviventes: **376 de 896**
+
+A deriva completa (10 nomes — toda remoção do lançamento da v5 voltou):
+
+- **adicionados (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — o baú duplo voltou aos dados do jogo e as variantes laterais do spawner de mobs estão de volta.
+- **removidos:** nenhum.
+
+A mesma doutrina vale com mais força: 376 dos 896 sobreviventes mudaram de id só nesta etapa.
 
 ## Relacionados
 

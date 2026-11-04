@@ -1,8 +1,8 @@
 # Cabecera del motor (literal)
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
 
-El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto.
+El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto. Reverificado idéntico byte a byte en el build de producción actual (`xkg8x`, chunk c55, 2026-11-04) — los mismos 8,954 bytes decodificados, 208 líneas.
 
 Guía de lectura:
 - Explicaciones campo por campo → [Estructuras](../api/structures.md)

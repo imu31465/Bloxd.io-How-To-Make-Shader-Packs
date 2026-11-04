@@ -17,7 +17,7 @@ O ledger de medições desta documentação — cada valor confirmado, todos med
 | bindings do pacote | group 3: 0 uniform · 1 profundidade de cena (líquido) · 2 storage `bloxdSpTextureLayers` |
 | flags | a struct `BloxdFlags`, 14 bools; os valores de bits da v4 retirados |
 | limites do carregador | 256 `.wgsl` / 256 KB de fonte / 64 KB `pack.json` / 32 MB de zip / 1.024 entradas; UTF-8; um manifesto; caminhos únicos — tudo inalterado |
-| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](texture-registry.md)) |
+| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906 nomes utilizáveis** — as 10 remoções revertidas, 376 mudanças de id |
 | curva de luz | níveis 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — no cabeçalho, inalterada |
 | curva de lift | `1 - (1 - x / (3 - 2x))^3` — inalterada (atualmente chunk c9) |
 | cone direcional | `0.12 / 0.65 / 0.62 / 0.95` — inalterado (chunk c9) |
