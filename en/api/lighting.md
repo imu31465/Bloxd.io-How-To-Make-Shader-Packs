@@ -1,6 +1,6 @@
 # Lighting
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored verbatim from the live header)
+> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored verbatim from the live header)
 
 v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
 

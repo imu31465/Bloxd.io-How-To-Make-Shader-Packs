@@ -1,6 +1,6 @@
 # Hooks de shader
 
-> API alvo: 5 · Build alvo: `ab90qa` · Estado: Verified
+> API alvo: 5 · Build alvo: `xkg8x` · Estado: Verified
 
 Pacotes podem definir **9 hooks** — 3 alvos de renderização (programas) × 3 estágios de pipeline, todos opcionais (não definido significa o padrão do motor).
 

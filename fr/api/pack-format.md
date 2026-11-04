@@ -1,6 +1,6 @@
 # Format du pack
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified (remesuré sur le chargeur en production)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (remesuré sur le chargeur en production)
 
 Tout le modèle de pack sur une seule page — manifeste, limites du chargeur, uniform par frame. Pour la version pas à pas, voir [Prise en main](../getting-started/manifest.md).
 

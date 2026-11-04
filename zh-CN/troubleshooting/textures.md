@@ -1,6 +1,6 @@
 # 纹理问题
 
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (消息逐字采录自现行验证器)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (消息逐字采录自现行验证器)
 
 围绕 `bloxdTextureId*` / `bloxdTexel` 的问题。全部 896 个名称可在[纹理目录](../api/texture-catalog.md)中搜索。
 

@@ -1,6 +1,6 @@
 # Textur-Registry-Interna
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
 Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](../api/texture-catalog.md).
 
@@ -12,7 +12,7 @@ Wir haben das eigene Registry-Bau-Modul der Engine (29833 auf diesem Build, koor
 
 | Ausgabe | v5 gemessen | Bedeutung |
 |---|---|---|
-| `named` | **896** | als `bloxdTextureId<Name>` referenzierbare Namen |
+| `named` | **906** | als `bloxdTextureId<Name>` referenzierbare Namen |
 | `aliases` | 416 | gefaltete Schreibweisen — 188 Rahmen-Aliasse (`lava0`…) und 228 Rotations-Aliasse (`chest_top[rot[1`…) |
 | `layers` | 228 | die Layer-Tabelle — einschließlich 171 vor-rotierter Slots (57 Wurzeln × 4 Rotationen) |
 

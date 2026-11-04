@@ -1,6 +1,6 @@
 # テクスチャAPI
 
-> 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Verified (v4 から不変のAPIを v5 ビルドで再確認)
+> 対象API: 5 · 対象ビルド: `xkg8x` · 検証状況: Verified (v4 から不変のAPIを v5 ビルドで再確認)
 
 v4 から不変で、現在も同じ形で使える、ゲーム側テクスチャを読むAPIです。関数2種 + 名前付き定数ファミリー + 入力フィールド4個で構成されます。ヘッダー自身の一行要約: *"This face's texture. Compare with `bloxdTextureId*`."*
 

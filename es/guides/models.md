@@ -1,6 +1,6 @@
 # Modelos y texturas
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (restaurado de la cabecera y el validador)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Analyzed (restaurado de la cabecera y el validador)
 
 Qué dibujan y qué leen los nuevos hooks de Model de v5.
 

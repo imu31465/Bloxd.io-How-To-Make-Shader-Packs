@@ -23,7 +23,7 @@
 8. [验证](getting-started/validation.md) — 三阶段加载检查与实机测试
 9. [分发](getting-started/distribution.md) — 打 zip 与发布卫生
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified/Analyzed
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](api/)；要现成效果请看[实战配方](recipes/)。
 
@@ -31,7 +31,7 @@
 ---
 
 ## 概览与前置条件
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 ### 着色器包是什么
 
@@ -103,7 +103,7 @@ URL 参数或 localStorage 中残留的渲染器覆盖项会让包拒绝启动 �
 ---
 
 ## 快速开始
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 五分钟做出你的第一个包。
 
@@ -162,7 +162,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 包结构
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified
 
 ### 分发格式
 
@@ -191,7 +191,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## pack.json (manifest)
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 `pack.json` 是包的 manifest — zip 根部恰好一个 JSON 对象。
 
@@ -230,7 +230,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
 
@@ -359,7 +359,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 变体与守卫
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed
 
 ### 6 种变体
 
@@ -398,7 +398,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 验证
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 ### 三阶段加载检查
 
@@ -451,7 +451,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## API 参考
-当前 API v5 的系统性规格。这里的一切都实测自目标构建 `ab90qa` (2026-11-03；生产与预发环境一致)。拼在每个包前的引擎标头 (复现于[引擎内部](internals/engine-header.md)) 是首要资料来源。
+当前 API v5 的系统性规格。这里的一切都实测自目标构建 `xkg8x` (2026-11-04；生产与预发环境一致)。拼在每个包前的引擎标头 (复现于[引擎内部](internals/engine-header.md)) 是首要资料来源。
 
 ### 导航
 
@@ -470,7 +470,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 | [兼容性](api/compatibility.md) | 旧版本包、已保存包重验 |
 | [纹理目录](api/texture-catalog.md) | 全部 896 个可用名称 (可搜索) |
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从标头与验证器逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (从标头与验证器逐字复原)
 
 从 v4 迁移？请看[版本历史: v5](history/v5.md)。
 
@@ -478,7 +478,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 包格式
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (在现行加载器上重新实测)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (在现行加载器上重新实测)
 
 整个包模型一页讲完 — manifest、加载器限制、逐帧 uniform。分步版本见[入门指南](getting-started/manifest.md)。
 
@@ -549,7 +549,7 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified
 
 包可以定义 **9 个钩子** — 3 个渲染目标 (程序) × 3 个管线阶段，全部可选 (未定义即用引擎默认)。
 
@@ -641,7 +641,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 标志 (BloxdFlags)
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 v5 以具名布尔结构体标识面。v4 的 `blockFlags: u32` 位掩码及其 6 个 `bloxdBlockFlag*` 常量已被移除。
 
@@ -765,7 +765,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 输入与输出结构体
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 包可读写的结构体共七个。每个字段都列在下面 (`#ifdef` 字段为条件存在)。完整标头见[引擎内部](internals/engine-header.md)。
 
@@ -939,7 +939,7 @@ struct BloxdOpaqueBehind {
 ---
 
 ## 函数
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 标头函数一览。纹理 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 连同 `bloxdOpaqueBehind` 在[纹理 API](api/texture-api.md) 中讲述。
 
@@ -1102,7 +1102,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## 光照
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 v5 公开了光照 API。引擎原先在内部做的事 (构建 `litColour`) 现在可从包中调用。本页把光照输入、函数与处理顺序作为一个体系来讲。
 
@@ -1286,7 +1286,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理 API
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
 
 读取游戏自带纹理的 API: 两个函数、一个具名常量族、四个输入字段。标头自己的概句: *「This face's texture. Compare with `bloxdTextureId*`.」*
 
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 常量
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 标头提供三个常量 (纹理名称常量 `bloxdTextureId*` 见[纹理 API](api/texture-api.md))。
 
@@ -1572,7 +1572,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 预处理器
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行验证器复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行验证器复原)
 
 条件编译只支持 `#define NAME` (不带值) / `#ifdef` / `#ifndef` / `#else` / `#endif`。`#` 须在行首 (函数体内也可以)。宏名匹配不区分大小写；`#ifdef` 的名称写错时，错误消息会列出官方集合。
 
@@ -1654,7 +1654,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 限制与保留名称
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
 
 包可以写什么，以及完整的名称保留规则。
 
@@ -1721,7 +1721,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 兼容性
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified
 
 当前游戏与旧版本包如何互操作。
 
@@ -1792,9 +1792,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 纹理目录
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
-可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**896 个名称**，按字母序排列。
+可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**906 个名称**，按字母序排列。
 
 ### 如何阅读
 
@@ -1804,7 +1804,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 **备注**列标出两个折叠族。「动画（N帧）」表示采样该名称会自动返回当前动画帧 — **切勿书写帧号后缀** (`lava0` 是已知的别名，有专属诊断)。「旋转族（4副本）」表示该纹理只以预旋转槽位存在 — 名称指向根，`bloxdTexel` 会在采样时重新应用旋转。恰好一个名称 (`radar_screen`) 同时带两条备注。
 
-刻意**不**列出的是: 其余注册表拼写 — 188 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,210 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](internals/texture-registry.md)。
+刻意**不**列出的是: 其余注册表拼写 — 188 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,220 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](internals/texture-registry.md)。
 
 #### 数字之间如何对上
 
@@ -1812,76 +1812,76 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 | 数量 | 统计对象 |
 |---|---|
-| **896** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
+| **906** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
 | **416** | 别名 (188 帧 + 228 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
-| **1,210** | 图集条目 — 纹理图集中的实际槽位 (id 1–1210) |
+| **1,220** | 图集条目 — 纹理图集中的实际槽位 (id 1–1220) |
 
-896 个名称各自映射到一个不同的图集条目。其余 **314 个条目**是没有可用名称的附加动画帧 (143) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。与上一构建对比: v4 有 905 个可用名称；本构建为 896 (+1 `scorpion_eggs`，−10 个双箱 ×8 与刷怪笼侧面 ×2)，且幸存名称中有 334 个改了 id。
+906 个名称各自映射到一个不同的图集条目。其余 **314 个条目**是没有可用名称的附加动画帧 (143) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。对比: v4 有 905 个可用名称，v5 首发构建 896 个；本构建为 906 — v5 首发时移除的 10 个名称 (双箱×8、刷怪笼侧面×2) 已回归 (加上先前的 +1 `scorpion_eggs`)，且首发幸存的 896 个名称中有 376 个改了 id。
 
 ### 目录
 
-全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `ab90qa` (2026-11-03)。**id 是快照；把名称当作 API**: 即使在 v4 构建 (cnty9) 与本构建之间，拼写未变的名称里也有 334 个改了 id (见下方漂移实测)。
+全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `xkg8x` (2026-11-04)。**id 是快照；把名称当作 API**: v4 构建 (cnty9) 与 v5 首发构建 (ab90qa) 之间有 334 个幸存名称改了 id，ab90qa 与本构建之间又有 376 个 (见下方漂移实测)。
 
-| 名称 | id (ab90qa) | 备注 |
+| 名称 | id (xkg8x) | 备注 |
 |---|---|---|
-| `alloy_kiln_back` | 1089 |  |
-| `alloy_kiln_front` | 1083 |  |
-| `alloy_kiln_side` | 1084 |  |
+| `alloy_kiln_back` | 1091 |  |
+| `alloy_kiln_front` | 1085 |  |
+| `alloy_kiln_side` | 1086 |  |
 | `alloy_kiln_side_running` | 33 | 动画（4帧） |
-| `alloy_kiln_top` | 1085 | 旋转族（4副本） |
+| `alloy_kiln_top` | 1087 | 旋转族（4副本） |
 | `andesite_brick` | 465 |  |
 | `apple_block_bottom` | 441 |  |
 | `apple_block_side` | 439 |  |
 | `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 993 |  |
-| `armour_lucky_block_rare` | 995 |  |
-| `armour_lucky_block_super` | 997 |  |
+| `armour_lucky_block` | 995 |  |
+| `armour_lucky_block_rare` | 997 |  |
+| `armour_lucky_block_super` | 999 |  |
 | `artisan_table_side` | 367 |  |
 | `artisan_table_top` | 368 |  |
-| `ash` | 1029 |  |
-| `auto_bench_back` | 1104 |  |
-| `auto_bench_front` | 1098 |  |
-| `auto_bench_side` | 1099 |  |
+| `ash` | 1031 |  |
+| `auto_bench_back` | 1106 |  |
+| `auto_bench_front` | 1100 |  |
+| `auto_bench_side` | 1101 |  |
 | `auto_bench_side_running` | 35 | 动画（4帧） |
-| `auto_bench_top` | 1100 | 旋转族（4副本） |
-| `autocrafter_bottom` | 960 |  |
-| `autocrafter_lunite_bottom` | 971 |  |
-| `autocrafter_lunite_side` | 970 |  |
-| `autocrafter_side` | 959 |  |
-| `banana_block_side` | 897 |  |
-| `banana_block_top` | 898 |  |
+| `auto_bench_top` | 1102 | 旋转族（4副本） |
+| `autocrafter_bottom` | 962 |  |
+| `autocrafter_lunite_bottom` | 973 |  |
+| `autocrafter_lunite_side` | 972 |  |
+| `autocrafter_side` | 961 |  |
+| `banana_block_side` | 899 |  |
+| `banana_block_top` | 900 |  |
 | `beacon` | 330 |  |
 | `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 923 |  |
-| `beetroot_block_side` | 921 |  |
-| `beetroot_block_top` | 922 |  |
-| `belt_drop_side` | 1183 |  |
-| `belt_drop_top` | 1182 |  |
-| `belt_lift_side` | 1181 |  |
-| `belt_lift_top` | 1180 |  |
-| `belt_loader_slab_front` | 1108 |  |
-| `belt_loader_top` | 1107 |  |
-| `belt_tunnel_back` | 1197 |  |
-| `belt_tunnel_exit_top` | 1198 | 旋转族（4副本） |
-| `belt_tunnel_mouth` | 1191 |  |
-| `belt_tunnel_side` | 1192 |  |
-| `belt_tunnel_top` | 1193 | 旋转族（4副本） |
+| `beetroot_block_bottom` | 925 |  |
+| `beetroot_block_side` | 923 |  |
+| `beetroot_block_top` | 924 |  |
+| `belt_drop_side` | 1185 |  |
+| `belt_drop_top` | 1184 |  |
+| `belt_lift_side` | 1183 |  |
+| `belt_lift_top` | 1182 |  |
+| `belt_loader_slab_front` | 1110 |  |
+| `belt_loader_top` | 1109 |  |
+| `belt_tunnel_back` | 1199 |  |
+| `belt_tunnel_exit_top` | 1200 | 旋转族（4副本） |
+| `belt_tunnel_mouth` | 1193 |  |
+| `belt_tunnel_side` | 1194 |  |
+| `belt_tunnel_top` | 1195 | 旋转族（4副本） |
 | `black_concrete` | 273 |  |
 | `black_glazed_terracotta` | 429 | 旋转族（4副本） |
 | `black_planks` | 366 |  |
 | `black_portal` | 2 | 动画（4帧） |
 | `black_spawn_block_side` | 760 |  |
 | `black_spawn_block_top` | 756 | 旋转族（4副本） |
-| `block_destroyer_tnt_side` | 1015 |  |
-| `block_destroyer_tnt_top` | 1016 |  |
+| `block_destroyer_tnt_side` | 1017 |  |
+| `block_destroyer_tnt_top` | 1018 |  |
 | `blue_concrete` | 274 |  |
 | `blue_gen_spawn_coal` | 774 |  |
 | `blue_gen_spawn_iron` | 775 |  |
 | `blue_gen_spawn_top` | 773 |  |
 | `blue_glazed_terracotta` | 413 | 旋转族（4副本） |
-| `blue_lucky_block` | 992 |  |
-| `blue_lucky_block_rare` | 994 |  |
-| `blue_lucky_block_super` | 996 |  |
+| `blue_lucky_block` | 994 |  |
+| `blue_lucky_block_rare` | 996 |  |
+| `blue_lucky_block_super` | 998 |  |
 | `blue_planks` | 362 |  |
 | `blue_portal` | 3 | 动画（4帧） |
 | `blue_spawn_block_side` | 755 |  |
@@ -1896,7 +1896,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `bookshelf_5` | 570 |  |
 | `bookshelf_empty` | 565 |  |
 | `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 976 |  |
+| `bowling_alley_floor` | 978 |  |
 | `bread_block_back` | 435 |  |
 | `bread_block_front` | 434 |  |
 | `bread_block_side` | 436 |  |
@@ -1909,80 +1909,88 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `brown_portal` | 4 | 动画（4帧） |
 | `brown_spawn_block_side` | 750 |  |
 | `brown_spawn_block_top` | 746 | 旋转族（4副本） |
-| `building_lucky_block` | 987 |  |
-| `building_lucky_block_rare` | 989 |  |
-| `building_lucky_block_super` | 991 |  |
-| `burner_drill_back` | 1046 |  |
-| `burner_drill_bottom` | 1045 |  |
-| `burner_drill_front` | 1039 |  |
-| `burner_drill_side` | 1040 |  |
+| `building_lucky_block` | 989 |  |
+| `building_lucky_block_rare` | 991 |  |
+| `building_lucky_block_super` | 993 |  |
+| `burner_drill_back` | 1048 |  |
+| `burner_drill_bottom` | 1047 |  |
+| `burner_drill_front` | 1041 |  |
+| `burner_drill_side` | 1042 |  |
 | `burner_drill_side_running` | 27 | 动画（4帧） |
-| `burner_drill_top` | 1041 | 旋转族（4副本） |
+| `burner_drill_top` | 1043 | 旋转族（4副本） |
 | `cactus_dry` | 350 |  |
 | `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 919 |  |
-| `carrot_block_side` | 917 |  |
-| `carrot_block_top` | 918 |  |
-| `carved_messy_stone` | 826 |  |
+| `carrot_block_bottom` | 921 |  |
+| `carrot_block_side` | 919 |  |
+| `carrot_block_top` | 920 |  |
+| `carved_messy_stone` | 827 |  |
 | `carved_pumpkin` | 543 |  |
-| `chalk` | 837 |  |
-| `chalk_black` | 853 |  |
-| `chalk_blue` | 852 |  |
-| `chalk_bricks_black` | 869 |  |
-| `chalk_bricks_blue` | 868 |  |
-| `chalk_bricks_brown` | 867 |  |
-| `chalk_bricks_cyan` | 866 |  |
-| `chalk_bricks_gray` | 865 |  |
-| `chalk_bricks_green` | 864 |  |
-| `chalk_bricks_light_blue` | 863 |  |
-| `chalk_bricks_light_gray` | 862 |  |
-| `chalk_bricks_lime` | 861 |  |
-| `chalk_bricks_magenta` | 860 |  |
-| `chalk_bricks_orange` | 859 |  |
-| `chalk_bricks_pink` | 858 |  |
-| `chalk_bricks_purple` | 857 |  |
-| `chalk_bricks_red` | 856 |  |
-| `chalk_bricks_slab_side_black` | 885 |  |
-| `chalk_bricks_slab_side_blue` | 884 |  |
-| `chalk_bricks_slab_side_brown` | 883 |  |
-| `chalk_bricks_slab_side_cyan` | 882 |  |
-| `chalk_bricks_slab_side_gray` | 881 |  |
-| `chalk_bricks_slab_side_green` | 880 |  |
-| `chalk_bricks_slab_side_light_blue` | 879 |  |
-| `chalk_bricks_slab_side_light_gray` | 878 |  |
-| `chalk_bricks_slab_side_lime` | 877 |  |
-| `chalk_bricks_slab_side_magenta` | 876 |  |
-| `chalk_bricks_slab_side_orange` | 875 |  |
-| `chalk_bricks_slab_side_pink` | 874 |  |
-| `chalk_bricks_slab_side_purple` | 873 |  |
-| `chalk_bricks_slab_side_red` | 872 |  |
-| `chalk_bricks_slab_side_white` | 871 |  |
-| `chalk_bricks_slab_side_yellow` | 870 |  |
-| `chalk_bricks_white` | 855 |  |
-| `chalk_bricks_yellow` | 854 |  |
-| `chalk_brown` | 851 |  |
-| `chalk_cyan` | 850 |  |
-| `chalk_gray` | 849 |  |
-| `chalk_green` | 848 |  |
-| `chalk_light_blue` | 847 |  |
-| `chalk_light_gray` | 846 |  |
-| `chalk_lime` | 845 |  |
-| `chalk_magenta` | 844 |  |
-| `chalk_orange` | 843 |  |
-| `chalk_pink` | 842 |  |
-| `chalk_purple` | 841 |  |
-| `chalk_red` | 840 |  |
-| `chalk_white` | 839 |  |
-| `chalk_yellow` | 838 |  |
-| `charge_vault_side` | 1112 |  |
-| `charge_vault_top` | 1111 |  |
-| `charging_pad_side` | 1157 |  |
-| `charging_pad_top` | 1156 |  |
+| `chalk` | 839 |  |
+| `chalk_black` | 855 |  |
+| `chalk_blue` | 854 |  |
+| `chalk_bricks_black` | 871 |  |
+| `chalk_bricks_blue` | 870 |  |
+| `chalk_bricks_brown` | 869 |  |
+| `chalk_bricks_cyan` | 868 |  |
+| `chalk_bricks_gray` | 867 |  |
+| `chalk_bricks_green` | 866 |  |
+| `chalk_bricks_light_blue` | 865 |  |
+| `chalk_bricks_light_gray` | 864 |  |
+| `chalk_bricks_lime` | 863 |  |
+| `chalk_bricks_magenta` | 862 |  |
+| `chalk_bricks_orange` | 861 |  |
+| `chalk_bricks_pink` | 860 |  |
+| `chalk_bricks_purple` | 859 |  |
+| `chalk_bricks_red` | 858 |  |
+| `chalk_bricks_slab_side_black` | 887 |  |
+| `chalk_bricks_slab_side_blue` | 886 |  |
+| `chalk_bricks_slab_side_brown` | 885 |  |
+| `chalk_bricks_slab_side_cyan` | 884 |  |
+| `chalk_bricks_slab_side_gray` | 883 |  |
+| `chalk_bricks_slab_side_green` | 882 |  |
+| `chalk_bricks_slab_side_light_blue` | 881 |  |
+| `chalk_bricks_slab_side_light_gray` | 880 |  |
+| `chalk_bricks_slab_side_lime` | 879 |  |
+| `chalk_bricks_slab_side_magenta` | 878 |  |
+| `chalk_bricks_slab_side_orange` | 877 |  |
+| `chalk_bricks_slab_side_pink` | 876 |  |
+| `chalk_bricks_slab_side_purple` | 875 |  |
+| `chalk_bricks_slab_side_red` | 874 |  |
+| `chalk_bricks_slab_side_white` | 873 |  |
+| `chalk_bricks_slab_side_yellow` | 872 |  |
+| `chalk_bricks_white` | 857 |  |
+| `chalk_bricks_yellow` | 856 |  |
+| `chalk_brown` | 853 |  |
+| `chalk_cyan` | 852 |  |
+| `chalk_gray` | 851 |  |
+| `chalk_green` | 850 |  |
+| `chalk_light_blue` | 849 |  |
+| `chalk_light_gray` | 848 |  |
+| `chalk_lime` | 847 |  |
+| `chalk_magenta` | 846 |  |
+| `chalk_orange` | 845 |  |
+| `chalk_pink` | 844 |  |
+| `chalk_purple` | 843 |  |
+| `chalk_red` | 842 |  |
+| `chalk_white` | 841 |  |
+| `chalk_yellow` | 840 |  |
+| `charge_vault_side` | 1114 |  |
+| `charge_vault_top` | 1113 |  |
+| `charging_pad_side` | 1159 |  |
+| `charging_pad_top` | 1158 |  |
 | `checkpoint_block` | 761 | 旋转族（4副本） |
 | `cherry_block_bottom` | 590 |  |
 | `cherry_block_side` | 588 |  |
 | `cherry_block_top` | 589 |  |
 | `chest_back` | 347 |  |
+| `chest_double_back_hi` | 1219 |  |
+| `chest_double_back_lo` | 1218 |  |
+| `chest_double_front_hi` | 1213 |  |
+| `chest_double_front_lo` | 1212 |  |
+| `chest_double_top_1_hi` | 1215 |  |
+| `chest_double_top_1_lo` | 1214 |  |
+| `chest_double_top_2_hi` | 1217 |  |
+| `chest_double_top_2_lo` | 1216 |  |
 | `chest_front` | 341 |  |
 | `chest_side` | 342 |  |
 | `chest_top` | 343 | 旋转族（4副本） |
@@ -1993,46 +2001,46 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `chiseled_sandstone` | 325 |  |
 | `clay` | 195 |  |
 | `coal_block` | 233 |  |
-| `coal_deposit` | 1030 |  |
+| `coal_deposit` | 1032 |  |
 | `coal_ore` | 227 |  |
 | `coarse_dirt` | 191 |  |
 | `coconut_block_bottom` | 522 |  |
 | `coconut_block_side` | 520 |  |
 | `coconut_block_top` | 521 |  |
 | `code_block` | 679 |  |
-| `comet_heart` | 1168 |  |
-| `comet_ore` | 1167 |  |
+| `comet_heart` | 1170 |  |
+| `comet_ore` | 1169 |  |
 | `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1079 |  |
-| `conveyor_belt_slab_side` | 1078 |  |
-| `conveyor_belt_top` | 1077 |  |
-| `conveyor_belt_turn_left` | 1169 |  |
-| `conveyor_belt_turn_right` | 1170 |  |
-| `copper_deposit` | 1033 |  |
-| `copper_ore` | 1038 |  |
+| `conveyor_belt_bottom` | 1081 |  |
+| `conveyor_belt_slab_side` | 1080 |  |
+| `conveyor_belt_top` | 1079 |  |
+| `conveyor_belt_turn_left` | 1171 |  |
+| `conveyor_belt_turn_right` | 1172 |  |
+| `copper_deposit` | 1035 |  |
+| `copper_ore` | 1040 |  |
 | `corn_block_bottom` | 594 |  |
 | `corn_block_side` | 592 |  |
 | `corn_block_top` | 593 |  |
 | `crafting_table_side` | 338 |  |
 | `crafting_table_top` | 339 |  |
-| `crate` | 916 |  |
-| `crop_harvester_back` | 1190 |  |
+| `crate` | 918 |  |
+| `crop_harvester_back` | 1192 |  |
 | `crop_harvester_back_running` | 45 | 动画（4帧） |
-| `crop_harvester_front` | 1184 |  |
-| `crop_harvester_side` | 1185 |  |
+| `crop_harvester_front` | 1186 |  |
+| `crop_harvester_side` | 1187 |  |
 | `crop_harvester_side_running` | 44 | 动画（4帧） |
-| `crop_harvester_top` | 1186 | 旋转族（4副本） |
-| `crusher_back` | 1053 |  |
-| `crusher_front` | 1047 |  |
-| `crusher_side` | 1048 |  |
+| `crop_harvester_top` | 1188 | 旋转族（4副本） |
+| `crusher_back` | 1055 |  |
+| `crusher_front` | 1049 |  |
+| `crusher_side` | 1050 |  |
 | `crusher_side_running` | 28 | 动画（4帧） |
-| `crusher_top` | 1049 | 旋转族（4副本） |
-| `crystal_block` | 1027 |  |
-| `crystal_vat_back` | 1164 |  |
-| `crystal_vat_front` | 1158 |  |
-| `crystal_vat_side` | 1159 |  |
+| `crusher_top` | 1051 | 旋转族（4副本） |
+| `crystal_block` | 1029 |  |
+| `crystal_vat_back` | 1166 |  |
+| `crystal_vat_front` | 1160 |  |
+| `crystal_vat_side` | 1161 |  |
 | `crystal_vat_side_running` | 42 | 动画（4帧） |
-| `crystal_vat_top` | 1160 | 旋转族（4副本） |
+| `crystal_vat_top` | 1162 | 旋转族（4副本） |
 | `custom_lobby_block_side` | 769 |  |
 | `custom_lobby_block_top` | 765 | 旋转族（4副本） |
 | `cut_red_sandstone` | 457 |  |
@@ -2047,18 +2055,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `cyan_spawn_block_side` | 745 |  |
 | `cyan_spawn_block_top` | 741 | 旋转族（4副本） |
 | `dark_green_bricks` | 460 |  |
-| `darkstone` | 1204 |  |
-| `darkstone_bricks` | 1205 |  |
-| `darkstone_bricks_cracked` | 1206 |  |
-| `darkstone_bricks_lava` | 1207 |  |
-| `darkstone_engraved` | 1208 |  |
-| `darkstone_smooth` | 1209 |  |
-| `deep_drill_back` | 1138 |  |
-| `deep_drill_bottom` | 1137 |  |
-| `deep_drill_front` | 1131 |  |
-| `deep_drill_side` | 1132 |  |
+| `darkstone` | 1206 |  |
+| `darkstone_bricks` | 1207 |  |
+| `darkstone_bricks_cracked` | 1208 |  |
+| `darkstone_bricks_lava` | 1209 |  |
+| `darkstone_engraved` | 1210 |  |
+| `darkstone_smooth` | 1211 |  |
+| `deep_drill_back` | 1140 |  |
+| `deep_drill_bottom` | 1139 |  |
+| `deep_drill_front` | 1133 |  |
+| `deep_drill_side` | 1134 |  |
 | `deep_drill_side_running` | 39 | 动画（4帧） |
-| `deep_drill_top` | 1133 | 旋转族（4副本） |
+| `deep_drill_top` | 1135 | 旋转族（4副本） |
 | `diamond_block` | 340 |  |
 | `diamond_gen_spawn_side` | 807 |  |
 | `diamond_gen_spawn_top` | 806 |  |
@@ -2067,23 +2075,23 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `dirt` | 190 |  |
 | `drop_location_block_side` | 814 |  |
 | `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1036 |  |
-| `dry_grass_block` | 978 |  |
-| `dry_grass_block_side` | 977 |  |
-| `electric_drill_back` | 1097 |  |
-| `electric_drill_bottom` | 1096 |  |
-| `electric_drill_front` | 1090 |  |
-| `electric_drill_side` | 1091 |  |
+| `drop_pad` | 1038 |  |
+| `dry_grass_block` | 980 |  |
+| `dry_grass_block_side` | 979 |  |
+| `electric_drill_back` | 1099 |  |
+| `electric_drill_bottom` | 1098 |  |
+| `electric_drill_front` | 1092 |  |
+| `electric_drill_side` | 1093 |  |
 | `electric_drill_side_running` | 34 | 动画（4帧） |
-| `electric_drill_top` | 1092 | 旋转族（4副本） |
+| `electric_drill_top` | 1094 | 旋转族（4副本） |
 | `emerald_block` | 237 |  |
 | `emerald_ore` | 231 |  |
 | `end_stone` | 226 |  |
 | `engraved_andesite` | 464 |  |
 | `engraved_diorite` | 462 |  |
 | `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1020 |  |
-| `evil_lucky_block_face` | 1021 |  |
+| `evil_lucky_block` | 1022 |  |
+| `evil_lucky_block_face` | 1023 |  |
 | `explosive_paint_black_side` | 626 |  |
 | `explosive_paint_black_top` | 627 |  |
 | `explosive_paint_blue_side` | 624 |  |
@@ -2168,29 +2176,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `fallen_cherry_leaves_side` | 586 |  |
 | `fallen_maple_leaves_side` | 478 |  |
 | `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1155 |  |
-| `fast_belt_top` | 1154 |  |
-| `fast_belt_turn_left` | 1171 |  |
-| `fast_belt_turn_right` | 1172 |  |
-| `fertilised_soil` | 924 |  |
+| `fast_belt_slab_side` | 1157 |  |
+| `fast_belt_top` | 1156 |  |
+| `fast_belt_turn_left` | 1173 |  |
+| `fast_belt_turn_right` | 1174 |  |
+| `fertilised_soil` | 926 |  |
 | `finish_block` | 812 |  |
 | `fireball_block` | 539 |  |
-| `food_lucky_block` | 1005 |  |
-| `food_lucky_block_rare` | 1007 |  |
-| `food_lucky_block_super` | 1009 |  |
-| `forge_hopper_top` | 1166 |  |
+| `food_lucky_block` | 1007 |  |
+| `food_lucky_block_rare` | 1009 |  |
+| `food_lucky_block_super` | 1011 |  |
+| `forge_hopper_top` | 1168 |  |
 | `furnace_front` | 335 |  |
 | `furnace_side` | 336 |  |
 | `furnace_top` | 337 |  |
-| `generator_side` | 1061 |  |
+| `generator_side` | 1063 |  |
 | `generator_side_running` | 30 | 动画（4帧） |
-| `generator_top` | 1062 |  |
-| `ghost_chest_back` | 954 |  |
-| `ghost_chest_front` | 951 |  |
-| `ghost_chest_side` | 952 |  |
-| `ghost_chest_top` | 953 |  |
-| `ghost_lucky_block` | 955 |  |
-| `ghost_mystery_block` | 956 |  |
+| `generator_top` | 1064 |  |
+| `ghost_chest_back` | 956 |  |
+| `ghost_chest_front` | 953 |  |
+| `ghost_chest_side` | 954 |  |
+| `ghost_chest_top` | 955 |  |
+| `ghost_lucky_block` | 957 |  |
+| `ghost_mystery_block` | 958 |  |
 | `glass` | 294 |  |
 | `glass_black` | 295 |  |
 | `glass_blue` | 296 |  |
@@ -2211,7 +2219,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `glass_yellow` | 310 |  |
 | `glowstone` | 331 |  |
 | `gold_block` | 235 |  |
-| `gold_deposit` | 1034 |  |
+| `gold_deposit` | 1036 |  |
 | `gold_ore` | 229 |  |
 | `granite_brick` | 467 |  |
 | `grass_block_side` | 192 |  |
@@ -2229,9 +2237,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `green_bricks` | 459 |  |
 | `green_concrete` | 285 |  |
 | `green_glazed_terracotta` | 421 | 旋转族（4副本） |
-| `green_lucky_block` | 1004 |  |
-| `green_lucky_block_rare` | 1006 |  |
-| `green_lucky_block_super` | 1008 |  |
+| `green_lucky_block` | 1006 |  |
+| `green_lucky_block_rare` | 1008 |  |
+| `green_lucky_block_super` | 1010 |  |
 | `green_planks` | 364 |  |
 | `green_portal` | 7 | 动画（4帧） |
 | `green_spawn_block_side` | 735 |  |
@@ -2239,7 +2247,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `green_stone` | 458 |  |
 | `grenade_block` | 581 |  |
 | `grey_portal` | 8 | 动画（4帧） |
-| `gun_lucky_block` | 950 |  |
+| `gun_lucky_block` | 952 |  |
 | `hardened_clay` | 254 |  |
 | `hardened_clay_stained_black` | 270 |  |
 | `hardened_clay_stained_blue` | 266 |  |
@@ -2257,18 +2265,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `hardened_clay_stained_silver` | 263 |  |
 | `hardened_clay_stained_white` | 255 |  |
 | `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 967 |  |
-| `harvester_lunite_bottom` | 975 |  |
-| `harvester_lunite_side_0` | 972 |  |
-| `harvester_lunite_side_1` | 973 |  |
-| `harvester_lunite_top` | 974 |  |
-| `harvester_side0` | 964 |  |
-| `harvester_side1` | 965 |  |
-| `harvester_top` | 966 |  |
+| `harvester_bottom` | 969 |  |
+| `harvester_lunite_bottom` | 977 |  |
+| `harvester_lunite_side_0` | 974 |  |
+| `harvester_lunite_side_1` | 975 |  |
+| `harvester_lunite_top` | 976 |  |
+| `harvester_side0` | 966 |  |
+| `harvester_side1` | 967 |  |
+| `harvester_top` | 968 |  |
 | `hay_block_side` | 328 |  |
-| `homestead_core` | 1035 |  |
-| `homestead_core_cap` | 1120 |  |
-| `homestead_core_crown` | 1119 |  |
+| `homestead_core` | 1037 |  |
+| `homestead_core_cap` | 1122 |  |
+| `homestead_core_crown` | 1121 |  |
 | `homestead_core_mid` | 26 | 动画（4帧） |
 | `hyper_compressed_messy_stone` | 533 |  |
 | `ice` | 326 |  |
@@ -2276,44 +2284,44 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `iceball_block` | 540 |  |
 | `invisible_solid` | 314 |  |
 | `iron_block` | 234 |  |
-| `iron_chest_back` | 915 |  |
-| `iron_chest_front` | 909 |  |
-| `iron_chest_side` | 910 |  |
-| `iron_chest_top` | 911 | 旋转族（4副本） |
-| `iron_deposit` | 1031 |  |
+| `iron_chest_back` | 917 |  |
+| `iron_chest_front` | 911 |  |
+| `iron_chest_side` | 912 |  |
+| `iron_chest_top` | 913 | 旋转族（4副本） |
+| `iron_deposit` | 1033 |  |
 | `iron_ore` | 228 |  |
 | `iron_watermelon_side` | 546 |  |
 | `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 887 |  |
-| `jungle_grass_block_side` | 886 |  |
+| `jungle_grass_block` | 889 |  |
+| `jungle_grass_block_side` | 888 |  |
 | `lapis_block` | 236 |  |
 | `lapis_ore` | 230 |  |
 | `lava` | 1 | 动画（8帧） |
-| `leather_block_side` | 906 |  |
-| `leather_block_top` | 907 |  |
+| `leather_block_side` | 908 |  |
+| `leather_block_top` | 909 |  |
 | `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 908 |  |
+| `leaves_aspen_autumn` | 910 |  |
 | `leaves_cedar` | 470 |  |
 | `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 904 |  |
+| `leaves_cherry_fruity` | 906 |  |
 | `leaves_jungle` | 290 |  |
-| `leaves_mango` | 892 |  |
-| `leaves_mango_fruity` | 905 |  |
+| `leaves_mango` | 894 |  |
+| `leaves_mango_fruity` | 907 |  |
 | `leaves_maple` | 289 |  |
 | `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 899 |  |
+| `leaves_maple_fruity` | 901 |  |
 | `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 902 |  |
+| `leaves_palm_fruity` | 904 |  |
 | `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 903 |  |
+| `leaves_pear_fruity` | 905 |  |
 | `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 900 |  |
+| `leaves_pine_cone` | 902 |  |
 | `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 901 |  |
-| `leaves_spectral` | 830 |  |
+| `leaves_plum_fruity` | 903 |  |
+| `leaves_spectral` | 831 |  |
 | `light_blue_concrete` | 277 |  |
 | `light_blue_glazed_terracotta` | 381 | 旋转族（4副本） |
-| `light_blue_lucky_block` | 931 |  |
+| `light_blue_lucky_block` | 933 |  |
 | `light_blue_planks` | 354 |  |
 | `light_blue_spawn_block_side` | 730 |  |
 | `light_blue_spawn_block_top` | 726 | 旋转族（4副本） |
@@ -2333,26 +2341,26 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `lime_portal` | 11 | 动画（4帧） |
 | `lime_spawn_block_side` | 720 |  |
 | `lime_spawn_block_top` | 716 | 旋转族（4副本） |
-| `log_ancient_maple` | 1019 |  |
+| `log_ancient_maple` | 1021 |  |
 | `log_aspen` | 202 |  |
 | `log_cedar` | 201 |  |
 | `log_cherry` | 582 |  |
 | `log_jungle` | 203 |  |
-| `log_mango` | 889 |  |
+| `log_mango` | 891 |  |
 | `log_maple` | 198 |  |
 | `log_palm` | 472 |  |
 | `log_pear` | 523 |  |
 | `log_pine` | 199 |  |
 | `log_plum` | 200 |  |
-| `log_spectral` | 827 |  |
-| `lucky_block_pink_question` | 957 |  |
-| `lucky_block_pink_question_rare` | 1011 |  |
-| `lucky_block_pink_question_super` | 1013 |  |
-| `lunite_block` | 969 |  |
-| `lunite_ore` | 968 |  |
-| `machine_bench_side` | 1113 |  |
-| `machine_bench_top` | 1114 |  |
-| `machine_side` | 1037 |  |
+| `log_spectral` | 828 |  |
+| `lucky_block_pink_question` | 959 |  |
+| `lucky_block_pink_question_rare` | 1013 |  |
+| `lucky_block_pink_question_super` | 1015 |  |
+| `lunite_block` | 971 |  |
+| `lunite_ore` | 970 |  |
+| `machine_bench_side` | 1115 |  |
+| `machine_bench_top` | 1116 |  |
+| `machine_side` | 1039 |  |
 | `magenta_concrete` | 279 |  |
 | `magenta_glazed_terracotta` | 377 | 旋转族（4副本） |
 | `magenta_planks` | 353 |  |
@@ -2363,16 +2371,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `mailbox_front` | 571 |  |
 | `mailbox_front_full` | 573 |  |
 | `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 896 |  |
-| `mango_block_side` | 894 |  |
-| `mango_block_top` | 895 |  |
+| `mango_block_bottom` | 898 |  |
+| `mango_block_side` | 896 |  |
+| `mango_block_top` | 897 |  |
 | `mega_compressed_messy_stone` | 535 |  |
 | `melon_side` | 544 |  |
 | `melon_top` | 545 |  |
 | `melting_ice` | 595 |  |
 | `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 822 |  |
+| `mob_spawner_block_empty_side` | 823 |  |
 | `mob_spawner_block_top` | 821 |  |
+| `mob_spawner_hostile_block_side` | 822 |  |
+| `mob_spawner_neutral_block_side` | 838 |  |
 | `mob_spawner_passive_block_side` | 820 |  |
 | `moonstone_block` | 450 |  |
 | `moonstone_chest_back` | 449 |  |
@@ -2387,22 +2397,22 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `mossy_cobblestone` | 438 |  |
 | `mushroom_stem` | 538 |  |
 | `mystery_block` | 578 |  |
-| `neon_black` | 949 |  |
-| `neon_blue` | 948 |  |
-| `neon_brown` | 947 |  |
-| `neon_cyan` | 946 |  |
-| `neon_gray` | 945 |  |
-| `neon_green` | 944 |  |
-| `neon_light_blue` | 943 |  |
-| `neon_light_gray` | 942 |  |
-| `neon_lime` | 941 |  |
-| `neon_magenta` | 940 |  |
-| `neon_orange` | 939 |  |
-| `neon_pink` | 938 |  |
-| `neon_purple` | 937 |  |
-| `neon_red` | 936 |  |
-| `neon_white` | 935 |  |
-| `neon_yellow` | 934 |  |
+| `neon_black` | 951 |  |
+| `neon_blue` | 950 |  |
+| `neon_brown` | 949 |  |
+| `neon_cyan` | 948 |  |
+| `neon_gray` | 947 |  |
+| `neon_green` | 946 |  |
+| `neon_light_blue` | 945 |  |
+| `neon_light_gray` | 944 |  |
+| `neon_lime` | 943 |  |
+| `neon_magenta` | 942 |  |
+| `neon_orange` | 941 |  |
+| `neon_pink` | 940 |  |
+| `neon_purple` | 939 |  |
+| `neon_red` | 938 |  |
+| `neon_white` | 937 |  |
+| `neon_yellow` | 936 |  |
 | `nether_brick` | 317 |  |
 | `netherrack` | 318 |  |
 | `obby_absorb_block` | 816 |  |
@@ -2411,18 +2421,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `obsidian` | 327 |  |
 | `orange_concrete` | 280 |  |
 | `orange_glazed_terracotta` | 373 | 旋转族（4副本） |
-| `orange_lucky_block` | 998 |  |
-| `orange_lucky_block_rare` | 1000 |  |
-| `orange_lucky_block_super` | 1002 |  |
+| `orange_lucky_block` | 1000 |  |
+| `orange_lucky_block_rare` | 1002 |  |
+| `orange_lucky_block_super` | 1004 |  |
 | `orange_planks` | 352 |  |
 | `orange_portal` | 13 | 动画（4帧） |
 | `orange_spawn_block_side` | 710 |  |
 | `orange_spawn_block_top` | 706 | 旋转族（4副本） |
 | `ore_gen_spawn_side` | 811 |  |
 | `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 825 |  |
-| `parts_bench_side` | 1115 |  |
-| `parts_bench_top` | 1116 |  |
+| `packed_snow` | 826 |  |
+| `parts_bench_side` | 1117 |  |
+| `parts_bench_top` | 1118 |  |
 | `patterned_glass_black` | 548 |  |
 | `patterned_glass_blue` | 549 |  |
 | `patterned_glass_brown` | 550 |  |
@@ -2442,11 +2452,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `pear_block_bottom` | 529 |  |
 | `pear_block_side` | 527 |  |
 | `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 958 |  |
-| `pine_cone_block_side` | 835 |  |
-| `pine_cone_block_top` | 836 |  |
-| `pine_grass_block` | 833 |  |
-| `pine_grass_block_side` | 832 |  |
+| `pet_lucky_block` | 960 |  |
+| `pine_cone_block_side` | 836 |  |
+| `pine_cone_block_top` | 837 |  |
+| `pine_grass_block` | 834 |  |
+| `pine_grass_block_side` | 833 |  |
 | `pink_concrete` | 281 |  |
 | `pink_gen_spawn_coal` | 789 |  |
 | `pink_gen_spawn_iron` | 790 |  |
@@ -2460,69 +2470,69 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `planks_cedar` | 209 |  |
 | `planks_cherry` | 584 |  |
 | `planks_jungle` | 207 |  |
-| `planks_mango` | 891 |  |
+| `planks_mango` | 893 |  |
 | `planks_maple` | 204 |  |
 | `planks_palm` | 473 |  |
 | `planks_pear` | 524 |  |
 | `planks_pine` | 208 |  |
 | `planks_plum` | 206 |  |
-| `planks_spectral` | 829 |  |
+| `planks_spectral` | 830 |  |
 | `plum_block_bottom` | 519 |  |
 | `plum_block_side` | 517 |  |
 | `plum_block_top` | 518 |  |
 | `podzol_top` | 452 |  |
-| `potato_block` | 920 |  |
-| `potion_lucky_block` | 1010 |  |
-| `potion_lucky_block_rare` | 1012 |  |
-| `potion_lucky_block_super` | 1014 |  |
-| `press_back` | 1069 |  |
-| `press_front` | 1063 |  |
-| `press_side` | 1064 |  |
+| `potato_block` | 922 |  |
+| `potion_lucky_block` | 1012 |  |
+| `potion_lucky_block_rare` | 1014 |  |
+| `potion_lucky_block_super` | 1016 |  |
+| `press_back` | 1071 |  |
+| `press_front` | 1065 |  |
+| `press_side` | 1066 |  |
 | `press_side_running` | 31 | 动画（4帧） |
-| `press_top` | 1065 | 旋转族（4副本） |
+| `press_top` | 1067 | 旋转族（4副本） |
 | `protector` | 348 |  |
 | `protector_faction` | 575 |  |
 | `protector_tribe` | 574 |  |
 | `pumpkin_face_on` | 291 |  |
 | `pumpkin_side` | 541 |  |
 | `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1022 |  |
-| `pure_copper_ore` | 1202 |  |
-| `pure_diamond_ore` | 1025 |  |
-| `pure_gold_ore` | 1024 |  |
-| `pure_iron_ore` | 1023 |  |
-| `pure_moonstone_ore` | 1026 |  |
-| `pure_voltite_ore` | 1203 |  |
+| `pure_coal_ore` | 1024 |  |
+| `pure_copper_ore` | 1204 |  |
+| `pure_diamond_ore` | 1027 |  |
+| `pure_gold_ore` | 1026 |  |
+| `pure_iron_ore` | 1025 |  |
+| `pure_moonstone_ore` | 1028 |  |
+| `pure_voltite_ore` | 1205 |  |
 | `purple_concrete` | 282 |  |
 | `purple_glazed_terracotta` | 409 | 旋转族（4副本） |
-| `purple_lucky_block` | 986 |  |
-| `purple_lucky_block_rare` | 988 |  |
-| `purple_lucky_block_super` | 990 |  |
+| `purple_lucky_block` | 988 |  |
+| `purple_lucky_block_rare` | 990 |  |
+| `purple_lucky_block_super` | 992 |  |
 | `purple_planks` | 361 |  |
 | `purple_portal` | 15 | 动画（4帧） |
 | `purple_spawn_block_side` | 700 |  |
 | `purple_spawn_block_top` | 696 | 旋转族（4副本） |
 | `quartz_block_chiseled` | 320 |  |
 | `quartz_block_side` | 319 |  |
-| `radar_bottom` | 927 |  |
+| `radar_bottom` | 929 |  |
 | `radar_screen` | 19 | 动画（4帧）旋转族（4副本） |
-| `radar_side_active` | 925 |  |
-| `radar_side_inactive` | 928 |  |
-| `radar_top_active` | 926 |  |
-| `radar_top_inactive` | 929 |  |
-| `recycler_back` | 1179 |  |
-| `recycler_front` | 1173 |  |
-| `recycler_side` | 1174 |  |
+| `radar_side_active` | 927 |  |
+| `radar_side_inactive` | 930 |  |
+| `radar_top_active` | 928 |  |
+| `radar_top_inactive` | 931 |  |
+| `recycler_back` | 1181 |  |
+| `recycler_front` | 1175 |  |
+| `recycler_side` | 1176 |  |
 | `recycler_side_running` | 43 | 动画（4帧） |
-| `recycler_top` | 1175 | 旋转族（4副本） |
+| `recycler_top` | 1177 | 旋转族（4副本） |
 | `red_concrete` | 283 |  |
 | `red_gen_spawn_coal` | 771 |  |
 | `red_gen_spawn_iron` | 772 |  |
 | `red_gen_spawn_top` | 770 |  |
 | `red_glazed_terracotta` | 425 | 旋转族（4副本） |
-| `red_lucky_block` | 932 |  |
-| `red_lucky_block_rare` | 982 |  |
-| `red_lucky_block_super` | 984 |  |
+| `red_lucky_block` | 934 |  |
+| `red_lucky_block_rare` | 984 |  |
+| `red_lucky_block_super` | 986 |  |
 | `red_mushroom_block` | 537 |  |
 | `red_planks` | 365 |  |
 | `red_portal` | 16 | 动画（4帧） |
@@ -2536,29 +2546,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `redstone_lamp_on` | 312 |  |
 | `rocket_block` | 579 |  |
 | `rocky_dirt` | 476 |  |
-| `rope_block` | 1028 |  |
+| `rope_block` | 1030 |  |
 | `sand` | 194 |  |
 | `sandstone_brick` | 461 |  |
 | `sandstone_normal` | 225 |  |
 | `sandstone_top` | 324 |  |
-| `scorpion_eggs` | 1210 |  |
-| `shatter_mill_back` | 1145 |  |
-| `shatter_mill_front` | 1139 |  |
-| `shatter_mill_side` | 1140 |  |
+| `scorpion_eggs` | 1220 |  |
+| `shatter_mill_back` | 1147 |  |
+| `shatter_mill_front` | 1141 |  |
+| `shatter_mill_side` | 1142 |  |
 | `shatter_mill_side_running` | 40 | 动画（4帧） |
-| `shatter_mill_top` | 1141 | 旋转族（4副本） |
+| `shatter_mill_top` | 1143 | 旋转族（4副本） |
 | `shop_trader_spawn_face` | 799 |  |
 | `shop_trader_spawn_side` | 798 |  |
 | `shop_trader_spawn_top` | 794 | 旋转族（4副本） |
 | `shop_wizard_spawn_face` | 805 |  |
 | `shop_wizard_spawn_side` | 804 |  |
 | `shop_wizard_spawn_top` | 800 | 旋转族（4副本） |
-| `sky_tap_back` | 1153 |  |
-| `sky_tap_bottom` | 1152 |  |
-| `sky_tap_front` | 1146 |  |
-| `sky_tap_side` | 1147 |  |
+| `sky_tap_back` | 1155 |  |
+| `sky_tap_bottom` | 1154 |  |
+| `sky_tap_front` | 1148 |  |
+| `sky_tap_side` | 1149 |  |
 | `sky_tap_side_running` | 41 | 动画（4帧） |
-| `sky_tap_top` | 1148 | 旋转族（4副本） |
+| `sky_tap_top` | 1150 | 旋转族（4副本） |
 | `slab_andesite_brick_side` | 498 |  |
 | `slab_aspen_side` | 483 |  |
 | `slab_brick_side` | 515 |  |
@@ -2571,21 +2581,21 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_cut_sandstone_side` | 509 |  |
 | `slab_diorite_brick_side` | 502 |  |
 | `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 979 |  |
+| `slab_dry_grass_top_side` | 981 |  |
 | `slab_engraved_andesite_side` | 497 |  |
 | `slab_engraved_diorite_side` | 501 |  |
 | `slab_engraved_granite_side` | 505 |  |
 | `slab_granite_brick_side` | 506 |  |
 | `slab_grass_top_side` | 487 |  |
 | `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 888 |  |
+| `slab_jungle_grass_top_side` | 890 |  |
 | `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 893 |  |
+| `slab_mango_side` | 895 |  |
 | `slab_maple_side` | 479 |  |
 | `slab_mossy_cobblestone_side` | 493 |  |
 | `slab_palm_side` | 485 |  |
 | `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 834 |  |
+| `slab_pine_grass_top_side` | 835 |  |
 | `slab_pine_side` | 480 |  |
 | `slab_plum_side` | 481 |  |
 | `slab_red_sandstone_brick_side` | 514 |  |
@@ -2593,7 +2603,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_sandstone_brick_side` | 510 |  |
 | `slab_sandstone_normal_side` | 507 |  |
 | `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 831 |  |
+| `slab_spectral_side` | 832 |  |
 | `slab_stone_andesite_side` | 495 |  |
 | `slab_stone_andesite_smooth_side` | 496 |  |
 | `slab_stone_diorite_side` | 499 |  |
@@ -2604,29 +2614,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_stonebrick_carved_side` | 491 |  |
 | `slab_stonebrick_mossy_side` | 494 |  |
 | `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1060 |  |
-| `smelter_front` | 1054 |  |
-| `smelter_side` | 1055 |  |
+| `smelter_back` | 1062 |  |
+| `smelter_front` | 1056 |  |
+| `smelter_side` | 1057 |  |
 | `smelter_side_running` | 29 | 动画（4帧） |
-| `smelter_top` | 1056 | 旋转族（4副本） |
+| `smelter_top` | 1058 | 旋转族（4副本） |
 | `smoke` | 23 | 动画（4帧） |
 | `smooth_stone` | 218 |  |
 | `snow` | 197 |  |
-| `snowy_messy_stone` | 823 |  |
-| `snowy_messy_stone_side` | 824 |  |
-| `solar_panel_bottom` | 963 |  |
-| `solar_panel_side` | 961 |  |
-| `solar_panel_top` | 962 |  |
-| `sorting_gate_slab_side` | 1106 |  |
-| `sorting_gate_top` | 1105 |  |
-| `splitter_slab_side` | 1081 |  |
-| `splitter_top` | 1080 |  |
+| `snowy_messy_stone` | 824 |  |
+| `snowy_messy_stone_side` | 825 |  |
+| `solar_panel_bottom` | 965 |  |
+| `solar_panel_side` | 963 |  |
+| `solar_panel_top` | 964 |  |
+| `sorting_gate_slab_side` | 1108 |  |
+| `sorting_gate_top` | 1107 |  |
+| `splitter_slab_side` | 1083 |  |
+| `splitter_top` | 1082 |  |
 | `sponge` | 329 |  |
-| `starframe` | 1165 |  |
+| `starframe` | 1167 |  |
 | `stone` | 217 |  |
 | `stone_andesite` | 221 |  |
 | `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1032 |  |
+| `stone_deposit` | 1034 |  |
 | `stone_diorite` | 219 |  |
 | `stone_diorite_smooth` | 220 |  |
 | `stone_granite` | 223 |  |
@@ -2635,49 +2645,49 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `stonebrick_carved` | 321 |  |
 | `stonebrick_cracked` | 323 |  |
 | `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1110 |  |
-| `storage_silo_top` | 1109 |  |
+| `storage_silo_side` | 1112 |  |
+| `storage_silo_top` | 1111 |  |
 | `stripped_aspen_log` | 211 |  |
 | `stripped_cedar_log` | 215 |  |
 | `stripped_cherry_log` | 583 |  |
 | `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 890 |  |
+| `stripped_mango_log` | 892 |  |
 | `stripped_maple_log` | 210 |  |
 | `stripped_palm_log` | 576 |  |
 | `stripped_pear_log` | 577 |  |
 | `stripped_pine_log` | 214 |  |
 | `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 828 |  |
+| `stripped_spectral_log` | 829 |  |
 | `super_compressed_messy_stone` | 532 |  |
 | `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1117 |  |
-| `tool_bench_top` | 1118 |  |
-| `tools_lucky_block` | 999 |  |
-| `tools_lucky_block_rare` | 1001 |  |
-| `tools_lucky_block_super` | 1003 |  |
+| `tool_bench_side` | 1119 |  |
+| `tool_bench_top` | 1120 |  |
+| `tools_lucky_block` | 1001 |  |
+| `tools_lucky_block_rare` | 1003 |  |
+| `tools_lucky_block_super` | 1005 |  |
 | `toxic_waste` | 25 | 动画（8帧） |
-| `toxic_waste_barrel_bottom` | 1018 |  |
-| `toxic_waste_barrel_side` | 1017 |  |
+| `toxic_waste_barrel_bottom` | 1020 |  |
+| `toxic_waste_barrel_side` | 1019 |  |
 | `toxic_waste_barrel_top` | 24 | 动画（4帧） |
 | `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1127 |  |
+| `tree_cutter_back` | 1129 |  |
 | `tree_cutter_back_running` | 37 | 动画（4帧） |
-| `tree_cutter_front` | 1121 |  |
-| `tree_cutter_side` | 1122 |  |
+| `tree_cutter_front` | 1123 |  |
+| `tree_cutter_side` | 1124 |  |
 | `tree_cutter_side_running` | 36 | 动画（4帧） |
-| `tree_cutter_top` | 1123 | 旋转族（4副本） |
+| `tree_cutter_top` | 1125 | 旋转族（4副本） |
 | `ultra_compressed_messy_stone` | 534 |  |
 | `unloaded` | 189 |  |
-| `volt_engine_side` | 1129 |  |
+| `volt_engine_side` | 1131 |  |
 | `volt_engine_side_running` | 38 | 动画（4帧） |
-| `volt_engine_top` | 1130 |  |
-| `voltite_deposit` | 1128 |  |
-| `voltite_ore` | 1082 |  |
+| `volt_engine_top` | 1132 |  |
+| `voltite_deposit` | 1130 |  |
+| `voltite_ore` | 1084 |  |
 | `watermelon_side` | 292 |  |
 | `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 933 |  |
-| `weapon_lucky_block_rare` | 983 |  |
-| `weapon_lucky_block_super` | 985 |  |
+| `weapon_lucky_block` | 935 |  |
+| `weapon_lucky_block_rare` | 985 |  |
+| `weapon_lucky_block_super` | 987 |  |
 | `white_concrete` | 284 |  |
 | `white_gen_spawn_coal` | 786 |  |
 | `white_gen_spawn_iron` | 787 |  |
@@ -2687,11 +2697,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `white_portal` | 17 | 动画（4帧） |
 | `white_spawn_block_side` | 690 |  |
 | `white_spawn_block_top` | 686 | 旋转族（4副本） |
-| `wire_mill_back` | 1076 |  |
-| `wire_mill_front` | 1070 |  |
-| `wire_mill_side` | 1071 |  |
+| `wire_mill_back` | 1078 |  |
+| `wire_mill_front` | 1072 |  |
+| `wire_mill_side` | 1073 |  |
 | `wire_mill_side_running` | 32 | 动画（4帧） |
-| `wire_mill_top` | 1072 | 旋转族（4副本） |
+| `wire_mill_top` | 1074 | 旋转族（4副本） |
 | `wool_colored_black` | 253 |  |
 | `wool_colored_blue` | 249 |  |
 | `wool_colored_brown` | 250 |  |
@@ -2713,9 +2723,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `yellow_gen_spawn_iron` | 781 |  |
 | `yellow_gen_spawn_top` | 779 |  |
 | `yellow_glazed_terracotta` | 385 | 旋转族（4副本） |
-| `yellow_lucky_block` | 930 |  |
-| `yellow_lucky_block_rare` | 980 |  |
-| `yellow_lucky_block_super` | 981 |  |
+| `yellow_lucky_block` | 932 |  |
+| `yellow_lucky_block_rare` | 982 |  |
+| `yellow_lucky_block_super` | 983 |  |
 | `yellow_planks` | 355 |  |
 | `yellow_portal` | 18 | 动画（4帧） |
 | `yellow_spawn_block_side` | 685 |  |
@@ -2726,32 +2736,32 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 这些纹理只以预旋转副本存在 (`name[rot[1..4`)。注册表把它们折叠到下面的根，`bloxdTexel` 在采样时重新应用旋转 — 引用根，绝不引用副本。写成 `[rot[N` 拼写会得到专属的旋转诊断。
 
-- `alloy_kiln_top` (id 1085)
-- `auto_bench_top` (id 1100)
-- `belt_tunnel_exit_top` (id 1198)
-- `belt_tunnel_top` (id 1193)
+- `alloy_kiln_top` (id 1087)
+- `auto_bench_top` (id 1102)
+- `belt_tunnel_exit_top` (id 1200)
+- `belt_tunnel_top` (id 1195)
 - `black_glazed_terracotta` (id 429)
 - `black_spawn_block_top` (id 756)
 - `blue_glazed_terracotta` (id 413)
 - `blue_spawn_block_top` (id 751)
 - `brown_glazed_terracotta` (id 417)
 - `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1041)
+- `burner_drill_top` (id 1043)
 - `checkpoint_block` (id 761)
 - `chest_top` (id 343)
-- `crop_harvester_top` (id 1186)
-- `crusher_top` (id 1049)
-- `crystal_vat_top` (id 1160)
+- `crop_harvester_top` (id 1188)
+- `crusher_top` (id 1051)
+- `crystal_vat_top` (id 1162)
 - `custom_lobby_block_top` (id 765)
 - `cyan_glazed_terracotta` (id 405)
 - `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1133)
-- `electric_drill_top` (id 1092)
+- `deep_drill_top` (id 1135)
+- `electric_drill_top` (id 1094)
 - `gray_glazed_terracotta` (id 397)
 - `gray_spawn_block_top` (id 736)
 - `green_glazed_terracotta` (id 421)
 - `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 911)
+- `iron_chest_top` (id 913)
 - `light_blue_glazed_terracotta` (id 381)
 - `light_blue_spawn_block_top` (id 726)
 - `light_gray_glazed_terracotta` (id 401)
@@ -2765,22 +2775,22 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `orange_spawn_block_top` (id 706)
 - `pink_glazed_terracotta` (id 393)
 - `pink_spawn_block_top` (id 701)
-- `press_top` (id 1065)
+- `press_top` (id 1067)
 - `purple_glazed_terracotta` (id 409)
 - `purple_spawn_block_top` (id 696)
 - `radar_screen` (id 19)
-- `recycler_top` (id 1175)
+- `recycler_top` (id 1177)
 - `red_glazed_terracotta` (id 425)
 - `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1141)
+- `shatter_mill_top` (id 1143)
 - `shop_trader_spawn_top` (id 794)
 - `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1148)
-- `smelter_top` (id 1056)
-- `tree_cutter_top` (id 1123)
+- `sky_tap_top` (id 1150)
+- `smelter_top` (id 1058)
+- `tree_cutter_top` (id 1125)
 - `white_glazed_terracotta` (id 369)
 - `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1072)
+- `wire_mill_top` (id 1074)
 - `yellow_glazed_terracotta` (id 385)
 - `yellow_spawn_block_top` (id 681)
 #### 动画族 (42 个名称)
@@ -2789,48 +2799,48 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 | 名称 | 帧数 | 间隔 |
 |---|---|---|
-| `alloy_kiln_side_running` | 4 | 250 ms |
-| `auto_bench_side_running` | 4 | 250 ms |
-| `black_portal` | 4 | 300 ms |
-| `blue_portal` | 4 | 300 ms |
+| `alloy_kiln_side_running` | 33 | 250 ms |
+| `auto_bench_side_running` | 35 | 250 ms |
+| `black_portal` | 2 | 300 ms |
+| `blue_portal` | 3 | 300 ms |
 | `brown_portal` | 4 | 300 ms |
-| `burner_drill_side_running` | 4 | 250 ms |
-| `crop_harvester_back_running` | 4 | 250 ms |
-| `crop_harvester_side_running` | 4 | 250 ms |
-| `crusher_side_running` | 4 | 250 ms |
-| `crystal_vat_side_running` | 4 | 250 ms |
-| `cyan_portal` | 4 | 300 ms |
-| `deep_drill_side_running` | 4 | 250 ms |
-| `electric_drill_side_running` | 4 | 250 ms |
-| `generator_side_running` | 4 | 250 ms |
-| `gray_portal` | 4 | 300 ms |
-| `green_portal` | 4 | 300 ms |
-| `grey_portal` | 4 | 300 ms |
-| `homestead_core_mid` | 4 | 250 ms |
-| `lava` | 8 | 200 ms |
-| `lightblue_portal` | 4 | 300 ms |
-| `lightgray_portal` | 4 | 300 ms |
-| `lime_portal` | 4 | 300 ms |
-| `magenta_portal` | 4 | 300 ms |
-| `orange_portal` | 4 | 300 ms |
-| `pink_portal` | 4 | 300 ms |
-| `press_side_running` | 4 | 250 ms |
-| `purple_portal` | 4 | 300 ms |
-| `radar_screen` | 4 | 200 ms |
-| `recycler_side_running` | 4 | 250 ms |
-| `red_portal` | 4 | 300 ms |
-| `shatter_mill_side_running` | 4 | 250 ms |
-| `sky_tap_side_running` | 4 | 250 ms |
-| `smelter_side_running` | 4 | 250 ms |
-| `smoke` | 4 | 250 ms |
-| `toxic_waste` | 8 | 200 ms |
-| `toxic_waste_barrel_top` | 4 | 300 ms |
-| `tree_cutter_back_running` | 4 | 250 ms |
-| `tree_cutter_side_running` | 4 | 250 ms |
-| `volt_engine_side_running` | 4 | 250 ms |
-| `white_portal` | 4 | 300 ms |
-| `wire_mill_side_running` | 4 | 250 ms |
-| `yellow_portal` | 4 | 300 ms |
+| `burner_drill_side_running` | 27 | 250 ms |
+| `crop_harvester_back_running` | 45 | 250 ms |
+| `crop_harvester_side_running` | 44 | 250 ms |
+| `crusher_side_running` | 28 | 250 ms |
+| `crystal_vat_side_running` | 42 | 250 ms |
+| `cyan_portal` | 5 | 300 ms |
+| `deep_drill_side_running` | 39 | 250 ms |
+| `electric_drill_side_running` | 34 | 250 ms |
+| `generator_side_running` | 30 | 250 ms |
+| `gray_portal` | 6 | 300 ms |
+| `green_portal` | 7 | 300 ms |
+| `grey_portal` | 8 | 300 ms |
+| `homestead_core_mid` | 26 | 250 ms |
+| `lava` | 1 | 200 ms |
+| `lightblue_portal` | 9 | 300 ms |
+| `lightgray_portal` | 10 | 300 ms |
+| `lime_portal` | 11 | 300 ms |
+| `magenta_portal` | 12 | 300 ms |
+| `orange_portal` | 13 | 300 ms |
+| `pink_portal` | 14 | 300 ms |
+| `press_side_running` | 31 | 250 ms |
+| `purple_portal` | 15 | 300 ms |
+| `radar_screen` | 19 | 200 ms |
+| `recycler_side_running` | 43 | 250 ms |
+| `red_portal` | 16 | 300 ms |
+| `shatter_mill_side_running` | 40 | 250 ms |
+| `sky_tap_side_running` | 41 | 250 ms |
+| `smelter_side_running` | 29 | 250 ms |
+| `smoke` | 23 | 250 ms |
+| `toxic_waste` | 25 | 200 ms |
+| `toxic_waste_barrel_top` | 24 | 300 ms |
+| `tree_cutter_back_running` | 37 | 250 ms |
+| `tree_cutter_side_running` | 36 | 250 ms |
+| `volt_engine_side_running` | 38 | 250 ms |
+| `white_portal` | 17 | 300 ms |
+| `wire_mill_side_running` | 32 | 250 ms |
+| `yellow_portal` | 18 | 300 ms |
 
 原始数据中可见的结构性说明: 图集容纳 45 个动画根而非 42 — `radar_screen` 的四个预旋转副本各自带一条 4 帧阶梯，这也是 `radar_screen` 成为唯一同时带两条族备注之名称的原因。
 
@@ -2877,13 +2887,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [与纹理包组合](guides/combinations.md) | 与纹理包的搭配 |
 | [调试技巧](guides/debugging.md) | 症状 → 原因诊断 |
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认)
 
 
 ---
 
 ## 光照的机制
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 引擎默认光照只有「乘法」，不存在高光、菲涅尔、暖冷分离、半球环境光。以下为可重建范围：
 
@@ -2906,7 +2916,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 阴影
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
 
 着色器包里做出「阴影」的三种方式，以及它们的极限。
 
@@ -2975,7 +2985,7 @@ let lit = sunL * sky;
 ---
 
 ## 让水看起来自然
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 本 API 采样不到场景色，因此**是以菲涅尔风颜色混合与太阳高光的拟似表现，而非真实的反射/折射** (深度计算使用液体限定的 `bloxdOpaqueBehind()`——厚度吸收配方在本页后文)。下例保留基色，掠角混入近空色，仅有太阳时加小闪光。
 
@@ -3041,7 +3051,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 夜间表现设计
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 只压暗阴影，太阳缺席时引擎完成色 (`engineColour`) 依然偏亮，面影落差会显得不自然。应对完成色整体施加衰减。
 
@@ -3072,7 +3082,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型与纹理
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从标头与验证器复原)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (从标头与验证器复原)
 
 v5 新的 Model 钩子绘制与读取什么。
 
@@ -3147,7 +3157,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 写实化的两大流派
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 **流派 A：加算修正 (defaultLight 起点)** —— 以 `engineColour` (完成色) 为底，叠加暖色辉光或轮廓光。轻便安全，但光照模型仍是默认。
 
@@ -3162,7 +3172,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器包能做到什么、做不到什么
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 一页讲清着色器包的写实化天花板：当前 API 能到达哪里、原理上做不到什么、什么是有条件的、限制为何存在、以及最接近的替代手段。动手之前先在这里核对预想。
 
@@ -3258,7 +3268,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 性能
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (基于实测的实践)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (基于实测的实践)
 
 包的钩子在每个片段 (地形 / 液体 / 模型的全部像素) 上运行，因此风格选择会显著左右帧率。
 
@@ -3305,7 +3315,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 实机测试清单
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 编译成功与「好看」是两回事。请按顺序确认：
 
@@ -3329,7 +3339,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 与纹理包的组合
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 着色器包不能添加或采样纹理，材质细微凹凸与天空图像不要只靠着色器解决。Bloxd.io 公开纹理包仓库 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 以另一方式处理纹理、天空盒、模型等。
 
@@ -3343,7 +3353,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 调试技巧
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 - 洞穴过亮 → `skyLight` 非线性曲线不足 (R2 洞穴配方 / R9.9)
 - 白天过曝 → 降低 ACES 前曝光
@@ -3379,13 +3389,13 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [模型着色器](recipes/model-shaders.md) | v5 — 手持物品、皮肤、植物摇摆 |
 | [附魔效果](recipes/enchant-effects.md) | v5 — 移除、增强、重着色闪光 |
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
 
 
 ---
 
 ## 颜色
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 单色 tint (最基础)
 
@@ -3466,7 +3476,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 照明
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 对比 S 曲线
 
@@ -3580,7 +3590,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 发光
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `emission` 在光照计算后叠加，但默认处理会**按雾量 (`fogAlpha`) 衰减它。完全沉雾的远景发光也一并消失。远景也想发光的成分不要加到 emission，在 light 钩子内以 `out.colour += ...` 直接叠加** (默认输出已打雾，远景光落在雾色之上)
 
@@ -3632,7 +3642,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 坐标
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 世界坐标
 
@@ -3687,7 +3697,7 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 时间与动画
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `bloxdSeconds()` 每 3600 秒 (1 小时) 回绕。但这是着色器流逝时间，不保证与游戏内太阳/昼夜同步。视觉周期动画可用，实际夜晚判定优先用 `bloxdSunDirection()` 与光照输入。
 
@@ -3727,7 +3737,7 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 液体
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 水面涟漪 (颜色明灭)
 
@@ -3789,7 +3799,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 顶点（仅 allow）
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
 > 关于确切条件 (allow 标题一览；Custom Games 为 strict) 见[各游戏的着色器适用策略](internals/policy.md)
@@ -3855,7 +3865,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 数学小技巧
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ```wgsl
 // 0..1 平滑分级 (n 级)
@@ -3886,7 +3896,7 @@ let phase = t * 0.15;
 ---
 
 ## 写实化
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 「把原版外观从材质重新组装」的物理系配方集。先读前提：
 >
@@ -4191,7 +4201,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型着色器配方
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (依 v5 标头规格撰写)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (依 v5 标头规格撰写)
 
 使用 v5 Model 钩子与新标志的配方，实现 **v5 之前不可能做到的「我看的是什么」选取**。基础: [模型与纹理](guides/models.md)。
 
@@ -4343,7 +4353,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 附魔效果
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从现行标头复原)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (从现行标头复原)
 
 v5 在输入与输出两端都开放了附魔管线。这些配方在保留引擎数学的前提下控制附魔物品与盔甲的闪光。
 
@@ -4488,7 +4498,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 卡顿 / 被实机检查弃用 | [性能](troubleshooting/performance.md) |
 | 法律、安全、常见问题 | [FAQ](troubleshooting/faq.md) |
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
 
 ### 错误出现在哪里
 
@@ -4565,7 +4575,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 版本错误
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (逐字取自现行 i18n 字典)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified (逐字取自现行 i18n 字典)
 
 围绕 `apiVersion` 的错误。当前游戏**只接受 `5`**。
 
@@ -4844,7 +4854,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理问题
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (消息逐字采录自现行验证器)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (消息逐字采录自现行验证器)
 
 围绕 `bloxdTextureId*` / `bloxdTexel` 的问题。全部 896 个名称可在[纹理目录](api/texture-catalog.md)中搜索。
 
@@ -4960,7 +4970,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型问题
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (v5 新领域)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (v5 新领域)
 
 围绕 v5 新 Model 钩子的问题。
 
@@ -5058,7 +5068,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ 与法律事项
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified
 
 ### 常见问题
 
@@ -5108,9 +5118,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 引擎内部机制与研究
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
-通过分析引擎实现复原的内部规格。这里的一切都直接复原自当前生产构建 (`ab90qa`) 的 JavaScript。与公开 API 文档 ([API 参考](api/)) 分离，以保存精确的内部行为与分析结果。
+通过分析引擎实现复原的内部规格。这里的一切都直接复原自当前生产构建 (`xkg8x`) 的 JavaScript。与公开 API 文档 ([API 参考](api/)) 分离，以保存精确的内部行为与分析结果。
 
 ### 导航
 
@@ -5134,7 +5144,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [调试手段](internals/debugging.md) | URL 参数、统计面板 |
 | [研究日志](internals/research-log.md) | 方法论、构建历史、未验证事项 |
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认)
 
 内部机制不是稳定的 API 契约 — 它们可能随引擎更新而变化，每页都标注其证据构建 ([研究日志](internals/research-log.md))。
 
@@ -5142,7 +5152,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 渲染管线
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 - **surface 钩子在 alphaTest 「之前」跑**：`out.alpha` 直接喂给丢弃判定。镂空材质 (草、叶) 可做溶解式抖动特效 (配方 R-C)。液体 (混合) 中 `out.alpha` 为真实透明度 (配方 R-D)。通常不透明地形无效果——勿误解
 - **`l.ambient` 内容**为 `material.ambient × sceneAmbient`，按材质各异。场景侧直连图形设置「Ambient Lighting Intensity」(默认 0.5)，切勿写死默认值
@@ -5215,7 +5225,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 钩子接入内部机制
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
 
 引擎在运行时如何调用钩子。这不改变你写的代码，但能消除「钩子收到什么」的猜测。
 
@@ -5271,9 +5281,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 引擎标头 (v5, 逐字)
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Analyzed (从现行生产包复原)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Analyzed (从现行生产包复原)
 
-加载器拼在每个包前面的精确文本。复原自现行生产包 (`ab90qa`，chunk c55，以 6 处现行插值渲染模板 — `apiVersion` 与经 `bloxdPackInputs` 的 5 个 uniform 读取)。解码后 8,954 字节、208 行。没有任何转述。
+加载器拼在每个包前面的精确文本。复原自现行生产包 (`ab90qa`，chunk c55，以 6 处现行插值渲染模板 — `apiVersion` 与经 `bloxdPackInputs` 的 5 个 uniform 读取)。解码后 8,954 字节、208 行。没有任何转述。已在当前生产构建 (`xkg8x`，分块 c55，2026-11-04) 上复核字节一致 — 同样的 8,954 解码字节、208 行。
 
 阅读指引:
 - 逐字段说明 → [结构体](api/structures.md)
@@ -5504,7 +5514,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 着色器验证
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行验证器复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行验证器复原)
 
 静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](troubleshooting/validation.md)。
 
@@ -5579,7 +5589,7 @@ const Jq = new Map([
 ---
 
 ## WGSL 编译
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 复原)
 
 第二验证阶段 — 经浏览器 WGSL 编译器的真实编译 — 以及 v5 的验证桩。
 
@@ -5648,7 +5658,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 保留标识符内部机制
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行 bundle 的生成器复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 的生成器复原)
 
 `bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](api/restrictions.md)。
 
@@ -5680,7 +5690,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 光照内部机制
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 `blockLight` 是**三通道 RGB 彩色光**。各发光方块定义有发射色 `[R, G, B]` (各 0–15)，该色原样成为光色 (普通火把 = 暖白 (14,14,12) / 岩浆 = 橙 (14,8,2) / 信标 = 青 (5,14,14) / 白色火把 = (15,15,15) 等)。到顶点阶段时，它以 4 nibble——r / g / b / sky——打包进一个 float 属性到达。在 light 钩子内分通道处理，即可实现彩色局部照明——暖色火把配方 (R9.1) 正是以该行为为基准校准的。
 
@@ -5696,7 +5706,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 雾的内部规格
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 雾计算恒为 LINEAR 模式 (等价于 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogAlpha` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**。它随玩家加载距离而变，因此距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (见下方「加载边界带」一节)。(渲染器的雾函数实际实现了 **四种** 模式——off / exponential / exponential-squared / linear——正式发布的游戏驱动的是 linear；复原源码与稳健性讨论保存于[版本历史：v3 迁移指南](history/v3.md)。)
 
@@ -5723,7 +5733,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理采样内部机制
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行生成器 c56 复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行生成器 c56 复原)
 
 `bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](api/texture-api.md)。
 
@@ -5784,7 +5794,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 纹理注册表内部机制
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `ab90qa` (2026-11-04 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 名称→id 的解析机制与实测的注册表漂移。面向用户的目录: [纹理目录](api/texture-catalog.md)。
 
@@ -5796,7 +5806,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 | 输出 | v5 实测 | 含义 |
 |---|---|---|
-| `named` | **896** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
+| `named` | **906** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
 | `aliases` | 416 | 被折叠的拼写 — 188 个帧别名 (`lava0`…) 与 228 个旋转别名 (`chest_top[rot[1`…) |
 | `layers` | 228 | 层表 — 含 171 个预旋转槽位 (57 个根 × 4 个旋转) |
 
@@ -5834,7 +5844,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 模型渲染内部机制
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 复原)
 
 v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](guides/models.md)。
 
@@ -5876,9 +5886,9 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 ---
 
 ## 引擎数据台账 (v5 实测)
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03; 生产环境 = 预发环境，逐字节一致) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04; 生产环境；着色器包各表面上与预发环境一致) · 状态: Verified
 
-本文档的实测台账 — 每个已确认的值，全部实测于当前目标构建 `ab90qa`。
+本文档的实测台账 — 每个已确认的值，全部实测于当前目标构建 `xkg8x`。
 
 ### 台账
 
@@ -5893,15 +5903,15 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 | 包绑定 | group 3: 0 uniform · 1 场景深度 (液体) · 2 `bloxdSpTextureLayers` 存储 |
 | 标志 | `BloxdFlags` 结构体，14 个布尔；v4 的位值退役 |
 | 加载器限制 | 256 个 `.wgsl` / 256 KB 源码 / 64 KB `pack.json` / 32 MB zip / 1,024 条目；UTF-8；单一 manifest；路径唯一 — 均不变 |
-| 纹理注册表 | 1,210 条目 → **896 个可用名称**；相对 cnty9 漂移 +1/−10 ([纹理注册表](internals/texture-registry.md)) |
+| 纹理注册表 | 1,210 条目 → **896 个可用名称**；相对 cnty9 漂移 +1/−10 ([纹理注册表](internals/texture-registry.md)) → `xkg8x` (2026-11-04)：1,220 / **906 个可用名称** — 10 项移除全部逆转，376 个 id 变化 |
 | 光照曲线 | 0–15 级 → 0–1，缓出 (`6 → 0.45`、`12 → 0.92`) — 在标头中，不变 |
 | 提升曲线 | `1 - (1 - x / (3 - 2x))^3` — 不变 (当前位于 chunk c9) |
 | 方向光锥 | `0.12 / 0.65 / 0.62 / 0.95` — 不变 (chunk c9) |
 | 雾颜色 | `vec3f(183/255, 191/255, 195/255)` — 不变 |
 | 保留名称 | `/^bloxd/i` (不区分大小写) + 46 个 `bloxdSp*` 引擎符号 ([保留标识符](internals/reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 标题 | 除 [策略](internals/policy.md) 中 12 个 allow 标题外的一切 (已在 ab90qa 上复验，不变) |
-| 标头/注册表构建器 | chunk c55 (模块 29833 + 1371 + 1391 + 1384 + 219 协调) |
+| strict 标题 | 除 [策略](internals/policy.md) 中 12 个 allow 标题外的一切 (已在 xkg8x 上复验，不变) |
+| 标头/注册表构建器 | chunk c55 (模块 29833 + 1371 + 1391 + 1384 + 219 协调); 在 `xkg8x` 上构建器为模块 30093 (数据模块 1391) |
 | 默认包模板 | chunk c116 (自 v4 的 c124 迁来)，1,683 B |
 
 ### bundle 布局 (供重新调查者)
@@ -5925,7 +5935,7 @@ chunk 格式说明: 每个 chunk 都是一个 ES 模块 (`export const modules =
 ---
 
 ## 会改变包可见值的因素
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 同一包因**世界与玩家设置**渲染各异。分发前至少在以下 3 环境确认外观：
 
@@ -5943,7 +5953,7 @@ chunk 格式说明: 每个 chunk 都是一个 ES 模块 (`export const modules =
 
 本页把 `allow / strict` 在标题层面的语义确定下来。只有游戏定义中显式写着 `shaderPackPolicy: "allow"` 的标题才以完整模式运行 (vertex 钩子、`discard`、地形 `alpha`)；未指定 (或 allow 以外的值) 的标题视为 strict — 定义 `BLOXD_STRICT`，守卫内的代码自动失效。这个判定不在包一侧可控，因此弄清哪些标题跑什么内容是发布的前提。
 
-- 依据构建: `szby6g.main.94a7596c.js` (2026-10-17 时点的正式部署)。静态解析全部 111 个游戏定义的结果为 **allow 26 条目 (12 个标题) / strict 85 条目**。同样 12 个标题的同样 12 个 allow 字面量已在 v3 生产 bundle (`3ymzdd`，2026-10-20) 上再次确认未变，并在 v4 bundle (`cnty9`，2026-10-27) 上再度确认——下方列表原样沿用至 v3 与 v4。
+- 依据构建: `szby6g.main.94a7596c.js` (2026-10-17 时点的正式部署)。静态解析全部 111 个游戏定义的结果为 **allow 26 条目 (12 个标题) / strict 85 条目**。同样 12 个标题的同样 12 个 allow 字面量已在 v3 生产 bundle (`3ymzdd`，2026-10-20) 上再次确认未变，并在 v4 bundle (`cnty9`，2026-10-27) 上再度确认——下方列表原样沿用至 v3 与 v4。 在 v5 构建上同样未变：已在 `ab90qa` (2026-11-03) 与 `xkg8x` (2026-11-04，重新清点 12 个 allow 字面量) 上再次确认 — 下列列表同样原样沿用至 v5。
 - 在 `shaderPackPolicy` 之上还有分发渠道闸门 (大致 `canUseShaderPacks`)：经外部 portal (如 Coolmath Games 构建) 时，着色器包系统本身可能在 `shaderPackPolicy` 被查看之前就被禁用。下文的 allow/strict 分析基于 bloxd.io 主 Web 构建。
 - allow 共在 12 处声明: 游戏定义内的直接书写 8 处与基底变量 (`tb` / `kz` / `cb` / `Fb`) 的 4 处，变体通过 spread 继承 (`{...tb,...}`)。按变体的个别覆写目前不存在 (也不存在 父 allow·子 strict 的逆模式)。
 
@@ -5968,7 +5978,7 @@ strict 侧特别容易误解的点:
 ---
 
 ## 太阳与月亮
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 `bloxdSunDirection()` 之源是仅在天空盒种类变化时改写的天空方向缓冲，判定基准不是「天空有无太阳」而是**「天空盒是否为 earth 型」**。
 
@@ -6013,7 +6023,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 调试工具
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 - URL 参数 `?renderer=lite` — 强制 Lite (WebGPU) 渲染器 (`webgl2` / `babylon` 亦可；`babylon` 是 webgl2 的旧名)。优先级：URL 参数 > localStorage `bloxdRenderer` > 设置画面 > 默认 (webgl2)。无效值附带警告忽略。URL 或 localStorage 中残留的覆盖会使需要 WebGPU (lite) 的场景以「needs the new WebGPU renderer, so remove the renderer override...」出错 ([加载错误](troubleshooting/loading.md))
 - URL 参数 `?vconsole` — 屏幕内控制台 (VConsole)。手机实机验证趁手
@@ -6048,6 +6058,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `cnty9` | v4 | 2026-10-27 | v4 指南与 905 名称目录的证据 |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 冻结确认 (万圣节活动 + Skyblock 改版) |
 | `ab90qa` | **v5** | 2026-11-03 | **现行**；本文档的基线。prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **现行**；本文档基线。prod 主包 ≠ preprod (`2lcqcl`) 主包，但着色器包各表面实测一致 |
 
 ### 关键方法论
 
@@ -6079,6 +6090,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 |---|---|---|
 | sjr0p7 → cnty9 | 10 天 | 新增 98、移除 79；779/1121 个名称改 id (69%) |
 | cnty9 → ab90qa | 7 天 | +1 (`scorpion_eggs`)、−10 (双箱 ×8、刷怪笼侧面 ×2)；334/905 个名称改 id |
+| ab90qa → xkg8x | 1天 | +10 (v5 首发的移除全部回归: 双箱×8、刷怪笼侧面×2)；896 个中 376 个改 id；无移除 |
 
 ### 未验证 / 推测
 
@@ -8959,7 +8971,7 @@ wire_mill_top_rot4
 
 ## API v5 迁移指南
 > 版本: 5 · 状态: Historical (该时期的迁移指南; 目标构建见正文)
-目标构建: `ab90qa.main.6188124c.js` —— **2026-11-03 测量时点在生产与预发布环境同时上线**，两者 bundle 再次逐字节一致 (主 bundle 自两个主机分别实时抓取并 md5 核对: `fc3322212d15be2445c0e8dfc9733fcc`)，因此本文内容原样适用于生产环境。这是 v3 以来最大的 API 修订: 主 bundle 增长到 3.39 MB (比上一个 v4 构建 +115 KB)，chunk 映射现有 195 个 id (c0–c195，刨去已知的 7 个空洞后实际输出 188 个)，着色器管线仍位于 c51–c56 簇 (加载器 c53、验证器/头文件/注册表构建器 c55、WebGPU/代码生成 c56、雾 c9)——但默认包模板移到了 c116 (`tcwczu` 时是 c124)。这些布局细节对包都不可见。
+目标构建: `ab90qa.main.6188124c.js` —— **2026-11-03 测量时点在生产与预发布环境同时上线**，两者 bundle 再次逐字节一致 (主 bundle 自两个主机分别实时抓取并 md5 核对: `fc3322212d15be2445c0e8dfc9733fcc`)，因此本文内容原样适用于生产环境。这是 v3 以来最大的 API 修订: 主 bundle 增长到 3.39 MB (比上一个 v4 构建 +115 KB)，chunk 映射现有 195 个 id (c0–c195，刨去已知的 7 个空洞后实际输出 188 个)，着色器管线仍位于 c51–c56 簇 (加载器 c53、验证器/头文件/注册表构建器 c55、WebGPU/代码生成 c56、雾 c9)——但默认包模板移到了 c116 (`tcwczu` 时是 c124)。这些布局细节对包都不可见。 已在当前生产构建 `xkg8x.main.641a7732.js` (2026-11-04，md5 `f11cc032efd474aca567d3793b792057`) 上重新验证: 引擎头字节一致，下文的加载器/变体/钩子/保留名各项实测经复核均未变化 — 唯一变动的是纹理注册表 (896 → 906 个可用名称；§80 补记)。preprod (`2lcqcl`) 提供的是另一个主包，但在着色器包的每个表面上实测一致。
 
 *看得见*的是: 引擎头文件从 6,021 增长到 **8,954 解码字节** (151 → 208 行)——几乎每个结构体都新增了字段，四个新函数把引擎自己的光照配方写成了文档，`blockFlags` 位掩码消失，取而代之的是正经的布尔结构体 `BloxdFlags`。编译期开关 `#ifdef BLOXD_LIGHTING` 也取消了: 光照状态作为 `lit: u32` 成员移入逐帧 uniform，在运行时以 `bloxdLit()` 查询。默认包模板从 6 个钩子改为随附**全部 9 个钩子**。而引擎内部的 `bloxdSp*` 命名空间从 27 个符号增长到 46 个。
 
@@ -9433,6 +9445,8 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 v4 名录的信条 ([v4 迁移指南](history/v4.md) §68) 逐字沿用: **名称是 API，id 是快照。** 905 个幸存名中有 334 个在两个构建之间换了 id——写 `bloxdTextureIdStone`，永远别写 `351`。v4 名录的字母序清单 ([v4 迁移指南](history/v4.md) §68.2) 除上述 11 名漂移外对 v5 仍然有效；折叠规则与两张族表不变，所以其 §68.3–§68.4 (旋转族与动画族) 仍然精确。现行形态的名录是[纹理名录](api/texture-catalog.md)。
 
+**补记 (2026-11-04，`xkg8x`):** 注册表在 v5 首发次日再次变动 — 下述每项移除都已逆转。图集条目 1,210 → 1,220，可用名称 896 → **906** (双箱的 8 个纹理和两个刷怪笼侧面变体均已回归；无移除)，幸存 896 个名称中 376 个改 id，折叠族不变 (57 / 42)。preprod `2lcqcl` 在着色器包各表面实测一致。现行形式的目录已在 `xkg8x` 上重新实测: [纹理目录](api/texture-catalog.md)。
+
 ### 81. 已确认的常数、限制与布局 (v5)
 
 本指南测量台账的 v5 行——以下均在 `ab90qa` 上测量 (2026-11-03，生产 = 预发布，逐字节一致):
@@ -9448,7 +9462,7 @@ v4 名录的信条 ([v4 迁移指南](history/v4.md) §68) 逐字沿用: **名�
 | 包绑定 | 组 3: 0 uniform · 1 场景深度 (液体) · 2 `bloxdSpTextureLayers` storage |
 | flags | `BloxdFlags` 结构体，14 个 bool (§71)；v4 位值退役 |
 | 加载器限制 | 256 个 `.wgsl` / 256 KB 源码 / 64 KB `pack.json` / 32 MB zip / 1,024 个 zip 条目；UTF-8；单一 manifest；路径唯一——全部不变 |
-| 纹理注册表 | 1,210 个条目 → **896 个可用名**；相对 cnty9 漂移 +1/−10 (§80)；名录: v4 指南 §68 + §80 的漂移清单 (现行形态: [纹理名录](api/texture-catalog.md)) |
+| 纹理注册表 | 1,210 个条目 → **896 个可用名**；相对 cnty9 漂移 +1/−10 (§80)；名录: v4 指南 §68 + §80 的漂移清单 (现行形态: [纹理名录](api/texture-catalog.md)); 已在 `xkg8x` (2026-11-04) 重新实测: 1,220 / **906**，10 项移除全部逆转，376 个 id 变化 (§80 补记) |
 | 光照曲线 | 0–15 级 → 0–1 缓出曲线 (`6 → 0.45`、`12 → 0.92`) —— 头文件内，不变 |
 | 提升曲线 | `1 - (1 - x / (3 - 2x))^3` —— 不变 (现位于 chunk c9) |
 | 方向光圆锥 | `0.12 / 0.65 / 0.62 / 0.95` —— 不变 (chunk c9) |

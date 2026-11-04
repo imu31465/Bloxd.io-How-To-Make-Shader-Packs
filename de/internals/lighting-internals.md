@@ -1,6 +1,6 @@
 # Lighting-Interna
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 `blockLight` ist **farbiges Licht** mit drei RGB-Kanälen. Jeder leuchtende Block definiert eine Emissionsfarbe `[R, G, B]` (je 0–15), die unverändert als Lichtfarbe übernommen wird (normale Fackel = warmweiß (14,14,12) / Lava = orange (14,8,2) / Beacon = cyan (5,14,14) / weiße Fackel = (15,15,15) usw.). In der Vertex-Stufe kommt sie als 4 Nibbles gepackt an — r / g / b / sky — in einem Float-Attribut. Die drei Kanäle im Light-Hook getrennt zu behandeln, ermöglicht farbiges lokales Licht — das warme Fackel-Rezept (R9.1) ist auf dieses Verhalten kalibriert.
 

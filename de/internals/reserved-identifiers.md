@@ -1,6 +1,6 @@
 # Interna reservierter Bezeichner
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus den Generatoren des Live-Bundles restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus den Generatoren des Live-Bundles restauriert)
 
 Der `bloxdSp*`-Namensraum — Symbole, die die Generatoren injizieren können und die Pakete daher nicht neu deklarieren dürfen. Die Zusammenfassung für Paket-Autoren: [Einschränkungen](../api/restrictions.md).
 

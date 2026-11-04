@@ -1,6 +1,6 @@
 # 纹理 API
 
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
 
 读取游戏自带纹理的 API: 两个函数、一个具名常量族、四个输入字段。标头自己的概句: *「This face's texture. Compare with `bloxdTextureId*`.」*
 

@@ -1,6 +1,6 @@
 # 雾的内部规格
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 雾计算恒为 LINEAR 模式 (等价于 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogAlpha` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**。它随玩家加载距离而变，因此距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (见下方「加载边界带」一节)。(渲染器的雾函数实际实现了 **四种** 模式——off / exponential / exponential-squared / linear——正式发布的游戏驱动的是 linear；复原源码与稳健性讨论保存于[版本历史：v3 迁移指南](../history/v3.md)。)
 

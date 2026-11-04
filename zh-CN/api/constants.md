@@ -1,6 +1,6 @@
 # 常量
 
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
 
 标头提供三个常量 (纹理名称常量 `bloxdTextureId*` 见[纹理 API](texture-api.md))。
 

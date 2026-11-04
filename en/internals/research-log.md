@@ -20,7 +20,8 @@ The technical statements here rest not on official developer documentation but o
 | `sjr0p7` | v3-era | 2026-10-17 | drift-comparison baseline |
 | `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
-| `ab90qa` | **v5** | 2026-11-03 | **current**; this documentation's baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `ab90qa` | **v5** | 2026-11-03 | v5 launch build; original v5 baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **current**; this documentation's baseline. prod main ≠ preprod main (preprod `2lcqcl`) but every shader-pack surface measured identical |
 
 ## Key methodology
 
@@ -30,7 +31,7 @@ Rendering the c55 header template with its live interpolations (`${vC}` = apiVer
 
 ### Texture-registry recomputation
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 896 / aliases 416 / layers 228) ([Texture registry](texture-registry.md)).
+Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 906 / aliases 416 / layers 228 on the current build `xkg8x`, 2026-11-04 — modules 30093 + 1391; 896 at the v5 launch) ([Texture registry](texture-registry.md)).
 
 Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
 
@@ -52,11 +53,12 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 |---|---|---|
 | sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
 | cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
+| ab90qa → xkg8x | 1 day | +10 (all v5-launch removals returned: double chest ×8, spawner sides ×2); 376/896 names changed id; none removed |
 
 ## Unverified / speculative
 
 - Pixel-accurate shadow maps as "future plans" is an **interpretation** (inferred from the unused `var shadow: f32 = 1.;` in the lighting template)
-- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa; future games unknown)
+- The allow/strict split can change per build (12-title identity re-confirmed on ab90qa and xkg8x; future games unknown)
 - `bloxdFragmentBlockPosition` (out of the v5 header): signature-table entry and runtime injection both confirmed live — calls validate and compile; whether the engine team intends to keep it is unknown
 
 ## When to re-verify

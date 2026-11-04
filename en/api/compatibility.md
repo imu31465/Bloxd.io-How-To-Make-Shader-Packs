@@ -1,6 +1,6 @@
 # Compatibility
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified
 
 How the current game and old-version packs interoperate.
 

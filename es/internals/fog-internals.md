@@ -1,6 +1,6 @@
 # Internas de niebla
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
 
 El cómputo de niebla es siempre modo LINEAR (equivalente a `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), con `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = ajuste de distancia de niebla; solo D = 0 es especial con fogEnd = 5). **La banda de gradiente de niebla es de solo 32 bloques**, y `l.fogAlpha` es menos "bruma por distancia" que **distancia normalizada al borde del mundo cargado**. Varía por jugador con la distancia de carga, así que los efectos por distancia deben calcular `distance(l.position, bloxdEyePosition())` ellos mismos (la sección «Banda de borde de carga» más abajo). (La función de niebla del renderizador implementa en realidad **cuatro** modos — off / exponencial / exponencial al cuadrado / lineal — con los títulos distribuidos activando el lineal; el código fuente restaurado y el argumento de robustez se conservan en [Historial de versiones: v3](../history/v3.md).)
 

@@ -1,6 +1,6 @@
 # Shader-Hooks
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 Ein Paket kann **9 Hooks** einhängen: 3 Render-Ziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle sind optional — ein undefinierter Hook fällt auf den Engine-Standard zurück.
 

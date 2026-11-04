@@ -1,6 +1,6 @@
 # Texture API
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (API unchanged since v4, re-confirmed on the v5 build)
+> Target API: 5 · Target build: `xkg8x` · Status: Verified (API unchanged since v4, re-confirmed on the v5 build)
 
 The API for reading the game's own textures: two functions, a named-constant family, and four input fields. The header's own one-liner: *"This face's texture. Compare with `bloxdTextureId*`."*
 

@@ -1,6 +1,6 @@
 # API-Versionsfehler
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (wortwörtlich aus dem Live-i18n-Wörterbuch)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (wortwörtlich aus dem Live-i18n-Wörterbuch)
 
 Fehler rund um `apiVersion`. Das aktuelle Spiel akzeptiert **nur `5`**.
 

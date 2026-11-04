@@ -18,7 +18,7 @@ Erreurs et problèmes visuels, repérables **par symptôme**. Les pages suivent 
 | Lent / écarté par le contrôle sur appareil | [Performance](performance.md) |
 | Légal, sécurité, questions courantes | [FAQ](faq.md) |
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
 
 ## Où apparaissent les erreurs
 

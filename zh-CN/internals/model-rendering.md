@@ -1,6 +1,6 @@
 # 模型渲染内部机制
 
-> 目标API: 5 · 目标构建: `ab90qa` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 复原)
 
 v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](../guides/models.md)。
 

@@ -1,6 +1,6 @@
 # テクスチャサンプリングの内部
 
-> 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブ生成器 c56 から復元)
+> 対象API: 5 · 対象ビルド: `xkg8x` · 検証状況: Analyzed (ライブ生成器 c56 から復元)
 
 `bloxdTexel` / `bloxdTextureSize` が実際にどうコンパイルされるか — 3バリアントのテクスチャコード生成です。使い方の側は [テクスチャAPI](../api/texture-api.md) を参照。
 

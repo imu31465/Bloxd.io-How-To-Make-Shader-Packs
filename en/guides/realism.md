@@ -1,6 +1,6 @@
 # Realism: two schools
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 **School A: additive fixes (from defaultLight)** — use `engineColour` (finished color) as the base and add warm glow or rim. Easy and safe, but the lighting model stays default.
 
 **School B: full relighting (from s.colour)** — discard `l.engineColour` and rebuild lighting from `s.colour` (albedo) and raw LightIn materials. The real path to realism. Four rules:

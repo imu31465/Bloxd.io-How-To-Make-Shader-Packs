@@ -14,6 +14,6 @@ Um tutorial de trilha única para autores de pacotes de shaders de primeira viag
 8. [Validação](validation.md) — a verificação de carga em 3 etapas e os testes no dispositivo
 9. [Distribuição](distribution.md) — compactação em zip e higiene de lançamento
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção em 2026-11-03) · Estado: Verified/Analyzed
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção em 2026-11-04) · Estado: Verified/Analyzed
 
 Quando você precisar da especificação completa, siga para a [Referência da API](../api/); para efeitos prontos, veja [Receitas](../recipes/).

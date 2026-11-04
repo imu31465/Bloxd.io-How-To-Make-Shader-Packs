@@ -1,6 +1,6 @@
 # Colores
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ## Tinte único (lo más básico)
 

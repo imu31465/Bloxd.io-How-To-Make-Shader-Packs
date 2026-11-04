@@ -1,6 +1,6 @@
 # Packformat
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (am Live-Loader nachgemessen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (am Live-Loader nachgemessen)
 
 Das ganze Paketmodell auf einer Seite — Manifest, Loader-Limits, Per-Frame-Uniform. Für die Schritt-für-Schritt-Version siehe [Erste Schritte](../getting-started/manifest.md).
 

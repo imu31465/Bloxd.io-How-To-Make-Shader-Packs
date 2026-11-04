@@ -1,6 +1,6 @@
 # Funktionen
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Jede Header-Funktion. Die Textur-API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) steht zusammen mit `bloxdOpaqueBehind` in der [Textur-API](texture-api.md).
 

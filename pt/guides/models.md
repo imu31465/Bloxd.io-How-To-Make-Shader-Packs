@@ -1,6 +1,6 @@
 # Modelos e texturas
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Analyzed (restaurado do cabeçalho e do validador)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Analyzed (restaurado do cabeçalho e do validador)
 
 O que os novos hooks de Model do v5 desenham e leem.
 

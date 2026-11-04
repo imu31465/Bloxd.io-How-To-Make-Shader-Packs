@@ -1,6 +1,6 @@
 # Textur-Sampling-Interna
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
 
 Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — der 3-Varianten-Textur-Codegen. Die Nutzerseite: [Textur-API](../api/texture-api.md).
 

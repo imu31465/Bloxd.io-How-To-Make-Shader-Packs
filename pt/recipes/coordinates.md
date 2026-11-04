@@ -1,6 +1,6 @@
 # Coordenadas
 
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado à API atual — re-verificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Verified (portado à API atual — re-verificação no dispositivo recomendada)
 ## Coordenadas de mundo
 
 ```wgsl

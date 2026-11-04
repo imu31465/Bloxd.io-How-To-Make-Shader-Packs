@@ -1,6 +1,6 @@
 # Problèmes de textures
 
-> API cible : 5 · Build cible : `ab90qa` · État : Verified (messages relevés verbatim depuis le validateur en production)
+> API cible : 5 · Build cible : `xkg8x` · État : Verified (messages relevés verbatim depuis le validateur en production)
 
 Problèmes autour de `bloxdTextureId*` / `bloxdTexel`. Cherchez parmi les 896 noms dans le [catalogue de textures](../api/texture-catalog.md).
 

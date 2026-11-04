@@ -1,8 +1,8 @@
 # Ledger de datos del motor
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03; producción = preprod, idéntico byte a byte) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04; producción; preprod idéntico en todas las superficies de shader packs) · Estado: Verified
 
-El ledger de mediciones de esta documentación — cada valor confirmado, todo medido sobre el build objetivo vigente `ab90qa`.
+El ledger de mediciones de esta documentación — cada valor confirmado, todo medido sobre el build objetivo vigente `xkg8x`.
 
 ## El ledger
 
@@ -24,8 +24,8 @@ El ledger de mediciones de esta documentación — cada valor confirmado, todo m
 | color de niebla | `vec3f(183/255, 191/255, 195/255)` — sin cambios |
 | nombres reservados | `/^bloxd/i` (sin distinguir mayúsculas) + los 46 símbolos `bloxdSp*` del motor ([Identificadores reservados](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| títulos strict | todo salvo los 12 títulos allow de [Política](policy.md) (reverificado en ab90qa, sin cambios) |
-| constructores de cabecera/registro | chunk c55 (módulos 29833 + 1371 + 1391 + 1384 + 219 en coordinación) |
+| títulos strict | todo salvo los 12 títulos allow de [Política](policy.md) (reverificado en xkg8x, sin cambios) |
+| constructores de cabecera/registro | chunk c55 (módulos 29833 + 1371 + 1391 + 1384 + 219 en coordinación); en `xkg8x` el constructor es el módulo 30093 (módulo de datos 1391) |
 | plantilla de paquete por defecto | chunk c116 (movida desde el c124 de v4), 1.683 B |
 
 ## Disposición del bundle (para reinspectores)

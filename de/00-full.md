@@ -23,7 +23,7 @@ Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom 
 8. [Validierung](getting-started/validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](getting-started/distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/); für fertige Effekte siehe [Rezepte](recipes/).
 
@@ -31,7 +31,7 @@ Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/
 ---
 
 ## Überblick & Voraussetzungen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 ### Was ein Shader Pack ist
 
@@ -103,7 +103,7 @@ In URL-Parametern oder localStorage zurückgebliebene Renderer-Overrides lassen 
 ---
 
 ## Quick Start
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 Dein erstes Paket in fünf Minuten.
 
@@ -162,7 +162,7 @@ Als Zip packen — siehe [Vertrieb](getting-started/distribution.md).
 ---
 
 ## Pack-Struktur
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified
 
 ### Vertriebsformat
 
@@ -191,7 +191,7 @@ Eine Zip, die alles unter einem gemeinsamen Wurzelordner ablegt, bekommt dieses 
 ---
 
 ## pack.json (Manifest)
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 `pack.json` ist das Paket-Manifest — exakt ein JSON-Objekt im Zip-Root.
 
@@ -230,7 +230,7 @@ Für die Migration von v1–v4 siehe [Versionsgeschichte](history/).
 ---
 
 ## Shader-Hooks
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 Ein Paket kann **9 Hooks** einhängen: 3 Render-Ziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle sind optional — ein undefinierter Hook fällt auf den Engine-Standard zurück.
 
@@ -359,7 +359,7 @@ Welche Felder jeder Hook lesen und schreiben kann, steht in [Strukturen](api/str
 ---
 
 ## Varianten und Guards
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed
 
 ### 6 Varianten
 
@@ -398,7 +398,7 @@ Zu den Interna der Policy je Spiel siehe [Engine-Interna: Policy](internals/poli
 ---
 
 ## Validierung
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 ### Die 3-stufige Ladeprüfung
 
@@ -451,7 +451,7 @@ Siehe den [Test-Leitfaden](guides/testing.md) für die vollständige Checkliste 
 ---
 
 ## API-Referenz
-Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `ab90qa` gemessen (2026-11-03; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](internals/engine-header.md)), ist die Primärquelle.
+Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `xkg8x` gemessen (2026-11-04; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](internals/engine-header.md)), ist die Primärquelle.
 
 ### Map
 
@@ -470,7 +470,7 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Kompatibilität](api/compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
 | [Texturkatalog](api/texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
 
 Migration von v4? Siehe [Versionsgeschichte: v5](history/v5.md).
 
@@ -478,7 +478,7 @@ Migration von v4? Siehe [Versionsgeschichte: v5](history/v5.md).
 ---
 
 ## Packformat
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (am Live-Loader nachgemessen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (am Live-Loader nachgemessen)
 
 Das ganze Paketmodell auf einer Seite — Manifest, Loader-Limits, Per-Frame-Uniform. Für die Schritt-für-Schritt-Version siehe [Erste Schritte](getting-started/manifest.md).
 
@@ -549,7 +549,7 @@ Mehrere `.wgsl`-Dateien werden in **Wörterbuch-Reihenfolge des Pfadnamens** zu 
 ---
 
 ## Shader-Hooks
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified
 
 Pakete können **9 Hooks** definieren — 3 Render-Ziele (Programme) × 3 Pipeline-Stufen, alle optional (undefiniert bedeutet Engine-Standard).
 
@@ -641,7 +641,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Flags (BloxdFlags)
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 identifiziert Flächen über eine benannte Boolean-Struktur. Die v4-Bitmaske `blockFlags: u32` und ihre 6 `bloxdBlockFlag*`-Konstanten sind weg.
 
@@ -765,7 +765,7 @@ Verbleibende Referenzen auf die `bloxdBlockFlag*`-Konstanten scheitern an der Re
 ---
 
 ## Ein- & Ausgabe-Strukturen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Sieben Strukturen sind für Pakete les-/schreibbar. Jedes Feld ist unten aufgelistet (`#ifdef`-Felder sind bedingt). Der vollständige Header steht in [Engine-Interna](internals/engine-header.md).
 
@@ -939,7 +939,7 @@ Rückgabewert von `bloxdOpaqueBehind()`. In Liquid-Varianten hinter einem `#ifde
 ---
 
 ## Funktionen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Jede Header-Funktion. Die Textur-API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) steht zusammen mit `bloxdOpaqueBehind` in der [Textur-API](api/texture-api.md).
 
@@ -1102,7 +1102,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## Beleuchtung
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 hat die Beleuchtungs-API veröffentlicht. Was die Engine intern tat (den Aufbau von `litColour`) ist jetzt aus Paketen aufrufbar. Diese Seite behandelt die Beleuchtungs-Eingaben, Funktionen und die Verarbeitungsreihenfolge als System.
 
@@ -1286,7 +1286,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Textur-API
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (API seit v4 unverändert, am v5-Build erneut bestätigt)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (API seit v4 unverändert, am v5-Build erneut bestätigt)
 
 Die API zum Lesen der Texturen des Spiels selbst: zwei Funktionen, eine Familie benannter Konstanten und vier Eingabefelder. Der Einzeiler des Headers selbst: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Konstanten
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Der Header stellt drei Konstanten bereit (Textur-Namenskonstanten `bloxdTextureId*` stehen in der [Textur-API](api/texture-api.md)).
 
@@ -1572,7 +1572,7 @@ Hinweis: `bloxdChunkSize` ist `i32` — beim Mischen mit Floats per `f32(bloxdCh
 ---
 
 ## Präprozessor
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Validator restauriert)
 
 Die bedingte Kompilierung unterstützt nur `#define NAME` (ohne Wert) / `#ifdef` / `#ifndef` / `#else` / `#endif`. Die `#` steht am Zeilenanfang (auch innerhalb von Funktionen ist das zulässig). Das Abgleichen der Flag-Namen ist case-insensitive; ein falscher `#ifdef`-Name lässt die Fehlermeldung die offizielle Menge auflisten.
 
@@ -1654,7 +1654,7 @@ Siehe [Strukturen](api/structures.md#bedingte-felder--makros).
 ---
 
 ## Einschränkungen & reservierte Namen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
 
 Was Pakete schreiben dürfen — und die vollständigen Regeln der Namensreservierung.
 
@@ -1721,7 +1721,7 @@ Bezeichner, die mit `bloxdTextureId` beginnen, werden als Textur-Namenskonstante
 ---
 
 ## Kompatibilität
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified
 
 Wie das aktuelle Spiel und Pakete alter Versionen zusammenwirken.
 
@@ -1792,9 +1792,9 @@ Details: [Engine-Interna: Textur-Registry](internals/texture-registry.md).
 ---
 
 ## Texturkatalog
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
-Der vollständige Katalog der benutzbaren Textur-Namenskonstanten (`bloxdTextureId*`). **896 Namen**, alphabetisch.
+Der vollständige Katalog der benutzbaren Textur-Namenskonstanten (`bloxdTextureId*`). **906 Namen**, alphabetisch.
 
 ### Wie zu lesen
 
@@ -1812,76 +1812,76 @@ Die Zählungen benennen verschiedene Mengen, sie summieren sich also nicht naiv:
 
 | Zählung | Was sie zählt |
 |---|---|
-| **896** | benutzbare benannte Konstanten — Texturnamen, die du als `bloxdTextureId*` schreiben kannst |
+| **906** | benutzbare benannte Konstanten — Texturnamen, die du als `bloxdTextureId*` schreiben kannst |
 | **416** | Alias-Namen (188 Rahmen + 228 Rotation) — erkannte Schreibweisen, die *abgelehnt* werden mit einem Hinweis auf den Basisnamen; sie sind Namen, keine Konstanten, und fügen keine ids hinzu |
-| **1.210** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1210) |
+| **1.210** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1220) |
 
-Jeder der 896 Namen bildet auf einen eigenen Atlas-Eintrag ab. Die übrigen **314 Einträge** sind zusätzliche Animationsrahmen (143) und vor-rotierte Kopien (171) ohne benutzbaren Namen — Pakete referenzieren sie nie direkt, weil `bloxdTexel` Rahmen animiert und Rotation automatisch anwendet. Der erste Rahmen jeder Animationsfamilie und die Wurzel jeder Rotationsfamilie *sind* benannt, weshalb manche Einträge sowohl als „benannt“ als auch als „Rahmen-/Rotations-Basis“ zählen. Zum Vergleich mit dem vorherigen Build: v4 hatte 905 benutzbare Namen; dieser Build hat 896 (+1 `scorpion_eggs`, −10 double-chest ×8 und mob-spawner side ×2), und 334 überlebende Namen änderten die id.
+Jeder der 906 Namen bildet auf einen eigenen Atlas-Eintrag ab. Die übrigen **314 Einträge** sind zusätzliche Animationsrahmen (143) und vor-rotierte Kopien (171) ohne benutzbaren Namen — Pakete referenzieren sie nie direkt, weil `bloxdTexel` Rahmen animiert und Rotation automatisch anwendet. Der erste Rahmen jeder Animationsfamilie und die Wurzel jeder Rotationsfamilie *sind* benannt, weshalb manche Einträge sowohl als „benannt“ als auch als „Rahmen-/Rotations-Basis“ zählen. Zum Vergleich: v4 hatte 905 benutzbare Namen, der v5-Start-Build 896; dieser Build hat 906 — die 10 beim v5-Start entfernten Namen (Double-Chest ×8, Mob-Spawner-Seite ×2) sind zurück (neben dem früheren +1 `scorpion_eggs`), und 376 der 896 v5-Start-Überlebenden änderten die id.
 
 ### Der Katalog
 
-Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-Wert — gemessen auf `ab90qa` (2026-11-03). **Ids sind Momentaufnahmen; behandle Namen als die API**: Selbst zwischen dem v4-Build (cnty9) und diesem Build änderten 334 der Namen, die ihre Schreibweise behielten, die id (siehe die Drift-Messungen unten).
+Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-Wert — gemessen auf `xkg8x` (2026-11-04). **Ids sind Momentaufnahmen; behandle Namen als die API**: Zwischen dem v4-Build (cnty9) und dem v5-Start-Build (ab90qa) änderten 334 überlebende Namen die id, und zwischen ab90qa und diesem Build weitere 376 (siehe die Drift-Messungen unten).
 
-| Name | id (ab90qa) | Hinweise |
+| Name | id (xkg8x) | Hinweise |
 |---|---|---|
-| `alloy_kiln_back` | 1089 |  |
-| `alloy_kiln_front` | 1083 |  |
-| `alloy_kiln_side` | 1084 |  |
+| `alloy_kiln_back` | 1091 |  |
+| `alloy_kiln_front` | 1085 |  |
+| `alloy_kiln_side` | 1086 |  |
 | `alloy_kiln_side_running` | 33 | anim (4 Frames) |
-| `alloy_kiln_top` | 1085 | Rotationsfamilie (4 Kopien) |
+| `alloy_kiln_top` | 1087 | Rotationsfamilie (4 Kopien) |
 | `andesite_brick` | 465 |  |
 | `apple_block_bottom` | 441 |  |
 | `apple_block_side` | 439 |  |
 | `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 993 |  |
-| `armour_lucky_block_rare` | 995 |  |
-| `armour_lucky_block_super` | 997 |  |
+| `armour_lucky_block` | 995 |  |
+| `armour_lucky_block_rare` | 997 |  |
+| `armour_lucky_block_super` | 999 |  |
 | `artisan_table_side` | 367 |  |
 | `artisan_table_top` | 368 |  |
-| `ash` | 1029 |  |
-| `auto_bench_back` | 1104 |  |
-| `auto_bench_front` | 1098 |  |
-| `auto_bench_side` | 1099 |  |
+| `ash` | 1031 |  |
+| `auto_bench_back` | 1106 |  |
+| `auto_bench_front` | 1100 |  |
+| `auto_bench_side` | 1101 |  |
 | `auto_bench_side_running` | 35 | anim (4 Frames) |
-| `auto_bench_top` | 1100 | Rotationsfamilie (4 Kopien) |
-| `autocrafter_bottom` | 960 |  |
-| `autocrafter_lunite_bottom` | 971 |  |
-| `autocrafter_lunite_side` | 970 |  |
-| `autocrafter_side` | 959 |  |
-| `banana_block_side` | 897 |  |
-| `banana_block_top` | 898 |  |
+| `auto_bench_top` | 1102 | Rotationsfamilie (4 Kopien) |
+| `autocrafter_bottom` | 962 |  |
+| `autocrafter_lunite_bottom` | 973 |  |
+| `autocrafter_lunite_side` | 972 |  |
+| `autocrafter_side` | 961 |  |
+| `banana_block_side` | 899 |  |
+| `banana_block_top` | 900 |  |
 | `beacon` | 330 |  |
 | `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 923 |  |
-| `beetroot_block_side` | 921 |  |
-| `beetroot_block_top` | 922 |  |
-| `belt_drop_side` | 1183 |  |
-| `belt_drop_top` | 1182 |  |
-| `belt_lift_side` | 1181 |  |
-| `belt_lift_top` | 1180 |  |
-| `belt_loader_slab_front` | 1108 |  |
-| `belt_loader_top` | 1107 |  |
-| `belt_tunnel_back` | 1197 |  |
-| `belt_tunnel_exit_top` | 1198 | Rotationsfamilie (4 Kopien) |
-| `belt_tunnel_mouth` | 1191 |  |
-| `belt_tunnel_side` | 1192 |  |
-| `belt_tunnel_top` | 1193 | Rotationsfamilie (4 Kopien) |
+| `beetroot_block_bottom` | 925 |  |
+| `beetroot_block_side` | 923 |  |
+| `beetroot_block_top` | 924 |  |
+| `belt_drop_side` | 1185 |  |
+| `belt_drop_top` | 1184 |  |
+| `belt_lift_side` | 1183 |  |
+| `belt_lift_top` | 1182 |  |
+| `belt_loader_slab_front` | 1110 |  |
+| `belt_loader_top` | 1109 |  |
+| `belt_tunnel_back` | 1199 |  |
+| `belt_tunnel_exit_top` | 1200 | Rotationsfamilie (4 Kopien) |
+| `belt_tunnel_mouth` | 1193 |  |
+| `belt_tunnel_side` | 1194 |  |
+| `belt_tunnel_top` | 1195 | Rotationsfamilie (4 Kopien) |
 | `black_concrete` | 273 |  |
 | `black_glazed_terracotta` | 429 | Rotationsfamilie (4 Kopien) |
 | `black_planks` | 366 |  |
 | `black_portal` | 2 | anim (4 Frames) |
 | `black_spawn_block_side` | 760 |  |
 | `black_spawn_block_top` | 756 | Rotationsfamilie (4 Kopien) |
-| `block_destroyer_tnt_side` | 1015 |  |
-| `block_destroyer_tnt_top` | 1016 |  |
+| `block_destroyer_tnt_side` | 1017 |  |
+| `block_destroyer_tnt_top` | 1018 |  |
 | `blue_concrete` | 274 |  |
 | `blue_gen_spawn_coal` | 774 |  |
 | `blue_gen_spawn_iron` | 775 |  |
 | `blue_gen_spawn_top` | 773 |  |
 | `blue_glazed_terracotta` | 413 | Rotationsfamilie (4 Kopien) |
-| `blue_lucky_block` | 992 |  |
-| `blue_lucky_block_rare` | 994 |  |
-| `blue_lucky_block_super` | 996 |  |
+| `blue_lucky_block` | 994 |  |
+| `blue_lucky_block_rare` | 996 |  |
+| `blue_lucky_block_super` | 998 |  |
 | `blue_planks` | 362 |  |
 | `blue_portal` | 3 | anim (4 Frames) |
 | `blue_spawn_block_side` | 755 |  |
@@ -1896,7 +1896,7 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `bookshelf_5` | 570 |  |
 | `bookshelf_empty` | 565 |  |
 | `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 976 |  |
+| `bowling_alley_floor` | 978 |  |
 | `bread_block_back` | 435 |  |
 | `bread_block_front` | 434 |  |
 | `bread_block_side` | 436 |  |
@@ -1909,80 +1909,88 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `brown_portal` | 4 | anim (4 Frames) |
 | `brown_spawn_block_side` | 750 |  |
 | `brown_spawn_block_top` | 746 | Rotationsfamilie (4 Kopien) |
-| `building_lucky_block` | 987 |  |
-| `building_lucky_block_rare` | 989 |  |
-| `building_lucky_block_super` | 991 |  |
-| `burner_drill_back` | 1046 |  |
-| `burner_drill_bottom` | 1045 |  |
-| `burner_drill_front` | 1039 |  |
-| `burner_drill_side` | 1040 |  |
+| `building_lucky_block` | 989 |  |
+| `building_lucky_block_rare` | 991 |  |
+| `building_lucky_block_super` | 993 |  |
+| `burner_drill_back` | 1048 |  |
+| `burner_drill_bottom` | 1047 |  |
+| `burner_drill_front` | 1041 |  |
+| `burner_drill_side` | 1042 |  |
 | `burner_drill_side_running` | 27 | anim (4 Frames) |
-| `burner_drill_top` | 1041 | Rotationsfamilie (4 Kopien) |
+| `burner_drill_top` | 1043 | Rotationsfamilie (4 Kopien) |
 | `cactus_dry` | 350 |  |
 | `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 919 |  |
-| `carrot_block_side` | 917 |  |
-| `carrot_block_top` | 918 |  |
-| `carved_messy_stone` | 826 |  |
+| `carrot_block_bottom` | 921 |  |
+| `carrot_block_side` | 919 |  |
+| `carrot_block_top` | 920 |  |
+| `carved_messy_stone` | 827 |  |
 | `carved_pumpkin` | 543 |  |
-| `chalk` | 837 |  |
-| `chalk_black` | 853 |  |
-| `chalk_blue` | 852 |  |
-| `chalk_bricks_black` | 869 |  |
-| `chalk_bricks_blue` | 868 |  |
-| `chalk_bricks_brown` | 867 |  |
-| `chalk_bricks_cyan` | 866 |  |
-| `chalk_bricks_gray` | 865 |  |
-| `chalk_bricks_green` | 864 |  |
-| `chalk_bricks_light_blue` | 863 |  |
-| `chalk_bricks_light_gray` | 862 |  |
-| `chalk_bricks_lime` | 861 |  |
-| `chalk_bricks_magenta` | 860 |  |
-| `chalk_bricks_orange` | 859 |  |
-| `chalk_bricks_pink` | 858 |  |
-| `chalk_bricks_purple` | 857 |  |
-| `chalk_bricks_red` | 856 |  |
-| `chalk_bricks_slab_side_black` | 885 |  |
-| `chalk_bricks_slab_side_blue` | 884 |  |
-| `chalk_bricks_slab_side_brown` | 883 |  |
-| `chalk_bricks_slab_side_cyan` | 882 |  |
-| `chalk_bricks_slab_side_gray` | 881 |  |
-| `chalk_bricks_slab_side_green` | 880 |  |
-| `chalk_bricks_slab_side_light_blue` | 879 |  |
-| `chalk_bricks_slab_side_light_gray` | 878 |  |
-| `chalk_bricks_slab_side_lime` | 877 |  |
-| `chalk_bricks_slab_side_magenta` | 876 |  |
-| `chalk_bricks_slab_side_orange` | 875 |  |
-| `chalk_bricks_slab_side_pink` | 874 |  |
-| `chalk_bricks_slab_side_purple` | 873 |  |
-| `chalk_bricks_slab_side_red` | 872 |  |
-| `chalk_bricks_slab_side_white` | 871 |  |
-| `chalk_bricks_slab_side_yellow` | 870 |  |
-| `chalk_bricks_white` | 855 |  |
-| `chalk_bricks_yellow` | 854 |  |
-| `chalk_brown` | 851 |  |
-| `chalk_cyan` | 850 |  |
-| `chalk_gray` | 849 |  |
-| `chalk_green` | 848 |  |
-| `chalk_light_blue` | 847 |  |
-| `chalk_light_gray` | 846 |  |
-| `chalk_lime` | 845 |  |
-| `chalk_magenta` | 844 |  |
-| `chalk_orange` | 843 |  |
-| `chalk_pink` | 842 |  |
-| `chalk_purple` | 841 |  |
-| `chalk_red` | 840 |  |
-| `chalk_white` | 839 |  |
-| `chalk_yellow` | 838 |  |
-| `charge_vault_side` | 1112 |  |
-| `charge_vault_top` | 1111 |  |
-| `charging_pad_side` | 1157 |  |
-| `charging_pad_top` | 1156 |  |
+| `chalk` | 839 |  |
+| `chalk_black` | 855 |  |
+| `chalk_blue` | 854 |  |
+| `chalk_bricks_black` | 871 |  |
+| `chalk_bricks_blue` | 870 |  |
+| `chalk_bricks_brown` | 869 |  |
+| `chalk_bricks_cyan` | 868 |  |
+| `chalk_bricks_gray` | 867 |  |
+| `chalk_bricks_green` | 866 |  |
+| `chalk_bricks_light_blue` | 865 |  |
+| `chalk_bricks_light_gray` | 864 |  |
+| `chalk_bricks_lime` | 863 |  |
+| `chalk_bricks_magenta` | 862 |  |
+| `chalk_bricks_orange` | 861 |  |
+| `chalk_bricks_pink` | 860 |  |
+| `chalk_bricks_purple` | 859 |  |
+| `chalk_bricks_red` | 858 |  |
+| `chalk_bricks_slab_side_black` | 887 |  |
+| `chalk_bricks_slab_side_blue` | 886 |  |
+| `chalk_bricks_slab_side_brown` | 885 |  |
+| `chalk_bricks_slab_side_cyan` | 884 |  |
+| `chalk_bricks_slab_side_gray` | 883 |  |
+| `chalk_bricks_slab_side_green` | 882 |  |
+| `chalk_bricks_slab_side_light_blue` | 881 |  |
+| `chalk_bricks_slab_side_light_gray` | 880 |  |
+| `chalk_bricks_slab_side_lime` | 879 |  |
+| `chalk_bricks_slab_side_magenta` | 878 |  |
+| `chalk_bricks_slab_side_orange` | 877 |  |
+| `chalk_bricks_slab_side_pink` | 876 |  |
+| `chalk_bricks_slab_side_purple` | 875 |  |
+| `chalk_bricks_slab_side_red` | 874 |  |
+| `chalk_bricks_slab_side_white` | 873 |  |
+| `chalk_bricks_slab_side_yellow` | 872 |  |
+| `chalk_bricks_white` | 857 |  |
+| `chalk_bricks_yellow` | 856 |  |
+| `chalk_brown` | 853 |  |
+| `chalk_cyan` | 852 |  |
+| `chalk_gray` | 851 |  |
+| `chalk_green` | 850 |  |
+| `chalk_light_blue` | 849 |  |
+| `chalk_light_gray` | 848 |  |
+| `chalk_lime` | 847 |  |
+| `chalk_magenta` | 846 |  |
+| `chalk_orange` | 845 |  |
+| `chalk_pink` | 844 |  |
+| `chalk_purple` | 843 |  |
+| `chalk_red` | 842 |  |
+| `chalk_white` | 841 |  |
+| `chalk_yellow` | 840 |  |
+| `charge_vault_side` | 1114 |  |
+| `charge_vault_top` | 1113 |  |
+| `charging_pad_side` | 1159 |  |
+| `charging_pad_top` | 1158 |  |
 | `checkpoint_block` | 761 | Rotationsfamilie (4 Kopien) |
 | `cherry_block_bottom` | 590 |  |
 | `cherry_block_side` | 588 |  |
 | `cherry_block_top` | 589 |  |
 | `chest_back` | 347 |  |
+| `chest_double_back_hi` | 1219 |  |
+| `chest_double_back_lo` | 1218 |  |
+| `chest_double_front_hi` | 1213 |  |
+| `chest_double_front_lo` | 1212 |  |
+| `chest_double_top_1_hi` | 1215 |  |
+| `chest_double_top_1_lo` | 1214 |  |
+| `chest_double_top_2_hi` | 1217 |  |
+| `chest_double_top_2_lo` | 1216 |  |
 | `chest_front` | 341 |  |
 | `chest_side` | 342 |  |
 | `chest_top` | 343 | Rotationsfamilie (4 Kopien) |
@@ -1993,46 +2001,46 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `chiseled_sandstone` | 325 |  |
 | `clay` | 195 |  |
 | `coal_block` | 233 |  |
-| `coal_deposit` | 1030 |  |
+| `coal_deposit` | 1032 |  |
 | `coal_ore` | 227 |  |
 | `coarse_dirt` | 191 |  |
 | `coconut_block_bottom` | 522 |  |
 | `coconut_block_side` | 520 |  |
 | `coconut_block_top` | 521 |  |
 | `code_block` | 679 |  |
-| `comet_heart` | 1168 |  |
-| `comet_ore` | 1167 |  |
+| `comet_heart` | 1170 |  |
+| `comet_ore` | 1169 |  |
 | `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1079 |  |
-| `conveyor_belt_slab_side` | 1078 |  |
-| `conveyor_belt_top` | 1077 |  |
-| `conveyor_belt_turn_left` | 1169 |  |
-| `conveyor_belt_turn_right` | 1170 |  |
-| `copper_deposit` | 1033 |  |
-| `copper_ore` | 1038 |  |
+| `conveyor_belt_bottom` | 1081 |  |
+| `conveyor_belt_slab_side` | 1080 |  |
+| `conveyor_belt_top` | 1079 |  |
+| `conveyor_belt_turn_left` | 1171 |  |
+| `conveyor_belt_turn_right` | 1172 |  |
+| `copper_deposit` | 1035 |  |
+| `copper_ore` | 1040 |  |
 | `corn_block_bottom` | 594 |  |
 | `corn_block_side` | 592 |  |
 | `corn_block_top` | 593 |  |
 | `crafting_table_side` | 338 |  |
 | `crafting_table_top` | 339 |  |
-| `crate` | 916 |  |
-| `crop_harvester_back` | 1190 |  |
+| `crate` | 918 |  |
+| `crop_harvester_back` | 1192 |  |
 | `crop_harvester_back_running` | 45 | anim (4 Frames) |
-| `crop_harvester_front` | 1184 |  |
-| `crop_harvester_side` | 1185 |  |
+| `crop_harvester_front` | 1186 |  |
+| `crop_harvester_side` | 1187 |  |
 | `crop_harvester_side_running` | 44 | anim (4 Frames) |
-| `crop_harvester_top` | 1186 | Rotationsfamilie (4 Kopien) |
-| `crusher_back` | 1053 |  |
-| `crusher_front` | 1047 |  |
-| `crusher_side` | 1048 |  |
+| `crop_harvester_top` | 1188 | Rotationsfamilie (4 Kopien) |
+| `crusher_back` | 1055 |  |
+| `crusher_front` | 1049 |  |
+| `crusher_side` | 1050 |  |
 | `crusher_side_running` | 28 | anim (4 Frames) |
-| `crusher_top` | 1049 | Rotationsfamilie (4 Kopien) |
-| `crystal_block` | 1027 |  |
-| `crystal_vat_back` | 1164 |  |
-| `crystal_vat_front` | 1158 |  |
-| `crystal_vat_side` | 1159 |  |
+| `crusher_top` | 1051 | Rotationsfamilie (4 Kopien) |
+| `crystal_block` | 1029 |  |
+| `crystal_vat_back` | 1166 |  |
+| `crystal_vat_front` | 1160 |  |
+| `crystal_vat_side` | 1161 |  |
 | `crystal_vat_side_running` | 42 | anim (4 Frames) |
-| `crystal_vat_top` | 1160 | Rotationsfamilie (4 Kopien) |
+| `crystal_vat_top` | 1162 | Rotationsfamilie (4 Kopien) |
 | `custom_lobby_block_side` | 769 |  |
 | `custom_lobby_block_top` | 765 | Rotationsfamilie (4 Kopien) |
 | `cut_red_sandstone` | 457 |  |
@@ -2047,18 +2055,18 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `cyan_spawn_block_side` | 745 |  |
 | `cyan_spawn_block_top` | 741 | Rotationsfamilie (4 Kopien) |
 | `dark_green_bricks` | 460 |  |
-| `darkstone` | 1204 |  |
-| `darkstone_bricks` | 1205 |  |
-| `darkstone_bricks_cracked` | 1206 |  |
-| `darkstone_bricks_lava` | 1207 |  |
-| `darkstone_engraved` | 1208 |  |
-| `darkstone_smooth` | 1209 |  |
-| `deep_drill_back` | 1138 |  |
-| `deep_drill_bottom` | 1137 |  |
-| `deep_drill_front` | 1131 |  |
-| `deep_drill_side` | 1132 |  |
+| `darkstone` | 1206 |  |
+| `darkstone_bricks` | 1207 |  |
+| `darkstone_bricks_cracked` | 1208 |  |
+| `darkstone_bricks_lava` | 1209 |  |
+| `darkstone_engraved` | 1210 |  |
+| `darkstone_smooth` | 1211 |  |
+| `deep_drill_back` | 1140 |  |
+| `deep_drill_bottom` | 1139 |  |
+| `deep_drill_front` | 1133 |  |
+| `deep_drill_side` | 1134 |  |
 | `deep_drill_side_running` | 39 | anim (4 Frames) |
-| `deep_drill_top` | 1133 | Rotationsfamilie (4 Kopien) |
+| `deep_drill_top` | 1135 | Rotationsfamilie (4 Kopien) |
 | `diamond_block` | 340 |  |
 | `diamond_gen_spawn_side` | 807 |  |
 | `diamond_gen_spawn_top` | 806 |  |
@@ -2067,23 +2075,23 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `dirt` | 190 |  |
 | `drop_location_block_side` | 814 |  |
 | `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1036 |  |
-| `dry_grass_block` | 978 |  |
-| `dry_grass_block_side` | 977 |  |
-| `electric_drill_back` | 1097 |  |
-| `electric_drill_bottom` | 1096 |  |
-| `electric_drill_front` | 1090 |  |
-| `electric_drill_side` | 1091 |  |
+| `drop_pad` | 1038 |  |
+| `dry_grass_block` | 980 |  |
+| `dry_grass_block_side` | 979 |  |
+| `electric_drill_back` | 1099 |  |
+| `electric_drill_bottom` | 1098 |  |
+| `electric_drill_front` | 1092 |  |
+| `electric_drill_side` | 1093 |  |
 | `electric_drill_side_running` | 34 | anim (4 Frames) |
-| `electric_drill_top` | 1092 | Rotationsfamilie (4 Kopien) |
+| `electric_drill_top` | 1094 | Rotationsfamilie (4 Kopien) |
 | `emerald_block` | 237 |  |
 | `emerald_ore` | 231 |  |
 | `end_stone` | 226 |  |
 | `engraved_andesite` | 464 |  |
 | `engraved_diorite` | 462 |  |
 | `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1020 |  |
-| `evil_lucky_block_face` | 1021 |  |
+| `evil_lucky_block` | 1022 |  |
+| `evil_lucky_block_face` | 1023 |  |
 | `explosive_paint_black_side` | 626 |  |
 | `explosive_paint_black_top` | 627 |  |
 | `explosive_paint_blue_side` | 624 |  |
@@ -2168,29 +2176,29 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `fallen_cherry_leaves_side` | 586 |  |
 | `fallen_maple_leaves_side` | 478 |  |
 | `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1155 |  |
-| `fast_belt_top` | 1154 |  |
-| `fast_belt_turn_left` | 1171 |  |
-| `fast_belt_turn_right` | 1172 |  |
-| `fertilised_soil` | 924 |  |
+| `fast_belt_slab_side` | 1157 |  |
+| `fast_belt_top` | 1156 |  |
+| `fast_belt_turn_left` | 1173 |  |
+| `fast_belt_turn_right` | 1174 |  |
+| `fertilised_soil` | 926 |  |
 | `finish_block` | 812 |  |
 | `fireball_block` | 539 |  |
-| `food_lucky_block` | 1005 |  |
-| `food_lucky_block_rare` | 1007 |  |
-| `food_lucky_block_super` | 1009 |  |
-| `forge_hopper_top` | 1166 |  |
+| `food_lucky_block` | 1007 |  |
+| `food_lucky_block_rare` | 1009 |  |
+| `food_lucky_block_super` | 1011 |  |
+| `forge_hopper_top` | 1168 |  |
 | `furnace_front` | 335 |  |
 | `furnace_side` | 336 |  |
 | `furnace_top` | 337 |  |
-| `generator_side` | 1061 |  |
+| `generator_side` | 1063 |  |
 | `generator_side_running` | 30 | anim (4 Frames) |
-| `generator_top` | 1062 |  |
-| `ghost_chest_back` | 954 |  |
-| `ghost_chest_front` | 951 |  |
-| `ghost_chest_side` | 952 |  |
-| `ghost_chest_top` | 953 |  |
-| `ghost_lucky_block` | 955 |  |
-| `ghost_mystery_block` | 956 |  |
+| `generator_top` | 1064 |  |
+| `ghost_chest_back` | 956 |  |
+| `ghost_chest_front` | 953 |  |
+| `ghost_chest_side` | 954 |  |
+| `ghost_chest_top` | 955 |  |
+| `ghost_lucky_block` | 957 |  |
+| `ghost_mystery_block` | 958 |  |
 | `glass` | 294 |  |
 | `glass_black` | 295 |  |
 | `glass_blue` | 296 |  |
@@ -2211,7 +2219,7 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `glass_yellow` | 310 |  |
 | `glowstone` | 331 |  |
 | `gold_block` | 235 |  |
-| `gold_deposit` | 1034 |  |
+| `gold_deposit` | 1036 |  |
 | `gold_ore` | 229 |  |
 | `granite_brick` | 467 |  |
 | `grass_block_side` | 192 |  |
@@ -2229,9 +2237,9 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `green_bricks` | 459 |  |
 | `green_concrete` | 285 |  |
 | `green_glazed_terracotta` | 421 | Rotationsfamilie (4 Kopien) |
-| `green_lucky_block` | 1004 |  |
-| `green_lucky_block_rare` | 1006 |  |
-| `green_lucky_block_super` | 1008 |  |
+| `green_lucky_block` | 1006 |  |
+| `green_lucky_block_rare` | 1008 |  |
+| `green_lucky_block_super` | 1010 |  |
 | `green_planks` | 364 |  |
 | `green_portal` | 7 | anim (4 Frames) |
 | `green_spawn_block_side` | 735 |  |
@@ -2239,7 +2247,7 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `green_stone` | 458 |  |
 | `grenade_block` | 581 |  |
 | `grey_portal` | 8 | anim (4 Frames) |
-| `gun_lucky_block` | 950 |  |
+| `gun_lucky_block` | 952 |  |
 | `hardened_clay` | 254 |  |
 | `hardened_clay_stained_black` | 270 |  |
 | `hardened_clay_stained_blue` | 266 |  |
@@ -2257,18 +2265,18 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `hardened_clay_stained_silver` | 263 |  |
 | `hardened_clay_stained_white` | 255 |  |
 | `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 967 |  |
-| `harvester_lunite_bottom` | 975 |  |
-| `harvester_lunite_side_0` | 972 |  |
-| `harvester_lunite_side_1` | 973 |  |
-| `harvester_lunite_top` | 974 |  |
-| `harvester_side0` | 964 |  |
-| `harvester_side1` | 965 |  |
-| `harvester_top` | 966 |  |
+| `harvester_bottom` | 969 |  |
+| `harvester_lunite_bottom` | 977 |  |
+| `harvester_lunite_side_0` | 974 |  |
+| `harvester_lunite_side_1` | 975 |  |
+| `harvester_lunite_top` | 976 |  |
+| `harvester_side0` | 966 |  |
+| `harvester_side1` | 967 |  |
+| `harvester_top` | 968 |  |
 | `hay_block_side` | 328 |  |
-| `homestead_core` | 1035 |  |
-| `homestead_core_cap` | 1120 |  |
-| `homestead_core_crown` | 1119 |  |
+| `homestead_core` | 1037 |  |
+| `homestead_core_cap` | 1122 |  |
+| `homestead_core_crown` | 1121 |  |
 | `homestead_core_mid` | 26 | anim (4 Frames) |
 | `hyper_compressed_messy_stone` | 533 |  |
 | `ice` | 326 |  |
@@ -2276,44 +2284,44 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `iceball_block` | 540 |  |
 | `invisible_solid` | 314 |  |
 | `iron_block` | 234 |  |
-| `iron_chest_back` | 915 |  |
-| `iron_chest_front` | 909 |  |
-| `iron_chest_side` | 910 |  |
-| `iron_chest_top` | 911 | Rotationsfamilie (4 Kopien) |
-| `iron_deposit` | 1031 |  |
+| `iron_chest_back` | 917 |  |
+| `iron_chest_front` | 911 |  |
+| `iron_chest_side` | 912 |  |
+| `iron_chest_top` | 913 | Rotationsfamilie (4 Kopien) |
+| `iron_deposit` | 1033 |  |
 | `iron_ore` | 228 |  |
 | `iron_watermelon_side` | 546 |  |
 | `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 887 |  |
-| `jungle_grass_block_side` | 886 |  |
+| `jungle_grass_block` | 889 |  |
+| `jungle_grass_block_side` | 888 |  |
 | `lapis_block` | 236 |  |
 | `lapis_ore` | 230 |  |
 | `lava` | 1 | anim (8 Frames) |
-| `leather_block_side` | 906 |  |
-| `leather_block_top` | 907 |  |
+| `leather_block_side` | 908 |  |
+| `leather_block_top` | 909 |  |
 | `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 908 |  |
+| `leaves_aspen_autumn` | 910 |  |
 | `leaves_cedar` | 470 |  |
 | `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 904 |  |
+| `leaves_cherry_fruity` | 906 |  |
 | `leaves_jungle` | 290 |  |
-| `leaves_mango` | 892 |  |
-| `leaves_mango_fruity` | 905 |  |
+| `leaves_mango` | 894 |  |
+| `leaves_mango_fruity` | 907 |  |
 | `leaves_maple` | 289 |  |
 | `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 899 |  |
+| `leaves_maple_fruity` | 901 |  |
 | `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 902 |  |
+| `leaves_palm_fruity` | 904 |  |
 | `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 903 |  |
+| `leaves_pear_fruity` | 905 |  |
 | `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 900 |  |
+| `leaves_pine_cone` | 902 |  |
 | `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 901 |  |
-| `leaves_spectral` | 830 |  |
+| `leaves_plum_fruity` | 903 |  |
+| `leaves_spectral` | 831 |  |
 | `light_blue_concrete` | 277 |  |
 | `light_blue_glazed_terracotta` | 381 | Rotationsfamilie (4 Kopien) |
-| `light_blue_lucky_block` | 931 |  |
+| `light_blue_lucky_block` | 933 |  |
 | `light_blue_planks` | 354 |  |
 | `light_blue_spawn_block_side` | 730 |  |
 | `light_blue_spawn_block_top` | 726 | Rotationsfamilie (4 Kopien) |
@@ -2333,26 +2341,26 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `lime_portal` | 11 | anim (4 Frames) |
 | `lime_spawn_block_side` | 720 |  |
 | `lime_spawn_block_top` | 716 | Rotationsfamilie (4 Kopien) |
-| `log_ancient_maple` | 1019 |  |
+| `log_ancient_maple` | 1021 |  |
 | `log_aspen` | 202 |  |
 | `log_cedar` | 201 |  |
 | `log_cherry` | 582 |  |
 | `log_jungle` | 203 |  |
-| `log_mango` | 889 |  |
+| `log_mango` | 891 |  |
 | `log_maple` | 198 |  |
 | `log_palm` | 472 |  |
 | `log_pear` | 523 |  |
 | `log_pine` | 199 |  |
 | `log_plum` | 200 |  |
-| `log_spectral` | 827 |  |
-| `lucky_block_pink_question` | 957 |  |
-| `lucky_block_pink_question_rare` | 1011 |  |
-| `lucky_block_pink_question_super` | 1013 |  |
-| `lunite_block` | 969 |  |
-| `lunite_ore` | 968 |  |
-| `machine_bench_side` | 1113 |  |
-| `machine_bench_top` | 1114 |  |
-| `machine_side` | 1037 |  |
+| `log_spectral` | 828 |  |
+| `lucky_block_pink_question` | 959 |  |
+| `lucky_block_pink_question_rare` | 1013 |  |
+| `lucky_block_pink_question_super` | 1015 |  |
+| `lunite_block` | 971 |  |
+| `lunite_ore` | 970 |  |
+| `machine_bench_side` | 1115 |  |
+| `machine_bench_top` | 1116 |  |
+| `machine_side` | 1039 |  |
 | `magenta_concrete` | 279 |  |
 | `magenta_glazed_terracotta` | 377 | Rotationsfamilie (4 Kopien) |
 | `magenta_planks` | 353 |  |
@@ -2363,16 +2371,18 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `mailbox_front` | 571 |  |
 | `mailbox_front_full` | 573 |  |
 | `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 896 |  |
-| `mango_block_side` | 894 |  |
-| `mango_block_top` | 895 |  |
+| `mango_block_bottom` | 898 |  |
+| `mango_block_side` | 896 |  |
+| `mango_block_top` | 897 |  |
 | `mega_compressed_messy_stone` | 535 |  |
 | `melon_side` | 544 |  |
 | `melon_top` | 545 |  |
 | `melting_ice` | 595 |  |
 | `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 822 |  |
+| `mob_spawner_block_empty_side` | 823 |  |
 | `mob_spawner_block_top` | 821 |  |
+| `mob_spawner_hostile_block_side` | 822 |  |
+| `mob_spawner_neutral_block_side` | 838 |  |
 | `mob_spawner_passive_block_side` | 820 |  |
 | `moonstone_block` | 450 |  |
 | `moonstone_chest_back` | 449 |  |
@@ -2387,22 +2397,22 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `mossy_cobblestone` | 438 |  |
 | `mushroom_stem` | 538 |  |
 | `mystery_block` | 578 |  |
-| `neon_black` | 949 |  |
-| `neon_blue` | 948 |  |
-| `neon_brown` | 947 |  |
-| `neon_cyan` | 946 |  |
-| `neon_gray` | 945 |  |
-| `neon_green` | 944 |  |
-| `neon_light_blue` | 943 |  |
-| `neon_light_gray` | 942 |  |
-| `neon_lime` | 941 |  |
-| `neon_magenta` | 940 |  |
-| `neon_orange` | 939 |  |
-| `neon_pink` | 938 |  |
-| `neon_purple` | 937 |  |
-| `neon_red` | 936 |  |
-| `neon_white` | 935 |  |
-| `neon_yellow` | 934 |  |
+| `neon_black` | 951 |  |
+| `neon_blue` | 950 |  |
+| `neon_brown` | 949 |  |
+| `neon_cyan` | 948 |  |
+| `neon_gray` | 947 |  |
+| `neon_green` | 946 |  |
+| `neon_light_blue` | 945 |  |
+| `neon_light_gray` | 944 |  |
+| `neon_lime` | 943 |  |
+| `neon_magenta` | 942 |  |
+| `neon_orange` | 941 |  |
+| `neon_pink` | 940 |  |
+| `neon_purple` | 939 |  |
+| `neon_red` | 938 |  |
+| `neon_white` | 937 |  |
+| `neon_yellow` | 936 |  |
 | `nether_brick` | 317 |  |
 | `netherrack` | 318 |  |
 | `obby_absorb_block` | 816 |  |
@@ -2411,18 +2421,18 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `obsidian` | 327 |  |
 | `orange_concrete` | 280 |  |
 | `orange_glazed_terracotta` | 373 | Rotationsfamilie (4 Kopien) |
-| `orange_lucky_block` | 998 |  |
-| `orange_lucky_block_rare` | 1000 |  |
-| `orange_lucky_block_super` | 1002 |  |
+| `orange_lucky_block` | 1000 |  |
+| `orange_lucky_block_rare` | 1002 |  |
+| `orange_lucky_block_super` | 1004 |  |
 | `orange_planks` | 352 |  |
 | `orange_portal` | 13 | anim (4 Frames) |
 | `orange_spawn_block_side` | 710 |  |
 | `orange_spawn_block_top` | 706 | Rotationsfamilie (4 Kopien) |
 | `ore_gen_spawn_side` | 811 |  |
 | `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 825 |  |
-| `parts_bench_side` | 1115 |  |
-| `parts_bench_top` | 1116 |  |
+| `packed_snow` | 826 |  |
+| `parts_bench_side` | 1117 |  |
+| `parts_bench_top` | 1118 |  |
 | `patterned_glass_black` | 548 |  |
 | `patterned_glass_blue` | 549 |  |
 | `patterned_glass_brown` | 550 |  |
@@ -2442,11 +2452,11 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `pear_block_bottom` | 529 |  |
 | `pear_block_side` | 527 |  |
 | `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 958 |  |
-| `pine_cone_block_side` | 835 |  |
-| `pine_cone_block_top` | 836 |  |
-| `pine_grass_block` | 833 |  |
-| `pine_grass_block_side` | 832 |  |
+| `pet_lucky_block` | 960 |  |
+| `pine_cone_block_side` | 836 |  |
+| `pine_cone_block_top` | 837 |  |
+| `pine_grass_block` | 834 |  |
+| `pine_grass_block_side` | 833 |  |
 | `pink_concrete` | 281 |  |
 | `pink_gen_spawn_coal` | 789 |  |
 | `pink_gen_spawn_iron` | 790 |  |
@@ -2460,69 +2470,69 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `planks_cedar` | 209 |  |
 | `planks_cherry` | 584 |  |
 | `planks_jungle` | 207 |  |
-| `planks_mango` | 891 |  |
+| `planks_mango` | 893 |  |
 | `planks_maple` | 204 |  |
 | `planks_palm` | 473 |  |
 | `planks_pear` | 524 |  |
 | `planks_pine` | 208 |  |
 | `planks_plum` | 206 |  |
-| `planks_spectral` | 829 |  |
+| `planks_spectral` | 830 |  |
 | `plum_block_bottom` | 519 |  |
 | `plum_block_side` | 517 |  |
 | `plum_block_top` | 518 |  |
 | `podzol_top` | 452 |  |
-| `potato_block` | 920 |  |
-| `potion_lucky_block` | 1010 |  |
-| `potion_lucky_block_rare` | 1012 |  |
-| `potion_lucky_block_super` | 1014 |  |
-| `press_back` | 1069 |  |
-| `press_front` | 1063 |  |
-| `press_side` | 1064 |  |
+| `potato_block` | 922 |  |
+| `potion_lucky_block` | 1012 |  |
+| `potion_lucky_block_rare` | 1014 |  |
+| `potion_lucky_block_super` | 1016 |  |
+| `press_back` | 1071 |  |
+| `press_front` | 1065 |  |
+| `press_side` | 1066 |  |
 | `press_side_running` | 31 | anim (4 Frames) |
-| `press_top` | 1065 | Rotationsfamilie (4 Kopien) |
+| `press_top` | 1067 | Rotationsfamilie (4 Kopien) |
 | `protector` | 348 |  |
 | `protector_faction` | 575 |  |
 | `protector_tribe` | 574 |  |
 | `pumpkin_face_on` | 291 |  |
 | `pumpkin_side` | 541 |  |
 | `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1022 |  |
-| `pure_copper_ore` | 1202 |  |
-| `pure_diamond_ore` | 1025 |  |
-| `pure_gold_ore` | 1024 |  |
-| `pure_iron_ore` | 1023 |  |
-| `pure_moonstone_ore` | 1026 |  |
-| `pure_voltite_ore` | 1203 |  |
+| `pure_coal_ore` | 1024 |  |
+| `pure_copper_ore` | 1204 |  |
+| `pure_diamond_ore` | 1027 |  |
+| `pure_gold_ore` | 1026 |  |
+| `pure_iron_ore` | 1025 |  |
+| `pure_moonstone_ore` | 1028 |  |
+| `pure_voltite_ore` | 1205 |  |
 | `purple_concrete` | 282 |  |
 | `purple_glazed_terracotta` | 409 | Rotationsfamilie (4 Kopien) |
-| `purple_lucky_block` | 986 |  |
-| `purple_lucky_block_rare` | 988 |  |
-| `purple_lucky_block_super` | 990 |  |
+| `purple_lucky_block` | 988 |  |
+| `purple_lucky_block_rare` | 990 |  |
+| `purple_lucky_block_super` | 992 |  |
 | `purple_planks` | 361 |  |
 | `purple_portal` | 15 | anim (4 Frames) |
 | `purple_spawn_block_side` | 700 |  |
 | `purple_spawn_block_top` | 696 | Rotationsfamilie (4 Kopien) |
 | `quartz_block_chiseled` | 320 |  |
 | `quartz_block_side` | 319 |  |
-| `radar_bottom` | 927 |  |
+| `radar_bottom` | 929 |  |
 | `radar_screen` | 19 | anim (4 Frames) Rotationsfamilie (4 Kopien) |
-| `radar_side_active` | 925 |  |
-| `radar_side_inactive` | 928 |  |
-| `radar_top_active` | 926 |  |
-| `radar_top_inactive` | 929 |  |
-| `recycler_back` | 1179 |  |
-| `recycler_front` | 1173 |  |
-| `recycler_side` | 1174 |  |
+| `radar_side_active` | 927 |  |
+| `radar_side_inactive` | 930 |  |
+| `radar_top_active` | 928 |  |
+| `radar_top_inactive` | 931 |  |
+| `recycler_back` | 1181 |  |
+| `recycler_front` | 1175 |  |
+| `recycler_side` | 1176 |  |
 | `recycler_side_running` | 43 | anim (4 Frames) |
-| `recycler_top` | 1175 | Rotationsfamilie (4 Kopien) |
+| `recycler_top` | 1177 | Rotationsfamilie (4 Kopien) |
 | `red_concrete` | 283 |  |
 | `red_gen_spawn_coal` | 771 |  |
 | `red_gen_spawn_iron` | 772 |  |
 | `red_gen_spawn_top` | 770 |  |
 | `red_glazed_terracotta` | 425 | Rotationsfamilie (4 Kopien) |
-| `red_lucky_block` | 932 |  |
-| `red_lucky_block_rare` | 982 |  |
-| `red_lucky_block_super` | 984 |  |
+| `red_lucky_block` | 934 |  |
+| `red_lucky_block_rare` | 984 |  |
+| `red_lucky_block_super` | 986 |  |
 | `red_mushroom_block` | 537 |  |
 | `red_planks` | 365 |  |
 | `red_portal` | 16 | anim (4 Frames) |
@@ -2536,29 +2546,29 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `redstone_lamp_on` | 312 |  |
 | `rocket_block` | 579 |  |
 | `rocky_dirt` | 476 |  |
-| `rope_block` | 1028 |  |
+| `rope_block` | 1030 |  |
 | `sand` | 194 |  |
 | `sandstone_brick` | 461 |  |
 | `sandstone_normal` | 225 |  |
 | `sandstone_top` | 324 |  |
-| `scorpion_eggs` | 1210 |  |
-| `shatter_mill_back` | 1145 |  |
-| `shatter_mill_front` | 1139 |  |
-| `shatter_mill_side` | 1140 |  |
+| `scorpion_eggs` | 1220 |  |
+| `shatter_mill_back` | 1147 |  |
+| `shatter_mill_front` | 1141 |  |
+| `shatter_mill_side` | 1142 |  |
 | `shatter_mill_side_running` | 40 | anim (4 Frames) |
-| `shatter_mill_top` | 1141 | Rotationsfamilie (4 Kopien) |
+| `shatter_mill_top` | 1143 | Rotationsfamilie (4 Kopien) |
 | `shop_trader_spawn_face` | 799 |  |
 | `shop_trader_spawn_side` | 798 |  |
 | `shop_trader_spawn_top` | 794 | Rotationsfamilie (4 Kopien) |
 | `shop_wizard_spawn_face` | 805 |  |
 | `shop_wizard_spawn_side` | 804 |  |
 | `shop_wizard_spawn_top` | 800 | Rotationsfamilie (4 Kopien) |
-| `sky_tap_back` | 1153 |  |
-| `sky_tap_bottom` | 1152 |  |
-| `sky_tap_front` | 1146 |  |
-| `sky_tap_side` | 1147 |  |
+| `sky_tap_back` | 1155 |  |
+| `sky_tap_bottom` | 1154 |  |
+| `sky_tap_front` | 1148 |  |
+| `sky_tap_side` | 1149 |  |
 | `sky_tap_side_running` | 41 | anim (4 Frames) |
-| `sky_tap_top` | 1148 | Rotationsfamilie (4 Kopien) |
+| `sky_tap_top` | 1150 | Rotationsfamilie (4 Kopien) |
 | `slab_andesite_brick_side` | 498 |  |
 | `slab_aspen_side` | 483 |  |
 | `slab_brick_side` | 515 |  |
@@ -2571,21 +2581,21 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `slab_cut_sandstone_side` | 509 |  |
 | `slab_diorite_brick_side` | 502 |  |
 | `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 979 |  |
+| `slab_dry_grass_top_side` | 981 |  |
 | `slab_engraved_andesite_side` | 497 |  |
 | `slab_engraved_diorite_side` | 501 |  |
 | `slab_engraved_granite_side` | 505 |  |
 | `slab_granite_brick_side` | 506 |  |
 | `slab_grass_top_side` | 487 |  |
 | `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 888 |  |
+| `slab_jungle_grass_top_side` | 890 |  |
 | `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 893 |  |
+| `slab_mango_side` | 895 |  |
 | `slab_maple_side` | 479 |  |
 | `slab_mossy_cobblestone_side` | 493 |  |
 | `slab_palm_side` | 485 |  |
 | `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 834 |  |
+| `slab_pine_grass_top_side` | 835 |  |
 | `slab_pine_side` | 480 |  |
 | `slab_plum_side` | 481 |  |
 | `slab_red_sandstone_brick_side` | 514 |  |
@@ -2593,7 +2603,7 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `slab_sandstone_brick_side` | 510 |  |
 | `slab_sandstone_normal_side` | 507 |  |
 | `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 831 |  |
+| `slab_spectral_side` | 832 |  |
 | `slab_stone_andesite_side` | 495 |  |
 | `slab_stone_andesite_smooth_side` | 496 |  |
 | `slab_stone_diorite_side` | 499 |  |
@@ -2604,29 +2614,29 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `slab_stonebrick_carved_side` | 491 |  |
 | `slab_stonebrick_mossy_side` | 494 |  |
 | `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1060 |  |
-| `smelter_front` | 1054 |  |
-| `smelter_side` | 1055 |  |
+| `smelter_back` | 1062 |  |
+| `smelter_front` | 1056 |  |
+| `smelter_side` | 1057 |  |
 | `smelter_side_running` | 29 | anim (4 Frames) |
-| `smelter_top` | 1056 | Rotationsfamilie (4 Kopien) |
+| `smelter_top` | 1058 | Rotationsfamilie (4 Kopien) |
 | `smoke` | 23 | anim (4 Frames) |
 | `smooth_stone` | 218 |  |
 | `snow` | 197 |  |
-| `snowy_messy_stone` | 823 |  |
-| `snowy_messy_stone_side` | 824 |  |
-| `solar_panel_bottom` | 963 |  |
-| `solar_panel_side` | 961 |  |
-| `solar_panel_top` | 962 |  |
-| `sorting_gate_slab_side` | 1106 |  |
-| `sorting_gate_top` | 1105 |  |
-| `splitter_slab_side` | 1081 |  |
-| `splitter_top` | 1080 |  |
+| `snowy_messy_stone` | 824 |  |
+| `snowy_messy_stone_side` | 825 |  |
+| `solar_panel_bottom` | 965 |  |
+| `solar_panel_side` | 963 |  |
+| `solar_panel_top` | 964 |  |
+| `sorting_gate_slab_side` | 1108 |  |
+| `sorting_gate_top` | 1107 |  |
+| `splitter_slab_side` | 1083 |  |
+| `splitter_top` | 1082 |  |
 | `sponge` | 329 |  |
-| `starframe` | 1165 |  |
+| `starframe` | 1167 |  |
 | `stone` | 217 |  |
 | `stone_andesite` | 221 |  |
 | `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1032 |  |
+| `stone_deposit` | 1034 |  |
 | `stone_diorite` | 219 |  |
 | `stone_diorite_smooth` | 220 |  |
 | `stone_granite` | 223 |  |
@@ -2635,49 +2645,49 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `stonebrick_carved` | 321 |  |
 | `stonebrick_cracked` | 323 |  |
 | `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1110 |  |
-| `storage_silo_top` | 1109 |  |
+| `storage_silo_side` | 1112 |  |
+| `storage_silo_top` | 1111 |  |
 | `stripped_aspen_log` | 211 |  |
 | `stripped_cedar_log` | 215 |  |
 | `stripped_cherry_log` | 583 |  |
 | `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 890 |  |
+| `stripped_mango_log` | 892 |  |
 | `stripped_maple_log` | 210 |  |
 | `stripped_palm_log` | 576 |  |
 | `stripped_pear_log` | 577 |  |
 | `stripped_pine_log` | 214 |  |
 | `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 828 |  |
+| `stripped_spectral_log` | 829 |  |
 | `super_compressed_messy_stone` | 532 |  |
 | `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1117 |  |
-| `tool_bench_top` | 1118 |  |
-| `tools_lucky_block` | 999 |  |
-| `tools_lucky_block_rare` | 1001 |  |
-| `tools_lucky_block_super` | 1003 |  |
+| `tool_bench_side` | 1119 |  |
+| `tool_bench_top` | 1120 |  |
+| `tools_lucky_block` | 1001 |  |
+| `tools_lucky_block_rare` | 1003 |  |
+| `tools_lucky_block_super` | 1005 |  |
 | `toxic_waste` | 25 | anim (8 Frames) |
-| `toxic_waste_barrel_bottom` | 1018 |  |
-| `toxic_waste_barrel_side` | 1017 |  |
+| `toxic_waste_barrel_bottom` | 1020 |  |
+| `toxic_waste_barrel_side` | 1019 |  |
 | `toxic_waste_barrel_top` | 24 | anim (4 Frames) |
 | `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1127 |  |
+| `tree_cutter_back` | 1129 |  |
 | `tree_cutter_back_running` | 37 | anim (4 Frames) |
-| `tree_cutter_front` | 1121 |  |
-| `tree_cutter_side` | 1122 |  |
+| `tree_cutter_front` | 1123 |  |
+| `tree_cutter_side` | 1124 |  |
 | `tree_cutter_side_running` | 36 | anim (4 Frames) |
-| `tree_cutter_top` | 1123 | Rotationsfamilie (4 Kopien) |
+| `tree_cutter_top` | 1125 | Rotationsfamilie (4 Kopien) |
 | `ultra_compressed_messy_stone` | 534 |  |
 | `unloaded` | 189 |  |
-| `volt_engine_side` | 1129 |  |
+| `volt_engine_side` | 1131 |  |
 | `volt_engine_side_running` | 38 | anim (4 Frames) |
-| `volt_engine_top` | 1130 |  |
-| `voltite_deposit` | 1128 |  |
-| `voltite_ore` | 1082 |  |
+| `volt_engine_top` | 1132 |  |
+| `voltite_deposit` | 1130 |  |
+| `voltite_ore` | 1084 |  |
 | `watermelon_side` | 292 |  |
 | `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 933 |  |
-| `weapon_lucky_block_rare` | 983 |  |
-| `weapon_lucky_block_super` | 985 |  |
+| `weapon_lucky_block` | 935 |  |
+| `weapon_lucky_block_rare` | 985 |  |
+| `weapon_lucky_block_super` | 987 |  |
 | `white_concrete` | 284 |  |
 | `white_gen_spawn_coal` | 786 |  |
 | `white_gen_spawn_iron` | 787 |  |
@@ -2687,11 +2697,11 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `white_portal` | 17 | anim (4 Frames) |
 | `white_spawn_block_side` | 690 |  |
 | `white_spawn_block_top` | 686 | Rotationsfamilie (4 Kopien) |
-| `wire_mill_back` | 1076 |  |
-| `wire_mill_front` | 1070 |  |
-| `wire_mill_side` | 1071 |  |
+| `wire_mill_back` | 1078 |  |
+| `wire_mill_front` | 1072 |  |
+| `wire_mill_side` | 1073 |  |
 | `wire_mill_side_running` | 32 | anim (4 Frames) |
-| `wire_mill_top` | 1072 | Rotationsfamilie (4 Kopien) |
+| `wire_mill_top` | 1074 | Rotationsfamilie (4 Kopien) |
 | `wool_colored_black` | 253 |  |
 | `wool_colored_blue` | 249 |  |
 | `wool_colored_brown` | 250 |  |
@@ -2713,9 +2723,9 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 | `yellow_gen_spawn_iron` | 781 |  |
 | `yellow_gen_spawn_top` | 779 |  |
 | `yellow_glazed_terracotta` | 385 | Rotationsfamilie (4 Kopien) |
-| `yellow_lucky_block` | 930 |  |
-| `yellow_lucky_block_rare` | 980 |  |
-| `yellow_lucky_block_super` | 981 |  |
+| `yellow_lucky_block` | 932 |  |
+| `yellow_lucky_block_rare` | 982 |  |
+| `yellow_lucky_block_super` | 983 |  |
 | `yellow_planks` | 355 |  |
 | `yellow_portal` | 18 | anim (4 Frames) |
 | `yellow_spawn_block_side` | 685 |  |
@@ -2726,32 +2736,32 @@ Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-We
 
 Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Registry faltet sie auf die unten stehende Wurzel, und `bloxdTexel` wendet die Rotation zur Sample-Zeit erneut an — die Wurzel referenzieren, nie die Kopien. Eine `[rot[N`-Schreibweise zu schreiben zieht die eigene Rotationsdiagnose nach sich.
 
-- `alloy_kiln_top` (id 1085)
-- `auto_bench_top` (id 1100)
-- `belt_tunnel_exit_top` (id 1198)
-- `belt_tunnel_top` (id 1193)
+- `alloy_kiln_top` (id 1087)
+- `auto_bench_top` (id 1102)
+- `belt_tunnel_exit_top` (id 1200)
+- `belt_tunnel_top` (id 1195)
 - `black_glazed_terracotta` (id 429)
 - `black_spawn_block_top` (id 756)
 - `blue_glazed_terracotta` (id 413)
 - `blue_spawn_block_top` (id 751)
 - `brown_glazed_terracotta` (id 417)
 - `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1041)
+- `burner_drill_top` (id 1043)
 - `checkpoint_block` (id 761)
 - `chest_top` (id 343)
-- `crop_harvester_top` (id 1186)
-- `crusher_top` (id 1049)
-- `crystal_vat_top` (id 1160)
+- `crop_harvester_top` (id 1188)
+- `crusher_top` (id 1051)
+- `crystal_vat_top` (id 1162)
 - `custom_lobby_block_top` (id 765)
 - `cyan_glazed_terracotta` (id 405)
 - `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1133)
-- `electric_drill_top` (id 1092)
+- `deep_drill_top` (id 1135)
+- `electric_drill_top` (id 1094)
 - `gray_glazed_terracotta` (id 397)
 - `gray_spawn_block_top` (id 736)
 - `green_glazed_terracotta` (id 421)
 - `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 911)
+- `iron_chest_top` (id 913)
 - `light_blue_glazed_terracotta` (id 381)
 - `light_blue_spawn_block_top` (id 726)
 - `light_gray_glazed_terracotta` (id 401)
@@ -2765,22 +2775,22 @@ Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Reg
 - `orange_spawn_block_top` (id 706)
 - `pink_glazed_terracotta` (id 393)
 - `pink_spawn_block_top` (id 701)
-- `press_top` (id 1065)
+- `press_top` (id 1067)
 - `purple_glazed_terracotta` (id 409)
 - `purple_spawn_block_top` (id 696)
 - `radar_screen` (id 19)
-- `recycler_top` (id 1175)
+- `recycler_top` (id 1177)
 - `red_glazed_terracotta` (id 425)
 - `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1141)
+- `shatter_mill_top` (id 1143)
 - `shop_trader_spawn_top` (id 794)
 - `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1148)
-- `smelter_top` (id 1056)
-- `tree_cutter_top` (id 1123)
+- `sky_tap_top` (id 1150)
+- `smelter_top` (id 1058)
+- `tree_cutter_top` (id 1125)
 - `white_glazed_terracotta` (id 369)
 - `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1072)
+- `wire_mill_top` (id 1074)
 - `yellow_glazed_terracotta` (id 385)
 - `yellow_spawn_block_top` (id 681)
 
@@ -2790,48 +2800,48 @@ Diese Namen zu sampeln liefert automatisch den aktuellen Animationsrahmen. Die E
 
 | Name | Rahmen | Intervall |
 |---|---|---|
-| `alloy_kiln_side_running` | 4 | 250 ms |
-| `auto_bench_side_running` | 4 | 250 ms |
-| `black_portal` | 4 | 300 ms |
-| `blue_portal` | 4 | 300 ms |
+| `alloy_kiln_side_running` | 33 | 250 ms |
+| `auto_bench_side_running` | 35 | 250 ms |
+| `black_portal` | 2 | 300 ms |
+| `blue_portal` | 3 | 300 ms |
 | `brown_portal` | 4 | 300 ms |
-| `burner_drill_side_running` | 4 | 250 ms |
-| `crop_harvester_back_running` | 4 | 250 ms |
-| `crop_harvester_side_running` | 4 | 250 ms |
-| `crusher_side_running` | 4 | 250 ms |
-| `crystal_vat_side_running` | 4 | 250 ms |
-| `cyan_portal` | 4 | 300 ms |
-| `deep_drill_side_running` | 4 | 250 ms |
-| `electric_drill_side_running` | 4 | 250 ms |
-| `generator_side_running` | 4 | 250 ms |
-| `gray_portal` | 4 | 300 ms |
-| `green_portal` | 4 | 300 ms |
-| `grey_portal` | 4 | 300 ms |
-| `homestead_core_mid` | 4 | 250 ms |
-| `lava` | 8 | 200 ms |
-| `lightblue_portal` | 4 | 300 ms |
-| `lightgray_portal` | 4 | 300 ms |
-| `lime_portal` | 4 | 300 ms |
-| `magenta_portal` | 4 | 300 ms |
-| `orange_portal` | 4 | 300 ms |
-| `pink_portal` | 4 | 300 ms |
-| `press_side_running` | 4 | 250 ms |
-| `purple_portal` | 4 | 300 ms |
-| `radar_screen` | 4 | 200 ms |
-| `recycler_side_running` | 4 | 250 ms |
-| `red_portal` | 4 | 300 ms |
-| `shatter_mill_side_running` | 4 | 250 ms |
-| `sky_tap_side_running` | 4 | 250 ms |
-| `smelter_side_running` | 4 | 250 ms |
-| `smoke` | 4 | 250 ms |
-| `toxic_waste` | 8 | 200 ms |
-| `toxic_waste_barrel_top` | 4 | 300 ms |
-| `tree_cutter_back_running` | 4 | 250 ms |
-| `tree_cutter_side_running` | 4 | 250 ms |
-| `volt_engine_side_running` | 4 | 250 ms |
-| `white_portal` | 4 | 300 ms |
-| `wire_mill_side_running` | 4 | 250 ms |
-| `yellow_portal` | 4 | 300 ms |
+| `burner_drill_side_running` | 27 | 250 ms |
+| `crop_harvester_back_running` | 45 | 250 ms |
+| `crop_harvester_side_running` | 44 | 250 ms |
+| `crusher_side_running` | 28 | 250 ms |
+| `crystal_vat_side_running` | 42 | 250 ms |
+| `cyan_portal` | 5 | 300 ms |
+| `deep_drill_side_running` | 39 | 250 ms |
+| `electric_drill_side_running` | 34 | 250 ms |
+| `generator_side_running` | 30 | 250 ms |
+| `gray_portal` | 6 | 300 ms |
+| `green_portal` | 7 | 300 ms |
+| `grey_portal` | 8 | 300 ms |
+| `homestead_core_mid` | 26 | 250 ms |
+| `lava` | 1 | 200 ms |
+| `lightblue_portal` | 9 | 300 ms |
+| `lightgray_portal` | 10 | 300 ms |
+| `lime_portal` | 11 | 300 ms |
+| `magenta_portal` | 12 | 300 ms |
+| `orange_portal` | 13 | 300 ms |
+| `pink_portal` | 14 | 300 ms |
+| `press_side_running` | 31 | 250 ms |
+| `purple_portal` | 15 | 300 ms |
+| `radar_screen` | 19 | 200 ms |
+| `recycler_side_running` | 43 | 250 ms |
+| `red_portal` | 16 | 300 ms |
+| `shatter_mill_side_running` | 40 | 250 ms |
+| `sky_tap_side_running` | 41 | 250 ms |
+| `smelter_side_running` | 29 | 250 ms |
+| `smoke` | 23 | 250 ms |
+| `toxic_waste` | 25 | 200 ms |
+| `toxic_waste_barrel_top` | 24 | 300 ms |
+| `tree_cutter_back_running` | 37 | 250 ms |
+| `tree_cutter_side_running` | 36 | 250 ms |
+| `volt_engine_side_running` | 38 | 250 ms |
+| `white_portal` | 17 | 300 ms |
+| `wire_mill_side_running` | 32 | 250 ms |
+| `yellow_portal` | 18 | 300 ms |
 
 Strukturhinweis, sichtbar in den Rohdaten: Der Atlas hält 45 Animationswurzeln, nicht 42 — die vier vor-rotierten Kopien von `radar_screen` tragen jeweils ihre eigene 4-Rahmen-Leiter, was auch der Grund ist, warum `radar_screen` der einzige Name mit beiden Familien-Hinweisen ist.
 
@@ -2878,13 +2888,13 @@ Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht 
 | [Kombination mit Texturpacks](guides/combinations.md) | Zusammenspiel mit Texturpacks |
 | [Debugging-Tipps](guides/debugging.md) | Diagnose Symptom → Ursache |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion)
 
 
 ---
 
 ## Wie das Lighting funktioniert
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, Warm-Kalt-Trennung oder Hemisphären-Ambiente existiert. Folgendes lässt sich neu aufbauen:
 
@@ -2907,7 +2917,7 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 ---
 
 ## Schatten
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
 
 Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Grenzen.
 
@@ -2976,7 +2986,7 @@ Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5
 ---
 
 ## Wasser natürlich aussehen lassen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Diese API kann die Szenenfarbe nicht sampeln: Es ist **Pseudo-Rendering per Fresnel-Farbmischung und Sonnen-Highlights, keine echte Reflexion/Refraktion** (die Tiefenberechnung nutzt das liquid-exklusive `bloxdOpaqueBehind()` — das Rezept für Dickenabsorption steht weiter unten auf dieser Seite). Das Sample behält die Basisfarbe, mischt bei streifenden Blickwinkeln etwas Richtung Himmelsfarbe und addiert nur mit Sonne einen kleinen Glint.
 
@@ -3042,7 +3052,7 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 ---
 
 ## Nacht-Looks gestalten
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Nur Schatten abzudunkeln lässt die fertige Farbe (`engineColour`) ohne Sonne hell, und die Flächen/Schatten-Lücke wird unnatürlich. Die ganze fertige Farbe dämpfen.
 
@@ -3073,7 +3083,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Modelle und Texturen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (aus Header & Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (aus Header & Validator restauriert)
 
 Was die neuen v5-Model-Hooks zeichnen und lesen.
 
@@ -3148,7 +3158,7 @@ Wie Modelle rendern und wie Flags-/Enchant-Eingaben fließen: [Engine-Interna: M
 ---
 
 ## Realismus: zwei Schulen
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 **Schule A: additive Fixes (ab defaultLight)** — `engineColour` (fertige Farbe) als Basis nutzen und warmen Glow oder Rim addieren. Leicht und sicher, aber das Lichtmodell bleibt Standard.
 
@@ -3163,7 +3173,7 @@ Wie Modelle rendern und wie Flags-/Enchant-Eingaben fließen: [Engine-Interna: M
 ---
 
 ## Was Shader-Pakete können und was nicht
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erreicht, was grundlegend nicht, was bedingt ist, warum die Grenzen existieren und welche Ersatzansätze am nächsten kommen. Vor dem Bauen eines Looks hier scopen.
 
@@ -3259,7 +3269,7 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 ---
 
 ## Performance
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (messbasierte Praxis)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (messbasierte Praxis)
 
 Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model), deshalb bewegen Stilentscheidungen die Framerate deutlich.
 
@@ -3306,7 +3316,7 @@ Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model),
 ---
 
 ## Checkliste für Tests im Spiel
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihenfolge prüfen:
 
@@ -3330,7 +3340,7 @@ Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihen
 ---
 
 ## Kombination mit Texturpacks
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Da Pakete keine Texturen hinzufügen oder sampeln können, keine feinen Material-Bumps oder Himmelsbilder per Shader allein lösen wollen. Das öffentliche Texturpaket-Repo für Bloxd.io [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) behandelt Texturen, Skybox, Modelle etc. auf anderem Weg.
 
@@ -3344,7 +3354,7 @@ Texturpakete haben ihre eigene Spezifikation (als Referenz): Das Größenlimit l
 ---
 
 ## Debugging-Tipps
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 - Zu helle Höhlen → nichtlineare `skyLight`-Kurve fehlt (Höhlenrezept R2 / R9.9)
 - Ausgebrannte Tage → Pre-ACES-Belichtung senken
@@ -3380,13 +3390,13 @@ Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [L
 | [Modell-Shader](recipes/model-shaders.md) | v5 — gehaltene Items, Skins, Pflanzen-Wiegen |
 | [Enchant-Effekte](recipes/enchant-effects.md) | v5 — Glint entfernen, verstärken, umfärben |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
 
 
 ---
 
 ## Farben
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Einzelfarbton (am grundlegendsten)
 
@@ -3467,7 +3477,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## Beleuchtung
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Kontrast-S-Kurve
 
@@ -3581,7 +3591,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Emission
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > `emission` wird nach der Lichtberechnung addiert, aber die Standardverarbeitung **dämpft es mit der Fog-Menge (`fogAlpha`). In völlig vernebelter Ferne verschwindet Emission ebenfalls. Um Glanz in der Ferne zu behalten, nicht auf emission addieren — direkt als `out.colour += ...` im Light-Hook addieren** (der Standard-Output ist bereits gefoggt, also landet Licht in der Ferne auf der Fog-Farbe)
 
@@ -3633,7 +3643,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Koordinaten
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Weltkoordinaten
 
@@ -3688,7 +3698,7 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## Zeit & Animation
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > `bloxdSeconds()` wrappt alle 3600 Sekunden (1 Stunde). Es ist Shader-Laufzeit ohne garantierte Synchronisation mit Tag/Nacht im Spiel. Für sichtbare periodische Animation ok, aber für echte Nachterkennung `bloxdSunDirection()` und Licht-Inputs bevorzugen.
 
@@ -3728,7 +3738,7 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## Flüssigkeiten
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Gekräuselte Oberfläche (Farbschimmer)
 
@@ -3790,7 +3800,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Vertices (nur allow)
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > Alles in `#ifndef BLOXD_STRICT` einpacken.
 > Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe [Shader-Pack-Richtlinien je Spiel](internals/policy.md)
@@ -3856,7 +3866,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## Mathe-Tricks
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ```wgsl
 // weiche Quantisierung von 0..1 (n Stufen)
@@ -3887,7 +3897,7 @@ let phase = t * 0.15;
 ---
 
 ## Realismus
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > Physik-Rezepte zum „Vanilla-Look aus Materialien neu aufbauen". Erst diese Prämissen lesen:
 >
@@ -4192,7 +4202,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Modell-Shader
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (gegen die v5-Header-Spezifikation geschrieben)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (gegen die v5-Header-Spezifikation geschrieben)
 
 Rezepte mit den v5-Model-Hooks und neuen Flags für **„Worauf schaue ich gerade“-Auswahlen, die vor v5 unmöglich waren**. Grundlagen: [Modelle und Texturen](guides/models.md).
 
@@ -4344,7 +4354,7 @@ Das Muster der geteilten Funktion ist es, das die Standard-Pack-Vorlage selbst e
 ---
 
 ## Enchant-Effekte
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 hat die Enchant-Pipeline für Ein- und Ausgaben geöffnet. Rezepte, um den Glint verzauberter Items und Rüstung zu steuern und dabei die Mathematik der Engine zu bewahren.
 
@@ -4489,7 +4499,7 @@ Fehler und visuelle Probleme, **nach Symptom** auffindbar. Die Seiten folgen der
 | Langsam / von der Geräte-Prüfung rausgeworfen | [Performance](troubleshooting/performance.md) |
 | Rechtliches, Sicherheit, häufige Fragen | [FAQ](troubleshooting/faq.md) |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
 
 ### Wo Fehler erscheinen
 
@@ -4566,7 +4576,7 @@ Split-Zips, zip64, verschlüsselte Einträge und nicht unterstützte Kompression
 ---
 
 ## API-Versionsfehler
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (wortwörtlich aus dem Live-i18n-Wörterbuch)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (wortwörtlich aus dem Live-i18n-Wörterbuch)
 
 Fehler rund um `apiVersion`. Das aktuelle Spiel akzeptiert **nur `5`**.
 
@@ -4845,7 +4855,7 @@ Kompiliert einwandfrei, sieht aber falsch aus.
 ---
 
 ## Textur-Probleme
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
 
 Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkatalog](api/texture-catalog.md) durchsuchen.
 
@@ -4961,7 +4971,7 @@ Helligkeits-, Schatten- und Fog-Probleme.
 ---
 
 ## Modell-Probleme
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (neues v5-Territorium)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (neues v5-Territorium)
 
 Probleme rund um die neuen v5-Model-Hooks.
 
@@ -5059,7 +5069,7 @@ Geschwindigkeitsprobleme und ihre Fixes.
 ---
 
 ## FAQ & rechtliche Hinweise
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
 
 ### Häufig gestellte Fragen
 
@@ -5109,7 +5119,7 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 ---
 
 ## Engine-Interna & Forschung
-Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. Alles hier wurde direkt aus dem JavaScript des aktuellen Produktions-Builds (`ab90qa`) zurückgewonnen. Von der öffentlichen API-Dokumentation ([API-Referenz](api/)) getrennt, um exaktes internes Verhalten und Analyseergebnisse zu bewahren.
+Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. Alles hier wurde direkt aus dem JavaScript des aktuellen Produktions-Builds (`xkg8x`) zurückgewonnen. Von der öffentlichen API-Dokumentation ([API-Referenz](api/)) getrennt, um exaktes internes Verhalten und Analyseergebnisse zu bewahren.
 
 ### Map
 
@@ -5133,7 +5143,7 @@ Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. A
 | [Debugging](internals/debugging.md) | URL-Parameter, Statistik-Panels |
 | [Forschungslog](internals/research-log.md) | Methodik, Build-Historie, unverifizierte Punkte |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion)
 
 Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates ändern, und jede Seite nennt ihren Evidenz-Build ([Forschungslog](internals/research-log.md)).
 
@@ -5141,7 +5151,7 @@ Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates �
 ---
 
 ## Rendering-Pipeline
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 - **Surface-Hooks laufen „vor" alphaTest**: `out.alpha` speist den Verwerfungstest direkt. Cutout-Materialien (Gras, Blätter) erlauben Dissolve-Dither-Effekte (Rezept R-C). In Flüssigkeiten (Blending) ist `out.alpha` die echte Transparenz (Rezept R-D). Kein Effekt auf normalem opakem Terrain — nicht verwechseln
 - **`l.ambient`-Inhalt**: `material.ambient × sceneAmbient`, pro Material verschieden. Die Szenenseite hängt an der Grafik-Einstellung „Ambient Lighting Intensity" (Standard 0.5) — nie Fixes einprogrammieren
@@ -5214,7 +5224,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Hook-Aufruf-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Produktions-Bundle restauriert — der Lite-Renderer; die integrierte Quelldatei `lite/terrainShaderPack.ts` überlebt in Fehlerstrings)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Produktions-Bundle restauriert — der Lite-Renderer; die integrierte Quelldatei `lite/terrainShaderPack.ts` überlebt in Fehlerstrings)
 
 Wie die Engine Hooks zur Laufzeit aufruft. Das ändert nichts an dem Code, den du schreibst, nimmt aber das Rätselraten darüber, was Hooks empfangen.
 
@@ -5270,9 +5280,9 @@ Die Spleiß-Architektur existierte schon im v2-Renderer und blieb über v2 → v
 ---
 
 ## Engine-Header (wortwörtlich)
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
 
-Der exakte Text, den der Loader jedem Paket voranstellt. Aus dem Live-Produktions-Bundle restauriert (`ab90qa`, Chunk c55, die Vorlage mit ihren 6 Live-Interpolationen rendernd — `apiVersion` und die 5 Uniform-Lesezugriffe über `bloxdPackInputs`). 8.954 Byte dekodiert, 208 Zeilen. Keinerlei Paraphrase.
+Der exakte Text, den der Loader jedem Paket voranstellt. Aus dem Live-Produktions-Bundle restauriert (`ab90qa`, Chunk c55, die Vorlage mit ihren 6 Live-Interpolationen rendernd — `apiVersion` und die 5 Uniform-Lesezugriffe über `bloxdPackInputs`). 8.954 Byte dekodiert, 208 Zeilen. Keinerlei Paraphrase. Auf dem aktuellen Produktions-Build (`xkg8x`, Chunk c55, 2026-11-04) byte-identisch nachverifiziert — dieselben 8.954 dekodierten Bytes, 208 Zeilen.
 
 Lese-Anleitung:
 - Feld-für-Feld-Erklärungen → [Strukturen](api/structures.md)
@@ -5503,7 +5513,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Shader-Validierung
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Validator restauriert)
 
 Die statische Validierung (Analyzer, Stufe 1 der Ladeprüfung). Nutzerseitige Fixes: [Validierungsfehler](troubleshooting/validation.md).
 
@@ -5578,7 +5588,7 @@ Code, der die statische Validierung besteht, bekommt vor der echten Browser-WGSL
 ---
 
 ## WGSL-Kompilierung
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Bundle restauriert)
 
 Die zweite Validierungsstufe — echte Kompilierung durch den WGSL-Compiler des Browsers — und die Validierungs-Stubs von v5.
 
@@ -5647,7 +5657,7 @@ Beim Spleißen von Hook-Aufrufen behält die Engine eine Bezeichner-Abbildung (`
 ---
 
 ## Interna reservierter Bezeichner
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus den Generatoren des Live-Bundles restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus den Generatoren des Live-Bundles restauriert)
 
 Der `bloxdSp*`-Namensraum — Symbole, die die Generatoren injizieren können und die Pakete daher nicht neu deklarieren dürfen. Die Zusammenfassung für Paket-Autoren: [Einschränkungen](api/restrictions.md).
 
@@ -5679,7 +5689,7 @@ Bezeichner mit `bloxdTextureId`-Präfix lösen als Texturnamen auf, mit ihrer ei
 ---
 
 ## Lighting-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 `blockLight` ist **farbiges Licht** mit drei RGB-Kanälen. Jeder leuchtende Block definiert eine Emissionsfarbe `[R, G, B]` (je 0–15), die unverändert als Lichtfarbe übernommen wird (normale Fackel = warmweiß (14,14,12) / Lava = orange (14,8,2) / Beacon = cyan (5,14,14) / weiße Fackel = (15,15,15) usw.). In der Vertex-Stufe kommt sie als 4 Nibbles gepackt an — r / g / b / sky — in einem Float-Attribut. Die drei Kanäle im Light-Hook getrennt zu behandeln, ermöglicht farbiges lokales Licht — das warme Fackel-Rezept (R9.1) ist auf dieses Verhalten kalibriert.
 
@@ -5695,7 +5705,7 @@ Custom-Blöcke können `skyLightEmission` (0–15) tragen, das **in den skyLight
 ---
 
 ## Fog-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 Die Fog-Berechnung ist immer LINEAR-Modus (äquivalent zu `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), mit `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = Fog-Einstellung; nur D = 0 ist speziell mit fogEnd = 5). **Das Gradientenband ist nur 32 Blöcke breit**, und `l.fogAlpha` ist weniger „Distanzdunst" als **normierte Distanz zur Kante der geladenen Welt**. Es variiert pro Spieler mit der Ladedistanz: Distanz-Effekte sollten daher `distance(l.position, bloxdEyePosition())` selbst berechnen (Abschnitt „Ladekanten-Band" unten). (Die Fog-Funktion des Renderers implementiert tatsächlich **vier** Modi — aus / exponentiell / exponentiell-quadratisch / linear —, wobei ausgelieferte Titel den linearen Modus fahren; der restaurierte Quellcode und das Robustheitsargument stehen im [v3-Migrationsleitfaden](history/v3.md).)
 
@@ -5722,7 +5732,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Textur-Sampling-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
 
 Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — der 3-Varianten-Textur-Codegen. Die Nutzerseite: [Textur-API](api/texture-api.md).
 
@@ -5783,7 +5793,7 @@ Der Mesher verschmilzt Flächen mit gleichem Material/AO/Licht zu einzelnen Rech
 ---
 
 ## Textur-Registry-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
 
 Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](api/texture-catalog.md).
 
@@ -5795,7 +5805,7 @@ Wir haben das eigene Registry-Bau-Modul der Engine (29833 auf diesem Build, koor
 
 | Ausgabe | v5 gemessen | Bedeutung |
 |---|---|---|
-| `named` | **896** | als `bloxdTextureId<Name>` referenzierbare Namen |
+| `named` | **906** | als `bloxdTextureId<Name>` referenzierbare Namen |
 | `aliases` | 416 | gefaltete Schreibweisen — 188 Rahmen-Aliasse (`lava0`…) und 228 Rotations-Aliasse (`chest_top[rot[1`…) |
 | `layers` | 228 | die Layer-Tabelle — einschließlich 171 vor-rotierter Slots (57 Wurzeln × 4 Rotationen) |
 
@@ -5833,7 +5843,7 @@ Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 
 ---
 
 ## Model-Rendering-Interna
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Bundle restauriert)
 
 Die Interna des v5-Model-Programms. Der nutzerseitige Leitfaden: [Modelle und Texturen](guides/models.md).
 
@@ -5875,9 +5885,9 @@ Das Model-Programm bildet eine Achse der Varianten-Matrix: `strict.model` / `all
 ---
 
 ## Engine-Daten-Hauptbuch
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03; Produktion = Preprod, byte-identisch) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04; Produktion; Preprod auf allen Shader-Pack-Oberflächen identisch) · Status: Verified
 
-Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `ab90qa` gemessen.
+Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `xkg8x` gemessen.
 
 ### Das Hauptbuch
 
@@ -5899,8 +5909,8 @@ Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuel
 | Fog-Farbe | `vec3f(183/255, 191/255, 195/255)` — unverändert |
 | reservierte Namen | `/^bloxd/i` (case-insensitive) + die 46 `bloxdSp*`-Engine-Symbole ([Reservierte Bezeichner](internals/reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict-Titel | alles außer den 12 allow-Titeln in [Policy](internals/policy.md) (auf ab90qa nachverifiziert, unverändert) |
-| Header-/Registry-Builder | Chunk c55 (Modul 29833 + 1371 + 1391 + 1384 + 219 koordinierend) |
+| strict-Titel | alles außer den 12 allow-Titeln in [Policy](internals/policy.md) (auf xkg8x nachverifiziert, unverändert) |
+| Header-/Registry-Builder | Chunk c55 (Modul 29833 + 1371 + 1391 + 1384 + 219 koordinierend); auf `xkg8x` ist der Builder Modul 30093 (Datenmodul 1391) |
 | Standard-Pack-Vorlage | Chunk c116 (in v4: c124), 1.683 B |
 
 ### Bundle-Layout (für Nachvermesser)
@@ -5924,7 +5934,7 @@ Das Main-Bundle ist 3,39 MB (+115 KB gegenüber dem v4-Build); die Chunk-Map hat
 ---
 
 ## Was paket-sichtbare Werte verändert
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 Dasselbe Paket rendert je nach **Welt und Spieler-Einstellungen** anders. Vor Verteilung mindestens diese 3 Umgebungen prüfen:
 
@@ -5938,11 +5948,11 @@ Haupt-Varianzquellen: `lightingOverride` (Zwangslicht) / `skyLightColourOverride
 ---
 
 ## Shader-Pack-Richtlinien je Spiel
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 Diese Seite legt fest, was „allow / strict" auf Titelebene bedeutet. Nur Titel, deren Spieldefinition ausdrücklich `shaderPackPolicy: "allow"` enthält, laufen im vollen Modus (Vertex-Hooks, `discard`, Terrain-`alpha`); Titel ohne Angabe (oder mit einem anderen Wert) sind strict — `BLOXD_STRICT` wird definiert, umschlossener Code automatisch deaktiviert. Das Paket kann dies nicht selbst wählen; zu wissen, in welchen Titeln was läuft, ist Voraussetzung für das Verteilen.
 
-- Referenz-Build: `szby6g.main.94a7596c.js` (Produktions-Deployment zum 2026-10-17). Statische Auswertung aller 111 Spieldefinitionen: **26 allow-Einträge (12 Titel) / 85 strict-Einträge**. Dieselben 12 allow-Literale in denselben 12 Titeln wurden im v3-Produktions-Bundle (`3ymzdd`, 2026-10-20) unverändert erneut bestätigt und nochmals im v4-Bundle (`cnty9`, 2026-10-27) — die folgende Liste gilt wortgleich auch für v3 und v4.
+- Referenz-Build: `szby6g.main.94a7596c.js` (Produktions-Deployment zum 2026-10-17). Statische Auswertung aller 111 Spieldefinitionen: **26 allow-Einträge (12 Titel) / 85 strict-Einträge**. Dieselben 12 allow-Literale in denselben 12 Titeln wurden im v3-Produktions-Bundle (`3ymzdd`, 2026-10-20) unverändert erneut bestätigt und nochmals im v4-Bundle (`cnty9`, 2026-10-27) — die folgende Liste gilt wortgleich auch für v3 und v4. Und an den v5-Builds erneut unverändert bestätigt auf `ab90qa` (2026-11-03) und `xkg8x` (2026-11-04, 12 allow-Literale nachgezählt) — die Liste unten gilt wortwörtlich auch für v5.
 - Oberhalb von `shaderPackPolicy` gibt es ein Gate auf Auslieferungskanal-Ebene (grob `canUseShaderPacks`): Über externe Portale (z. B. Coolmath-Games-Builds) kann das Shader-Paket-System selbst deaktiviert sein, bevor `shaderPackPolicy` überhaupt konsultiert wird. Die Allow/Strict-Analyse unten basiert auf dem bloxd.io-Haupt-Web-Build.
 - allow wird an 12 Stellen deklariert: 8 direkte Literale in den Spieldefinitionen und 4 Basisvariablen (`tb` / `kz` / `cb` / `Fb`); Varianten erben über Spread (`{...tb,...}`). Eine Übersteuerung pro Variante (Eltern-allow / Kind-strict) gibt es derzeit nicht.
 
@@ -5967,7 +5977,7 @@ Diese Liste spiegelt die statische Analyse des genannten Builds wider; Engine-Up
 ---
 
 ## Sonne und Mond
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 Die `bloxdSunDirection()`-Quelle ist ein Sonnenrichtungs-Buffer, der nur bei Skybox-Typwechsel neu geschrieben wird — Kriterium ist nicht „ob der Himmel eine Sonne hat", sondern **„ob die Skybox vom Erdtyp ist"**.
 
@@ -6012,7 +6022,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Debugging-Werkzeuge
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 - URL-Parameter `?renderer=lite` — den Lite-Renderer (WebGPU) erzwingen (`webgl2` / `babylon` gehen auch; `babylon` ist der alte Name für webgl2). Priorität: URL-Parameter > localStorage `bloxdRenderer` > Einstellungsbildschirm > Standard (webgl2). Ungültige Werte werden mit Warnung ignoriert. In URL oder localStorage belassene Overrides können Szenen brechen, die WebGPU (lite) brauchen — „needs the new WebGPU renderer, so remove the renderer override..." ([Fehler beim Laden](troubleshooting/loading.md))
 - URL-Parameter `?vconsole` — On-Screen-Konsole (VConsole). Praktisch für echte Mobil-Verifikation
@@ -6047,6 +6057,7 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 | `cnty9` | v4 | 2026-10-27 | Evidenz des v4-Leitfadens & des 905-Namen-Katalogs |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
 | `ab90qa` | **v5** | 2026-11-03 | **aktuell**; die Basislinie dieser Dokumentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **aktuell**; Baseline dieser Dokumentation. prod-Haupt-Bundle ≠ preprod (`2lcqcl`), aber jede Shader-Pack-Oberfläche identisch gemessen |
 
 ### Kern-Methodik
 
@@ -6056,7 +6067,7 @@ Rendern der c55-Header-Vorlage mit ihren Live-Interpolationen (`${vC}` = apiVers
 
 #### Textur-Registry-Neuberechnung
 
-Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 896 / aliases 416 / layers 228) ([Textur-Registry](internals/texture-registry.md)).
+Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 906 / aliases 416 / layers 228 auf dem aktuellen Build `xkg8x`, 2026-11-04 — Module 30093 + 1391; beim v5-Start 896) ([Textur-Registry](internals/texture-registry.md)).
 
 Die Animationsintervalle stammen aus der `animDataPerTex`-artigen Tabelle (pro Layer `numAnimStates` / `animationInterval`) — es existieren nur drei Intervallwerte: 200 / 250 / 300 ms ([der Katalog](api/texture-catalog.md#animationsfamilien-42-namen)).
 
@@ -6078,6 +6089,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 |---|---|---|
 | sjr0p7 → cnty9 | 10 Tage | 98 hinzugekommen, 79 entfernt; 779/1121 Namen änderten die id (69 %) |
 | cnty9 → ab90qa | 7 Tage | +1 (`scorpion_eggs`), −10 (Doppel-Truhe ×8, Spawner-Seiten ×2); 334/905 Namen änderten die id |
+| ab90qa → xkg8x | 1 Tag | +10 (alle v5-Start-Entfernungen kehrten zurück: Double-Chest ×8, Spawner-Seiten ×2); 376/896 Namen änderten die id; keine entfernt |
 
 ### Unverifiziert / spekulativ
 
@@ -8964,7 +8976,7 @@ wire_mill_top_rot4
 ## API v5 Migrationsleitfaden
 > Version: 5 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 
-Ziel-Build: `ab90qa.main.6188124c.js` — **seit der Messung am 2026-11-03 gleichzeitig in Produktion und Preprod live**, und die beiden Bundles sind wieder byte-identisch (md5 `fc3322212d15be2445c0e8df9733fcc` auf dem Haupt-Bundle, live von beiden Hosts geladen), daher gilt alles hier unverändert für die Produktion. Dies ist die größte API-Revision seit v3: das Haupt-Bundle wuchs auf 3,39 MB (+115 KB über den letzten v4-Build), die Chunk-Map hat jetzt 195 ids (c0–c195, 188 emittiert nach den 7 bekannten Löchern), die Shader-Pipeline sitzt weiterhin im c51–c56-Cluster (Loader c53, Validator/Header/Registry-Builder c55, WebGPU/Codegen c56, Fog c9) — aber die Standard-Pack-Vorlage zog nach c116 (in `tcwczu` war sie c124). Keins dieser Layout-Details ist für ein Paket sichtbar.
+Ziel-Build: `ab90qa.main.6188124c.js` — **seit der Messung am 2026-11-03 gleichzeitig in Produktion und Preprod live**, und die beiden Bundles sind wieder byte-identisch (md5 `fc3322212d15be2445c0e8df9733fcc` auf dem Haupt-Bundle, live von beiden Hosts geladen), daher gilt alles hier unverändert für die Produktion. Dies ist die größte API-Revision seit v3: das Haupt-Bundle wuchs auf 3,39 MB (+115 KB über den letzten v4-Build), die Chunk-Map hat jetzt 195 ids (c0–c195, 188 emittiert nach den 7 bekannten Löchern), die Shader-Pipeline sitzt weiterhin im c51–c56-Cluster (Loader c53, Validator/Header/Registry-Builder c55, WebGPU/Codegen c56, Fog c9) — aber die Standard-Pack-Vorlage zog nach c116 (in `tcwczu` war sie c124). Keins dieser Layout-Details ist für ein Paket sichtbar. Nachverifiziert auf dem aktuellen Produktions-Build `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`): der Engine-Header ist byte-identisch, und sämtliche Loader-/Varianten-/Hook-/reservierte-Namen-Messungen unten wurden unverändert nachgeprüft — die einzige bewegte Oberfläche ist die Textur-Registry (896 → 906 nutzbare Namen; §80-Nachtrag). Preprod (`2lcqcl`) liefert ein anderes Haupt-Bundle, misst aber auf jeder Shader-Pack-Oberfläche identisch.
 
 Was *doch* sichtbar ist: Der Engine-Header wuchs von 6.021 auf **8.954 dekodierte Bytes** (151 → 208 Zeilen) — fast jede Struktur erhielt Felder, vier neue Funktionen dokumentieren das hauseigene Beleuchtungsrezept der Engine, und die `blockFlags`-Bitmaske ist weg, ersetzt durch eine echte `BloxdFlags`-Struktur aus Booleans. Auch das Kompilierzeit-Gate `#ifdef BLOXD_LIGHTING` ist weg: Der Beleuchtungszustand zog als `lit: u32`-Mitglied ins Uniform pro Frame und wird zur Laufzeit mit `bloxdLit()` abgefragt. Die Standard-Pack-Vorlage liefert jetzt **alle neun Hooks** statt sechs. Und der engine-interne `bloxdSp*`-Namespace wuchs von 27 auf 46 Symbole.
 
@@ -9438,6 +9450,8 @@ Die Drift, vollständig (das ist die vollständige Liste — 11 Namen):
 
 Die Doktrin des v4-Katalogs (§68 des [v4-Migrationsleitfadens](history/v4.md)) trägt Wort für Wort über: **Namen sind die API, ids sind ein Snapshot.** 334 der 905 überlebenden Namen wechselten zwischen den beiden Builds die id — schreibe `bloxdTextureIdStone`, nie `351`. Die alphabetische Liste des v4-Katalogs (§68.2 des [v4-Migrationsleitfadens](history/v4.md)) bleibt für v5 gültig, modulo der 11-Namen-Drift oben; die Faltungsregeln und beide Familientabellen sind unverändert, daher sind dessen §68.3–§68.4 (gedrehte und animierte Familien) weiterhin exakt. Der Katalog in aktueller Form ist der [Textur-Katalog](api/texture-catalog.md).
 
+**Nachtrag (2026-11-04, `xkg8x`):** die Registry bewegte sich erneut einen Tag nach dem v5-Start — jede untenstehende Entfernung ist rückgängig. Atlas-Einträge 1,210 → 1,220, benutzbare Namen 896 → **906** (die acht Double-Chest-Texturen und beide Spawner-Seitenvarianten sind zurück; nichts entfernt), 376 der 896 Überlebenden änderten die id, Familien unverändert (57 / 42). Preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen. Der Katalog in aktueller Form ist auf `xkg8x` nachgemessen: [Textur-Katalog](api/texture-catalog.md).
+
 ### 81. Bestätigte Konstanten, Limits und Layouts (v5)
 
 Die v5-Zeile im Mess-Ledger dieses Leitfadens — alles am `ab90qa` gemessen (2026-11-03, prod = preprod, byte-identisch):
@@ -9453,7 +9467,7 @@ Die v5-Zeile im Mess-Ledger dieses Leitfadens — alles am `ab90qa` gemessen (20
 | Paket-Bindings | Gruppe 3: 0 Uniform · 1 Szenentiefe (Liquid) · 2 `bloxdSpTextureLayers`-Storage |
 | Flags | `BloxdFlags`-Struktur, 14 Bools (§71); die v4-Bit-Werte sind zurückgezogen |
 | Loader-Limits | 256 `.wgsl` / 256 KB Quelltext / 64 KB `pack.json` / 32 MB Zip / 1.024 Zip-Einträge; UTF-8; ein Manifest; eindeutige Pfade — alles unverändert |
-| Textur-Registry | 1.210 Einträge → **896 nutzbare Namen**; Drift +1/−10 gegenüber cnty9 (§80); Katalog: v4-Leitfaden §68 + Drift-Liste aus §80 (aktuelle Form: [Textur-Katalog](api/texture-catalog.md)) |
+| Textur-Registry | 1.210 Einträge → **896 nutzbare Namen**; Drift +1/−10 gegenüber cnty9 (§80); Katalog: v4-Leitfaden §68 + Drift-Liste aus §80 (aktuelle Form: [Textur-Katalog](api/texture-catalog.md)); nachgemessen auf `xkg8x` (2026-11-04): 1.220 / **906**, alle 10 Entfernungen rückgängig, 376 id-Änderungen (§80-Nachtrag) |
 | Lichtkurve | 0–15 Level → 0–1 auf der Ease-out-Kurve (`6 → 0.45`, `12 → 0.92`) — im Header, unverändert |
 | Lift-Kurve | `1 - (1 - x / (3 - 2x))^3` — unverändert (jetzt Chunk c9) |
 | Richtlicht-Kegel | `0.12 / 0.65 / 0.62 / 0.95` — unverändert (Chunk c9) |

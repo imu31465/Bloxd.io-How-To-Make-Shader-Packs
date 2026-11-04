@@ -1,6 +1,6 @@
 # Model shaders
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (written against the v5 header spec)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Analyzed (written against the v5 header spec)
 
 Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
 

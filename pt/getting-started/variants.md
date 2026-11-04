@@ -1,6 +1,6 @@
 # Variantes e guardas
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção em 2026-11-03) · Estado: Analyzed
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção em 2026-11-04) · Estado: Analyzed
 
 ## 6 variantes
 

@@ -1,6 +1,6 @@
 # Texture registry internals
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (extracted by re-running the engine's own registry builder)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified (extracted by re-running the engine's own registry builder)
 
 The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
 
@@ -12,7 +12,7 @@ We ran the engine's own registry-building module (29833 on this build, coordinat
 
 | Output | v5 measured | Meaning |
 |---|---|---|
-| `named` | **896** | names referable as `bloxdTextureId<Name>` |
+| `named` | **906** | names referable as `bloxdTextureId<Name>` |
 | `aliases` | 416 | folded spellings — 188 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
 | `layers` | 228 | the layer table — including 171 pre-rotated slots (57 roots × 4 rotations) |
 
@@ -34,6 +34,19 @@ We ran the engine's own registry-building module (29833 on this build, coordinat
 
 The complete drift (11 names): added (1) `scorpion_eggs`; removed (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (the double chest left the game data; spawners keep `mob_spawner_block_top`).
 
+## Drift (ab90qa → xkg8x)
+
+| Measurement | ab90qa (v5 launch) | xkg8x (v5, current) |
+|---|---|---|
+| atlas entries | 1,210 | **1,220** |
+| rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
+| animation families (frame spellings) | 42 (188) | **42 (188) — unchanged** |
+| usable named constants | 896 | **906** |
+| id changes among surviving names | — | **376 of 896** |
+
+The complete drift (10 names): added (10) the eight double-chest textures plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — every name removed at the v5 launch is back (the double chest returned to the game data; the spawner side variants returned with it). Nothing was removed.
+
+
 ## Effect on HEADER_VERSION
 
 The registry-hash suffix bakes in ids, so this drift marks **every saved pack "needs re-check"** (auto re-validated on page load). Name-written packs survive re-resolution; raw-id packs break ([Compatibility](../api/compatibility.md)).
@@ -41,6 +54,8 @@ The registry-hash suffix bakes in ids, so this drift marks **every saved pack "n
 ## Past drift records
 
 October's two-build comparison (sjr0p7 → cnty9, 10 days): entries 1200 → 1219 (98 added, 79 removed); 779 of 1121 unchanged names changed id (69%); a naming-convention migration (`_rot1..4` suffixes → `[rot[1..4` slots); the double chest appearing. The full record lives in [Version History: v4](../history/v4.md).
+
+November 4 (ab90qa → xkg8x, 1 day): entries 1,210 → 1,220 (+10, all returning names — the v5-launch removals reversed); 376 of 896 names changed id (42%); no removals; both folding families unchanged. The double chest is back.
 
 ## Related
 

@@ -1,6 +1,6 @@
 # Liste de vérification en jeu
 
-> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Build cible : `xkg8x` (2026-11-04, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
 Une compilation réussie et un « bel aspect » sont deux choses différentes. Vérifiez dans cet ordre :
 
 1. **Chargement :** `pack.json` se trouve à la racine du ZIP. Juste après la sélection, `Ready. Reload the page to use it.` s'affiche et le pack devient actif **au rechargement de la page** ; confirmez ensuite `Ready to use`. Les packs enregistrés sont revalidés automatiquement au prochain chargement de page : chaque fois que l'en-tête de spec côté moteur est mis à jour, le contenu de l'en-tête est vérifié par empreinte (succès = reste tel quel / échec = affiché comme bloqué), donc un ancien pack cassé ne reste jamais silencieusement actif.

@@ -1,6 +1,6 @@
 # 모델 문제
 
-> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (v5 의 새 영역)
+> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (v5 의 새 영역)
 
 새로운 v5 Model 훅 관련 문제.
 

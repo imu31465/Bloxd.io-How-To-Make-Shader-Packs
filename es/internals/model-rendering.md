@@ -1,6 +1,6 @@
 # Internas del renderizado de modelos
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado del bundle en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado del bundle en vivo)
 
 Las internas del programa Model de v5. La guía orientada al usuario: [Modelos y texturas](../guides/models.md).
 

@@ -14,6 +14,6 @@ A single-track tutorial for first-time shader pack authors, from overview to dis
 8. [Validation](validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified/Analyzed
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).

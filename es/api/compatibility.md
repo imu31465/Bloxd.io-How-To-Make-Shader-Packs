@@ -1,6 +1,6 @@
 # Compatibilidad
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-04, producción) · Estado: Verified
 
 Cómo interoperan el juego actual y los paquetes de versiones antiguas.
 

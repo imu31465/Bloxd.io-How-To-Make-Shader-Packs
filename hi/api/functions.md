@@ -1,6 +1,6 @@
 # फ़ंक्शन
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
 
 हेडर का हर फ़ंक्शन। टेक्सचर API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) `bloxdOpaqueBehind` के साथ [टेक्सचर API](texture-api.md) में कवर किया गया है।
 

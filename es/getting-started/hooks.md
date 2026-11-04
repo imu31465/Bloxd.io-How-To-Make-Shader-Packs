@@ -1,6 +1,6 @@
 # Hooks de sombreado
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified
 
 Un paquete puede enchufarse en **9 hooks**: 3 objetivos de render (Terrain / Liquid / Model) × 3 etapas del pipeline (Vertex / Surface / Light). Todos son opcionales — un hook indefinido cae en el valor por defecto del motor.
 

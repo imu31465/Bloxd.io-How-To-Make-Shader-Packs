@@ -1,6 +1,6 @@
 # Flags (BloxdFlags)
 
-> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 v5 identifie les faces à l'aide d'une structure de booléens nommés. Le masque de bits `blockFlags: u32` de v4 et ses 6 constantes `bloxdBlockFlag*` ont disparu.
 

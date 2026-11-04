@@ -1,6 +1,6 @@
 # Time & animation
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 > `bloxdSeconds()` wraps every 3600 seconds (1 hour). Note this is shader elapsed time and is not guaranteed to sync with the in-game sun/day-night. Use it for visual periodic animation, but prefer `bloxdSunDirection()` and lighting inputs for actual night detection.
 
 ## Day-night cycle (1 day per hour)

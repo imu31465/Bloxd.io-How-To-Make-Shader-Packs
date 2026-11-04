@@ -1,6 +1,6 @@
 # Model rendering internals
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored from the live bundle)
 
 The internals of the v5 Model program. The user-facing guide: [Models and textures](../guides/models.md).
 

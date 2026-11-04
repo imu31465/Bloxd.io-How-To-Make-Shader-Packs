@@ -1,6 +1,6 @@
 # WGSL-Kompilierung
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (aus dem Live-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Bundle restauriert)
 
 Die zweite Validierungsstufe — echte Kompilierung durch den WGSL-Compiler des Browsers — und die Validierungs-Stubs von v5.
 

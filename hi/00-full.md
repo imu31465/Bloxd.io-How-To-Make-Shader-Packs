@@ -23,7 +23,7 @@ Bloxd.io के WebGPU रेंडरर के लिए शेडर पै�
 8. [सत्यापन](getting-started/validation.md) — 3-चरणीय लोड जाँच और ऑन-डिवाइस टेस्टिंग
 9. [वितरण](getting-started/distribution.md) — zip बनाना और रिलीज़ की सफ़ाई
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified/Analyzed
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified/Analyzed
 
 पूरी स्पेसिफ़िकेशन चाहिए तो [API रेफ़रेंस](api/) पर आगे बढ़ें; तैयार बने-बनाए इफ़ेक्ट के लिए [रेसिपी](recipes/) देखें।
 
@@ -31,7 +31,7 @@ Bloxd.io के WebGPU रेंडरर के लिए शेडर पै�
 ---
 
 ## अवलोकन व पूर्व-आवश्यकताएँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
 ### शेडर पैक क्या है
 
@@ -103,7 +103,7 @@ URL पैरामीटर या localStorage में छूटा हु�
 ---
 
 ## क्विक स्टार्ट
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
 पाँच मिनट में आपका पहला पैक।
 
@@ -162,7 +162,7 @@ zip बना दें — देखें [वितरण](getting-started/di
 ---
 
 ## पैक संरचना
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified
 
 ### वितरण प्रारूप
 
@@ -191,7 +191,7 @@ zip बना दें — देखें [वितरण](getting-started/di
 ---
 
 ## pack.json (मैनिफ़ेस्ट)
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
 `pack.json` पैक का मैनिफ़ेस्ट है — zip के रूट में ठीक एक JSON ऑब्जेक्ट।
 
@@ -230,7 +230,7 @@ v1–v4 से माइग्रेट करने के लिए देख�
 ---
 
 ## शेडर हुक
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
 एक पैक **9 हुक** प्लग कर सकता है: 3 रेंडर लक्ष्य (Terrain / Liquid / Model) × 3 पाइपलाइन चरण (Vertex / Surface / Light)। सभी वैकल्पिक हैं — अपरिभाषित छूटा हुक इंजन डिफ़ॉल्ट पर लौट जाता है।
 
@@ -359,7 +359,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## वेरिएंट और गार्ड
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed
 
 ### 6 वेरिएंट
 
@@ -398,7 +398,7 @@ v4 और उससे पहले का "लाइटिंग चालू/�
 ---
 
 ## सत्यापन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified
 
 ### 3-चरणीय लोड जाँच
 
@@ -451,7 +451,7 @@ v4 और उससे पहले का "लाइटिंग चालू/�
 ---
 
 ## API रेफ़रेंस
-मौजूदा API v5 की व्यवस्थित स्पेसिफ़िकेशन। यहाँ का सब कुछ लक्ष्य बिल्ड `ab90qa` (2026-11-03; प्रोडक्शन और प्रीप्रोड एक जैसे) से मापा गया है। हर पैक के आगे जुड़ने वाला इंजन हेडर ([इंजन-आंतरिक](internals/engine-header.md) में पुनरुत्पादित) प्राथमिक स्रोत है।
+मौजूदा API v5 की व्यवस्थित स्पेसिफ़िकेशन। यहाँ का सब कुछ लक्ष्य बिल्ड `xkg8x` (2026-11-04; प्रोडक्शन और प्रीप्रोड एक जैसे) से मापा गया है। हर पैक के आगे जुड़ने वाला इंजन हेडर ([इंजन-आंतरिक](internals/engine-header.md) में पुनरुत्पादित) प्राथमिक स्रोत है।
 
 ### नक़्शा
 
@@ -470,7 +470,7 @@ v4 और उससे पहले का "लाइटिंग चालू/�
 | [कम्पैटिबिलिटी](api/compatibility.md) | पुराने-संस्करण के पैक, सेव-पैक का पुनः-सत्यापन |
 | [टेक्सचर कैटलॉग](api/texture-catalog.md) | इस्तेमाल-योग्य सभी 896 नाम (खोजने-योग्य) |
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर व वैलिडेटर से शब्दशः बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर व वैलिडेटर से शब्दशः बहाल)
 
 v4 से माइग्रेट कर रहे हैं? देखें [संस्करण इतिहास: v5](history/v5.md)।
 
@@ -478,7 +478,7 @@ v4 से माइग्रेट कर रहे हैं? देखें [
 ---
 
 ## पैक फ़ॉर्मैट
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव लोडर पर पुनः मापा गया)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव लोडर पर पुनः मापा गया)
 
 पूरा पैक मॉडल एक ही पेज पर — मैनिफ़ेस्ट, लोडर सीमाएँ, प्रति-फ़्रेम uniform। कदम-दर-कदम संस्करण के लिए देखें [शुरुआत करें](getting-started/manifest.md)।
 
@@ -549,7 +549,7 @@ v4 से माइग्रेट कर रहे हैं? देखें [
 ---
 
 ## शेडर हुक
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified
 
 पैक **9 हुक** परिभाषित कर सकते हैं — 3 रेंडर लक्ष्य (प्रोग्राम) × 3 पाइपलाइन चरण, सभी वैकल्पिक (अपरिभाषित का मतलब इंजन डिफ़ॉल्ट)।
 
@@ -641,7 +641,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## फ़्लैग (BloxdFlags)
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से शब्दशः बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से शब्दशः बहाल)
 
 v5 फलकों की पहचान नाम वाले boolean स्ट्रक्चर से करता है। v4 का `blockFlags: u32` बिटमास्क और उसके 6 `bloxdBlockFlag*` कॉन्स्टैंट हटा दिए गए हैं।
 
@@ -765,7 +765,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## इनपुट व आउटपुट स्ट्रक्चर
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से शब्दशः बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से शब्दशः बहाल)
 
 सात स्ट्रक्चर पैक से पढ़े/लिखे जा सकते हैं। हर फ़ील्ड नीचे सूचीबद्ध है (`#ifdef` वाले फ़ील्ड सशर्त हैं)। पूरा हेडर [इंजन-आंतरिक](internals/engine-header.md) में है।
 
@@ -939,7 +939,7 @@ struct BloxdOpaqueBehind {
 ---
 
 ## फ़ंक्शन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
 
 हेडर का हर फ़ंक्शन। टेक्सचर API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) `bloxdOpaqueBehind` के साथ [टेक्सचर API](api/texture-api.md) में कवर किया गया है।
 
@@ -1102,7 +1102,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## लाइटिंग
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
 
 v5 ने लाइटिंग API प्रकाशित किया। जो काम इंजन आंतरिक रूप से करता था (`litColour` बनाना), वह अब पैकों से कॉल किया जा सकता है। यह पेज लाइटिंग के इनपुट, फ़ंक्शन और प्रोसेसिंग क्रम को एक पूरे तंत्र के रूप में कवर करता है।
 
@@ -1286,7 +1286,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## टेक्सचर API
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (v4 से API अपरिवर्तित, v5 बिल्ड पर पुनः पुष्ट की गई)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified (v4 से API अपरिवर्तित, v5 बिल्ड पर पुनः पुष्ट की गई)
 
 गेम के अपने टेक्सचर पढ़ने का API: दो फ़ंक्शन, एक नामित-स्थिरांक परिवार, और चार इनपुट फ़ील्ड। हेडर की अपनी एक-पंक्ति: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## स्थिरांक
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव हेडर से अक्षरशः पुनर्स्थापित)
 
 हेडर तीन स्थिरांक देता है (टेक्सचर-नाम स्थिरांक `bloxdTextureId*` [टेक्सचर API](api/texture-api.md) में कवर किए गए हैं)।
 
@@ -1572,7 +1572,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## प्रीप्रोसेसर
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
 
 कंडीशनल कंपाइलेशन केवल `#define NAME` (बिना मान) / `#ifdef` / `#ifndef` / `#else` / `#endif` को समर्थन देता है। `#` पंक्ति की शुरुआत में लगता है (फ़ंक्शन के भीतर होना भी ठीक है)। फ़्लैग-नाम मिलान केस-असंवेदनशील है; ग़लत `#ifdef` नाम लिखने पर त्रुटि संदेश आधिकारिक सेट की सूची दिखाता है।
 
@@ -1654,7 +1654,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## प्रतिबंध और आरक्षित नाम
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (v4 की सीमाएँ v5 पर बाइट-समान रूप से पुनः पुष्ट की गईं)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified (v4 की सीमाएँ v5 पर बाइट-समान रूप से पुनः पुष्ट की गईं)
 
 पैक क्या लिख सकते हैं, और नाम-आरक्षण के पूरे नियम।
 
@@ -1721,7 +1721,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## कम्पैटिबिलिटी
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-03) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-04) · स्थिति: Verified
 
 मौजूदा गेम और पुराने-वर्शन के पैक आपस में कैसे काम करते हैं।
 
@@ -1792,9 +1792,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## टेक्सचर कैटलॉग
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-03) · स्थिति: Verified (इंजन के अपने रजिस्ट्री बिल्डर को दोबारा चलाकर निकाला गया)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (प्रोडक्शन में सत्यापित 2026-11-04) · स्थिति: Verified (इंजन के अपने रजिस्ट्री बिल्डर को दोबारा चलाकर निकाला गया)
 
-प्रयोग-योग्य टेक्सचर-नाम स्थिरांकों (`bloxdTextureId*`) का पूरा कैटलॉग। **896 नाम**, वर्णनिक्रम में।
+प्रयोग-योग्य टेक्सचर-नाम स्थिरांकों (`bloxdTextureId*`) का पूरा कैटलॉग। **906 नाम**, वर्णनिक्रम में।
 
 ### कैसे पढ़ें
 
@@ -1804,7 +1804,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 **टिप्पणियाँ** कॉलम दो फ़ोल्डिंग परिवारों को चिह्नित करता है। "anim (N फ़्रेम)" का अर्थ है कि इस नाम को सैंपल करने पर मौजूदा एनीमेशन फ़्रेम अपने आप लौट आता है — **फ़्रेम सफ़िक्स कभी न लिखें** (`lava0` एक ज्ञात उपनाम है जिसके लिए समर्पित डायग्नोस्टिक मिलता है)। "रोटेशन परिवार (4 प्रतियाँ)" का अर्थ है कि टेक्सचर केवल पहले से घुमाई हुई स्लॉटों के रूप में मौजूद है — नाम मूल की ओर इशारा करता है और `bloxdTexel` रोटेशन दोबारा लगाता है। ठीक एक नाम (`radar_screen`) दोनों टिप्पणियाँ ले चलता है।
 
-जान-बूझकर **नहीं** सूचीबद्ध: रजिस्ट्री की बाकी स्पेलिंग — 188 फ़्रेम उपनाम और 228 रोटेशन उपनाम — जो प्रयोग-योग्य स्थिरांक नहीं हैं; इन्हें लिखने पर समर्पित इंजन त्रुटि संदेश मिलते हैं। इसके नीचे पड़ी 1,210-पंक्तियों की लेयर टेबल (171 पहले-घुमाई स्लॉट सहित) इंजन-आंतरिक है और [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](internals/texture-registry.md) में कवर की गई है।
+जान-बूझकर **नहीं** सूचीबद्ध: रजिस्ट्री की बाकी स्पेलिंग — 188 फ़्रेम उपनाम और 228 रोटेशन उपनाम — जो प्रयोग-योग्य स्थिरांक नहीं हैं; इन्हें लिखने पर समर्पित इंजन त्रुटि संदेश मिलते हैं। इसके नीचे पड़ी 1,220-पंक्तियों की लेयर टेबल (171 पहले-घुमाई स्लॉट सहित) इंजन-आंतरिक है और [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](internals/texture-registry.md) में कवर की गई है।
 
 #### ये संख्याएँ आपस में कैसे जुड़ती हैं
 
@@ -1812,76 +1812,76 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 | संख्या | यह क्या गिनती है |
 |---|---|
-| **896** | प्रयोग-योग्य नामित स्थिरांक — टेक्सचर नाम जिन्हें आप `bloxdTextureId*` के रूप में लिख सकते हैं |
+| **906** | प्रयोग-योग्य नामित स्थिरांक — टेक्सचर नाम जिन्हें आप `bloxdTextureId*` के रूप में लिख सकते हैं |
 | **416** | उपनाम नाम (188 फ़्रेम + 228 रोटेशन) — पहचानी जाने वाली स्पेलिंग जो *अस्वीकृत* होकर मूल नाम की ओर राह दिखाती हैं; वे नाम हैं, स्थिरांक नहीं, और कोई id नहीं जोड़तीं |
-| **1,210** | एटलस प्रविष्टियाँ — टेक्सचर एटलस के असली स्लॉट (ids 1–1210) |
+| **1,220** | एटलस प्रविष्टियाँ — टेक्सचर एटलस के असली स्लॉट (ids 1–1220) |
 
-896 में से हर नाम एक अलग एटलस प्रविष्टि पर मैप होता है। बची हुई **314 प्रविष्टियाँ** बिना प्रयोग-योग्य नाम वाले अतिरिक्त एनीमेशन फ़्रेम (143) और पहले-घुमाई प्रतियाँ (171) हैं — पैक कभी उन्हें सीधे संदर्भित नहीं करते, क्योंकि `bloxdTexel` फ़्रेम चलाता है और रोटेशन अपने आप लगाता है। हर एनीमेशन परिवार का पहला फ़्रेम और हर रोटेशन परिवार का मूल *नाम रखते हैं*, इसीलिए कुछ प्रविष्टियाँ "नामित" और "फ़्रेम/रोटेशन आधार" दोनों गिनती में आती हैं। पिछले बिल्ड से तुलना के लिए: v4 में 905 प्रयोग-योग्य नाम थे; इस बिल्ड में 896 हैं (+1 `scorpion_eggs`, −10 डबल-चेस्ट ×8 और मॉब-स्पॉनर साइड ×2), और बचे रह गए नामों में से 334 का id बदल गया।
+906 में से हर नाम एक अलग एटलस प्रविष्टि पर मैप होता है। बची हुई **314 प्रविष्टियाँ** बिना प्रयोग-योग्य नाम वाले अतिरिक्त एनीमेशन फ़्रेम (143) और पहले-घुमाई प्रतियाँ (171) हैं — पैक कभी उन्हें सीधे संदर्भित नहीं करते, क्योंकि `bloxdTexel` फ़्रेम चलाता है और रोटेशन अपने आप लगाता है। हर एनीमेशन परिवार का पहला फ़्रेम और हर रोटेशन परिवार का मूल *नाम रखते हैं*, इसीलिए कुछ प्रविष्टियाँ "नामित" और "फ़्रेम/रोटेशन आधार" दोनों गिनती में आती हैं। तुलना के लिए: v4 में 905 प्रयोग-योग्य नाम थे, v5 लॉन्च बिल्ड में 896; इस बिल्ड में 906 हैं — v5 लॉन्च पर हटाए गए 10 नाम (डबल-चेस्ट ×8, मॉब-स्पॉनर साइड ×2) वापस आ गए हैं (पहले के +1 `scorpion_eggs` के साथ), और लॉन्च के 896 जीवित नामों में से 376 का id बदल गया।
 
 ### कैटलॉग
 
-सभी प्रयोग-योग्य नाम, वर्णनिक्रम में। id कॉलम `bloxdTextureId*` का मान है — `ab90qa` (2026-11-03) पर मापा गया। **Id स्नैपशॉट हैं; नामों को ही API मानें**: v4 बिल्ड (cnty9) और इस बिल्ड के बीच भी, अपनी स्पेलिंग बचाए रखने वाले नामों में से 334 का id बदल गया (नीचे ड्रिफ़्ट माप देखें)।
+सभी प्रयोग-योग्य नाम, वर्णनिक्रम में। id कॉलम `bloxdTextureId*` का मान है — `xkg8x` (2026-11-04) पर मापा गया। **Id स्नैपशॉट हैं; नामों को ही API मानें**: v4 बिल्ड (cnty9) और v5 लॉन्च बिल्ड (ab90qa) के बीच 334 जीवित नामों का id बदला, और ab90qa से इस बिल्ड के बीच और 376 बदले (नीचे ड्रिफ़्ट माप देखें)।
 
-| नाम | id (ab90qa) | टिप्पणियाँ |
+| नाम | id (xkg8x) | टिप्पणियाँ |
 |---|---|---|
-| `alloy_kiln_back` | 1089 |  |
-| `alloy_kiln_front` | 1083 |  |
-| `alloy_kiln_side` | 1084 |  |
+| `alloy_kiln_back` | 1091 |  |
+| `alloy_kiln_front` | 1085 |  |
+| `alloy_kiln_side` | 1086 |  |
 | `alloy_kiln_side_running` | 33 | anim (4 फ़्रेम) |
-| `alloy_kiln_top` | 1085 | रोटेशन परिवार (4 प्रतियाँ) |
+| `alloy_kiln_top` | 1087 | रोटेशन परिवार (4 प्रतियाँ) |
 | `andesite_brick` | 465 |  |
 | `apple_block_bottom` | 441 |  |
 | `apple_block_side` | 439 |  |
 | `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 993 |  |
-| `armour_lucky_block_rare` | 995 |  |
-| `armour_lucky_block_super` | 997 |  |
+| `armour_lucky_block` | 995 |  |
+| `armour_lucky_block_rare` | 997 |  |
+| `armour_lucky_block_super` | 999 |  |
 | `artisan_table_side` | 367 |  |
 | `artisan_table_top` | 368 |  |
-| `ash` | 1029 |  |
-| `auto_bench_back` | 1104 |  |
-| `auto_bench_front` | 1098 |  |
-| `auto_bench_side` | 1099 |  |
+| `ash` | 1031 |  |
+| `auto_bench_back` | 1106 |  |
+| `auto_bench_front` | 1100 |  |
+| `auto_bench_side` | 1101 |  |
 | `auto_bench_side_running` | 35 | anim (4 फ़्रेम) |
-| `auto_bench_top` | 1100 | रोटेशन परिवार (4 प्रतियाँ) |
-| `autocrafter_bottom` | 960 |  |
-| `autocrafter_lunite_bottom` | 971 |  |
-| `autocrafter_lunite_side` | 970 |  |
-| `autocrafter_side` | 959 |  |
-| `banana_block_side` | 897 |  |
-| `banana_block_top` | 898 |  |
+| `auto_bench_top` | 1102 | रोटेशन परिवार (4 प्रतियाँ) |
+| `autocrafter_bottom` | 962 |  |
+| `autocrafter_lunite_bottom` | 973 |  |
+| `autocrafter_lunite_side` | 972 |  |
+| `autocrafter_side` | 961 |  |
+| `banana_block_side` | 899 |  |
+| `banana_block_top` | 900 |  |
 | `beacon` | 330 |  |
 | `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 923 |  |
-| `beetroot_block_side` | 921 |  |
-| `beetroot_block_top` | 922 |  |
-| `belt_drop_side` | 1183 |  |
-| `belt_drop_top` | 1182 |  |
-| `belt_lift_side` | 1181 |  |
-| `belt_lift_top` | 1180 |  |
-| `belt_loader_slab_front` | 1108 |  |
-| `belt_loader_top` | 1107 |  |
-| `belt_tunnel_back` | 1197 |  |
-| `belt_tunnel_exit_top` | 1198 | रोटेशन परिवार (4 प्रतियाँ) |
-| `belt_tunnel_mouth` | 1191 |  |
-| `belt_tunnel_side` | 1192 |  |
-| `belt_tunnel_top` | 1193 | रोटेशन परिवार (4 प्रतियाँ) |
+| `beetroot_block_bottom` | 925 |  |
+| `beetroot_block_side` | 923 |  |
+| `beetroot_block_top` | 924 |  |
+| `belt_drop_side` | 1185 |  |
+| `belt_drop_top` | 1184 |  |
+| `belt_lift_side` | 1183 |  |
+| `belt_lift_top` | 1182 |  |
+| `belt_loader_slab_front` | 1110 |  |
+| `belt_loader_top` | 1109 |  |
+| `belt_tunnel_back` | 1199 |  |
+| `belt_tunnel_exit_top` | 1200 | रोटेशन परिवार (4 प्रतियाँ) |
+| `belt_tunnel_mouth` | 1193 |  |
+| `belt_tunnel_side` | 1194 |  |
+| `belt_tunnel_top` | 1195 | रोटेशन परिवार (4 प्रतियाँ) |
 | `black_concrete` | 273 |  |
 | `black_glazed_terracotta` | 429 | रोटेशन परिवार (4 प्रतियाँ) |
 | `black_planks` | 366 |  |
 | `black_portal` | 2 | anim (4 फ़्रेम) |
 | `black_spawn_block_side` | 760 |  |
 | `black_spawn_block_top` | 756 | रोटेशन परिवार (4 प्रतियाँ) |
-| `block_destroyer_tnt_side` | 1015 |  |
-| `block_destroyer_tnt_top` | 1016 |  |
+| `block_destroyer_tnt_side` | 1017 |  |
+| `block_destroyer_tnt_top` | 1018 |  |
 | `blue_concrete` | 274 |  |
 | `blue_gen_spawn_coal` | 774 |  |
 | `blue_gen_spawn_iron` | 775 |  |
 | `blue_gen_spawn_top` | 773 |  |
 | `blue_glazed_terracotta` | 413 | रोटेशन परिवार (4 प्रतियाँ) |
-| `blue_lucky_block` | 992 |  |
-| `blue_lucky_block_rare` | 994 |  |
-| `blue_lucky_block_super` | 996 |  |
+| `blue_lucky_block` | 994 |  |
+| `blue_lucky_block_rare` | 996 |  |
+| `blue_lucky_block_super` | 998 |  |
 | `blue_planks` | 362 |  |
 | `blue_portal` | 3 | anim (4 फ़्रेम) |
 | `blue_spawn_block_side` | 755 |  |
@@ -1896,7 +1896,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `bookshelf_5` | 570 |  |
 | `bookshelf_empty` | 565 |  |
 | `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 976 |  |
+| `bowling_alley_floor` | 978 |  |
 | `bread_block_back` | 435 |  |
 | `bread_block_front` | 434 |  |
 | `bread_block_side` | 436 |  |
@@ -1909,80 +1909,88 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `brown_portal` | 4 | anim (4 फ़्रेम) |
 | `brown_spawn_block_side` | 750 |  |
 | `brown_spawn_block_top` | 746 | रोटेशन परिवार (4 प्रतियाँ) |
-| `building_lucky_block` | 987 |  |
-| `building_lucky_block_rare` | 989 |  |
-| `building_lucky_block_super` | 991 |  |
-| `burner_drill_back` | 1046 |  |
-| `burner_drill_bottom` | 1045 |  |
-| `burner_drill_front` | 1039 |  |
-| `burner_drill_side` | 1040 |  |
+| `building_lucky_block` | 989 |  |
+| `building_lucky_block_rare` | 991 |  |
+| `building_lucky_block_super` | 993 |  |
+| `burner_drill_back` | 1048 |  |
+| `burner_drill_bottom` | 1047 |  |
+| `burner_drill_front` | 1041 |  |
+| `burner_drill_side` | 1042 |  |
 | `burner_drill_side_running` | 27 | anim (4 फ़्रेम) |
-| `burner_drill_top` | 1041 | रोटेशन परिवार (4 प्रतियाँ) |
+| `burner_drill_top` | 1043 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cactus_dry` | 350 |  |
 | `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 919 |  |
-| `carrot_block_side` | 917 |  |
-| `carrot_block_top` | 918 |  |
-| `carved_messy_stone` | 826 |  |
+| `carrot_block_bottom` | 921 |  |
+| `carrot_block_side` | 919 |  |
+| `carrot_block_top` | 920 |  |
+| `carved_messy_stone` | 827 |  |
 | `carved_pumpkin` | 543 |  |
-| `chalk` | 837 |  |
-| `chalk_black` | 853 |  |
-| `chalk_blue` | 852 |  |
-| `chalk_bricks_black` | 869 |  |
-| `chalk_bricks_blue` | 868 |  |
-| `chalk_bricks_brown` | 867 |  |
-| `chalk_bricks_cyan` | 866 |  |
-| `chalk_bricks_gray` | 865 |  |
-| `chalk_bricks_green` | 864 |  |
-| `chalk_bricks_light_blue` | 863 |  |
-| `chalk_bricks_light_gray` | 862 |  |
-| `chalk_bricks_lime` | 861 |  |
-| `chalk_bricks_magenta` | 860 |  |
-| `chalk_bricks_orange` | 859 |  |
-| `chalk_bricks_pink` | 858 |  |
-| `chalk_bricks_purple` | 857 |  |
-| `chalk_bricks_red` | 856 |  |
-| `chalk_bricks_slab_side_black` | 885 |  |
-| `chalk_bricks_slab_side_blue` | 884 |  |
-| `chalk_bricks_slab_side_brown` | 883 |  |
-| `chalk_bricks_slab_side_cyan` | 882 |  |
-| `chalk_bricks_slab_side_gray` | 881 |  |
-| `chalk_bricks_slab_side_green` | 880 |  |
-| `chalk_bricks_slab_side_light_blue` | 879 |  |
-| `chalk_bricks_slab_side_light_gray` | 878 |  |
-| `chalk_bricks_slab_side_lime` | 877 |  |
-| `chalk_bricks_slab_side_magenta` | 876 |  |
-| `chalk_bricks_slab_side_orange` | 875 |  |
-| `chalk_bricks_slab_side_pink` | 874 |  |
-| `chalk_bricks_slab_side_purple` | 873 |  |
-| `chalk_bricks_slab_side_red` | 872 |  |
-| `chalk_bricks_slab_side_white` | 871 |  |
-| `chalk_bricks_slab_side_yellow` | 870 |  |
-| `chalk_bricks_white` | 855 |  |
-| `chalk_bricks_yellow` | 854 |  |
-| `chalk_brown` | 851 |  |
-| `chalk_cyan` | 850 |  |
-| `chalk_gray` | 849 |  |
-| `chalk_green` | 848 |  |
-| `chalk_light_blue` | 847 |  |
-| `chalk_light_gray` | 846 |  |
-| `chalk_lime` | 845 |  |
-| `chalk_magenta` | 844 |  |
-| `chalk_orange` | 843 |  |
-| `chalk_pink` | 842 |  |
-| `chalk_purple` | 841 |  |
-| `chalk_red` | 840 |  |
-| `chalk_white` | 839 |  |
-| `chalk_yellow` | 838 |  |
-| `charge_vault_side` | 1112 |  |
-| `charge_vault_top` | 1111 |  |
-| `charging_pad_side` | 1157 |  |
-| `charging_pad_top` | 1156 |  |
+| `chalk` | 839 |  |
+| `chalk_black` | 855 |  |
+| `chalk_blue` | 854 |  |
+| `chalk_bricks_black` | 871 |  |
+| `chalk_bricks_blue` | 870 |  |
+| `chalk_bricks_brown` | 869 |  |
+| `chalk_bricks_cyan` | 868 |  |
+| `chalk_bricks_gray` | 867 |  |
+| `chalk_bricks_green` | 866 |  |
+| `chalk_bricks_light_blue` | 865 |  |
+| `chalk_bricks_light_gray` | 864 |  |
+| `chalk_bricks_lime` | 863 |  |
+| `chalk_bricks_magenta` | 862 |  |
+| `chalk_bricks_orange` | 861 |  |
+| `chalk_bricks_pink` | 860 |  |
+| `chalk_bricks_purple` | 859 |  |
+| `chalk_bricks_red` | 858 |  |
+| `chalk_bricks_slab_side_black` | 887 |  |
+| `chalk_bricks_slab_side_blue` | 886 |  |
+| `chalk_bricks_slab_side_brown` | 885 |  |
+| `chalk_bricks_slab_side_cyan` | 884 |  |
+| `chalk_bricks_slab_side_gray` | 883 |  |
+| `chalk_bricks_slab_side_green` | 882 |  |
+| `chalk_bricks_slab_side_light_blue` | 881 |  |
+| `chalk_bricks_slab_side_light_gray` | 880 |  |
+| `chalk_bricks_slab_side_lime` | 879 |  |
+| `chalk_bricks_slab_side_magenta` | 878 |  |
+| `chalk_bricks_slab_side_orange` | 877 |  |
+| `chalk_bricks_slab_side_pink` | 876 |  |
+| `chalk_bricks_slab_side_purple` | 875 |  |
+| `chalk_bricks_slab_side_red` | 874 |  |
+| `chalk_bricks_slab_side_white` | 873 |  |
+| `chalk_bricks_slab_side_yellow` | 872 |  |
+| `chalk_bricks_white` | 857 |  |
+| `chalk_bricks_yellow` | 856 |  |
+| `chalk_brown` | 853 |  |
+| `chalk_cyan` | 852 |  |
+| `chalk_gray` | 851 |  |
+| `chalk_green` | 850 |  |
+| `chalk_light_blue` | 849 |  |
+| `chalk_light_gray` | 848 |  |
+| `chalk_lime` | 847 |  |
+| `chalk_magenta` | 846 |  |
+| `chalk_orange` | 845 |  |
+| `chalk_pink` | 844 |  |
+| `chalk_purple` | 843 |  |
+| `chalk_red` | 842 |  |
+| `chalk_white` | 841 |  |
+| `chalk_yellow` | 840 |  |
+| `charge_vault_side` | 1114 |  |
+| `charge_vault_top` | 1113 |  |
+| `charging_pad_side` | 1159 |  |
+| `charging_pad_top` | 1158 |  |
 | `checkpoint_block` | 761 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cherry_block_bottom` | 590 |  |
 | `cherry_block_side` | 588 |  |
 | `cherry_block_top` | 589 |  |
 | `chest_back` | 347 |  |
+| `chest_double_back_hi` | 1219 |  |
+| `chest_double_back_lo` | 1218 |  |
+| `chest_double_front_hi` | 1213 |  |
+| `chest_double_front_lo` | 1212 |  |
+| `chest_double_top_1_hi` | 1215 |  |
+| `chest_double_top_1_lo` | 1214 |  |
+| `chest_double_top_2_hi` | 1217 |  |
+| `chest_double_top_2_lo` | 1216 |  |
 | `chest_front` | 341 |  |
 | `chest_side` | 342 |  |
 | `chest_top` | 343 | रोटेशन परिवार (4 प्रतियाँ) |
@@ -1993,46 +2001,46 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `chiseled_sandstone` | 325 |  |
 | `clay` | 195 |  |
 | `coal_block` | 233 |  |
-| `coal_deposit` | 1030 |  |
+| `coal_deposit` | 1032 |  |
 | `coal_ore` | 227 |  |
 | `coarse_dirt` | 191 |  |
 | `coconut_block_bottom` | 522 |  |
 | `coconut_block_side` | 520 |  |
 | `coconut_block_top` | 521 |  |
 | `code_block` | 679 |  |
-| `comet_heart` | 1168 |  |
-| `comet_ore` | 1167 |  |
+| `comet_heart` | 1170 |  |
+| `comet_ore` | 1169 |  |
 | `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1079 |  |
-| `conveyor_belt_slab_side` | 1078 |  |
-| `conveyor_belt_top` | 1077 |  |
-| `conveyor_belt_turn_left` | 1169 |  |
-| `conveyor_belt_turn_right` | 1170 |  |
-| `copper_deposit` | 1033 |  |
-| `copper_ore` | 1038 |  |
+| `conveyor_belt_bottom` | 1081 |  |
+| `conveyor_belt_slab_side` | 1080 |  |
+| `conveyor_belt_top` | 1079 |  |
+| `conveyor_belt_turn_left` | 1171 |  |
+| `conveyor_belt_turn_right` | 1172 |  |
+| `copper_deposit` | 1035 |  |
+| `copper_ore` | 1040 |  |
 | `corn_block_bottom` | 594 |  |
 | `corn_block_side` | 592 |  |
 | `corn_block_top` | 593 |  |
 | `crafting_table_side` | 338 |  |
 | `crafting_table_top` | 339 |  |
-| `crate` | 916 |  |
-| `crop_harvester_back` | 1190 |  |
+| `crate` | 918 |  |
+| `crop_harvester_back` | 1192 |  |
 | `crop_harvester_back_running` | 45 | anim (4 फ़्रेम) |
-| `crop_harvester_front` | 1184 |  |
-| `crop_harvester_side` | 1185 |  |
+| `crop_harvester_front` | 1186 |  |
+| `crop_harvester_side` | 1187 |  |
 | `crop_harvester_side_running` | 44 | anim (4 फ़्रेम) |
-| `crop_harvester_top` | 1186 | रोटेशन परिवार (4 प्रतियाँ) |
-| `crusher_back` | 1053 |  |
-| `crusher_front` | 1047 |  |
-| `crusher_side` | 1048 |  |
+| `crop_harvester_top` | 1188 | रोटेशन परिवार (4 प्रतियाँ) |
+| `crusher_back` | 1055 |  |
+| `crusher_front` | 1049 |  |
+| `crusher_side` | 1050 |  |
 | `crusher_side_running` | 28 | anim (4 फ़्रेम) |
-| `crusher_top` | 1049 | रोटेशन परिवार (4 प्रतियाँ) |
-| `crystal_block` | 1027 |  |
-| `crystal_vat_back` | 1164 |  |
-| `crystal_vat_front` | 1158 |  |
-| `crystal_vat_side` | 1159 |  |
+| `crusher_top` | 1051 | रोटेशन परिवार (4 प्रतियाँ) |
+| `crystal_block` | 1029 |  |
+| `crystal_vat_back` | 1166 |  |
+| `crystal_vat_front` | 1160 |  |
+| `crystal_vat_side` | 1161 |  |
 | `crystal_vat_side_running` | 42 | anim (4 फ़्रेम) |
-| `crystal_vat_top` | 1160 | रोटेशन परिवार (4 प्रतियाँ) |
+| `crystal_vat_top` | 1162 | रोटेशन परिवार (4 प्रतियाँ) |
 | `custom_lobby_block_side` | 769 |  |
 | `custom_lobby_block_top` | 765 | रोटेशन परिवार (4 प्रतियाँ) |
 | `cut_red_sandstone` | 457 |  |
@@ -2047,18 +2055,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `cyan_spawn_block_side` | 745 |  |
 | `cyan_spawn_block_top` | 741 | रोटेशन परिवार (4 प्रतियाँ) |
 | `dark_green_bricks` | 460 |  |
-| `darkstone` | 1204 |  |
-| `darkstone_bricks` | 1205 |  |
-| `darkstone_bricks_cracked` | 1206 |  |
-| `darkstone_bricks_lava` | 1207 |  |
-| `darkstone_engraved` | 1208 |  |
-| `darkstone_smooth` | 1209 |  |
-| `deep_drill_back` | 1138 |  |
-| `deep_drill_bottom` | 1137 |  |
-| `deep_drill_front` | 1131 |  |
-| `deep_drill_side` | 1132 |  |
+| `darkstone` | 1206 |  |
+| `darkstone_bricks` | 1207 |  |
+| `darkstone_bricks_cracked` | 1208 |  |
+| `darkstone_bricks_lava` | 1209 |  |
+| `darkstone_engraved` | 1210 |  |
+| `darkstone_smooth` | 1211 |  |
+| `deep_drill_back` | 1140 |  |
+| `deep_drill_bottom` | 1139 |  |
+| `deep_drill_front` | 1133 |  |
+| `deep_drill_side` | 1134 |  |
 | `deep_drill_side_running` | 39 | anim (4 फ़्रेम) |
-| `deep_drill_top` | 1133 | रोटेशन परिवार (4 प्रतियाँ) |
+| `deep_drill_top` | 1135 | रोटेशन परिवार (4 प्रतियाँ) |
 | `diamond_block` | 340 |  |
 | `diamond_gen_spawn_side` | 807 |  |
 | `diamond_gen_spawn_top` | 806 |  |
@@ -2067,23 +2075,23 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `dirt` | 190 |  |
 | `drop_location_block_side` | 814 |  |
 | `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1036 |  |
-| `dry_grass_block` | 978 |  |
-| `dry_grass_block_side` | 977 |  |
-| `electric_drill_back` | 1097 |  |
-| `electric_drill_bottom` | 1096 |  |
-| `electric_drill_front` | 1090 |  |
-| `electric_drill_side` | 1091 |  |
+| `drop_pad` | 1038 |  |
+| `dry_grass_block` | 980 |  |
+| `dry_grass_block_side` | 979 |  |
+| `electric_drill_back` | 1099 |  |
+| `electric_drill_bottom` | 1098 |  |
+| `electric_drill_front` | 1092 |  |
+| `electric_drill_side` | 1093 |  |
 | `electric_drill_side_running` | 34 | anim (4 फ़्रेम) |
-| `electric_drill_top` | 1092 | रोटेशन परिवार (4 प्रतियाँ) |
+| `electric_drill_top` | 1094 | रोटेशन परिवार (4 प्रतियाँ) |
 | `emerald_block` | 237 |  |
 | `emerald_ore` | 231 |  |
 | `end_stone` | 226 |  |
 | `engraved_andesite` | 464 |  |
 | `engraved_diorite` | 462 |  |
 | `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1020 |  |
-| `evil_lucky_block_face` | 1021 |  |
+| `evil_lucky_block` | 1022 |  |
+| `evil_lucky_block_face` | 1023 |  |
 | `explosive_paint_black_side` | 626 |  |
 | `explosive_paint_black_top` | 627 |  |
 | `explosive_paint_blue_side` | 624 |  |
@@ -2168,29 +2176,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `fallen_cherry_leaves_side` | 586 |  |
 | `fallen_maple_leaves_side` | 478 |  |
 | `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1155 |  |
-| `fast_belt_top` | 1154 |  |
-| `fast_belt_turn_left` | 1171 |  |
-| `fast_belt_turn_right` | 1172 |  |
-| `fertilised_soil` | 924 |  |
+| `fast_belt_slab_side` | 1157 |  |
+| `fast_belt_top` | 1156 |  |
+| `fast_belt_turn_left` | 1173 |  |
+| `fast_belt_turn_right` | 1174 |  |
+| `fertilised_soil` | 926 |  |
 | `finish_block` | 812 |  |
 | `fireball_block` | 539 |  |
-| `food_lucky_block` | 1005 |  |
-| `food_lucky_block_rare` | 1007 |  |
-| `food_lucky_block_super` | 1009 |  |
-| `forge_hopper_top` | 1166 |  |
+| `food_lucky_block` | 1007 |  |
+| `food_lucky_block_rare` | 1009 |  |
+| `food_lucky_block_super` | 1011 |  |
+| `forge_hopper_top` | 1168 |  |
 | `furnace_front` | 335 |  |
 | `furnace_side` | 336 |  |
 | `furnace_top` | 337 |  |
-| `generator_side` | 1061 |  |
+| `generator_side` | 1063 |  |
 | `generator_side_running` | 30 | anim (4 फ़्रेम) |
-| `generator_top` | 1062 |  |
-| `ghost_chest_back` | 954 |  |
-| `ghost_chest_front` | 951 |  |
-| `ghost_chest_side` | 952 |  |
-| `ghost_chest_top` | 953 |  |
-| `ghost_lucky_block` | 955 |  |
-| `ghost_mystery_block` | 956 |  |
+| `generator_top` | 1064 |  |
+| `ghost_chest_back` | 956 |  |
+| `ghost_chest_front` | 953 |  |
+| `ghost_chest_side` | 954 |  |
+| `ghost_chest_top` | 955 |  |
+| `ghost_lucky_block` | 957 |  |
+| `ghost_mystery_block` | 958 |  |
 | `glass` | 294 |  |
 | `glass_black` | 295 |  |
 | `glass_blue` | 296 |  |
@@ -2211,7 +2219,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `glass_yellow` | 310 |  |
 | `glowstone` | 331 |  |
 | `gold_block` | 235 |  |
-| `gold_deposit` | 1034 |  |
+| `gold_deposit` | 1036 |  |
 | `gold_ore` | 229 |  |
 | `granite_brick` | 467 |  |
 | `grass_block_side` | 192 |  |
@@ -2229,9 +2237,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `green_bricks` | 459 |  |
 | `green_concrete` | 285 |  |
 | `green_glazed_terracotta` | 421 | रोटेशन परिवार (4 प्रतियाँ) |
-| `green_lucky_block` | 1004 |  |
-| `green_lucky_block_rare` | 1006 |  |
-| `green_lucky_block_super` | 1008 |  |
+| `green_lucky_block` | 1006 |  |
+| `green_lucky_block_rare` | 1008 |  |
+| `green_lucky_block_super` | 1010 |  |
 | `green_planks` | 364 |  |
 | `green_portal` | 7 | anim (4 फ़्रेम) |
 | `green_spawn_block_side` | 735 |  |
@@ -2239,7 +2247,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `green_stone` | 458 |  |
 | `grenade_block` | 581 |  |
 | `grey_portal` | 8 | anim (4 फ़्रेम) |
-| `gun_lucky_block` | 950 |  |
+| `gun_lucky_block` | 952 |  |
 | `hardened_clay` | 254 |  |
 | `hardened_clay_stained_black` | 270 |  |
 | `hardened_clay_stained_blue` | 266 |  |
@@ -2257,18 +2265,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `hardened_clay_stained_silver` | 263 |  |
 | `hardened_clay_stained_white` | 255 |  |
 | `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 967 |  |
-| `harvester_lunite_bottom` | 975 |  |
-| `harvester_lunite_side_0` | 972 |  |
-| `harvester_lunite_side_1` | 973 |  |
-| `harvester_lunite_top` | 974 |  |
-| `harvester_side0` | 964 |  |
-| `harvester_side1` | 965 |  |
-| `harvester_top` | 966 |  |
+| `harvester_bottom` | 969 |  |
+| `harvester_lunite_bottom` | 977 |  |
+| `harvester_lunite_side_0` | 974 |  |
+| `harvester_lunite_side_1` | 975 |  |
+| `harvester_lunite_top` | 976 |  |
+| `harvester_side0` | 966 |  |
+| `harvester_side1` | 967 |  |
+| `harvester_top` | 968 |  |
 | `hay_block_side` | 328 |  |
-| `homestead_core` | 1035 |  |
-| `homestead_core_cap` | 1120 |  |
-| `homestead_core_crown` | 1119 |  |
+| `homestead_core` | 1037 |  |
+| `homestead_core_cap` | 1122 |  |
+| `homestead_core_crown` | 1121 |  |
 | `homestead_core_mid` | 26 | anim (4 फ़्रेम) |
 | `hyper_compressed_messy_stone` | 533 |  |
 | `ice` | 326 |  |
@@ -2276,44 +2284,44 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `iceball_block` | 540 |  |
 | `invisible_solid` | 314 |  |
 | `iron_block` | 234 |  |
-| `iron_chest_back` | 915 |  |
-| `iron_chest_front` | 909 |  |
-| `iron_chest_side` | 910 |  |
-| `iron_chest_top` | 911 | रोटेशन परिवार (4 प्रतियाँ) |
-| `iron_deposit` | 1031 |  |
+| `iron_chest_back` | 917 |  |
+| `iron_chest_front` | 911 |  |
+| `iron_chest_side` | 912 |  |
+| `iron_chest_top` | 913 | रोटेशन परिवार (4 प्रतियाँ) |
+| `iron_deposit` | 1033 |  |
 | `iron_ore` | 228 |  |
 | `iron_watermelon_side` | 546 |  |
 | `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 887 |  |
-| `jungle_grass_block_side` | 886 |  |
+| `jungle_grass_block` | 889 |  |
+| `jungle_grass_block_side` | 888 |  |
 | `lapis_block` | 236 |  |
 | `lapis_ore` | 230 |  |
 | `lava` | 1 | anim (8 फ़्रेम) |
-| `leather_block_side` | 906 |  |
-| `leather_block_top` | 907 |  |
+| `leather_block_side` | 908 |  |
+| `leather_block_top` | 909 |  |
 | `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 908 |  |
+| `leaves_aspen_autumn` | 910 |  |
 | `leaves_cedar` | 470 |  |
 | `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 904 |  |
+| `leaves_cherry_fruity` | 906 |  |
 | `leaves_jungle` | 290 |  |
-| `leaves_mango` | 892 |  |
-| `leaves_mango_fruity` | 905 |  |
+| `leaves_mango` | 894 |  |
+| `leaves_mango_fruity` | 907 |  |
 | `leaves_maple` | 289 |  |
 | `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 899 |  |
+| `leaves_maple_fruity` | 901 |  |
 | `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 902 |  |
+| `leaves_palm_fruity` | 904 |  |
 | `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 903 |  |
+| `leaves_pear_fruity` | 905 |  |
 | `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 900 |  |
+| `leaves_pine_cone` | 902 |  |
 | `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 901 |  |
-| `leaves_spectral` | 830 |  |
+| `leaves_plum_fruity` | 903 |  |
+| `leaves_spectral` | 831 |  |
 | `light_blue_concrete` | 277 |  |
 | `light_blue_glazed_terracotta` | 381 | रोटेशन परिवार (4 प्रतियाँ) |
-| `light_blue_lucky_block` | 931 |  |
+| `light_blue_lucky_block` | 933 |  |
 | `light_blue_planks` | 354 |  |
 | `light_blue_spawn_block_side` | 730 |  |
 | `light_blue_spawn_block_top` | 726 | रोटेशन परिवार (4 प्रतियाँ) |
@@ -2333,26 +2341,26 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `lime_portal` | 11 | anim (4 फ़्रेम) |
 | `lime_spawn_block_side` | 720 |  |
 | `lime_spawn_block_top` | 716 | रोटेशन परिवार (4 प्रतियाँ) |
-| `log_ancient_maple` | 1019 |  |
+| `log_ancient_maple` | 1021 |  |
 | `log_aspen` | 202 |  |
 | `log_cedar` | 201 |  |
 | `log_cherry` | 582 |  |
 | `log_jungle` | 203 |  |
-| `log_mango` | 889 |  |
+| `log_mango` | 891 |  |
 | `log_maple` | 198 |  |
 | `log_palm` | 472 |  |
 | `log_pear` | 523 |  |
 | `log_pine` | 199 |  |
 | `log_plum` | 200 |  |
-| `log_spectral` | 827 |  |
-| `lucky_block_pink_question` | 957 |  |
-| `lucky_block_pink_question_rare` | 1011 |  |
-| `lucky_block_pink_question_super` | 1013 |  |
-| `lunite_block` | 969 |  |
-| `lunite_ore` | 968 |  |
-| `machine_bench_side` | 1113 |  |
-| `machine_bench_top` | 1114 |  |
-| `machine_side` | 1037 |  |
+| `log_spectral` | 828 |  |
+| `lucky_block_pink_question` | 959 |  |
+| `lucky_block_pink_question_rare` | 1013 |  |
+| `lucky_block_pink_question_super` | 1015 |  |
+| `lunite_block` | 971 |  |
+| `lunite_ore` | 970 |  |
+| `machine_bench_side` | 1115 |  |
+| `machine_bench_top` | 1116 |  |
+| `machine_side` | 1039 |  |
 | `magenta_concrete` | 279 |  |
 | `magenta_glazed_terracotta` | 377 | रोटेशन परिवार (4 प्रतियाँ) |
 | `magenta_planks` | 353 |  |
@@ -2363,16 +2371,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `mailbox_front` | 571 |  |
 | `mailbox_front_full` | 573 |  |
 | `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 896 |  |
-| `mango_block_side` | 894 |  |
-| `mango_block_top` | 895 |  |
+| `mango_block_bottom` | 898 |  |
+| `mango_block_side` | 896 |  |
+| `mango_block_top` | 897 |  |
 | `mega_compressed_messy_stone` | 535 |  |
 | `melon_side` | 544 |  |
 | `melon_top` | 545 |  |
 | `melting_ice` | 595 |  |
 | `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 822 |  |
+| `mob_spawner_block_empty_side` | 823 |  |
 | `mob_spawner_block_top` | 821 |  |
+| `mob_spawner_hostile_block_side` | 822 |  |
+| `mob_spawner_neutral_block_side` | 838 |  |
 | `mob_spawner_passive_block_side` | 820 |  |
 | `moonstone_block` | 450 |  |
 | `moonstone_chest_back` | 449 |  |
@@ -2387,22 +2397,22 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `mossy_cobblestone` | 438 |  |
 | `mushroom_stem` | 538 |  |
 | `mystery_block` | 578 |  |
-| `neon_black` | 949 |  |
-| `neon_blue` | 948 |  |
-| `neon_brown` | 947 |  |
-| `neon_cyan` | 946 |  |
-| `neon_gray` | 945 |  |
-| `neon_green` | 944 |  |
-| `neon_light_blue` | 943 |  |
-| `neon_light_gray` | 942 |  |
-| `neon_lime` | 941 |  |
-| `neon_magenta` | 940 |  |
-| `neon_orange` | 939 |  |
-| `neon_pink` | 938 |  |
-| `neon_purple` | 937 |  |
-| `neon_red` | 936 |  |
-| `neon_white` | 935 |  |
-| `neon_yellow` | 934 |  |
+| `neon_black` | 951 |  |
+| `neon_blue` | 950 |  |
+| `neon_brown` | 949 |  |
+| `neon_cyan` | 948 |  |
+| `neon_gray` | 947 |  |
+| `neon_green` | 946 |  |
+| `neon_light_blue` | 945 |  |
+| `neon_light_gray` | 944 |  |
+| `neon_lime` | 943 |  |
+| `neon_magenta` | 942 |  |
+| `neon_orange` | 941 |  |
+| `neon_pink` | 940 |  |
+| `neon_purple` | 939 |  |
+| `neon_red` | 938 |  |
+| `neon_white` | 937 |  |
+| `neon_yellow` | 936 |  |
 | `nether_brick` | 317 |  |
 | `netherrack` | 318 |  |
 | `obby_absorb_block` | 816 |  |
@@ -2411,18 +2421,18 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `obsidian` | 327 |  |
 | `orange_concrete` | 280 |  |
 | `orange_glazed_terracotta` | 373 | रोटेशन परिवार (4 प्रतियाँ) |
-| `orange_lucky_block` | 998 |  |
-| `orange_lucky_block_rare` | 1000 |  |
-| `orange_lucky_block_super` | 1002 |  |
+| `orange_lucky_block` | 1000 |  |
+| `orange_lucky_block_rare` | 1002 |  |
+| `orange_lucky_block_super` | 1004 |  |
 | `orange_planks` | 352 |  |
 | `orange_portal` | 13 | anim (4 फ़्रेम) |
 | `orange_spawn_block_side` | 710 |  |
 | `orange_spawn_block_top` | 706 | रोटेशन परिवार (4 प्रतियाँ) |
 | `ore_gen_spawn_side` | 811 |  |
 | `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 825 |  |
-| `parts_bench_side` | 1115 |  |
-| `parts_bench_top` | 1116 |  |
+| `packed_snow` | 826 |  |
+| `parts_bench_side` | 1117 |  |
+| `parts_bench_top` | 1118 |  |
 | `patterned_glass_black` | 548 |  |
 | `patterned_glass_blue` | 549 |  |
 | `patterned_glass_brown` | 550 |  |
@@ -2442,11 +2452,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `pear_block_bottom` | 529 |  |
 | `pear_block_side` | 527 |  |
 | `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 958 |  |
-| `pine_cone_block_side` | 835 |  |
-| `pine_cone_block_top` | 836 |  |
-| `pine_grass_block` | 833 |  |
-| `pine_grass_block_side` | 832 |  |
+| `pet_lucky_block` | 960 |  |
+| `pine_cone_block_side` | 836 |  |
+| `pine_cone_block_top` | 837 |  |
+| `pine_grass_block` | 834 |  |
+| `pine_grass_block_side` | 833 |  |
 | `pink_concrete` | 281 |  |
 | `pink_gen_spawn_coal` | 789 |  |
 | `pink_gen_spawn_iron` | 790 |  |
@@ -2460,69 +2470,69 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `planks_cedar` | 209 |  |
 | `planks_cherry` | 584 |  |
 | `planks_jungle` | 207 |  |
-| `planks_mango` | 891 |  |
+| `planks_mango` | 893 |  |
 | `planks_maple` | 204 |  |
 | `planks_palm` | 473 |  |
 | `planks_pear` | 524 |  |
 | `planks_pine` | 208 |  |
 | `planks_plum` | 206 |  |
-| `planks_spectral` | 829 |  |
+| `planks_spectral` | 830 |  |
 | `plum_block_bottom` | 519 |  |
 | `plum_block_side` | 517 |  |
 | `plum_block_top` | 518 |  |
 | `podzol_top` | 452 |  |
-| `potato_block` | 920 |  |
-| `potion_lucky_block` | 1010 |  |
-| `potion_lucky_block_rare` | 1012 |  |
-| `potion_lucky_block_super` | 1014 |  |
-| `press_back` | 1069 |  |
-| `press_front` | 1063 |  |
-| `press_side` | 1064 |  |
+| `potato_block` | 922 |  |
+| `potion_lucky_block` | 1012 |  |
+| `potion_lucky_block_rare` | 1014 |  |
+| `potion_lucky_block_super` | 1016 |  |
+| `press_back` | 1071 |  |
+| `press_front` | 1065 |  |
+| `press_side` | 1066 |  |
 | `press_side_running` | 31 | anim (4 फ़्रेम) |
-| `press_top` | 1065 | रोटेशन परिवार (4 प्रतियाँ) |
+| `press_top` | 1067 | रोटेशन परिवार (4 प्रतियाँ) |
 | `protector` | 348 |  |
 | `protector_faction` | 575 |  |
 | `protector_tribe` | 574 |  |
 | `pumpkin_face_on` | 291 |  |
 | `pumpkin_side` | 541 |  |
 | `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1022 |  |
-| `pure_copper_ore` | 1202 |  |
-| `pure_diamond_ore` | 1025 |  |
-| `pure_gold_ore` | 1024 |  |
-| `pure_iron_ore` | 1023 |  |
-| `pure_moonstone_ore` | 1026 |  |
-| `pure_voltite_ore` | 1203 |  |
+| `pure_coal_ore` | 1024 |  |
+| `pure_copper_ore` | 1204 |  |
+| `pure_diamond_ore` | 1027 |  |
+| `pure_gold_ore` | 1026 |  |
+| `pure_iron_ore` | 1025 |  |
+| `pure_moonstone_ore` | 1028 |  |
+| `pure_voltite_ore` | 1205 |  |
 | `purple_concrete` | 282 |  |
 | `purple_glazed_terracotta` | 409 | रोटेशन परिवार (4 प्रतियाँ) |
-| `purple_lucky_block` | 986 |  |
-| `purple_lucky_block_rare` | 988 |  |
-| `purple_lucky_block_super` | 990 |  |
+| `purple_lucky_block` | 988 |  |
+| `purple_lucky_block_rare` | 990 |  |
+| `purple_lucky_block_super` | 992 |  |
 | `purple_planks` | 361 |  |
 | `purple_portal` | 15 | anim (4 फ़्रेम) |
 | `purple_spawn_block_side` | 700 |  |
 | `purple_spawn_block_top` | 696 | रोटेशन परिवार (4 प्रतियाँ) |
 | `quartz_block_chiseled` | 320 |  |
 | `quartz_block_side` | 319 |  |
-| `radar_bottom` | 927 |  |
+| `radar_bottom` | 929 |  |
 | `radar_screen` | 19 | anim (4 फ़्रेम) रोटेशन परिवार (4 प्रतियाँ) |
-| `radar_side_active` | 925 |  |
-| `radar_side_inactive` | 928 |  |
-| `radar_top_active` | 926 |  |
-| `radar_top_inactive` | 929 |  |
-| `recycler_back` | 1179 |  |
-| `recycler_front` | 1173 |  |
-| `recycler_side` | 1174 |  |
+| `radar_side_active` | 927 |  |
+| `radar_side_inactive` | 930 |  |
+| `radar_top_active` | 928 |  |
+| `radar_top_inactive` | 931 |  |
+| `recycler_back` | 1181 |  |
+| `recycler_front` | 1175 |  |
+| `recycler_side` | 1176 |  |
 | `recycler_side_running` | 43 | anim (4 फ़्रेम) |
-| `recycler_top` | 1175 | रोटेशन परिवार (4 प्रतियाँ) |
+| `recycler_top` | 1177 | रोटेशन परिवार (4 प्रतियाँ) |
 | `red_concrete` | 283 |  |
 | `red_gen_spawn_coal` | 771 |  |
 | `red_gen_spawn_iron` | 772 |  |
 | `red_gen_spawn_top` | 770 |  |
 | `red_glazed_terracotta` | 425 | रोटेशन परिवार (4 प्रतियाँ) |
-| `red_lucky_block` | 932 |  |
-| `red_lucky_block_rare` | 982 |  |
-| `red_lucky_block_super` | 984 |  |
+| `red_lucky_block` | 934 |  |
+| `red_lucky_block_rare` | 984 |  |
+| `red_lucky_block_super` | 986 |  |
 | `red_mushroom_block` | 537 |  |
 | `red_planks` | 365 |  |
 | `red_portal` | 16 | anim (4 फ़्रेम) |
@@ -2536,29 +2546,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `redstone_lamp_on` | 312 |  |
 | `rocket_block` | 579 |  |
 | `rocky_dirt` | 476 |  |
-| `rope_block` | 1028 |  |
+| `rope_block` | 1030 |  |
 | `sand` | 194 |  |
 | `sandstone_brick` | 461 |  |
 | `sandstone_normal` | 225 |  |
 | `sandstone_top` | 324 |  |
-| `scorpion_eggs` | 1210 |  |
-| `shatter_mill_back` | 1145 |  |
-| `shatter_mill_front` | 1139 |  |
-| `shatter_mill_side` | 1140 |  |
+| `scorpion_eggs` | 1220 |  |
+| `shatter_mill_back` | 1147 |  |
+| `shatter_mill_front` | 1141 |  |
+| `shatter_mill_side` | 1142 |  |
 | `shatter_mill_side_running` | 40 | anim (4 फ़्रेम) |
-| `shatter_mill_top` | 1141 | रोटेशन परिवार (4 प्रतियाँ) |
+| `shatter_mill_top` | 1143 | रोटेशन परिवार (4 प्रतियाँ) |
 | `shop_trader_spawn_face` | 799 |  |
 | `shop_trader_spawn_side` | 798 |  |
 | `shop_trader_spawn_top` | 794 | रोटेशन परिवार (4 प्रतियाँ) |
 | `shop_wizard_spawn_face` | 805 |  |
 | `shop_wizard_spawn_side` | 804 |  |
 | `shop_wizard_spawn_top` | 800 | रोटेशन परिवार (4 प्रतियाँ) |
-| `sky_tap_back` | 1153 |  |
-| `sky_tap_bottom` | 1152 |  |
-| `sky_tap_front` | 1146 |  |
-| `sky_tap_side` | 1147 |  |
+| `sky_tap_back` | 1155 |  |
+| `sky_tap_bottom` | 1154 |  |
+| `sky_tap_front` | 1148 |  |
+| `sky_tap_side` | 1149 |  |
 | `sky_tap_side_running` | 41 | anim (4 फ़्रेम) |
-| `sky_tap_top` | 1148 | रोटेशन परिवार (4 प्रतियाँ) |
+| `sky_tap_top` | 1150 | रोटेशन परिवार (4 प्रतियाँ) |
 | `slab_andesite_brick_side` | 498 |  |
 | `slab_aspen_side` | 483 |  |
 | `slab_brick_side` | 515 |  |
@@ -2571,21 +2581,21 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_cut_sandstone_side` | 509 |  |
 | `slab_diorite_brick_side` | 502 |  |
 | `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 979 |  |
+| `slab_dry_grass_top_side` | 981 |  |
 | `slab_engraved_andesite_side` | 497 |  |
 | `slab_engraved_diorite_side` | 501 |  |
 | `slab_engraved_granite_side` | 505 |  |
 | `slab_granite_brick_side` | 506 |  |
 | `slab_grass_top_side` | 487 |  |
 | `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 888 |  |
+| `slab_jungle_grass_top_side` | 890 |  |
 | `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 893 |  |
+| `slab_mango_side` | 895 |  |
 | `slab_maple_side` | 479 |  |
 | `slab_mossy_cobblestone_side` | 493 |  |
 | `slab_palm_side` | 485 |  |
 | `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 834 |  |
+| `slab_pine_grass_top_side` | 835 |  |
 | `slab_pine_side` | 480 |  |
 | `slab_plum_side` | 481 |  |
 | `slab_red_sandstone_brick_side` | 514 |  |
@@ -2593,7 +2603,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_sandstone_brick_side` | 510 |  |
 | `slab_sandstone_normal_side` | 507 |  |
 | `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 831 |  |
+| `slab_spectral_side` | 832 |  |
 | `slab_stone_andesite_side` | 495 |  |
 | `slab_stone_andesite_smooth_side` | 496 |  |
 | `slab_stone_diorite_side` | 499 |  |
@@ -2604,29 +2614,29 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `slab_stonebrick_carved_side` | 491 |  |
 | `slab_stonebrick_mossy_side` | 494 |  |
 | `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1060 |  |
-| `smelter_front` | 1054 |  |
-| `smelter_side` | 1055 |  |
+| `smelter_back` | 1062 |  |
+| `smelter_front` | 1056 |  |
+| `smelter_side` | 1057 |  |
 | `smelter_side_running` | 29 | anim (4 फ़्रेम) |
-| `smelter_top` | 1056 | रोटेशन परिवार (4 प्रतियाँ) |
+| `smelter_top` | 1058 | रोटेशन परिवार (4 प्रतियाँ) |
 | `smoke` | 23 | anim (4 फ़्रेम) |
 | `smooth_stone` | 218 |  |
 | `snow` | 197 |  |
-| `snowy_messy_stone` | 823 |  |
-| `snowy_messy_stone_side` | 824 |  |
-| `solar_panel_bottom` | 963 |  |
-| `solar_panel_side` | 961 |  |
-| `solar_panel_top` | 962 |  |
-| `sorting_gate_slab_side` | 1106 |  |
-| `sorting_gate_top` | 1105 |  |
-| `splitter_slab_side` | 1081 |  |
-| `splitter_top` | 1080 |  |
+| `snowy_messy_stone` | 824 |  |
+| `snowy_messy_stone_side` | 825 |  |
+| `solar_panel_bottom` | 965 |  |
+| `solar_panel_side` | 963 |  |
+| `solar_panel_top` | 964 |  |
+| `sorting_gate_slab_side` | 1108 |  |
+| `sorting_gate_top` | 1107 |  |
+| `splitter_slab_side` | 1083 |  |
+| `splitter_top` | 1082 |  |
 | `sponge` | 329 |  |
-| `starframe` | 1165 |  |
+| `starframe` | 1167 |  |
 | `stone` | 217 |  |
 | `stone_andesite` | 221 |  |
 | `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1032 |  |
+| `stone_deposit` | 1034 |  |
 | `stone_diorite` | 219 |  |
 | `stone_diorite_smooth` | 220 |  |
 | `stone_granite` | 223 |  |
@@ -2635,49 +2645,49 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `stonebrick_carved` | 321 |  |
 | `stonebrick_cracked` | 323 |  |
 | `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1110 |  |
-| `storage_silo_top` | 1109 |  |
+| `storage_silo_side` | 1112 |  |
+| `storage_silo_top` | 1111 |  |
 | `stripped_aspen_log` | 211 |  |
 | `stripped_cedar_log` | 215 |  |
 | `stripped_cherry_log` | 583 |  |
 | `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 890 |  |
+| `stripped_mango_log` | 892 |  |
 | `stripped_maple_log` | 210 |  |
 | `stripped_palm_log` | 576 |  |
 | `stripped_pear_log` | 577 |  |
 | `stripped_pine_log` | 214 |  |
 | `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 828 |  |
+| `stripped_spectral_log` | 829 |  |
 | `super_compressed_messy_stone` | 532 |  |
 | `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1117 |  |
-| `tool_bench_top` | 1118 |  |
-| `tools_lucky_block` | 999 |  |
-| `tools_lucky_block_rare` | 1001 |  |
-| `tools_lucky_block_super` | 1003 |  |
+| `tool_bench_side` | 1119 |  |
+| `tool_bench_top` | 1120 |  |
+| `tools_lucky_block` | 1001 |  |
+| `tools_lucky_block_rare` | 1003 |  |
+| `tools_lucky_block_super` | 1005 |  |
 | `toxic_waste` | 25 | anim (8 फ़्रेम) |
-| `toxic_waste_barrel_bottom` | 1018 |  |
-| `toxic_waste_barrel_side` | 1017 |  |
+| `toxic_waste_barrel_bottom` | 1020 |  |
+| `toxic_waste_barrel_side` | 1019 |  |
 | `toxic_waste_barrel_top` | 24 | anim (4 फ़्रेम) |
 | `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1127 |  |
+| `tree_cutter_back` | 1129 |  |
 | `tree_cutter_back_running` | 37 | anim (4 फ़्रेम) |
-| `tree_cutter_front` | 1121 |  |
-| `tree_cutter_side` | 1122 |  |
+| `tree_cutter_front` | 1123 |  |
+| `tree_cutter_side` | 1124 |  |
 | `tree_cutter_side_running` | 36 | anim (4 फ़्रेम) |
-| `tree_cutter_top` | 1123 | रोटेशन परिवार (4 प्रतियाँ) |
+| `tree_cutter_top` | 1125 | रोटेशन परिवार (4 प्रतियाँ) |
 | `ultra_compressed_messy_stone` | 534 |  |
 | `unloaded` | 189 |  |
-| `volt_engine_side` | 1129 |  |
+| `volt_engine_side` | 1131 |  |
 | `volt_engine_side_running` | 38 | anim (4 फ़्रेम) |
-| `volt_engine_top` | 1130 |  |
-| `voltite_deposit` | 1128 |  |
-| `voltite_ore` | 1082 |  |
+| `volt_engine_top` | 1132 |  |
+| `voltite_deposit` | 1130 |  |
+| `voltite_ore` | 1084 |  |
 | `watermelon_side` | 292 |  |
 | `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 933 |  |
-| `weapon_lucky_block_rare` | 983 |  |
-| `weapon_lucky_block_super` | 985 |  |
+| `weapon_lucky_block` | 935 |  |
+| `weapon_lucky_block_rare` | 985 |  |
+| `weapon_lucky_block_super` | 987 |  |
 | `white_concrete` | 284 |  |
 | `white_gen_spawn_coal` | 786 |  |
 | `white_gen_spawn_iron` | 787 |  |
@@ -2687,11 +2697,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `white_portal` | 17 | anim (4 फ़्रेम) |
 | `white_spawn_block_side` | 690 |  |
 | `white_spawn_block_top` | 686 | रोटेशन परिवार (4 प्रतियाँ) |
-| `wire_mill_back` | 1076 |  |
-| `wire_mill_front` | 1070 |  |
-| `wire_mill_side` | 1071 |  |
+| `wire_mill_back` | 1078 |  |
+| `wire_mill_front` | 1072 |  |
+| `wire_mill_side` | 1073 |  |
 | `wire_mill_side_running` | 32 | anim (4 फ़्रेम) |
-| `wire_mill_top` | 1072 | रोटेशन परिवार (4 प्रतियाँ) |
+| `wire_mill_top` | 1074 | रोटेशन परिवार (4 प्रतियाँ) |
 | `wool_colored_black` | 253 |  |
 | `wool_colored_blue` | 249 |  |
 | `wool_colored_brown` | 250 |  |
@@ -2713,9 +2723,9 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | `yellow_gen_spawn_iron` | 781 |  |
 | `yellow_gen_spawn_top` | 779 |  |
 | `yellow_glazed_terracotta` | 385 | रोटेशन परिवार (4 प्रतियाँ) |
-| `yellow_lucky_block` | 930 |  |
-| `yellow_lucky_block_rare` | 980 |  |
-| `yellow_lucky_block_super` | 981 |  |
+| `yellow_lucky_block` | 932 |  |
+| `yellow_lucky_block_rare` | 982 |  |
+| `yellow_lucky_block_super` | 983 |  |
 | `yellow_planks` | 355 |  |
 | `yellow_portal` | 18 | anim (4 फ़्रेम) |
 | `yellow_spawn_block_side` | 685 |  |
@@ -2725,32 +2735,32 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 ये टेक्सचर केवल पहले-घुमाई प्रतियों (`name[rot[1..4`) के रूप में मौजूद हैं। रजिस्ट्री उन्हें नीचे दिए मूल पर फ़ोल्ड करता है, और `bloxdTexel` सैंपल के समय रोटेशन दोबारा लगाता है — मूल को संदर्भित करें, प्रतियों को कभी नहीं। कोई `[rot[N` स्पेलिंग लिखने पर समर्पित रोटेशन डायग्नोस्टिक मिलता है।
 
-- `alloy_kiln_top` (id 1085)
-- `auto_bench_top` (id 1100)
-- `belt_tunnel_exit_top` (id 1198)
-- `belt_tunnel_top` (id 1193)
+- `alloy_kiln_top` (id 1087)
+- `auto_bench_top` (id 1102)
+- `belt_tunnel_exit_top` (id 1200)
+- `belt_tunnel_top` (id 1195)
 - `black_glazed_terracotta` (id 429)
 - `black_spawn_block_top` (id 756)
 - `blue_glazed_terracotta` (id 413)
 - `blue_spawn_block_top` (id 751)
 - `brown_glazed_terracotta` (id 417)
 - `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1041)
+- `burner_drill_top` (id 1043)
 - `checkpoint_block` (id 761)
 - `chest_top` (id 343)
-- `crop_harvester_top` (id 1186)
-- `crusher_top` (id 1049)
-- `crystal_vat_top` (id 1160)
+- `crop_harvester_top` (id 1188)
+- `crusher_top` (id 1051)
+- `crystal_vat_top` (id 1162)
 - `custom_lobby_block_top` (id 765)
 - `cyan_glazed_terracotta` (id 405)
 - `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1133)
-- `electric_drill_top` (id 1092)
+- `deep_drill_top` (id 1135)
+- `electric_drill_top` (id 1094)
 - `gray_glazed_terracotta` (id 397)
 - `gray_spawn_block_top` (id 736)
 - `green_glazed_terracotta` (id 421)
 - `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 911)
+- `iron_chest_top` (id 913)
 - `light_blue_glazed_terracotta` (id 381)
 - `light_blue_spawn_block_top` (id 726)
 - `light_gray_glazed_terracotta` (id 401)
@@ -2764,22 +2774,22 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 - `orange_spawn_block_top` (id 706)
 - `pink_glazed_terracotta` (id 393)
 - `pink_spawn_block_top` (id 701)
-- `press_top` (id 1065)
+- `press_top` (id 1067)
 - `purple_glazed_terracotta` (id 409)
 - `purple_spawn_block_top` (id 696)
 - `radar_screen` (id 19)
-- `recycler_top` (id 1175)
+- `recycler_top` (id 1177)
 - `red_glazed_terracotta` (id 425)
 - `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1141)
+- `shatter_mill_top` (id 1143)
 - `shop_trader_spawn_top` (id 794)
 - `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1148)
-- `smelter_top` (id 1056)
-- `tree_cutter_top` (id 1123)
+- `sky_tap_top` (id 1150)
+- `smelter_top` (id 1058)
+- `tree_cutter_top` (id 1125)
 - `white_glazed_terracotta` (id 369)
 - `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1072)
+- `wire_mill_top` (id 1074)
 - `yellow_glazed_terracotta` (id 385)
 - `yellow_spawn_block_top` (id 681)
 
@@ -2789,48 +2799,48 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 | नाम | फ़्रेम | अंतराल |
 |---|---|---|
-| `alloy_kiln_side_running` | 4 | 250 ms |
-| `auto_bench_side_running` | 4 | 250 ms |
-| `black_portal` | 4 | 300 ms |
-| `blue_portal` | 4 | 300 ms |
+| `alloy_kiln_side_running` | 33 | 250 ms |
+| `auto_bench_side_running` | 35 | 250 ms |
+| `black_portal` | 2 | 300 ms |
+| `blue_portal` | 3 | 300 ms |
 | `brown_portal` | 4 | 300 ms |
-| `burner_drill_side_running` | 4 | 250 ms |
-| `crop_harvester_back_running` | 4 | 250 ms |
-| `crop_harvester_side_running` | 4 | 250 ms |
-| `crusher_side_running` | 4 | 250 ms |
-| `crystal_vat_side_running` | 4 | 250 ms |
-| `cyan_portal` | 4 | 300 ms |
-| `deep_drill_side_running` | 4 | 250 ms |
-| `electric_drill_side_running` | 4 | 250 ms |
-| `generator_side_running` | 4 | 250 ms |
-| `gray_portal` | 4 | 300 ms |
-| `green_portal` | 4 | 300 ms |
-| `grey_portal` | 4 | 300 ms |
-| `homestead_core_mid` | 4 | 250 ms |
-| `lava` | 8 | 200 ms |
-| `lightblue_portal` | 4 | 300 ms |
-| `lightgray_portal` | 4 | 300 ms |
-| `lime_portal` | 4 | 300 ms |
-| `magenta_portal` | 4 | 300 ms |
-| `orange_portal` | 4 | 300 ms |
-| `pink_portal` | 4 | 300 ms |
-| `press_side_running` | 4 | 250 ms |
-| `purple_portal` | 4 | 300 ms |
-| `radar_screen` | 4 | 200 ms |
-| `recycler_side_running` | 4 | 250 ms |
-| `red_portal` | 4 | 300 ms |
-| `shatter_mill_side_running` | 4 | 250 ms |
-| `sky_tap_side_running` | 4 | 250 ms |
-| `smelter_side_running` | 4 | 250 ms |
-| `smoke` | 4 | 250 ms |
-| `toxic_waste` | 8 | 200 ms |
-| `toxic_waste_barrel_top` | 4 | 300 ms |
-| `tree_cutter_back_running` | 4 | 250 ms |
-| `tree_cutter_side_running` | 4 | 250 ms |
-| `volt_engine_side_running` | 4 | 250 ms |
-| `white_portal` | 4 | 300 ms |
-| `wire_mill_side_running` | 4 | 250 ms |
-| `yellow_portal` | 4 | 300 ms |
+| `burner_drill_side_running` | 27 | 250 ms |
+| `crop_harvester_back_running` | 45 | 250 ms |
+| `crop_harvester_side_running` | 44 | 250 ms |
+| `crusher_side_running` | 28 | 250 ms |
+| `crystal_vat_side_running` | 42 | 250 ms |
+| `cyan_portal` | 5 | 300 ms |
+| `deep_drill_side_running` | 39 | 250 ms |
+| `electric_drill_side_running` | 34 | 250 ms |
+| `generator_side_running` | 30 | 250 ms |
+| `gray_portal` | 6 | 300 ms |
+| `green_portal` | 7 | 300 ms |
+| `grey_portal` | 8 | 300 ms |
+| `homestead_core_mid` | 26 | 250 ms |
+| `lava` | 1 | 200 ms |
+| `lightblue_portal` | 9 | 300 ms |
+| `lightgray_portal` | 10 | 300 ms |
+| `lime_portal` | 11 | 300 ms |
+| `magenta_portal` | 12 | 300 ms |
+| `orange_portal` | 13 | 300 ms |
+| `pink_portal` | 14 | 300 ms |
+| `press_side_running` | 31 | 250 ms |
+| `purple_portal` | 15 | 300 ms |
+| `radar_screen` | 19 | 200 ms |
+| `recycler_side_running` | 43 | 250 ms |
+| `red_portal` | 16 | 300 ms |
+| `shatter_mill_side_running` | 40 | 250 ms |
+| `sky_tap_side_running` | 41 | 250 ms |
+| `smelter_side_running` | 29 | 250 ms |
+| `smoke` | 23 | 250 ms |
+| `toxic_waste` | 25 | 200 ms |
+| `toxic_waste_barrel_top` | 24 | 300 ms |
+| `tree_cutter_back_running` | 37 | 250 ms |
+| `tree_cutter_side_running` | 36 | 250 ms |
+| `volt_engine_side_running` | 38 | 250 ms |
+| `white_portal` | 17 | 300 ms |
+| `wire_mill_side_running` | 32 | 250 ms |
+| `yellow_portal` | 18 | 300 ms |
 
 कच्चे डेटा में दिखने वाली संरचनात्मक टिप्पणी: एटलस में 45 एनीमेशन मूल हैं, 42 नहीं — `radar_screen` की चारों पहले-घुमाई प्रतियाँ अपनी-अपनी 4-फ़्रेम सीढ़ी ले चलती हैं, यही वजह भी है कि `radar_screen` एकमात्र नाम है जो दोनों परिवार-टिप्पणियाँ ले चलता है।
 
@@ -2877,13 +2887,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [टेक्सचर पैकों के साथ संयोजन](guides/combinations.md) | टेक्सचर पैकों के साथ जोड़ी |
 | [दोषमार्जन युक्तियाँ](guides/debugging.md) | लक्षण → कारण निदान |
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित)
 
 
 ---
 
 ## प्रकाश कैसे काम करता है
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 इंजन का डिफ़ॉल्ट प्रकाश "केवल गुणन" है — कोई स्पेक्युलर, फ्रेनेल, उष्ण/शीत पृथक्करण या अर्धगोल परिवेश मौजूद नहीं है। निम्नलिखित चीज़ें दोबारा बनाई जा सकती हैं:
 
 | सुविधा | डिफ़ॉल्ट | पैक में बनाई जा सकती है? |
@@ -2905,7 +2915,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## छायाएँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (v4 के माप के बाद से LightEngine का व्यवहार अपरिवर्तित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified (v4 के माप के बाद से LightEngine का व्यवहार अपरिवर्तित)
 
 शेडर पैक में "छाया" बनाने के तीन तरीके, और उनकी सीमाएँ।
 
@@ -2974,7 +2984,7 @@ let lit = sunL * sky;
 ---
 
 ## पानी को प्राकृतिक दिखाना
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 यह API सीन का रंग सैंपल नहीं कर सकता, इसलिए यह **फ्रेनेल-शैली रंग मिश्रण और सूर्य हाइलाइट वाली छद्म स्टाइलिंग है, वास्तविक परावर्तन/अपवर्तन नहीं** (गहराई का गणित केवल-तरल `bloxdOpaqueBehind()` से करता है — मोटाई-अवशोषण रेसिपी इसी पृष्ठ पर आगे दी है)। नीचे का नमूना आधार रंग रखता है, छिछले देखने के कोणों पर थोड़ा आकाश-जैसे रंग की ओर मिलाता है, और केवल तभी एक छोटी चमक जोड़ता है जब सूर्य मौजूद हो।
 
 ```wgsl
@@ -3039,7 +3049,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## रात के रूप डिज़ाइन करना
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 केवल छायाएँ गहरी करने से सूर्य के न रहने पर इंजन का पूर्ण रंग (`engineColour`) उजला बना रहता है, जिससे फलक/छाया का अंतर अप्राकृतिक दिखता है। इसके बजाय पूरे पूर्ण रंग को क्षय करें।
 
 नीचे का उदाहरण शून्य `bloxdSunDirection()` को रात और दिशात्मक सूर्य को दिन मानता है, और अंधेरे समय में टेरेन के पूर्ण रंगों को क्षय करता है। जहाँ `blockLight` और `heldLight` प्रबल होते हैं, वहाँ क्षय कमज़ोर पड़ जाता है ताकि मशाल जैसे निकट के दीये बने रहें। `0.52` एक समायोजन मान है — ज़्यादा अंधेरी रातों के लिए इसे घटाएँ।
@@ -3069,7 +3079,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## मॉडल और टेक्सचर
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर और सत्यापक से पुनर्प्राप्त)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (हेडर और सत्यापक से पुनर्प्राप्त)
 
 नए v5 मॉडल हुक क्या बनाते और पढ़ते हैं।
 
@@ -3144,7 +3154,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## यथार्थवाद: दो स्कूल
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 **स्कूल A: योगात्मक सुधार (defaultLight से)** — `engineColour` (पूर्ण रंग) को आधार मानकर उष्ण दीप्ति या रिम जोड़ें। आसान और सुरक्षित, पर प्रकाश मॉडल डिफ़ॉल्ट ही रहता है।
 
 **स्कूल B: पूर्ण पुनःप्रकाशन (s.colour से)** — `l.engineColour` त्यागकर `s.colour` (एल्बिडो) और कच्ची LightIn सामग्री से प्रकाश फिर से बनाएँ। यथार्थवाद का वास्तविक मार्ग। चार नियम:
@@ -3158,7 +3168,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## शेडर पैक क्या कर सकते हैं और क्या नहीं
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (मौजूदा API पर पोर्ट किया गया — डिवाइस पर दोबारा जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (मौजूदा API पर पोर्ट किया गया — डिवाइस पर दोबारा जाँच की सिफ़ारिश)
 
 शेडर पैकों की यथार्थवाद की छत एक ही पेज में: मौजूदा API कहाँ तक पहुँचता है, वह मूल रूप से क्या नहीं कर सकता, क्या सशर्त है, ये सीमाएँ क्यों मौजूद हैं, और सबसे नज़दीकी विकल्प क्या हैं। कुछ बनाने से पहले यहाँ एक नज़र डालकर उसका दायरा तय कर लें।
 
@@ -3254,7 +3264,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## प्रदर्शन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (माप-आधारित अभ्यास)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified (माप-आधारित अभ्यास)
 
 पैक हुक हर फ्रैगमेंट (टेरेन/तरल/मॉडल के सभी पिक्सेल) पर चलते हैं, इसलिए स्टाइल चुनाव फ़्रेम दर को काफ़ी हिलाते हैं।
 
@@ -3301,7 +3311,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## खेल-भीतर परीक्षण जाँच-सूची
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 कंपाइल की सफलता और "अच्छा दिखना" अलग-अलग बातें हैं। इस क्रम में जाँचें:
 
 1. **लोडिंग:** `pack.json` ZIP के मूल में स्थित हो। चयन के तुरंत बाद `Ready. Reload the page to use it.` दिखता है और पैक **पेज पुनः लोड होने पर** सक्रिय हो जाता है; बाद में `Ready to use` की पुष्टि करें। सहेजे गए पैक अगली पेज लोड पर स्वतः पुनः सत्यापित होते हैं: जब भी इंजन-पक्ष का spec हेडर अपडेट होता है, हेडर सामग्री की फ़िंगरप्रिंट-जाँच होती है (पास = वैसे ही रहता है / फेल = blocked दिखता है), इसलिए टूटा हुआ पुराना पैक चुपचाप सक्रिय नहीं रहता।
@@ -3324,7 +3334,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## टेक्सचर पैकों के साथ संयोजन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 चूँकि शेडर पैक टेक्सचर जोड़ या सैंपल नहीं सकते, इसलिए सामग्री की बारीक खुरदराहट या आकाश की छवि बदलने जैसी समस्याएँ केवल शेडर से हल करने की कोशिश न करें। Bloxd.io के लिए सार्वजनिक टेक्सचर-पैक रिपॉज़िटरी [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) टेक्सचर, skybox, मॉडल आदि को एक अलग सिस्टम से संभालती है।
 
 संदर्भ के लिए: एक मामले में विश्लेषित समुदाय के "cinematic shader" वितरण वास्तव में टेक्सचर पैक निकले (128x128 टेक्सचर, बिना `pack.json` / `.wgsl`)।
@@ -3337,7 +3347,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## दोषमार्जन युक्तियाँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 - गुफ़ाएँ बहुत उजली → `skyLight` का अरैखिक वक्र छूटा हुआ (R2 गुफ़ा रेसिपी / R9.9)
 - फटे हुए दिन → ACES-पूर्व एक्सपोज़र घटाएँ
 - रातें देखे न जाने जितनी अंधेरी → न्यूनतम परिवेश सुनिश्चित करें (रात का `skyLightColour` प्राकल्पना से ही लगभग काला है)
@@ -3372,13 +3382,13 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [मॉडल शेडर](recipes/model-shaders.md) | v5 — पकड़े हुए आइटम, स्किन, पौधों का दोलन |
 | [एनचैंट प्रभाव](recipes/enchant-effects.md) | v5 — चमक हटाना, बढ़ाना, रंगना |
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (मूल रेसिपियों के v5 पोर्ट — वितरण से पहले खेल-भीतर संकलन से अभी भी सत्यापित करें)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (मूल रेसिपियों के v5 पोर्ट — वितरण से पहले खेल-भीतर संकलन से अभी भी सत्यापित करें)
 
 
 ---
 
 ## रंग
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 ### एकल रंजन (सबसे बुनियादी)
 
 ```wgsl
@@ -3458,7 +3468,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## प्रकाश
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 ### कंट्रास्ट S-वक्र
 
 ```wgsl
@@ -3571,7 +3581,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## उत्सर्जन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 > `emission` प्रकाश गणना के बाद जोड़ा जाता है, पर डिफ़ॉल्ट प्रक्रिया **इसे फ़ॉग मात्रा (`fogAlpha`) से क्षीण कर देती है। पूरी तरह फ़ॉग-युक्त दूरी में उत्सर्जन भी गायब हो जाता है। दूर तक चमकते रहना हो तो emission में न जोड़ें — लाइट हुक के भीतर सीधे `out.colour += ...` करें** (डिफ़ॉल्ट निर्गम पहले से फ़ॉग-युक्त है, इसलिए दूरी पर प्रकाश फ़ॉग रंग के ऊपर बैठता है)
 
 ### स्पंदित दीये (साँस लेती मशालें)
@@ -3622,7 +3632,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## निर्देशांक
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 ### विश्व निर्देशांक
 
 ```wgsl
@@ -3676,7 +3686,7 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## समय और एनिमेशन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 > `bloxdSeconds()` हर 3600 सेकंड (1 घंटा) पर लपेट जाता है। ध्यान दें कि यह शेडर का बीता समय है और खेल के सूर्य/दिन-रात से मेल खाने की गारंटी नहीं है। इसे दृश्य-आवर्ती एनिमेशन के लिए प्रयोग करें, पर वास्तविक रात की पहचान के लिए `bloxdSunDirection()` और प्रकाश इनपुट को प्राथमिकता दें।
 
 ### दिन-रात चक्र (1 घंटे में 1 दिन)
@@ -3715,7 +3725,7 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## तरल
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 ### लहराती सतह (रंग झिलमिल)
 
 ```wgsl
@@ -3776,7 +3786,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## शीर्ष (केवल allow)
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 > सब कुछ `#ifndef BLOXD_STRICT` में लपेटें।
 > सटीक शर्तों (allow शीर्षक सूची; Custom Games का strict होना) के लिए देखें [गेम-अनुसार शेडर-पैक नीति](internals/policy.md)
 
@@ -3841,7 +3851,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## गणित टूलबॉक्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 ```wgsl
 // 0..1 का चिकना श्रेणीकरण (n श्रेणियाँ)
 fn pack_bands(x: f32, n: f32) -> f32 { return floor(x * n) / n; }
@@ -3871,7 +3881,7 @@ let phase = t * 0.15;
 ---
 
 ## यथार्थवाद
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
 > "वैनिला के रूप को सामग्री से दोबारा बनाने" की भौतिक रेसिपियाँ। पहले ये प्राकल्पनाएँ पढ़ें:
 >
 > 1. **लाइट हुक अंतिम फ्रैगमेंट चरण पर बुलाया जाता है**। इसका लौटाया colour वैसा ही अंतिम रंग बन जाता है। **फ़ॉग आपको स्वयं दोबारा लगाना ही होगा** (R9.10)  
@@ -4175,7 +4185,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## मॉडल शेडर
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (v5 हेडर विनिर्देश के अनुसार लिखा गया)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (v5 हेडर विनिर्देश के अनुसार लिखा गया)
 
 v5 के मॉडल हुक और नए फ़्लैग से बनी रेसिपियाँ — **v5 से पहले असंभव रहे "मैं किस चीज़ को देख रहा हूँ" वाले चयनों** के लिए। बुनियादी बातें: [मॉडल और टेक्सचर](guides/models.md)।
 
@@ -4327,7 +4337,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## एनचैंट प्रभाव
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (लाइव हेडर से पुनर्प्राप्त)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (लाइव हेडर से पुनर्प्राप्त)
 
 v5 ने एनचैंट पाइपलाइन को इनपुट और आउटपुट दोनों ओर खोल दिया है। इंजन का गणित बनाए रखते हुए एनचैंटेड आइटम और कवच की चमक नियंत्रित करने की रेसिपियाँ।
 
@@ -4472,7 +4482,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | धीमा / ऑन-डिवाइस जाँच में ड्रॉप हो जाता है | [प्रदर्शन](troubleshooting/performance.md) |
 | कानूनी, सुरक्षा, सामान्य प्रश्न | [FAQ](troubleshooting/faq.md) |
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (संदेश लाइव वैलिडेटर और लोडर से अक्षरशः दर्ज किए गए)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (संदेश लाइव वैलिडेटर और लोडर से अक्षरशः दर्ज किए गए)
 
 ### त्रुटियाँ कहाँ दिखती हैं
 
@@ -4549,7 +4559,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API संस्करण त्रुटियाँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव i18n डिक्शनरी से अक्षरशः)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित) · स्थिति: Verified (लाइव i18n डिक्शनरी से अक्षरशः)
 
 `apiVersion` के आसपास की त्रुटियाँ। मौजूदा गेम **केवल `5`** स्वीकार करता है।
 
@@ -4828,7 +4838,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## टेक्सचर समस्याएँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Verified (संदेश लाइव वैलिडेटर से अक्षरशः दर्ज किए गए)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Verified (संदेश लाइव वैलिडेटर से अक्षरशः दर्ज किए गए)
 
 `bloxdTextureId*` / `bloxdTexel` के आसपास की समस्याएँ। सभी 896 नाम [टेक्सचर कैटलॉग](api/texture-catalog.md) में खोजें।
 
@@ -4944,7 +4954,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## मॉडल समस्याएँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (नया v5 क्षेत्र)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (नया v5 क्षेत्र)
 
 नए v5 Model हुकों के आसपास की समस्याएँ।
 
@@ -5042,7 +5052,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ और कानूनी टिप्पणियाँ
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Verified
 
 ### अक्सर पूछे जाने वाले प्रश्न
 
@@ -5092,7 +5102,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## इंजन इंटर्नल्स और रिसर्च
-इंजन के कार्यान्वयन का विश्लेषण करके बहाल की गई आंतरिक विनिर्देश। यहाँ की हर बात मौजूदा प्रोडक्शन बिल्ड (`ab90qa`) के JavaScript से सीधे बहाल की गई है। सटीक आंतरिक व्यवहार और विश्लेषण परिणामों को बचाए रखने के लिए इसे सार्वजनिक-API दस्तावेज़ीकरण ([API रेफ़रेंस](api/)) से अलग रखा गया है।
+इंजन के कार्यान्वयन का विश्लेषण करके बहाल की गई आंतरिक विनिर्देश। यहाँ की हर बात मौजूदा प्रोडक्शन बिल्ड (`xkg8x`) के JavaScript से सीधे बहाल की गई है। सटीक आंतरिक व्यवहार और विश्लेषण परिणामों को बचाए रखने के लिए इसे सार्वजनिक-API दस्तावेज़ीकरण ([API रेफ़रेंस](api/)) से अलग रखा गया है।
 
 ### नक्शा
 
@@ -5116,7 +5126,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [दोषमार्जन](internals/debugging.md) | URL पैरामीटर, आँकड़ा पैनल |
 | [रिसर्च लॉग](internals/research-log.md) | पद्धति, बिल्ड इतिहास, असत्यापित मदें |
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04 को प्रोडक्शन में सत्यापित)
 
 इंटर्नल्स स्थिर API-अनुबंध नहीं हैं — इंजन अपडेट के साथ वे बदल सकते हैं, और हर पेज अपना साक्ष्य-बिल्ड नाम बताता है ([रिसर्च लॉग](internals/research-log.md))।
 
@@ -5124,7 +5134,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## रेंडरिंग पाइपलाइन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 - **Surface हुक alphaTest से "पहले" चलते हैं**: `out.alpha` सीधे discard परीक्षण को खिलाता है। कटआउट सामग्री (घास, पत्ते) dissolve-शैली के डाइथर प्रभाव की अनुमति देती है (रेसिपी R-C)। लिक्विड (ब्लेंडेड) के लिए `out.alpha` असली पारदर्शिता है (रेसिपी R-D)। सामान्य अपारदर्शी terrain पर कोई प्रभाव नहीं — ग़लत न समझें
 - **`l.ambient` की सामग्री** `material.ambient × sceneAmbient` है, सामग्री के अनुसार भिन्न। Scene-पक्ष ग्राफ़िक्स सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5) से जुड़ा है — डिफ़ॉल्ट कभी हार्डकोड न करें
@@ -5197,7 +5207,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## हुक इनवोकेशन इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (प्रोडक्शन बंडल से बहाल — Lite रेंडरर; एकीकृत स्रोत फ़ाइल `lite/terrainShaderPack.ts` त्रुटि-स्ट्रिंगों में बची रहती है)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (प्रोडक्शन बंडल से बहाल — Lite रेंडरर; एकीकृत स्रोत फ़ाइल `lite/terrainShaderPack.ts` त्रुटि-स्ट्रिंगों में बची रहती है)
 
 इंजन रनटाइम पर हुक कैसे बुलाता है। इससे आपके लिखे कोड पर कुछ नहीं बदलता, पर हुक क्या पाते हैं इसका अंदाज़ा-लगाना मिट जाता है।
 
@@ -5255,7 +5265,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ## इंजन हेडर (शब्दशः)
 > लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03 को प्रोडक्शन में सत्यापित) · स्थिति: Analyzed (लाइव प्रोडक्शन बंडल से बहाल)
 
-वह सटीक पाठ जो लोडर हर पैक के आगे जोड़ता है। लाइव प्रोडक्शन बंडल (`ab90qa`, चंक c55, टेम्पलेट को उसके 6 लाइव इंटरपोलेशन के साथ रेंडर करके — `apiVersion` और `bloxdPackInputs` के ज़रिए 5 uniform पठन) से बहाल किया गया। 8,954 बाइट डिकोडेड, 208 पंक्तियाँ। कहीं भी कोई पेराफ़्रेज़ नहीं।
+वह सटीक पाठ जो लोडर हर पैक के आगे जोड़ता है। लाइव प्रोडक्शन बंडल (`ab90qa`, चंक c55, टेम्पलेट को उसके 6 लाइव इंटरपोलेशन के साथ रेंडर करके — `apiVersion` और `bloxdPackInputs` के ज़रिए 5 uniform पठन) से बहाल किया गया। 8,954 बाइट डिकोडेड, 208 पंक्तियाँ। कहीं भी कोई पेराफ़्रेज़ नहीं। मौजूदा प्रोडक्शन बिल्ड (`xkg8x`, चंक c55, 2026-11-04) पर बाइट-समान पुनः सत्यापित — वही 8,954 डिकोडेड बाइट, 208 पंक्तियाँ।
 
 पठन गाइड:
 - फ़ील्ड-दर-फ़ील्ड व्याख्याएँ → [स्ट्रक्चर](api/structures.md)
@@ -5486,7 +5496,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## शेडर सत्यापन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
 
 स्थैतिक सत्यापन (एनालाइज़र, लोड जाँच का चरण 1)। उपयोगकर्ता के लिए सुधार: [सत्यापन त्रुटियाँ](troubleshooting/validation.md)।
 
@@ -5561,7 +5571,7 @@ const Jq = new Map([
 ---
 
 ## WGSL कंपाइलेशन
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल से बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव बंडल से बहाल)
 
 सत्यापन का दूसरा चरण — ब्राउज़र के WGSL कंपाइलर से होने वाला असली संकलन — और v5 के सत्यापन स्टब।
 
@@ -5630,7 +5640,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## आरक्षित पहचानकर्ता इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल के जनरेटरों से बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव बंडल के जनरेटरों से बहाल)
 
 `bloxdSp*` नेमस्पेस — वे प्रतीक जो जनरेटर इंजेक्ट कर सकते हैं और जिन्हें पैक इसीलिए पुनः घोषित नहीं कर सकते। पैक-लेखकों के लिए सारांश: [प्रतिबंध](api/restrictions.md)।
 
@@ -5662,7 +5672,7 @@ v4 के 27 से बढ़कर **46** (20 जोड़े गए, 1 से�
 ---
 
 ## लाइटिंग इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 `blockLight` तीन RGB चैनलों वाला **रंगीन प्रकाश** है। प्रत्येक प्रकाश-उत्सर्जक ब्लॉक एक उत्सर्जन रंग `[R, G, B]` (प्रत्येक 0–15) परिभाषित करता है, जो सीधे ही प्रकाश का रंग बन जाता है (सामान्य मशाल = उष्ण श्वेत (14,14,12) / लावा = नारंगी (14,8,2) / बीकन = सियान (5,14,14) / श्वेत मशाल = (15,15,15) आदि)। शीर्ष (vertex) चरण में यह एक float एट्रिब्यूट में r / g / b / sky — चार निबल के रूप में पैक होकर आता है। लाइट हुक के भीतर तीनों चैनलों को अलग-अलग संभालना रंगीन स्थानीय प्रकाश को संभव बनाता है — उष्ण-मशाल रेसिपी (R9.1) इसी व्यवहार के विरुद्ध कैलिब्रेट है।
 
 `aPackedLightLevels` को डिकोड करते समय इंजन हर चैनल को **सबसे चमकीले RGB चैनल के 35% पर फ़्लोर** करता है। जैसे कोई "शुद्ध लाल प्रकाश" अंतर्वेशन और लिफ़्ट से पहले ही शीर्षों पर (1.00, 0.35, 0) तक उठ जाता है। मशाल का नारंगी खेल में "लाल की बजाय श्वेताभ-गुलाबी" दिखना यहीं से है — उष्ण-मशाल रेसिपी (R9.1) की संतृप्ति इसी डिफ़ॉल्ट के विरुद्ध समायोजित करें।
@@ -5677,7 +5687,7 @@ v4 के 27 से बढ़कर **46** (20 जोड़े गए, 1 से�
 ---
 
 ## फ़ॉग इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 फ़ॉग-परिकलन सदा LINEAR मोड है (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` के बराबर, clamp 0..1), जिसमें `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = फ़ॉग-दूरी सेटिंग; केवल D = 0 विशेष है, fogEnd = 5 के साथ)। **फ़ॉग प्रवणता पट्टी केवल 32 ब्लॉक चौड़ी** है, और `l.fogAlpha` "दूरी-धुंध" से कम और **लोड होती दुनिया के किनारे तक की प्रसामान्यीकृत दूरी** ज़्यादा है। यह लोड-दूरी के साथ खिलाड़ी-अनुसार बदलती है, इसलिए दूरी-आधारित प्रभाव `distance(l.position, bloxdEyePosition())` ख़ुद गिनें (नीचे "लोड-सीमा पट्टी" अनुभाग)। (रेंडरर का फ़ॉग फ़ंक्शन वास्तव में **चार** मोड लागू करता है — बंद / चरघातांकी / चरघातांकी-वर्ग / रैखिक — और भेजे गए शीर्षक रैखिक वाला चलाते हैं; बहाल स्रोत और टिकाऊपन का तर्क [संस्करण इतिहास: v3](history/v3.md) में सुरक्षित हैं।)
 
@@ -5704,7 +5714,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## टेक्सचर सैंपलिंग इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव जेनरेटर से बहाल, c56)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव जेनरेटर से बहाल, c56)
 
 `bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — 3-वेरिएंट टेक्सचर कोडजेन। उपयोगकर्ता-पक्ष: [टेक्सचर API](api/texture-api.md)।
 
@@ -5777,7 +5787,7 @@ name→id रिज़ॉल्यूशन की मशीनरी और म
 
 | आउटपुट | v5 माप | अर्थ |
 |---|---|---|
-| `named` | **896** | `bloxdTextureId<Name>` के रूप में संदर्भण-योग्य नाम |
+| `named` | **906** | `bloxdTextureId<Name>` के रूप में संदर्भण-योग्य नाम |
 | `aliases` | 416 | फ़ोल्ड की गई स्पेलिंग — 188 फ़्रेम उपनाम (`lava0`…) और 228 रोटेशन उपनाम (`chest_top[rot[1`…) |
 | `layers` | 228 | लेयर तालिका — 171 पूर्व-घूर्णित स्लॉट सहित (57 रूट × 4 रोटेशन) |
 
@@ -5815,7 +5825,7 @@ name→id रिज़ॉल्यूशन की मशीनरी और म
 ---
 
 ## मॉडल रेंडरिंग इंटर्नल्स
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` · स्थिति: Analyzed (लाइव बंडल से बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` · स्थिति: Analyzed (लाइव बंडल से बहाल)
 
 v5 Model प्रोग्राम की आंतरिक बनावट। उपयोगकर्ता-सामने की गाइड: [मॉडल और टेक्सचर](guides/models.md)।
 
@@ -5857,9 +5867,9 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 ---
 
 ## इंजन डेटा लेजर
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03; प्रोडक्शन = प्रीप्रोड, बाइट-समान) · स्थिति: Verified
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04; प्रोडक्शन; शेडर-पैक की सभी सतहों पर प्रीप्रोड समान) · स्थिति: Verified
 
-इस दस्तावेज़ीकरण का माप-लेजर — हर पुष्ट किया गया मान, सब मौजूदा लक्ष्य बिल्ड `ab90qa` पर मापा गया।
+इस दस्तावेज़ीकरण का माप-लेजर — हर पुष्ट किया गया मान, सब मौजूदा लक्ष्य बिल्ड `xkg8x` पर मापा गया।
 
 ### लेजर
 
@@ -5874,15 +5884,15 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 | पैक बाइंडिंग | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
 | फ़्लैग | `BloxdFlags` स्ट्रक्चर, 14 bool; v4 के बिट मान सेवानिवृत्त |
 | लोडर सीमाएँ | 256 `.wgsl` / 256 KB स्रोत / 64 KB `pack.json` / 32 MB zip / 1,024 प्रविष्टियाँ; UTF-8; एक मैनिफ़ेस्ट; अद्वितीय पथ — सब अपरिवर्तित |
-| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 ([टेक्सचर रजिस्ट्री](internals/texture-registry.md)) |
+| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 ([टेक्सचर रजिस्ट्री](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1,220 / **906 प्रयोग-योग्य नाम** — सभी 10 हटाने उलटे, 376 id परिवर्तन |
 | लाइट वक्र | 0–15 स्तर → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — हेडर में, अपरिवर्तित |
 | लिफ़्ट वक्र | `1 - (1 - x / (3 - 2x))^3` — अपरिवर्तित (वर्तमान में चंक c9) |
 | डायरेक्शनल शंकु | `0.12 / 0.65 / 0.62 / 0.95` — अपरिवर्तित (चंक c9) |
 | फ़ॉग रंग | `vec3f(183/255, 191/255, 195/255)` — अपरिवर्तित |
 | आरक्षित नाम | `/^bloxd/i` (केस-असंवेदनशील) + 46 `bloxdSp*` इंजन प्रतीक ([आरक्षित पहचानकर्ता](internals/reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict शीर्षक | [नीति](internals/policy.md) के 12 allow शीर्षकों के अतिरिक्त सब कुछ (ab90qa पर पुनः-सत्यापित, अपरिवर्तित) |
-| हेडर/रजिस्ट्री बिल्डर | चंक c55 (मॉड्यूल 29833 + 1371 + 1391 + 1384 + 219 मिलकर समन्वय) |
+| strict शीर्षक | [नीति](internals/policy.md) के 12 allow शीर्षकों के अतिरिक्त सब कुछ (xkg8x पर पुनः-सत्यापित, अपरिवर्तित) |
+| हेडर/रजिस्ट्री बिल्डर | चंक c55 (मॉड्यूल 29833 + 1371 + 1391 + 1384 + 219 मिलकर समन्वय); `xkg8x` पर बिल्डर मॉड्यूल 30093 है (डेटा मॉड्यूल 1391) |
 | डिफ़ॉल्ट पैक टेम्पलेट | चंक c116 (v4 के c124 से स्थानांतरित), 1,683 B |
 
 ### बंडल लेआउट (पुनः-सर्वेक्षकों के लिए)
@@ -5906,7 +5916,7 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 ---
 
 ## पैक-दृश्य मान बदलने वाली चीज़ें
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 वही पैक **दुनिया और खिलाड़ी की सेटिंगों** के आर-पार अलग-अलग रेंडर होता है। वितरण से पहले कम से कम इन 3 परिवेशों में जाँच करें:
 
 1. **सामान्य दुनिया** (डिफ़ॉल्ट स्काईबॉक्स, कोई ओवरराइड नहीं) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`, डिफ़ॉल्ट रंग
@@ -5919,11 +5929,11 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 ---
 
 ## प्रति-गेम शेडर-पैक पॉलिसी
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 यह पेज `allow / strict` के शीर्षक-स्तरीय अर्थ को पक्का करता है। केवल वही शीर्षक पूर्ण मोड (vertex हुक, `discard`, terrain `alpha`) में चलते हैं जिनकी गेम परिभाषा साफ़ तौर पर `shaderPackPolicy: "allow"` ले चलती है; बिना सेटिंग वाले (या कोई भी ग़ैर-allow मान वाले) शीर्षक strict हैं — `BLOXD_STRICT` परिभाषित होता है और गार्डेड कोड अपने आप निष्क्रिय हो जाता है। पैक-पक्ष यह नहीं चुन सकता, इसलिए यह जानना कि कौन-सा शीर्षक क्या चलाता है, वितरण की पूर्व-शर्त है।
 
-- संदर्भ बिल्ड: `szby6g.main.94a7596c.js` (2026-10-17 तक की प्रोडक्शन डिप्लॉय)। सभी 111 गेम परिभाषाओं का स्थैतिक गिनती-आधारित उल्लेख करने पर **26 allow प्रविष्टियाँ (12 शीर्षक) / 85 strict प्रविष्टियाँ** मिलती हैं। उन्हीं 12 शीर्षकों में उन्हीं 12 allow लिटरल्स को v3 प्रोडक्शन बंडल (`3ymzdd`, 2026-10-20) पर और फिर v4 बंडल (`cnty9`, 2026-10-27) पर अपरिवर्तित दोबारा पुष्ट किया गया — नीचे की सूची v3 और v4 पर जस-की-तस लागू होती है।
+- संदर्भ बिल्ड: `szby6g.main.94a7596c.js` (2026-10-17 तक की प्रोडक्शन डिप्लॉय)। सभी 111 गेम परिभाषाओं का स्थैतिक गिनती-आधारित उल्लेख करने पर **26 allow प्रविष्टियाँ (12 शीर्षक) / 85 strict प्रविष्टियाँ** मिलती हैं। उन्हीं 12 शीर्षकों में उन्हीं 12 allow लिटरल्स को v3 प्रोडक्शन बंडल (`3ymzdd`, 2026-10-20) पर और फिर v4 बंडल (`cnty9`, 2026-10-27) पर अपरिवर्तित दोबारा पुष्ट किया गया — नीचे की सूची v3 और v4 पर जस-की-तस लागू होती है। और v5 बिल्डों पर भी अपरिवर्तित: `ab90qa` (2026-11-03) और `xkg8x` (2026-11-04, 12 allow लिटरल दोबारा गिने गए) पर पुनः पुष्टि — नीचे की सूची v5 पर भी जस-की-तस लागू होती है।
 - `shaderPackPolicy` के ऊपर एक डिलीवरी-चैनल द्वार भी है (मोटे तौर पर `canUseShaderPacks`): बाहरी पोर्टलों (जैसे Coolmath Games बिल्ड) के ज़रिए शेडर पैक सिस्टम ख़ुद `shaderPackPolicy` के देखे जाने से पहले ही बंद किया जा सकता है। नीचे का allow/strict विश्लेषण bloxd.io के मुख्य वेब बिल्ड पर आधारित है।
 - allow 12 जगह घोषित है: गेम परिभाषाओं में 8 सीधे लिटरल और 4 बेस वेरिएबल (`tb` / `kz` / `cb` / `Fb`); वेरिएंट इसे spread (`{...tb,...}`) से उत्तराधिकार में लेते हैं। फ़िलहाल कोई प्रति-वेरिएंट ओवरराइड नहीं है (parent-allow / child-strict पैटर्न भी नहीं)।
 
@@ -5948,7 +5958,7 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 ---
 
 ## सूर्य और चंद्र
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 `bloxdSunDirection()` का स्रोत एक सूर्य-दिशा बफ़र है जो केवल स्काईबॉक्स बदलने पर दोबारा लिखा जाता है — कसौटी "आकाश में सूर्य है या नहीं" नहीं, बल्कि **"स्काईबॉक्स पृथ्वी-प्रकार का है या नहीं"** है।
 
@@ -5993,7 +6003,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## दोषमार्जन टूल
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `ab90qa` (2026-11-03, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 - URL पैरामीटर `?renderer=lite` — Lite (WebGPU) रेंडरर पर मज़बूरी से चलाएँ (`webgl2` / `babylon` भी चलते हैं; `babylon`, webgl2 का पुराना नाम है)। प्राथमिकता: URL पैरामीटर > localStorage `bloxdRenderer` > सेटिंग्स स्क्रीन > डिफ़ॉल्ट (webgl2)। अमान्य मान चेतावनी के साथ नज़रअंदाज़ किए जाते हैं। URL या localStorage में छूटे रेंडरर-ओवरराइड WebGPU (lite) माँगने वाले scene तोड़ सकते हैं — "needs the new WebGPU renderer, so remove the renderer override..." ([लोडिंग त्रुटियाँ](troubleshooting/loading.md))
 - URL पैरामीटर `?vconsole` — ऑन-स्क्रीन कंसोल (VConsole)। मोबाइल डिवाइस सत्यापन के लिए सुविधाजनक
@@ -6028,6 +6038,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 | `cnty9` | v4 | 2026-10-27 | v4 गाइड और 905-नाम कैटलॉग का साक्ष्य |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 फ़्रीज़ की पुष्टि (Halloween इवेंट + Skyblock रीवर्क) |
 | `ab90qa` | **v5** | 2026-11-03 | **वर्तमान**; इस दस्तावेज़ीकरण की आधाररेखा। prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **वर्तमान**; इस दस्तावेज़ का बेसलाइन। prod मेन ≠ preprod (`2lcqcl`) मेन, लेकिन शेडर-पैक की हर सतह समान मापी गई |
 
 ### प्रमुख पद्धति
 
@@ -6059,6 +6070,7 @@ uniform-लेआउट मॉड्यूल (29838) से `BloxdPackInputs` �
 |---|---|---|
 | sjr0p7 → cnty9 | 10 दिन | 98 जोड़े, 79 हटाए; 779/1121 नामों का id बदला (69%) |
 | cnty9 → ab90qa | 7 दिन | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 नामों का id बदला |
+| ab90qa → xkg8x | 1 दिन | +10 (v5 लॉन्च के सभी हटाए नाम लौटे: डबल चेस्ट ×8, स्पॉनर साइड ×2); 376/896 नामों का id बदला; कोई हटाया नहीं गया |
 
 ### असत्यापित / अनुमान-आधारित
 
@@ -8938,7 +8950,7 @@ wire_mill_top_rot4
 
 ## API v5 माइग्रेशन गाइड
 > संस्करण: 5 · स्थिति: Historical (उस दौर का माइग्रेशन गाइड; लक्ष्य बिल्ड पाठ में नोट किया गया है)
-लक्ष्य बिल्ड: `ab90qa.main.6188124c.js` — **2026-11-03 को मापा गया, प्रोडक्शन और preprod दोनों पर एक साथ लाइव**, और दोनों बंडल फिर से बाइट-समान हैं (मुख्य बंडल पर md5 `fc3322212d15be2445c0e8dfc9733fcc`, दोनों होस्ट से लाइव-फ़ेच किया गया), इसलिए यहाँ की हर बात प्रोडक्शन पर ज्यों की त्यों लागू होती है। v3 के बाद से यह सबसे बड़ा API संशोधन है: मुख्य बंडल बढ़कर 3.39 MB हुआ (+115 KB, पिछले v4 बिल्ड से), चंक मैप में अब 195 ids हैं (c0–c195, 7 ज्ञात छिद्रों के बाद 188 उत्सर्जित), शेडर पाइपलाइन अब भी c51–c56 क्लस्टर में है (लोडर c53, वैलिडेटर/हेडर/रजिस्ट्री-बिल्डर c55, WebGPU/कोडजेन c56, फ़ॉग c9) — पर डिफ़ॉल्ट पैक टेम्पलेट c116 पर चला गया (`tcwczu` में वह c124 था)। इस लेआउट विवरण की कोई भी बात पैक को दिखती नहीं।
+लक्ष्य बिल्ड: `ab90qa.main.6188124c.js` — **2026-11-03 को मापा गया, प्रोडक्शन और preprod दोनों पर एक साथ लाइव**, और दोनों बंडल फिर से बाइट-समान हैं (मुख्य बंडल पर md5 `fc3322212d15be2445c0e8dfc9733fcc`, दोनों होस्ट से लाइव-फ़ेच किया गया), इसलिए यहाँ की हर बात प्रोडक्शन पर ज्यों की त्यों लागू होती है। v3 के बाद से यह सबसे बड़ा API संशोधन है: मुख्य बंडल बढ़कर 3.39 MB हुआ (+115 KB, पिछले v4 बिल्ड से), चंक मैप में अब 195 ids हैं (c0–c195, 7 ज्ञात छिद्रों के बाद 188 उत्सर्जित), शेडर पाइपलाइन अब भी c51–c56 क्लस्टर में है (लोडर c53, वैलिडेटर/हेडर/रजिस्ट्री-बिल्डर c55, WebGPU/कोडजेन c56, फ़ॉग c9) — पर डिफ़ॉल्ट पैक टेम्पलेट c116 पर चला गया (`tcwczu` में वह c124 था)। इस लेआउट विवरण की कोई भी बात पैक को दिखती नहीं। मौजूदा प्रोडक्शन बिल्ड `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`) पर पुनः सत्यापित: इंजन हेडर बाइट-समान है और नीचे की सभी लोडर / वेरिएंट / हुक / आरक्षित-नाम माप अपरिवर्तित दोबारा जाँची गईं — केवल टेक्सचर रजिस्ट्री ही खिसकी है (896 → 906 प्रयोग-योग्य नाम; §80 परिशिष्ट)। Preprod (`2lcqcl`) एक अलग मेन बंडल चलाता है, लेकिन शेडर-पैक की हर सतह पर समान मापा गया।
 
 जो *दिखता* है: इंजन हेडर 6,021 से बढ़कर **8,954 डिकोडेड बाइट** हुआ (151 → 208 पंक्तियाँ) — लगभग हर स्ट्रक्चर को फ़ील्ड मिले, चार नए फ़ंक्शन इंजन की अपनी लाइटिंग रेसिपी प्रलेखित करते हैं, और `blockFlags` बिटमास्क गायब है, उसकी जगह boolean का एक उचित `BloxdFlags` स्ट्रक्चर आया है। `#ifdef BLOXD_LIGHTING` कंपाइल-टाइम गेट भी गायब है: लाइटिंग स्थिति प्रति-फ़्रेम uniform में `lit: u32` मेंबर के रूप में चली गई और रन-टाइम पर `bloxdLit()` से पूछी जाती है। डिफ़ॉल्ट पैक टेम्पलेट अब छह की जगह **सभी नौ हुक** लेकर आता है। और `bloxdSp*` इंजन-आंतरिक नेमस्पेस 27 से बढ़कर 46 सिंबल हो गया।
 
@@ -9412,6 +9424,8 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 v4 कैटलॉग का सिद्धांत ([v4 गाइड](history/v4.md) का §68) शब्द-दर-शब्द आगे बढ़ता है: **नाम ही API हैं, ids केवल स्नैपशॉट हैं।** दोनों बिल्डों के बीच बचे 905 नामों में से 334 का id बदल गया — `bloxdTextureIdStone` लिखें, कभी `351` नहीं। v4 कैटलॉग की वर्णनात्मक सूची ([v4 गाइड](history/v4.md) का §68.2) ऊपर बताए 11-नाम ड्रिफ़्ट को छोड़कर v5 के लिए वैध बनी हुई है; फ़ोल्डिंग नियम और दोनों परिवार-तालिकाएँ अपरिवर्तित हैं, इसलिए उसके §68.3–§68.4 (turned और animated परिवार) अब भी यथार्थ हैं। मौजूदा-रूप कैटलॉग [टेक्सचर कैटलॉग](api/texture-catalog.md) है।
 
+**परिशिष्ट (2026-11-04, `xkg8x`):** रजिस्ट्री v5 लॉन्च के अगले दिन फिर खिसका — नीचे की हर हटाई उलट गई है। एटलस प्रविष्टियाँ 1,210 → 1,220, प्रयोग-योग्य नाम 896 → **906** (डबल-चेस्ट की आठ टेक्सचर और दोनों स्पॉनर साइड वैरिएंट वापस; कुछ हटाया नहीं गया), 896 जीवित नामों में से 376 का id बदला, परिवार अपरिवर्तित (57 / 42)। Preprod `2lcqcl` शेडर-पैक की हर सतह पर समान मापा गया। वर्तमान रूप का कैटलॉग `xkg8x` पर दोबारा मापा गया है: [टेक्सचर कैटलॉग](api/texture-catalog.md)।
+
 ### 81. पुष्ट कॉन्स्टैंट, सीमाएँ और लेआउट (v5)
 
 गाइड के माप-खाते की v5 पंक्ति — सब कुछ `ab90qa` पर मापा गया (2026-11-03, prod = preprod, बाइट-समान):
@@ -9427,7 +9441,7 @@ v4 कैटलॉग का सिद्धांत ([v4 गाइड](history
 | पैक बाइंडिंग | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` स्टोरेज |
 | फ़्लैग | `BloxdFlags` स्ट्रक्चर, 14 bool (§71); v4 बिट-मान रिटायर |
 | लोडर सीमाएँ | 256 `.wgsl` / 256 KB स्रोत / 64 KB `pack.json` / 32 MB zip / 1,024 zip प्रविष्टियाँ; UTF-8; एक मैनिफ़ेस्ट; अद्वितीय पथ — सब अपरिवर्तित |
-| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 (§80); कैटलॉग: v4 गाइड §68 + §80 की ड्रिफ़्ट सूची (मौजूदा रूप: [टेक्सचर कैटलॉग](api/texture-catalog.md)) |
+| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 (§80); कैटलॉग: v4 गाइड §68 + §80 की ड्रिफ़्ट सूची (मौजूदा रूप: [टेक्सचर कैटलॉग](api/texture-catalog.md)); `xkg8x` (2026-11-04) पर पुनः मापा: 1,220 / **906**, सभी 10 हटाने उलटे, 376 id परिवर्तन (§80 परिशिष्ट) |
 | लाइट वक्र | 0–15 लेवल → ईज़-आउट वक्र पर 0–1 (`6 → 0.45`, `12 → 0.92`) — हेडर-भीतर, अपरिवर्तित |
 | लिफ़्ट वक्र | `1 - (1 - x / (3 - 2x))^3` — अपरिवर्तित (अब चंक c9) |
 | डायरेक्शनल शंकु | `0.12 / 0.65 / 0.62 / 0.95` — अपरिवर्तित (चंक c9) |

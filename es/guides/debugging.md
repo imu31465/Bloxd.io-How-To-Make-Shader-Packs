@@ -1,6 +1,6 @@
 # Consejos de depuración
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 - Cuevas muy claras → falta curva no lineal de `skyLight` (receta de cuevas R2 / R9.9)
 - Días quemados → baja la exposición pre-ACES

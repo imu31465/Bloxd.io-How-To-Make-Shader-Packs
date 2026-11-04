@@ -1,6 +1,6 @@
 # Intérieurs du rendu des modèles
 
-> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré depuis le bundle en production)
+> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré depuis le bundle en production)
 
 Les intérieurs du programme Model v5. Le guide côté utilisateur : [Modèles et textures](../guides/models.md).
 

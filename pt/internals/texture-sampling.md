@@ -1,6 +1,6 @@
 # Interioridades da amostragem de texturas
 
-> API alvo: 5 · Build alvo: `ab90qa` · Estado: Analyzed (restaurado do gerador em produção, c56)
+> API alvo: 5 · Build alvo: `xkg8x` · Estado: Analyzed (restaurado do gerador em produção, c56)
 
 Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — o codegen de texturas de 3 variantes. O lado do usuário: [API de texturas](../api/texture-api.md).
 

@@ -1,6 +1,6 @@
 # What shader packs can and cannot do
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 
 The realism ceiling of shader packs in one page: what the current API reaches, what it fundamentally cannot, what is conditional, why the limits exist, and the closest substitutes. Scope a look here before building it.
 

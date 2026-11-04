@@ -1,6 +1,6 @@
 # FAQ e notas legais
 
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Verified
 
 ## Perguntas frequentes
 

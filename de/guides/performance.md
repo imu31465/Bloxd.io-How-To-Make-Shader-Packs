@@ -1,6 +1,6 @@
 # Performance
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified (messbasierte Praxis)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (messbasierte Praxis)
 
 Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model), deshalb bewegen Stilentscheidungen die Framerate deutlich.
 

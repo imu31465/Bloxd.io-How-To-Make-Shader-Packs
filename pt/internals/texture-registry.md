@@ -1,6 +1,6 @@
 # Interioridades do registro de texturas
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
 
 A maquinaria de resolução nome→id e a deriva medida do registro. O catálogo voltado ao usuário: [Catálogo de texturas](../api/texture-catalog.md).
 
@@ -12,7 +12,7 @@ Executamos o próprio módulo de construção de registro do motor (29833 nesta 
 
 | Saída | medido na v5 | Significado |
 |---|---|---|
-| `named` | **896** | nomes referenciáveis como `bloxdTextureId<Name>` |
+| `named` | **906** | nomes referenciáveis como `bloxdTextureId<Name>` |
 | `aliases` | 416 | grafias dobradas — 188 aliases de quadro (`lava0`…) e 228 aliases de rotação (`chest_top[rot[1`…) |
 | `layers` | 228 | a tabela de camadas — incluindo 171 slots pré-rotacionados (57 raízes × 4 rotações) |
 

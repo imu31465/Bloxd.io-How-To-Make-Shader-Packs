@@ -1,8 +1,8 @@
 # Relevé des données du moteur
 
-> API cible : 5 · Build cible : `ab90qa` (2026-11-03 ; production = preprod, identique octet par octet) · État : Verified
+> API cible : 5 · Build cible : `xkg8x` (2026-11-04 ; production ; preprod identique sur toutes les surfaces de shader pack) · État : Verified
 
-Le relevé de mesures de la documentation — chaque valeur confirmée, toutes mesurées sur le build cible actuel `ab90qa`.
+Le relevé de mesures de la documentation — chaque valeur confirmée, toutes mesurées sur le build cible actuel `xkg8x`.
 
 ## Le relevé
 
@@ -24,8 +24,8 @@ Le relevé de mesures de la documentation — chaque valeur confirmée, toutes m
 | couleur de brouillard | `vec3f(183/255, 191/255, 195/255)` — inchangée |
 | noms réservés | `/^bloxd/i` (insensible à la casse) + les 46 symboles `bloxdSp*` du moteur ([Identifiants réservés](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| titres stricts | tout sauf les 12 titres allow de [Politique](policy.md) (revérifiés sur ab90qa, inchangés) |
-| constructeurs en-tête/registre | chunk c55 (module 29833 + 1371 + 1391 + 1384 + 219 en coordination) |
+| titres stricts | tout sauf les 12 titres allow de [Politique](policy.md) (revérifiés sur xkg8x, inchangés) |
+| constructeurs en-tête/registre | chunk c55 (module 29833 + 1371 + 1391 + 1384 + 219 en coordination) ; sur `xkg8x` le constructeur est le module 30093 (module de données 1391) |
 | gabarit de pack par défaut | chunk c116 (déplacé depuis le c124 de la v4), 1 683 o |
 
 ## Agencement du bundle (pour refaire le relevé)

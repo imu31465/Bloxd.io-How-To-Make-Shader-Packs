@@ -1,6 +1,6 @@
 # Kompatibilität
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-04, Produktion) · Status: Verified
 
 Wie das aktuelle Spiel und Pakete alter Versionen zusammenwirken.
 

@@ -1,6 +1,6 @@
 # Restrictions & reserved names
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
+> Target API: 5 · Target build: `xkg8x` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
 
 What packs may write, and the complete name-reservation rules.
 

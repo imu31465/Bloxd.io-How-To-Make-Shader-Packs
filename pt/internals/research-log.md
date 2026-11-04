@@ -21,6 +21,7 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 | `cnty9` | v4 | 2026-10-27 | evidência do guia da v4 e do catálogo de 905 nomes |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | **atual**; linha de base desta documentação. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **atual**; linha de base desta documentação. main de prod ≠ main de preprod (`2lcqcl`), mas toda superfície de shader packs medida idêntica |
 
 ## Metodologia chave
 
@@ -52,6 +53,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 |---|---|---|
 | sjr0p7 → cnty9 | 10 dias | 98 adicionados, 79 removidos; 779/1121 nomes mudaram de id (69%) |
 | cnty9 → ab90qa | 7 dias | +1 (scorpion_eggs), −10 (cofre duplo ×8, laterais de spawner ×2); 334/905 nomes mudaram de id |
+| ab90qa → xkg8x | 1 dia | +10 (todas as remoções do lançamento da v5 voltaram: baú duplo ×8, laterais de spawner ×2); 376/896 nomes mudaram de id; nenhum removido |
 
 ## Não verificado / especulativo
 

@@ -1,6 +1,6 @@
 # Formato del paquete
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (remedido en el cargador en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (remedido en el cargador en vivo)
 
 El modelo completo del paquete en una sola página — manifiesto, límites del cargador, uniform por fotograma. Para la versión paso a paso ver [Primeros pasos](../getting-started/manifest.md).
 

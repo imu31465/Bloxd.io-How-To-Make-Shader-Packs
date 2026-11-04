@@ -1,6 +1,6 @@
 # Modell-Shader
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (gegen die v5-Header-Spezifikation geschrieben)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (gegen die v5-Header-Spezifikation geschrieben)
 
 Rezepte mit den v5-Model-Hooks und neuen Flags für **„Worauf schaue ich gerade“-Auswahlen, die vor v5 unmöglich waren**. Grundlagen: [Modelle und Texturen](../guides/models.md).
 

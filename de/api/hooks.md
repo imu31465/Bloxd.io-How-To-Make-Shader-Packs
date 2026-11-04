@@ -1,6 +1,6 @@
 # Shader-Hooks
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified
 
 Pakete können **9 Hooks** definieren — 3 Render-Ziele (Programme) × 3 Pipeline-Stufen, alle optional (undefiniert bedeutet Engine-Standard).
 

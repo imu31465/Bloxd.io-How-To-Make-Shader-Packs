@@ -1,6 +1,6 @@
 # 모델 렌더링의 내부
 
-> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (라이브 번들에서 복원)
+> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 번들에서 복원)
 
 v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](../guides/models.md).
 

@@ -1,6 +1,6 @@
 # Interior do motor e pesquisa
 
-Especificações internas restauradas analisando a implementação do motor. Tudo aqui foi recuperado diretamente do JavaScript da build de produção atual (`ab90qa`). Separado da documentação da API pública ([Referência da API](../api/)) para preservar o comportamento interno exato e os resultados da análise.
+Especificações internas restauradas analisando a implementação do motor. Tudo aqui foi recuperado diretamente do JavaScript da build de produção atual (`xkg8x`). Separado da documentação da API pública ([Referência da API](../api/)) para preservar o comportamento interno exato e os resultados da análise.
 
 ## Mapa
 
@@ -24,6 +24,6 @@ Especificações internas restauradas analisando a implementação do motor. Tud
 | [Depuração](debugging.md) | parâmetros de URL, painéis de estatísticas |
 | [Registro de pesquisa](research-log.md) | metodologia, histórico de builds, itens não verificados |
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04)
 
 As interioridades não são um contrato de API estável — elas podem mudar com as atualizações do motor, e cada página nomeia sua build de evidência ([registro de pesquisa](research-log.md)).

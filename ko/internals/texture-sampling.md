@@ -1,6 +1,6 @@
 # 텍스처 샘플링의 내부
 
-> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
+> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
 
 `bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](../api/texture-api.md).
 

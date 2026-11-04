@@ -21,6 +21,7 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 | `cnty9` | v4 | 2026-10-27 | Evidenz des v4-Leitfadens & des 905-Namen-Katalogs |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
 | `ab90qa` | **v5** | 2026-11-03 | **aktuell**; die Basislinie dieser Dokumentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **aktuell**; Baseline dieser Dokumentation. prod-Haupt-Bundle ≠ preprod (`2lcqcl`), aber jede Shader-Pack-Oberfläche identisch gemessen |
 
 ## Kern-Methodik
 
@@ -30,7 +31,7 @@ Rendern der c55-Header-Vorlage mit ihren Live-Interpolationen (`${vC}` = apiVers
 
 ### Textur-Registry-Neuberechnung
 
-Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 896 / aliases 416 / layers 228) ([Textur-Registry](texture-registry.md)).
+Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 906 / aliases 416 / layers 228 auf dem aktuellen Build `xkg8x`, 2026-11-04 — Module 30093 + 1391; beim v5-Start 896) ([Textur-Registry](texture-registry.md)).
 
 Die Animationsintervalle stammen aus der `animDataPerTex`-artigen Tabelle (pro Layer `numAnimStates` / `animationInterval`) — es existieren nur drei Intervallwerte: 200 / 250 / 300 ms ([der Katalog](../api/texture-catalog.md#animationsfamilien-42-namen)).
 
@@ -52,6 +53,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 |---|---|---|
 | sjr0p7 → cnty9 | 10 Tage | 98 hinzugekommen, 79 entfernt; 779/1121 Namen änderten die id (69 %) |
 | cnty9 → ab90qa | 7 Tage | +1 (`scorpion_eggs`), −10 (Doppel-Truhe ×8, Spawner-Seiten ×2); 334/905 Namen änderten die id |
+| ab90qa → xkg8x | 1 Tag | +10 (alle v5-Start-Entfernungen kehrten zurück: Double-Chest ×8, Spawner-Seiten ×2); 376/896 Namen änderten die id; keine entfernt |
 
 ## Unverifiziert / spekulativ
 

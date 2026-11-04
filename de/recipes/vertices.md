@@ -1,6 +1,6 @@
 # Vertices (nur allow)
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > Alles in `#ifndef BLOXD_STRICT` einpacken.
 > Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe [Shader-Pack-Richtlinien je Spiel](../internals/policy.md)

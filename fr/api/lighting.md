@@ -1,6 +1,6 @@
 # Éclairage
 
-> API cible : 5 · Build cible : `ab90qa` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 v5 a rendu publique l'API d'éclairage. Ce que le moteur faisait en interne (construire `litColour`) est désormais appelable depuis les packs. Cette page couvre les entrées d'éclairage, les fonctions et l'ordre de traitement comme un système.
 

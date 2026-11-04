@@ -1,6 +1,6 @@
 # Intérieurs du registre des textures
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
+> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-04) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
 
 La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](../api/texture-catalog.md).
 
@@ -12,7 +12,7 @@ Nous avons exécuté le propre module de construction du registre du moteur (298
 
 | Sortie | mesuré en v5 | Signification |
 |---|---|---|
-| `named` | **896** | noms référençables comme `bloxdTextureId<Name>` |
+| `named` | **906** | noms référençables comme `bloxdTextureId<Name>` |
 | `aliases` | 416 | orthographes repliées — 188 alias d'image (`lava0`…) et 228 alias de rotation (`chest_top[rot[1`…) |
 | `layers` | 228 | la table de couches — dont 171 emplacements pré-rotés (57 racines × 4 rotations) |
 

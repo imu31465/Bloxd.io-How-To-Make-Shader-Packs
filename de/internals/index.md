@@ -1,6 +1,6 @@
 # Engine-Interna & Forschung
 
-Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. Alles hier wurde direkt aus dem JavaScript des aktuellen Produktions-Builds (`ab90qa`) zurückgewonnen. Von der öffentlichen API-Dokumentation ([API-Referenz](../api/)) getrennt, um exaktes internes Verhalten und Analyseergebnisse zu bewahren.
+Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. Alles hier wurde direkt aus dem JavaScript des aktuellen Produktions-Builds (`xkg8x`) zurückgewonnen. Von der öffentlichen API-Dokumentation ([API-Referenz](../api/)) getrennt, um exaktes internes Verhalten und Analyseergebnisse zu bewahren.
 
 ## Map
 
@@ -24,6 +24,6 @@ Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. A
 | [Debugging](debugging.md) | URL-Parameter, Statistik-Panels |
 | [Forschungslog](research-log.md) | Methodik, Build-Historie, unverifizierte Punkte |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion)
 
 Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates ändern, und jede Seite nennt ihren Evidenz-Build ([Forschungslog](research-log.md)).

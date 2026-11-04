@@ -1,6 +1,6 @@
 # Effets d'enchantement
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Analyzed (restauré depuis l'en-tête en production)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Analyzed (restauré depuis l'en-tête en production)
 
 v5 a ouvert le pipeline d'enchantement, côté entrées comme côté sorties. Des recettes pour contrôler le scintillement des objets et armures enchantés tout en préservant les calculs du moteur.
 

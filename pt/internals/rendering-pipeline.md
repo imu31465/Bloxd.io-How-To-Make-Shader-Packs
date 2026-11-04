@@ -1,6 +1,6 @@
 # Pipeline de renderização
 
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
 - **Os hooks surface rodam "antes" do alphaTest**: `out.alpha` alimenta o teste de discard diretamente. Materiais cutout (grama, folhas) permitem efeitos de dissolução estilo dither (receita R-C). Em líquidos (com blend) `out.alpha` é a transparência real (receita R-D). Sem efeito sobre terreno opaco normal — não confunda
 - **O conteúdo de `l.ambient`** é `material.ambient × sceneAmbient`, diferente por material. O lado da cena se liga ao ajuste gráfico "Ambient Lighting Intensity" (padrão 0.5) — nunca deixe valores padrão fixados no código
 - **As luzes direcionais da cena são um esquema de 2 luzes**: a soma de Lambert da luz principal (direção vinda da posição de sol do ajuste de céu, intensidade 1.0) e da luz de preenchimento (direção `[-0.5, -1, -1]`, intensidade 0.35) chega a `l.directional`. A luz de preenchimento aponta para baixo, então não contribui em nada para as faces superiores e capta as superfícies voltadas para baixo (tetos de cavernas etc.). O terreno só considera luzes adicionadas em `_initScene`; luzes adicionadas à cena após a inicialização são ignoradas pelo terreno e pelos modelos de blocos (uma mensagem de aviso oficial diz isso)

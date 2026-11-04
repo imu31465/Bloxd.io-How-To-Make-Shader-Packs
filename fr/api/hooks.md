@@ -1,6 +1,6 @@
 # Hooks de shader
 
-> API cible : 5 · Build cible : `ab90qa` · État : Verified
+> API cible : 5 · Build cible : `xkg8x` · État : Verified
 
 Les packs peuvent définir **9 hooks** — 3 cibles de rendu (programmes) × 3 étapes de pipeline, tous optionnels (non défini = défaut du moteur).
 

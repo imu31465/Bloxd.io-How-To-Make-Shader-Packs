@@ -1,8 +1,8 @@
 # Engine-Daten-Hauptbuch
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03; Produktion = Preprod, byte-identisch) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04; Produktion; Preprod auf allen Shader-Pack-Oberflächen identisch) · Status: Verified
 
-Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `ab90qa` gemessen.
+Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `xkg8x` gemessen.
 
 ## Das Hauptbuch
 
@@ -24,8 +24,8 @@ Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuel
 | Fog-Farbe | `vec3f(183/255, 191/255, 195/255)` — unverändert |
 | reservierte Namen | `/^bloxd/i` (case-insensitive) + die 46 `bloxdSp*`-Engine-Symbole ([Reservierte Bezeichner](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict-Titel | alles außer den 12 allow-Titeln in [Policy](policy.md) (auf ab90qa nachverifiziert, unverändert) |
-| Header-/Registry-Builder | Chunk c55 (Modul 29833 + 1371 + 1391 + 1384 + 219 koordinierend) |
+| strict-Titel | alles außer den 12 allow-Titeln in [Policy](policy.md) (auf xkg8x nachverifiziert, unverändert) |
+| Header-/Registry-Builder | Chunk c55 (Modul 29833 + 1371 + 1391 + 1384 + 219 koordinierend); auf `xkg8x` ist der Builder Modul 30093 (Datenmodul 1391) |
 | Standard-Pack-Vorlage | Chunk c116 (in v4: c124), 1.683 B |
 
 ## Bundle-Layout (für Nachvermesser)

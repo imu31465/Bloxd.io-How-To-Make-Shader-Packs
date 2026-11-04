@@ -1,6 +1,6 @@
 # FAQ & legal notes
 
-> Target API: 5 · Target build: `ab90qa` (2026-11-03, production) · Status: Verified
+> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified
 
 ## Frequently asked questions
 

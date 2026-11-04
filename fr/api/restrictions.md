@@ -1,6 +1,6 @@
 # Restrictions & noms réservés
 
-> API cible : 5 · Build cible : `ab90qa` · État : Verified (limites de v4 reconfirmées identiques octet par octet sur v5)
+> API cible : 5 · Build cible : `xkg8x` · État : Verified (limites de v4 reconfirmées identiques octet par octet sur v5)
 
 Ce que les packs ont le droit d'écrire, et les règles complètes de réservation de noms.
 

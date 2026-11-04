@@ -1,6 +1,6 @@
 # Pack-Struktur
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified
 
 ## Vertriebsformat
 

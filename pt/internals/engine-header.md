@@ -1,6 +1,6 @@
 # Cabeçalho do motor (verbatim)
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Analyzed (restaurado do bundle de produção em execução)
+> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-04) · Estado: Analyzed (restaurado do bundle de produção em execução)
 
 O texto exato que o carregador antepõe a cada pacote. Restaurado do bundle de produção em execução (`ab90qa`, chunk c55, renderizando o template com suas 6 interpolações reais — `apiVersion` e as 5 leituras de uniform via `bloxdPackInputs`). 8.954 bytes decodificados, 208 linhas. Nenhuma paráfrase em nenhum ponto.
 

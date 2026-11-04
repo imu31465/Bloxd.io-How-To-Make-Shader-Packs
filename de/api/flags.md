@@ -1,6 +1,6 @@
 # Flags (BloxdFlags)
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 identifiziert Flächen über eine benannte Boolean-Struktur. Die v4-Bitmaske `blockFlags: u32` und ihre 6 `bloxdBlockFlag*`-Konstanten sind weg.
 

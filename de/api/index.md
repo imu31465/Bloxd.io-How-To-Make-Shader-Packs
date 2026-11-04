@@ -1,6 +1,6 @@
 # API-Referenz
 
-Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `ab90qa` gemessen (2026-11-03; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](../internals/engine-header.md)), ist die Primärquelle.
+Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `xkg8x` gemessen (2026-11-04; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](../internals/engine-header.md)), ist die Primärquelle.
 
 ## Map
 
@@ -19,6 +19,6 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Kompatibilität](compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
 | [Texturkatalog](texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` (2026-11-03, Produktion) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
 
 Migration von v4? Siehe [Versionsgeschichte: v5](../history/v5.md).

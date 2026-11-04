@@ -1,6 +1,6 @@
 # Démarrage rapide
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Verified
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified
 
 Votre premier pack en cinq minutes.
 

@@ -1,6 +1,6 @@
 # API Reference
 
-The systematic specification of the current API v5. Everything here is measured from target build `ab90qa` (2026-11-03; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
+The systematic specification of the current API v5. Everything here is measured from target build `xkg8x` (2026-11-04; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
 
 ## Map
 
@@ -19,6 +19,6 @@ The systematic specification of the current API v5. Everything here is measured 
 | [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
 | [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored verbatim from header & validator)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Analyzed (restored verbatim from header & validator)
 
 Migrating from v4? See [Version History: v5](../history/v5.md).

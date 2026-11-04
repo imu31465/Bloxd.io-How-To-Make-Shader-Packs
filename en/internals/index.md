@@ -1,6 +1,6 @@
 # Engine Internals & Research
 
-Internal specifications restored by analyzing the engine's implementation. Everything here was recovered directly from the JavaScript of the current production build (`ab90qa`). Separated from the public-API documentation ([API Reference](../api/)) to preserve exact internal behavior and analysis results.
+Internal specifications restored by analyzing the engine's implementation. Everything here was recovered directly from the JavaScript of the current production build (`xkg8x`). Separated from the public-API documentation ([API Reference](../api/)) to preserve exact internal behavior and analysis results.
 
 ## Map
 
@@ -24,6 +24,6 @@ Internal specifications restored by analyzing the engine's implementation. Every
 | [Debugging](debugging.md) | URL parameters, stats panels |
 | [Research log](research-log.md) | methodology, build history, unverified items |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04)
 
 Internals are not a stable API contract — they may change with engine updates, and each page names its evidence build ([research log](research-log.md)).

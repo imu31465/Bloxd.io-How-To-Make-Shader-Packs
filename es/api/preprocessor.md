@@ -1,6 +1,6 @@
 # Preprocesador
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado del validador en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado del validador en vivo)
 
 La compilación condicional solo soporta `#define NAME` (sin valor) / `#ifdef` / `#ifndef` / `#else` / `#endif`. La `#` va al inicio de línea (dentro de funciones está bien). La coincidencia de nombres de flag no distingue mayúsculas; un nombre erróneo en `#ifdef` hace que el mensaje de error liste el conjunto oficial.
 

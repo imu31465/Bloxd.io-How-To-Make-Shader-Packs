@@ -1,6 +1,6 @@
 # pack.json (manifest)
 
-> 目标API: 5 · 目标构建: `ab90qa` (2026-11-03 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
 
 `pack.json` 是包的 manifest — zip 根部恰好一个 JSON 对象。
 

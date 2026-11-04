@@ -18,4 +18,4 @@
 | [Combining with texture packs](combinations.md) | pairing with texture packs |
 | [Debugging tips](debugging.md) | symptom → cause diagnostics |
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04)

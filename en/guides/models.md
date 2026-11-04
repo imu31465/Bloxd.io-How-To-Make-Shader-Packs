@@ -1,6 +1,6 @@
 # Models and textures
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Analyzed (restored from header & validator)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Analyzed (restored from header & validator)
 
 What the new v5 Model hooks draw and read.
 

@@ -1,6 +1,6 @@
 # 플래그 (BloxdFlags)
 
-> 대상 API: 5 · 대상 빌드: `ab90qa` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 면을 이름 붙은 bool 구조체로 식별한다. v4 의 `blockFlags: u32` 비트마스크와 그 6개 `bloxdBlockFlag*` 상수는 사라졌다.
 

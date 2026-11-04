@@ -1,6 +1,6 @@
 # Interioridades de iluminação
 
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Analyzed (análise de JavaScript do bundle de produção)
 `blockLight` é **luz colorida** com três canais RGB. Cada bloco emissor de luz define uma cor de emissão `[R, G, B]` (0–15 cada) que se torna a cor da luz tal qual (tocha comum = branco quente (14,14,12) / lava = laranja (14,8,2) / beacon = ciano (5,14,14) / tocha branca = (15,15,15), etc.). No estágio de vértice ela chega empacotada como 4 nibbles — r / g / b / sky — em um único atributo float. Tratar os três canais separadamente dentro do hook light permite a iluminação local colorida — a receita de tocha quente (R9.1) é calibrada contra esse comportamento.
 
 Ao decodificar `aPackedLightLevels`, o motor aplica a cada canal um **piso de 35% do canal RGB mais brilhante**. Ex.: uma "luz vermelha pura" é erguida a (1.00, 0.35, 0) nos vértices, antes da interpolação e do lift. O laranja da tocha parecer "rosado esbranquiçado em vez de vermelho" no jogo vem daqui — ajuste a saturação da receita de tocha quente (R9.1) contra esse padrão.

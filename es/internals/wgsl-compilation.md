@@ -1,6 +1,6 @@
 # Compilación de WGSL
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado del bundle en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado del bundle en vivo)
 
 La segunda etapa de validación — la compilación real a través del compilador WGSL del navegador — y los stubs de validación de v5.
 

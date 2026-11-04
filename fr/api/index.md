@@ -1,6 +1,6 @@
 # Référence API
 
-La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est mesuré sur le build cible `ab90qa` (2026-11-03 ; production et preprod identiques). L'en-tête du moteur préfixé à chaque pack (reproduit dans [Internals du moteur](../internals/engine-header.md)) est la source principale.
+La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est mesuré sur le build cible `xkg8x` (2026-11-04 ; production et preprod identiques). L'en-tête du moteur préfixé à chaque pack (reproduit dans [Internals du moteur](../internals/engine-header.md)) est la source principale.
 
 ## Plan
 
@@ -19,6 +19,6 @@ La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est
 | [Compatibilité](compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
 | [Catalogue de textures](texture-catalog.md) | les 896 noms utilisables (recherchables) |
 
-> API cible : 5 · Build cible : `ab90qa` (vérifié en production le 2026-11-03) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
+> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](../history/v5.md).

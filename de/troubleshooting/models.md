@@ -1,6 +1,6 @@
 # Modell-Probleme
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (neues v5-Territorium)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (neues v5-Territorium)
 
 Probleme rund um die neuen v5-Model-Hooks.
 

@@ -1,6 +1,6 @@
 # Funciones
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](texture-api.md), junto con `bloxdOpaqueBehind`.
 

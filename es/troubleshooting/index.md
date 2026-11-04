@@ -18,7 +18,7 @@ Errores y problemas visuales, localizables **por síntoma**. Las páginas siguen
 | Lento / descartado por la comprobación en el dispositivo | [Rendimiento](performance.md) |
 | Legal, seguridad, preguntas frecuentes | [FAQ](faq.md) |
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
 
 ## Dónde aparecen los errores
 

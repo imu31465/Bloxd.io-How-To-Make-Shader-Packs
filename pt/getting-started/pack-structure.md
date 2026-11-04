@@ -1,6 +1,6 @@
 # Estrutura do pacote
 
-> API alvo: 5 · Build alvo: `ab90qa` · Estado: Verified
+> API alvo: 5 · Build alvo: `xkg8x` · Estado: Verified
 
 ## Formato de distribuição
 

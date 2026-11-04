@@ -1,6 +1,6 @@
 # Liquides
 
-> API cible : 5 · Build cible : `ab90qa` (2026-11-03, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> API cible : 5 · Build cible : `xkg8x` (2026-11-04, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
 ## Surface ridée (scintillement de couleur)
 
 ```wgsl

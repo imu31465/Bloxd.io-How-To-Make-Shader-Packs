@@ -1,6 +1,6 @@
 # Estructura del paquete
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Verified
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Verified
 
 ## Formato de distribución
 

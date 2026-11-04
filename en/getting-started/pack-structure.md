@@ -1,6 +1,6 @@
 # Pack structure
 
-> Target API: 5 · Target build: `ab90qa` · Status: Verified
+> Target API: 5 · Target build: `xkg8x` · Status: Verified
 
 ## Distribution format
 

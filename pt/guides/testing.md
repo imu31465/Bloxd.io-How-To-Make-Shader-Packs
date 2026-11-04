@@ -1,6 +1,6 @@
 # Lista de verificação de testes no jogo
 
-> API alvo: 5 · Build alvo: `ab90qa` (2026-11-03, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 
 Sucesso de compilação e "boa aparência" são coisas diferentes. Verifique nesta ordem:
 

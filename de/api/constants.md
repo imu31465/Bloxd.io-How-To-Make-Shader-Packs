@@ -1,6 +1,6 @@
 # Konstanten
 
-> Ziel-API: 5 · Ziel-Build: `ab90qa` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Der Header stellt drei Konstanten bereit (Textur-Namenskonstanten `bloxdTextureId*` stehen in der [Textur-API](texture-api.md)).
 

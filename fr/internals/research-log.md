@@ -21,6 +21,7 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 | `cnty9` | v4 | 2026-10-27 | preuve du guide v4 & du catalogue à 905 noms |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmation du gel de la v4 (événement Halloween + refonte de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | **actuel** ; la base de référence de cette documentation. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
+| `xkg8x` | **v5** | 2026-11-04 | **actuel** ; référence de cette documentation. main de prod ≠ main de preprod (`2lcqcl`), mais chaque surface de shader pack mesurée identique |
 
 ## Méthodologie clé
 
@@ -30,7 +31,7 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 
 ### Recalcul du registre de textures
 
-Exécution des modules de construction du registre du moteur (29833 + 1371 + 1391 + 1384 + 219) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal ; enregistrement de la sortie (named 896 / aliases 416 / layers 228) ([Registre des textures](texture-registry.md)).
+Exécution des modules de construction du registre du moteur (29833 + 1371 + 1391 + 1384 + 219) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal ; enregistrement de la sortie (named 906 / aliases 416 / layers 228 sur le build actuel `xkg8x`, 2026-11-04 — modules 30093 + 1391 ; 896 au lancement de la v5) ([Registre des textures](texture-registry.md)).
 
 Les intervalles d'animation viennent de la table façon `animDataPerTex` (`numAnimStates` / `animationInterval` par couche) — seules trois valeurs d'intervalle existent : 200 / 250 / 300 ms ([le catalogue](../api/texture-catalog.md#familles-danimation-42-noms)).
 
@@ -52,6 +53,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 |---|---|---|
 | sjr0p7 → cnty9 | 10 jours | 98 ajoutés, 79 retirés ; 779/1121 noms ont changé d'id (69 %) |
 | cnty9 → ab90qa | 7 jours | +1 (scorpion_eggs), −10 (coffre double ×8, côtés de spawner ×2) ; 334/905 noms ont changé d'id |
+| ab90qa → xkg8x | 1 jour | +10 (tous les retraits du lancement de v5 sont revenus : coffre double ×8, côtés de spawner ×2) ; 376/896 noms ont changé d'id ; aucun retiré |
 
 ## Non vérifié / spéculatif
 

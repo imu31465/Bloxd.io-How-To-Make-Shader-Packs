@@ -1,6 +1,6 @@
 # Referência da API
 
-A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o build alvo `ab90qa` (2026-11-03; produção e preprod idênticos). O cabeçalho do motor anteposto a cada pacote (reproduzido em [Interior do motor](../internals/engine-header.md)) é a fonte primária.
+A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o build alvo `xkg8x` (2026-11-04; produção e preprod idênticos). O cabeçalho do motor anteposto a cada pacote (reproduzido em [Interior do motor](../internals/engine-header.md)) é a fonte primária.
 
 ## Mapa
 
@@ -19,6 +19,6 @@ A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o bui
 | [Compatibilidade](compatibility.md) | pacotes de versões antigas, revalidação de pacotes salvos |
 | [Catálogo de texturas](texture-catalog.md) | todos os 896 nomes utilizáveis (com busca) |
 
-> API alvo: 5 · Build alvo: `ab90qa` (verificado em produção 2026-11-03) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
+> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
 
 Migrando da v4? Veja [Histórico de versões: v5](../history/v5.md).

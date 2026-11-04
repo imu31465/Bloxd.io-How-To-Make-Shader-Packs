@@ -1,6 +1,6 @@
 # Structure du pack
 
-> API cible : 5 · Build cible : `ab90qa` · État : Verified
+> API cible : 5 · Build cible : `xkg8x` · État : Verified
 
 ## Format de distribution
 

@@ -1,6 +1,6 @@
 # フラグ (BloxdFlags)
 
-> 対象API: 5 · 対象ビルド: `ab90qa` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
+> 対象API: 5 · 対象ビルド: `xkg8x` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
 v5 は面の識別を名前付き boolean 構造体で行います。v4 の `blockFlags: u32` ビットマスクと 6 個の `bloxdBlockFlag*` 定数は廃止されました。
 

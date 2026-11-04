@@ -1,6 +1,6 @@
 # モデルの描画とテクスチャ
 
-> 対象API: 5 · 対象ビルド: `ab90qa` (2026-11-03 本番確認) · 検証状況: Analyzed (ヘッダー・バリデータから復元)
+> 対象API: 5 · 対象ビルド: `xkg8x` (2026-11-04 本番確認) · 検証状況: Analyzed (ヘッダー・バリデータから復元)
 
 v5 の新しい Model フック (`bloxdModelVertex` / `bloxdModelSurface` / `bloxdModelLight`) が何を描き、何が読めるかを説明します。
 

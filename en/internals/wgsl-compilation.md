@@ -1,6 +1,6 @@
 # WGSL compilation
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the live bundle)
+> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored from the live bundle)
 
 The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
 

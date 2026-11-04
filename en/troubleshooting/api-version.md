@@ -1,6 +1,6 @@
 # API version errors
 
-> Target API: 5 · Target build: `ab90qa` (verified in production 2026-11-03) · Status: Verified (verbatim from the live i18n dictionary)
+> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified (verbatim from the live i18n dictionary)
 
 Errors around `apiVersion`. The current game accepts **only `5`**.
 

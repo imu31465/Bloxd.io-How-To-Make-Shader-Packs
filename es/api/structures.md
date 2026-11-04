@@ -1,6 +1,6 @@
 # Estructuras de entrada y salida
 
-> API objetivo: 5 · Build objetivo: `ab90qa` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
+> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 Siete estructuras son legibles/escribibles por los paquetes. Abajo se listan todos los campos (los campos `#ifdef` son condicionales). La cabecera completa está en [Interior del motor](../internals/engine-header.md).
 

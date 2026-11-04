@@ -1,6 +1,6 @@
 # Hook invocation internals
 
-> Target API: 5 · Target build: `ab90qa` · Status: Analyzed (restored from the production bundle — the Lite renderer; the integrated source file `lite/terrainShaderPack.ts` survives in error strings)
+> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored from the production bundle — the Lite renderer; the integrated source file `lite/terrainShaderPack.ts` survives in error strings)
 
 How the engine calls hooks at runtime. This changes nothing about the code you write, but removes the guesswork about what hooks receive.
 

@@ -18,4 +18,4 @@ Material de «mecanismo y mentalidad». Qué es posible en primer lugar está en
 | [Combinación con texture packs](combinations.md) | emparejamiento con paquetes de texturas |
 | [Consejos de depuración](debugging.md) | diagnóstico de síntoma → causa |
 
-> API objetivo: 5 · Build objetivo: `ab90qa` (2026-11-03, producción)
+> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción)
