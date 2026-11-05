@@ -1,8 +1,8 @@
 # Engine-Header (wortwörtlich)
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
 
-Der exakte Text, den der Loader jedem Paket voranstellt. Aus dem Live-Produktions-Bundle restauriert (`ab90qa`, Chunk c55, die Vorlage mit ihren 6 Live-Interpolationen rendernd — `apiVersion` und die 5 Uniform-Lesezugriffe über `bloxdPackInputs`). 8.954 Byte dekodiert, 208 Zeilen. Keinerlei Paraphrase. Auf dem aktuellen Produktions-Build (`xkg8x`, Chunk c55, 2026-11-04) byte-identisch nachverifiziert — dieselben 8.954 dekodierten Bytes, 208 Zeilen.
+Der exakte Text, den der Loader jedem Paket voranstellt. Aus dem Live-Produktions-Bundle restauriert (`ab90qa`, Chunk c55, die Vorlage mit ihren 6 Live-Interpolationen rendernd — `apiVersion` und die 5 Uniform-Lesezugriffe über `bloxdPackInputs`). 8.954 Byte dekodiert, 208 Zeilen. Keinerlei Paraphrase. Auf dem aktuellen Produktions-Build (`bny9u`, Chunk c56 (von c55 umnummeriert), 2026-11-05) byte-identisch nachverifiziert — dieselben 8.954 dekodierten Bytes, 208 Zeilen.
 
 Lese-Anleitung:
 - Feld-für-Feld-Erklärungen → [Strukturen](../api/structures.md)

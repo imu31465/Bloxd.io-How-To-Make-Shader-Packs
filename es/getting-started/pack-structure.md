@@ -1,6 +1,6 @@
 # Estructura del paquete
 
-> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Verified
+> API objetivo: 5 · Build objetivo: `bny9u` · Estado: Verified
 
 ## Formato de distribución
 

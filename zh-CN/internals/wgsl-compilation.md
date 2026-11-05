@@ -1,6 +1,6 @@
 # WGSL 编译
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行 bundle 复原)
 
 第二验证阶段 — 经浏览器 WGSL 编译器的真实编译 — 以及 v5 的验证桩。
 

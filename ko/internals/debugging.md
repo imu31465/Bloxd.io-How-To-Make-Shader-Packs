@@ -1,6 +1,6 @@
 # 디버깅 도구
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · 대상 빌드: `bny9u` (2026-11-05, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](../troubleshooting/loading.md) 참조)
 - URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다

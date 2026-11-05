@@ -1,6 +1,6 @@
 # 그림자
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
+> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
 
 셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
 

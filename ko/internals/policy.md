@@ -1,16 +1,16 @@
 # 게임별 셰이더 팩 정책
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · 대상 빌드: `bny9u` (2026-11-05, 프로덕션) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
 
-- 근거 빌드: `szby6g.main.94a7596c.js` (2026-10-17 시점의 정식 배포). 전체 111 게임 정의를 정적으로 분석한 결과 **allow 26 엔트리 (12 타이틀) / strict 85 엔트리**. 같은 12개의 allow 리터럴이 같은 12개 타이틀에서 v3 프로덕션 번들 (`3ymzdd`, 2026-10-20) 과 v4 번들 (`cnty9`, 2026-10-27) 에서도 변경 없이 재확인되었다 — 아래 목록은 v3·v4에도 그대로 적용된다. 그리고 v5 빌드에서도 다시 불변: `ab90qa` (2026-11-03) 와 `xkg8x` (2026-11-04, allow 리터럴 12개 재계산) 에서 재확인했다 — 아래 목록은 v5 에도 그대로 적용된다.
+- 근거 빌드: `szby6g.main.94a7596c.js` (2026-10-17 시점의 정식 배포). 전체 111 게임 정의를 정적으로 분석한 결과 **allow 26 엔트리 (12 타이틀) / strict 85 엔트리**. 같은 12개의 allow 리터럴이 같은 12개 타이틀에서 v3 프로덕션 번들 (`3ymzdd`, 2026-10-20) 과 v4 번들 (`cnty9`, 2026-10-27) 에서도 변경 없이 재확인되었다 — 아래 목록은 v3·v4에도 그대로 적용된다. 그리고 v5 빌드에서도 다시 불변: `ab90qa` (2026-11-03) 와 `xkg8x` (2026-11-04, allow 리터럴 12개 재계산) 에서 재확인했다. `bny9u` (2026-11-05) 에서는 전체 열거를 다시 실행했다: 게임 정의 수는 111 에서 **115** 로, allow 측은 26 에서 **28 엔트리** 로 늘었다 — 타이틀 12개는 그대로이고 Test Gym 의 새 변형 2종 (Imported Mobs, Interest) 이 합류했다. 아래 목록은 v5 에도 그대로 적용된다.
 - `shaderPackPolicy` 보다 상위의 판정으로서 배포 채널 측의 게이트 (`canUseShaderPacks` 상당) 도 있어, 외부 포털 경유의 배포 (Coolmath Games 판 등) 에서는 `shaderPackPolicy` 의 판정에 이르기 전단에서 셰이더 팩 기구 자체가 무효화될 수 있다. 이하의 allow / strict 의 판별은 bloxd.io 본가 Web판의 해석에 근거한다.
 - allow 는 게임 정의 안의 직접 리터럴 8곳과 기저 변수 (`tb` / `kz` / `cb` / `Fb`) 4곳, 합계 12곳에서 선언되고, 베리언트는 스프레드 상속 (`{...tb,...}`) 으로 받는다. 베리언트 단위의 개별 덮어쓰기 (부모 allow·자식 strict 의 역 패턴) 는 현재 제로.
 
 allow 의 12 타이틀 (합계 26 엔트리):
 
-- **Test Gym** — 기본 + Empty / Mobs / Mobs & Worldgen / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles (합계 11 엔트리)
+- **Test Gym** — 기본 + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (합계 13 엔트리)
 - **Doodle Cube** — 기본 + Solos / Duos (합계 3)
 - **Rocket Obby** — 기본 + Sheep / January (합계 3)
 - **단독 타이틀 (9)**: Creative (`classic_creative`) / Bloxd Hop / Fishing / Dress Up / Evil Tower / Plots / Test Mode (`schematicTester`) / Tsunami Steal Brainrots / Work at a Restaurant (`cooking`)

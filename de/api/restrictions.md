@@ -1,6 +1,6 @@
 # Einschränkungen & reservierte Namen
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
+> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
 
 Was Pakete schreiben dürfen — und die vollständigen Regeln der Namensreservierung.
 

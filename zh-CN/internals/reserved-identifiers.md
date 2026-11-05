@@ -1,6 +1,6 @@
 # 保留标识符内部机制
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行 bundle 的生成器复原)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行 bundle 的生成器复原)
 
 `bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](../api/restrictions.md)。
 

@@ -1,6 +1,6 @@
 # Receitas de líquidos
 
-> API alvo: 5 · Build alvo: `xkg8x` (2026-11-04, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 ## Superfície ondulada (cintilação de cor)
 
 ```wgsl

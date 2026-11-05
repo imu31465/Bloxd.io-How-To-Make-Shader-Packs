@@ -1,26 +1,26 @@
 # Internas del registro de texturas
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 La maquinaria de resolución nombre→id y la deriva medida del registro. El catálogo orientado al usuario: [Catálogo de texturas](../api/texture-catalog.md).
 
 ## Metodología
 
-Ejecutamos el módulo constructor de registro del propio motor (29833 en este build, coordinando los módulos 1371 / 1391 / 1384 / 219) contra los datos de textura del registro de bloques distribuido dentro de un mini arnés de webpack y registramos su salida — estos números son **el cómputo del propio bundle de producción**, no una reimplementación.
+Ejecutamos el módulo constructor de registro del propio motor (29812 en este build, transportado por los chunks 52/53/54) contra los datos de textura del registro de bloques distribuido (módulo de datos 1351 en el bundle principal) contra los datos de textura del registro de bloques distribuido dentro de un mini arnés de webpack y registramos su salida — estos números son **el cómputo del propio bundle de producción**, no una reimplementación.
 
 ## Estructura de salida
 
 | Salida | v5 medida | Significado |
 |---|---|---|
-| `named` | **906** | nombres referenciables como `bloxdTextureId<Name>` |
-| `aliases` | 416 | grafías plegadas — 188 alias de fotograma (`lava0`…) y 228 alias de rotación (`chest_top[rot[1`…) |
-| `layers` | 228 | la tabla de capas — incluidas 171 ranuras prerrotadas (57 raíces × 4 rotaciones) |
+| `named` | **911** | nombres referenciables como `bloxdTextureId<Name>` |
+| `aliases` | 424 | grafías plegadas — 196 alias de fotograma (`lava0`…) y 228 alias de rotación (`chest_top[rot[1`…) |
+| `layers` | 1,232 | la tabla de capas completa del atlas — 911 raíces nombradas, 150 fotogramas extra de animación, 171 ranuras prerrotadas |
 
 ## Reglas de plegado
 
-- **familias de animación** (42): las grafías de fotograma (`lava0`–`lava7`) se pliegan al nombre base (`lava`); `bloxdTexel` devuelve el fotograma actual en el momento del muestreo
+- **familias de animación** (43): las grafías de fotograma (`lava0`–`lava7`) se pliegan al nombre base (`lava`); `bloxdTexel` devuelve el fotograma actual en el momento del muestreo
 - **familias de rotación** (57): las ranuras giradas (`[rot[1..4`) se pliegan al nombre raíz; `bloxdTexel` reaplica la `textureRotation` por cara
-- `radar_screen` es el único nombre en ambas familias (sus cuatro copias prerrotadas llevan cada una su propia escalera de 4 fotogramas — de ahí 45 raíces de animación en el atlas, no 42)
+- `radar_screen` es el único nombre en ambas familias (sus cuatro copias prerrotadas llevan cada una su propia escalera de 4 fotogramas — de ahí 46 raíces de animación en el atlas, no 43)
 
 ## Deriva (cnty9 → ab90qa)
 
@@ -45,6 +45,20 @@ La deriva completa (11 nombres): añadido (1) `scorpion_eggs`; eliminados (10) l
 | cambios de id entre nombres supervivientes | — | **376 de 896** |
 
 La deriva completa (10 nombres): añadidos (10) las ocho texturas del cofre doble más `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — cada nombre eliminado en el lanzamiento de v5 ha vuelto (el cofre doble regresó a los datos del juego; las variantes laterales del generador volvieron con él). No se eliminó nada.
+
+5 de noviembre (xkg8x → bny9u, 1 día): entradas 1,220 → 1,232 (+5: las texturas del Terminal de Intercambio ×3 y el Generador de Piedra ×2); 864 de 906 nombres cambiaron de id (95 %); sin eliminaciones; familias de rotación sin cambios, familias de animación 42 → 43 (`trading_terminal_front`, 8 fotogramas a 250 ms). Producción y preprod sirven el mismo bundle idéntico byte a byte.
+
+## Deriva (xkg8x → bny9u)
+
+| Medición | xkg8x (v5) | bny9u (v5, actual) |
+|---|---|---|
+| entradas del atlas | 1,220 | **1,232** |
+| familias de rotación (grafías giradas) | 57 (228) | **57 (228) — sin cambios** |
+| familias de animación (grafías de fotograma) | 42 (188) | **43 (196)** |
+| constantes con nombre utilizables | 906 | **911** |
+| cambios de id entre nombres supervivientes | — | **864 de 906** |
+
+La deriva completa (5 nombres): añadidos (5) `trading_terminal_front` (anim, 8 fotogramas) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top` — dos bloques nuevos (Terminal de Intercambio, Generador de Piedra) entraron en los datos del juego. No se eliminó nada; la rotación de ids es casi total (el 95 % de los supervivientes).
 
 
 ## Efecto sobre HEADER_VERSION

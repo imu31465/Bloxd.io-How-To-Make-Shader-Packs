@@ -1,6 +1,6 @@
 # दोषमार्जन टूल
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `xkg8x` (2026-11-04, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bny9u` (2026-11-05, production) · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
 - URL पैरामीटर `?renderer=lite` — Lite (WebGPU) रेंडरर पर मज़बूरी से चलाएँ (`webgl2` / `babylon` भी चलते हैं; `babylon`, webgl2 का पुराना नाम है)। प्राथमिकता: URL पैरामीटर > localStorage `bloxdRenderer` > सेटिंग्स स्क्रीन > डिफ़ॉल्ट (webgl2)। अमान्य मान चेतावनी के साथ नज़रअंदाज़ किए जाते हैं। URL या localStorage में छूटे रेंडरर-ओवरराइड WebGPU (lite) माँगने वाले scene तोड़ सकते हैं — "needs the new WebGPU renderer, so remove the renderer override..." ([लोडिंग त्रुटियाँ](../troubleshooting/loading.md))
 - URL पैरामीटर `?vconsole` — ऑन-स्क्रीन कंसोल (VConsole)। मोबाइल डिवाइस सत्यापन के लिए सुविधाजनक

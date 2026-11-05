@@ -1,6 +1,6 @@
 # Variants and guards
 
-> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Analyzed
+> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Analyzed
 
 ## 6 variants
 

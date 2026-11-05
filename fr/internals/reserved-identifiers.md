@@ -1,6 +1,6 @@
 # Intérieurs des identifiants réservés
 
-> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré depuis les générateurs du bundle en production)
+> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré depuis les générateurs du bundle en production)
 
 L'espace de noms `bloxdSp*` — des symboles que les générateurs peuvent injecter et que les packs ne peuvent donc pas redéclarer. Le résumé pour auteurs de packs : [Restrictions](../api/restrictions.md).
 

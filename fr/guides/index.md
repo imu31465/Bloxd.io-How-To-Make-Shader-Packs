@@ -18,4 +18,4 @@ Contenu « mécanismes et état d'esprit ». Ce qui est possible d'emblée figur
 | [Combiner avec des packs de textures](combinations.md) | l'appariement avec les packs de textures |
 | [Astuces de débogage](debugging.md) | diagnostics symptôme → cause |
 
-> API cible : 5 · Build cible : `xkg8x` (vérifié en production 2026-11-04)
+> API cible : 5 · Build cible : `bny9u` (vérifié en production 2026-11-05)

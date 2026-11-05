@@ -1,6 +1,6 @@
 # Variantes et gardes
 
-> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Analyzed
+> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Analyzed
 
 ## 6 variantes
 

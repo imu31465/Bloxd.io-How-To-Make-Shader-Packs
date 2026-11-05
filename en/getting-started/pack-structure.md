@@ -1,6 +1,6 @@
 # Pack structure
 
-> Target API: 5 · Target build: `xkg8x` · Status: Verified
+> Target API: 5 · Target build: `bny9u` · Status: Verified
 
 ## Distribution format
 

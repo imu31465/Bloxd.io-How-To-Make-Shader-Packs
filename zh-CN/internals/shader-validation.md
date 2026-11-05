@@ -1,6 +1,6 @@
 # 着色器验证
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行验证器复原)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行验证器复原)
 
 静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](../troubleshooting/validation.md)。
 

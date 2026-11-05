@@ -6,8 +6,8 @@ Un guide non officiel sur les shader packs du renderer WebGPU de Bloxd.io — de
 
 - API actuelle : **5** (`pack.json` doit déclarer `apiVersion: 5`)
 - Cible : renderer WebGPU
-- Dernière vérification : 2026-11-04
-- Build cible : `xkg8x.main.641a7732.js` (production, vérifié le 2026-11-04 ; preprod `2lcqcl` mesuré identique sur chaque surface de shader pack — registre, en-tête, hooks, limites)
+- Dernière vérification : 2026-11-05
+- Build cible : `bny9u.main.02116121.js` (production, vérifié le 2026-11-05 ; preprod sert le même bundle identique octet par octet, md5 `60eea80ec48253b7ac6cc45604dc8273` — registre, en-tête, hooks, limites remesurés)
 - Hooks de shader : 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). Cherchez-vous une fonction de l'API ? Voir la [Référence API](api/).
@@ -32,7 +32,7 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 ## Carte de la documentation
 
 - **[Premiers pas](getting-started/)** — vue d'ensemble, démarrage rapide, structure du pack, pack.json, les 9 hooks, variantes, validation, distribution. Un tutoriel en voie unique jusqu'à votre premier pack.
-- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 896 noms de textures.
+- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 911 noms de textures.
 - **[Guides](guides/)** — comment fonctionne l'éclairage, les ombres, l'eau, la nuit, le rendu des modèles, les performances, les concepts de réalisme.
 - **[Recettes](recipes/)** — exemples de code orientés objectif : couleurs, éclairage, émission, coordonnées, animation, liquides, sommets, maths, réalisme, shaders de modèle, effets d'enchantement.
 - **[Dépannage](troubleshooting/)** — résolution d'erreurs par symptôme : chargement, version d'API, compilation, validation, variantes, visuel, textures, éclairage, modèles, performances.

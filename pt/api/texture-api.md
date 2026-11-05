@@ -1,6 +1,6 @@
 # API de texturas
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Verified (API inalterada desde a v4, reconfirmada no build da v5)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Verified (API inalterada desde a v4, reconfirmada no build da v5)
 
 A API para ler as texturas do próprio jogo: duas funções, uma família de constantes nomeadas e quatro campos de entrada. A frase de uma linha do próprio cabeçalho: *"This face's texture. Compare with `bloxdTextureId*`."*
 

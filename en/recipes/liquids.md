@@ -1,6 +1,6 @@
 # Liquids
 
-> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 ## Rippling surface (color shimmer)
 
 ```wgsl

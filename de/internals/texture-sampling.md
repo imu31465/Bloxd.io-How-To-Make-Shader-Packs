@@ -1,6 +1,6 @@
 # Textur-Sampling-Interna
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
+> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Analyzed (aus dem Live-Generator restauriert, c56)
 
 Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — der 3-Varianten-Textur-Codegen. Die Nutzerseite: [Textur-API](../api/texture-api.md).
 
@@ -43,7 +43,7 @@ Code, der für den echten Atlas geschrieben ist, kompiliert und läuft auch hier
 
 ## Die Animationsrahmen-Leiter
 
-Animierte Texturen (42 Familien) rücken in festen pro-Familie-Intervallen (200 / 250 / 300 ms — die Intervall-Spalte im [Texturkatalog](../api/texture-catalog.md#animationsfamilien-42-namen)). Eine Animationsfamilien-id an `bloxdTexel` zu übergeben sampelt den aktuellen Rahmen.
+Animierte Texturen (42 Familien) rücken in festen pro-Familie-Intervallen (200 / 250 / 300 ms — die Intervall-Spalte im [Texturkatalog](../api/texture-catalog.md#animationsfamilien-43-namen)). Eine Animationsfamilien-id an `bloxdTexel` zu übergeben sampelt den aktuellen Rahmen.
 
 ## Sampler-Einstellungen
 

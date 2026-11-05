@@ -18,4 +18,4 @@ Exemplos de código orientados a objetivo. O lado do "como funciona" vive em [Gu
 | [Shaders de modelo](model-shaders.md) | v5 — itens na mão, skins, vaivém de plantas |
 | [Efeitos de encantamento](enchant-effects.md) | v5 — remover, reforçar e recolorir o brilho |
 
-> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified (portes v5 das receitas originais — verifique ainda assim com compilação no jogo antes de distribuir)
+> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Verified (portes v5 das receitas originais — verifique ainda assim com compilação no jogo antes de distribuir)

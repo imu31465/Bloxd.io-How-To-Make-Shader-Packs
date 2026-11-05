@@ -1,6 +1,6 @@
 # 팩 구조
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Verified
+> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Verified
 
 ## 배포 형식
 

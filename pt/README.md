@@ -6,8 +6,8 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 
 - API atual: **5** (o `pack.json` deve declarar `apiVersion: 5`)
 - Alvo: renderizador WebGPU
-- Última verificação: 2026-11-04
-- Build alvo: `xkg8x.main.641a7732.js` (produção, verificado em 2026-11-04; preprod `2lcqcl` medido idêntico em todas as superfícies de shader packs — registro, cabeçalho, hooks, limites)
+- Última verificação: 2026-11-05
+- Build alvo: `bny9u.main.02116121.js` (produção, verificado em 2026-11-05; preprod serve o mesmo bundle idêntico byte a byte, md5 `60eea80ec48253b7ac6cc45604dc8273` — registro, cabeçalho, hooks, limites remedidos)
 - Hooks de shader: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultando a API? Veja [Referência da API](api/).
@@ -32,7 +32,7 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 ## Mapa da documentação
 
 - **[Primeiros passos](getting-started/)** — visão geral, início rápido, estrutura do pacote, pack.json, os 9 hooks, variantes, validação, distribuição. Um tutorial de pista única até seu primeiro pack.
-- **[Referência da API](api/)** — a especificação sistemática da v5: hooks, flags, estruturas de entrada/saída, todas as funções, iluminação, API de texturas, constantes, pré-processador, restrições, compatibilidade e o catálogo de 896 nomes.
+- **[Referência da API](api/)** — a especificação sistemática da v5: hooks, flags, estruturas de entrada/saída, todas as funções, iluminação, API de texturas, constantes, pré-processador, restrições, compatibilidade e o catálogo de 911 nomes.
 - **[Guias](guides/)** — como funciona a iluminação, sombras, água, noite, renderização de modelos, desempenho, conceitos de realismo.
 - **[Receitas](recipes/)** — exemplos de código orientados a objetivo: cores, iluminação, emissão, coordenadas, animação, líquidos, vértices, matemática, realismo, shaders de modelo, efeitos de encantamento.
 - **[Solução de problemas](troubleshooting/)** — resolução de erros por sintoma: carregamento, versão de API, compilação, validação, variantes, visual, texturas, iluminação, modelos, desempenho.

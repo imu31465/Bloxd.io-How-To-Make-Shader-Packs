@@ -18,4 +18,4 @@ Ejemplos de código orientados a objetivo. El lado del «cómo funciona» vive e
 | [Sombreadores de modelo](model-shaders.md) | v5 — ítems en mano, pieles, vaivén de plantas |
 | [Efectos de encantamiento](enchant-effects.md) | v5 — quitar, reforzar y recolorear el brillo |
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (puertos a v5 de las recetas originales — verifica aún con compilación en el juego antes de distribuir)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (puertos a v5 de las recetas originales — verifica aún con compilación en el juego antes de distribuir)

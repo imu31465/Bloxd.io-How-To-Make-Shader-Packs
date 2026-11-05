@@ -1,6 +1,6 @@
 # Structure du pack
 
-> API cible : 5 · Build cible : `xkg8x` · État : Verified
+> API cible : 5 · Build cible : `bny9u` · État : Verified
 
 ## Format de distribution
 

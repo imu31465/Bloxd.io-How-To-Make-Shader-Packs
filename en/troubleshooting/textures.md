@@ -1,6 +1,6 @@
 # Texture issues
 
-> Target API: 5 · Target build: `xkg8x` · Status: Verified (messages recorded verbatim from the live validator)
+> Target API: 5 · Target build: `bny9u` · Status: Verified (messages recorded verbatim from the live validator)
 
 Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
 
@@ -14,7 +14,7 @@ Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [t
 
 - **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
 - **Fix**: use the base name — sampling returns the current frame automatically
-- **Prevention**: never write frame suffixes for the 42 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
+- **Prevention**: never write frame suffixes for the 43 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 

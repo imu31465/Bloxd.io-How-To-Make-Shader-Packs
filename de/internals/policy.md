@@ -1,16 +1,16 @@
 # Shader-Pack-Richtlinien je Spiel
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
 
 Diese Seite legt fest, was „allow / strict" auf Titelebene bedeutet. Nur Titel, deren Spieldefinition ausdrücklich `shaderPackPolicy: "allow"` enthält, laufen im vollen Modus (Vertex-Hooks, `discard`, Terrain-`alpha`); Titel ohne Angabe (oder mit einem anderen Wert) sind strict — `BLOXD_STRICT` wird definiert, umschlossener Code automatisch deaktiviert. Das Paket kann dies nicht selbst wählen; zu wissen, in welchen Titeln was läuft, ist Voraussetzung für das Verteilen.
 
-- Referenz-Build: `szby6g.main.94a7596c.js` (Produktions-Deployment zum 2026-10-17). Statische Auswertung aller 111 Spieldefinitionen: **26 allow-Einträge (12 Titel) / 85 strict-Einträge**. Dieselben 12 allow-Literale in denselben 12 Titeln wurden im v3-Produktions-Bundle (`3ymzdd`, 2026-10-20) unverändert erneut bestätigt und nochmals im v4-Bundle (`cnty9`, 2026-10-27) — die folgende Liste gilt wortgleich auch für v3 und v4. Und an den v5-Builds erneut unverändert bestätigt auf `ab90qa` (2026-11-03) und `xkg8x` (2026-11-04, 12 allow-Literale nachgezählt) — die Liste unten gilt wortwörtlich auch für v5.
+- Referenz-Build: `szby6g.main.94a7596c.js` (Produktions-Deployment zum 2026-10-17). Statische Auswertung aller 111 Spieldefinitionen: **26 allow-Einträge (12 Titel) / 85 strict-Einträge**. Dieselben 12 allow-Literale in denselben 12 Titeln wurden im v3-Produktions-Bundle (`3ymzdd`, 2026-10-20) unverändert erneut bestätigt und nochmals im v4-Bundle (`cnty9`, 2026-10-27) — die folgende Liste gilt wortgleich auch für v3 und v4. Und an den v5-Builds erneut unverändert bestätigt auf `ab90qa` (2026-11-03) und `xkg8x` (2026-11-04, 12 allow-Literale nachgezählt). Auf `bny9u` (2026-11-05) wurde die vollständige Aufzählung erneut durchlaufen: die Zahl der Spieldefinitionen wuchs von 111 auf **115**, die allow-Seite von 26 auf **28 Einträge** — weiterhin dieselben 12 Titel, ergänzt um zwei neue Test-Gym-Varianten (Imported Mobs, Interest). Die Liste unten gilt wortwörtlich auch für v5.
 - Oberhalb von `shaderPackPolicy` gibt es ein Gate auf Auslieferungskanal-Ebene (grob `canUseShaderPacks`): Über externe Portale (z. B. Coolmath-Games-Builds) kann das Shader-Paket-System selbst deaktiviert sein, bevor `shaderPackPolicy` überhaupt konsultiert wird. Die Allow/Strict-Analyse unten basiert auf dem bloxd.io-Haupt-Web-Build.
 - allow wird an 12 Stellen deklariert: 8 direkte Literale in den Spieldefinitionen und 4 Basisvariablen (`tb` / `kz` / `cb` / `Fb`); Varianten erben über Spread (`{...tb,...}`). Eine Übersteuerung pro Variante (Eltern-allow / Kind-strict) gibt es derzeit nicht.
 
 Die 12 allow-Titel (insgesamt 26 Einträge):
 
-- **Test Gym** — Basis + Empty / Mobs / Mobs & Worldgen / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles (insgesamt 11 Einträge)
+- **Test Gym** — Basis + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (insgesamt 13 Einträge)
 - **Doodle Cube** — Basis + Solos / Duos (3)
 - **Rocket Obby** — Basis + Sheep / January (3)
 - **9 Einzeltitel**: Creative (`classic_creative`) / Bloxd Hop / Fishing / Dress Up / Evil Tower / Plots / Test Mode (`schematicTester`) / Tsunami Steal Brainrots / Work at a Restaurant (`cooking`)

@@ -1,6 +1,6 @@
 # Texture sampling internals
 
-> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored from the live generator, c56)
+> Target API: 5 · Target build: `bny9u` · Status: Analyzed (restored from the live generator, c56)
 
 How `bloxdTexel` / `bloxdTextureSize` actually compile — the 3-variant texture codegen. The user side: [Texture API](../api/texture-api.md).
 
@@ -43,7 +43,7 @@ Code written for the real atlas still compiles and runs here — it just sees wh
 
 ## The animation frame ladder
 
-Animated textures (42 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](../api/texture-catalog.md#animation-families-42-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
+Animated textures (43 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](../api/texture-catalog.md#animation-families-43-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
 
 ## Sampler settings
 

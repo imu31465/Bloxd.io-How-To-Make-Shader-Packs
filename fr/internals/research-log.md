@@ -21,7 +21,8 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 | `cnty9` | v4 | 2026-10-27 | preuve du guide v4 & du catalogue à 905 noms |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmation du gel de la v4 (événement Halloween + refonte de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | build de lancement de la v5 ; base de référence d'origine de la v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | **actuel** ; référence de cette documentation. main de prod ≠ main de preprod (`2lcqcl`), mais chaque surface de shader pack mesurée identique |
+| `xkg8x` | **v5** | 2026-11-04 | dérive du registre (+10 noms) ; preprod `2lcqcl` mesurée identique sur chaque surface de shader pack |
+| `bny9u` | **v5** | 2026-11-05 | **actuel** ; référence de cette documentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` sur le bundle principal, récupéré en direct depuis les deux hôtes) |
 
 ## Méthodologie clé
 
@@ -31,9 +32,9 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 
 ### Recalcul du registre de textures
 
-Exécution des modules de construction du registre du moteur (29833 + 1371 + 1391 + 1384 + 219) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal ; enregistrement de la sortie (named 906 / aliases 416 / layers 228 sur le build actuel `xkg8x`, 2026-11-04 — modules 30093 + 1391 ; 896 au lancement de la v5) ([Registre des textures](texture-registry.md)).
+Exécution du module de construction du registre du moteur (29812, porté par les chunks 52/53/54) sur les données de textures (module de données 1351 dans le bundle principal) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal ; enregistrement de la sortie (named 911 / aliases 424 / atlas 1 232 sur le build actuel `bny9u`, 2026-11-05 — module 29812 + module de données 1351 ; 906 / 416 / 1 220 sur `xkg8x` via modules 30093 + 1391 ; 896 au lancement de la v5) ([Registre des textures](texture-registry.md)).
 
-Les intervalles d'animation viennent de la table façon `animDataPerTex` (`numAnimStates` / `animationInterval` par couche) — seules trois valeurs d'intervalle existent : 200 / 250 / 300 ms ([le catalogue](../api/texture-catalog.md#familles-danimation-42-noms)).
+Les intervalles d'animation viennent de la table façon `animDataPerTex` (`numAnimStates` / `animationInterval` par couche) — seules trois valeurs d'intervalle existent : 200 / 250 / 300 ms ([le catalogue](../api/texture-catalog.md#familles-danimation-43-noms)).
 
 ### Capture des messages d'erreur
 
@@ -54,6 +55,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 | sjr0p7 → cnty9 | 10 jours | 98 ajoutés, 79 retirés ; 779/1121 noms ont changé d'id (69 %) |
 | cnty9 → ab90qa | 7 jours | +1 (scorpion_eggs), −10 (coffre double ×8, côtés de spawner ×2) ; 334/905 noms ont changé d'id |
 | ab90qa → xkg8x | 1 jour | +10 (tous les retraits du lancement de v5 sont revenus : coffre double ×8, côtés de spawner ×2) ; 376/896 noms ont changé d'id ; aucun retiré |
+| xkg8x → bny9u | 1 jour | +5 (Terminal d'Échange ×3, Générateur de Pierre ×2) ; 864/906 noms ont changé d'id (95 %) ; aucun retiré ; familles d'animation 42 → 43 |
 
 ## Non vérifié / spéculatif
 
@@ -63,7 +65,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 
 ## Quand revérifier
 
-À la détection d'une mise à jour du jeu (un nouveau hash de main.js) : revérifier l'en-tête (9 125 o), la constante apiVersion, recalculer le registre et reconfirmer la liste allow/strict. La méthodologie de surveillance détaillée sort du périmètre de cette documentation, mais les emplacements de modules ci-dessus (c55 / c116 / c56) sont les points de départ.
+À la détection d'une mise à jour du jeu (un nouveau hash de main.js) : revérifier l'en-tête (9 125 o), la constante apiVersion, recalculer le registre et reconfirmer la liste allow/strict. La méthodologie de surveillance détaillée sort du périmètre de cette documentation, mais les emplacements de modules ci-dessus (c55 / c116 / c56) étaient les points de départ — sur `bny9u` : module header/apiVersion 29815 et modules validateurs dans le chunk c56, chargeur (zip/manifeste/limites) module 32942 dans le chunk c54, constructeur du registre 29812 dans les chunks c52/c53/c54, codegen WebGPU chunk c57, gabarit de pack par défaut module 33350 dans le chunk c122, module jeux/politique 517 dans le bundle principal.
 
 ## Voir aussi
 

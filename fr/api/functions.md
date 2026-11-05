@@ -1,6 +1,6 @@
 # Fonctions
 
-> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 Toutes les fonctions de l'en-tête. L'API de textures (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) est couverte dans [API de textures](texture-api.md), tout comme `bloxdOpaqueBehind`.
 

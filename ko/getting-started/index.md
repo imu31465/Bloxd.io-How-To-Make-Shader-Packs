@@ -14,6 +14,6 @@
 8. [검증](validation.md) — 3단계 로드 검사와 실기기 테스트
 9. [배포](distribution.md) — zipping 과 릴리스 위생
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified/Analyzed
+> 대상 API: 5 · 대상 빌드: `bny9u` (2026-11-05, 프로덕션 확인) · 상태: Verified/Analyzed
 
 전체 사양이 필요하면 [API 레퍼런스](../api/) 로, 완성품 효과는 [레시피](../recipes/) 로 계속하라.

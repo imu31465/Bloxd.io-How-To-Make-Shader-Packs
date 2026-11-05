@@ -21,7 +21,8 @@ The technical statements here rest not on official developer documentation but o
 | `cnty9` | v4 | 2026-10-27 | v4 guide & 905-name catalog evidence |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
 | `ab90qa` | **v5** | 2026-11-03 | v5 launch build; original v5 baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | **current**; this documentation's baseline. prod main ≠ preprod main (preprod `2lcqcl`) but every shader-pack surface measured identical |
+| `xkg8x` | **v5** | 2026-11-04 | registry drift (+10 names); preprod `2lcqcl` measured identical on every shader-pack surface |
+| `bny9u` | **v5** | 2026-11-05 | **current**; this documentation's baseline. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` on the main bundle, live-fetched from both hosts) |
 
 ## Key methodology
 
@@ -31,9 +32,9 @@ Rendering the c55 header template with its live interpolations (`${vC}` = apiVer
 
 ### Texture-registry recomputation
 
-Running the engine's registry-building modules (29833 + 1371 + 1391 + 1384 + 219) against the shipped block registry's texture data in a mini webpack harness; recording the output (named 906 / aliases 416 / layers 228 on the current build `xkg8x`, 2026-11-04 — modules 30093 + 1391; 896 at the v5 launch) ([Texture registry](texture-registry.md)).
+Running the engine's registry-building module (29812, carried by chunks 52/53/54) against the shipped block registry's texture data (data module 1351 in the main bundle) in a mini webpack harness; recording the output (named 911 / aliases 424 / atlas 1,232 on the current build `bny9u`, 2026-11-05; 906 / 416 / 1,220 on `xkg8x` via modules 30093 + 1391; 896 at the v5 launch) ([Texture registry](texture-registry.md)).
 
-Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-42-names)).
+Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-43-names)).
 
 ### Error-message capture
 
@@ -54,6 +55,7 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 | sjr0p7 → cnty9 | 10 days | 98 added, 79 removed; 779/1121 names changed id (69%) |
 | cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
 | ab90qa → xkg8x | 1 day | +10 (all v5-launch removals returned: double chest ×8, spawner sides ×2); 376/896 names changed id; none removed |
+| xkg8x → bny9u | 1 day | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 names changed id (95%); none removed; anim families 42 → 43 |
 
 ## Unverified / speculative
 
@@ -63,7 +65,7 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 
 ## When to re-verify
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above (c55 / c116 / c56) are the starting points.
+On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above are the starting points — on `bny9u`: header/apiVersion module 29815 and validator modules in chunk c56, loader (zip/manifest/limits) module 32942 in chunk c54, registry builder 29812 in chunks c52/c53/c54, WebGPU codegen chunk c57, default pack template module 33350 in chunk c122, games/policy module 517 in the main bundle.
 
 ## Related
 

@@ -21,7 +21,8 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 | `cnty9` | v4 | 2026-10-27 | Evidenz des v4-Leitfadens & des 905-Namen-Katalogs |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
 | `ab90qa` | **v5** | 2026-11-03 | v5-Start-Build; ursprüngliche v5-Basislinie. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | **aktuell**; Baseline dieser Dokumentation. prod-Haupt-Bundle ≠ preprod (`2lcqcl`), aber jede Shader-Pack-Oberfläche identisch gemessen |
+| `xkg8x` | **v5** | 2026-11-04 | Registry-Drift (+10 Namen); preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen |
+| `bny9u` | **v5** | 2026-11-05 | **aktuell**; Baseline dieser Dokumentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` auf dem Haupt-Bundle, live von beiden Hosts geladen) |
 
 ## Kern-Methodik
 
@@ -31,9 +32,9 @@ Rendern der c55-Header-Vorlage mit ihren Live-Interpolationen (`${vC}` = apiVers
 
 ### Textur-Registry-Neuberechnung
 
-Laufenlassen der Registry-Bau-Module der Engine (29833 + 1371 + 1391 + 1384 + 219) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 906 / aliases 416 / layers 228 auf dem aktuellen Build `xkg8x`, 2026-11-04 — Module 30093 + 1391; beim v5-Start 896) ([Textur-Registry](texture-registry.md)).
+Laufenlassen des Registry-Bau-Moduls der Engine (29812, getragen von den Chunks 52/53/54) gegen die Texturdaten (Datenmodul 1351 im Haupt-Bundle) gegen die Texturdaten des ausgelieferten Block-Registry in einem Mini-Webpack-Harness; Aufzeichnen der Ausgabe (named 911 / aliases 424 / Atlas 1.232 auf dem aktuellen Build `bny9u`, 2026-11-05 — Modul 29812 + Datenmodul 1351; 906 / 416 / 1.220 auf `xkg8x` via Module 30093 + 1391; 896 beim v5-Start) ([Textur-Registry](texture-registry.md)).
 
-Die Animationsintervalle stammen aus der `animDataPerTex`-artigen Tabelle (pro Layer `numAnimStates` / `animationInterval`) — es existieren nur drei Intervallwerte: 200 / 250 / 300 ms ([der Katalog](../api/texture-catalog.md#animationsfamilien-42-namen)).
+Die Animationsintervalle stammen aus der `animDataPerTex`-artigen Tabelle (pro Layer `numAnimStates` / `animationInterval`) — es existieren nur drei Intervallwerte: 200 / 250 / 300 ms ([der Katalog](../api/texture-catalog.md#animationsfamilien-43-namen)).
 
 ### Fehlermeldungs-Erfassung
 
@@ -54,6 +55,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 | sjr0p7 → cnty9 | 10 Tage | 98 hinzugekommen, 79 entfernt; 779/1121 Namen änderten die id (69 %) |
 | cnty9 → ab90qa | 7 Tage | +1 (`scorpion_eggs`), −10 (Doppel-Truhe ×8, Spawner-Seiten ×2); 334/905 Namen änderten die id |
 | ab90qa → xkg8x | 1 Tag | +10 (alle v5-Start-Entfernungen kehrten zurück: Double-Chest ×8, Spawner-Seiten ×2); 376/896 Namen änderten die id; keine entfernt |
+| xkg8x → bny9u | 1 Tag | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 Namen änderten die id (95 %); keine entfernt; Animationsfamilien 42 → 43 |
 
 ## Unverifiziert / spekulativ
 
@@ -63,7 +65,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 
 ## Wann neu zu verifizieren ist
 
-Beim Erkennen eines Spiel-Updates (ein neuer main.js-Hash): den Header (9.125 B) prüfen, die apiVersion-Konstante, die Registry neu berechnen und die allow/strict-Liste erneut bestätigen. Die detaillierte Monitoring-Methodik liegt außerhalb des Umfangs dieser Dokumentation, aber die oben genannten Modul-Orte (c55 / c116 / c56) sind die Ausgangspunkte.
+Beim Erkennen eines Spiel-Updates (ein neuer main.js-Hash): den Header (9.125 B) prüfen, die apiVersion-Konstante, die Registry neu berechnen und die allow/strict-Liste erneut bestätigen. Die detaillierte Monitoring-Methodik liegt außerhalb des Umfangs dieser Dokumentation, aber die oben genannten Modul-Orte (c55 / c116 / c56) waren die Ausgangspunkte — auf `bny9u`: Header/apiVersion-Modul 29815 und Validatormodule in Chunk c56, Loader (Zip/Manifest/Limits) Modul 32942 in Chunk c54, Registry-Builder 29812 in den Chunks c52/c53/c54, WebGPU-Codegen Chunk c57, Standard-Pack-Vorlage Modul 33350 in Chunk c122, Spiele-/Policy-Modul 517 im Haupt-Bundle.
 
 ## Verwandte Seiten
 

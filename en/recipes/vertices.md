@@ -1,6 +1,6 @@
 # Vertices (allow only)
 
-> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Verified (ported to the current API — on-device re-check recommended)
 > Wrap everything in `#ifndef BLOXD_STRICT`.
 > For exact conditions (the allow title list; Custom Games being strict) see [Per-game shader-pack policy](../internals/policy.md)
 

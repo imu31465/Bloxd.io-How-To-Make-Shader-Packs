@@ -1,6 +1,6 @@
 # Intérieurs de l'éclairage
 
-> API cible : 5 · Build cible : `xkg8x` (2026-11-04, production) · État : Analyzed (analyse JavaScript du bundle de production)
+> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Analyzed (analyse JavaScript du bundle de production)
 
 `blockLight` est une **lumière colorée** à trois canaux RVB. Chaque bloc émetteur définit une couleur d'émission `[R, G, B]` (0–15 chacun) reprise telle quelle comme couleur de lumière (torche normale = blanc chaud (14,14,12) / lave = orange (14,8,2) / beacon = cyan (5,14,14) / torche blanche = (15,15,15), etc.). À l'étage vertex elle arrive empaquetée en 4 nibbles — r / g / b / sky — dans un seul attribut flottant. Traiter les trois canaux séparément dans le hook light permet l'éclairage local coloré — la recette de torche chaude (R9.1) est calibrée sur ce comportement.
 

@@ -1,6 +1,6 @@
 # Internas de los identificadores reservados
 
-> API objetivo: 5 · Build objetivo: `xkg8x` · Estado: Analyzed (restaurado de los generadores del bundle en vivo)
+> API objetivo: 5 · Build objetivo: `bny9u` · Estado: Analyzed (restaurado de los generadores del bundle en vivo)
 
 El espacio de nombres `bloxdSp*` — símbolos que los generadores pueden inyectar y que los paquetes por tanto no pueden redeclarar. El resumen para autores de paquetes: [Restricciones](../api/restrictions.md).
 

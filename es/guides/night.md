@@ -1,6 +1,6 @@
 # Diseñar looks nocturnos
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 Oscurecer solo sombras deja el color terminado (`engineColour`) brillante sin sol, y el salto cara/sombra se vuelve antinatural. Atenúa todo el color terminado.
 

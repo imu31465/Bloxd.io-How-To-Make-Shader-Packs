@@ -1,6 +1,6 @@
 # 阴影
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
 
 着色器包里做出「阴影」的三种方式，以及它们的极限。
 

@@ -1,6 +1,6 @@
 # Hacer que el agua parezca natural
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 Esta API no puede muestrear color de escena, así que esto es **estilizado pseudo con mezcla de color fresnel e iluminaciones solares, no reflejo/refracción reales** (el cálculo de profundidad usa el `bloxdOpaqueBehind()` exclusivo de líquidos — la receta de absorción por grosor está más abajo en esta página). La muestra conserva el color base, mezcla un poco hacia un color cielo en ángulos rasantes y añade un pequeño destello solo cuando existe el sol.
 

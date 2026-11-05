@@ -6,8 +6,8 @@ An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from cr
 
 - Current API: **5** (`pack.json` must declare `apiVersion: 5`)
 - Target: WebGPU renderer
-- Last verified: 2026-11-04
-- Target build: `xkg8x.main.641a7732.js` (production, verified 2026-11-04; preprod `2lcqcl` measured identical on every shader-pack surface — registry, header, hooks, limits)
+- Last verified: 2026-11-05
+- Target build: `bny9u.main.02116121.js` (production, verified 2026-11-05; preprod serves the same byte-identical bundle, md5 `60eea80ec48253b7ac6cc45604dc8273` — registry, header, hooks, limits re-measured)
 - Shader hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 New to shader packs? Start with [Getting Started](getting-started/). Looking up the API? Start with [API Reference](api/).
@@ -32,7 +32,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 ## Documentation map
 
 - **[Getting Started](getting-started/)** — overview, quick start, pack structure, pack.json, the 9 hooks, variants, validation, distribution. A single-track tutorial to your first pack.
-- **[API Reference](api/)** — the systematic v5 specification: hooks, flags, input/output structures, all functions, lighting, texture API, constants, preprocessor, restrictions, compatibility, and the 896-name texture catalog.
+- **[API Reference](api/)** — the systematic v5 specification: hooks, flags, input/output structures, all functions, lighting, texture API, constants, preprocessor, restrictions, compatibility, and the 911-name texture catalog.
 - **[Guides](guides/)** — how lighting works, shadows, water, night, model rendering, performance, realism concepts.
 - **[Recipes](recipes/)** — goal-oriented code examples: colors, lighting, emission, coordinates, animation, liquids, vertices, math, realism, model shaders, enchant effects.
 - **[Troubleshooting](troubleshooting/)** — symptom-driven error resolution: loading, API version, compilation, validation, variants, visual, texture, lighting, model, performance.

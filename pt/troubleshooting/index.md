@@ -18,7 +18,7 @@ Erros e problemas visuais, localizáveis **por sintoma**. As páginas seguem a e
 | Lento / descartado pela verificação no dispositivo | [Desempenho](performance.md) |
 | Jurídico, segurança, perguntas comuns | [FAQ](faq.md) |
 
-> API alvo: 5 · Build alvo: `xkg8x` (verificado em produção 2026-11-04) · Estado: Verified (mensagens registradas literalmente do validador e do carregador em produção)
+> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Verified (mensagens registradas literalmente do validador e do carregador em produção)
 
 ## Onde os erros aparecem
 

@@ -1,6 +1,6 @@
 # Функции
 
-> Целевой API: 5 · Целевой билд: `xkg8x` · Статус: Analyzed (восстановлен дословно из живого заголовка)
+> Целевой API: 5 · Целевой билд: `bny9u` · Статус: Analyzed (восстановлен дословно из живого заголовка)
 
 Все функции заголовка. Текстурный API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) разобран в [API текстур](texture-api.md) — вместе с `bloxdOpaqueBehind`.
 

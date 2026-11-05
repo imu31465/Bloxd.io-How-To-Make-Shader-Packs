@@ -1,6 +1,6 @@
 # Problèmes de textures
 
-> API cible : 5 · Build cible : `xkg8x` · État : Verified (messages relevés verbatim depuis le validateur en production)
+> API cible : 5 · Build cible : `bny9u` · État : Verified (messages relevés verbatim depuis le validateur en production)
 
 Problèmes autour de `bloxdTextureId*` / `bloxdTexel`. Cherchez parmi les 896 noms dans le [catalogue de textures](../api/texture-catalog.md).
 
@@ -14,7 +14,7 @@ Problèmes autour de `bloxdTextureId*` / `bloxdTexel`. Cherchez parmi les 896 no
 
 - **Cause** : écrire un **numéro d'image** sur une texture animée (`lava0` etc.)
 - **Correction** : utilisez le nom de base — l'échantillonnage renvoie automatiquement l'image courante
-- **Prévention** : n'écrivez jamais de suffixes d'image pour les 42 familles d'animation ([nommage](../api/texture-api.md#règles-dorthographe-et-liberté-de-nommage))
+- **Prévention** : n'écrivez jamais de suffixes d'image pour les 43 familles d'animation ([nommage](../api/texture-api.md#règles-dorthographe-et-liberté-de-nommage))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 

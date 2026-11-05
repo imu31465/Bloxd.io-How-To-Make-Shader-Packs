@@ -1,6 +1,6 @@
 # Pack format
 
-> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified (re-measured on the live loader)
+> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified (re-measured on the live loader)
 
 The whole pack model on one page — manifest, loader limits, per-frame uniform. For the step-by-step version see [Getting Started](../getting-started/manifest.md).
 

@@ -1,6 +1,6 @@
 # Interior del motor e investigación
 
-Especificaciones internas restauradas analizando la implementación del motor. Todo lo que hay aquí se recuperó directamente del JavaScript del build de producción vigente (`xkg8x`). Separado de la documentación de la API pública ([Referencia de la API](../api/)) para preservar el comportamiento interno exacto y los resultados del análisis.
+Especificaciones internas restauradas analizando la implementación del motor. Todo lo que hay aquí se recuperó directamente del JavaScript del build de producción vigente (`bny9u`). Separado de la documentación de la API pública ([Referencia de la API](../api/)) para preservar el comportamiento interno exacto y los resultados del análisis.
 
 ## Mapa
 
@@ -24,6 +24,6 @@ Especificaciones internas restauradas analizando la implementación del motor. T
 | [Depuración](debugging.md) | parámetros de URL, paneles de estadísticas |
 | [Registro de investigación](research-log.md) | metodología, historia de builds, elementos sin verificar |
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción)
 
 Las internas no son un contrato de API estable — pueden cambiar con las actualizaciones del motor, y cada página nombra su build de evidencia ([registro de investigación](research-log.md)).

@@ -1,6 +1,6 @@
 # 셰이더 검증의 내부
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 검증기에서 복원)
+> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Analyzed (라이브 검증기에서 복원)
 
 정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](../troubleshooting/validation.md).
 

@@ -1,6 +1,6 @@
 # Intérieurs du moteur et recherche
 
-Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`xkg8x`). Séparé de la documentation d'API publique ([Référence API](../api/)) pour préserver le comportement interne exact et les résultats d'analyse.
+Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`bny9u`). Séparé de la documentation d'API publique ([Référence API](../api/)) pour préserver le comportement interne exact et les résultats d'analyse.
 
 ## Plan
 
@@ -24,6 +24,6 @@ Spécifications internes restaurées en analysant l'implémentation du moteur. T
 | [Débogage](debugging.md) | paramètres URL, panneaux de statistiques |
 | [Journal de recherche](research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
 
-> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04)
+> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05)
 
 Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](research-log.md)).

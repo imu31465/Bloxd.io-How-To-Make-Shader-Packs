@@ -1,6 +1,6 @@
 # 纹理问题
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Verified (消息逐字采录自现行验证器)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Verified (消息逐字采录自现行验证器)
 
 围绕 `bloxdTextureId*` / `bloxdTexel` 的问题。全部 896 个名称可在[纹理目录](../api/texture-catalog.md)中搜索。
 
@@ -14,7 +14,7 @@
 
 - **原因**: 给动画纹理写了**帧号** (`lava0` 等)
 - **修复**: 用基础名称 — 采样会自动返回当前帧
-- **预防**: 42 个动画族永远不要写帧号后缀 ([命名](../api/texture-api.md#拼写规则与命名自由度))
+- **预防**: 43 个动画族永远不要写帧号后缀 ([命名](../api/texture-api.md#拼写规则与命名自由度))
 
 ## 「...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...」
 

@@ -6,8 +6,8 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 
 - API actual: **5** (`pack.json` debe declarar `apiVersion: 5`)
 - Objetivo: renderizador WebGPU
-- Última verificación: 2026-11-04
-- Build objetivo: `xkg8x.main.641a7732.js` (producción, verificado el 2026-11-04; preprod `2lcqcl` medido idéntico en todas las superficies de shader packs — registro, cabecera, hooks, límites)
+- Última verificación: 2026-11-05
+- Build objetivo: `bny9u.main.02116121.js` (producción, verificado el 2026-11-05; preprod sirve el mismo bundle idéntico byte a byte, md5 `60eea80ec48253b7ac6cc45604dc8273` — registro, cabecera, hooks, límites remedidos)
 - Hooks de sombreado: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 ¿Nuevo con los shader packs? Empieza por [Primeros pasos](getting-started/). ¿Consultas de la API? Mira [Referencia de la API](api/).
@@ -32,7 +32,7 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 ## Mapa de la documentación
 
 - **[Primeros pasos](getting-started/)** — visión general, inicio rápido, estructura del pack, pack.json, los 9 hooks, variantes, validación, distribución. Un tutorial de vía única hasta tu primer pack.
-- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 896 nombres.
+- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 911 nombres.
 - **[Guías](guides/)** — cómo funciona la iluminación, sombras, agua, noche, renderizado de modelos, rendimiento, conceptos de realismo.
 - **[Recetas](recipes/)** — ejemplos de código orientados a objetivo: colores, iluminación, emisión, coordenadas, animación, líquidos, vértices, matemáticas, realismo, sombreadores de modelo, efectos de encantamiento.
 - **[Solución de problemas](troubleshooting/)** — resolución de errores por síntoma: carga, versión de API, compilación, validación, variantes, visual, texturas, iluminación, modelos, rendimiento.

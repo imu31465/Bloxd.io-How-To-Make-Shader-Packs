@@ -1,6 +1,6 @@
 # Input & output structures
 
-> Target API: 5 · Target build: `xkg8x` · Status: Analyzed (restored verbatim from the live header)
+> Target API: 5 · Target build: `bny9u` · Status: Analyzed (restored verbatim from the live header)
 
 Seven structs are readable/writable by packs. Every field is listed below (`#ifdef` fields are conditional). The full header is in [Engine Internals](../internals/engine-header.md).
 

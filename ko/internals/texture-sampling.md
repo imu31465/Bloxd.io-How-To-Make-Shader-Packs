@@ -1,6 +1,6 @@
 # 텍스처 샘플링의 내부
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
+> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
 
 `bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](../api/texture-api.md).
 
@@ -43,7 +43,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ## 애니메이션 프레임 사다리
 
-애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](../api/texture-catalog.md#애니메이션-계열-42-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
+애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](../api/texture-catalog.md#애니메이션-계열-43-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
 
 ## 샘플러 설정
 

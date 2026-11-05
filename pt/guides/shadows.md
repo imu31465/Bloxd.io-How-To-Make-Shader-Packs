@@ -1,6 +1,6 @@
 # Sombras
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Verified (comportamento do LightEngine inalterado desde a medição da v4)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Verified (comportamento do LightEngine inalterado desde a medição da v4)
 
 As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 

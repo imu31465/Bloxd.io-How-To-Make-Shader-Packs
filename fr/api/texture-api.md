@@ -1,6 +1,6 @@
 # API de textures
 
-> API cible : 5 · Build cible : `xkg8x` · État : Verified (API inchangée depuis v4, reconfirmée sur le build v5)
+> API cible : 5 · Build cible : `bny9u` · État : Verified (API inchangée depuis v4, reconfirmée sur le build v5)
 
 L'API de lecture des textures propres du jeu : deux fonctions, une famille de constantes nommées et quatre champs d'entrée. Le résumé en une ligne de l'en-tête lui-même : *« This face's texture. Compare with `bloxdTextureId*`. »*
 

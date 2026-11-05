@@ -1,6 +1,6 @@
 # Interioridades da amostragem de texturas
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Analyzed (restaurado do gerador em produção, c56)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado do gerador em produção, c56)
 
 Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — o codegen de texturas de 3 variantes. O lado do usuário: [API de texturas](../api/texture-api.md).
 
@@ -43,7 +43,7 @@ Código escrito para o atlas real ainda compila e roda aqui — ele só vê texe
 
 ## A escada de quadros de animação
 
-Texturas animadas (42 famílias) avançam em intervalos fixos por família (200 / 250 / 300 ms — a coluna de intervalo no [catálogo de texturas](../api/texture-catalog.md#famílias-de-animação-42-nomes)). Passar um id de família de animação a `bloxdTexel` amostra o quadro atual.
+Texturas animadas (42 famílias) avançam em intervalos fixos por família (200 / 250 / 300 ms — a coluna de intervalo no [catálogo de texturas](../api/texture-catalog.md#famílias-de-animação-43-nomes)). Passar um id de família de animação a `bloxdTexel` amostra o quadro atual.
 
 ## Ajustes do sampler
 

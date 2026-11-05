@@ -1,6 +1,6 @@
 # Überblick & Voraussetzungen
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified
 
 ## Was ein Shader Pack ist
 

@@ -21,7 +21,8 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 | `cnty9` | v4 | 2026-10-27 | evidência do guia da v4 e do catálogo de 905 nomes |
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | build de lançamento da v5; linha de base original da v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | **atual**; linha de base desta documentação. main de prod ≠ main de preprod (`2lcqcl`), mas toda superfície de shader packs medida idêntica |
+| `xkg8x` | **v5** | 2026-11-04 | deriva de registro (+10 nomes); preprod `2lcqcl` medido idêntico em toda superfície de shader packs |
+| `bny9u` | **v5** | 2026-11-05 | **atual**; linha de base desta documentação. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` no bundle principal, baixado ao vivo de ambos os hosts) |
 
 ## Metodologia chave
 
@@ -31,9 +32,9 @@ Renderizando o template de cabeçalho do c55 com suas interpolações reais (`${
 
 ### Recomputação do registro de texturas
 
-Executando os módulos de construção de registro do motor (29833 + 1371 + 1391 + 1384 + 219) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (906 nomes / 416 aliases / 228 camadas no build atual `xkg8x`, 2026-11-04 — módulos 30093 + 1391; 896 no lançamento da v5) ([Registro de texturas](texture-registry.md)).
+Executando o módulo de construção de registro do motor (29812, carregado pelos chunks 52/53/54) contra os dados de textura (módulo de dados 1351 no bundle principal) contra os dados de textura do registro de blocos distribuído em um mini harness de webpack; registrando a saída (911 nomes / 424 aliases / atlas 1.232 no build atual `bny9u`, 2026-11-05 — módulo 29812 + módulo de dados 1351; 906 / 416 / 1.220 no `xkg8x` via módulos 30093 + 1391; 896 no lançamento da v5) ([Registro de texturas](texture-registry.md)).
 
-Os intervalos de animação vêm da tabela no estilo `animDataPerTex` (`numAnimStates` / `animationInterval` por camada) — só existem três valores de intervalo: 200 / 250 / 300 ms ([o catálogo](../api/texture-catalog.md#famílias-de-animação-42-nomes)).
+Os intervalos de animação vêm da tabela no estilo `animDataPerTex` (`numAnimStates` / `animationInterval` por camada) — só existem três valores de intervalo: 200 / 250 / 300 ms ([o catálogo](../api/texture-catalog.md#famílias-de-animação-43-nomes)).
 
 ### Captura de mensagens de erro
 
@@ -54,6 +55,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 | sjr0p7 → cnty9 | 10 dias | 98 adicionados, 79 removidos; 779/1121 nomes mudaram de id (69%) |
 | cnty9 → ab90qa | 7 dias | +1 (scorpion_eggs), −10 (cofre duplo ×8, laterais de spawner ×2); 334/905 nomes mudaram de id |
 | ab90qa → xkg8x | 1 dia | +10 (todas as remoções do lançamento da v5 voltaram: baú duplo ×8, laterais de spawner ×2); 376/896 nomes mudaram de id; nenhum removido |
+| xkg8x → bny9u | 1 dia | +5 (Terminal de Troca ×3, Gerador de Pedra ×2); 864/906 nomes mudaram de id (95%); nenhum removido; famílias de animação 42 → 43 |
 
 ## Não verificado / especulativo
 
@@ -63,7 +65,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 
 ## Quando reverificar
 
-Ao detectar uma atualização do jogo (um novo hash de main.js): reconferir o cabeçalho (9.125 B), a constante apiVersion, recomputar o registro e reconfirmar a lista allow/strict. A metodologia detalhada de monitoramento está fora do escopo desta documentação, mas as localizações de módulos acima (c55 / c116 / c56) são os pontos de partida.
+Ao detectar uma atualização do jogo (um novo hash de main.js): reconferir o cabeçalho (9.125 B), a constante apiVersion, recomputar o registro e reconfirmar a lista allow/strict. A metodologia detalhada de monitoramento está fora do escopo desta documentação, mas as localizações de módulos acima (c55 / c116 / c56) eram os pontos de partida — no `bny9u`: módulo header/apiVersion 29815 e módulos validadores no chunk c56, carregador (zip/manifest/limites) módulo 32942 no chunk c54, construtor do registro 29812 nos chunks c52/c53/c54, codegen WebGPU chunk c57, template de pack padrão módulo 33350 no chunk c122, módulo de jogos/política 517 no bundle principal
 
 ## Relacionado
 

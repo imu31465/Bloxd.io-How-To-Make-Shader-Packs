@@ -1,6 +1,6 @@
 # Estruturas de entrada e saída
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
 
 Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Interioridades do motor](../internals/engine-header.md).
 

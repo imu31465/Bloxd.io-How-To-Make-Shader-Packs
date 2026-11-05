@@ -1,6 +1,6 @@
 # 定数
 
-> 対象API: 5 · 対象ビルド: `xkg8x` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
+> 対象API: 5 · 対象ビルド: `bny9u` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
 ヘッダーが提供する定数は3つです (テクスチャ名定数 `bloxdTextureId*` は [テクスチャAPI](texture-api.md) を参照)。
 

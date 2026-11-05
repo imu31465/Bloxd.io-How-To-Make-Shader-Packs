@@ -1,6 +1,6 @@
 # 纹理采样内部机制
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行生成器 c56 复原)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行生成器 c56 复原)
 
 `bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](../api/texture-api.md)。
 
@@ -43,7 +43,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ## 动画帧阶梯
 
-动画纹理 (42 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](../api/texture-catalog.md#动画族-42-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
+动画纹理 (43 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](../api/texture-catalog.md#动画族-43-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
 
 ## 采样器设置
 

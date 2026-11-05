@@ -1,6 +1,6 @@
 # FAQ & legal notes
 
-> Target API: 5 · Target build: `xkg8x` (2026-11-04, production) · Status: Verified
+> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Verified
 
 ## Frequently asked questions
 

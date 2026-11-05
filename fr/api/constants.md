@@ -1,6 +1,6 @@
 # Constantes
 
-> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 L'en-tête fournit trois constantes (les constantes de noms de textures `bloxdTextureId*` sont couvertes dans [API de textures](texture-api.md)).
 

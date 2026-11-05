@@ -1,6 +1,6 @@
 # Flags (BloxdFlags)
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Analyzed (restaurado literalmente do cabeçalho em produção)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado literalmente do cabeçalho em produção)
 
 A v5 identifica faces com uma struct de booleanos nomeados. A máscara de bits `blockFlags: u32` da v4 e as suas 6 constantes `bloxdBlockFlag*` desapareceram.
 

@@ -1,6 +1,6 @@
 # pack.json (매니페스트)
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` (2026-11-04, 프로덕션 확인) · 상태: Verified
+> 대상 API: 5 · 대상 빌드: `bny9u` (2026-11-05, 프로덕션 확인) · 상태: Verified
 
 `pack.json` 은 팩의 매니페스트다 — zip 루트에 정확히 하나의 JSON 객체.
 

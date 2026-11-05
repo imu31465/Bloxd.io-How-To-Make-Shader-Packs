@@ -1,6 +1,6 @@
 # Textur-API
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (API seit v4 unverändert, am v5-Build erneut bestätigt)
+> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Verified (API seit v4 unverändert, am v5-Build erneut bestätigt)
 
 Die API zum Lesen der Texturen des Spiels selbst: zwei Funktionen, eine Familie benannter Konstanten und vier Eingabefelder. Der Einzeiler des Headers selbst: *"This face's texture. Compare with `bloxdTextureId*`."*
 

@@ -1,6 +1,6 @@
 # Le soleil et la lune
 
-> API cible : 5 · Build cible : `xkg8x` (2026-11-04, production) · État : Analyzed (analyse JavaScript du bundle de production)
+> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Analyzed (analyse JavaScript du bundle de production)
 La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit uniquement quand le type de skybox change — le critère n'est pas « si le ciel a un soleil » mais **« si la skybox est de type terre »**.
 
 | Skybox | `bloxdSunDirection()` |

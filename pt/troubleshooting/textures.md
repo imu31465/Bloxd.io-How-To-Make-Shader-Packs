@@ -1,6 +1,6 @@
 # Problemas de texturas
 
-> API alvo: 5 · Build alvo: `xkg8x` · Estado: Verified (mensagens registradas literalmente do validador em produção)
+> API alvo: 5 · Build alvo: `bny9u` · Estado: Verified (mensagens registradas literalmente do validador em produção)
 
 Problemas em torno de `bloxdTextureId*` / `bloxdTexel`. Pesquise os 896 nomes no [catálogo de texturas](../api/texture-catalog.md).
 
@@ -14,7 +14,7 @@ Problemas em torno de `bloxdTextureId*` / `bloxdTexel`. Pesquise os 896 nomes no
 
 - **Causa**: escrever um **número de quadro** em uma textura animada (`lava0` etc.)
 - **Correção**: use o nome base — a amostragem devolve o quadro atual automaticamente
-- **Prevenção**: nunca escreva sufixos de quadro para as 42 famílias de animação ([nomenclatura](../api/texture-api.md#regras-de-grafia-e-liberdade-de-nomes))
+- **Prevenção**: nunca escreva sufixos de quadro para as 43 famílias de animação ([nomenclatura](../api/texture-api.md#regras-de-grafia-e-liberdade-de-nomes))
 
 ## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 

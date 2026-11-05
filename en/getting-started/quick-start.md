@@ -1,6 +1,6 @@
 # Quick start
 
-> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified
+> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified
 
 Your first pack in five minutes.
 

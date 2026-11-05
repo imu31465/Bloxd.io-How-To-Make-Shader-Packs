@@ -1,6 +1,6 @@
 # Referencia de la API
 
-La especificación sistemática de la API v5 actual. Todo lo que hay aquí está medido sobre el build objetivo `xkg8x` (2026-11-04; producción y preprod idénticos). La cabecera del motor antepuesta a cada paquete (reproducida en [Interior del motor](../internals/engine-header.md)) es la fuente primaria.
+La especificación sistemática de la API v5 actual. Todo lo que hay aquí está medido sobre el build objetivo `bny9u` (2026-11-05; producción y preprod idénticos). La cabecera del motor antepuesta a cada paquete (reproducida en [Interior del motor](../internals/engine-header.md)) es la fuente primaria.
 
 ## Mapa
 
@@ -19,6 +19,6 @@ La especificación sistemática de la API v5 actual. Todo lo que hay aquí está
 | [Compatibilidad](compatibility.md) | paquetes de versiones antiguas, revalidación de paquetes guardados |
 | [Catálogo de texturas](texture-catalog.md) | los 896 nombres utilizables (con búsqueda) |
 
-> API objetivo: 5 · Build objetivo: `xkg8x` (2026-11-04, producción) · Estado: Analyzed (restaurado literalmente de la cabecera y el validador)
+> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Analyzed (restaurado literalmente de la cabecera y el validador)
 
 ¿Migras desde v4? Ver [Historial de versiones: v5](../history/v5.md).

@@ -1,6 +1,6 @@
 # Coordonnées
 
-> API cible : 5 · Build cible : `xkg8x` (2026-11-04, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
 ## Coordonnées monde
 
 ```wgsl

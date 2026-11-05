@@ -1,6 +1,6 @@
 # Intérieurs de l'échantillonnage des textures
 
-> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré depuis le générateur en production, c56)
+> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré depuis le générateur en production, c56)
 
 Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — le codegen de textures à 3 variantes. Le côté utilisateur : [API de textures](../api/texture-api.md).
 
@@ -43,7 +43,7 @@ Le code écrit pour le vrai atlas se compile et s'exécute toujours ici — il v
 
 ## L'échelle d'images d'animation
 
-Les textures animées (42 familles) avancent à intervalles fixes par famille (200 / 250 / 300 ms — la colonne intervalle du [catalogue de textures](../api/texture-catalog.md#familles-danimation-42-noms)). Passer un id de famille d'animation à `bloxdTexel` échantillonne l'image courante.
+Les textures animées (43 familles) avancent à intervalles fixes par famille (200 / 250 / 300 ms — la colonne intervalle du [catalogue de textures](../api/texture-catalog.md#familles-danimation-43-noms)). Passer un id de famille d'animation à `bloxdTexel` échantillonne l'image courante.
 
 ## Réglages du sampler
 

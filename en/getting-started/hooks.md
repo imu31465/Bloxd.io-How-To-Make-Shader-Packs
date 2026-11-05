@@ -1,6 +1,6 @@
 # Shader hooks
 
-> Target API: 5 · Target build: `xkg8x` (verified in production 2026-11-04) · Status: Verified
+> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified
 
 A pack can plug in **9 hooks**: 3 render targets (Terrain / Liquid / Model) × 3 pipeline stages (Vertex / Surface / Light). All are optional — an undefined hook falls back to the engine default.
 

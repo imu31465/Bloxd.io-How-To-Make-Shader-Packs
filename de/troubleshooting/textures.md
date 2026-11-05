@@ -1,6 +1,6 @@
 # Textur-Probleme
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
 
 Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkatalog](../api/texture-catalog.md) durchsuchen.
 
@@ -14,7 +14,7 @@ Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkata
 
 - **Ursache**: eine **Rahmennummer** auf einer animierten Textur geschrieben (`lava0` etc.)
 - **Fix**: den Basisnamen benutzen — Sampeln liefert automatisch den aktuellen Rahmen
-- **Vorbeugen**: für die 42 Animationsfamilien nie Rahmen-Suffixe schreiben ([Namensgebung](../api/texture-api.md#schreibregeln-und-namensfreiheit))
+- **Vorbeugen**: für die 43 Animationsfamilien nie Rahmen-Suffixe schreiben ([Namensgebung](../api/texture-api.md#schreibregeln-und-namensfreiheit))
 
 ## „...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 

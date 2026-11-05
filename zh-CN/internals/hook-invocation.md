@@ -1,6 +1,6 @@
 # 钩子接入内部机制
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
 
 引擎在运行时如何调用钩子。这不改变你写的代码，但能消除「钩子收到什么」的猜测。
 

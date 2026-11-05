@@ -1,6 +1,6 @@
 # 着色器钩子
 
-> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04 生产环境确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `bny9u` (2026-11-05 生产环境确认) · 状态: Verified
 
 包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
 

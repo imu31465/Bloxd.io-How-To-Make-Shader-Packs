@@ -1,6 +1,6 @@
 # Was Shader-Pakete können und was nicht
 
-> Ziel-API: 5 · Ziel-Build: `xkg8x` (2026-11-04, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erreicht, was grundlegend nicht, was bedingt ist, warum die Grenzen existieren und welche Ersatzansätze am nächsten kommen. Vor dem Bauen eines Looks hier scopen.
 

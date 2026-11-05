@@ -1,6 +1,6 @@
 # 상수
 
-> 대상 API: 5 · 대상 빌드: `xkg8x` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더는 세 개의 상수를 제공한다 (텍스처 이름 상수 `bloxdTextureId*` 는 [텍스처 API](texture-api.md) 에서 다룬다).
 

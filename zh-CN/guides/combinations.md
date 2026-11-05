@@ -1,6 +1,6 @@
 # 与纹理包的组合
 
-> 目标API: 5 · 目标构建: `xkg8x` (2026-11-04, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `bny9u` (2026-11-05, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 着色器包不能添加或采样纹理，材质细微凹凸与天空图像不要只靠着色器解决。Bloxd.io 公开纹理包仓库 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 以另一方式处理纹理、天空盒、模型等。
 

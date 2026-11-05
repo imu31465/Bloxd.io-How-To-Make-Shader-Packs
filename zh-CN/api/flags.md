@@ -1,6 +1,6 @@
 # 标志 (BloxdFlags)
 
-> 目标API: 5 · 目标构建: `xkg8x` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行标头逐字复原)
 
 v5 以具名布尔结构体标识面。v4 的 `blockFlags: u32` 位掩码及其 6 个 `bloxdBlockFlag*` 常量已被移除。
 

@@ -1,6 +1,6 @@
 # Structures d'entrée et de sortie
 
-> API cible : 5 · Build cible : `xkg8x` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 Sept structures sont accessibles aux packs en lecture/écriture. Chaque champ est listé ci-dessous (les champs `#ifdef` sont conditionnels). L'en-tête complet est dans [Internals du moteur](../internals/engine-header.md).
 

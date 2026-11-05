@@ -14,6 +14,6 @@ Un tutoriel au parcours unique pour les auteurs de packs de shaders qui débuten
 8. [Validation](validation.md) — le contrôle de chargement en 3 étapes et les tests sur appareil
 9. [Distribution](distribution.md) — compression en zip et hygiène de publication
 
-> API cible : 5 · Build cible : `xkg8x` (vérifié en production le 2026-11-04) · État : Verified/Analyzed
+> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Verified/Analyzed
 
 Quand vous avez besoin de la spécification complète, poursuivez vers la [Référence API](../api/) ; pour des effets prêts à l'emploi, voyez les [Recettes](../recipes/).

@@ -1,6 +1,6 @@
 # テクスチャの問題
 
-> 対象API: 5 · 対象ビルド: `xkg8x` · 検証状況: Verified (メッセージはライブバリデータから逐語採録)
+> 対象API: 5 · 対象ビルド: `bny9u` · 検証状況: Verified (メッセージはライブバリデータから逐語採録)
 
 `bloxdTextureId*` / `bloxdTexel` まわりの問題です。906 件超のテクスチャ名は [テクスチャカタログ](../api/texture-catalog.md) で検索できます。
 

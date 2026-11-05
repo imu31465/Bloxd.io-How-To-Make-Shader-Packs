@@ -6,8 +6,8 @@ Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer —
 
 - Aktuelle API: **5** (`pack.json` muss `apiVersion: 5` deklarieren)
 - Ziel: WebGPU-Renderer
-- Zuletzt verifiziert: 2026-11-04
-- Ziel-Build: `xkg8x.main.641a7732.js` (Produktion, verifiziert am 2026-11-04; preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen — Registry, Header, Hooks, Limits)
+- Zuletzt verifiziert: 2026-11-05
+- Ziel-Build: `bny9u.main.02116121.js` (Produktion, verifiziert am 2026-11-05; preprod liefert dasselbe byte-identische Bundle, md5 `60eea80ec48253b7ac6cc45604dc8273` — Registry, Header, Hooks, Limits nachgemessen)
 - Shader-Hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachschlagen? Siehe [API-Referenz](api/).
@@ -32,7 +32,7 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 ## Dokumentationsstruktur
 
 - **[Erste Schritte](getting-started/)** — Überblick, Quick Start, Pack-Struktur, pack.json, die 9 Hooks, Varianten, Validierung, Vertrieb. Ein durchgängiges Tutorial bis zum ersten Paket.
-- **[API-Referenz](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Beleuchtung, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 896-Namen-Texturkatalog.
+- **[API-Referenz](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Beleuchtung, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 911-Namen-Texturkatalog.
 - **[Leitfäden](guides/)** — wie Beleuchtung funktioniert, Schatten, Wasser, Nacht, Modell-Rendering, Performance, Realismus-Konzepte.
 - **[Rezepte](recipes/)** — zielgerichtete Codebeispiele: Farben, Beleuchtung, Emission, Koordinaten, Animation, Flüssigkeiten, Vertices, Mathematik, Realismus, Modell-Shader, Enchant-Effekte.
 - **[Fehlerbehebung](troubleshooting/)** — symptomgetriebene Fehlerlösung: Laden, API-Version, Kompilierung, Validierung, Varianten, visuell, Texturen, Beleuchtung, Modelle, Performance.
