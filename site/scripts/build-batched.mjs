@@ -93,4 +93,6 @@ console.log('\n=== post-processing ===')
 execSync(`node scripts/flatten-rsc.mjs out`, { stdio: 'inherit' })
 execSync(`node scripts/fix-html-lang.mjs out`, { stdio: 'inherit' })
 execSync(`npx pagefind --site out --output-path out/_pagefind`, { stdio: 'inherit' })
+// pagefind の索引対象にならないよう、索引後に言語別 404 を生成する
+execSync(`node scripts/localize-404.mjs out`, { stdio: 'inherit' })
 console.log('\nbatched build complete -> out/')

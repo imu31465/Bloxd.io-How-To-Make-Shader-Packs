@@ -1,8 +1,11 @@
 import { Layout, LocaleSwitch, Navbar, ThemeSwitch } from 'nextra-theme-docs'
 import { Search } from 'nextra/components'
+import { GitHubIcon } from 'nextra/icons'
 import { getPageMap } from 'nextra/page-map'
 import { LOCALES } from '../../lib/langs.mjs'
 import { repoUrl } from '../../lib/paths.mjs'
+import { UI_I18N } from '../../lib/ui-i18n.mjs'
+import { UiTranslator } from '../../components/ui-translator.jsx'
 
 // 検索 UI の言語別テキスト (テーマ既定値は英語固定のため上書きする)
 const SEARCH_I18N = {
@@ -82,6 +85,8 @@ export default async function LangLayout({ children, params }) {
     ? rawMap.find(item => item.name === lang).children
     : rawMap
   const t = SEARCH_I18N[lang] ?? SEARCH_I18N.en
+  // Nextra テーマの UI 文言 (英語ハードコード) を言語別に上書きする
+  const u = UI_I18N[lang] ?? UI_I18N.en
   return (
     <Layout
       pageMap={pageMap}
@@ -89,6 +94,12 @@ export default async function LangLayout({ children, params }) {
       docsRepositoryBase={repoUrl}
       editLink={null}
       sidebar={{ defaultMenuCollapseLevel: 1, autoCollapse: true }}
+      toc={{ title: u.tocTitle, backToTop: u.backToTop }}
+      feedback={{ content: u.feedbackContent }}
+      themeSwitch={{ dark: u.themeDark, light: u.themeLight, system: u.themeSystem }}
+      // テーマ内蔵 CopyPage は英語ハードコードのため無効化し、
+      // mdx-components.jsx の wrapper 上書きで多言語版に差し替える
+      copyPageButton={false}
       search={
         <Search
           placeholder={t.placeholder}
@@ -101,6 +112,9 @@ export default async function LangLayout({ children, params }) {
         <Navbar
           logo={<b>Bloxd Shader Packs</b>}
           projectLink={repoUrl}
+          projectIcon={
+            <GitHubIcon height="24" aria-label={u.projectRepository} />
+          }
         >
           <LocaleSwitch lite />
           <ThemeSwitch />
@@ -108,6 +122,7 @@ export default async function LangLayout({ children, params }) {
       }
       footer={null}
     >
+      <UiTranslator lang={lang} />
       {children}
     </Layout>
   )
