@@ -84,6 +84,19 @@ export default async function LangLayout({ children, params }) {
   const pageMap = rawMap.some(item => item.name === lang)
     ? rawMap.find(item => item.name === lang).children
     : rawMap
+  // Shader Studio (/tools/shader-studio) は MDX ではなく app router の
+  // page.jsx で提供するため、pageMap に手動で登録する
+  // (Nextra 4 は MDX 内 import と JSX を無効化するため MDX 経由では
+  //  'use client' コンポーネントを配置できない)
+  if (!pageMap.some(item => item.route === `/${lang}/tools/shader-studio`)) {
+    pageMap.push({
+      name: 'tools',
+      route: `/${lang}/tools`,
+      children: [
+        { name: 'shader-studio', route: `/${lang}/tools/shader-studio`, title: 'Shader Studio' }
+      ]
+    })
+  }
   const t = SEARCH_I18N[lang] ?? SEARCH_I18N.en
   // Nextra テーマの UI 文言 (英語ハードコード) を言語別に上書きする
   const u = UI_I18N[lang] ?? UI_I18N.en
