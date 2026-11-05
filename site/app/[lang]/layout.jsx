@@ -116,7 +116,11 @@ export default async function LangLayout({ children, params }) {
             {
               name: 'shader-studio',
               route: `/${lang}/tools/shader-studio`,
-              title: 'Shader Studio'
+              title: 'Shader Studio',
+              // ツールページは右 TOC 欄を使わずコンテンツ幅をフルに使う
+              // (wrapper.client.js は layout==="default" || toc で空の w-64
+              // 列を描いてしまうため、両方オフにする)
+              frontMatter: { theme: { layout: 'full', toc: false } }
             }
           ]
         }
