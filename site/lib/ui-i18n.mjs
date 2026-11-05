@@ -11,6 +11,8 @@
 //      projectRepository / menu / collapseSidebar / expandSidebar / copyCode /
 //      toggleWordWrap / skipToContent
 //   4. scripts/localize-404.mjs (静的 404 ページの多言語化): notFound
+//   5. app/[lang]/layout.jsx (サイドバーに手動登録する Tools セクションの見出し):
+//      toolsSection
 //
 // en は Nextra 既定値と同一にすること (翻訳対象判定が英語値との一致で行われるため)。
 
@@ -40,7 +42,8 @@ export const UI_I18N = {
     openInChatGPT: 'Open in ChatGPT',
     openInClaude: 'Open in Claude',
     askQuestions: 'Ask questions about this page',
-    notFound: 'This page could not be found.'
+    notFound: 'This page could not be found.',
+    toolsSection: 'Tools'
   },
   de: {
     tocTitle: 'Auf dieser Seite',
@@ -67,7 +70,8 @@ export const UI_I18N = {
     openInChatGPT: 'In ChatGPT öffnen',
     openInClaude: 'In Claude öffnen',
     askQuestions: 'Fragen zu dieser Seite stellen',
-    notFound: 'Diese Seite konnte nicht gefunden werden.'
+    notFound: 'Diese Seite konnte nicht gefunden werden.',
+    toolsSection: 'Werkzeuge'
   },
   es: {
     tocTitle: 'En esta página',
@@ -94,7 +98,8 @@ export const UI_I18N = {
     openInChatGPT: 'Abrir en ChatGPT',
     openInClaude: 'Abrir en Claude',
     askQuestions: 'Haz preguntas sobre esta página',
-    notFound: 'No se pudo encontrar esta página.'
+    notFound: 'No se pudo encontrar esta página.',
+    toolsSection: 'Herramientas'
   },
   fr: {
     tocTitle: 'Sur cette page',
@@ -121,7 +126,8 @@ export const UI_I18N = {
     openInChatGPT: 'Ouvrir dans ChatGPT',
     openInClaude: 'Ouvrir dans Claude',
     askQuestions: 'Poser des questions sur cette page',
-    notFound: "Cette page est introuvable."
+    notFound: "Cette page est introuvable.",
+    toolsSection: 'Outils'
   },
   hi: {
     tocTitle: 'इस पेज पर',
@@ -148,7 +154,8 @@ export const UI_I18N = {
     openInChatGPT: 'ChatGPT में खोलें',
     openInClaude: 'Claude में खोलें',
     askQuestions: 'इस पेज के बारे में प्रश्न पूछें',
-    notFound: 'यह पेज नहीं मिल सका।'
+    notFound: 'यह पेज नहीं मिल सका।',
+    toolsSection: 'टूल्स'
   },
   ja: {
     tocTitle: 'このページの内容',
@@ -175,7 +182,8 @@ export const UI_I18N = {
     openInChatGPT: 'ChatGPTで開く',
     openInClaude: 'Claudeで開く',
     askQuestions: 'このページについて質問する',
-    notFound: 'このページは見つかりませんでした。'
+    notFound: 'このページは見つかりませんでした。',
+    toolsSection: 'ツール'
   },
   ko: {
     tocTitle: '이 페이지에서',
@@ -202,7 +210,8 @@ export const UI_I18N = {
     openInChatGPT: 'ChatGPT에서 열기',
     openInClaude: 'Claude에서 열기',
     askQuestions: '이 페이지에 대해 질문하기',
-    notFound: '이 페이지를 찾을 수 없습니다.'
+    notFound: '이 페이지를 찾을 수 없습니다.',
+    toolsSection: '도구'
   },
   pt: {
     tocTitle: 'Nesta página',
@@ -229,7 +238,8 @@ export const UI_I18N = {
     openInChatGPT: 'Abrir no ChatGPT',
     openInClaude: 'Abrir no Claude',
     askQuestions: 'Faça perguntas sobre esta página',
-    notFound: 'Esta página não foi encontrada.'
+    notFound: 'Esta página não foi encontrada.',
+    toolsSection: 'Ferramentas'
   },
   ru: {
     tocTitle: 'На этой странице',
@@ -256,7 +266,8 @@ export const UI_I18N = {
     openInChatGPT: 'Открыть в ChatGPT',
     openInClaude: 'Открыть в Claude',
     askQuestions: 'Задать вопрос об этой странице',
-    notFound: 'Не удалось найти эту страницу.'
+    notFound: 'Не удалось найти эту страницу.',
+    toolsSection: 'Инструменты'
   },
   'zh-CN': {
     tocTitle: '本页内容',
@@ -283,6 +294,7 @@ export const UI_I18N = {
     openInChatGPT: '在 ChatGPT 中打开',
     openInClaude: '在 Claude 中打开',
     askQuestions: '就此页面提问',
-    notFound: '找不到该页面。'
+    notFound: '找不到该页面。',
+    toolsSection: '工具'
   }
 }

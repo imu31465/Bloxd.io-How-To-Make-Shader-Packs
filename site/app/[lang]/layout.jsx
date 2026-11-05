@@ -81,25 +81,48 @@ export default async function LangLayout({ children, params }) {
   //   - ルート形: [index, { name: lang, children: [...] }, ...]
   //   - スコープ形: 言語の children が直接並ぶ配列
   const rawMap = await getPageMap(`/${lang}`)
-  const pageMap = rawMap.some(item => item.name === lang)
+  const baseMap = rawMap.some(item => item.name === lang)
     ? rawMap.find(item => item.name === lang).children
     : rawMap
-  // Shader Studio (/tools/shader-studio) は MDX ではなく app router の
-  // page.jsx で提供するため、pageMap に手動で登録する
-  // (Nextra 4 は MDX 内 import と JSX を無効化するため MDX 経由では
-  //  'use client' コンポーネントを配置できない)
-  if (!pageMap.some(item => item.route === `/${lang}/tools/shader-studio`)) {
-    pageMap.push({
-      name: 'tools',
-      route: `/${lang}/tools`,
-      children: [
-        { name: 'shader-studio', route: `/${lang}/tools/shader-studio`, title: 'Shader Studio' }
+  const u = UI_I18N[lang] ?? UI_I18N.en
+  // Shader Studio (/tools/shader-studio) は MDX ではなく app router の page.jsx で
+  // 提供するため、pageMap に手動で登録する (Nextra 4 は MDX 内 import と JSX を
+  // 無効化するため MDX 経由では 'use client' コンポーネントを配置できない)。
+  //
+  // 【重要】getPageMap() は Nextra がモジュールレベルでキャッシュしている配列を
+  // 毎回同じ参照で返す。そのためここで破壊的に push するとレンダーのたびに同じ
+  // キャッシュ配列へ tools エントリが積み重なり、サイドバーにフォルダが大量に
+  // 並ぶ事故になる (各言語 80 個超の重複が発生した実績あり)。キャッシュ配列は
+  // 一切変更せず、必ず新しい配列を合成して <Layout> に渡すこと。
+  // また重複検査はフォルダ自身の route (/lang/tools) でも子の route でも
+  // 一致するように見ること (従来は子の route だけをトップレベルで探していたため
+  // 永遠に false になりガードが機能していなかった)。
+  const hasStudio = baseMap.some(
+    item =>
+      item.route === `/${lang}/tools` ||
+      (item.children ?? []).some(
+        child => child.route === `/${lang}/tools/shader-studio`
+      )
+  )
+  const pageMap = hasStudio
+    ? baseMap
+    : [
+        ...baseMap,
+        {
+          name: 'tools',
+          route: `/${lang}/tools`,
+          title: u.toolsSection,
+          children: [
+            {
+              name: 'shader-studio',
+              route: `/${lang}/tools/shader-studio`,
+              title: 'Shader Studio'
+            }
+          ]
+        }
       ]
-    })
-  }
   const t = SEARCH_I18N[lang] ?? SEARCH_I18N.en
   // Nextra テーマの UI 文言 (英語ハードコード) を言語別に上書きする
-  const u = UI_I18N[lang] ?? UI_I18N.en
   return (
     <Layout
       pageMap={pageMap}
