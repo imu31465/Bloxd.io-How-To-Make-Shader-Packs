@@ -158,10 +158,18 @@ fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
 }
 
 fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-    return BloxdSurface(
-        surface.colour,
+    // Studio approximation: the studio mesher bakes tint×AO into colour, and
+    // the atlas texel supplies the texture, so colour×texel reproduces the
+    // engine's texture × tint × AO. Model faces (textureId 0) read white here.
+    let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
+    let baseColour = surface.colour * texel.rgb;
 #ifdef BLOXD_ALPHA
-        surface.alpha,
+    let baseAlpha = surface.alpha * texel.a;
+#endif
+    return BloxdSurface(
+        baseColour,
+#ifdef BLOXD_ALPHA
+        baseAlpha,
 #endif
         vec3f(0.0),
         surface.enchantColour,

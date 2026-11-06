@@ -55,6 +55,18 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 const SCENE_IDS = ['plains', 'forest', 'desert', 'waterside', 'ruins', 'night', 'cave', 'procedural']
 
+// ホットバーのブロック色 (プレビュー演出用の飾り)
+const HOTBAR = [
+  { c1: '#7bbf4d', c2: '#5d9433' }, // grass
+  { c1: '#9a6b45', c2: '#6f4a2e' }, // dirt
+  { c1: '#8f9299', c2: '#6f7278' }, // stone
+  { c1: '#c09a63', c2: '#8a6a3d' }, // planks
+  { c1: '#5d9445', c2: '#3f6b2e' }, // leaves
+  { c1: '#e3d5a1', c2: '#c2b17a' }, // sand
+  { c1: '#9c5f52', c2: '#74423a' }, // brick
+  null, null
+]
+
 export function ShaderStudioApp({ lang }) {
   const t = STUDIO_I18N[lang] ?? STUDIO_I18N.en
   const canvasRef = useRef(null)
@@ -73,12 +85,13 @@ export function ShaderStudioApp({ lang }) {
   const [editorKey, setEditorKey] = useState(0)
   const [softMode, setSoftMode] = useState(false)
   const [softRes, setSoftRes] = useState(null)
+  const [gameHud, setGameHud] = useState(true)
 
   // パラメータ (スライダー) — renderer.params を直接更新
   const paramsRef = useRef(null)
   if (!paramsRef.current) paramsRef.current = {
-    sunAzimuth: 215, sunElevation: 54, fogDistance: 4, lit: true,
-    ambient: 0.5, diffuse: 0.75, heldLight: 0,
+    sunAzimuth: 215, sunElevation: 54, fogDistance: 1, lit: true,
+    ambient: 0.45, diffuse: 0.95, heldLight: 0,
     enchantTier: 3, overlayOn: false
   }
   const [ui, setUi] = useState({ ...paramsRef.current })
@@ -301,6 +314,31 @@ export function ShaderStudioApp({ lang }) {
                 {t.cpuMode}{softRes ? ` · ${softRes.w}×${softRes.h}` : ''}
               </div>
             )}
+            {/* bloxd風ゲームHUD (クロスヘア + ホットバー) — プレビューらしさ演出。
+                nextra の prefix CSS に任意の position ユーティリティが無いので
+                全部 inline style で配置する */}
+            {gameHud && initState === 'ready' && (
+              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', userSelect: 'none' }}>
+                <div style={{ position: 'absolute', left: '50%', top: '50%', width: 0, height: 0, mixBlendMode: 'difference' }}>
+                  <div style={{ position: 'absolute', background: '#fff', width: 18, height: 2, left: -9, top: -1 }} />
+                  <div style={{ position: 'absolute', background: '#fff', width: 2, height: 18, left: -1, top: -9 }} />
+                </div>
+                <div style={{
+                  position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
+                  display: 'flex', gap: 3, padding: 3, borderRadius: 6,
+                  background: 'rgba(10,12,16,0.45)', boxShadow: '0 1px 8px rgba(0,0,0,0.35)'
+                }}>
+                  {HOTBAR.map((slot, i) => (
+                    <div key={i} style={{
+                      width: 34, height: 34, borderRadius: 4,
+                      background: slot ? `linear-gradient(135deg, ${slot.c1}, ${slot.c2})` : 'rgba(255,255,255,0.07)',
+                      border: i === 0 ? '2px solid rgba(255,255,255,0.95)' : '1px solid rgba(255,255,255,0.35)',
+                      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.25)'
+                    }} />
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="x:absolute x:bottom-2 x:right-3 x:text-[10px] x:text-gray-400 x:font-mono x:flex x:gap-3">
               <span>{t.controls}</span>
               <span>{fps} {t.fps}</span>
@@ -354,6 +392,10 @@ export function ShaderStudioApp({ lang }) {
             >
               {SCENE_IDS.map(id => <option key={id} value={id}>{t.scenes[id]}</option>)}
             </select>
+          </label>
+          <label className="x:flex x:items-center x:gap-2 x:mb-3 x:text-xs x:cursor-pointer">
+            <input type="checkbox" checked={gameHud} onChange={e => setGameHud(e.target.checked)} />
+            {t.hud}
           </label>
           {scene === 'procedural' && (
             <div className="x:flex x:gap-2 x:mb-3">

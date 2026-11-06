@@ -9,7 +9,7 @@
 //     textureRotation (= bloxdSpTextureRotation) は private var 経由
 //   - litColour は fog 直前キャプチャ (エンジンの splice 位置と同じ)
 //   - strict terrain の surface alpha は書き戻されない (graft 無しと同じ)
-//   - 2-light directional (main=sun 1.0 + fill=[-0.5,-1,-1] 0.35)
+//   - 2-light directional (main=sun 1.0 + fill=[-0.5,-1,-1] 0.45)
 //   - linear fog: fogStart=32D, fogEnd=32(D+1), 色 rgb(183,191,195)
 //   - lift curve 1-(1-x/(3-2x))^3 と blockLight の35%フロア
 
@@ -255,7 +255,7 @@ fn buildLightIn(f: FragmentOut) -> BloxdLightIn {
     mainL = saturate(dot(n, sun));
   }
   let fillDir = normalize(vec3f(-0.5, -1.0, -1.0));
-  let fillL = saturate(dot(n, fillDir)) * 0.35;
+  let fillL = saturate(dot(n, fillDir)) * 0.45;
   l.directional = mainL + fillL;
   l.diffuse = view.diffuse.xyz;
   l.emissive = select(vec3f(0.0), vec3f(0.55, 0.50, 0.45), flags.emissive);

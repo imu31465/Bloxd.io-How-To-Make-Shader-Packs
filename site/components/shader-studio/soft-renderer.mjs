@@ -108,23 +108,10 @@ function makeFastHeaderFns() {
   }
 }
 
-// bloxdDefaultSurface はバリアント (BLOXD_ALPHA) でフィールドが変わるため別生成
-function makeFastDefaultSurface(withAlpha) {
-  return withAlpha
-    ? s => ({
-        colour: [s.colour[0], s.colour[1], s.colour[2]],
-        alpha: s.alpha,
-        emission: [0, 0, 0],
-        enchantColour: [s.enchantColour[0], s.enchantColour[1], s.enchantColour[2], s.enchantColour[3]],
-        overlayColour: [s.overlayColour[0], s.overlayColour[1], s.overlayColour[2], s.overlayColour[3]]
-      })
-    : s => ({
-        colour: [s.colour[0], s.colour[1], s.colour[2]],
-        emission: [0, 0, 0],
-        enchantColour: [s.enchantColour[0], s.enchantColour[1], s.enchantColour[2], s.enchantColour[3]],
-        overlayColour: [s.overlayColour[0], s.overlayColour[1], s.overlayColour[2], s.overlayColour[3]]
-      })
-}
+// bloxdDefaultSurface はバリアント (BLOXD_ALPHA) でフィールドが変わるため別生成。
+// スタジオ仕様: colour (tint×AO) × bloxdTexel のテクスチャ — GPU 側の
+// engine-header.mjs と同じ式。レンダラーの _bloxdTexel に結び付けるため
+// クラスメソッド側でファクトリを生成する。
 
 export class StudioSoftRenderer {
   constructor(canvas, opts = {}) {
@@ -140,8 +127,8 @@ export class StudioSoftRenderer {
     this.compileErrors = []
     this.params = {
       sunAzimuth: 215, sunElevation: 54,
-      fogDistance: 4, lit: true, paused: false,
-      ambient: 0.5, diffuse: 0.75,
+      fogDistance: 1, lit: true, paused: false,
+      ambient: 0.45, diffuse: 0.95,
       heldLight: 0, enchantTier: 3,
       overlayOn: false
     }
@@ -220,8 +207,8 @@ export class StudioSoftRenderer {
     this.camera.yaw = this.scene.lookYaw ?? 0
     this.camera.pitch = this.scene.lookPitch ?? 0.3
     const c = this.scene.camera
-    this.camera.dist = c ? Math.hypot(c[0], c[1], c[2]) * 0.55 : 24
-    this.camera.target = [0, this.sceneId === 'cave' ? -3 : 3, 0]
+    this.camera.dist = this.scene.camDist ?? (c ? Math.hypot(c[0], c[1], c[2]) * 0.55 : 24)
+    this.camera.target = this.scene.camTarget ?? [0, this.sceneId === 'cave' ? -3 : 3, 0]
     if (sceneId === 'night') this.params.sunElevation = -12
     else if (this.params.sunElevation < 0) this.params.sunElevation = 54
     this._dirty = true
@@ -270,7 +257,7 @@ export class StudioSoftRenderer {
       const source = prelude + '\n' + header.code + '\n' + user.code
       const userOffset = preludeLines + header.code.split('\n').length
       // bloxdDefaultSurface はバリアント依存 (BLOXD_ALPHA) — env を都度更新
-      this._wgslEnv.bloxdDefaultSurface = makeFastDefaultSurface(program === 'liquid' || !this.strict)
+      this._wgslEnv.bloxdDefaultSurface = this._makeDefaultSurface(program === 'liquid' || !this.strict)
       const externals = ['bloxdPackInputs', 'bloxdTexel', 'bloxdTextureSize',
         'bloxdDefaultSurface', 'bloxdLitColour', 'bloxdDefaultLight',
         'bloxdApplyFog', 'bloxdShading', 'bloxdWorldLight']
@@ -347,6 +334,33 @@ export class StudioSoftRenderer {
   }
 
   // ---------------------------------------------------- texture API ------
+  // bloxdDefaultSurface (スタジオ式: tint×AO × texel)。GPU 側 engine-header.mjs
+  // の bloxdDefaultSurface と同じ意味。
+  _makeDefaultSurface(withAlpha) {
+    const texel = this._bloxdTexel.bind(this)
+    if (withAlpha) {
+      return s => {
+        const t = texel(s.textureId, s.uv, s.mipLevel)
+        return {
+          colour: [s.colour[0] * t[0], s.colour[1] * t[1], s.colour[2] * t[2]],
+          alpha: s.alpha * t[3],
+          emission: [0, 0, 0],
+          enchantColour: [s.enchantColour[0], s.enchantColour[1], s.enchantColour[2], s.enchantColour[3]],
+          overlayColour: [s.overlayColour[0], s.overlayColour[1], s.overlayColour[2], s.overlayColour[3]]
+        }
+      }
+    }
+    return s => {
+      const t = texel(s.textureId, s.uv, s.mipLevel)
+      return {
+        colour: [s.colour[0] * t[0], s.colour[1] * t[1], s.colour[2] * t[2]],
+        emission: [0, 0, 0],
+        enchantColour: [s.enchantColour[0], s.enchantColour[1], s.enchantColour[2], s.enchantColour[3]],
+        overlayColour: [s.overlayColour[0], s.overlayColour[1], s.overlayColour[2], s.overlayColour[3]]
+      }
+    }
+  }
+
   _bloxdTexel(textureId, uv, mipLevel) {
     const rot = this._fragRot | 0
     let ux = uv[0], uy = uv[1]
@@ -425,18 +439,22 @@ export class StudioSoftRenderer {
     V.eye = eye
     V.nearFarViewport = [near, far, this.resW, this.resH]
     V.sunDirection = sun
-    const ambient = p.ambient * 0.35
+    // 夜は ambient を底上げ (月光相当) して地形が潰れないようにする
+    const ambient = night ? 0.38 : p.ambient * 0.35
     V.ambient = [ambient, ambient, ambient]
     V.diffuse = [p.diffuse, p.diffuse, p.diffuse]
-    V.ambientLightColour = night ? [0.10, 0.12, 0.18] : [0.38, 0.42, 0.48]
-    V.skyLightColour = night ? [0.22, 0.28, 0.42] : [1.0, 0.97, 0.90]
+    V.ambientLightColour = night ? [0.15, 0.17, 0.25] : [0.38, 0.42, 0.48]
+    V.skyLightColour = night ? [0.32, 0.38, 0.55] : [1.0, 0.97, 0.90]
     V.heldLight = [p.heldLight * 0.95, p.heldLight * 0.85, p.heldLight * 0.65]
     const D = p.fogDistance
     V.fogParams = [D === 0 ? 0 : 32 * D, D === 0 ? 5 : 32 * (D + 1)]
+    // フォグ色は地平線の空色に合わせる (GPU 側 renderer.mjs と同一)
+    V.fogColour = night ? [0.08, 0.11, 0.21] : [0.66, 0.78, 0.91]
 
     this._skySun = sun
     this._skyNight = night
     this._skyFog = V.fogColour
+    this._skySeconds = seconds
     this._skyInvRot = mat4InvViewNoTrans(yaw, -pitch)
     this._skyTan = [Math.tan(Math.PI / 6) * aspect, Math.tan(Math.PI / 6)]
   }
@@ -562,7 +580,7 @@ export class StudioSoftRenderer {
     this.ctx.drawImage(this.bufCanvas, 0, 0, this.canvas.width, this.canvas.height)
   }
 
-  // ---- skybox (renderer.mjs SKYBOX_WGSL の JS 移植) ----
+  // ---- skybox (renderer.mjs SKYBOX_WGSL の JS 移植: 四角い太陽/月 + 四角い雲) ----
   _drawSky() {
     const W = this.resW, H = this.resH
     const img = this.imgData.data
@@ -572,12 +590,32 @@ export class StudioSoftRenderer {
     const sx = sun[0], sy = sun[1], sz = sun[2]
     const sunLen2 = sx * sx + sy * sy + sz * sz
     const night = this._skyNight
+    const seconds = this._skySeconds || 0
     const fog = this._skyFog
     // day/night を先にミックス (定数)
-    const topR = mixN(0.32, 0.02, night), topG = mixN(0.52, 0.03, night), topB = mixN(0.85, 0.09, night)
-    const horR = mixN(0.74, 0.08, night), horG = mixN(0.82, 0.11, night), horB = mixN(0.92, 0.21, night)
-    const fogR = fog[0] * 0.9, fogG = fog[1] * 0.9, fogB = fog[2] * 0.9
+    const topR = mixN(0.28, 0.02, night), topG = mixN(0.47, 0.03, night), topB = mixN(0.83, 0.09, night)
+    const horR = mixN(0.66, 0.08, night), horG = mixN(0.78, 0.11, night), horB = mixN(0.91, 0.21, night)
+    const fogR = fog[0], fogG = fog[1], fogB = fog[2]
     const dayAmt = 1 - night
+    // 太陽面の正規直交基底 (四角い太陽/月判定用)
+    let bxx = 0, bxy = 1, bxz = 0
+    if (sunLen2 > 1e-6) {
+      let rx = 0, ry = 1, rz = 0
+      if (Math.abs(sy) > 0.9) { rx = 1; ry = 0 }
+      // bx = normalize(cross(sun, ref))
+      bxx = sy * rz - sz * ry; bxy = sz * rx - sx * rz; bxz = sx * ry - sy * rx
+      const bl = 1 / (Math.sqrt(bxx * bxx + bxy * bxy + bxz * bxz) || 1)
+      bxx *= bl; bxy *= bl; bxz *= bl
+      // by = cross(bx, sun)
+      var byx = bxy * sz - bxz * sy
+      var byy = bxz * sx - bxx * sz
+      var byz = bxx * sy - bxy * sx
+    }
+    const cloudT = seconds * 0.010
+    const cellHash = (cx, cy) => {
+      const s = Math.sin(cx * 12.9898 + cy * 78.233) * 43758.5453
+      return s - Math.floor(s)
+    }
     let i = 0
     for (let py = 0; py < H; py++) {
       const ndcY = 1 - 2 * (py + 0.5) / H
@@ -602,21 +640,32 @@ export class StudioSoftRenderer {
         }
         if (sunLen2 > 1e-6) {
           const sunDot = ux * sx + uy * sy + uz * sz
-          if (sunDot > 0.999) {
-            const sunAmt = smoothstep(0.9993, 0.9997, sunDot)
-            r += sunAmt; g += 0.95 * sunAmt; b += 0.82 * sunAmt
-          }
-          if (sunDot > 0.7) {
+          // 四角い太陽/月 (sun に垂直な平面への射影)
+          const du = ux * bxx + uy * bxy + uz * bxz
+          const dv = ux * byx + uy * byy + uz * byz
+          const m = Math.max(Math.abs(du), Math.abs(dv))
+          const disk = 1 - smoothstep(0.060, 0.070, m)
+          if (sunDot > 0) {
+            const sunAmt = disk * (1 - night * 0.55)
+            r += (1.0 - r) * sunAmt; g += (0.99 - g) * sunAmt; b += (0.90 - b) * sunAmt
             const s1 = sat(sunDot)
             const glow = Math.pow(s1, 220) * 0.22 + Math.pow(s1, 28) * 0.06
             r += glow * dayAmt; g += 0.85 * glow * dayAmt; b += 0.55 * glow * dayAmt
+          } else {
+            const moon = disk * night
+            r += (1.0 - r) * moon; g += (1.0 - g) * moon; b += (1.05 - b) * moon
           }
-          if (night > 0.01) {
-            const moonDot = -sunDot
-            if (moonDot > 0.999) {
-              const moon = smoothstep(0.99965, 0.99985, moonDot)
-              r += 0.9 * moon * night; g += 0.93 * moon * night; b += moon * night
-            }
+        }
+        // 四角い雲
+        if (uy > 0.06) {
+          const cu = (ux / uy) * 0.85 + cloudT
+          const cv = (uz / uy) * 0.85
+          const cellX = Math.floor(cu * 2.2), cellY = Math.floor(cv * 2.2)
+          const v = cellHash(Math.floor(cellX / 3), Math.floor(cellY / 3)) * 0.75 + cellHash(cellX, cellY) * 0.25
+          const cloudAmt = (v >= 0.62 ? 1 : 0) * sat((uy - 0.06) / 0.14) * (1 - night)
+          if (cloudAmt > 0) {
+            const cr = mixN(1.0, 0.30, night), cg = mixN(1.0, 0.33, night), cb = mixN(1.0, 0.42, night)
+            r += (cr - r) * cloudAmt; g += (cg - g) * cloudAmt; b += (cb - b) * cloudAmt
           }
         }
         if (night > 0.01 && uy > 0.02) {
@@ -980,7 +1029,7 @@ export class StudioSoftRenderer {
       slc = this._white3
     }
     L.litColour[0] = 0; L.litColour[1] = 0; L.litColour[2] = 0
-    // 2-light Lambert: main (sun 1.0) + fill ([-0.5,-1,-1] 正規化, 0.35)
+    // 2-light Lambert: main (sun 1.0) + fill ([-0.5,-1,-1] 正規化, 0.45)
     const n = F.vNormal
     let nl = Math.sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]) || 1
     const nx = n[0] / nl, ny = n[1] / nl, nz = n[2] / nl
@@ -992,7 +1041,7 @@ export class StudioSoftRenderer {
       mainL = sat(dot)
     }
     // fillDir = normalize([-0.5, -1, -1]) = [-0.3333, -0.6667, -0.6667]
-    const fillL = sat(-(nx * 0.5 + ny + nz) / 1.5) * 0.35
+    const fillL = sat(-(nx * 0.5 + ny + nz) / 1.5) * 0.45
     L.directional = mainL + fillL
     L.diffuse = view.diffuse
     const flags = this._decodeFlags(F.vFlagsBits)

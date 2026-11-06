@@ -15,7 +15,7 @@ struct SkyUniforms {
   invRot: mat4x4f,        // カメラ回転の逆 (yaw/pitch)
   tanHalf: vec4f,         // tan(fov/2)*aspect, tan(fov/2), 0, 0
   sunDirection: vec4f,    // xyz
-  night: vec4f,           // x = night [0,1]
+  night: vec4f,           // x = night [0,1], y = seconds (雲の流れ)
   fogColour: vec4f,       // xyz
 };
 @group(0) @binding(0) var<uniform> sky: SkyUniforms;
@@ -36,33 +36,58 @@ fn vsMain(@builtin(vertex_index) vi: u32) -> VOut {
   return out;
 }
 
+fn skyCellHash(c: vec2f) -> f32 {
+  return fract(sin(dot(c, vec2f(12.9898, 78.233))) * 43758.5453);
+}
+
 @fragment
 fn fsMain(in: VOut) -> @location(0) vec4f {
   let d = normalize(in.dir);
   let up = saturate(d.y * 0.5 + 0.5);
   let night = sky.night.x;
-  let dayTop = vec3f(0.32, 0.52, 0.85);
-  let dayHorizon = vec3f(0.74, 0.82, 0.92);
+  let seconds = sky.night.y;
+  let dayTop = vec3f(0.28, 0.47, 0.83);
+  let dayHorizon = vec3f(0.66, 0.78, 0.91);
   let nightTop = vec3f(0.02, 0.03, 0.09);
   let nightHorizon = vec3f(0.08, 0.11, 0.21);
   let top = mix(dayTop, nightTop, night);
   let horizon = mix(dayHorizon, nightHorizon, night);
   var skyCol = mix(horizon, top, pow(up, 0.6));
   if (d.y < 0.0) {
-    skyCol = mix(skyCol, sky.fogColour.xyz * 0.9, saturate(-d.y * 3.0));
+    skyCol = mix(skyCol, sky.fogColour.xyz, saturate(-d.y * 3.0));
   }
   let sun = sky.sunDirection.xyz;
   let sunDot = dot(d, sun);
   if (dot(sun, sun) > 1e-6) {
-    let sunAmt = smoothstep(0.9993, 0.9997, sunDot);
-    let glow = pow(saturate(sunDot), 220.0) * 0.22 + pow(saturate(sunDot), 28.0) * 0.06;
-    skyCol += vec3f(1.0, 0.95, 0.82) * sunAmt;
-    skyCol += vec3f(1.0, 0.85, 0.55) * glow * (1.0 - night);
+    // 四角い太陽/月 (bloxd・MC風): sun に垂直な平面への射影で判定
+    let ref = select(vec3f(0.0, 1.0, 0.0), vec3f(1.0, 0.0, 0.0), abs(sun.y) > 0.9);
+    let bx = normalize(cross(sun, ref));
+    let by = cross(bx, sun);
+    let du = dot(d, bx);
+    let dv = dot(d, by);
+    let m = max(abs(du), abs(dv));
+    let disk = 1.0 - smoothstep(0.060, 0.070, m);
+    if (sunDot > 0.0) {
+      let sunAmt = disk * (1.0 - night * 0.55);
+      skyCol = mix(skyCol, vec3f(1.0, 0.99, 0.90), sunAmt); // 四角く塗りつぶす
+      let glow = pow(saturate(sunDot), 220.0) * 0.22 + pow(saturate(sunDot), 28.0) * 0.06;
+      skyCol += vec3f(1.0, 0.85, 0.55) * glow * (1.0 - night);
+    } else {
+      let moon = disk * night;
+      skyCol = mix(skyCol, vec3f(1.0, 1.0, 1.05), moon);
+    }
   }
-  let moonDot = dot(d, -sun);
-  if (dot(sun, sun) > 1e-6 && night > 0.01) {
-    let moon = smoothstep(0.99965, 0.99985, moonDot);
-    skyCol += vec3f(0.9, 0.93, 1.0) * moon * night;
+  // 四角い雲 (高度固定平面 + 量子化ノイズ、ゆっくり流れる。塊で出る)
+  if (d.y > 0.06) {
+    let t = seconds * 0.010;
+    let cu = (d.x / d.y) * 0.85 + t;
+    let cv = (d.z / d.y) * 0.85;
+    let cell = floor(vec2f(cu, cv) * 2.2);
+    let big = floor(cell / 3.0);
+    let v = skyCellHash(big) * 0.75 + skyCellHash(cell) * 0.25;
+    let cloudAmt = step(0.62, v) * saturate((d.y - 0.06) / 0.14) * (1.0 - night);
+    let cloudCol = mix(vec3f(1.0, 1.0, 1.0), vec3f(0.30, 0.33, 0.42), night);
+    skyCol = mix(skyCol, cloudCol, cloudAmt);
   }
   if (night > 0.01 && d.y > 0.02) {
     let g = floor(d * 160.0);
@@ -143,8 +168,8 @@ export class StudioRenderer {
     this.compileErrors = []
     this.params = {
       sunAzimuth: 215, sunElevation: 54,
-      fogDistance: 4, lit: true, paused: false,
-      ambient: 0.5, diffuse: 0.75,
+      fogDistance: 1, lit: true, paused: false,
+      ambient: 0.45, diffuse: 0.95,
       heldLight: 0, enchantTier: 3,
       overlayOn: false
     }
@@ -263,8 +288,8 @@ export class StudioRenderer {
     this.camera.yaw = this.scene.lookYaw ?? 0
     this.camera.pitch = this.scene.lookPitch ?? 0.3
     const c = this.scene.camera
-    this.camera.dist = c ? Math.hypot(c[0], c[1], c[2]) * 0.55 : 24
-    this.camera.target = [0, this.sceneId === 'cave' ? -3 : 3, 0]
+    this.camera.dist = this.scene.camDist ?? (c ? Math.hypot(c[0], c[1], c[2]) * 0.55 : 24)
+    this.camera.target = this.scene.camTarget ?? [0, this.sceneId === 'cave' ? -3 : 3, 0]
     if (sceneId === 'night') this.params.sunElevation = -12
     else if (this.params.sunElevation < 0) this.params.sunElevation = 54
     return true
@@ -496,12 +521,13 @@ export class StudioRenderer {
       f.set([eye[0], eye[1], eye[2], 0], 16)
       f.set([near, far, this.canvas.width, this.canvas.height], 20)
       f.set([sun[0], sun[1], sun[2], 0], 24)
-      const ambient = p.ambient * 0.35
+      // 夜は ambient を底上げ (月光相当) して地形が潰れないようにする
+      const ambient = night ? 0.38 : p.ambient * 0.35
       f.set([ambient, ambient, ambient, 0], 28)
       f.set([p.diffuse, p.diffuse, p.diffuse, 0], 32)
       const alc = night ? [0.10, 0.12, 0.18] : [0.38, 0.42, 0.48]
       f.set([...alc, 0], 36)
-      const slc = night ? [0.22, 0.28, 0.42] : [1.0, 0.97, 0.90]
+      const slc = night ? [0.32, 0.38, 0.55] : [1.0, 0.97, 0.90]
       f.set([...slc, 0], 40)
       const hl = p.heldLight
       f.set([hl * 0.95, hl * 0.85, hl * 0.65, 0], 44)
@@ -509,7 +535,9 @@ export class StudioRenderer {
       const fogStart = D === 0 ? 0 : 32 * D
       const fogEnd = D === 0 ? 5 : 32 * (D + 1)
       f.set([fogStart, fogEnd, 0, 0], 48)
-      f.set([183 / 255, 191 / 255, 195 / 255, 0], 52)
+      // フォグ色は地平線の空色に合わせる (ワールドの縁を柔らかく溶かす)
+      const fogC = night ? [0.08, 0.11, 0.21] : [0.66, 0.78, 0.91]
+      f.set([...fogC, 0], 52)
       f.set([0.62, 0.42, 1.0, 1.4], 56) // enchantRGB + speed
       const u = new Uint32Array(this.viewData)
       u[60] = p.enchantTier
@@ -524,8 +552,10 @@ export class StudioRenderer {
       const tanY = Math.tan(Math.PI / 6)
       f.set([tanY * aspect, tanY, 0, 0], 16)
       f.set([sun[0], sun[1], sun[2], 0], 20)
-      f.set([night, 0, 0, 0], 24)
-      f.set([183 / 255, 191 / 255, 195 / 255, 0], 28)
+      const seconds = performance.now() / 1000 - this.startSeconds
+      f.set([night, seconds % 3600, 0, 0], 24)
+      const fogC = night ? [0.08, 0.11, 0.21] : [0.66, 0.78, 0.91]
+      f.set([...fogC, 0], 28)
       this.device.queue.writeBuffer(this.skyBuf, 0, f)
     }
   }
