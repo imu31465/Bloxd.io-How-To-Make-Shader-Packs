@@ -89,6 +89,20 @@ export function ShaderStudioApp({ lang }) {
     const canvas = canvasRef.current
     if (!canvas) return
     let r = null
+    // webgpu コンテキストを一度でも取得した canvas には getContext('2d')
+    // が二度と返らない (HTML 仕様: コンテキストモードは固定)。GPU 初期化が
+    // コンテキスト取得後に失敗した場合の CPU フォールバック用に、新しい
+    // canvas を隣に挿入して差し替える。React 管理の旧ノードは隠したまま
+    // 残す (アンマウント時の removeChild が壊れないように)。
+    let softCanvas = null
+    const detachSoftCanvas = () => {
+      if (softCanvas) {
+        softCanvas.remove()
+        softCanvas = null
+        canvas.style.display = ''
+        canvasRef.current = canvas
+      }
+    }
     const onStatus = s => {
       if (s.type === 'compiled' || s.type === 'wgsl-errors') {
         setCompileState(s)
@@ -103,12 +117,23 @@ export function ShaderStudioApp({ lang }) {
         r = gpu
       } catch (e) {
         // WebGPU なしでもプレビューできるのがこのツールの要件:
-        // WGSL を JS にトランスパイルして CPU でラスタライズする
-        const soft = new StudioSoftRenderer(canvas, { onStatus })
+        // WGSL を JS にトランスパイルして CPU でラスタライズする。
+        // コンテキストが webgpu で固定済みなら 2d を取れないので canvas を新調する。
+        let target = canvas
+        if (!canvas.getContext || !canvas.getContext('2d')) {
+          target = document.createElement('canvas')
+          target.className = canvas.className
+          target.style.touchAction = 'none'
+          canvas.style.display = 'none'
+          canvas.parentNode?.insertBefore(target, canvas.nextSibling)
+          softCanvas = target
+          canvasRef.current = target
+        }
+        const soft = new StudioSoftRenderer(target, { onStatus })
         await soft.init()
         r = soft
       }
-      if (cancelled) { r.destroy(); return }
+      if (cancelled) { r.destroy(); detachSoftCanvas(); return }
       rendererRef.current = r
       setSoftMode(!!r.soft)
       r.resize()
@@ -136,6 +161,8 @@ export function ShaderStudioApp({ lang }) {
     }
     boot().catch(e => {
       if (cancelled) return
+      // soft 初期化自体が失敗した場合も、差し替えた canvas を解除して元に戻す
+      detachSoftCanvas()
       setInitError(String(e?.message || e))
       setInitState('error')
     })
@@ -145,6 +172,7 @@ export function ShaderStudioApp({ lang }) {
       cancelled = true
       window.removeEventListener('resize', onResize)
       rendererRef.current?.destroy()
+      detachSoftCanvas()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -239,9 +267,12 @@ export function ShaderStudioApp({ lang }) {
 
   return (
     <div className="x:not-first:mt-6">
-      <h1 className="x:text-3xl x:font-bold x:mb-1">{t.title}</h1>
+      <h1 className="x:text-3xl x:font-bold x:mb-1">
+        {t.title}
+        <span className="x:ml-2 x:align-middle x:text-xs x:font-semibold x:uppercase x:tracking-wider x:px-1.5 x:py-0.5 x:rounded x:border x:border-blue-500/40 x:bg-blue-500/10 x:text-blue-600 x:dark:text-blue-400">beta</span>
+      </h1>
       <p className="x:text-sm x:text-gray-600 x:dark:text-gray-400 x:mb-2">{t.tagline}</p>
-      <p className="x:text-xs x:text-gray-500 x:dark:text-gray-500 x:mb-4">⚠︎ {t.note}</p>
+      <p className="x:text-xs x:text-gray-500 x:dark:text-gray-500 x:mb-4">{t.note}</p>
 
       <div className="x:grid x:grid-cols-1 lg:x:grid-cols-[1fr_300px] x:gap-4">
         {/* ---------------- プレビュー ---------------- */}
@@ -267,7 +298,7 @@ export function ShaderStudioApp({ lang }) {
             )}
             {softMode && initState === 'ready' && (
               <div className="x:absolute x:top-2 x:left-2 x:text-[10px] x:font-mono x:px-1.5 x:py-0.5 x:rounded x:bg-black/60 x:text-amber-300">
-                ⚡ {t.cpuMode}{softRes ? ` · ${softRes.w}×${softRes.h}` : ''}
+                {t.cpuMode}{softRes ? ` · ${softRes.w}×${softRes.h}` : ''}
               </div>
             )}
             <div className="x:absolute x:bottom-2 x:right-3 x:text-[10px] x:text-gray-400 x:font-mono x:flex x:gap-3">
@@ -292,7 +323,7 @@ export function ShaderStudioApp({ lang }) {
               </span>
             </div>
             {(validation.errors.length === 0 && validation.warnings.length === 0 && !compileState?.errors?.length) && (
-              <p className="x:text-xs x:text-green-600">✓ {t.noIssues}</p>
+              <p className="x:text-xs x:text-green-600">{t.noIssues}</p>
             )}
             {validation.errors.map((e, i) => (
               <p key={'e' + i} className="x:text-xs x:text-red-500 x:font-mono x:mb-0.5">
@@ -335,7 +366,7 @@ export function ShaderStudioApp({ lang }) {
               <button
                 onClick={() => setSeed(1 + Math.floor(Math.random() * 99999))}
                 className="nextra-border x:border x:rounded x:px-2 x:py-1 x:text-xs x:cursor-pointer x:hover:bg-gray-100 x:dark:x:hover:bg-gray-800"
-              >🎲 {t.randomize}</button>
+              >{t.randomize}</button>
             </div>
           )}
 

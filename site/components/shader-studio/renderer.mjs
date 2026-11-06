@@ -161,7 +161,22 @@ export class StudioRenderer {
     }
     this.adapter = await navigator.gpu.requestAdapter()
     if (!this.adapter) throw new Error('WebGPU adapter unavailable')
-    this.device = await this.adapter.requestDevice()
+    // アトラスは ATLAS_LAYERS (1232) 層で、WebGPU の既定上限
+    // maxTextureArrayLayers=256 を超える。requiredLimits で明示的に
+    // 要求しないと createTexture が Invalid Texture になり、以降の
+    // writeTexture / createView / createBindGroup が連鎖して失敗する。
+    // 要求値がアダプター上限を超えると requestDevice 自体が reject され
+    // るため、先にアダプター上限を確認する (この時点なら canvas への
+    // コンテキスト取得前なので、CPU フォールバックへの退路も残る)。
+    const adapterMaxLayers = this.adapter.limits?.maxTextureArrayLayers ?? 256
+    if (adapterMaxLayers < ATLAS_LAYERS) {
+      throw new Error(
+        `GPU texture array limit too small: adapter supports ${adapterMaxLayers} layers, atlas needs ${ATLAS_LAYERS}.`
+      )
+    }
+    this.device = await this.adapter.requestDevice({
+      requiredLimits: { maxTextureArrayLayers: ATLAS_LAYERS }
+    })
     this.ctx = this.canvas.getContext('webgpu')
     this.format = navigator.gpu.getPreferredCanvasFormat()
     this.ctx.configure({ device: this.device, format: this.format, alphaMode: 'opaque' })

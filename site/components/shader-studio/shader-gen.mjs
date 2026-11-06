@@ -156,10 +156,10 @@ struct FragmentOut {
 
 fn decodeFlags(bits: u32) -> BloxdFlags {
   return BloxdFlags(
-    (bits & 1u) != 0u, (bits >> 1u & 1u) != 0u, (bits >> 2u & 1u) != 0u, (bits >> 3u & 1u) != 0u,
-    (bits >> 4u & 1u) != 0u, (bits >> 5u & 1u) != 0u, (bits >> 6u & 1u) != 0u, (bits >> 7u & 1u) != 0u,
-    (bits >> 8u & 1u) != 0u, (bits >> 9u & 1u) != 0u, (bits >> 10u & 1u) != 0u, (bits >> 11u & 1u) != 0u,
-    (bits >> 12u & 1u) != 0u, (bits >> 13u & 1u) != 0u);
+    (bits & 1u) != 0u, ((bits >> 1u) & 1u) != 0u, ((bits >> 2u) & 1u) != 0u, ((bits >> 3u) & 1u) != 0u,
+    ((bits >> 4u) & 1u) != 0u, ((bits >> 5u) & 1u) != 0u, ((bits >> 6u) & 1u) != 0u, ((bits >> 7u) & 1u) != 0u,
+    ((bits >> 8u) & 1u) != 0u, ((bits >> 9u) & 1u) != 0u, ((bits >> 10u) & 1u) != 0u, ((bits >> 11u) & 1u) != 0u,
+    ((bits >> 12u) & 1u) != 0u, ((bits >> 13u) & 1u) != 0u);
 }
 
 // lift curve: 光レベル (0-15) → 0-1 (エンジンと同一式)
@@ -227,10 +227,10 @@ fn buildSurfaceIn(f: FragmentOut) -> BloxdSurfaceIn {
 fn buildLightIn(f: FragmentOut) -> BloxdLightIn {
   var l: BloxdLightIn;
   let flags = decodeFlags(f.vFlagsBits);
-  let rLevel = f32(f.vLightLevels >> 24u & 15u);
-  let gLevel = f32(f.vLightLevels >> 20u & 15u);
-  let bLevel = f32(f.vLightLevels >> 16u & 15u);
-  let skyLevel = f32(f.vLightLevels >> 12u & 15u);
+  let rLevel = f32((f.vLightLevels >> 24u) & 15u);
+  let gLevel = f32((f.vLightLevels >> 20u) & 15u);
+  let bLevel = f32((f.vLightLevels >> 16u) & 15u);
+  let skyLevel = f32((f.vLightLevels >> 12u) & 15u);
   var blockLight = vec3f(bloxdSpLift(rLevel), bloxdSpLift(gLevel), bloxdSpLift(bLevel));
   // 35% フロア (エンジンはデコード時に各チャンネルを最も明るいRGBの35%で床上げ)
   let brightest = max(max(blockLight.r, blockLight.g), blockLight.b);
