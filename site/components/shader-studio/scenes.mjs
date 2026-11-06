@@ -11,6 +11,11 @@ const texId = name => {
   return e ? e.id : 0
 }
 
+// テクスチャの平均色 (bny9u 実測) — エンジン仕様の
+// 「colour = テクスチャ × tint × AO」に合わせて mesher がベイクする。
+// スタジオは頂点色で運ぶため平均色 (パターンは bloxdTexel で読める)。
+const texAvg = name => registry.colors[name] ?? [0.6, 0.6, 0.62]
+
 // フラグビット (BloxdFlags の 14 bool と同じ順)
 export const FLAG = {
   OPAQUE: 0, EMISSIVE: 1, VEGETATION: 2, DIRT: 3, SAND: 4, ROCK: 5,
@@ -397,23 +402,24 @@ export function buildMeshes(scene) {
       const id = texId(texName)
       const layer = id - 1
       const texRot = 0
+      const avg = texAvg(texName)
 
       // 面中心の光
       const lightRGB = emissive ? [1, 1, 1] : lightAt(sb.lights, x + 0.5 + dx * 0.5, y + 0.5 + dy * 0.5, z + 0.5 + dz * 0.5)
       const sky = emissive ? 15 : skyLightAt(blocks, x, y, z, maxY)
 
-      const base = buffers[program].length / 12
+      const base = buffers[program].length / 21
       for (let ci = 0; ci < 4; ci++) {
         const c = face.corners[ci]
         const ao = def.flags.includes(FLAG.OPAQUE) || program === 'liquid'
           ? vertexAO(dx, dy, dz, c, (ox, oy, oz) => opaqueAt(x + ox + (dx && c[0] === 1 ? 1 : 0) * 0, y + oy, z + oz) && true)
           : 1
-        // AOをtintとしてcolourにベイク (エンジンの mesher と同じ: tint×AO)
+        // AOとテクスチャ平均色を colour にベイク (エンジンの mesher と同じ: texture × tint × AO)
         const aoF = program === 'liquid' ? Math.max(ao, 0.9) : ao
         const v = [
           x + c[0], y + c[1], z + c[2],
           dx, dy, dz,
-          Math.round(255 * aoF), Math.round(255 * aoF), Math.round(255 * aoF), 255, // colour u8n
+          Math.round(255 * aoF * avg[0]), Math.round(255 * aoF * avg[1]), Math.round(255 * aoF * avg[2]), 255, // colour u8n
           FACE_UVS[ci][0], FACE_UVS[ci][1],
           layer, // atlasIndex (f32)
           id, texRot, 0.0, // textureId, rotation, mip
@@ -458,7 +464,8 @@ function buildModelMeshes(models) {
   function pushBox(cx, cy, cz, sx, sy, sz, texName, flagsBits, extra = {}) {
     const id = texId(texName)
     const layer = id - 1
-    const base = verts.length / 12
+    const avg = texAvg(texName)
+    const base = verts.length / 21
     for (const face of FACES) {
       const [dx, dy, dz] = face.dir
       for (let ci = 0; ci < 4; ci++) {
@@ -466,7 +473,7 @@ function buildModelMeshes(models) {
         verts.push(
           cx + (c[0] - 0.5) * sx, cy + (c[1] - 0.5) * sy, cz + (c[2] - 0.5) * sz,
           dx, dy, dz,
-          255, 255, 255, 255,
+          Math.round(255 * avg[0]), Math.round(255 * avg[1]), Math.round(255 * avg[2]), 255,
           FACE_UVS[ci][0], FACE_UVS[ci][1],
           layer, id, texRotOf(face), 0.0,
           flagsBits,

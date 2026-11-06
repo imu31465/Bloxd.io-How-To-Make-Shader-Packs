@@ -1,10 +1,12 @@
 'use client'
 
 // Shader Studio 本体: WebGPU プレビュー + エディタ + コントロール + 検証。
-// レンダラー (renderer.mjs) はエンジン実測仕様に忠実な再現。
+// WebGPU が使えない環境では soft-renderer.mjs (WGSL→JS トランスパイル +
+// CPU ラスタライズ) へ自動フォールバックし、GPU API なしでプレビューする。
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { StudioRenderer } from './renderer.mjs'
+import { StudioSoftRenderer } from './soft-renderer.mjs'
 import { validatePack } from './validator.mjs'
 import { STUDIO_I18N } from '../../lib/studio-i18n.mjs'
 import registry from '../../lib/studio/registry.json'
@@ -69,6 +71,8 @@ export function ShaderStudioApp({ lang }) {
   const [fps, setFps] = useState(0)
   const [compileState, setCompileState] = useState(null)
   const [editorKey, setEditorKey] = useState(0)
+  const [softMode, setSoftMode] = useState(false)
+  const [softRes, setSoftRes] = useState(null)
 
   // パラメータ (スライダー) — renderer.params を直接更新
   const paramsRef = useRef(null)
@@ -79,21 +83,34 @@ export function ShaderStudioApp({ lang }) {
   }
   const [ui, setUi] = useState({ ...paramsRef.current })
 
-  // ---- 初期化 ----
+  // ---- 初期化 (WebGPU → 失敗時 CPU ソフトウェアレンダリングへフォールバック) ----
   useEffect(() => {
     let cancelled = false
     const canvas = canvasRef.current
     if (!canvas) return
-    const r = new StudioRenderer(canvas, {
-      onStatus: s => {
-        if (s.type === 'compiled' || s.type === 'wgsl-errors') {
-          setCompileState(s)
-        }
+    let r = null
+    const onStatus = s => {
+      if (s.type === 'compiled' || s.type === 'wgsl-errors') {
+        setCompileState(s)
+      } else if (s.type === 'soft-res') {
+        setSoftRes({ w: s.w, h: s.h })
       }
-    })
-    rendererRef.current = r
-    r.init().then(() => {
-      if (cancelled) return
+    }
+    const boot = async () => {
+      try {
+        const gpu = new StudioRenderer(canvas, { onStatus })
+        await gpu.init()
+        r = gpu
+      } catch (e) {
+        // WebGPU なしでもプレビューできるのがこのツールの要件:
+        // WGSL を JS にトランスパイルして CPU でラスタライズする
+        const soft = new StudioSoftRenderer(canvas, { onStatus })
+        await soft.init()
+        r = soft
+      }
+      if (cancelled) { r.destroy(); return }
+      rendererRef.current = r
+      setSoftMode(!!r.soft)
       r.resize()
       r.setPack(appliedCode)
       r.setStrict(strict)
@@ -116,17 +133,18 @@ export function ShaderStudioApp({ lang }) {
         if (!cancelled) requestAnimationFrame(tick)
       }
       requestAnimationFrame(tick)
-    }).catch(e => {
+    }
+    boot().catch(e => {
       if (cancelled) return
       setInitError(String(e?.message || e))
       setInitState('error')
     })
-    const onResize = () => r.resize()
+    const onResize = () => rendererRef.current?.resize()
     window.addEventListener('resize', onResize)
     return () => {
       cancelled = true
       window.removeEventListener('resize', onResize)
-      r.destroy()
+      rendererRef.current?.destroy()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -245,6 +263,11 @@ export function ShaderStudioApp({ lang }) {
                   <p className="x:text-red-400 x:text-sm x:font-medium x:mb-1">{t.webgpuMissing}</p>
                   <p className="x:text-gray-500 x:text-xs">{initError}</p>
                 </div>
+              </div>
+            )}
+            {softMode && initState === 'ready' && (
+              <div className="x:absolute x:top-2 x:left-2 x:text-[10px] x:font-mono x:px-1.5 x:py-0.5 x:rounded x:bg-black/60 x:text-amber-300">
+                ⚡ {t.cpuMode}{softRes ? ` · ${softRes.w}×${softRes.h}` : ''}
               </div>
             )}
             <div className="x:absolute x:bottom-2 x:right-3 x:text-[10px] x:text-gray-400 x:font-mono x:flex x:gap-3">

@@ -6,7 +6,7 @@ import { makeShaderSource } from './shader-gen.mjs'
 import { buildAtlasPixels, buildMips, animLadderInfo, ATLAS_TILE, ATLAS_LAYERS } from './textures.mjs'
 import { buildMeshes, SCENES } from './scenes.mjs'
 
-const FLOATS_PER_VERTEX = 12 // 48B
+const FLOATS_PER_VERTEX = 21 // 84B (scenes.mjs の 1 頂点 21 float と一致)
 const MIP_LEVELS = 4         // 16, 8, 4, 2
 
 // ------------------------------------------------------------ skybox ----
@@ -75,7 +75,7 @@ fn fsMain(in: VOut) -> @location(0) vec4f {
 `
 
 // ------------------------------------------------------------ matrices ---
-function mat4Perspective(fovY, aspect, near, far) {
+export function mat4Perspective(fovY, aspect, near, far) {
   const f = 1 / Math.tan(fovY / 2)
   const o = new Float32Array(16)
   o[0] = f / aspect; o[5] = f
@@ -83,7 +83,7 @@ function mat4Perspective(fovY, aspect, near, far) {
   o[14] = (far * near) / (near - far)
   return o
 }
-function mat4View(eye, yaw, pitch) {
+export function mat4View(eye, yaw, pitch) {
   const cy = Math.cos(yaw), sy = Math.sin(yaw)
   const cp = Math.cos(pitch), sp = Math.sin(pitch)
   const fwd = [sy * cp, sp, -cy * cp]
@@ -103,7 +103,7 @@ function mat4View(eye, yaw, pitch) {
   o[15] = 1
   return o
 }
-function mat4Mul(a, b) {
+export function mat4Mul(a, b) {
   const o = new Float32Array(16)
   for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
     o[c * 4 + r] = a[0 * 4 + r] * b[c * 4 + 0] + a[1 * 4 + r] * b[c * 4 + 1] + a[2 * 4 + r] * b[c * 4 + 2] + a[3 * 4 + r] * b[c * 4 + 3]
@@ -111,7 +111,7 @@ function mat4Mul(a, b) {
   return o
 }
 // カメラ回転の逆 (world←camera、平行移動なし) — skybox の方向復元用
-function mat4InvViewNoTrans(yaw, pitch) {
+export function mat4InvViewNoTrans(yaw, pitch) {
   const cy = Math.cos(yaw), sy = Math.sin(yaw)
   const cp = Math.cos(pitch), sp = Math.sin(pitch)
   const fwd = [sy * cp, sp, -cy * cp]
@@ -396,11 +396,20 @@ export class StudioRenderer {
     const w = this.canvas.width, h = this.canvas.height
     if (this.depthTex && this.depthTex.width === w && this.depthTex.height === h) return
     if (this.depthTex) this.depthTex.destroy()
+    if (this.depthCopyTex) this.depthCopyTex.destroy()
     this.depthTex = this.device.createTexture({
       size: [w, h], format: 'depth24plus',
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC
     })
     this.depthView = this.depthTex.createView()
+    // liquid 用のサンプルコピー: 同一テクスチャを同一パスで attachment と
+    // binding の両方には使えない (WebGPU の usage scope 規則) ので、liquid
+    // パスの直前にコピーしてこちらをサンプルする。
+    this.depthCopyTex = this.device.createTexture({
+      size: [w, h], format: 'depth24plus',
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
+    })
+    this.depthCopyView = this.depthCopyTex.createView()
     this.depthSampler = this.device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' })
     if (this.bgl3) this._buildBindGroups()
   }
@@ -419,8 +428,8 @@ export class StudioRenderer {
       { binding: 0, resource: { buffer: this.packInputsBuf } },
       { binding: 2, resource: { buffer: this.layersBuf } }
     ]
-    if (this.bgl3.entries.length > 2 && this.depthView) {
-      e3.push({ binding: 1, resource: this.depthView })
+    if (this.bgl3.entries.length > 2 && this.depthCopyView) {
+      e3.push({ binding: 1, resource: this.depthCopyView })
       e3.push({ binding: 3, resource: this.depthSampler })
     }
     this.bg3 = this.device.createBindGroup({ layout: this.bgl3, entries: e3 })
@@ -442,15 +451,18 @@ export class StudioRenderer {
 
     const { yaw, pitch, dist, target } = this.camera
     const cp = Math.cos(pitch), sp = Math.sin(pitch)
+    // orbit eye: pitch>0 = 俯瞰 (目標を上から見下ろす)。look 方向は
+    // (sy·cp, −sp, −cy·cp) なので eye はその逆方向に置く。
+    // (旧実装は eye = target + dist·fwd で目標の「後ろ側」→シーンと逆向き)
     const eye = [
-      target[0] + dist * Math.sin(yaw) * cp,
+      target[0] - dist * Math.sin(yaw) * cp,
       target[1] + dist * sp,
-      target[2] - dist * Math.cos(yaw) * cp
+      target[2] + dist * Math.cos(yaw) * cp
     ]
     const aspect = this.canvas.width / Math.max(1, this.canvas.height)
     const near = 0.1, far = 400
     const proj = mat4Perspective(Math.PI / 3, aspect, near, far)
-    this.viewProj = mat4Mul(proj, mat4View(eye, yaw, pitch))
+    this.viewProj = mat4Mul(proj, mat4View(eye, yaw, -pitch))
 
     // bloxdPackInputs (64B): seconds@0 lit@4 renderOffset@16 sunDirection@32 eyePosition@48
     {
@@ -493,7 +505,7 @@ export class StudioRenderer {
     // skybox uniform (128B)
     {
       const f = new Float32Array(32)
-      f.set(mat4InvViewNoTrans(yaw, pitch), 0)
+      f.set(mat4InvViewNoTrans(yaw, -pitch), 0)
       const tanY = Math.tan(Math.PI / 6)
       f.set([tanY * aspect, tanY, 0, 0], 16)
       f.set([sun[0], sun[1], sun[2], 0], 20)
@@ -571,6 +583,14 @@ export class StudioRenderer {
       const p = this.pipelines.liquid
       const mesh = this.meshes?.liquid
       if (p?.pipeline && mesh) {
+        // 深度をサンプリング用コピーへ (attachment と binding の同時使用を回避)
+        if (this.depthCopyTex) {
+          encoder.copyTextureToTexture(
+            { texture: this.depthTex },
+            { texture: this.depthCopyTex },
+            [this.canvas.width, this.canvas.height]
+          )
+        }
         const pass = encoder.beginRenderPass({
           colorAttachments: [{ view, loadOp: 'load', storeOp: 'store' }],
           depthStencilAttachment: { view: this.depthView, depthLoadOp: 'load', depthStoreOp: 'store' }

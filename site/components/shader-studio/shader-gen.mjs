@@ -14,8 +14,35 @@
 //   - lift curve 1-(1-x/(3-2x))^3 と blockLight の35%フロア
 
 import { preprocessWgsl } from './preprocess.mjs'
-import { ATLAS_LAYERS } from './textures.mjs'
+import { registry, ATLAS_LAYERS } from './textures.mjs'
 import ENGINE_HEADER from './engine-header.mjs'
+
+// bloxdTextureId* 名前付き定数群 (docs: api/texture-api.md)。エンジンと同じ
+// 生成規則 — テクスチャ名を非英数字の連続で分割し各部分を頭文字大文字化して連結。
+// 大小文字・アンダースコアの畳み込み照合はエンジン側機能のため、ここでは生成された
+// 綴りそのまま (studio では正規 CamelCase を推奨)。
+export function makeTextureIdConstants() {
+  const seen = new Set()
+  const out = []
+  for (const { name, id } of registry.names) {
+    const cname = 'bloxdTextureId' + name
+      .split(/[^a-zA-Z0-9]+/).filter(Boolean)
+      .map(p => p[0].toUpperCase() + p.slice(1)).join('')
+    if (seen.has(cname)) continue // 畳み込み後の重複 (エンジンでは曖昧エラー)
+    seen.add(cname)
+    out.push(`const ${cname}: u32 = ${id}u;`)
+  }
+  return out.join('\n')
+}
+
+// bloxdFragmentBlockPosition — v5 ヘッダーからは外れたがエンジンが今も注入する
+// 非公開関数 (docs: api/functions.md)。地形/液体の定義を全プログラムに適用
+// (モデル版の 1/64 スナップ変種は未公開のため同一式で近似)。
+export const FRAGMENT_BLOCK_POSITION_WGSL = /* wgsl */`
+fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i {
+    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
+}
+`
 
 export function makeVariantMacros(program, strict) {
   const macros = []
@@ -95,6 +122,7 @@ struct ViewUniforms {
 var<private> bloxdSpTextureRotation: u32;
 var<private> bloxdSpFragPosition: vec3f;
 var<private> bloxdSpScreenUV: vec2f;
+var<private> bloxdSpFragDepth: f32;
 
 // ---- 頂点入力 (mesher 相当: 12 float = 48B) ----
 struct VertexIn {
@@ -162,6 +190,11 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
   let level = u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u)));
   return textureSampleLevel(textureAtlas0, textureAtlasSampler, bloxdSpTurned, level, layer);
 }
+
+// ---- bloxdTextureId* 名前付き定数 (911名) + 非公開だが今も注入される
+// bloxdFragmentBlockPosition (api/functions.md 参照) ----
+${makeTextureIdConstants()}
+${FRAGMENT_BLOCK_POSITION_WGSL}
 `
 
   // ------------------------------------------------ runtime (hooks wiring) ---
@@ -252,14 +285,20 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
   if (d >= 0.9999) {
     return BloxdOpaqueBehind(false, vec3f(0.0), 0.0);
   }
-  let ndcZ = d * 2.0 - 1.0;
+  // レイスケール復元 — 実エンジンと同じ式 (docs: history/v3 §51):
+  //   behind = eye + (frag - eye) * max(zOpaque / zFrag, 1)
+  // z は軸距離 (near/far から再構築)。同一レイ上では軸距離の比率がそのまま
+  // レイパラメータになるため、方向の除算が不要で数値も安定。
   let near = view.nearFarViewport.x;
   let far = view.nearFarViewport.y;
-  let viewZ = 2.0 * near * far / (far + near - ndcZ * (far - near));
-  let dist = -viewZ;
-  let dir = normalize(bloxdSpFragPosition - bloxdEyePosition());
-  let hitPos = bloxdEyePosition() + dir * dist;
-  return BloxdOpaqueBehind(true, hitPos, dist);
+  let ndcOpaque = d * 2.0 - 1.0;
+  let axisOpaque = 2.0 * near * far / (far + near - ndcOpaque * (far - near));
+  let ndcFrag = bloxdSpFragDepth * 2.0 - 1.0;
+  let axisFrag = 2.0 * near * far / (far + near - ndcFrag * (far - near));
+  let scale = max(axisOpaque / axisFrag, 1.0);
+  let eye = bloxdEyePosition();
+  let behind = eye + (bloxdSpFragPosition - eye) * scale;
+  return BloxdOpaqueBehind(true, behind, distance(behind, eye));
 }` : ''}
 
 @vertex
@@ -291,6 +330,7 @@ fn fsMain(f: FragmentOut) -> @location(0) vec4f {
   bloxdSpTextureRotation = f.vTextureRotation;
   bloxdSpFragPosition = f.vPosition;
   bloxdSpScreenUV = f.pos.xy / view.nearFarViewport.zw;
+  bloxdSpFragDepth = f.pos.z;
 
   var surface = buildSurfaceIn(f);
   // splice 相当: surface フック → baseColor / alpha の書き戻し
