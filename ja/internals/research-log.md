@@ -23,6 +23,7 @@
 | `ab90qa` | **v5** | 2026-11-03 | v5 初回ビルド。元の v5 基準。prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | レジストリドリフト (+10 名)。preprod `2lcqcl` はシェーダーパック関連の全表面で同一と実測 |
 | `bny9u` | **v5** | 2026-11-05 | **現行**。本ドキュメントのベースライン。prod = preprod (メインバンドル md5 `60eea80ec48253b7ac6cc45604dc8273`、両ホストから生取得で確認) |
+| `v98qt8` | **v5** | 2026-11-08 | **現行**。本ドキュメントの基準ビルド。prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`)。レジストリドリフト (純 −5)、ゲーム定義 115 → 116、**テクスチャ定数畳み込みリグレッション** ([テクスチャレジストリの内部](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## 主な計測手法
 
@@ -56,6 +57,7 @@ uniform レイアウトモジュール (29838) から `BloxdPackInputs` のフ�
 | cnty9 → ab90qa | 7日 | +1 (scorpion_eggs)・−10 (ダブルチェスト×8・スポナー側面×2)、334/905 名が id 変化 |
 | ab90qa → xkg8x | 1日 | +10 (v5 初回の除去が全部復活: double chest×8、スポナー側面×2); 896名中376名がid変更; 削除なし |
 | xkg8x → bny9u | 1日 | +5 (Trading Terminal ×3、Stone Generator ×2); 906名中864名がid変更 (95%); 削除なし; アニメーション族 42 → 43 |
+| bny9u → v98qt8 | 3 日 | +1 `hay_block_top`、−6 (Furnace/Workbench/Artisan Bench がモデル化); 905 名中 716 名が id 変更 (79%); 両族とも不変; **畳み込みリグレッション** — エンジンは 1,047 の未畳み込み名を解決 |
 
 ## 未確認・推測事項
 

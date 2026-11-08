@@ -22,7 +22,8 @@
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 फ़्रीज़ की पुष्टि (Halloween इवेंट + Skyblock रीवर्क) |
 | `ab90qa` | **v5** | 2026-11-03 | v5 लॉन्च बिल्ड; मूल v5 आधाररेखा। prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | रजिस्ट्री-ड्रिफ़्ट (+10 नाम); preprod `2lcqcl` शेडर-पैक की हर सतह पर समान मापा गया |
-| `bny9u` | **v5** | 2026-11-05 | **वर्तमान**; इस दस्तावेज़ का बेसलाइन। prod = preprod (मुख्य बंडल पर md5 `60eea80ec48253b7ac6cc45604dc8273`, दोनों होस्ट से लाइव-फ़ेच करके पुष्ट) |
+| `bny9u` | **v5** | 2026-11-05 | ; इस दस्तावेज़ का बेसलाइन। prod = preprod (मुख्य बंडल पर md5 `60eea80ec48253b7ac6cc45604dc8273`, दोनों होस्ट से लाइव-फ़ेच करके पुष्ट) |
+| `v98qt8` | **v5** | 2026-11-08 | **वर्तमान**; इस दस्तावेज़ का बेसलाइन. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). रजिस्ट्री ड्रिफ़्ट (शुद्ध −5), गेम 115 → 116, और **टेक्सचर-स्थिरांक फ़ोल्डिंग प्रतिगमन** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## प्रमुख पद्धति
 
@@ -56,6 +57,7 @@ uniform-लेआउट मॉड्यूल (29838) से `BloxdPackInputs` �
 | cnty9 → ab90qa | 7 दिन | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 नामों का id बदला |
 | ab90qa → xkg8x | 1 दिन | +10 (v5 लॉन्च के सभी हटाए नाम लौटे: डबल चेस्ट ×8, स्पॉनर साइड ×2); 376/896 नामों का id बदला; कोई हटाया नहीं गया |
 | xkg8x → bny9u | 1 दिन | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 नामों का id बदला (95%); कोई हटाया नहीं गया; एनीमेशन परिवार 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## असत्यापित / अनुमान-आधारित
 

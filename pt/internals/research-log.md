@@ -22,7 +22,8 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmação do congelamento da v4 (evento de Halloween + rework de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | build de lançamento da v5; linha de base original da v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | deriva de registro (+10 nomes); preprod `2lcqcl` medido idêntico em toda superfície de shader packs |
-| `bny9u` | **v5** | 2026-11-05 | **atual**; linha de base desta documentação. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` no bundle principal, baixado ao vivo de ambos os hosts) |
+| `bny9u` | **v5** | 2026-11-05 | ; linha de base desta documentação. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` no bundle principal, baixado ao vivo de ambos os hosts) |
+| `v98qt8` | **v5** | 2026-11-08 | **atual**; linha de base desta documentação. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). deriva do registro (−5 líquido), jogos 115 → 116, e a **regressão de dobragem de constantes de textura** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## Metodologia chave
 
@@ -56,6 +57,7 @@ O layout de campos de `BloxdPackInputs` do módulo de layout de uniform (29838);
 | cnty9 → ab90qa | 7 dias | +1 (scorpion_eggs), −10 (cofre duplo ×8, laterais de spawner ×2); 334/905 nomes mudaram de id |
 | ab90qa → xkg8x | 1 dia | +10 (todas as remoções do lançamento da v5 voltaram: baú duplo ×8, laterais de spawner ×2); 376/896 nomes mudaram de id; nenhum removido |
 | xkg8x → bny9u | 1 dia | +5 (Terminal de Troca ×3, Gerador de Pedra ×2); 864/906 nomes mudaram de id (95%); nenhum removido; famílias de animação 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## Não verificado / especulativo
 

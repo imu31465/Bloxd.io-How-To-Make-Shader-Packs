@@ -1,6 +1,6 @@
 # Hooks de shader
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção em 2026-11-05) · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Verified
 
 Um pacote pode se conectar a **9 hooks**: 3 alvos de renderização (Terrain / Liquid / Model) × 3 estágios de pipeline (Vertex / Surface / Light). Todos são opcionais — um hook indefinido cai no padrão do motor.
 

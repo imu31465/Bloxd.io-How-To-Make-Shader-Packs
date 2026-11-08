@@ -1,6 +1,6 @@
 # Sombreadores de modelo
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Analyzed (escrito contra la especificación de cabecera v5)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Analyzed (escrito contra la especificación de cabecera v5)
 
 Recetas con los hooks de Model de v5 y los nuevos flags para selecciones de **«qué estoy mirando» que eran imposibles antes de v5**. Lo básico: [Modelos y texturas](../guides/models.md).
 

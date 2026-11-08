@@ -1,6 +1,6 @@
 # Compatibilité
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Verified
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified
 
 Comment le jeu actuel et les packs d'anciennes versions interopèrent.
 
@@ -39,6 +39,10 @@ Le piège silencieux cette fois : les packs qui continuent de lire `blockFlags` 
 ## Revalidation des packs sauvegardés (« à revérifier »)
 
 `HEADER_VERSION` vaut `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (l'entier initial est passé du 8 de v4 à 9). Quand l'en-tête du moteur ou le registre de textures change (fréquent avec les mises à jour du jeu), les packs sauvegardés sont marqués « à revérifier » et se revalident automatiquement au chargement de la page.
+
+**Réserve v98qt8 :** la régression de pliage du build actuel ([Intérieurs du moteur : Registre de textures](../internals/texture-registry.md#the-v98qt8-folding-regression)) change ce que le moteur hache — le suffixe de registre calculé est la table *dépliée* de 1 047 lignes (`694df62c`), et non la table pliée de 906 lignes prévue (`df6c1915`, était `e735ebdc` sur `bny9u`). Chaque pack enregistré se revalide donc sur ce build, et les packs référençant l'un des 43 noms de base des familles d'animation (`lava`, …) **échouent** ensuite à la revalidation jusqu'à correction côté moteur — écrivez malgré tout les noms pliés ; ce sont l'API.
+
+
 
 Un exemple mesuré du mouvement du registre (deux builds, à 10 jours d'écart) : entrées 1200 → 1219 (98 ajoutées, 79 retirées), et parmi les noms ayant conservé leur orthographe, **779 sur 1121 ont changé d'id**. Autrement dit :
 

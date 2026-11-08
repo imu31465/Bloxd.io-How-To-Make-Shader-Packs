@@ -1,6 +1,6 @@
 # Shaders de modèle
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Analyzed (rédigé à partir de la spécification d'en-tête v5)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Analyzed (rédigé à partir de la spécification d'en-tête v5)
 
 Recettes utilisant les hooks Model de v5 et les nouveaux flags pour des sélections **« qu'est-ce que je suis en train de regarder », impossibles avant v5**. Les bases : [Modèles et textures](../guides/models.md).
 

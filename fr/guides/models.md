@@ -1,6 +1,6 @@
 # Modèles et textures
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production 2026-11-05) · État : Analyzed (restauré depuis l'en-tête et le validateur)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production 2026-11-08) · État : Analyzed (restauré depuis l'en-tête et le validateur)
 
 Ce que dessinent et lisent les nouveaux hooks Model de la v5.
 

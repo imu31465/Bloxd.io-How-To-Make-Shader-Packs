@@ -1,6 +1,6 @@
 # Emisión
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > `emission` se suma tras el cálculo de iluminación, pero el proceso por defecto **lo atenúa con la cantidad de niebla (`fogAlpha`). En distancia totalmente anegada la emisión también desaparece. Para mantener brillo a lo lejos, no sumes a emission — suma directamente como `out.colour += ...` dentro del hook light** (la salida por defecto ya lleva niebla, así que a lo lejos la luz cae sobre el color de niebla)
 

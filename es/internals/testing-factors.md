@@ -1,6 +1,6 @@
 # Qué cambia los valores visibles para los paquetes
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
 
 El mismo paquete renderiza distinto según **mundo y ajustes de jugador**. Revisa al menos estos 3 entornos antes de distribuir:
 

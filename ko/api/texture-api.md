@@ -1,6 +1,6 @@
 # 텍스처 API
 
-> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
+> 대상 API: 5 · 대상 빌드: `v98qt8` · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
 
 게임 자신의 텍스처를 읽는 API: 함수 2개, 이름 상수 계열, 입력 필드 4개. 헤더 자신의 한 줄 요약: *"This face's texture. Compare with `bloxdTextureId*`."*
 

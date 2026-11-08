@@ -1,6 +1,6 @@
 # 顶点（仅 allow）
 
-> 目标API: 5 · 目标构建: `bny9u` (2026-11-05, 生产环境) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
 > 关于确切条件 (allow 标题一览；Custom Games 为 strict) 见[各游戏的着色器适用策略](../internals/policy.md)

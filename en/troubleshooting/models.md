@@ -1,6 +1,6 @@
 # Model issues
 
-> Target API: 5 · Target build: `bny9u` · Status: Analyzed (new v5 territory)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (new v5 territory)
 
 Issues around the new v5 Model hooks.
 

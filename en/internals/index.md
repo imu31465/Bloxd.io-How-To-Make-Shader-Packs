@@ -24,6 +24,6 @@ Internal specifications restored by analyzing the engine's implementation. Every
 | [Debugging](debugging.md) | URL parameters, stats panels |
 | [Research log](research-log.md) | methodology, build history, unverified items |
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08)
 
 Internals are not a stable API contract — they may change with engine updates, and each page names its evidence build ([research log](research-log.md)).

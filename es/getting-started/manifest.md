@@ -1,6 +1,6 @@
 # pack.json (manifiesto)
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified
 
 `pack.json` es el manifiesto del paquete — exactamente un objeto JSON en la raíz del zip.
 

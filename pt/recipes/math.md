@@ -1,6 +1,6 @@
 # Caixa de ferramentas matemática
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified (portado à API atual — re-verificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified (portado à API atual — re-verificação no dispositivo recomendada)
 ```wgsl
 // quantização suave de 0..1 (n passos)
 fn pack_bands(x: f32, n: f32) -> f32 { return floor(x * n) / n; }

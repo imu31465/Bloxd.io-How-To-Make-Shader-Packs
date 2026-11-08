@@ -1,6 +1,6 @@
 # Visão geral e pré-requisitos
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção em 2026-11-05) · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Verified
 
 ## O que é um pacote de shaders
 

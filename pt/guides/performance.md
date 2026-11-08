@@ -1,6 +1,6 @@
 # Desempenho
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Verified (prática baseada em medições)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Verified (prática baseada em medições)
 
 Os hooks do pacote rodam em cada fragmento (todos os pixels de terreno / líquido / modelo), então escolhas de estilo movem a taxa de quadros de forma significativa.
 

@@ -1,6 +1,6 @@
 # Projetando looks noturnos
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified (portado para a API atual — reverificação em jogo recomendada)
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified (portado para a API atual — reverificação em jogo recomendada)
 
 Escurecer só sombras deixa a cor terminada (`engineColour`) brilhante sem sol, e o salto face/sombra fica antinatural. Atenue toda a cor terminada.
 

@@ -1,6 +1,6 @@
 # Ombres
 
-> API cible : 5 · Build cible : `bny9u` · État : Verified (comportement du LightEngine inchangé depuis la mesure en v4)
+> API cible : 5 · Build cible : `v98qt8` · État : Verified (comportement du LightEngine inchangé depuis la mesure en v4)
 
 Les trois façons de faire des « ombres » dans un pack de shaders, et leurs limites.
 

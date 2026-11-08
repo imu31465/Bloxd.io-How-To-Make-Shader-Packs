@@ -14,6 +14,6 @@ Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom 
 8. [Validierung](validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](../api/); für fertige Effekte siehe [Rezepte](../recipes/).

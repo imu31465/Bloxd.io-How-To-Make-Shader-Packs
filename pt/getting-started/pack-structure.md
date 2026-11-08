@@ -1,6 +1,6 @@
 # Estrutura do pacote
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Verified
 
 ## Formato de distribuição
 

@@ -1,6 +1,6 @@
 # El sol y la luna
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
 
 La fuente de `bloxdSunDirection()` es un búfer de dirección solar reescrito solo cuando cambia el tipo de skybox — el criterio no es "si el cielo tiene sol" sino **"si el skybox es tipo tierra"**.
 

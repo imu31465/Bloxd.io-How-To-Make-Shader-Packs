@@ -1,6 +1,6 @@
 # Enchant effects
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Analyzed (restored from the live header)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Analyzed (restored from the live header)
 
 v5 opened the enchant pipeline on both inputs and outputs. Recipes for controlling the glint of enchanted items and armour while preserving the engine's math.
 

@@ -14,6 +14,6 @@ Un tutorial de vía única para autores primerizos de shader packs, de la visió
 8. [Validación](validation.md) — la comprobación de carga de 3 etapas y las pruebas en el dispositivo
 9. [Distribución](distribution.md) — comprimido en zip e higiene de publicación
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified/Analyzed
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified/Analyzed
 
 Cuando necesites la especificación completa, sigue a [Referencia de la API](../api/); para efectos listos para usar ver [Recetas](../recipes/).

@@ -1,6 +1,6 @@
 # Hooks de sombreado
 
-> API objetivo: 5 · Build objetivo: `bny9u` · Estado: Verified
+> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Verified
 
 Los paquetes pueden definir **9 hooks** — 3 objetivos de render (programas) × 3 etapas del pipeline, todos opcionales (indefinido significa valor por defecto del motor).
 

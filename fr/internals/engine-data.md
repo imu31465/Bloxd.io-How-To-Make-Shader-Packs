@@ -1,6 +1,6 @@
 # Relevé des données du moteur
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05 ; production et preprod servent le même bundle identique octet par octet) · État : Verified
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08 ; production et preprod servent le même bundle identique octet par octet) · État : Verified
 
 Le relevé de mesures de la documentation — chaque valeur confirmée, toutes mesurées sur le build cible actuel `bny9u`.
 
@@ -17,14 +17,14 @@ Le relevé de mesures de la documentation — chaque valeur confirmée, toutes m
 | bindings du pack | groupe 3 : 0 uniform · 1 profondeur de scène (liquide) · 2 storage `bloxdSpTextureLayers` |
 | flags | la struct `BloxdFlags`, 14 booléens ; les valeurs de bits de la v4 retirées |
 | limites du chargeur | 256 `.wgsl` / 256 Ko de source / 64 Ko `pack.json` / 32 Mo de zip / 1 024 entrées ; UTF-8 ; un seul manifeste ; chemins uniques — tout inchangé |
-| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](texture-registry.md)) → `xkg8x` (2026-11-04) : 1 220 / **906** → `bny9u` (2026-11-05) : 1 232 / **911 noms utilisables** — +5 (Terminal d'Échange ×3, Générateur de Pierre ×2), 864 changements d'id |
+| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](texture-registry.md)) → `xkg8x` (2026-11-04) : 1 220 / **906** → `bny9u` (2026-11-05) : 1 232 / **911 noms utilisables** — +5 (Terminal d'Échange ×3, Générateur de Pierre ×2), 864 changements d'id  → `v98qt8` (2026-11-08): 1,227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
 | courbe de lumière | niveaux 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — dans l'en-tête, inchangée |
 | courbe de lift | `1 - (1 - x / (3 - 2x))^3` — inchangée (actuellement chunk c9) |
 | cône directionnel | `0.12 / 0.65 / 0.62 / 0.95` — inchangé (chunk c9) |
 | couleur de brouillard | `vec3f(183/255, 191/255, 195/255)` — inchangée |
 | noms réservés | `/^bloxd/i` (insensible à la casse) + les 46 symboles `bloxdSp*` du moteur ([Identifiants réservés](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| titres stricts | tout sauf les 12 titres allow de [Politique](policy.md) (réénumérés sur bny9u : 115 définitions de jeu, 28 entrées allow — les mêmes 12 titres) |
+| titres stricts | tout sauf les 12 titres allow de [Politique](policy.md) (réénumérés sur v98qt8 : 116 définitions de jeu, 28 entrées allow — les mêmes 12 titres) |
 | constructeurs en-tête/registre | module d'en-tête 29815 dans le chunk c56 (renuméroté depuis c55) ; sur `bny9u` le constructeur du registre est le module 29812 (chunks c52/c53/c54, module de données 1351 ; sur `xkg8x` c'était 30093 + 1391) |
 | gabarit de pack par défaut | chunk c122 (c116 sur `xkg8x`, c124 en v4), 1 633 o |
 

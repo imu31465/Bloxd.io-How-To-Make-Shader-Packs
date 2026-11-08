@@ -1,6 +1,6 @@
 # Schatten
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
 
 Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Grenzen.
 

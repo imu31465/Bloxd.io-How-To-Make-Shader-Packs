@@ -1,6 +1,6 @@
 # 影の表現
 
-> 対象API: 5 · 対象ビルド: `bny9u` · 検証状況: Verified (LightEngine の挙動は v4 実測時から不変)
+> 対象API: 5 · 対象ビルド: `v98qt8` · 検証状況: Verified (LightEngine の挙動は v4 実測時から不変)
 
 シェーダーパックで「影」を作る3つの方法と、その限界。
 

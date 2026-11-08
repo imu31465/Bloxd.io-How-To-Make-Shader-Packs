@@ -1,6 +1,6 @@
 # Textur-Probleme
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator aufgezeichnet)
 
 Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle 896 Namen im [Texturkatalog](../api/texture-catalog.md) durchsuchen.
 

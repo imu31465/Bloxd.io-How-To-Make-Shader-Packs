@@ -1,6 +1,6 @@
 # 函数
 
-> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 目标构建: `v98qt8` · 状态: Analyzed (从现行标头逐字复原)
 
 标头函数一览。纹理 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 连同 `bloxdOpaqueBehind` 在[纹理 API](texture-api.md) 中讲述。
 

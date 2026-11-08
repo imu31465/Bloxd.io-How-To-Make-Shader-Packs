@@ -1,6 +1,6 @@
 # Restrictions & reserved names
 
-> Target API: 5 · Target build: `bny9u` · Status: Verified (v4 limits re-confirmed byte-identical on v5)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (v4 limits re-confirmed byte-identical on v5)
 
 What packs may write, and the complete name-reservation rules.
 

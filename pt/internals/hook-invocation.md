@@ -1,6 +1,6 @@
 # Interioridades da invocação de hooks
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado do bundle de produção — o renderizador Lite; o arquivo-fonte integrado `lite/terrainShaderPack.ts` sobrevive nas strings de erro)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Analyzed (restaurado do bundle de produção — o renderizador Lite; o arquivo-fonte integrado `lite/terrainShaderPack.ts` sobrevive nas strings de erro)
 
 Como o motor chama os hooks em tempo de execução. Isto não muda nada no código que você escreve, mas elimina as suposições sobre o que os hooks recebem.
 

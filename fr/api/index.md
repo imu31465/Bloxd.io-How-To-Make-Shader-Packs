@@ -19,6 +19,6 @@ La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est
 | [Compatibilité](compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
 | [Catalogue de textures](texture-catalog.md) | les 896 noms utilisables (recherchables) |
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](../history/v5.md).

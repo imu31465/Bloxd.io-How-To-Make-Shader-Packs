@@ -18,4 +18,4 @@ Exemples de code orientés vers un objectif. Le versant « comment ça marche »
 | [Shaders de modèle](model-shaders.md) | v5 — objets tenus, skins, balancement des plantes |
 | [Effets d'enchantement](enchant-effects.md) | v5 — retirer, booster, recolorer le scintillement |
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Verified (ports v5 des recettes originales — vérifiez malgré tout par compilation en jeu avant de distribuer)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified (ports v5 des recettes originales — vérifiez malgré tout par compilation en jeu avant de distribuer)

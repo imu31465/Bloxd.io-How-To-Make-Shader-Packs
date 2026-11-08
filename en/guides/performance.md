@@ -1,6 +1,6 @@
 # Performance
 
-> Target API: 5 · Target build: `bny9u` · Status: Verified (measurement-based practice)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (measurement-based practice)
 
 Pack hooks run on every fragment (all pixels of terrain / liquid / model), so style choices move frame rate significantly.
 

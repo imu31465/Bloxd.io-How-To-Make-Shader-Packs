@@ -1,6 +1,6 @@
 # Ledger de dados do motor
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05; produção e preprod servem o mesmo bundle idêntico byte a byte) · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified
 
 O ledger de medições desta documentação — cada valor confirmado, todos medidos sobre o build alvo atual `bny9u`.
 
@@ -17,14 +17,14 @@ O ledger de medições desta documentação — cada valor confirmado, todos med
 | bindings do pacote | group 3: 0 uniform · 1 profundidade de cena (líquido) · 2 storage `bloxdSpTextureLayers` |
 | flags | a struct `BloxdFlags`, 14 bools; os valores de bits da v4 retirados |
 | limites do carregador | 256 `.wgsl` / 256 KB de fonte / 64 KB `pack.json` / 32 MB de zip / 1.024 entradas; UTF-8; um manifesto; caminhos únicos — tudo inalterado |
-| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 nomes utilizáveis** — +5 (Terminal de Troca ×3, Gerador de Pedra ×2), 864 mudanças de id |
+| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 nomes utilizáveis** — +5 (Terminal de Troca ×3, Gerador de Pedra ×2), 864 mudanças de id  → `v98qt8` (2026-11-08): 1.227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
 | curva de luz | níveis 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — no cabeçalho, inalterada |
 | curva de lift | `1 - (1 - x / (3 - 2x))^3` — inalterada (atualmente chunk c9) |
 | cone direcional | `0.12 / 0.65 / 0.62 / 0.95` — inalterado (chunk c9) |
 | cor da névoa | `vec3f(183/255, 191/255, 195/255)` — inalterada |
 | nomes reservados | `/^bloxd/i` (não distingue maiúsculas de minúsculas) + os 46 símbolos `bloxdSp*` do motor ([Identificadores reservados](reserved-identifiers.md)) |
 | HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| títulos strict | tudo exceto os 12 títulos allow de [Política](policy.md) (reenumerados em bny9u: 115 definições de jogo, 28 entradas allow — os mesmos 12 títulos) |
+| títulos strict | tudo exceto os 12 títulos allow de [Política](policy.md) (reenumerados em v98qt8: 116 definições de jogo, 28 entradas allow — os mesmos 12 títulos) |
 | construtores de cabeçalho/registro | módulo de cabeçalho 29815 no chunk c56 (renumerado de c55); no `bny9u` o construtor do registro é o módulo 29812 (chunks c52/c53/c54, módulo de dados 1351; no `xkg8x` era 30093 + 1391) |
 | template de pacote padrão | chunk c122 (c116 no `xkg8x`, c124 na v4), 1.633 B |
 

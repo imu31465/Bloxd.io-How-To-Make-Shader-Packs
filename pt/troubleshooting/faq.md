@@ -1,6 +1,6 @@
 # FAQ e notas legais
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified
 
 ## Perguntas frequentes
 

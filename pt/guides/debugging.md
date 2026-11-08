@@ -1,6 +1,6 @@
 # Dicas de depuração
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 
 - Cavernas claras demais → falta a curva não linear de `skyLight` (receita de cavernas R2 / R9.9)
 - Dias estourados → baixe a exposição pré-ACES

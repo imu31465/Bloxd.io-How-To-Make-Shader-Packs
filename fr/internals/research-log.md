@@ -22,7 +22,8 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | confirmation du gel de la v4 (événement Halloween + refonte de Skyblock) |
 | `ab90qa` | **v5** | 2026-11-03 | build de lancement de la v5 ; base de référence d'origine de la v5. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | dérive du registre (+10 noms) ; preprod `2lcqcl` mesurée identique sur chaque surface de shader pack |
-| `bny9u` | **v5** | 2026-11-05 | **actuel** ; référence de cette documentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` sur le bundle principal, récupéré en direct depuis les deux hôtes) |
+| `bny9u` | **v5** | 2026-11-05 | ; référence de cette documentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` sur le bundle principal, récupéré en direct depuis les deux hôtes) |
+| `v98qt8` | **v5** | 2026-11-08 | **actuel**; référence de cette documentation. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). dérive du registre (−5 net), jeux 115 → 116, et la **régression de pliage des constantes de texture** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## Méthodologie clé
 
@@ -56,6 +57,7 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 | cnty9 → ab90qa | 7 jours | +1 (scorpion_eggs), −10 (coffre double ×8, côtés de spawner ×2) ; 334/905 noms ont changé d'id |
 | ab90qa → xkg8x | 1 jour | +10 (tous les retraits du lancement de v5 sont revenus : coffre double ×8, côtés de spawner ×2) ; 376/896 noms ont changé d'id ; aucun retiré |
 | xkg8x → bny9u | 1 jour | +5 (Terminal d'Échange ×3, Générateur de Pierre ×2) ; 864/906 noms ont changé d'id (95 %) ; aucun retiré ; familles d'animation 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## Non vérifié / spéculatif
 

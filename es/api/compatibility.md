@@ -1,6 +1,6 @@
 # Compatibilidad
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified
 
 Cómo interoperan el juego actual y los paquetes de versiones antiguas.
 
@@ -39,6 +39,10 @@ La trampa silenciosa de esta vez: los paquetes que sigan leyendo `blockFlags` o 
 ## Revalidación de paquetes guardados («necesita revisión»)
 
 `HEADER_VERSION` es `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (el entero inicial pasó del 8 de v4 al 9). Cuando la cabecera del motor o el registro de texturas cambian (habitual con las actualizaciones del juego), los paquetes guardados se marcan como «necesita revisión» y se revalidan automáticamente al cargar la página.
+
+**Advertencia de v98qt8:** la regresión de plegado del build actual ([Interior del motor: registro de texturas](../internals/texture-registry.md#the-v98qt8-folding-regression)) cambia lo que hashea el motor — el sufijo de registro que calcula es la tabla *sin plegar* de 1.047 filas (`694df62c`), no la plegada de 906 filas prevista (`df6c1915`, era `e735ebdc` en `bny9u`). Cada paquete guardado se revalida por tanto en este build, y los paquetes que referencien alguno de los 43 nombres base de familias de animación (`lava`, …) **fallan** la revalidación hasta que se arregle el lado del motor — escribe los nombres plegados de todos modos; son la API.
+
+
 
 Un ejemplo medido del movimiento del registro (dos builds, 10 días de diferencia): entradas 1200 → 1219 (98 añadidas, 79 eliminadas), y de los nombres que conservaron su grafía, **779 de 1121 cambiaron de id**. Dicho de otro modo:
 

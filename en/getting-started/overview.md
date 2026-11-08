@@ -1,6 +1,6 @@
 # Overview & prerequisites
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified
 
 ## What a shader pack is
 

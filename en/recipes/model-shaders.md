@@ -1,6 +1,6 @@
 # Model shaders
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Analyzed (written against the v5 header spec)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Analyzed (written against the v5 header spec)
 
 Recipes using the v5 Model hooks and new flags for **"what am I looking at" selections that were impossible before v5**. Basics: [Models and textures](../guides/models.md).
 

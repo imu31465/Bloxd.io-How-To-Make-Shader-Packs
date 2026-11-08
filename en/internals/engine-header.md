@@ -1,6 +1,6 @@
 # Engine header (verbatim)
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Analyzed (restored from the live production bundle)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Analyzed (restored from the live production bundle)
 
 The exact text the loader prepends to every pack. Restored from the live production bundle (`ab90qa`, chunk c55, rendering the template with its 6 live interpolations — `apiVersion` and the 5 uniform reads via `bloxdPackInputs`). 8,954 bytes decoded, 208 lines. No paraphrase anywhere. Re-verified byte-identical on the current production build (`bny9u`, chunk c56 — the validator/header chunk renumbered from c55, 2026-11-05) — same 8,954 decoded bytes, 208 lines.
 

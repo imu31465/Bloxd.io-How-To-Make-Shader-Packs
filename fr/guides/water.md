@@ -1,6 +1,6 @@
 # Rendre l'eau d'aspect naturel
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
 Cette API ne peut pas échantillonner la couleur de scène : c'est donc du **stylisme pseudo par mélange de couleurs façon fresnel et reflets solaires, pas une vraie réflexion/réfraction** (le calcul de profondeur utilise le `bloxdOpaqueBehind()` en liquides seuls — la recette d'absorption par épaisseur est plus bas dans cette page). L'échantillon ci-dessous conserve la couleur de base, mélange légèrement vers une couleur de type ciel aux angles de vue rasants et n'ajoute un petit éclat que lorsqu'il y a du soleil.
 
 ```wgsl

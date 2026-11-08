@@ -14,6 +14,6 @@
 8. [验证](validation.md) — 三阶段加载检查与实机测试
 9. [分发](distribution.md) — 打 zip 与发布卫生
 
-> 目标API: 5 · 目标构建: `bny9u` (2026-11-05 生产环境确认) · 状态: Verified/Analyzed
+> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](../api/)；要现成效果请看[实战配方](../recipes/)。

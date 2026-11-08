@@ -1,6 +1,6 @@
 # Receitas de vértices (só allow)
 
-> API alvo: 5 · Build alvo: `bny9u` (2026-11-05, produção) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
+> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
 > Envolva tudo em `#ifndef BLOXD_STRICT`.
 > Para as condições exatas (a lista de títulos allow; Custom Games sendo estrito) veja [Política de shader packs por jogo](../internals/policy.md)
 

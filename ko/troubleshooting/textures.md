@@ -1,6 +1,6 @@
 # 텍스처 문제
 
-> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
+> 대상 API: 5 · 대상 빌드: `v98qt8` · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
 
 `bloxdTextureId*` / `bloxdTexel` 관련 문제. 896 이름 전체는 [텍스처 카탈로그](../api/texture-catalog.md) 에서 검색하라.
 

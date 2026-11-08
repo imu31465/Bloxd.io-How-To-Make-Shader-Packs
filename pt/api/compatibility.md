@@ -1,6 +1,6 @@
 # Compatibilidade
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Verified
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified
 
 Como o jogo atual e os pacotes de versões antigas interoperam.
 
@@ -39,6 +39,10 @@ A armadilha silenciosa desta vez: pacotes que continuam lendo `blockFlags` ou en
 ## Revalidação de pacotes salvos ("precisa de nova verificação")
 
 `HEADER_VERSION` é `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (o inteiro inicial passou do 8 da v4 para 9). Quando o cabeçalho do motor ou o registro de texturas muda (comum com atualizações do jogo), os pacotes salvos são marcados como "precisa de nova verificação" e revalidam automaticamente no carregamento da página.
+
+**Ressalva do v98qt8:** a regressão de dobragem do build atual ([Interior do motor: registro de texturas](../internals/texture-registry.md#the-v98qt8-folding-regression)) muda o que o motor faz hash — o sufixo de registro calculado é a tabela *não dobrada* de 1.047 linhas (`694df62c`), não a pretendida de 906 linhas dobrada (`df6c1915`, era `e735ebdc` no `bny9u`). Cada pacote salvo portanto revalida neste build, e pacotes que referenciem qualquer um dos 43 nomes-base das famílias de animação (`lava`, …) **falham** na revalidação até o lado do motor ser corrigido — escreva os nomes dobrados mesmo assim; eles são a API.
+
+
 
 Um exemplo medido do movimento do registro (duas builds, 10 dias de distância): entradas 1200 → 1219 (98 adicionadas, 79 removidas) e, dos nomes que mantiveram a grafia, **779 de 1121 mudaram de id**. Em outras palavras:
 

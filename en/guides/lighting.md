@@ -1,6 +1,6 @@
 # How lighting works
 
-> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
 Engine default lighting is "multiplication only" — no specular, fresnel, warm/cool separation, or hemisphere ambient exists. The following can be rebuilt:
 
 | Feature | Default | Buildable in packs? |

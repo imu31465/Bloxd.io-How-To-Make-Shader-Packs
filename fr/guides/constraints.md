@@ -1,6 +1,6 @@
 # Ce que les packs de shaders peuvent et ne peuvent pas faire
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
 
 Le plafond de réalisme des packs de shaders en une page : jusqu'où va l'API actuelle, ce qu'elle ne peut fondamentalement pas faire, ce qui est conditionnel, pourquoi ces limites existent et quels sont les substituts les plus proches. Évaluez ici un look avant de le construire.
 

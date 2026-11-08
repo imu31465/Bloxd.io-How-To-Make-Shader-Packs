@@ -1,6 +1,6 @@
 # Iluminação
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
 
 A v5 publicou a API de iluminação. O que o motor fazia internamente (construir `litColour`) agora é chamável a partir dos pacotes. Esta página cobre as entradas, as funções e a ordem de processamento da iluminação como um sistema.
 

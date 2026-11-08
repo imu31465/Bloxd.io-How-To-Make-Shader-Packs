@@ -1,8 +1,8 @@
 # Cabecera del motor (literal)
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Analyzed (restaurado del bundle de producción en vivo)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Analyzed (restaurado del bundle de producción en vivo)
 
-El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto. Reverificado idéntico byte a byte en el build de producción actual (`bny9u`, chunk c56 (renumerado desde c55), 2026-11-05) — los mismos 8,954 bytes decodificados, 208 líneas.
+El texto exacto que el cargador antepone a cada paquete. Restaurado del bundle de producción en vivo (`ab90qa`, chunk c55, renderizando la plantilla con sus 6 interpolaciones en vivo — `apiVersion` y las 5 lecturas del uniform vía `bloxdPackInputs`). 8.954 bytes decodificados, 208 líneas. Sin paráfrasis en ningún punto. Reverificado idéntico byte a byte en el build de producción actual (`bny9u`, chunk c56 (renumerado desde c55), 2026-11-05) — los mismos 8,954 bytes decodificados, 208 líneas. Re-verificado de nuevo en `v98qt8` (2026-11-08, módulo de cabecera 30052 en el chunk c63 — renumerado otra vez): sigue siendo idéntico byte a byte, 8.954 bytes decodificados, 208 líneas.
 
 Guía de lectura:
 - Explicaciones campo por campo → [Estructuras](../api/structures.md)

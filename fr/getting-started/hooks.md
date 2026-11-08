@@ -1,6 +1,6 @@
 # Hooks de shader
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Verified
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified
 
 Un pack peut se brancher sur **9 hooks** : 3 cibles de rendu (Terrain / Liquid / Model) × 3 étapes de pipeline (Vertex / Surface / Light). Tous sont optionnels — un hook non défini retombe sur le comportement par défaut du moteur.
 

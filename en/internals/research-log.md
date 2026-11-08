@@ -22,7 +22,8 @@ The technical statements here rest not on official developer documentation but o
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 freeze confirmation (Halloween event + Skyblock rework) |
 | `ab90qa` | **v5** | 2026-11-03 | v5 launch build; original v5 baseline. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | registry drift (+10 names); preprod `2lcqcl` measured identical on every shader-pack surface |
-| `bny9u` | **v5** | 2026-11-05 | **current**; this documentation's baseline. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` on the main bundle, live-fetched from both hosts) |
+| `bny9u` | **v5** | 2026-11-05 | registry drift (+5 names); prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` on the main bundle, live-fetched from both hosts) |
+| `v98qt8` | **v5** | 2026-11-08 | **current**; this documentation's baseline. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). Registry drift (−5 net), games 115 → 116, and the **texture-constant folding regression** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## Key methodology
 
@@ -32,7 +33,7 @@ Rendering the c55 header template with its live interpolations (`${vC}` = apiVer
 
 ### Texture-registry recomputation
 
-Running the engine's registry-building module (29812, carried by chunks 52/53/54) against the shipped block registry's texture data (data module 1351 in the main bundle) in a mini webpack harness; recording the output (named 911 / aliases 424 / atlas 1,232 on the current build `bny9u`, 2026-11-05; 906 / 416 / 1,220 on `xkg8x` via modules 30093 + 1391; 896 at the v5 launch) ([Texture registry](texture-registry.md)).
+Running the engine's registry-building machinery against the shipped block registry's texture data (data module 1351 in the main bundle) in a mini webpack harness; recording the output (named 906 / aliases 424 / atlas 1,227 on the current build `v98qt8`, 2026-11-08 — computed with the intended slot-keyed input, plus the as-shipped name-keyed run that exposes the folding regression: 1,047 / 240 / 1,227; 911 / 424 / 1,232 on `bny9u` via its classifier module; 906 / 416 / 1,220 on `xkg8x`; 896 at the v5 launch) ([Texture registry](texture-registry.md)).
 
 Animation intervals come from the `animDataPerTex`-style table (per-layer `numAnimStates` / `animationInterval`) — only three interval values exist: 200 / 250 / 300 ms ([the catalog](../api/texture-catalog.md#animation-families-43-names)).
 
@@ -42,7 +43,7 @@ Loader messages verbatim from the live i18n dictionary; validator messages from 
 
 ### allow / strict static analysis
 
-Statically analyzing all 111 game definitions: `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too ([Policy](policy.md)).
+Statically analyzing all 111 game definitions (szby6g-era): `shaderPackPolicy` `"allow"` literals — 8 direct + 4 base-variable = 12 titles (26 entries), spread-inheritance (`{...tb,...}`) tracked too. On the current build the games module (513) is evaluated in a harness instead: 116 definitions, 28 allow entries — same 12 titles ([Policy](policy.md)).
 
 ### Uniform / pipeline restoration
 
@@ -56,6 +57,7 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 | cnty9 → ab90qa | 7 days | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 names changed id |
 | ab90qa → xkg8x | 1 day | +10 (all v5-launch removals returned: double chest ×8, spawner sides ×2); 376/896 names changed id; none removed |
 | xkg8x → bny9u | 1 day | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 names changed id (95%); none removed; anim families 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## Unverified / speculative
 
@@ -65,7 +67,7 @@ The `BloxdPackInputs` field layout from the uniform-layout module (29838); the t
 
 ## When to re-verify
 
-On detecting a game update (a new main.js hash): re-check the header (9,125B), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above are the starting points — on `bny9u`: header/apiVersion module 29815 and validator modules in chunk c56, loader (zip/manifest/limits) module 32942 in chunk c54, registry builder 29812 in chunks c52/c53/c54, WebGPU codegen chunk c57, default pack template module 33350 in chunk c122, games/policy module 517 in the main bundle.
+On detecting a game update (a new main.js hash): re-check the header (8,954 decoded bytes), the apiVersion constant, recompute the registry, and re-confirm the allow/strict list. Detailed monitoring methodology is outside this documentation's scope, but the module locations above are the starting points — on `v98qt8`: header/apiVersion module 30052 and validator modules in chunk c63, classifier module 30048 in c59/c60/c61/c9, loader (zip/manifest/limits) module 33165 in chunk c61, atlas/registry builder 28312 in chunk c49 (data module 1351 in main), default pack template in chunk c131, games/policy module 513 in the main bundle.
 
 ## Related
 

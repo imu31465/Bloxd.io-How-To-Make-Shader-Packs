@@ -1,6 +1,6 @@
 # Préprocesseur
 
-> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré depuis le validateur en production)
+> API cible : 5 · Build cible : `v98qt8` · État : Analyzed (restauré depuis le validateur en production)
 
 La compilation conditionnelle ne prend en charge que `#define NAME` (sans valeur) / `#ifdef` / `#ifndef` / `#else` / `#endif`. Le `#` se place en début de ligne (à l'intérieur des fonctions, c'est permis). La correspondance des noms de flags ne distingue pas la casse ; un nom erroné dans un `#ifdef` fait que le message d'erreur liste l'ensemble officiel.
 

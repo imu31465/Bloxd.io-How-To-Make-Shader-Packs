@@ -18,7 +18,7 @@ Fehler und visuelle Probleme, **nach Symptom** auffindbar. Die Seiten folgen der
 | Langsam / von der Geräte-Prüfung rausgeworfen | [Performance](performance.md) |
 | Rechtliches, Sicherheit, häufige Fragen | [FAQ](faq.md) |
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
 
 ## Wo Fehler erscheinen
 

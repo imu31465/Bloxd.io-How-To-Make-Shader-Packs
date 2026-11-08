@@ -18,7 +18,7 @@ Erreurs et problèmes visuels, repérables **par symptôme**. Les pages suivent 
 | Lent / écarté par le contrôle sur appareil | [Performance](performance.md) |
 | Légal, sécurité, questions courantes | [FAQ](faq.md) |
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
 
 ## Où apparaissent les erreurs
 

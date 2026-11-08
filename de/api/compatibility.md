@@ -1,6 +1,6 @@
 # Kompatibilität
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified
 
 Wie das aktuelle Spiel und Pakete alter Versionen zusammenwirken.
 
@@ -39,6 +39,10 @@ Die stille Falle ist diesmal eine andere: Pakete, die weiterhin `blockFlags` les
 ## Re-Validierung gespeicherter Pakete („muss erneut geprüft werden“)
 
 `HEADER_VERSION` ist `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (die führende Ganzzahl stieg von der 8 in v4 auf 9). Wenn sich der Engine-Header oder die Textur-Registry ändert (bei Spiel-Updates üblich), werden gespeicherte Pakete als „muss erneut geprüft werden“ markiert und beim Seitenladen automatisch neu validiert.
+
+**v98qt8-Vorbehalt:** die Faltungs-Regression des aktuellen Builds ([Engine-Interna: Textur-Registry](../internals/texture-registry.md#the-v98qt8-folding-regression)) ändert, was die Engine hasht — das berechnete Registry-Suffix ist die *ungefaltete* 1.047-Zeilen-Tabelle (`694df62c`), nicht die beabsichtigte gefaltete 906-Zeilen-Tabelle (`df6c1915`, auf `bny9u` `e735ebdc`). Jedes gespeicherte Paket validiert daher auf diesem Build neu, und Pakete, die einen der 43 Animationsfamilien-Basisnamen (`lava`, …) referenzieren, **scheitern** anschließend an der Neuprüfung, bis die Engine-Seite behoben ist — schreibe trotzdem die gefalteten Namen; sie sind die API.
+
+
 
 Ein gemessenes Beispiel für Registry-Bewegung (zwei Builds, 10 Tage auseinander): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt), und von den Namen, die ihre Schreibweise behielten, **änderten 779 von 1121 die id**. Mit anderen Worten:
 

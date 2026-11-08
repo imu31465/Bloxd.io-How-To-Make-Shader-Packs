@@ -1,6 +1,6 @@
 # Formato do pacote
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Verified (remedido no carregador em produção)
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified (remedido no carregador em produção)
 
 O modelo inteiro de pacote em uma página só — manifesto, limites do carregador, uniform por frame. Para a versão passo a passo, veja [Primeiros passos](../getting-started/manifest.md).
 

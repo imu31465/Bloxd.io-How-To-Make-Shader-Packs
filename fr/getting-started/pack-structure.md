@@ -1,6 +1,6 @@
 # Structure du pack
 
-> API cible : 5 · Build cible : `bny9u` · État : Verified
+> API cible : 5 · Build cible : `v98qt8` · État : Verified
 
 ## Format de distribution
 

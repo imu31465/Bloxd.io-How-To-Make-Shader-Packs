@@ -14,6 +14,6 @@
 8. [検証と動作確認](validation.md) — 読み込み時の3段階検証と実機チェック
 9. [配布](distribution.md) — zip の固め方と運用
 
-> 対象API: 5 · 対象ビルド: `bny9u` (2026-11-05 本番確認) · 検証状況: Verified/Analyzed
+> 対象API: 5 · 対象ビルド: `v98qt8` (2026-11-08 本番+preprod確認) · 検証状況: Verified/Analyzed
 
 API仕様を詳細に調べたくなったら [APIリファレンス](../api/) へ、表現の実装例は [Recipes](../recipes/) へ進んでください。

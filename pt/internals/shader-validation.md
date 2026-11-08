@@ -1,6 +1,6 @@
 # Validação de shaders
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado do validador em execução)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Analyzed (restaurado do validador em execução)
 
 A validação estática (o analisador, etapa 1 da verificação de carregamento). Correções voltadas ao usuário: [Erros de validação](../troubleshooting/validation.md).
 

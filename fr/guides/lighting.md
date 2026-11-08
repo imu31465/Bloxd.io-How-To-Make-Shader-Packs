@@ -1,6 +1,6 @@
 # Comment fonctionne l'éclairage
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
 L'éclairage par défaut du moteur est « multiplication seule » — aucun specular, fresnel, séparation chaud/froid ni ambiant hémisphérique n'existe. Voici ce qui se reconstruit :
 
 | Fonctionnalité | Par défaut | Reconstructible en packs ? |

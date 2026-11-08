@@ -1,6 +1,6 @@
 # Rendimiento
 
-> API objetivo: 5 · Build objetivo: `bny9u` · Estado: Verified (práctica basada en mediciones)
+> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Verified (práctica basada en mediciones)
 
 Los hooks del paquete corren en cada fragmento (todos los píxeles de terreno / líquido / modelo), así que las decisiones de estilo mueven la tasa de fotogramas de forma notable.
 

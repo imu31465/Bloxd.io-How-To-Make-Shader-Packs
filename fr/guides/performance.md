@@ -1,6 +1,6 @@
 # Performance
 
-> API cible : 5 · Build cible : `bny9u` · État : Verified (pratique fondée sur la mesure)
+> API cible : 5 · Build cible : `v98qt8` · État : Verified (pratique fondée sur la mesure)
 
 Les hooks des packs s'exécutent sur chaque fragment (tous les pixels de terrain / liquide / modèle), donc les choix de style déplacent sensiblement la fréquence d'images.
 

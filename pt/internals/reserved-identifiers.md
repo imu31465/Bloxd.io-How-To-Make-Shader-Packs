@@ -1,6 +1,6 @@
 # Interioridades dos identificadores reservados
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado dos geradores do bundle em produção)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Analyzed (restaurado dos geradores do bundle em produção)
 
 O namespace `bloxdSp*` — símbolos que os geradores podem injetar e que os pacotes, portanto, não podem redeclarar. O resumo para autores de pacotes: [Restrições](../api/restrictions.md).
 

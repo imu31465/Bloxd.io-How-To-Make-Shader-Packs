@@ -1,6 +1,6 @@
 # 包格式
 
-> 目标API: 5 · 目标构建: `bny9u` (2026-11-05 生产环境确认) · 状态: Verified (在现行加载器上重新实测)
+> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (在现行加载器上重新实测)
 
 整个包模型一页讲完 — manifest、加载器限制、逐帧 uniform。分步版本见[入门指南](../getting-started/manifest.md)。
 

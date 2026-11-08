@@ -24,6 +24,6 @@ Especificaciones internas restauradas analizando la implementación del motor. T
 | [Depuración](debugging.md) | parámetros de URL, paneles de estadísticas |
 | [Registro de investigación](research-log.md) | metodología, historia de builds, elementos sin verificar |
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod)
 
 Las internas no son un contrato de API estable — pueden cambiar con las actualizaciones del motor, y cada página nombra su build de evidencia ([registro de investigación](research-log.md)).

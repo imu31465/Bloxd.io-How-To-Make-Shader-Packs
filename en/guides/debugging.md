@@ -1,6 +1,6 @@
 # Debugging tips
 
-> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
 - Caves too bright → missing nonlinear `skyLight` curve (R2 cave recipe / R9.9)
 - Blown-out days → lower pre-ACES exposure
 - Nights too dark to see → secure minimum ambient (night `skyLightColour` is nearly black by premise)

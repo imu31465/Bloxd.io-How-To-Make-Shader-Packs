@@ -1,6 +1,6 @@
 # Reserved identifier internals
 
-> Target API: 5 · Target build: `bny9u` · Status: Analyzed (restored from the live bundle's generators)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored from the live bundle's generators)
 
 The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](../api/restrictions.md).
 

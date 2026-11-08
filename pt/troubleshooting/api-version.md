@@ -1,6 +1,6 @@
 # Erros de versão de API
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Verified (literal, do dicionário i18n em produção)
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified (literal, do dicionário i18n em produção)
 
 Erros em torno de `apiVersion`. O jogo atual aceita **apenas `5`**.
 

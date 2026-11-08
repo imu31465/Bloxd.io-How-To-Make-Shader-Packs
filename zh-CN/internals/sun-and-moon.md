@@ -1,6 +1,6 @@
 # 太阳与月亮
 
-> 目标API: 5 · 目标构建: `bny9u` (2026-11-05, 生产环境) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 `bloxdSunDirection()` 之源是仅在天空盒种类变化时改写的天空方向缓冲，判定基准不是「天空有无太阳」而是**「天空盒是否为 earth 型」**。
 

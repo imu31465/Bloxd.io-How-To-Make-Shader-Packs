@@ -14,6 +14,6 @@ A single-track tutorial for first-time shader pack authors, from overview to dis
 8. [Validation](validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified/Analyzed
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).

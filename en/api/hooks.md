@@ -1,6 +1,6 @@
 # Shader hooks
 
-> Target API: 5 · Target build: `bny9u` · Status: Verified
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified
 
 Packs can define **9 hooks** — 3 render targets (programs) × 3 pipeline stages, all optional (undefined means engine default).
 

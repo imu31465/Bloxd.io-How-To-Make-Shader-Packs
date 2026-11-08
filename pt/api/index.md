@@ -19,6 +19,6 @@ A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o bui
 | [Compatibilidade](compatibility.md) | pacotes de versões antigas, revalidação de pacotes salvos |
 | [Catálogo de texturas](texture-catalog.md) | todos os 896 nomes utilizáveis (com busca) |
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
 
 Migrando da v4? Veja [Histórico de versões: v5](../history/v5.md).

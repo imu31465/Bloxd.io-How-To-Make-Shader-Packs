@@ -1,6 +1,6 @@
 # FAQ & rechtliche Hinweise
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified
 
 ## Häufig gestellte Fragen
 

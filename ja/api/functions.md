@@ -1,6 +1,6 @@
 # 関数
 
-> 対象API: 5 · 対象ビルド: `bny9u` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
+> 対象API: 5 · 対象ビルド: `v98qt8` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
 ヘッダーが提供する全関数を掲載します。テクスチャAPI (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) は [テクスチャAPI](texture-api.md) で、特殊関数 `bloxdOpaqueBehind` も含めて個別に詳説します。
 

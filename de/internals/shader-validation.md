@@ -1,6 +1,6 @@
 # Shader-Validierung
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Analyzed (aus dem Live-Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Analyzed (aus dem Live-Validator restauriert)
 
 Die statische Validierung (Analyzer, Stufe 1 der Ladeprüfung). Nutzerseitige Fixes: [Validierungsfehler](../troubleshooting/validation.md).
 

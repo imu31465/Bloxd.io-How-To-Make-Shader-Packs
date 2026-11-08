@@ -22,7 +22,8 @@
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 동결 확인 (할로윈 이벤트 + 스카이블록 개편) |
 | `ab90qa` | **v5** | 2026-11-03 | v5 출시 빌드. 원래 v5 기준선. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | 레지스트리 드리프트 (+10 이름); preprod `2lcqcl` 은 셰이더 팩의 모든 표면에서 동일하게 실측됨 |
-| `bny9u` | **v5** | 2026-11-05 | **현행**; 이 문서의 베이스라인. prod = preprod (메인 번들 md5 `60eea80ec48253b7ac6cc45604dc8273`, 두 호스트에서 각각 실시간 수신으로 확인) |
+| `bny9u` | **v5** | 2026-11-05 | ; 이 문서의 베이스라인. prod = preprod (메인 번들 md5 `60eea80ec48253b7ac6cc45604dc8273`, 두 호스트에서 각각 실시간 수신으로 확인) |
+| `v98qt8` | **v5** | 2026-11-08 | **현행**; 이 문서의 베이스라인. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). 레지스트리 드리프트 (순 −5), 게임 115 → 116, 그리고 **텍스처 상수 폴딩 회귀** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## 핵심 방법론
 
@@ -56,6 +57,7 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 | cnty9 → ab90qa | 7일 | +1 (scorpion_eggs), −10 (더블 체스트 ×8, 스포너 옆면 ×2). 이름 905 중 334가 id 변화 |
 | ab90qa → xkg8x | 1일 | +10 (v5 출시 때의 제거가 전부 복귀: 더블 체스트 ×8, 스포너 옆면 ×2); 896명 중 376명 id 변경; 제거 없음 |
 | xkg8x → bny9u | 1일 | +5 (Trading Terminal ×3, Stone Generator ×2); 906개 중 864개 id 변경 (95%); 제거 없음; 애니메이션 계열 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## 미검증 · 추정
 

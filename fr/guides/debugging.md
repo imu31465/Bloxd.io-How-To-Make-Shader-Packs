@@ -1,6 +1,6 @@
 # Astuces de débogage
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
 - Grottes trop claires → courbe non linéaire de `skyLight` manquante (recette de grottes R2 / R9.9)
 - Jours cramés → baissez l'exposition pré-ACES
 - Nuits trop sombres pour y voir → sécurisez un ambiant minimum (le `skyLightColour` nocturne est quasi noir par prémisse)

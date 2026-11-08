@@ -1,6 +1,6 @@
 # Lista de comprobación en juego
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 El éxito de compilación y el "buen aspecto" son cosas distintas. Revisa en este orden:
 

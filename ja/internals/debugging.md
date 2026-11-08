@@ -1,6 +1,6 @@
 # デバッグツール
 
-> 対象API: 5 · 対象ビルド: `bny9u` (2026-11-05 本番確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
+> 対象API: 5 · 対象ビルド: `v98qt8` (2026-11-08 本番+preprod確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
 
 URL パラメータ・コンソール・drawcalls 統計など、解析と診断の道具。
 

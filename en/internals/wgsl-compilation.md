@@ -1,6 +1,6 @@
 # WGSL compilation
 
-> Target API: 5 · Target build: `bny9u` · Status: Analyzed (restored from the live bundle)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored from the live bundle)
 
 The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
 

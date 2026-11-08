@@ -18,4 +18,4 @@ Goal-oriented code examples. The "how it works" side lives in [Guides](../guides
 | [Model shaders](model-shaders.md) | v5 — held items, skins, plant sway |
 | [Enchant effects](enchant-effects.md) | v5 — removing, boosting, recoloring the glint |
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Verified (v5 ports of the original recipes — still verify with in-game compilation before distributing)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified (v5 ports of the original recipes — still verify with in-game compilation before distributing)

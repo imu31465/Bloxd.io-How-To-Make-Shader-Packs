@@ -1,6 +1,6 @@
 # Constantes
 
-> API alvo: 5 · Build alvo: `bny9u` · Estado: Analyzed (restaurado literalmente do cabeçalho em produção)
+> API alvo: 5 · Build alvo: `v98qt8` · Estado: Analyzed (restaurado literalmente do cabeçalho em produção)
 
 O cabeçalho fornece três constantes (as constantes de nome de textura `bloxdTextureId*` são tratadas em [API de texturas](texture-api.md)).
 

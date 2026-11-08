@@ -24,6 +24,6 @@ Especificações internas restauradas analisando a implementação do motor. Tud
 | [Depuração](debugging.md) | parâmetros de URL, painéis de estatísticas |
 | [Registro de pesquisa](research-log.md) | metodologia, histórico de builds, itens não verificados |
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05)
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08)
 
 As interioridades não são um contrato de API estável — elas podem mudar com as atualizações do motor, e cada página nomeia sua build de evidência ([registro de pesquisa](research-log.md)).

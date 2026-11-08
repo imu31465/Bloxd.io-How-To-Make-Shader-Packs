@@ -18,4 +18,4 @@ Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [L
 | [Modell-Shader](model-shaders.md) | v5 — gehaltene Items, Skins, Pflanzen-Wiegen |
 | [Enchant-Effekte](enchant-effects.md) | v5 — Glint entfernen, verstärken, umfärben |
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` (2026-11-05, Produktion) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)

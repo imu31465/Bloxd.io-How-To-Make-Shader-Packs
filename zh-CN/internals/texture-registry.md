@@ -1,6 +1,6 @@
 # 纹理注册表内部机制
 
-> 目标API: 5 · 目标构建: `bny9u` (2026-11-05 生产环境确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 名称→id 的解析机制与实测的注册表漂移。面向用户的目录: [纹理目录](../api/texture-catalog.md)。
 
@@ -12,9 +12,9 @@
 
 | 输出 | v5 实测 | 含义 |
 |---|---|---|
-| `named` | **911** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
+| `named` | **906** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
 | `aliases` | 424 | 被折叠的拼写 — 196 个帧别名 (`lava0`…) 与 228 个旋转别名 (`chest_top[rot[1`…) |
-| `layers` | 1,232 | 完整的图集层表 — 911 个具名根、150 个附加动画帧、171 个预旋转槽位 |
+| `layers` | 1,227 | 完整的图集层表 — 911 个具名根、150 个附加动画帧、171 个预旋转槽位 |
 
 ## 折叠规则
 
@@ -61,6 +61,34 @@
 完整漂移 (5 个名称): 新增 (5) — `trading_terminal_front` (动画, 8帧) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top`。两个新方块 (交易终端、石头发电机) 加入了游戏数据。无移除；id 洗牌几乎全量 (幸存名称的 95%)。
 
 
+## 漂移 (bny9u → v98qt8)
+
+| 测量 | bny9u (v5) | v98qt8 (v5, 现行) |
+|---|---|---|
+| 图集条目 | 1,232 | **1,227** |
+| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
+| 动画族 (帧拼写) | 43 (196) | **43 (196) — 不变** |
+| 可用命名常量 | 911 | **906** |
+| 幸存名称的 id 变动 | — | **905 个中的 716 个** (79%) |
+
+完整漂移 (7 个名称): 新增 (1) `hay_block_top`; 移除 (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — 熔炉、工作台 (合成台) 与工匠台从带地形纹理的方块转为方块模型，其地形纹理随之离开注册表 (工作台保留了 `crafting_table_top` — 顶面仍是地形纹理))生产与 preprod 提供同一字节相同的包 (md5 `7458fd47ff88331d9f451d1456ff48ac`)。
+
+## v98qt8 折叠回归
+
+`v98qt8` 携带一个经字节级验证的纹理常量折叠回归。数据模块 (1351) 现在把 `animatedBlockTextures` 构建为**以拼写为键的 Array** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — 已在线上主包中 hexdump 验证)，而分类器 (模块 30048) 仍在两处期待**以槽位为键的数组**:
+
+1. `hii.forEach((value, key))` — `Array.prototype.forEach` 永远不会遍历字符串键，因此额外帧的 slot→base 映射保持为空
+2. `hii[Qi]` (其中 `Qi` = 图集槽位) — 以槽位索引进行的方括号访问永远命中不了拼写键，因此基本拼写的折叠 (`lava0` → `lava`) 永远不会触发
+
+后果 (全部通过在 Node 中原样运行生产分类器与解析器实测):
+
+- 43 个动画族基本名 (`lava`、全部 `*_portal`、`smoke`、`radar_screen`、`trading_terminal_front`、19 个 `*_running` 机器纹理等) **验证失败**: `bloxdTextureIdLava` → "There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?"
+- 196 个帧拼写 (`lava0`–`lava7` 等) 解析为**各自独立的可用常量** (只采样基本帧 — 无动画)
+- 专用诊断 "names a frame of the animated texture" 永远无法触发 (不存在帧别名)
+- 引擎的运行时 `named` 集合为 1,047 行，因此引擎为 `HEADER_VERSION` 计算的注册表哈希是 `694df62c` — 而非预期的 `df6c1915` (折叠后) — 这还额外迫使**每个已保存的包在本构建上重新验证**
+
+对照实验: 向同一分类器喂入以槽位为键的数组 (折叠逻辑自身所期待的、也是 `bny9u` 的数据模块所产出的形式) 可精确重现文档记载的折叠输出 — 906 named (`lava` 位于 id 1)、`lava0`–`lava7` 作为帧别名、424 个别名、1,227 层。下面的折叠规则描述的正是该预期 API。
+
 ## 对 HEADER_VERSION 的影响
 
 注册表哈希后缀烘焙了 id，因此这次漂移会把**每个已保存的包标记为「需要重新检查」** (页面加载时自动重验)。按名称编写的包经得起重新解析；裸 id 包会损坏 ([兼容性](../api/compatibility.md))。
@@ -70,6 +98,8 @@
 十月的双构建对比 (sjr0p7 → cnty9，10 天): 条目 1200 → 1219 (新增 98、移除 79)；1121 个未改名名称中 779 个改了 id (69%)；一次命名约定迁移 (`_rot1..4` 后缀 → `[rot[1..4` 槽位)；双箱出现。完整记录见[版本历史: v4](../history/v4.md)。
 
 11月4日 (ab90qa → xkg8x，1天): 条目 1,210 → 1,220 (+10，全部为回归名称 — v5 首发时的移除被逆转)；896 个名称中 376 个改 id (42%)；无移除；两个折叠族不变。双箱回归。
+
+11月8日 (bny9u → v98qt8, 3天): 条目 1,232 → 1,227 (+1 `hay_block_top`, −6 个转为模型的方块纹理: 熔炉、工作台、工匠台); 905 个名称中的 716 个变更 id (79%); 旋转/动画族均不变 (57 / 43)。生产与 preprod 提供同一字节相同的包 — 且本构建携带上文记录的折叠回归。
 
 ## 相关
 

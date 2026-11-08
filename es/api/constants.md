@@ -1,6 +1,6 @@
 # Constantes
 
-> API objetivo: 5 · Build objetivo: `bny9u` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
+> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 La cabecera proporciona tres constantes (las constantes de nombre de textura `bloxdTextureId*` se tratan en [API de texturas](texture-api.md)).
 

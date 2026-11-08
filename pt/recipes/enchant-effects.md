@@ -1,6 +1,6 @@
 # Efeitos de encantamento
 
-> API alvo: 5 · Build alvo: `bny9u` (verificado em produção 2026-11-05) · Estado: Analyzed (restaurado do cabeçalho em produção)
+> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Analyzed (restaurado do cabeçalho em produção)
 
 O v5 abriu o pipeline de encantamento tanto nas entradas quanto nas saídas. Receitas para controlar o brilho de itens e armaduras encantados preservando a matemática do motor.
 

@@ -1,6 +1,6 @@
 # 模型问题
 
-> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (v5 新领域)
+> 目标API: 5 · 目标构建: `v98qt8` · 状态: Analyzed (v5 新领域)
 
 围绕 v5 新 Model 钩子的问题。
 

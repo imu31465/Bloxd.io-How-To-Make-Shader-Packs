@@ -24,6 +24,6 @@ Spécifications internes restaurées en analysant l'implémentation du moteur. T
 | [Débogage](debugging.md) | paramètres URL, panneaux de statistiques |
 | [Journal de recherche](research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
 
-> API cible : 5 · Build cible : `bny9u` (vérifié en production le 2026-11-05)
+> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08)
 
 Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](research-log.md)).

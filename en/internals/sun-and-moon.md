@@ -1,6 +1,6 @@
 # The sun and the moon
 
-> Target API: 5 · Target build: `bny9u` (2026-11-05, production) · Status: Analyzed (production-bundle JavaScript analysis)
+> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (production-bundle JavaScript analysis)
 The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
 
 | Skybox | `bloxdSunDirection()` |

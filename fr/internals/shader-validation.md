@@ -1,6 +1,6 @@
 # Validation des shaders
 
-> API cible : 5 · Build cible : `bny9u` · État : Analyzed (restauré depuis le validateur en production)
+> API cible : 5 · Build cible : `v98qt8` · État : Analyzed (restauré depuis le validateur en production)
 
 La validation statique (l'analyseur, étape 1 du contrôle de chargement). Les correctifs côté utilisateur : [Erreurs de validation](../troubleshooting/validation.md).
 

@@ -22,7 +22,8 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4-Freeze-Bestätigung (Halloween-Event + Skyblock-Rework) |
 | `ab90qa` | **v5** | 2026-11-03 | v5-Start-Build; ursprüngliche v5-Basislinie. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | Registry-Drift (+10 Namen); preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen |
-| `bny9u` | **v5** | 2026-11-05 | **aktuell**; Baseline dieser Dokumentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` auf dem Haupt-Bundle, live von beiden Hosts geladen) |
+| `bny9u` | **v5** | 2026-11-05 | ; Baseline dieser Dokumentation. prod = preprod (md5 `60eea80ec48253b7ac6cc45604dc8273` auf dem Haupt-Bundle, live von beiden Hosts geladen) |
+| `v98qt8` | **v5** | 2026-11-08 | **aktuell**; Baseline dieser Dokumentation. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). Registry-Drift (netto −5), Spiele 115 → 116, und die **Texturkonstanten-Faltungs-Regression** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## Kern-Methodik
 
@@ -56,6 +57,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 | cnty9 → ab90qa | 7 Tage | +1 (`scorpion_eggs`), −10 (Doppel-Truhe ×8, Spawner-Seiten ×2); 334/905 Namen änderten die id |
 | ab90qa → xkg8x | 1 Tag | +10 (alle v5-Start-Entfernungen kehrten zurück: Double-Chest ×8, Spawner-Seiten ×2); 376/896 Namen änderten die id; keine entfernt |
 | xkg8x → bny9u | 1 Tag | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 Namen änderten die id (95 %); keine entfernt; Animationsfamilien 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## Unverifiziert / spekulativ
 

@@ -1,6 +1,6 @@
 # Model-Rendering-Interna
 
-> Ziel-API: 5 · Ziel-Build: `bny9u` · Status: Analyzed (aus dem Live-Bundle restauriert)
+> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Analyzed (aus dem Live-Bundle restauriert)
 
 Die Interna des v5-Model-Programms. Der nutzerseitige Leitfaden: [Modelle und Texturen](../guides/models.md).
 

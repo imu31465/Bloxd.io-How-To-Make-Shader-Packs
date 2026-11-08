@@ -1,6 +1,6 @@
 # Temps et animation
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
 > `bloxdSeconds()` boucle toutes les 3600 secondes (1 heure). Notez qu'il s'agit du temps écoulé du shader, sans garantie de synchronisation avec le soleil/le cycle jour-nuit du jeu. Utilisez-le pour l'animation périodique visuelle, mais préférez `bloxdSunDirection()` et les entrées d'éclairage pour détecter réellement la nuit.
 
 ## Cycle jour-nuit (1 jour par heure)

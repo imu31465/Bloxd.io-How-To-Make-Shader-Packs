@@ -1,6 +1,6 @@
 # 텍스처 레지스트리의 내부
 
-> 대상 API: 5 · 대상 빌드: `bny9u` (2026-11-05, 프로덕션 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
+> 대상 API: 5 · 대상 빌드: `v98qt8` (2026-11-08, 프로덕션·preprod 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 이름→id 해석 기구와 실측 레지스트리 드리프트. 사용자용 카탈로그: [텍스처 카탈로그](../api/texture-catalog.md).
 
@@ -12,9 +12,9 @@
 
 | 출력 | v5 실측 | 의미 |
 |---|---|---|
-| `named` | **911** | `bloxdTextureId<Name>` 으로 참조 가능한 이름 |
+| `named` | **906** | `bloxdTextureId<Name>` 으로 참조 가능한 이름 |
 | `aliases` | 424 | 접힌 철자 — 프레임 별명 196 (`lava0`…) 과 회전 별명 228 (`chest_top[rot[1`…) |
-| `layers` | 1,232 | 아틀라스 전체 레이어 표 — 이름 있는 루트 911, 추가 애니메이션 프레임 150, 미리 회전된 슬롯 171 |
+| `layers` | 1,227 | 아틀라스 전체 레이어 표 — 이름 있는 루트 911, 추가 애니메이션 프레임 150, 미리 회전된 슬롯 171 |
 
 ## 접기 규칙
 
@@ -61,6 +61,34 @@
 전체 드리프트 (5 이름): 추가 (5) — `trading_terminal_front` (애니메이션, 8프레임) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top`. 새 블록 2종 (Trading Terminal, Stone Generator) 이 게임 데이터에 합류했다. 제거는 없고 id 뒤섞임은 거의 전량이다 (생존 이름의 95%).
 
 
+## 드리프트 (bny9u → v98qt8)
+
+| 측정 | bny9u (v5) | v98qt8 (v5, 현행) |
+|---|---|---|
+| 아틀라스 항목 | 1,232 | **1,227** |
+| 회전 계열 (회전 스펠링) | 57 (228) | **57 (228) — 불변** |
+| 애니메이션 계열 (프레임 스펠링) | 43 (196) | **43 (196) — 불변** |
+| 사용 가능한 명명 상수 | 911 | **906** |
+| 생존명의 id 변화 | — | **905명 중 716명** (79%) |
+
+전체 드리프트 (7 이름): 추가 (1) `hay_block_top`; 제거 (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — Furnace, Workbench(제작대), Artisan Bench가 텍스처 입힌 지형 블록에서 블록 모델로 전환되면서 지형 텍스처가 레지스트리를 떠났습니다 (Workbench 는 `crafting_table_top` 를 유지 — 윗면은 여전히 지형 텍스처). 프로덕션과 preprod는 동일한 바이트-동일 번들을 제공합니다 (md5 `7458fd47ff88331d9f451d1456ff48ac`).
+
+## v98qt8 폴딩 회귀
+
+`v98qt8`에는 텍스처 상수 폴딩의 바이트 검증된 회귀가 있습니다. 데이터 모듈(1351)이 이제 `animatedBlockTextures`를 **스펠링 키 Array**로 구축하는 반면(`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — 라이브 메인 번들에서 hexdump 검증), 분류기(모듈 30048)는 두 곳에서 **슬롯 키 배열**을 여전히 기대합니다:
+
+1. `hii.forEach((value, key))` — `Array.prototype.forEach`는 문자열 키를 결코 순회하지 않으므로 추가 프레임의 slot→base 맵이 빈 채 남는다
+2. `hii[Qi]` (여기서 `Qi` = 아틀라스 슬롯) — 슬롯 인덱스의 대괄호 접근은 스펠링 키에 절대 닿지 않으므로 기본 스펠링 폴딩(`lava0` → `lava`)이 결코 발동하지 않는다
+
+결과(프로덕션 분류기와 리졸버를 Node에서 그대로 실행해 실측):
+
+- 43개 애니메이션 계열 기본 이름(`lava`, 모든 `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, 19개 `*_running` 기계 텍스처, …)이 **검증에 실패**한다: `bloxdTextureIdLava` → "There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?"
+- 196개 프레임 스펠링(`lava0`–`lava7`, …)이 **개별 사용 가능 상수**로 풀린다 (기본 프레임만 샘플 — 애니메이션 없음)
+- 전용 진단 "names a frame of the animated texture"는 결코 발동할 수 없다 (프레임 별칭이 존재하지 않음)
+- 엔진의 런타임 `named` 집합은 1,047행이므로 `HEADER_VERSION`에 대해 엔진이 계산하는 레지스트리 해시는 `694df62c` — 의도된 `df6c1915`(폴디드)가 아니며 — 이 때문에 **저장된 모든 팩이 재검증을 강제**당한다
+
+대조 실험: 같은 분류기에 슬롯 키 배열을 넣으면(폴딩 코드 자신이 기대하고 `bny9u`의 데이터 모듈이 만들던 것) 문서화된 폴디드 출력이 정확히 재현된다 — 906 named(`lava`가 id 1), `lava0`–`lava7`이 프레임 별칭, 424 별칭, 1,227 레이어. 아래의 폴딩 규칙은 그 의도된 API를 서술한다.
+
 ## HEADER_VERSION 에 미치는 영향
 
 레지스트리 해시 접미사는 id 를 굽으므로, 이 드리프트는 **모든 저장 팩을 「재확인 필요」로 표시**한다 (페이지 로드 시 자동 재검증). 이름으로 쓴 팩은 재해석을 견디고, 원시 id 팩은 깨진다 ([호환성](../api/compatibility.md)).
@@ -70,6 +98,8 @@
 10월의 두 빌드 비교 (sjr0p7 → cnty9, 10일): 엔트리 1200 → 1219 (98 추가, 79 삭제). 불변 이름 1121 중 779개가 id 를 바꿨다 (69%). 명명 규약 이동 (`_rot1..4` 접미사 → `[rot[1..4` 슬롯). 더블 체스트의 등장. 전체 기록은 [버전 히스토리: v4](../history/v4.md) 에 있다.
 
 11월 4일 (ab90qa → xkg8x, 1일): 엔트리 1,210 → 1,220 (+10, 전부 복귀 이름 — v5 출시 때의 제거가 뒤집힘); 896개 중 376개 이름이 id 변경 (42%); 제거 없음; 두 접기 계열 모두 불변. 더블 체스트가 돌아왔다.
+
+11월 8일 (bny9u → v98qt8, 3일): 항목 1,232 → 1,227 (+1 `hay_block_top`, −6 모델화된 블록 텍스처: Furnace, Workbench, Artisan Bench); 905명 중 716명이 id 변경 (79%); 회전/애니메이션 계열 불변 (57 / 43). 프로덕션과 preprod는 동일한 바이트-동일 번들 제공 — 그리고 이 빌드는 위에 문서화된 폴딩 회귀를 안고 있습니다.
 
 ## 관련 문서
 

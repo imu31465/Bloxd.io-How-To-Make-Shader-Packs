@@ -1,6 +1,6 @@
 # 纹理采样内部机制
 
-> 目标API: 5 · 目标构建: `bny9u` · 状态: Analyzed (从现行生成器 c56 复原)
+> 目标API: 5 · 目标构建: `v98qt8` · 状态: Analyzed (从现行生成器 c56 复原)
 
 `bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](../api/texture-api.md)。
 

@@ -1,6 +1,6 @@
 # 훅 호출의 내부
 
-> 대상 API: 5 · 대상 빌드: `bny9u` · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
+> 대상 API: 5 · 대상 빌드: `v98qt8` · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
 
 엔진이 런타임에 훅을 부르는 방식. 쓰는 코드에는 아무것도 바뀌지 않지만, 훅이 무엇을 받는지에 대한 추측이 사라진다.
 

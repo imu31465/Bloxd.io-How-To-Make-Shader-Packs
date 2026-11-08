@@ -19,6 +19,6 @@ The systematic specification of the current API v5. Everything here is measured 
 | [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
 | [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
 
-> Target API: 5 · Target build: `bny9u` (verified in production 2026-11-05) · Status: Analyzed (restored verbatim from header & validator)
+> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Analyzed (restored verbatim from header & validator)
 
 Migrating from v4? See [Version History: v5](../history/v5.md).

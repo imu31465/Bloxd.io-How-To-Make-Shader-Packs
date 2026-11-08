@@ -22,7 +22,8 @@
 | `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 冻结确认 (万圣节活动 + Skyblock 改版) |
 | `ab90qa` | **v5** | 2026-11-03 | v5 首发构建；最初的 v5 基线。prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
 | `xkg8x` | **v5** | 2026-11-04 | 注册表漂移 (+10 个名称)；preprod `2lcqcl` 在着色器包各表面实测一致 |
-| `bny9u` | **v5** | 2026-11-05 | **现行**；本文档基线。prod = preprod (主包 md5 `60eea80ec48253b7ac6cc45604dc8273`，自两个主机分别实时抓取确认) |
+| `bny9u` | **v5** | 2026-11-05 | ；本文档基线。prod = preprod (主包 md5 `60eea80ec48253b7ac6cc45604dc8273`，自两个主机分别实时抓取确认) |
+| `v98qt8` | **v5** | 2026-11-08 | **现行**; 本文档基线. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). 注册表漂移 (净 −5)，游戏 115 → 116，以及**纹理常量折叠回归** ([Texture registry](texture-registry.md#the-v98qt8-folding-regression)) |
 
 ## 关键方法论
 
@@ -56,6 +57,7 @@
 | cnty9 → ab90qa | 7 天 | +1 (`scorpion_eggs`)、−10 (双箱 ×8、刷怪笼侧面 ×2)；334/905 个名称改 id |
 | ab90qa → xkg8x | 1天 | +10 (v5 首发的移除全部回归: 双箱×8、刷怪笼侧面×2)；896 个中 376 个改 id；无移除 |
 | xkg8x → bny9u | 1天 | +5 (交易终端 ×3、石头发电机 ×2)；906 个中 864 个改 id (95%)；无移除；动画族 42 → 43 |
+| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ## 未验证 / 推测
 

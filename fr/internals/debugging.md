@@ -1,6 +1,6 @@
 # Outils de débogage
 
-> API cible : 5 · Build cible : `bny9u` (2026-11-05, production) · État : Analyzed (analyse JavaScript du bundle de production)
+> API cible : 5 · Build cible : `v98qt8` (2026-11-08, production et preprod) · État : Analyzed (analyse JavaScript du bundle de production)
 - Paramètre URL `?renderer=lite` — force le renderer Lite (WebGPU) (`webgl2` / `babylon` fonctionnent aussi ; `babylon` est l'ancien nom de webgl2). Priorité : paramètre URL > localStorage `bloxdRenderer` > écran de réglages > défaut (webgl2). Les valeurs invalides sont ignorées avec un avertissement. Des overrides laissés dans l'URL ou le localStorage peuvent casser des scènes nécessitant WebGPU (lite) avec « needs the new WebGPU renderer, so remove the renderer override... » ([Erreurs de chargement](../troubleshooting/loading.md))
 - Paramètre URL `?vconsole` — console à l'écran (VConsole). Pratique pour la vérification sur appareil mobile
 - Paramètre URL `?drawcalls=1` — ajoute un panneau de debug de statistiques de draw. Choisissez des objets de jeu depuis la console de debug, ou utilisez `drawCalls()` / `why()` / `configureDrawCallWatching()`, pour inspecter le surdessin des gros mécanismes (pack ou autres) et les approches de la limite de ~65,000 vertices par draw call — utile pour isoler les goulots d'étranglement de performance

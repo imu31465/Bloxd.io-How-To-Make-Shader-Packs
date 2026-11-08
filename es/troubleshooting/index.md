@@ -18,7 +18,7 @@ Errores y problemas visuales, localizables **por síntoma**. Las páginas siguen
 | Lento / descartado por la comprobación en el dispositivo | [Rendimiento](performance.md) |
 | Legal, seguridad, preguntas frecuentes | [FAQ](faq.md) |
 
-> API objetivo: 5 · Build objetivo: `bny9u` (2026-11-05, producción) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
+> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
 
 ## Dónde aparecen los errores
 
