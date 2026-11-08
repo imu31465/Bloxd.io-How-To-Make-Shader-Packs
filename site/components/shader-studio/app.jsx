@@ -55,17 +55,16 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 const SCENE_IDS = ['plains', 'forest', 'desert', 'waterside', 'ruins', 'night', 'cave', 'procedural']
 
-// ホットバーのブロック色 (プレビュー演出用の飾り)
-const HOTBAR = [
-  { c1: '#7bbf4d', c2: '#5d9433' }, // grass
-  { c1: '#9a6b45', c2: '#6f4a2e' }, // dirt
-  { c1: '#8f9299', c2: '#6f7278' }, // stone
-  { c1: '#c09a63', c2: '#8a6a3d' }, // planks
-  { c1: '#5d9445', c2: '#3f6b2e' }, // leaves
-  { c1: '#e3d5a1', c2: '#c2b17a' }, // sand
-  { c1: '#9c5f52', c2: '#74423a' }, // brick
-  null, null
-]
+// ホットバーのブロック色 — 実アトラスのタイル平均色 (registry.colors)
+const HOTBAR_NAMES = ['grass_top', 'dirt', 'stone', 'planks_maple', 'leaves_maple', 'sand', 'brick']
+const hex = c => '#' + c.map(v => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0')).join('')
+const HOTBAR = HOTBAR_NAMES.map(name => {
+  const c = registry.colors[name]
+  if (!c) return null
+  const k = 0.78
+  return { c1: hex(c), c2: hex(c.map(v => v * k)) }
+})
+HOTBAR.push(null, null)
 
 export function ShaderStudioApp({ lang }) {
   const t = STUDIO_I18N[lang] ?? STUDIO_I18N.en
@@ -86,6 +85,8 @@ export function ShaderStudioApp({ lang }) {
   const [softMode, setSoftMode] = useState(false)
   const [softRes, setSoftRes] = useState(null)
   const [gameHud, setGameHud] = useState(true)
+  const [camMode, setCamMode] = useState('fps')   // fps = 本番と同じ一人称 / orbit = 俯瞰
+  const [pointerLocked, setPointerLocked] = useState(false)
 
   // パラメータ (スライダー) — renderer.params を直接更新
   const paramsRef = useRef(null)
@@ -132,6 +133,7 @@ export function ShaderStudioApp({ lang }) {
         // WebGPU なしでもプレビューできるのがこのツールの要件:
         // WGSL を JS にトランスパイルして CPU でラスタライズする。
         // コンテキストが webgpu で固定済みなら 2d を取れないので canvas を新調する。
+        try { console.warn('[studio] WebGPU path unavailable — falling back to CPU preview:', e?.message || e) } catch (_) {}
         let target = canvas
         if (!canvas.getContext || !canvas.getContext('2d')) {
           target = document.createElement('canvas')
@@ -190,38 +192,98 @@ export function ShaderStudioApp({ lang }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // ---- カメラ操作 ----
+  // ---- カメラ操作 (fps: ポインタロック + WASD + ジャンプ。orbit: ドラッグ + ホイール) ----
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     let dragging = false
     let lastX = 0, lastY = 0
-    const down = e => { dragging = true; lastX = e.clientX; lastY = e.clientY }
+    const r = () => rendererRef.current
+    const down = e => {
+      if (camMode === 'fps') {
+        // クリックでポインタロック (= 本番のPointer Lockと同じ操作系)
+        if (document.pointerLockElement !== canvas) {
+          canvas.requestPointerLock?.()
+        }
+        return
+      }
+      dragging = true; lastX = e.clientX; lastY = e.clientY
+    }
     const move = e => {
-      if (!dragging || !rendererRef.current) return
-      const r = rendererRef.current
-      r.camera.yaw += (e.clientX - lastX) * 0.006
-      r.camera.pitch = Math.max(-1.4, Math.min(1.4, r.camera.pitch + (e.clientY - lastY) * 0.006))
+      const rr = r()
+      if (!rr) return
+      if (camMode === 'fps') {
+        if (document.pointerLockElement !== canvas) return
+        // 本番相当の視点感度
+        rr.camera.yaw += e.movementX * 0.0024
+        rr.camera.pitch = Math.max(-1.45, Math.min(1.45, rr.camera.pitch + e.movementY * 0.0024))
+        return
+      }
+      if (!dragging) return
+      rr.camera.yaw += (e.clientX - lastX) * 0.006
+      rr.camera.pitch = Math.max(-1.4, Math.min(1.4, rr.camera.pitch + (e.clientY - lastY) * 0.006))
       lastX = e.clientX; lastY = e.clientY
     }
     const up = () => { dragging = false }
     const wheel = e => {
-      if (!rendererRef.current) return
+      if (camMode === 'fps') return
+      const rr = r()
+      if (!rr) return
       e.preventDefault()
-      const r = rendererRef.current
-      r.camera.dist = Math.max(4, Math.min(120, r.camera.dist * (1 + Math.sign(e.deltaY) * 0.08)))
+      rr.camera.dist = Math.max(4, Math.min(120, rr.camera.dist * (1 + Math.sign(e.deltaY) * 0.08)))
+    }
+    const keyDown = e => {
+      const rr = r()
+      if (!rr || camMode !== 'fps') return
+      if (e.code === 'Space') {
+        e.preventDefault()
+        rr.input.wantJump = true
+        return
+      }
+      rr.input.keys.add(e.code)
+    }
+    const keyUp = e => {
+      const rr = r()
+      if (!rr) return
+      rr.input.keys.delete(e.code)
+    }
+    const lockChange = () => {
+      const locked = document.pointerLockElement === canvas
+      setPointerLocked(locked)
+      const rr = r()
+      if (rr) {
+        rr.input.pointerLocked = locked
+        if (!locked) rr.input.keys.clear()
+      }
     }
     canvas.addEventListener('pointerdown', down)
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
     canvas.addEventListener('wheel', wheel, { passive: false })
+    window.addEventListener('keydown', keyDown)
+    window.addEventListener('keyup', keyUp)
+    document.addEventListener('pointerlockchange', lockChange)
     return () => {
       canvas.removeEventListener('pointerdown', down)
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
       canvas.removeEventListener('wheel', wheel)
+      window.removeEventListener('keydown', keyDown)
+      window.removeEventListener('keyup', keyUp)
+      document.removeEventListener('pointerlockchange', lockChange)
     }
-  }, [initState])
+  }, [initState, camMode])
+
+  // カメラモード反映 (ソフトレンダラーは俯瞰のみ)
+  useEffect(() => {
+    const rr = rendererRef.current
+    if (rr && typeof rr.setCameraMode === 'function') rr.setCameraMode(camMode)
+  }, [camMode, initState, scene, softMode])
+
+  // ソフトモードでは一人称不可
+  useEffect(() => {
+    if (softMode && camMode !== 'orbit') setCamMode('orbit')
+  }, [softMode])
 
   // ---- 適用 ----
   const applyCode = useCallback(() => {
@@ -339,8 +401,21 @@ export function ShaderStudioApp({ lang }) {
                 </div>
               </div>
             )}
+            {/* 一人称モード: クリックでプレイ (本番と同じ Pointer Lock) */}
+            {camMode === 'fps' && initState === 'ready' && !pointerLocked && !softMode && (
+              <button
+                onClick={() => canvasRef.current?.requestPointerLock?.()}
+                style={{
+                  position: 'absolute', inset: 0, width: '100%', height: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(8,10,14,0.35)', color: '#fff',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                }}
+              >{t.clickToPlay}</button>
+            )}
             <div className="x:absolute x:bottom-2 x:right-3 x:text-[10px] x:text-gray-400 x:font-mono x:flex x:gap-3">
-              <span>{t.controls}</span>
+              <span>{camMode === 'fps' ? t.controlsFps : t.controls}</span>
               <span>{fps} {t.fps}</span>
             </div>
           </div>
@@ -393,6 +468,21 @@ export function ShaderStudioApp({ lang }) {
               {SCENE_IDS.map(id => <option key={id} value={id}>{t.scenes[id]}</option>)}
             </select>
           </label>
+          {!softMode && (
+            <div className="x:mb-3">
+              <span className="x:text-xs x:font-semibold x:block x:mb-1">{t.camera}</span>
+              <div className="x:flex x:gap-1">
+                <button
+                  onClick={() => setCamMode('fps')}
+                  className={`x:flex-1 x:rounded x:px-2 x:py-1 x:text-xs x:cursor-pointer nextra-border x:border ${camMode === 'fps' ? 'x:bg-blue-500 x:text-white x:border-blue-500' : 'x:hover:bg-gray-100 x:dark:x:hover:bg-gray-800'}`}
+                >{t.gameView}</button>
+                <button
+                  onClick={() => setCamMode('orbit')}
+                  className={`x:flex-1 x:rounded x:px-2 x:py-1 x:text-xs x:cursor-pointer nextra-border x:border ${camMode === 'orbit' ? 'x:bg-blue-500 x:text-white x:border-blue-500' : 'x:hover:bg-gray-100 x:dark:x:hover:bg-gray-800'}`}
+                >{t.orbitView}</button>
+              </div>
+            </div>
+          )}
           <label className="x:flex x:items-center x:gap-2 x:mb-3 x:text-xs x:cursor-pointer">
             <input type="checkbox" checked={gameHud} onChange={e => setGameHud(e.target.checked)} />
             {t.hud}

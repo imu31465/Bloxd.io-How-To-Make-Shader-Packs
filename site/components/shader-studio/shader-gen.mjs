@@ -115,8 +115,15 @@ struct ViewUniforms {
   overlay: vec4f,            // xyz = rgb, w = alpha
 };
 @group(0) @binding(0) var<uniform> view: ViewUniforms;
+// アトラスは本番と同じ 5 構成 (imagesPerAtlas [256,256,256,256,203]) —
+// maxTextureArrayLayers の既定下限 256 に合わせ、5 枚 × ≤256 層の
+// texture_2d_array に分割してバインドする (どのアダプターでも GPU パスが動く)。
 @group(0) @binding(1) var textureAtlas0: texture_2d_array<f32>;
-@group(0) @binding(2) var textureAtlasSampler: sampler;
+@group(0) @binding(2) var textureAtlas1: texture_2d_array<f32>;
+@group(0) @binding(3) var textureAtlas2: texture_2d_array<f32>;
+@group(0) @binding(4) var textureAtlas3: texture_2d_array<f32>;
+@group(0) @binding(5) var textureAtlas4: texture_2d_array<f32>;
+@group(0) @binding(6) var textureAtlasSampler: sampler;
 
 // ---- 現在フラグメント情報 (エンジンの bloxdSp* 一時変数の役割) ----
 var<private> bloxdSpTextureRotation: u32;
@@ -187,8 +194,17 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
     return vec4f(1.0);
   }
   let layer = bloxdSpTextureLayers[bloxdSpTextureId];
-  let level = u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u)));
-  return textureSampleLevel(textureAtlas0, textureAtlasSampler, bloxdSpTurned, level, layer);
+  // texture_2d_array 版のシグネチャは (t, s, coords, array_index: u32, level: f32)
+  // — level は f32 で渡す (旧実装は u32 を渡しており GPU パスが常に壊れていた)
+  let level = clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u));
+  // 本番の 5 アトラス構成: スロット → (ストリップ, 行) への分割
+  let strip = layer / 256u;
+  let row = layer % 256u;
+  if (strip == 0u) { return textureSampleLevel(textureAtlas0, textureAtlasSampler, bloxdSpTurned, row, level); }
+  if (strip == 1u) { return textureSampleLevel(textureAtlas1, textureAtlasSampler, bloxdSpTurned, row, level); }
+  if (strip == 2u) { return textureSampleLevel(textureAtlas2, textureAtlasSampler, bloxdSpTurned, row, level); }
+  if (strip == 3u) { return textureSampleLevel(textureAtlas3, textureAtlasSampler, bloxdSpTurned, row, level); }
+  return textureSampleLevel(textureAtlas4, textureAtlasSampler, bloxdSpTurned, row, level);
 }
 
 // ---- bloxdTextureId* 名前付き定数 (911名) + 非公開だが今も注入される
@@ -281,7 +297,8 @@ fn buildLightIn(f: FragmentOut) -> BloxdLightIn {
 }
 ${isLiquid ? `
 fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
-  let d = textureSampleLevel(sceneDepth, sceneDepthSampler, bloxdSpScreenUV, 0.0);
+  // texture_depth_2d 版の level は整数 (i32/u32) — 0.0 だと型不一致で弾かれる
+  let d = textureSampleLevel(sceneDepth, sceneDepthSampler, bloxdSpScreenUV, 0u);
   if (d >= 0.9999) {
     return BloxdOpaqueBehind(false, vec3f(0.0), 0.0);
   }

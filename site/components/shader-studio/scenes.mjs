@@ -1,23 +1,22 @@
 // シーン生成: 手作りバイオーム 7 種 + 手続型 (シード) 地形 + モデル。
 // ブロック配置から3プログラム (terrain/liquid/model) のメッシュを生成する。
 //
+// テクスチャは本番 blockMetadata (v98qt8) の実在名のみを参照する。
+// 実アトラスのテクスチャは 既に着色済み (前色込み) のため tint は 1。
+// 水は本番と同じくテクスチャなしのカラー液体 (Water.textureInfo =
+// [0.5, 0.5, 0.8, 0.9])。溶岩は本番のアニメ族 lava0 (8状態/200ms)。
+//
 // ブロックの世界: y up、1ブロック=1単位。render position は原点中心に
 // なるようブロック座標から offset を引いたもの (renderOffset の役割を再現)。
-//
-// テクスチャは registry 実在名のみ参照する (bny9u の 911 名)。
-// registry に存在しないもの (水・丸太の年輪・プレイヤー) は textures.mjs の
-// カスタムタイル (customTexId) を使う。
 
 import { registry, customTexId } from './textures.mjs'
 
 const texId = name => {
-  if (name === 'water') return customTexId('water')
-  if (name === 'log_top') return customTexId('log_top')
   const e = registry.names.find(n => n.name === name)
-  return e ? e.id : 0
+  return e ? e.id : 0   // 0 = "no texture" (API 仕様) → 白テクセル = 色のみ
 }
 
-// カスタム (プレイヤー) タイル id
+// カスタム (プレイヤー) タイル id — 余白レイヤー
 const CID = {
   skin: customTexId('player_skin'),
   face: customTexId('player_face'),
@@ -33,9 +32,9 @@ export const FLAG = {
   SLAB: 6, STAIRS: 7, FLAT: 8, PLACED: 9, HELD: 10, DROPPED: 11, THROWN: 12, LIFEFORM: 13
 }
 
-// ブロック種別定義: tex面 (top/side/bottom), フラグ, 光, 頂点tint
-// colour (tint) は AO と掛けて頂点色に焼き込む。テクスチャの模様は
-// bloxdDefaultSurface が bloxdTexel で掛ける (エンジンの texture×tint×AO 相当)。
+// ブロック種別定義: tex面 (top/side/bottom), フラグ, 光, 頂点tint。
+// tint は本番の vertexTint 相当 (実テクスチャは前色込みなので基本 1)。
+// 水の tint/alpha は本番 Water.textureInfo のカラー値そのもの。
 const BLOCKS = {
   grass: { top: 'grass_top', side: 'grass_block_side', bottom: 'dirt', flags: [FLAG.VEGETATION, FLAG.DIRT, FLAG.OPAQUE, FLAG.PLACED] },
   dirt: { top: 'dirt', side: 'dirt', bottom: 'dirt', flags: [FLAG.DIRT, FLAG.OPAQUE, FLAG.PLACED] },
@@ -47,14 +46,14 @@ const BLOCKS = {
   sand: { top: 'sand', side: 'sand', bottom: 'sand', flags: [FLAG.SAND, FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] },
   sandstone: { top: 'sandstone_top', side: 'cut_sandstone', bottom: 'chiseled_sandstone', flags: [FLAG.SAND, FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] },
   bedrock: { top: 'bedrock', side: 'bedrock', bottom: 'bedrock', flags: [FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] },
-  oaklog: { top: 'log_top', side: 'log_maple', bottom: 'log_top', flags: [FLAG.OPAQUE, FLAG.PLACED] },
+  oaklog: { top: 'log_maple', side: 'log_maple', bottom: 'log_maple', flags: [FLAG.OPAQUE, FLAG.PLACED] },
   oakplank: { top: 'planks_maple', side: 'planks_maple', bottom: 'planks_maple', flags: [FLAG.OPAQUE, FLAG.PLACED] },
-  plankwall: { top: 'planks_maple', side: 'planks_maple', bottom: 'planks_maple', flags: [FLAG.OPAQUE, FLAG.PLACED], tint: [1.18, 1.10, 0.94] },
-  darkplank: { top: 'planks_cedar', side: 'planks_cedar', bottom: 'planks_cedar', flags: [FLAG.OPAQUE, FLAG.PLACED], tint: [0.62, 0.48, 0.36] },
-  leaves: { top: 'leaves_maple', side: 'leaves_maple', bottom: 'leaves_maple', flags: [FLAG.VEGETATION, FLAG.PLACED], tint: [0.85, 0.98, 0.78] },
-  spruceleaves: { top: 'leaves_cedar', side: 'leaves_cedar', bottom: 'leaves_cedar', flags: [FLAG.VEGETATION, FLAG.PLACED], tint: [0.64, 0.82, 0.62] },
-  water: { top: 'water', side: 'water', bottom: 'water', flags: [FLAG.PLACED], liquid: true },
-  lava: { top: 'lava', side: 'lava', bottom: 'lava', flags: [FLAG.EMISSIVE, FLAG.ROCK, FLAG.PLACED], light: [14, 8, 2] },
+  plankwall: { top: 'planks_maple', side: 'planks_maple', bottom: 'planks_maple', flags: [FLAG.OPAQUE, FLAG.PLACED] },
+  darkplank: { top: 'planks_cedar', side: 'planks_cedar', bottom: 'planks_cedar', flags: [FLAG.OPAQUE, FLAG.PLACED] },
+  leaves: { top: 'leaves_maple', side: 'leaves_maple', bottom: 'leaves_maple', flags: [FLAG.VEGETATION, FLAG.PLACED] },
+  spruceleaves: { top: 'leaves_cedar', side: 'leaves_cedar', bottom: 'leaves_cedar', flags: [FLAG.VEGETATION, FLAG.PLACED] },
+  water: { top: null, side: null, bottom: null, flags: [FLAG.PLACED], liquid: true, tint: [0.5, 0.5, 0.8], alpha: 229 },
+  lava: { top: 'lava0', side: 'lava0', bottom: 'lava0', flags: [FLAG.EMISSIVE, FLAG.ROCK, FLAG.PLACED], light: [15, 9, 3] },
   glowstone: { top: 'glowstone', side: 'glowstone', bottom: 'glowstone', flags: [FLAG.EMISSIVE, FLAG.OPAQUE, FLAG.PLACED], light: [15, 14, 10] },
   coalore: { top: 'coal_ore', side: 'coal_ore', bottom: 'coal_ore', flags: [FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] },
   ironore: { top: 'iron_ore', side: 'iron_ore', bottom: 'iron_ore', flags: [FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] },
@@ -70,6 +69,17 @@ const BLOCKS = {
   diamond: { top: 'diamond_ore', side: 'diamond_ore', bottom: 'diamond_ore', flags: [FLAG.ROCK, FLAG.OPAQUE, FLAG.PLACED] }
 }
 
+// 実在チェック (開発時検証用 — 見つからない名前は白テクセルに落ちる)
+export function missingTextureNames() {
+  const missing = new Set()
+  for (const def of Object.values(BLOCKS)) {
+    for (const t of [def.top, def.side, def.bottom]) {
+      if (t && texId(t) === 0) missing.add(t)
+    }
+  }
+  return [...missing]
+}
+
 // ---------------------------------------------------------------- scenes --
 
 function key(x, y, z) { return x + ',' + y + ',' + z }
@@ -77,17 +87,26 @@ function key(x, y, z) { return x + ',' + y + ',' + z }
 class SceneBuilder {
   constructor() {
     this.blocks = new Map()
+    this.solidBlocks = new Set()   // 一人称移動の衝突判定用 (水を除く)
     this.lights = [] // {x,y,z, rgb:[0-15]}
     this.models = []
     this.sky = { night: false }
   }
-  set(x, y, z, type) { if (type) this.blocks.set(key(x, y, z), type); else this.blocks.delete(key(x, y, z)) }
+  set(x, y, z, type) {
+    if (type) {
+      this.blocks.set(key(x, y, z), type)
+      if (!BLOCKS[type]?.liquid) this.solidBlocks.add(key(x, y, z))
+    } else {
+      this.blocks.delete(key(x, y, z))
+      this.solidBlocks.delete(key(x, y, z))
+    }
+  }
   fill(x0, y0, z0, x1, y1, z1, type) {
     for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) for (let z = z0; z <= z1; z++) this.set(x, y, z, type)
   }
   column(x, z, from, to, type) { for (let y = from; y <= to; y++) this.set(x, y, z, type) }
   light(x, y, z, rgb) { this.lights.push({ x, y, z, rgb }) }
-  clear(x, y, z) { this.blocks.delete(key(x, y, z)) }
+  clear(x, y, z) { this.set(x, y, z, null) }
 
   // 木 (幹4-6 + 葉っぱの塊) — bloxd風のもっくりした樹冠
   tree(x, base, z, h = 4, leaf = 'leaves') {
@@ -157,7 +176,7 @@ class SceneBuilder {
   }
 }
 
-// 高さマップ地形を敷く。surface/dirt/stone を積み、水位以下は水に。
+// 高度マップ地形を敷く。surface/dirt/stone を積み、水位以下は水に。
 function layTerrain(sb, R, seed, opts = {}) {
   const n1 = seeded2D(seed)
   const n2 = seeded2D(seed * 7919 + 13)
@@ -223,14 +242,19 @@ export function makePlains() {
   sb.tree(-20, h_of(sb, -20, -12) + 1, -12, 4)
   sb.tree(22, h_of(sb, 22, -18) + 1, -18, 5)
   sb.tree(-24, h_of(sb, -24, 2) + 1, 2, 4)
-  // ドロップアイテムとプレイヤー (カメラ寄りに置いて存在感を出す)
+  // ドロップアイテム (カメラ寄りに存在感を出す)
   sb.models.push({ type: 'drop', pos: [6.5, 3.2, 6.5] })
   const py = h_of(sb, 7, 15) + 1
   sb.models.push({ type: 'player', pos: [7.5, py, 15.5], yaw: 2.8 })
-  return { id: 'plains', builder: sb, camera: [10, 12, 22], lookYaw: -0.42, lookPitch: 0.16, camTarget: [0, 2, 0], camDist: 26 }
+  return {
+    id: 'plains', builder: sb, camera: [10, 12, 22], lookYaw: -0.42, lookPitch: 0.16,
+    camTarget: [0, 2, 0], camDist: 26,
+    // 一人称: 池の向かいの草原から家を見る
+    fpSpawn: [4.5, h_of(sb, 4, 9) + 2.62, 9.5], fpYaw: Math.PI + 0.35, fpPitch: 0.06
+  }
 }
 
-function h_of(sb, x, z) { // 高度補助 (使わないが互換のため残す)
+function h_of(sb, x, z) {
   for (let y = 30; y >= -8; y--) if (sb.blocks.has(key(x, y, z))) return y
   return 0
 }
@@ -239,7 +263,6 @@ export function makeForest() {
   const sb = new SceneBuilder()
   const R = 46
   layTerrain(sb, R, 777001, { amp: 3.4, base: 1 })
-  // 木の配置: 単純 LCG (seeded2D は座標引数が必要なのでここでは使わない)
   let s = 424242
   const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) & 0x7fffffff; return s / 0x7fffffff }
   for (let i = 0; i < 52; i++) {
@@ -251,7 +274,11 @@ export function makeForest() {
   }
   const py = h_of(sb, 1, 5) + 1
   sb.models.push({ type: 'player', pos: [1.5, py, 5.5], yaw: 0.5 })
-  return { id: 'forest', builder: sb, camera: [6, 11, 20], lookYaw: -0.28, lookPitch: 0.12, camTarget: [0, 3, 0], camDist: 22 }
+  return {
+    id: 'forest', builder: sb, camera: [6, 11, 20], lookYaw: -0.28, lookPitch: 0.12,
+    camTarget: [0, 3, 0], camDist: 22,
+    fpSpawn: [1.5, h_of(sb, 1, 8) + 2.62, 8.5], fpYaw: 0.2, fpPitch: 0.08
+  }
 }
 
 export function makeDesert() {
@@ -275,7 +302,11 @@ export function makeDesert() {
   sb.fill(13, 4, 9, 17, 4, 13, 'sandstone')
   sb.fill(14, 5, 10, 16, 5, 12, 'sandstone')
   sb.models.push({ type: 'player', pos: [0.5, 3, 7.5], yaw: -2.9 })
-  return { id: 'desert', builder: sb, camera: [4, 10, 20], lookYaw: -0.18, lookPitch: 0.14, camTarget: [0, 4, 0], camDist: 24 }
+  return {
+    id: 'desert', builder: sb, camera: [4, 10, 20], lookYaw: -0.18, lookPitch: 0.14,
+    camTarget: [0, 4, 0], camDist: 24,
+    fpSpawn: [0.5, h_of(sb, 0, 6) + 2.62, 6.5], fpYaw: Math.PI - 0.1, fpPitch: 0.05
+  }
 }
 
 export function makeWaterside() {
@@ -316,7 +347,11 @@ export function makeWaterside() {
   sb.tree(15, h_of(sb, 15, 7) + 1, 7, 4)
   sb.tree(19, h_of(sb, 19, -9) + 1, -9, 5)
   sb.models.push({ type: 'player', pos: [1.5, 2, 1.5], yaw: -1.2 })
-  return { id: 'waterside', builder: sb, camera: [14, 9, 15], lookYaw: -0.62, lookPitch: 0.16, camTarget: [-2, 1, 0], camDist: 26 }
+  return {
+    id: 'waterside', builder: sb, camera: [14, 9, 15], lookYaw: -0.62, lookPitch: 0.16,
+    camTarget: [-2, 1, 0], camDist: 26,
+    fpSpawn: [-2.5, 3.62, 3.5], fpYaw: Math.PI + 0.9, fpPitch: 0.04
+  }
 }
 
 export function makeRuins() {
@@ -347,7 +382,11 @@ export function makeRuins() {
   flatten(sb, 0, 12, 4, 3)
   sb.models.push({ type: 'player', pos: [0, 4, 12], yaw: 3.14 })
   sb.models.push({ type: 'drop', pos: [0, 8.2, 0] })
-  return { id: 'ruins', builder: sb, camera: [15, 10, 15], lookYaw: -0.72, lookPitch: 0.24, camTarget: [0, 5, 0], camDist: 26 }
+  return {
+    id: 'ruins', builder: sb, camera: [15, 10, 15], lookYaw: -0.72, lookPitch: 0.24,
+    camTarget: [0, 5, 0], camDist: 26,
+    fpSpawn: [0.5, 6.62, 10.5], fpYaw: Math.PI, fpPitch: 0.1
+  }
 }
 
 export function makeNight() {
@@ -364,10 +403,12 @@ export function makeNight() {
   sb.tree(-18, h_of(sb, -18, 6) + 1, 6, 5)
   // 道なりに松明
   for (const [tx, tz] of [[-2, 6], [2, 2], [6, -2], [10, -6]]) sb.torch(tx, h_of(sb, tx, tz) + 1, tz)
-  const py = h_of(sb, -2, 7) + 1
-  sb.models.push({ type: 'player', pos: [-2, py, 7], yaw: 0.9 })
   sb.sky.night = true
-  return { id: 'night', builder: sb, camera: [8, 9, 18], lookYaw: 2.6, lookPitch: 0.10, camTarget: [2, 3, 0], camDist: 24 }
+  return {
+    id: 'night', builder: sb, camera: [8, 9, 18], lookYaw: 2.6, lookPitch: 0.10,
+    camTarget: [2, 3, 0], camDist: 24,
+    fpSpawn: [-1.5, h_of(sb, -1, 6) + 2.62, 6.5], fpYaw: Math.PI + 0.4, fpPitch: 0.05
+  }
 }
 
 export function makeCave() {
@@ -382,8 +423,8 @@ export function makeCave() {
       if (!inCave) sb.set(x, y, z, y < -6 ? 'bedrock' : 'stone')
     }
   }
-  // 溶岩プール (床に沿って)
-  sb.fill(-6, -6, -4, 6, -6, 4, 'lava'); sb.light(0, -5, 0, [14, 8, 2])
+  // 溶岩プール (床に沿って) — 本番のアニメ族 (8状態/200ms)
+  sb.fill(-6, -6, -4, 6, -6, 4, 'lava'); sb.light(0, -5, 0, [15, 9, 3])
   sb.set(-16, -6, 0, 'glowstone'); sb.light(-15.5, -5, 0, [15, 14, 10])
   // 鉱石脈 (壁面 d≥16 に埋める — 空洞内に浮かせない)
   for (const [x, y, z, t] of [[-15, -4, -6, 'coalore'], [15, -3, 7, 'ironore'], [-6, -4, 15, 'diamondore'], [7, -5, -15, 'goldore'], [-13, -2, 10, 'coalore'], [10, -4, -13, 'ironore']]) sb.set(x, y, z, t)
@@ -396,7 +437,11 @@ export function makeCave() {
   sb.torch(-8, -6, -11)
   sb.torch(8, -6, 11)
   sb.models.push({ type: 'player', pos: [5, -6, 9], yaw: 2.6 })
-  return { id: 'cave', builder: sb, camera: [0, -4, 12], lookYaw: 0, lookPitch: 0.10, camTarget: [0, -5.5, 0], camDist: 13 }
+  return {
+    id: 'cave', builder: sb, camera: [0, -4, 12], lookYaw: 0, lookPitch: 0.10,
+    camTarget: [0, -5.5, 0], camDist: 13,
+    fpSpawn: [0.5, -4.38, 12.5], fpYaw: 0, fpPitch: 0.02
+  }
 }
 
 // ---- 手続型 (シード) ----
@@ -445,7 +490,11 @@ export function makeProcedural(seed = 1337) {
     }
   }
   sb.models.push({ type: 'player', pos: [6, h_of(sb, 6, 10) + 1, 10], yaw: -0.6 })
-  return { id: 'procedural', builder: sb, camera: [18, 14, 18], lookYaw: -0.8, lookPitch: 0.30, camTarget: [0, 4, 0], camDist: 22, seed }
+  return {
+    id: 'procedural', builder: sb, camera: [18, 14, 18], lookYaw: -0.8, lookPitch: 0.30,
+    camTarget: [0, 4, 0], camDist: 22, seed,
+    fpSpawn: [6.5, h_of(sb, 6, 12) + 2.62, 12.5], fpYaw: Math.PI + 0.5, fpPitch: 0.1
+  }
 }
 
 export const SCENES = {
@@ -516,8 +565,9 @@ function vertexAO(sx, sy, sz, corner, solidAt) {
 //   position f32×3 | normal f32×3 | colour u8×4 (unorm) | uv f32×2 |
 //   atlasIndex f32 | textureId u32 | textureRotation u32 | mipLevel f32 |
 //   flags u32 (bitpack) | lightLevels u32 (nibble pack) | localPosition f32×3
-// colour は tint×AO (テクスチャの平均色は含めない — 模様は
-// bloxdDefaultSurface の bloxdTexel が掛けて texture×tint×AO を再現する)。
+// colour は tint×AO (実テクスチャは前色込みなので tint は基本 1、水は本番
+// カラー値)。テクスチャの模様は bloxdDefaultSurface の bloxdTexel が掛けて
+// texture×tint×AO を再現する。
 export function buildMeshes(scene) {
   const sb = scene.builder
   const blocks = sb.blocks
@@ -529,7 +579,7 @@ export function buildMeshes(scene) {
     return t && BLOCKS[t]?.flags.includes(FLAG.OPAQUE) ? 1 : 0
   }
 
-  // mip 近似: 既定視点からの距離で 0..3
+  // mip 近似: 視点からの距離で 0..3 (fps は視点、orbit は既定視点)
   const eye = scene.camera ?? [0, 10, 20]
   const mipAt = (x, y, z) => {
     const d = Math.hypot(x - eye[0], y - eye[1], z - eye[2])
@@ -547,6 +597,7 @@ export function buildMeshes(scene) {
     const flagsBits = def.flags.reduce((acc, f) => acc | (1 << f), 0)
     const emissive = def.flags.includes(FLAG.EMISSIVE)
     const tint = def.tint ?? [1, 1, 1]
+    const alpha = def.alpha ?? 255
 
     for (const face of FACES) {
       const [dx, dy, dz] = face.dir
@@ -559,8 +610,8 @@ export function buildMeshes(scene) {
       if (type === 'bedrock' && dy === -1) continue
 
       const texName = dy === 1 ? def.top : dy === -1 ? def.bottom : def.side
-      const id = texId(texName)
-      const layer = id - 1
+      const id = texName ? texId(texName) : 0
+      const layer = Math.max(0, id - 1)
       const texRot = 0
 
       // 面中心の光
@@ -578,7 +629,7 @@ export function buildMeshes(scene) {
         const v = [
           x + c[0], y + c[1], z + c[2],
           dx, dy, dz,
-          Math.round(255 * aoF * tint[0]), Math.round(255 * aoF * tint[1]), Math.round(255 * aoF * tint[2]), 255, // colour u8n
+          Math.round(255 * aoF * tint[0]), Math.round(255 * aoF * tint[1]), Math.round(255 * aoF * tint[2]), alpha, // colour u8n
           FACE_UVS[ci][0], FACE_UVS[ci][1],
           layer, // atlasIndex (f32)
           id, texRot, mip, // textureId, rotation, mip
@@ -632,7 +683,7 @@ function buildModelMeshes(models) {
           ? tex
           : (tex[FACE_KEY[fi]] ?? tex.px ?? 'stone')
       const id = typeof texVal === 'number' ? texVal : texId(texVal)
-      const layer = id - 1
+      const layer = Math.max(0, id - 1)
       const lightSky = extra.skyLight ?? 15
       for (let ci = 0; ci < 4; ci++) {
         const c = face.corners[ci]

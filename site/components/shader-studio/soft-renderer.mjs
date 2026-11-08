@@ -182,8 +182,8 @@ export class StudioSoftRenderer {
   async init() {
     this.ctx = this.canvas.getContext && this.canvas.getContext('2d')
     if (!this.ctx) throw new Error('Canvas 2D unavailable (CPU preview)')
-    // アトラス (WebGPU パスと同じ生成物)
-    this.mips = buildMips(buildAtlasPixels())
+    // アトラス (WebGPU パスと同じ生成物 — 実データの fetch + decode を伴う)
+    this.mips = buildMips(await buildAtlasPixels())
     this.animLadders = animLadderInfo()
     this.layers = new Uint32Array(ATLAS_LAYERS + 1)
     for (let id = 0; id <= ATLAS_LAYERS; id++) this.layers[id] = Math.max(0, id - 1)
@@ -460,13 +460,19 @@ export class StudioSoftRenderer {
   }
 
   _updateAnimLayers(seconds) {
-    const bucket = Math.floor(seconds / 0.25)
-    if (bucket === this._lastAnimBucket) return
-    this._lastAnimBucket = bucket
+    // 本番は族ごとの interval (lava 200ms / portal 300ms)
+    let dirty = false
     const layers = this.layers
+    if (this._lastAnimKeys === undefined) this._lastAnimKeys = new Map()
     for (const L of this.animLadders) {
-      layers[L.id] = L.rootLayer + (bucket % L.frames)
+      const bucket = Math.floor(seconds * 1000 / (L.interval || 200))
+      if (this._lastAnimKeys.get(L.id) === bucket) continue
+      this._lastAnimKeys.set(L.id, bucket)
+      const n = L.frameLayers.length
+      layers[L.id] = L.frameLayers[bucket % n]
+      dirty = true
     }
+    if (dirty) this._lastAnimBucket = -1  // (互換: 変化時にラスタ側の再評価を許す)
   }
 
   // --------------------------------------------------------- raster ------
