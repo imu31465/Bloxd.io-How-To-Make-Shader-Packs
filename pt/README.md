@@ -7,7 +7,7 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 - API atual: **5** (o `pack.json` deve declarar `apiVersion: 5`)
 - Alvo: renderizador WebGPU
 - Última verificação: 2026-11-05
-- Build alvo: `bny9u.main.02116121.js` (produção, verificado em 2026-11-05; preprod serve o mesmo bundle idêntico byte a byte, md5 `60eea80ec48253b7ac6cc45604dc8273` — registro, cabeçalho, hooks, limites remedidos)
+- Build alvo: `v98qt8.main.62d8d238.js` (produção e preprod, verificado em 2026-11-08, bundle idêntico byte a byte, md5 `7458fd47ff88331d9f451d1456ff48ac` — registro, cabeçalho, hooks e limites remedidos)
 - Hooks de shader: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultando a API? Veja [Referência da API](api/).
