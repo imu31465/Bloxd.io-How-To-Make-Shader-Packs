@@ -1864,7 +1864,7 @@ The **id** column is the value the constant compares against — measured on `bb
 
 The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
 
-Deliberately **not** listed: the remaining registry spellings — 776 alias names (520 frame spellings, of which 208 are the new `a~b~interval` transition spellings, plus 256 rotation spellings) — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,650-row layer table is engine-internal and covered in [Engine Internals: Texture Registry](internals/texture-registry.md).
+Deliberately **not** listed: the remaining registry spellings — 776 alias names (520 frame spellings and 256 rotation spellings) — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,650-row layer table is engine-internal and covered in [Engine Internals: Texture Registry](internals/texture-registry.md).
 
 #### How the numbers relate
 
@@ -1880,7 +1880,7 @@ The `bbb6l5` registry has 1,017 usable names, 111 more than `v98qt8`. Texture ID
 
 ### The catalog
 
-All usable names, alphabetically. The id column is the `bloxdTextureId*` value — measured on `bbb6l5` (2026-11-20). **Ids are snapshots; treat names as the API**.
+All 1,017 usable names are listed alphabetically. The id column shows values measured on `bbb6l5`; IDs can change between builds, so reference textures by name in WGSL.
 
 | Name | id (bbb6l5) | Notes |
 |---|---|---|

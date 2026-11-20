@@ -1859,7 +1859,7 @@ Das Registry von `bbb6l5` enthält 1.017 nutzbare Namen, 111 mehr als `v98qt8`. 
 
 ### Der Katalog
 
-Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-Wert — gemessen auf `bbb6l5` (2026-11-20). **Ids sind Momentaufnahmen; behandle Namen als die API**: Zwischen dem v4-Build (cnty9) und dem v5-Start-Build (ab90qa) änderten 334 überlebende Namen die id, und zwischen ab90qa und `bbb6l5` weitere 376, zwischen `bbb6l5` und diesem Build weitere 864 (siehe die Drift-Messungen unten).
+Der Katalog enthält alle 1.017 nutzbaren Namen in alphabetischer Reihenfolge. Die id-Spalte zeigt die auf `bbb6l5` gemessenen Werte. Da sich IDs zwischen Builds ändern können, solltest du Texturen in WGSL über ihre Namen referenzieren.
 
 | Name | id (bbb6l5) | Anmerkungen |
 |---|---|---|

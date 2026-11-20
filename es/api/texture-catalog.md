@@ -14,7 +14,7 @@ La columna **id** es el valor con el que compara la constante — medido en `bbb
 
 La columna **notas** marca las dos familias de plegado. «anim (N fotogramas)» significa que muestrear este nombre devuelve automáticamente el fotograma de animación actual — **nunca escribas el sufijo de fotograma** (`lava0` es un alias conocido con un diagnóstico dedicado). «familia de rotación (4 copias)» significa que la textura existe solo como ranuras prerrotadas — el nombre se refiere a la raíz y `bloxdTexel` reaplica la rotación. Exactamente un nombre (`radar_screen`) lleva ambas notas.
 
-Deliberadamente **no** listadas: las demás grafías del registro — 520 alias de fotograma y 256 alias de rotación — que no son constantes utilizables; escribirlas dispara mensajes de error dedicados del motor. La tabla de capas subyacente de 1.650 filas (incluidas 171 ranuras prerrotadas) es interna del motor y se trata en [Interior del motor: registro de texturas](../internals/texture-registry.md).
+La tabla del atlas, con 1.650 capas, es un dato interno del motor. Su estructura y método de medición se explican en [Interior del motor: registro de texturas](../internals/texture-registry.md).
 
 ### Cómo se relacionan los números
 
@@ -30,7 +30,7 @@ El registro de `bbb6l5` contiene 1.017 nombres utilizables, 111 más que `v98qt8
 
 ## El catálogo
 
-Todos los nombres utilizables, en orden alfabético. La columna id es el valor de `bloxdTextureId*` — medido en `bbb6l5` (2026-11-20). **Los ids son instantáneas; trata los nombres como la API**: entre el build de v4 (cnty9) y el build de lanzamiento de v5 (ab90qa) cambiaron de id 334 nombres supervivientes, y entre ab90qa y `bbb6l5` otros 376, y entre `bbb6l5` y este build otros 864 (ver las mediciones de deriva abajo).
+El catálogo incluye los 1.017 nombres utilizables en orden alfabético. La columna id muestra los valores medidos en `bbb6l5`; pueden cambiar entre builds, así que referencia las texturas por nombre en WGSL.
 
 | Nombre | id (bbb6l5) | Notas |
 |---|---|---|

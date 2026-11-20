@@ -1859,7 +1859,7 @@ O registro de `bbb6l5` contém 1.017 nomes utilizáveis, 111 a mais que `v98qt8`
 
 ### O catálogo
 
-Todos os nomes utilizáveis, em ordem alfabética. A coluna id é o valor de `bloxdTextureId*` — medido em `bbb6l5` (2026-11-20). **Ids são instantâneos; trate os nomes como a API**: entre o build da v4 (cnty9) e o build de lançamento da v5 (ab90qa) mudaram de id 334 nomes sobreviventes, e entre ab90qa e `bbb6l5` outros 376, e entre `bbb6l5` e este build outros 864 (veja as medições de deriva abaixo).
+O catálogo lista os 1.017 nomes utilizáveis em ordem alfabética. A coluna id mostra os valores medidos em `bbb6l5`; eles podem mudar entre builds, portanto use os nomes para referenciar texturas no WGSL.
 
 | Nome | id (bbb6l5) | Notas |
 |---|---|---|
