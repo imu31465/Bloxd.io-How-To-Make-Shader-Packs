@@ -3,7 +3,6 @@
 > API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Verified (comportamiento de LightEngine sin cambios desde la medición de v4)
 > **Desde `bbb6l5`**: se añadió la API real de sombras solares — `bloxdShadow()` (factor de sombra 0–1; proyectan bloques, jugadores, mobs y objetos, siguiendo al sol), `bloxdAirShadow(t)` (para haces de luz) y `bloxdShadowDirection()` (dirección de la luz). `keepCircleShadows` en pack.json permite conservar también las antiguas sombras circulares. Detalles en [Funciones](../api/functions.md).
 
-
 Las tres formas de hacer «sombras» en un shader pack, y sus límites.
 
 ## Se puede / no se puede
@@ -13,7 +12,8 @@ Las tres formas de hacer «sombras» en un shader pack, y sus límites.
 | Oscurecer con claridad bajo árboles/techos (estilo proyectado) | ◎ | inversión del realce de `skyLight` + corte por umbral (abajo) |
 | Las sombras siguen las ediciones de bloques en tiempo real | ◎ | LightEngine recalcula de inmediato — automático |
 | Sombras de color frío / zonas al sol cálidas | ◎ | desplazamiento de dos colores |
-| Sombras que giran con el sol (mapa de sombras) | ✕ | la profundidad es solo para líquidos; la oclusión por rayos de luz no es una entrada |
+| Sombras que siguen al sol y a la luna | ◎ | `bloxdShadow()` |
+| Acceso a la profundidad del mapa de sombras | ✕ | La API devuelve el factor final, no los datos de profundidad. |
 | Penumbra física | ✕ | limitada por la propagación BFS a resolución de vóxeles |
 | AO en tiempo real (SSAO) | ✕ | solo el AO horneado en los colores de vértice |
 
@@ -60,7 +60,7 @@ Mandos: **área** = `shTh` (0.93→radio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 ## Límites honestos
 
 - Las sombras referencian el **cielo hacia arriba**, así que **no giran con el sol** (resolución de vóxeles; los bordes suaves vienen de la propagación BFS)
-- La plantilla de iluminación del motor conserva un `var shadow: f32 = 1.;` sin usar (siempre 1.0 = desactivado) — un rastro plausible de «planes futuros» para sombras rotatorias precisas al píxel
+
 - Las sombras rotatorias precisas al píxel quedan fuera de la API actual ([Looks inalcanzables](constraints.md))
 
 ## Relacionado

@@ -3,7 +3,6 @@
 > API cible : 5 · Build cible : `bbb6l5` · État : Verified (comportement du LightEngine inchangé depuis la mesure en v4)
 > **Depuis `bbb6l5`** : la véritable API d’ombres solaires a été ajoutée — `bloxdShadow()` (facteur d’ombre 0–1 ; blocs, joueurs, mobs et objets projettent et suivent le soleil), `bloxdAirShadow(t)` (pour les rais de lumière) et `bloxdShadowDirection()` (direction de la lumière). `keepCircleShadows` dans pack.json permet de garder aussi les anciennes ombres circulaires. Détails dans [Fonctions](../api/functions.md).
 
-
 Les trois façons de faire des « ombres » dans un pack de shaders, et leurs limites.
 
 ## Possible / impossible
@@ -13,7 +12,8 @@ Les trois façons de faire des « ombres » dans un pack de shaders, et leurs li
 | Assombrir nettement sous les arbres/toits (style projeté) | ◎ | inversion du lift de `skyLight` + coupe par seuil (ci-dessous) |
 | Les ombres suivent les éditions de blocs en temps réel | ◎ | le LightEngine recalcule immédiatement — automatique |
 | Ombres teintées froid / zones ensoleillées chaud | ◎ | décalage bicolore |
-| Ombres tournant avec le soleil (shadow map) | ✕ | la profondeur est en liquides seuls ; l'occlusion des rayons lumineux n'est pas une entrée |
+| Ombres qui suivent le soleil et la lune | ◎ | `bloxdShadow()` |
+| Accès à la profondeur de la shadow map | ✕ | L’API renvoie le facteur final, pas les données de profondeur. |
 | Pénombre physique | ✕ | plafonnée par la dispersion BFS à résolution voxel |
 | AO en temps réel (SSAO) | ✕ | seule l'AO cuite dans les couleurs de sommets |
 
@@ -57,10 +57,10 @@ let lit = sunL * sky;
 
 Manettes : **étendue** = `shTh` (0.93→rayon 1.5 / 0.87→2 / 0.80→3 / 0.67→5) ; **douceur des bords** = `shSoft` ; **obscurité du cœur** = l'ambiant minimum et le décalage à deux points de la diffusion du ciel ; ombres longues du soir ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-## Limites honnêtes
+## Limites de la méthode `skyLight`
 
-- Les ombres se réfèrent au **ciel vers le haut**, donc elles **ne tournent pas avec le soleil** (résolution voxel ; les bords doux viennent de la dispersion BFS)
-- Le gabarit d'éclairage du moteur conserve un `var shadow: f32 = 1.;` inutilisé (toujours 1.0 = désactivé) — une trace plausible de « plans futurs » pour des ombres rotatives précises au pixel
+- Cette limite concerne uniquement l’ancienne méthode fondée sur `skyLight` : elle se base sur le ciel au-dessus et **ne suit pas le soleil**. L’API actuelle `bloxdShadow()` suit la lumière du soleil ou de la lune.
+
 - Les ombres rotatives précises au pixel sont hors de portée de l'API actuelle ([Effets inatteignables](constraints.md))
 
 ## Voir aussi

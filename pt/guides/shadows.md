@@ -3,7 +3,6 @@
 > API alvo: 5 · Build alvo: `bbb6l5` · Estado: Verified (comportamento do LightEngine inalterado desde a medição da v4)
 > **Desde `bbb6l5`**: a API real de sombras solares foi adicionada — `bloxdShadow()` (fator de sombra 0–1; blocos, jogadores, mobs e itens projetam e seguem o sol), `bloxdAirShadow(t)` (para raios de luz) e `bloxdShadowDirection()` (direção da luz). `keepCircleShadows` no pack.json permite manter também as antigas sombras circulares. Detalhes em [Funções](../api/functions.md).
 
-
 As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 
 ## Pode / não pode
@@ -13,7 +12,8 @@ As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 | Escurecer claramente sob árvores/telhados (estilo projetado) | ◎ | inversão do lift de `skyLight` + corte por limiar (abaixo) |
 | Sombras que acompanham edições de blocos em tempo real | ◎ | o LightEngine recalcula imediatamente — automático |
 | Sombras coloridas frias / áreas ao sol quentes | ◎ | deslocamento em duas cores |
-| Sombras girando com o sol (mapa de sombras) | ✕ | a profundidade é exclusiva de líquidos; a oclusão por raios de luz não é uma entrada |
+| Sombras que acompanham o sol e a lua | ◎ | `bloxdShadow()` |
+| Acesso à profundidade do mapa de sombras | ✕ | A API retorna o fator final, não os dados de profundidade. |
 | Penumbra física | ✕ | limitada pela dispersão BFS em resolução de voxel |
 | AO em tempo real (SSAO) | ✕ | só o AO cozido nas cores de vértice |
 
@@ -59,8 +59,8 @@ Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 
 ## Limites honestos
 
-- As sombras têm como referência o **céu para cima**, então elas **não giram com o sol** (resolução de voxel; bordas suaves vêm da dispersão BFS)
-- O template de iluminação do motor retém um `var shadow: f32 = 1.;` não usado (sempre 1.0 = desativado) — um rastro plausível de "planos futuros" para sombras rotativas precisas ao pixel
+- Essa limitação se aplica apenas à técnica antiga baseada em `skyLight`: ela usa o céu acima como referência e **não gira com o sol**. A API atual `bloxdShadow()` acompanha a luz do sol ou da lua.
+
 - Sombras rotativas precisas ao pixel estão fora da API atual ([Looks inalcançáveis](constraints.md))
 
 ## Relacionado

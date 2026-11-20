@@ -3,7 +3,6 @@
 > Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
 > **Seit `bbb6l5`**: die echte Sonnenschatten-API wurde hinzugefügt — `bloxdShadow()` (0–1-Schattenfaktor; Blöcke, Spieler, Mobs und Items werfen und folgen der Sonne), `bloxdAirShadow(t)` (für Lichtsäulen) und `bloxdShadowDirection()` (Laufrichtung des Lichts). `keepCircleShadows` in pack.json hält optional auch die alten Kreisschatten. Details in [Funktionen](../api/functions.md).
 
-
 Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Grenzen.
 
 ## Möglich / unmöglich
@@ -13,7 +12,8 @@ Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Gren
 | Unter Bäumen/Dächern klar abdunkeln (projektionsartig) | ◎ | `skyLight`-Lift-Inversion + Schwellenwert-Schnitt (unten) |
 | Schatten folgen Block-Edits in Echtzeit | ◎ | LightEngine rechnet sofort neu — automatisch |
 | Schatten kühl / Sonnenlicht warm färben | ◎ | Zwei-Farb-Verschiebung |
-| Schatten, die mit der Sonne rotieren (Shadow-Map) | ✕ | Tiefe ist liquid-only; Lichtstrahl-Okklusion ist keine Eingabe |
+| Schatten, die Sonne und Mond folgen | ◎ | `bloxdShadow()` |
+| Zugriff auf die Shadowmap-Tiefe | ✕ | Die API liefert nur den fertigen Faktor, nicht die Tiefendaten. |
 | Physische Penumbra | ✕ | begrenzt durch die Voxel-auflösende BFS-Ausbreitung |
 | Echtzeit-AO (SSAO) | ✕ | nur das in Vertex-Farben gebackene AO |
 
@@ -57,10 +57,10 @@ let lit = sunL * sky;
 
 Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **Kanten-Weichheit** = `shSoft`; **Kerndunkelheit** = die Zwei-Punkt-Verschiebung aus Mindest-Ambiente und Himmelsstreulicht; lange Abend-Schatten ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-## Ehrliche Grenzen
+## Grenzen der `skyLight`-Methode
 
-- Schatten referenzieren den **Himmel nach oben**, daher **rotieren sie nicht mit der Sonne** (Voxel-Auflösung; weiche Kanten kommen aus der BFS-Ausbreitung)
-- Die Beleuchtungs-Vorlage der Engine behält ein unbenutztes `var shadow: f32 = 1.;` (immer 1.0 = deaktiviert) — eine plausible Spur „geplante Zukunft“ für pixelgenaue rotierende Schatten
+- Diese Einschränkung gilt nur für die ältere `skyLight`-Methode: Sie orientiert sich am Himmel nach oben und **rotiert nicht mit der Sonne**. Die aktuelle API `bloxdShadow()` folgt dem Sonnen- oder Mondlicht.
+
 - Pixelgenaue rotierende Schatten liegen außerhalb der aktuellen API ([Unerreichbare Effekte](constraints.md))
 
 ## Verwandte Seiten
