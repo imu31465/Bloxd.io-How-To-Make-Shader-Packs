@@ -23,7 +23,7 @@
 
 それ以外のマニフェスト内容はローダに無視されます。`pack.json` は zip ルートに厳密に1つ、JSON オブジェクトでなければなりません。
 
-## ローダ制限 (ライブ c53 で再計測)
+## ローダ制限
 
 | 制限 | 値 | 超過時のメッセージ |
 |---|---|---|
@@ -36,7 +36,7 @@
 
 ## API バージョン検証
 
-ローダは `manifest.apiVersion !== 5` を JavaScript の厳密な `!==` で比較します。バージョン定数 `5` とヘッダーテンプレートは同じモジュール (c55 / module 29836) にあり、検証とそれが前提するヘッダー文本体が一緒に動きます。不一致のメッセージは [互換性](compatibility.md) を参照。
+ローダは `manifest.apiVersion !== 5` を JavaScript の厳密な比較で判定します。`5` 以外の値 (文字列の `"5"` を含む) は受け付けません。不一致時のメッセージは[互換性](compatibility.md)を参照してください。
 
 ## per-frame uniform: bloxdPackInputs
 
@@ -59,15 +59,15 @@
 
 ## bind-group レイアウト
 
-group 3 のバインディングは:
+group 3 のバインディングは次のとおりです:
 
 | binding | 内容 |
 |---|---|
-| 0 | `bloxdPackInputs` uniform (64B) |
+| 0 | `bloxdPackInputs` uniform (80B) |
 | 1 | シーン深度テクスチャ (liquid バリアント) |
 | 2 | `bloxdSpTextureLayers` ストレージバッファ |
 
-`minBindingSize` も 64 のまま。深度テクスチャ (binding 1) は FRAGMENT 専用のため、`bloxdOpaqueBehind()` は surface / light フック限定です。
+`minBindingSize` は 80 バイトです。深度テクスチャ (binding 1) は FRAGMENT 専用のため、`bloxdOpaqueBehind()` は surface / light フック限定です。
 
 ## wgsl ファイルの連結
 
