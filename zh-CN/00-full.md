@@ -469,7 +469,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 | [兼容性](api/compatibility.md) | 旧版本包、已保存包重验 |
 | [纹理目录](api/texture-catalog.md) | 全部 896 个可用名称 (可搜索) |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
 
 从 v4 迁移？请看[版本历史: v5](history/v5.md)。
 
@@ -1842,11 +1842,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 **名称**列是注册表名称 — 也就是你实际书写的句柄。常量拼写取文件名的驼峰形式: `grass_top` → `bloxdTextureIdGrassTop`、`lava` → `bloxdTextureIdLava`。**大小写与下划线不区分** (`bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析结果相同)。名称即 API — 加载器在加载时对照现行注册表重新解析，因此名称能在注册表漂移中幸存 ([纹理 API](api/texture-api.md))。
 
-**id**列是常量比较时所对的值 — 实测于 `v98qt8` (图集层 + 1)。用它解读 `surface.textureId` 转储、把调试输出与当日构建互相核对即可。**切勿把 id 写进 WGSL** — 它只是某一构建图集顺序的快照 (见下方漂移实测)。
+**id**列是常量比较时所对的值 — 实测于 `bbb6l5` (图集层 + 1)。用它解读 `surface.textureId` 转储、把调试输出与当日构建互相核对即可。**切勿把 id 写进 WGSL** — 它只是某一构建图集顺序的快照 (见下方漂移实测)。
 
 **备注**列标出两个折叠族。「动画（N帧）」表示采样该名称会自动返回当前动画帧 — **切勿书写帧号后缀** (`lava0` 是已知的别名，有专属诊断)。「旋转族（4副本）」表示该纹理只以预旋转槽位存在 — 名称指向根，`bloxdTexel` 会在采样时重新应用旋转。恰好一个名称 (`radar_screen`) 同时带两条备注。
 
-刻意**不**列出的是: 其余注册表拼写 — 196 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,650 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](internals/texture-registry.md)。
+这张包含 1,650 层的图集表属于引擎内部数据，结构和测量方法见[引擎内部：纹理注册表](internals/texture-registry.md)。
 
 #### 数字之间如何对上
 
@@ -1855,14 +1855,14 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | 数量 | 统计对象 |
 |---|---|
 | **1,017** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
-| **776** | 别名 (196 帧 + 228 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
+| **776** | 别名 (520 帧 + 256 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
 | **1,650** | 图集条目 — 纹理图集中的实际槽位 (id 1–1650) |
 
-906 个名称各自映射到一个不同的图集条目。其余 **321 个条目**是没有可用名称的附加动画帧 (150) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。对比: v4 有 905 个可用名称，v5 首发构建 896 个，次日构建 1,017 个，`bny9u` 911 个；本构建为 1,017 — v5 首发时移除的 10 个名称在 `xkg8x` 回归 (加上先前的 +1 `scorpion_eggs`)，`bny9u` 加入了交易终端 (×3) 与石头发生器 (×2)，`v98qt8` 用 `hay_block_top` 换掉了六个转为模型的方块纹理 — `xkg8x` 幸存的 1,017 个名称中 864 个在 `bny9u` 改 id，另有 905 个中的 716 个在 `v98qt8` 改 id。
+`bbb6l5` 注册表中有 1,017 个可用名称，比 `v98qt8` 多 111 个。纹理 ID 可能随构建版本变化，因此应使用具名常量，不要在 WGSL 中硬编码数字 ID。
 
 ### 目录
 
-全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `v98qt8` (2026-11-08)。**id 是快照；把名称当作 API**: v4 构建 (cnty9) 与 v5 首发构建 (ab90qa) 之间有 334 个幸存名称改了 id，ab90qa 与 xkg8x 之间有 376 个，xkg8x 与本构建之间又有 864 个 (见下方漂移实测)。
+全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `bbb6l5` (2026-11-20)。**id 是快照；把名称当作 API**: v4 构建 (cnty9) 与 v5 首发构建 (ab90qa) 之间有 334 个幸存名称改了 id，ab90qa 与 xkg8x 之间有 376 个，xkg8x 与本构建之间又有 864 个 (见下方漂移实测)。
 
 | 名称 | id (bbb6l5) | 备注 |
 |---|---|---|
@@ -3025,7 +3025,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 - [纹理 API](api/texture-api.md) · [引擎内部: 纹理注册表](internals/texture-registry.md) · [版本历史: v4](history/v4.md)
 
-
 ---
 
 ## 指南
@@ -3047,7 +3046,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [与纹理包组合](guides/combinations.md) | 与纹理包的搭配 |
 | [调试技巧](guides/debugging.md) | 症状 → 原因诊断 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
 
 
 ---
@@ -3538,7 +3537,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [模型着色器](recipes/model-shaders.md) | v5 — 手持物品、皮肤、植物摇摆 |
 | [附魔效果](recipes/enchant-effects.md) | v5 — 移除、增强、重着色闪光 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
 
 
 ---
@@ -4647,7 +4646,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 卡顿 / 被实机检查弃用 | [性能](troubleshooting/performance.md) |
 | 法律、安全、常见问题 | [FAQ](troubleshooting/faq.md) |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
 
 ### 错误出现在哪里
 
@@ -5293,7 +5292,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [调试手段](internals/debugging.md) | URL 参数、统计面板 |
 | [研究日志](internals/research-log.md) | 方法论、构建历史、未验证事项 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
 
 内部机制不是稳定的 API 契约 — 它们可能随引擎更新而变化，每页都标注其证据构建 ([研究日志](internals/research-log.md))。
 

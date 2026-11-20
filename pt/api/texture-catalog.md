@@ -10,11 +10,11 @@ O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdText
 
 A coluna **nome** é o nome do registro — o identificador que você realmente escreve. A grafia da constante converte o nome do arquivo para CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Maiúsculas e sublinhados não são distinguidos** (`bloxdTextureId_grass_top` resolve de forma idêntica a `bloxdTextureIdGrassTop`). Os nomes são a API — o carregador os resolve novamente contra o registro vivo ao carregar, então os nomes sobrevivem à deriva do registro ([API de texturas](texture-api.md)).
 
-A coluna **id** é o valor contra o qual a constante se compara — medido em `v98qt8` (camada do atlas + 1). Use-o para decodificar dumps de `surface.textureId` e para conferir a saída de depuração com o build do dia. **Nunca escreva ids em WGSL** — eles são o instantâneo da ordem do atlas de um único build (veja as medições de deriva abaixo).
+A coluna **id** é o valor contra o qual a constante se compara — medido em `bbb6l5` (camada do atlas + 1). Use-o para decodificar dumps de `surface.textureId` e para conferir a saída de depuração com o build do dia. **Nunca escreva ids em WGSL** — eles são o instantâneo da ordem do atlas de um único build (veja as medições de deriva abaixo).
 
 A coluna **notas** marca as duas famílias de dobramento. «anim (N quadros)» significa que amostrar este nome retorna automaticamente o quadro de animação atual — **nunca escreva o sufixo de quadro** (`lava0` é um alias conhecido com um diagnóstico dedicado). «família de rotação (4 cópias)» significa que a textura existe apenas como slots pré-rotacionados — o nome refere-se à raiz e `bloxdTexel` reaplica a rotação. Exatamente um nome (`radar_screen`) carrega ambas as notas.
 
-Deliberadamente **não** listadas: as demais grafias do registro — 196 aliases de quadro e 228 aliases de rotação — que não são constantes utilizáveis; escrevê-las dispara mensagens de erro dedicadas do motor. A tabela de camadas subjacente, de 1.227 linhas (incluindo 171 slots pré-rotacionados), é interna do motor e tratada em [Interior do motor: registro de texturas](../internals/texture-registry.md).
+A tabela de 1.650 camadas do atlas é um dado interno do motor; sua estrutura e o método de medição estão em [Interior do motor: registro de texturas](../internals/texture-registry.md).
 
 ### Como os números se relacionam
 
@@ -23,14 +23,14 @@ As contagens nomeiam conjuntos distintos, então elas não se somam de forma ing
 | Contagem | O que conta |
 |---|---|
 | **1,017** | constantes nomeadas utilizáveis — nomes de textura que você pode escrever como `bloxdTextureId*` |
-| **776** | nomes de alias (196 de quadro + 228 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
-| **1.227** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1650) |
+| **776** | nomes de alias (520 de quadro + 256 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
+| **1.650** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1650) |
 
-Cada um dos 1,017 nomes mapeia para uma entrada distinta do atlas. As **321 entradas** restantes são quadros extras de animação (150) e cópias pré-rotacionadas (171) sem nome utilizável — os pacotes nunca as referenciam diretamente, porque `bloxdTexel` anima os quadros e aplica a rotação automaticamente. O primeiro quadro de cada família de animação e a raiz de cada família de rotação *têm* nome, razão pela qual algumas entradas contam ao mesmo tempo como «com nome» e «base de quadro/rotação». Em comparação: a v4 tinha 905 nomes utilizáveis, o build de lançamento da v5 896, o do dia seguinte 906, `bny9u` 911; este build tem 1,017 — os 10 nomes removidos no lançamento da v5 voltaram em `xkg8x` (além do anterior +1 `scorpion_eggs`), `bny9u` adicionou o Terminal de trocas (×3) e o Gerador de pedra (×2), e `v98qt8` trocou seis texturas de blocos convertidos em modelo por `hay_block_top` — 864 dos 1,017 sobreviventes de `xkg8x` mudaram de id em `bny9u` e outros 716 de 905 em `v98qt8`.
+O registro de `bbb6l5` contém 1.017 nomes utilizáveis, 111 a mais que `v98qt8`. Os IDs podem mudar entre builds; use as constantes nomeadas e nunca fixe IDs numéricos no WGSL.
 
 ## O catálogo
 
-Todos os nomes utilizáveis, em ordem alfabética. A coluna id é o valor de `bloxdTextureId*` — medido em `v98qt8` (2026-11-08). **Ids são instantâneos; trate os nomes como a API**: entre o build da v4 (cnty9) e o build de lançamento da v5 (ab90qa) mudaram de id 334 nomes sobreviventes, e entre ab90qa e `v98qt8` outros 376, e entre `v98qt8` e este build outros 864 (veja as medições de deriva abaixo).
+Todos os nomes utilizáveis, em ordem alfabética. A coluna id é o valor de `bloxdTextureId*` — medido em `bbb6l5` (2026-11-20). **Ids são instantâneos; trate os nomes como a API**: entre o build da v4 (cnty9) e o build de lançamento da v5 (ab90qa) mudaram de id 334 nomes sobreviventes, e entre ab90qa e `bbb6l5` outros 376, e entre `bbb6l5` e este build outros 864 (veja as medições de deriva abaixo).
 
 | Nome | id (bbb6l5) | Notas |
 |---|---|---|

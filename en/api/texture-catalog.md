@@ -26,7 +26,7 @@ The counts name different sets, so they do not sum naively:
 | **776** | alias names (520 frame + 256 rotation) — recognized spellings that are *rejected* with guidance to the base name; they are names, not constants, and add no ids |
 | **1,650** | atlas entries — the actual slots in the texture atlas (ids 1–1650) |
 
-Every one of the 1,017 names maps to one distinct atlas entry. The remaining entries are extra animation frames, the 208 pre-blended transition slots, and pre-rotated copies with no usable name — packs never reference them directly, because `bloxdTexel` animates frames and applies rotation automatically. The first frame of each animation family and the root of each rotation family *are* named, which is why some entries count as both "named" and "frame/rotation base". For comparison: v4 had 905 usable names, the v5 launch build 896, `xkg8x` 906, `bny9u` 911, `v98qt8` 906 — and this build has **1,017**, because the Atomic Age content (reactor, uranium, batteries, conveyors) added 111 names in one step; 863 of the 906 `v98qt8` survivors changed id.
+The `bbb6l5` registry has 1,017 usable names, 111 more than `v98qt8`. Texture IDs can change between builds, so use the named constants and never hard-code numeric IDs in WGSL.
 
 ## The catalog
 

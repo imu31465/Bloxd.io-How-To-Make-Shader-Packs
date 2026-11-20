@@ -469,7 +469,7 @@ La especificación sistemática de la API v5 actual. Todo lo que hay aquí está
 | [Compatibilidad](api/compatibility.md) | paquetes de versiones antiguas, revalidación de paquetes guardados |
 | [Catálogo de texturas](api/texture-catalog.md) | los 896 nombres utilizables (con búsqueda) |
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Analyzed (restaurado literalmente de la cabecera y el validador)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Analyzed (restaurado literalmente de la cabecera y el validador)
 
 ¿Migras desde v4? Ver [Historial de versiones: v5](history/v5.md).
 
@@ -1837,11 +1837,11 @@ El catálogo completo de las constantes de nombre de textura utilizables (`bloxd
 
 La columna **nombre** es el nombre del registro — el identificador que escribes de verdad. La grafía de la constante pasa el nombre de archivo a CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **No se distinguen mayúsculas ni guiones bajos** (`bloxdTextureId_grass_top` se resuelve idéntico a `bloxdTextureIdGrassTop`). Los nombres son la API — el cargador los re-resuelve contra el registro en vivo al cargar, así que los nombres sobreviven a la deriva del registro ([API de texturas](api/texture-api.md)).
 
-La columna **id** es el valor con el que compara la constante — medido en `v98qt8` (capa del atlas + 1). Úsalo para decodificar volcados de `surface.textureId` y contrastar la salida de depuración con el build del día. **Nunca escribas ids en WGSL** — son la instantánea del orden del atlas de un solo build (ver las mediciones de deriva abajo).
+La columna **id** es el valor con el que compara la constante — medido en `bbb6l5` (capa del atlas + 1). Úsalo para decodificar volcados de `surface.textureId` y contrastar la salida de depuración con el build del día. **Nunca escribas ids en WGSL** — son la instantánea del orden del atlas de un solo build (ver las mediciones de deriva abajo).
 
 La columna **notas** marca las dos familias de plegado. «anim (N fotogramas)» significa que muestrear este nombre devuelve automáticamente el fotograma de animación actual — **nunca escribas el sufijo de fotograma** (`lava0` es un alias conocido con un diagnóstico dedicado). «familia de rotación (4 copias)» significa que la textura existe solo como ranuras prerrotadas — el nombre se refiere a la raíz y `bloxdTexel` reaplica la rotación. Exactamente un nombre (`radar_screen`) lleva ambas notas.
 
-Deliberadamente **no** listadas: las demás grafías del registro — 196 alias de fotograma y 228 alias de rotación — que no son constantes utilizables; escribirlas dispara mensajes de error dedicados del motor. La tabla de capas subyacente de 1.227 filas (incluidas 171 ranuras prerrotadas) es interna del motor y se trata en [Interior del motor: registro de texturas](internals/texture-registry.md).
+Deliberadamente **no** listadas: las demás grafías del registro — 520 alias de fotograma y 256 alias de rotación — que no son constantes utilizables; escribirlas dispara mensajes de error dedicados del motor. La tabla de capas subyacente de 1.650 filas (incluidas 171 ranuras prerrotadas) es interna del motor y se trata en [Interior del motor: registro de texturas](internals/texture-registry.md).
 
 #### Cómo se relacionan los números
 
@@ -1850,14 +1850,14 @@ Las cifras cuentan conjuntos distintos, así que no suman a lo tonto:
 | Cantidad | Qué cuenta |
 |---|---|
 | **1,017** | constantes con nombre utilizables — nombres de textura que puedes escribir como `bloxdTextureId*` |
-| **776** | nombres de alias (196 de fotograma + 228 de rotación) — grafías reconocidas que se *rechazan* con guía hacia el nombre base; son nombres, no constantes, y no añaden ids |
-| **1.227** | entradas del atlas — las ranuras reales del atlas de texturas (ids 1–1650) |
+| **776** | nombres de alias (520 de fotograma + 256 de rotación) — grafías reconocidas que se *rechazan* con guía hacia el nombre base; son nombres, no constantes, y no añaden ids |
+| **1.650** | entradas del atlas — las ranuras reales del atlas de texturas (ids 1–1650) |
 
-Cada uno de los 1,017 nombres mapea a una entrada distinta del atlas. Las **321 entradas** restantes son fotogramas extra de animación (150) y copias prerrotadas (171) sin nombre utilizable — los paquetes nunca las referencian directamente, porque `bloxdTexel` anima los fotogramas y aplica la rotación automáticamente. El primer fotograma de cada familia de animación y la raíz de cada familia de rotación *sí* tienen nombre, razón por la que algunas entradas cuentan a la vez como «con nombre» y «base de fotograma/rotación». En comparación: v4 tenía 905 nombres utilizables, el build de lanzamiento de v5 896, el del día siguiente 906, `bny9u` 911; este build tiene 1,017 — los 10 nombres eliminados en el lanzamiento de v5 volvieron en `xkg8x` (junto al anterior +1 `scorpion_eggs`), `bny9u` añadió el Terminal de intercambio (×3) y el Generador de piedra (×2), y `v98qt8` cambió seis texturas de bloques convertidos a modelo por `hay_block_top` — 864 de los 1,017 supervivientes de `xkg8x` cambiaron de id en `bny9u` y otros 716 de 905 en `v98qt8`.
+El registro de `bbb6l5` contiene 1.017 nombres utilizables, 111 más que `v98qt8`. Los ID pueden cambiar entre builds; usa las constantes con nombre y no escribas ID numéricos directamente en WGSL.
 
 ### El catálogo
 
-Todos los nombres utilizables, en orden alfabético. La columna id es el valor de `bloxdTextureId*` — medido en `v98qt8` (2026-11-08). **Los ids son instantáneas; trata los nombres como la API**: entre el build de v4 (cnty9) y el build de lanzamiento de v5 (ab90qa) cambiaron de id 334 nombres supervivientes, y entre ab90qa y `v98qt8` otros 376, y entre `v98qt8` y este build otros 864 (ver las mediciones de deriva abajo).
+Todos los nombres utilizables, en orden alfabético. La columna id es el valor de `bloxdTextureId*` — medido en `bbb6l5` (2026-11-20). **Los ids son instantáneas; trata los nombres como la API**: entre el build de v4 (cnty9) y el build de lanzamiento de v5 (ab90qa) cambiaron de id 334 nombres supervivientes, y entre ab90qa y `bbb6l5` otros 376, y entre `bbb6l5` y este build otros 864 (ver las mediciones de deriva abajo).
 
 | Nombre | id (bbb6l5) | Notas |
 |---|---|---|
@@ -3019,7 +3019,6 @@ El mismo principio de siempre: 716 de los 905 supervivientes cambiaron de id en 
 
 - [API de texturas](api/texture-api.md) · [Interior del motor: registro de texturas](internals/texture-registry.md) · [Historial de versiones: v4](history/v4.md)
 
-
 ---
 
 ## Guías
@@ -3041,7 +3040,7 @@ Material de «mecanismo y mentalidad». Qué es posible en primer lugar está en
 | [Combinación con texture packs](guides/combinations.md) | emparejamiento con paquetes de texturas |
 | [Consejos de depuración](guides/debugging.md) | diagnóstico de síntoma → causa |
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod)
 
 
 ---
@@ -3531,7 +3530,7 @@ Ejemplos de código orientados a objetivo. El lado del «cómo funciona» vive e
 | [Sombreadores de modelo](recipes/model-shaders.md) | v5 — ítems en mano, pieles, vaivén de plantas |
 | [Efectos de encantamiento](recipes/enchant-effects.md) | v5 — quitar, reforzar y recolorear el brillo |
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (puertos a v5 de las recetas originales — verifica aún con compilación en el juego antes de distribuir)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (puertos a v5 de las recetas originales — verifica aún con compilación en el juego antes de distribuir)
 
 
 ---
@@ -4640,7 +4639,7 @@ Errores y problemas visuales, localizables **por síntoma**. Las páginas siguen
 | Lento / descartado por la comprobación en el dispositivo | [Rendimiento](troubleshooting/performance.md) |
 | Legal, seguridad, preguntas frecuentes | [FAQ](troubleshooting/faq.md) |
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
 
 ### Dónde aparecen los errores
 
@@ -5284,7 +5283,7 @@ Especificaciones internas restauradas analizando la implementación del motor. T
 | [Depuración](internals/debugging.md) | parámetros de URL, paneles de estadísticas |
 | [Registro de investigación](internals/research-log.md) | metodología, historia de builds, elementos sin verificar |
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod)
 
 Las internas no son un contrato de API estable — pueden cambiar con las actualizaciones del motor, y cada página nombra su build de evidencia ([registro de investigación](internals/research-log.md)).
 

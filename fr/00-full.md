@@ -469,7 +469,7 @@ La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est
 | [Compatibilité](api/compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
 | [Catalogue de textures](api/texture-catalog.md) | les 896 noms utilisables (recherchables) |
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](history/v5.md).
 
@@ -1831,17 +1831,17 @@ Détails : [Intérieurs du moteur : Registre de textures](internals/texture-regi
 
 Le catalogue complet des constantes de nom de texture utilisables (`bloxdTextureId*`). **1,017 noms**, par ordre alphabétique.
 
-**État du pliage (`bbb6l5`, 2026-11-20) :** la régression des constantes d'animation embarquée par `v98qt8` est **corrigée** — la table des textures animées est à nouveau indexée par emplacement, donc les noms de base des familles d'animation ci-dessous (`lava`, tous les `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, …) valident normalement ; l'échantillonner renvoie l'image courante. Ce qui suit est la vue pliée (prévue), re-mesurée sur le build en production.
+**État du pliage (`bbb6l5`, 2026-11-20) :** la régression des constantes d'animation embarquée par `bbb6l5` est **corrigée** — la table des textures animées est à nouveau indexée par emplacement, donc les noms de base des familles d'animation ci-dessous (`lava`, tous les `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, …) valident normalement ; l'échantillonner renvoie l'image courante. Ce qui suit est la vue pliée (prévue), re-mesurée sur le build en production.
 
 ### Comment lire
 
 La colonne **nom** est le nom du registre — l'identifiant que vous écrivez réellement. L'orthographe de la constante passe le nom de fichier en CamelCase : `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Casse et tirets bas ne sont pas distingués** (`bloxdTextureId_grass_top` se résout de façon identique à `bloxdTextureIdGrassTop`). Les noms sont l'API — le chargeur les résout de nouveau contre le registre en production au chargement, donc les noms survivent à la dérive du registre ([API de textures](api/texture-api.md)).
 
-La colonne **id** est la valeur à laquelle la constante se compare — mesurée sur `v98qt8` (couche d'atlas + 1). Utilisez-la pour décoder les dumps de `surface.textureId` et pour recouper la sortie de débogage avec le build du jour. **N'écrivez jamais d'ids dans le WGSL** — ce sont des instantanés de l'ordre d'atlas d'un seul build (voir les mesures de dérive plus bas).
+La colonne **id** est la valeur à laquelle la constante se compare — mesurée sur `bbb6l5` (couche d'atlas + 1). Utilisez-la pour décoder les dumps de `surface.textureId` et pour recouper la sortie de débogage avec le build du jour. **N'écrivez jamais d'ids dans le WGSL** — ce sont des instantanés de l'ordre d'atlas d'un seul build (voir les mesures de dérive plus bas).
 
 La colonne **notes** marque les deux familles de pliage. « anim (N images) » signifie que l'échantillonnage de ce nom renvoie automatiquement l'image d'animation courante — **n'écrivez jamais le suffixe d'image** (`lava0` est un alias connu avec un diagnostic dédié). « famille de rotation (4 copies) » signifie que la texture n'existe que sous forme d'emplacements pré-rotés — le nom désigne la racine et `bloxdTexel` réapplique la rotation. Exactement un nom (`radar_screen`) porte les deux notes.
 
-Volontairement **non** listées : les autres orthographes du registre — 196 alias d'image et 228 alias de rotation — qui ne sont pas des constantes utilisables ; les écrire déclenche des messages d'erreur dédiés du moteur. La table de couches sous-jacente de 1,650 lignes (dont 171 emplacements pré-rotés) est interne au moteur et traitée dans [Intérieurs du moteur : Registre de textures](internals/texture-registry.md).
+La table des 1 650 couches de l’atlas est une donnée interne au moteur ; sa structure et sa méthode de mesure sont expliquées dans [Intérieurs du moteur : Registre de textures](internals/texture-registry.md).
 
 #### Comment les chiffres s'articulent
 
@@ -1850,14 +1850,14 @@ Ces chiffres désignent des ensembles différents, donc ils ne s'additionnent pa
 | Chiffre | Ce qu'il compte |
 |---|---|
 | **1,017** | constantes nommées utilisables — des noms de texture que vous pouvez écrire comme `bloxdTextureId*` |
-| **776** | noms d'alias (196 d'image + 228 de rotation) — des orthographes reconnues qui sont *rejetées* avec une orientation vers le nom de base ; ce sont des noms, pas des constantes, et ils n'ajoutent aucun id |
+| **776** | noms d'alias (520 d'image + 256 de rotation) — des orthographes reconnues qui sont *rejetées* avec une orientation vers le nom de base ; ce sont des noms, pas des constantes, et ils n'ajoutent aucun id |
 | **1,650** | entrées d'atlas — les emplacements réels de l'atlas de textures (ids 1–1650) |
 
-Chacun des 1,017 noms correspond à une entrée d'atlas distincte. Les **321 entrées** restantes sont des images d'animation supplémentaires (150) et des copies pré-rotées (171) sans nom utilisable — les packs ne les référencent jamais directement, parce que `bloxdTexel` anime les images et applique la rotation automatiquement. La première image de chaque famille d'animation et la racine de chaque famille de rotation *ont* un nom, raison pour laquelle certaines entrées comptent à la fois comme « nommées » et « base d'image/rotation ». En comparaison : la v4 avait 905 noms utilisables, le build de lancement de la v5 896, celui du lendemain 906, `bny9u` 911 ; ce build en a 1,017 — les 10 noms retirés au lancement de la v5 sont revenus sur `xkg8x` (en plus du +1 `scorpion_eggs` antérieur), `bny9u` a ajouté le Terminal d'échange (×3) et le Générateur de pierre (×2), et `v98qt8` a échangé six textures de blocs convertis en modèles contre `hay_block_top` — 864 des 1,017 survivants de `xkg8x` ont changé d'id sur `bny9u`, et 716 de 905 autres sur `v98qt8`.
+Le registre de `bbb6l5` contient 1 017 noms utilisables, soit 111 de plus que `v98qt8`. Les ID peuvent changer d’un build à l’autre : utilisez les constantes nommées et ne codez jamais d’ID numériques en dur dans le WGSL.
 
 ### Le catalogue
 
-Tous les noms utilisables, par ordre alphabétique. La colonne id est la valeur de `bloxdTextureId*` — mesurée sur `v98qt8` (2026-11-08). **Les ids sont des instantanés ; traitez les noms comme l'API** : entre le build v4 (cnty9) et le build de lancement de la v5 (ab90qa), 334 noms survivants ont changé d'id, et 376 autres entre ab90qa et `v98qt8`, et 864 autres entre `v98qt8` et ce build (voir les mesures de dérive plus bas).
+Tous les noms utilisables, par ordre alphabétique. La colonne id est la valeur de `bloxdTextureId*` — mesurée sur `bbb6l5` (2026-11-20). **Les ids sont des instantanés ; traitez les noms comme l'API** : entre le build v4 (cnty9) et le build de lancement de la v5 (ab90qa), 334 noms survivants ont changé d'id, et 376 autres entre ab90qa et `bbb6l5`, et 864 autres entre `bbb6l5` et ce build (voir les mesures de dérive plus bas).
 
 | Nom | id (bbb6l5) | Notes |
 |---|---|---|
@@ -3019,7 +3019,6 @@ Même principe que toujours : 716 des 905 survivants ont changé d'id sur ce seu
 
 - [API de textures](api/texture-api.md) · [Intérieurs du moteur : Registre de textures](internals/texture-registry.md) · [Historique des versions : v4](history/v4.md)
 
-
 ---
 
 ## Guides
@@ -3041,7 +3040,7 @@ Contenu « mécanismes et état d'esprit ». Ce qui est possible d'emblée figur
 | [Combiner avec des packs de textures](guides/combinations.md) | l'appariement avec les packs de textures |
 | [Astuces de débogage](guides/debugging.md) | diagnostics symptôme → cause |
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production 2026-11-08)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production 2026-11-20)
 
 
 ---
@@ -3524,7 +3523,7 @@ Exemples de code orientés vers un objectif. Le versant « comment ça marche »
 | [Shaders de modèle](recipes/model-shaders.md) | v5 — objets tenus, skins, balancement des plantes |
 | [Effets d'enchantement](recipes/enchant-effects.md) | v5 — retirer, booster, recolorer le scintillement |
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified (ports v5 des recettes originales — vérifiez malgré tout par compilation en jeu avant de distribuer)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified (ports v5 des recettes originales — vérifiez malgré tout par compilation en jeu avant de distribuer)
 
 
 ---
@@ -4624,7 +4623,7 @@ Erreurs et problèmes visuels, repérables **par symptôme**. Les pages suivent 
 | Lent / écarté par le contrôle sur appareil | [Performance](troubleshooting/performance.md) |
 | Légal, sécurité, questions courantes | [FAQ](troubleshooting/faq.md) |
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified (messages relevés verbatim depuis le validateur et le chargeur en production)
 
 ### Où apparaissent les erreurs
 
@@ -5268,7 +5267,7 @@ Spécifications internes restaurées en analysant l'implémentation du moteur. T
 | [Débogage](internals/debugging.md) | paramètres URL, panneaux de statistiques |
 | [Journal de recherche](internals/research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20)
 
 Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](internals/research-log.md)).
 
