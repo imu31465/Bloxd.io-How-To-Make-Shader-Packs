@@ -57,7 +57,7 @@ let lit = sunL * sky;
 
 Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **suavidade de borda** = `shSoft`; **escuridão do núcleo** = o ambiente mínimo e o deslocamento de dois pontos da dispersão do céu; sombras longas de fim de tarde ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-## Limites honestos
+## Limites da técnica `skyLight`
 
 - Essa limitação se aplica apenas à técnica antiga baseada em `skyLight`: ela usa o céu acima como referência e **não gira com o sol**. A API atual `bloxdShadow()` acompanha a luz do sol ou da lua.
 

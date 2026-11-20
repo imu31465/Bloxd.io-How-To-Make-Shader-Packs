@@ -57,7 +57,7 @@ let lit = sunL * sky;
 
 Mandos: **área** = `shTh` (0.93→radio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **suavidad de borde** = `shSoft`; **oscuridad del núcleo** = el mínimo ambiente y el desplazamiento de dos puntos de dispersión de cielo; sombras vespertinas largas ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-## Límites honestos
+## Límites del método `skyLight`
 
 - Las sombras referencian el **cielo hacia arriba**, así que **no giran con el sol** (resolución de vóxeles; los bordes suaves vienen de la propagación BFS)
 
