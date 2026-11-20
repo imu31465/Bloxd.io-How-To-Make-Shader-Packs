@@ -1,6 +1,6 @@
 # 함수
 
-> 대상 API: 5 · 대상 빌드: `v98qt8` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더의 모든 함수이다. 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 와 `bloxdOpaqueBehind` 는 [텍스처 API](texture-api.md) 에서 다룬다.
 
@@ -139,6 +139,42 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 | `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | 이 장소의 월드 라이트 (block/sky/held 중 최광, `ambientLightColour` 가 바닥) |
 | `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | 면의 색을 엔진 방식으로 비춘 것 (emission·포그 이전) |
 | `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | 이 프래그먼트의 포그 적용 (`mix(colour, fogColour, fogAlpha)`) |
+
+## 섀도 함수
+
+\u0060bbb6l5\u0060 빌드는 엔진의 실제 태양/달 섀도 시스템(블록·플레이어·몹·아이템이 드리우는, 태양을 따라가는 투영 섀도)을 팩 API에 추가했습니다. 이 두 함수는 (\u0060bloxdFragmentBlockPosition\u0060처럼) **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+
+### bloxdShadow
+
+\u0060\u0060\u0060wgsl
+fn bloxdShadow() -> f32
+\u0060\u0060\u0060
+
+- **반환값**: 이 프래그먼트에 닿는 햇빛 또는 달빛 — **섀도에서 0, 비치면 1** — *`bbb6l5` 신규*
+- 섀도를 드리우는 것: **블록, 플레이어, 몹, 아이템** (1인칭 손에 든 아이템은 의도적으로 제외 — 몸이 돌면 자기가 자기를 가리기 때문)
+- 동작 (검증기 설명에서 그대로):
+  - 해나 달이 지거나 면이 빛에서 돌아설 때 0으로 페이드
+  - **\u0060flags.emissive\u0060 면에서는 1** (스스로 빛나는 면에는 섀도가 없음)
+  - 빛은 \u0060bloxdShadowDirection()\u0060을 따라 이동하므로 태양 없는 하늘 아래에서도 섀도가 생김
+- **호출 가능**: surface / light 훅
+- 레시피: \u0060let sun = mix(shadowColour, litColour, bloxdShadow());\u0060 — [섀도](../guides/shadows.md) 참조
+
+### bloxdAirShadow
+
+\u0060\u0060\u0060wgsl
+fn bloxdAirShadow(t: f32) -> f32
+\u0060\u0060\u0060
+
+- **반환값**: \u0060bloxdShadow()\u0060와 같지만 **카메라 (t = 0)와 이 프래그먼트 (t = 1) 사이의 점**에서 평가 — *`bbb6l5` 신규* — 빛 기둥용
+- 특성 (검증기 설명에서 그대로):
+  - **블록만 드리움** (플레이어·몹은 제외), **블록 단위로 블러**
+  - \u0060t\u0060는 0–1로 클램프
+- 레시피: 시선을 따라 여러 \u0060t\u0060를 샘플해 누적 — [섀도](../guides/shadows.md)
+
+### bloxdShadowDirection
+
+개념적으로는 섀도 함수와 함께 있지만 읽을 수 있는 헤더에 있습니다 — [프레임 함수](#bloxdshadowdirection)를 보세요.
+
 
 ## 특수 함수
 

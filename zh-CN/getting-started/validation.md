@@ -1,6 +1,6 @@
 # 验证
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
 
 ## 三阶段加载检查
 

@@ -1,6 +1,6 @@
 # The sun and the moon
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (production-bundle JavaScript analysis)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (production-bundle JavaScript analysis)
 The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
 
 | Skybox | `bloxdSunDirection()` |
@@ -13,6 +13,8 @@ The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when t
 The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector computed from inclination = −0.2 / azimuth = 0.55, static). A practical reference for predicting highlight directions on paper when testing distribution packs.
 
 Day/night cycles are not built into the engine — inclination is a static number, and worlds with moving day/night update it game-side. `bloxdSunDirection()` follows each update.
+
+**The shadow-casting light is a third thing (`bbb6l5`+)**: `bloxdShadowDirection()` is not `bloxdSunDirection()`. It is the travel direction of the light behind `bloxdShadow()` — from the sun by day, the moon by night, and the default sky's sun when the world has no sun — so real shadows exist under sunless skies too. Its `y` is never above 0: the light always comes down. `sunPresent`-style night estimation and moonlight recipes stay correct; sun/shadow gating now has a first-class input.
 
 Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and bloxdSunDirection()**, so packs darkening terrain at night must estimate the time band from bloxdSunDirection() themselves (the `sunPresent` technique in [Designing night looks](../guides/night.md)).
 

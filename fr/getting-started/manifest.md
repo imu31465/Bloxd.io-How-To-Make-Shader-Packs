@@ -1,6 +1,6 @@
 # pack.json (manifeste)
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified
 
 `pack.json` est le manifeste du pack — exactement un objet JSON à la racine du zip.
 

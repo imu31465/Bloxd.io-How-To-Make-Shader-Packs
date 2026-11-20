@@ -1,6 +1,6 @@
 # Enchant-Effekte
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 hat die Enchant-Pipeline für Ein- und Ausgaben geöffnet. Rezepte, um den Glint verzauberter Items und Rüstung zu steuern und dabei die Mathematik der Engine zu bewahren.
 

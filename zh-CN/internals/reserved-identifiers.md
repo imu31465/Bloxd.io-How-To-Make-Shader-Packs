@@ -1,14 +1,25 @@
 # 保留标识符内部机制
 
-> 目标API: 5 · 目标构建: `v98qt8` · 状态: Analyzed (从现行 bundle 的生成器复原)
+> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行 bundle 的生成器复原)
 
 `bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](../api/restrictions.md)。
+## 88 个符号
 
-## 46 个符号
+从 v4 的 27 个到 v5 发布时的 46 个，再到 `bbb6l5` 上的 **88 个**（+42，无退役；历史上唯一一次退役是 `bloxdSpLitColour`——升格为公开的 `bloxdLitColour()`）:
 
-从 v4 的 27 个增长到 **46 个** (新增 20、退役 1 — `bloxdSpLitColour`，已提升为公开的 `bloxdLitColour()`)：
+`bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-`bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
+## 新名称 ↔ \`bbb6l5\` 阴影系统
+
+全部 42 个新符号都来自引擎的太阳/月亮阴影实现（即 \`bloxdShadow()\` / \`bloxdAirShadow()\` 的支撑）:
+
+- \`bloxdSpSunShadow\` / \`bloxdSpShadowVolume\` / \`bloxdSpShadowVolumeSampler\` / \`bloxdSpShadowVoxels\` — 太阳阴影体（引擎在玩家周围填充的 3D 纹理）及其采样器
+- \`bloxdSpShadowMarch\` / \`bloxdSpMarch\` / \`bloxdSpOrigin\` / \`bloxdSpRayFresh\` / \`bloxdSpExitBox\` — 解析阴影光线的 ray march（64 步、stale-box 新鲜度测试）
+- \`bloxdSpShadowMask\` / \`bloxdSpShadowPixel\` / \`bloxdSpMaskBit\` / \`bloxdSpMaskEdge\` — 遮罩纹理路径（mask-edge 感知采样）
+- \`bloxdSpEntityLight\` / \`bloxdSpShadowEntities\` / \`bloxdSpShadowEntityGrids\` / \`bloxdSpEntityRow\` / \`bloxdSpCasterBlocks\` — 实体阴影投射（玩家、生物、物品）
+- \`bloxdSpShadowPosition\` / \`bloxdSpShadowNormal\` / \`bloxdSpShadowEmissive\` / \`bloxdSpShadowFirstPerson\` / \`bloxdSpShadowLight\` / \`bloxdSpShadowDz\` / \`bloxdSpShadowZ\` / \`bloxdSpShadowSpecial\` — 逐片元阴影上下文（自发光与第一人称的排除）
+- \`bloxdSpVolumeAt\` / \`bloxdSpVolumeOpenLit\` / \`bloxdSpVolumeTexel\` / \`bloxdSpVolumeOut\` / \`bloxdSpVolumeWork\` — 体积查询（\`bloxdAirShadow\` 的仅方块、整块模糊路径）
+- \`bloxdSpLit\` / \`bloxdSpFacing\` / \`bloxdSpFacingDot\` / \`bloxdSpT\` / \`bloxdSpCrossed\` / \`bloxdSpNormalCode\` / \`bloxdSpCellFull\` / \`bloxdSpWindowHas\` / \`bloxdSpWindowSlot\` / \`bloxdSpOwnTexture\` / \`bloxdSpPlaneTolerance\` — 阴影与采样代码生成的辅助局部变量
 
 ## 新名称 ↔ v5 功能
 

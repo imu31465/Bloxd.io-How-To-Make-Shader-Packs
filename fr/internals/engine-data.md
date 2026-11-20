@@ -1,6 +1,6 @@
 # Relevé des données du moteur
 
-> API cible : 5 · Build cible : `v98qt8` (2026-11-08 ; production et preprod servent le même bundle identique octet par octet) · État : Verified
+> API cible : 5 · Build cible : `bbb6l5` (2026-11-20 ; production et preprod servent le même bundle identique octet par octet) · État : Verified
 
 Le relevé de mesures de la documentation — chaque valeur confirmée, toutes mesurées sur le build cible actuel `bny9u`.
 

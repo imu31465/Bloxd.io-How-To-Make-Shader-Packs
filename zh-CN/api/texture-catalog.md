@@ -1,10 +1,10 @@
 # 纹理目录
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
-可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**906 个名称**，按字母序排列。
+可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**1,017 个名称**，按字母序排列。
 
-**线上构建说明（v98qt8，2026-11-08）：** 该构建存在一个纹理常量回归 — 引擎的动画纹理表按拼写建立索引，而折叠代码期望的是槽位索引。因此下方 43 个动画族基本名（`lava`、全部 `*_portal`、`smoke`、`radar_screen`、`trading_terminal_front` 等）目前**验证失败**（"There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?"），而 196 个帧拼写（`lava0`…`lava7`）却作为独立常量被解析。本文档记录的是预期 API（以槽位索引数据喂给折叠逻辑时它自身计算出的结果）。细节与字节级证据：[引擎内部：纹理注册表](../internals/texture-registry.md#the-v98qt8-folding-regression)。
+**折叠状态（`bbb6l5`，2026-11-20）：** `v98qt8` 携带的动画常量折叠回归**已修复** — 动画纹理表重新按槽位索引，因此下方动画族基本名（`lava`、全部 `*_portal`、`smoke`、`radar_screen`、`trading_terminal_front` 等）正常通过验证，采样返回当前帧。下面是按当前线上构建重新测量的折叠（预期）视图。
 
 ## 如何阅读
 
@@ -14,7 +14,7 @@
 
 **备注**列标出两个折叠族。「动画（N帧）」表示采样该名称会自动返回当前动画帧 — **切勿书写帧号后缀** (`lava0` 是已知的别名，有专属诊断)。「旋转族（4副本）」表示该纹理只以预旋转槽位存在 — 名称指向根，`bloxdTexel` 会在采样时重新应用旋转。恰好一个名称 (`radar_screen`) 同时带两条备注。
 
-刻意**不**列出的是: 其余注册表拼写 — 196 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,227 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](../internals/texture-registry.md)。
+刻意**不**列出的是: 其余注册表拼写 — 196 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,650 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](../internals/texture-registry.md)。
 
 ### 数字之间如何对上
 
@@ -22,1031 +22,1105 @@
 
 | 数量 | 统计对象 |
 |---|---|
-| **906** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
-| **424** | 别名 (196 帧 + 228 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
-| **1,227** | 图集条目 — 纹理图集中的实际槽位 (id 1–1227) |
+| **1,017** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
+| **776** | 别名 (196 帧 + 228 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
+| **1,650** | 图集条目 — 纹理图集中的实际槽位 (id 1–1650) |
 
-906 个名称各自映射到一个不同的图集条目。其余 **321 个条目**是没有可用名称的附加动画帧 (150) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。对比: v4 有 905 个可用名称，v5 首发构建 896 个，次日构建 906 个，`bny9u` 911 个；本构建为 906 — v5 首发时移除的 10 个名称在 `xkg8x` 回归 (加上先前的 +1 `scorpion_eggs`)，`bny9u` 加入了交易终端 (×3) 与石头发生器 (×2)，`v98qt8` 用 `hay_block_top` 换掉了六个转为模型的方块纹理 — `xkg8x` 幸存的 906 个名称中 864 个在 `bny9u` 改 id，另有 905 个中的 716 个在 `v98qt8` 改 id。
+906 个名称各自映射到一个不同的图集条目。其余 **321 个条目**是没有可用名称的附加动画帧 (150) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。对比: v4 有 905 个可用名称，v5 首发构建 896 个，次日构建 1,017 个，`bny9u` 911 个；本构建为 1,017 — v5 首发时移除的 10 个名称在 `xkg8x` 回归 (加上先前的 +1 `scorpion_eggs`)，`bny9u` 加入了交易终端 (×3) 与石头发生器 (×2)，`v98qt8` 用 `hay_block_top` 换掉了六个转为模型的方块纹理 — `xkg8x` 幸存的 1,017 个名称中 864 个在 `bny9u` 改 id，另有 905 个中的 716 个在 `v98qt8` 改 id。
 
 ## 目录
 
 全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `v98qt8` (2026-11-08)。**id 是快照；把名称当作 API**: v4 构建 (cnty9) 与 v5 首发构建 (ab90qa) 之间有 334 个幸存名称改了 id，ab90qa 与 xkg8x 之间有 376 个，xkg8x 与本构建之间又有 864 个 (见下方漂移实测)。
 
-| 名称 | id (v98qt8) | 备注 |
+| 名称 | id (bbb6l5) | 备注 |
 |---|---|---|
-| `alloy_kiln_back` | 1093 |  |
-| `alloy_kiln_front` | 1087 |  |
-| `alloy_kiln_side` | 1088 |  |
-| `alloy_kiln_side_running` | 33 | 动画（4帧） |
-| `alloy_kiln_top` | 1089 | 旋转族（4副本） |
-| `andesite_brick` | 466 |  |
-| `apple_block_bottom` | 442 |  |
-| `apple_block_side` | 440 |  |
-| `apple_block_top` | 441 |  |
-| `armour_lucky_block` | 997 |  |
-| `armour_lucky_block_rare` | 999 |  |
-| `armour_lucky_block_super` | 1001 |  |
-| `ash` | 1033 |  |
-| `auto_bench_back` | 1108 |  |
-| `auto_bench_front` | 1102 |  |
-| `auto_bench_side` | 1103 |  |
-| `auto_bench_side_running` | 35 | 动画（4帧） |
-| `auto_bench_top` | 1104 | 旋转族（4副本） |
-| `autocrafter_bottom` | 964 |  |
-| `autocrafter_lunite_bottom` | 975 |  |
-| `autocrafter_lunite_side` | 974 |  |
-| `autocrafter_side` | 962 |  |
-| `banana_block_side` | 900 |  |
-| `banana_block_top` | 901 |  |
-| `beacon` | 338 |  |
-| `bedrock` | 342 |  |
-| `beetroot_block_bottom` | 926 |  |
-| `beetroot_block_side` | 924 |  |
-| `beetroot_block_top` | 925 |  |
-| `belt_drop_side` | 1187 |  |
-| `belt_drop_top` | 1186 |  |
-| `belt_lift_side` | 1185 |  |
-| `belt_lift_top` | 1184 |  |
-| `belt_loader_slab_front` | 1112 |  |
-| `belt_loader_top` | 1111 |  |
-| `belt_tunnel_back` | 1201 |  |
-| `belt_tunnel_exit_top` | 1202 | 旋转族（4副本） |
-| `belt_tunnel_mouth` | 1195 |  |
-| `belt_tunnel_side` | 1196 |  |
-| `belt_tunnel_top` | 1197 | 旋转族（4副本） |
-| `black_concrete` | 281 |  |
-| `black_glazed_terracotta` | 430 | 旋转族（4副本） |
-| `black_planks` | 369 |  |
-| `black_portal` | 2 | 动画（4帧） |
-| `black_spawn_block_side` | 761 |  |
-| `black_spawn_block_top` | 757 | 旋转族（4副本） |
-| `block_destroyer_tnt_side` | 1019 |  |
-| `block_destroyer_tnt_top` | 1020 |  |
-| `blue_concrete` | 282 |  |
-| `blue_gen_spawn_coal` | 775 |  |
-| `blue_gen_spawn_iron` | 776 |  |
-| `blue_gen_spawn_top` | 774 |  |
-| `blue_glazed_terracotta` | 414 | 旋转族（4副本） |
-| `blue_lucky_block` | 996 |  |
-| `blue_lucky_block_rare` | 998 |  |
-| `blue_lucky_block_super` | 1000 |  |
-| `blue_planks` | 365 |  |
-| `blue_portal` | 3 | 动画（4帧） |
-| `blue_spawn_block_side` | 756 |  |
-| `blue_spawn_block_top` | 752 | 旋转族（4副本） |
-| `bone_block_side` | 819 |  |
-| `bone_block_top` | 820 |  |
-| `bookshelf` | 565 |  |
-| `bookshelf_1` | 567 |  |
-| `bookshelf_2` | 568 |  |
-| `bookshelf_3` | 569 |  |
-| `bookshelf_4` | 570 |  |
-| `bookshelf_5` | 571 |  |
-| `bookshelf_empty` | 566 |  |
-| `bouncy_bomb_block` | 592 |  |
-| `bowling_alley_floor` | 980 |  |
-| `bread_block_back` | 436 |  |
-| `bread_block_front` | 435 |  |
-| `bread_block_side` | 437 |  |
-| `bread_block_top` | 438 |  |
-| `brick` | 323 |  |
-| `brown_concrete` | 283 |  |
-| `brown_glazed_terracotta` | 418 | 旋转族（4副本） |
-| `brown_mushroom_block` | 537 |  |
-| `brown_planks` | 366 |  |
-| `brown_portal` | 4 | 动画（4帧） |
-| `brown_spawn_block_side` | 751 |  |
-| `brown_spawn_block_top` | 747 | 旋转族（4副本） |
-| `building_lucky_block` | 991 |  |
-| `building_lucky_block_rare` | 993 |  |
-| `building_lucky_block_super` | 995 |  |
-| `burner_drill_back` | 1050 |  |
-| `burner_drill_bottom` | 1049 |  |
-| `burner_drill_front` | 1043 |  |
-| `burner_drill_side` | 1044 |  |
-| `burner_drill_side_running` | 27 | 动画（4帧） |
-| `burner_drill_top` | 1045 | 旋转族（4副本） |
-| `cactus_dry` | 353 |  |
-| `cactus_top` | 352 |  |
-| `carrot_block_bottom` | 922 |  |
-| `carrot_block_side` | 920 |  |
-| `carrot_block_top` | 921 |  |
-| `carved_messy_stone` | 828 |  |
-| `carved_pumpkin` | 544 |  |
-| `chalk` | 840 |  |
-| `chalk_black` | 856 |  |
-| `chalk_blue` | 855 |  |
-| `chalk_bricks_black` | 872 |  |
-| `chalk_bricks_blue` | 871 |  |
-| `chalk_bricks_brown` | 870 |  |
-| `chalk_bricks_cyan` | 869 |  |
-| `chalk_bricks_gray` | 868 |  |
-| `chalk_bricks_green` | 867 |  |
-| `chalk_bricks_light_blue` | 866 |  |
-| `chalk_bricks_light_gray` | 865 |  |
-| `chalk_bricks_lime` | 864 |  |
-| `chalk_bricks_magenta` | 863 |  |
-| `chalk_bricks_orange` | 862 |  |
-| `chalk_bricks_pink` | 861 |  |
-| `chalk_bricks_purple` | 860 |  |
-| `chalk_bricks_red` | 859 |  |
-| `chalk_bricks_slab_side_black` | 888 |  |
-| `chalk_bricks_slab_side_blue` | 887 |  |
-| `chalk_bricks_slab_side_brown` | 886 |  |
-| `chalk_bricks_slab_side_cyan` | 885 |  |
-| `chalk_bricks_slab_side_gray` | 884 |  |
-| `chalk_bricks_slab_side_green` | 883 |  |
-| `chalk_bricks_slab_side_light_blue` | 882 |  |
-| `chalk_bricks_slab_side_light_gray` | 881 |  |
-| `chalk_bricks_slab_side_lime` | 880 |  |
-| `chalk_bricks_slab_side_magenta` | 879 |  |
-| `chalk_bricks_slab_side_orange` | 878 |  |
-| `chalk_bricks_slab_side_pink` | 877 |  |
-| `chalk_bricks_slab_side_purple` | 876 |  |
-| `chalk_bricks_slab_side_red` | 875 |  |
-| `chalk_bricks_slab_side_white` | 874 |  |
-| `chalk_bricks_slab_side_yellow` | 873 |  |
-| `chalk_bricks_white` | 858 |  |
-| `chalk_bricks_yellow` | 857 |  |
-| `chalk_brown` | 854 |  |
-| `chalk_cyan` | 853 |  |
-| `chalk_gray` | 852 |  |
-| `chalk_green` | 851 |  |
-| `chalk_light_blue` | 850 |  |
-| `chalk_light_gray` | 849 |  |
-| `chalk_lime` | 848 |  |
-| `chalk_magenta` | 847 |  |
-| `chalk_orange` | 846 |  |
-| `chalk_pink` | 845 |  |
-| `chalk_purple` | 844 |  |
-| `chalk_red` | 843 |  |
-| `chalk_white` | 842 |  |
-| `chalk_yellow` | 841 |  |
-| `charge_vault_side` | 1116 |  |
-| `charge_vault_top` | 1115 |  |
-| `charging_pad_side` | 1161 |  |
-| `charging_pad_top` | 1160 |  |
-| `checkpoint_block` | 762 | 旋转族（4副本） |
-| `cherry_block_bottom` | 591 |  |
-| `cherry_block_side` | 589 |  |
-| `cherry_block_top` | 590 |  |
-| `chest_back` | 350 |  |
-| `chest_double_back_hi` | 1221 |  |
-| `chest_double_back_lo` | 1220 |  |
-| `chest_double_front_hi` | 1215 |  |
-| `chest_double_front_lo` | 1214 |  |
-| `chest_double_top_1_hi` | 1217 |  |
-| `chest_double_top_1_lo` | 1216 |  |
-| `chest_double_top_2_hi` | 1219 |  |
-| `chest_double_top_2_lo` | 1218 |  |
-| `chest_front` | 344 |  |
-| `chest_side` | 345 |  |
-| `chest_top` | 346 | 旋转族（4副本） |
-| `chili_pepper_block_bottom` | 679 |  |
-| `chili_pepper_block_side` | 677 |  |
-| `chili_pepper_block_top` | 678 |  |
-| `chiseled_red_sandstone` | 457 |  |
-| `chiseled_sandstone` | 333 |  |
-| `clay` | 203 |  |
-| `coal_block` | 241 |  |
-| `coal_deposit` | 1034 |  |
-| `coal_ore` | 235 |  |
-| `coarse_dirt` | 199 |  |
-| `coconut_block_bottom` | 523 |  |
-| `coconut_block_side` | 521 |  |
-| `coconut_block_top` | 522 |  |
-| `code_block` | 680 |  |
-| `comet_heart` | 1172 |  |
-| `comet_ore` | 1171 |  |
-| `compressed_messy_stone` | 531 |  |
-| `conveyor_belt_bottom` | 1083 |  |
-| `conveyor_belt_slab_side` | 1082 |  |
-| `conveyor_belt_top` | 1081 |  |
-| `conveyor_belt_turn_left` | 1173 |  |
-| `conveyor_belt_turn_right` | 1174 |  |
-| `copper_deposit` | 1037 |  |
-| `copper_ore` | 1042 |  |
-| `corn_block_bottom` | 595 |  |
-| `corn_block_side` | 593 |  |
-| `corn_block_top` | 594 |  |
-| `crafting_table_top` | 963 |  |
-| `crate` | 919 |  |
-| `crop_harvester_back` | 1194 |  |
-| `crop_harvester_back_running` | 45 | 动画（4帧） |
-| `crop_harvester_front` | 1188 |  |
-| `crop_harvester_side` | 1189 |  |
-| `crop_harvester_side_running` | 44 | 动画（4帧） |
-| `crop_harvester_top` | 1190 | 旋转族（4副本） |
-| `crusher_back` | 1057 |  |
-| `crusher_front` | 1051 |  |
-| `crusher_side` | 1052 |  |
-| `crusher_side_running` | 28 | 动画（4帧） |
-| `crusher_top` | 1053 | 旋转族（4副本） |
-| `crystal_block` | 1031 |  |
-| `crystal_vat_back` | 1168 |  |
-| `crystal_vat_front` | 1162 |  |
-| `crystal_vat_side` | 1163 |  |
-| `crystal_vat_side_running` | 42 | 动画（4帧） |
-| `crystal_vat_top` | 1164 | 旋转族（4副本） |
-| `custom_lobby_block_side` | 770 |  |
-| `custom_lobby_block_top` | 766 | 旋转族（4副本） |
-| `cut_red_sandstone` | 458 |  |
-| `cut_sandstone` | 454 |  |
-| `cyan_concrete` | 284 |  |
-| `cyan_gen_spawn_coal` | 784 |  |
-| `cyan_gen_spawn_iron` | 785 |  |
-| `cyan_gen_spawn_top` | 783 |  |
-| `cyan_glazed_terracotta` | 406 | 旋转族（4副本） |
-| `cyan_planks` | 363 |  |
-| `cyan_portal` | 5 | 动画（4帧） |
-| `cyan_spawn_block_side` | 746 |  |
-| `cyan_spawn_block_top` | 742 | 旋转族（4副本） |
-| `dark_green_bricks` | 461 |  |
-| `darkstone` | 1208 |  |
-| `darkstone_bricks` | 1209 |  |
-| `darkstone_bricks_cracked` | 1210 |  |
-| `darkstone_bricks_lava` | 1211 |  |
-| `darkstone_engraved` | 1212 |  |
-| `darkstone_smooth` | 1213 |  |
-| `deep_drill_back` | 1142 |  |
-| `deep_drill_bottom` | 1141 |  |
-| `deep_drill_front` | 1135 |  |
-| `deep_drill_side` | 1136 |  |
-| `deep_drill_side_running` | 39 | 动画（4帧） |
-| `deep_drill_top` | 1137 | 旋转族（4副本） |
-| `diamond_block` | 343 |  |
-| `diamond_gen_spawn_side` | 808 |  |
-| `diamond_gen_spawn_top` | 807 |  |
-| `diamond_ore` | 240 |  |
-| `diorite_brick` | 464 |  |
-| `dirt` | 198 |  |
-| `drop_location_block_side` | 815 |  |
-| `drop_location_block_top` | 814 |  |
-| `drop_pad` | 1040 |  |
-| `dry_grass_block` | 982 |  |
-| `dry_grass_block_side` | 981 |  |
-| `electric_drill_back` | 1101 |  |
-| `electric_drill_bottom` | 1100 |  |
-| `electric_drill_front` | 1094 |  |
-| `electric_drill_side` | 1095 |  |
-| `electric_drill_side_running` | 34 | 动画（4帧） |
-| `electric_drill_top` | 1096 | 旋转族（4副本） |
-| `emerald_block` | 245 |  |
-| `emerald_ore` | 239 |  |
-| `end_stone` | 234 |  |
-| `engraved_andesite` | 465 |  |
-| `engraved_diorite` | 463 |  |
-| `engraved_granite` | 467 |  |
-| `evil_lucky_block` | 1024 |  |
-| `evil_lucky_block_face` | 1025 |  |
-| `explosive_paint_black_side` | 627 |  |
-| `explosive_paint_black_top` | 628 |  |
-| `explosive_paint_blue_side` | 625 |  |
-| `explosive_paint_blue_top` | 626 |  |
-| `explosive_paint_brown_side` | 623 |  |
-| `explosive_paint_brown_top` | 624 |  |
-| `explosive_paint_cyan_side` | 621 |  |
-| `explosive_paint_cyan_top` | 622 |  |
-| `explosive_paint_gray_side` | 619 |  |
-| `explosive_paint_gray_top` | 620 |  |
-| `explosive_paint_green_side` | 617 |  |
-| `explosive_paint_green_top` | 618 |  |
-| `explosive_paint_light_blue_side` | 615 |  |
-| `explosive_paint_light_blue_top` | 616 |  |
-| `explosive_paint_light_gray_side` | 613 |  |
-| `explosive_paint_light_gray_top` | 614 |  |
-| `explosive_paint_lime_side` | 611 |  |
-| `explosive_paint_lime_top` | 612 |  |
-| `explosive_paint_magenta_side` | 609 |  |
-| `explosive_paint_magenta_top` | 610 |  |
-| `explosive_paint_orange_side` | 607 |  |
-| `explosive_paint_orange_top` | 608 |  |
-| `explosive_paint_pink_side` | 605 |  |
-| `explosive_paint_pink_top` | 606 |  |
-| `explosive_paint_purple_side` | 603 |  |
-| `explosive_paint_purple_top` | 604 |  |
-| `explosive_paint_quick_black` | 644 |  |
-| `explosive_paint_quick_blue` | 643 |  |
-| `explosive_paint_quick_brown` | 642 |  |
-| `explosive_paint_quick_cyan` | 641 |  |
-| `explosive_paint_quick_gray` | 640 |  |
-| `explosive_paint_quick_green` | 639 |  |
-| `explosive_paint_quick_light_blue` | 638 |  |
-| `explosive_paint_quick_light_gray` | 637 |  |
-| `explosive_paint_quick_lime` | 636 |  |
-| `explosive_paint_quick_magenta` | 635 |  |
-| `explosive_paint_quick_orange` | 634 |  |
-| `explosive_paint_quick_pink` | 633 |  |
-| `explosive_paint_quick_purple` | 632 |  |
-| `explosive_paint_quick_red` | 631 |  |
-| `explosive_paint_quick_white` | 630 |  |
-| `explosive_paint_quick_yellow` | 629 |  |
-| `explosive_paint_red_side` | 601 |  |
-| `explosive_paint_red_top` | 602 |  |
-| `explosive_paint_seeking_black` | 660 |  |
-| `explosive_paint_seeking_blue` | 659 |  |
-| `explosive_paint_seeking_brown` | 658 |  |
-| `explosive_paint_seeking_cyan` | 657 |  |
-| `explosive_paint_seeking_gray` | 656 |  |
-| `explosive_paint_seeking_green` | 655 |  |
-| `explosive_paint_seeking_light_blue` | 654 |  |
-| `explosive_paint_seeking_light_gray` | 653 |  |
-| `explosive_paint_seeking_lime` | 652 |  |
-| `explosive_paint_seeking_magenta` | 651 |  |
-| `explosive_paint_seeking_orange` | 650 |  |
-| `explosive_paint_seeking_pink` | 649 |  |
-| `explosive_paint_seeking_purple` | 648 |  |
-| `explosive_paint_seeking_red` | 647 |  |
-| `explosive_paint_seeking_white` | 646 |  |
-| `explosive_paint_seeking_yellow` | 645 |  |
-| `explosive_paint_sticky_black` | 676 |  |
-| `explosive_paint_sticky_blue` | 675 |  |
-| `explosive_paint_sticky_brown` | 674 |  |
-| `explosive_paint_sticky_cyan` | 673 |  |
-| `explosive_paint_sticky_gray` | 672 |  |
-| `explosive_paint_sticky_green` | 671 |  |
-| `explosive_paint_sticky_light_blue` | 670 |  |
-| `explosive_paint_sticky_light_gray` | 669 |  |
-| `explosive_paint_sticky_lime` | 668 |  |
-| `explosive_paint_sticky_magenta` | 667 |  |
-| `explosive_paint_sticky_orange` | 666 |  |
-| `explosive_paint_sticky_pink` | 665 |  |
-| `explosive_paint_sticky_purple` | 664 |  |
-| `explosive_paint_sticky_red` | 663 |  |
-| `explosive_paint_sticky_white` | 662 |  |
-| `explosive_paint_sticky_yellow` | 661 |  |
-| `explosive_paint_white_side` | 599 |  |
-| `explosive_paint_white_top` | 600 |  |
-| `explosive_paint_yellow_side` | 597 |  |
-| `explosive_paint_yellow_top` | 598 |  |
-| `extra_compressed_messy_stone` | 532 |  |
-| `fallen_cherry_leaves_side` | 587 |  |
-| `fallen_maple_leaves_side` | 479 |  |
-| `farmland` | 434 |  |
-| `fast_belt_slab_side` | 1159 |  |
-| `fast_belt_top` | 1158 |  |
-| `fast_belt_turn_left` | 1175 |  |
-| `fast_belt_turn_right` | 1176 |  |
-| `fertilised_soil` | 927 |  |
-| `finish_block` | 813 |  |
-| `fireball_block` | 540 |  |
-| `food_lucky_block` | 1009 |  |
-| `food_lucky_block_rare` | 1011 |  |
-| `food_lucky_block_super` | 1013 |  |
-| `forge_hopper_top` | 1170 |  |
-| `generator_side` | 1065 |  |
-| `generator_side_running` | 30 | 动画（4帧） |
-| `generator_top` | 1066 |  |
-| `ghost_chest_back` | 957 |  |
-| `ghost_chest_front` | 954 |  |
-| `ghost_chest_side` | 955 |  |
-| `ghost_chest_top` | 956 |  |
-| `ghost_lucky_block` | 958 |  |
-| `ghost_mystery_block` | 959 |  |
-| `glass` | 302 |  |
-| `glass_black` | 303 |  |
-| `glass_blue` | 304 |  |
-| `glass_brown` | 305 |  |
-| `glass_cyan` | 306 |  |
-| `glass_gray` | 307 |  |
-| `glass_green` | 309 |  |
-| `glass_light_blue` | 310 |  |
-| `glass_light_gray` | 308 |  |
-| `glass_lime` | 311 |  |
-| `glass_magenta` | 312 |  |
-| `glass_orange` | 313 |  |
-| `glass_pink` | 314 |  |
-| `glass_purple` | 315 |  |
-| `glass_red` | 316 |  |
-| `glass_silver` | 319 |  |
-| `glass_white` | 317 |  |
-| `glass_yellow` | 318 |  |
-| `glowstone` | 339 |  |
-| `gold_block` | 243 |  |
-| `gold_deposit` | 1038 |  |
-| `gold_ore` | 237 |  |
-| `granite_brick` | 468 |  |
-| `grass_block_side` | 200 |  |
-| `grass_top` | 201 |  |
-| `gravel` | 204 |  |
-| `gray_concrete` | 279 |  |
-| `gray_gen_spawn_coal` | 793 |  |
-| `gray_gen_spawn_iron` | 794 |  |
-| `gray_gen_spawn_top` | 792 |  |
-| `gray_glazed_terracotta` | 398 | 旋转族（4副本） |
-| `gray_planks` | 361 |  |
-| `gray_portal` | 6 | 动画（4帧） |
-| `gray_spawn_block_side` | 741 |  |
-| `gray_spawn_block_top` | 737 | 旋转族（4副本） |
-| `green_bricks` | 460 |  |
-| `green_concrete` | 293 |  |
-| `green_glazed_terracotta` | 422 | 旋转族（4副本） |
-| `green_lucky_block` | 1008 |  |
-| `green_lucky_block_rare` | 1010 |  |
-| `green_lucky_block_super` | 1012 |  |
-| `green_planks` | 367 |  |
-| `green_portal` | 7 | 动画（4帧） |
-| `green_spawn_block_side` | 736 |  |
-| `green_spawn_block_top` | 732 | 旋转族（4副本） |
-| `green_stone` | 459 |  |
-| `grenade_block` | 582 |  |
-| `grey_portal` | 8 | 动画（4帧） |
-| `gun_lucky_block` | 953 |  |
-| `hardened_clay` | 262 |  |
-| `hardened_clay_stained_black` | 278 |  |
-| `hardened_clay_stained_blue` | 274 |  |
-| `hardened_clay_stained_brown` | 275 |  |
-| `hardened_clay_stained_cyan` | 272 |  |
-| `hardened_clay_stained_gray` | 270 |  |
-| `hardened_clay_stained_green` | 276 |  |
-| `hardened_clay_stained_light_blue` | 266 |  |
-| `hardened_clay_stained_lime` | 268 |  |
-| `hardened_clay_stained_magenta` | 265 |  |
-| `hardened_clay_stained_orange` | 264 |  |
-| `hardened_clay_stained_pink` | 269 |  |
-| `hardened_clay_stained_purple` | 273 |  |
-| `hardened_clay_stained_red` | 277 |  |
-| `hardened_clay_stained_silver` | 271 |  |
-| `hardened_clay_stained_white` | 263 |  |
-| `hardened_clay_stained_yellow` | 267 |  |
-| `harvester_bottom` | 971 |  |
-| `harvester_lunite_bottom` | 979 |  |
-| `harvester_lunite_side_0` | 976 |  |
-| `harvester_lunite_side_1` | 977 |  |
-| `harvester_lunite_top` | 978 |  |
-| `harvester_side0` | 968 |  |
-| `harvester_side1` | 969 |  |
-| `harvester_top` | 970 |  |
-| `hay_block_side` | 336 |  |
-| `hay_block_top` | 1227 |  |
-| `homestead_core` | 1039 |  |
-| `homestead_core_cap` | 1124 |  |
-| `homestead_core_crown` | 1123 |  |
-| `homestead_core_mid` | 26 | 动画（4帧） |
-| `hyper_compressed_messy_stone` | 534 |  |
-| `ice` | 334 |  |
-| `ice_brick` | 469 |  |
-| `iceball_block` | 541 |  |
-| `invisible_solid` | 322 |  |
-| `iron_block` | 242 |  |
-| `iron_chest_back` | 918 |  |
-| `iron_chest_front` | 912 |  |
-| `iron_chest_side` | 913 |  |
-| `iron_chest_top` | 914 | 旋转族（4副本） |
-| `iron_deposit` | 1035 |  |
-| `iron_ore` | 236 |  |
-| `iron_watermelon_side` | 547 |  |
-| `iron_watermelon_top` | 548 |  |
-| `jungle_grass_block` | 890 |  |
-| `jungle_grass_block_side` | 889 |  |
-| `lapis_block` | 244 |  |
-| `lapis_ore` | 238 |  |
-| `lava` | 1 | 动画（8帧） |
-| `leather_block_side` | 909 |  |
-| `leather_block_top` | 910 |  |
-| `leaves_aspen` | 296 |  |
-| `leaves_aspen_autumn` | 911 |  |
-| `leaves_cedar` | 471 |  |
-| `leaves_cherry` | 586 |  |
-| `leaves_cherry_fruity` | 907 |  |
-| `leaves_jungle` | 298 |  |
-| `leaves_mango` | 895 |  |
-| `leaves_mango_fruity` | 908 |  |
-| `leaves_maple` | 297 |  |
-| `leaves_maple_autumn` | 478 |  |
-| `leaves_maple_fruity` | 902 |  |
-| `leaves_palm` | 472 |  |
-| `leaves_palm_fruity` | 905 |  |
-| `leaves_pear` | 526 |  |
-| `leaves_pear_fruity` | 906 |  |
-| `leaves_pine` | 295 |  |
-| `leaves_pine_cone` | 903 |  |
-| `leaves_plum` | 470 |  |
-| `leaves_plum_fruity` | 904 |  |
-| `leaves_spectral` | 832 |  |
-| `light_blue_concrete` | 285 |  |
-| `light_blue_glazed_terracotta` | 382 | 旋转族（4副本） |
-| `light_blue_lucky_block` | 934 |  |
-| `light_blue_planks` | 357 |  |
-| `light_blue_spawn_block_side` | 731 |  |
-| `light_blue_spawn_block_top` | 727 | 旋转族（4副本） |
-| `light_gray_concrete` | 280 |  |
-| `light_gray_glazed_terracotta` | 402 | 旋转族（4副本） |
-| `light_gray_planks` | 362 |  |
-| `light_gray_spawn_block_side` | 726 |  |
-| `light_gray_spawn_block_top` | 722 | 旋转族（4副本） |
-| `lightblue_portal` | 9 | 动画（4帧） |
-| `lightgray_portal` | 10 | 动画（4帧） |
-| `lime_concrete` | 286 |  |
-| `lime_gen_spawn_coal` | 778 |  |
-| `lime_gen_spawn_iron` | 779 |  |
-| `lime_gen_spawn_top` | 777 |  |
-| `lime_glazed_terracotta` | 390 | 旋转族（4副本） |
-| `lime_planks` | 359 |  |
-| `lime_portal` | 11 | 动画（4帧） |
-| `lime_spawn_block_side` | 721 |  |
-| `lime_spawn_block_top` | 717 | 旋转族（4副本） |
-| `log_ancient_maple` | 1023 |  |
-| `log_aspen` | 210 |  |
-| `log_cedar` | 209 |  |
-| `log_cherry` | 583 |  |
-| `log_jungle` | 211 |  |
-| `log_mango` | 892 |  |
-| `log_maple` | 206 |  |
-| `log_palm` | 473 |  |
-| `log_pear` | 524 |  |
-| `log_pine` | 207 |  |
-| `log_plum` | 208 |  |
-| `log_spectral` | 829 |  |
-| `lucky_block_pink_question` | 960 |  |
-| `lucky_block_pink_question_rare` | 1015 |  |
-| `lucky_block_pink_question_super` | 1017 |  |
-| `lunite_block` | 973 |  |
-| `lunite_ore` | 972 |  |
-| `machine_bench_side` | 1117 |  |
-| `machine_bench_top` | 1118 |  |
-| `machine_side` | 1041 |  |
-| `magenta_concrete` | 287 |  |
-| `magenta_glazed_terracotta` | 378 | 旋转族（4副本） |
-| `magenta_planks` | 356 |  |
-| `magenta_portal` | 12 | 动画（4帧） |
-| `magenta_spawn_block_side` | 716 |  |
-| `magenta_spawn_block_top` | 712 | 旋转族（4副本） |
-| `magma` | 452 |  |
-| `mailbox_front` | 572 |  |
-| `mailbox_front_full` | 574 |  |
-| `mailbox_side` | 573 |  |
-| `mango_block_bottom` | 899 |  |
-| `mango_block_side` | 897 |  |
-| `mango_block_top` | 898 |  |
-| `mega_compressed_messy_stone` | 536 |  |
-| `melon_side` | 545 |  |
-| `melon_top` | 546 |  |
-| `melting_ice` | 596 |  |
-| `messy_stone` | 224 |  |
-| `mob_spawner_block_empty_side` | 824 |  |
-| `mob_spawner_block_top` | 822 |  |
-| `mob_spawner_hostile_block_side` | 823 |  |
-| `mob_spawner_neutral_block_side` | 839 |  |
-| `mob_spawner_passive_block_side` | 821 |  |
-| `moonstone_block` | 451 |  |
-| `moonstone_chest_back` | 450 |  |
-| `moonstone_chest_front` | 444 |  |
-| `moonstone_chest_side` | 445 |  |
-| `moonstone_chest_top` | 446 | 旋转族（4副本） |
-| `moonstone_explosive_side` | 340 |  |
-| `moonstone_explosive_top` | 341 |  |
-| `moonstone_gen_spawn_side` | 810 |  |
-| `moonstone_gen_spawn_top` | 809 |  |
-| `moonstone_ore` | 443 |  |
-| `mossy_cobblestone` | 439 |  |
-| `mushroom_stem` | 539 |  |
-| `mystery_block` | 579 |  |
-| `neon_black` | 952 |  |
-| `neon_blue` | 951 |  |
-| `neon_brown` | 950 |  |
-| `neon_cyan` | 949 |  |
-| `neon_gray` | 948 |  |
-| `neon_green` | 947 |  |
-| `neon_light_blue` | 946 |  |
-| `neon_light_gray` | 945 |  |
-| `neon_lime` | 944 |  |
-| `neon_magenta` | 943 |  |
-| `neon_orange` | 942 |  |
-| `neon_pink` | 941 |  |
-| `neon_purple` | 940 |  |
-| `neon_red` | 939 |  |
-| `neon_white` | 938 |  |
-| `neon_yellow` | 937 |  |
-| `nether_brick` | 325 |  |
-| `netherrack` | 326 |  |
-| `obby_absorb_block` | 817 |  |
-| `obby_absorb_death_block` | 818 |  |
-| `obby_death_block` | 816 |  |
-| `obsidian` | 335 |  |
-| `orange_concrete` | 288 |  |
-| `orange_glazed_terracotta` | 374 | 旋转族（4副本） |
-| `orange_lucky_block` | 1002 |  |
-| `orange_lucky_block_rare` | 1004 |  |
-| `orange_lucky_block_super` | 1006 |  |
-| `orange_planks` | 355 |  |
-| `orange_portal` | 13 | 动画（4帧） |
-| `orange_spawn_block_side` | 711 |  |
-| `orange_spawn_block_top` | 707 | 旋转族（4副本） |
-| `ore_gen_spawn_side` | 812 |  |
-| `ore_gen_spawn_top` | 811 |  |
-| `packed_snow` | 827 |  |
-| `parts_bench_side` | 1119 |  |
-| `parts_bench_top` | 1120 |  |
-| `patterned_glass_black` | 549 |  |
-| `patterned_glass_blue` | 550 |  |
-| `patterned_glass_brown` | 551 |  |
-| `patterned_glass_cyan` | 552 |  |
-| `patterned_glass_gray` | 553 |  |
-| `patterned_glass_green` | 555 |  |
-| `patterned_glass_light_blue` | 556 |  |
-| `patterned_glass_light_gray` | 554 |  |
-| `patterned_glass_lime` | 557 |  |
-| `patterned_glass_magenta` | 558 |  |
-| `patterned_glass_orange` | 559 |  |
-| `patterned_glass_pink` | 560 |  |
-| `patterned_glass_purple` | 561 |  |
-| `patterned_glass_red` | 562 |  |
-| `patterned_glass_white` | 563 |  |
-| `patterned_glass_yellow` | 564 |  |
-| `pear_block_bottom` | 530 |  |
-| `pear_block_side` | 528 |  |
-| `pear_block_top` | 529 |  |
-| `pet_lucky_block` | 961 |  |
-| `pine_cone_block_side` | 837 |  |
-| `pine_cone_block_top` | 838 |  |
-| `pine_grass_block` | 835 |  |
-| `pine_grass_block_side` | 834 |  |
-| `pink_concrete` | 289 |  |
-| `pink_gen_spawn_coal` | 790 |  |
-| `pink_gen_spawn_iron` | 791 |  |
-| `pink_gen_spawn_top` | 789 |  |
-| `pink_glazed_terracotta` | 394 | 旋转族（4副本） |
-| `pink_planks` | 360 |  |
-| `pink_portal` | 14 | 动画（4帧） |
-| `pink_spawn_block_side` | 706 |  |
-| `pink_spawn_block_top` | 702 | 旋转族（4副本） |
-| `planks_aspen` | 213 |  |
-| `planks_cedar` | 217 |  |
-| `planks_cherry` | 585 |  |
-| `planks_jungle` | 215 |  |
-| `planks_mango` | 894 |  |
-| `planks_maple` | 212 |  |
-| `planks_palm` | 474 |  |
-| `planks_pear` | 525 |  |
-| `planks_pine` | 216 |  |
-| `planks_plum` | 214 |  |
-| `planks_spectral` | 831 |  |
-| `plum_block_bottom` | 520 |  |
-| `plum_block_side` | 518 |  |
-| `plum_block_top` | 519 |  |
-| `podzol_top` | 453 |  |
-| `potato_block` | 923 |  |
-| `potion_lucky_block` | 1014 |  |
-| `potion_lucky_block_rare` | 1016 |  |
-| `potion_lucky_block_super` | 1018 |  |
-| `press_back` | 1073 |  |
-| `press_front` | 1067 |  |
-| `press_side` | 1068 |  |
-| `press_side_running` | 31 | 动画（4帧） |
-| `press_top` | 1069 | 旋转族（4副本） |
-| `protector` | 351 |  |
-| `protector_faction` | 576 |  |
-| `protector_tribe` | 575 |  |
-| `pumpkin_face_on` | 299 |  |
-| `pumpkin_side` | 542 |  |
-| `pumpkin_top` | 543 |  |
-| `pure_coal_ore` | 1026 |  |
-| `pure_copper_ore` | 1206 |  |
-| `pure_diamond_ore` | 1029 |  |
-| `pure_gold_ore` | 1028 |  |
-| `pure_iron_ore` | 1027 |  |
-| `pure_moonstone_ore` | 1030 |  |
-| `pure_voltite_ore` | 1207 |  |
-| `purple_concrete` | 290 |  |
-| `purple_glazed_terracotta` | 410 | 旋转族（4副本） |
-| `purple_lucky_block` | 990 |  |
-| `purple_lucky_block_rare` | 992 |  |
-| `purple_lucky_block_super` | 994 |  |
-| `purple_planks` | 364 |  |
-| `purple_portal` | 15 | 动画（4帧） |
-| `purple_spawn_block_side` | 701 |  |
-| `purple_spawn_block_top` | 697 | 旋转族（4副本） |
-| `quartz_block_chiseled` | 328 |  |
-| `quartz_block_side` | 327 |  |
-| `radar_bottom` | 930 |  |
-| `radar_screen` | 19 | 动画（16帧） 旋转族（4副本） |
-| `radar_side_active` | 928 |  |
-| `radar_side_inactive` | 931 |  |
-| `radar_top_active` | 929 |  |
-| `radar_top_inactive` | 932 |  |
-| `recycler_back` | 1183 |  |
-| `recycler_front` | 1177 |  |
-| `recycler_side` | 1178 |  |
-| `recycler_side_running` | 43 | 动画（4帧） |
-| `recycler_top` | 1179 | 旋转族（4副本） |
-| `red_concrete` | 291 |  |
-| `red_gen_spawn_coal` | 772 |  |
-| `red_gen_spawn_iron` | 773 |  |
-| `red_gen_spawn_top` | 771 |  |
-| `red_glazed_terracotta` | 426 | 旋转族（4副本） |
-| `red_lucky_block` | 935 |  |
-| `red_lucky_block_rare` | 986 |  |
-| `red_lucky_block_super` | 988 |  |
-| `red_mushroom_block` | 538 |  |
-| `red_planks` | 368 |  |
-| `red_portal` | 16 | 动画（4帧） |
-| `red_sand` | 475 |  |
-| `red_sandstone` | 455 |  |
-| `red_sandstone_brick` | 476 |  |
-| `red_sandstone_top` | 456 |  |
-| `red_spawn_block_side` | 696 |  |
-| `red_spawn_block_top` | 692 | 旋转族（4副本） |
-| `redstone_lamp_off` | 321 |  |
-| `redstone_lamp_on` | 320 |  |
-| `rocket_block` | 580 |  |
-| `rocky_dirt` | 477 |  |
-| `rope_block` | 1032 |  |
-| `sand` | 202 |  |
-| `sandstone_brick` | 462 |  |
-| `sandstone_normal` | 233 |  |
-| `sandstone_top` | 332 |  |
-| `scorpion_eggs` | 1222 |  |
-| `shatter_mill_back` | 1149 |  |
-| `shatter_mill_front` | 1143 |  |
-| `shatter_mill_side` | 1144 |  |
-| `shatter_mill_side_running` | 40 | 动画（4帧） |
-| `shatter_mill_top` | 1145 | 旋转族（4副本） |
-| `shop_trader_spawn_face` | 800 |  |
-| `shop_trader_spawn_side` | 799 |  |
-| `shop_trader_spawn_top` | 795 | 旋转族（4副本） |
-| `shop_wizard_spawn_face` | 806 |  |
-| `shop_wizard_spawn_side` | 805 |  |
-| `shop_wizard_spawn_top` | 801 | 旋转族（4副本） |
-| `sky_tap_back` | 1157 |  |
-| `sky_tap_bottom` | 1156 |  |
-| `sky_tap_front` | 1150 |  |
-| `sky_tap_side` | 1151 |  |
-| `sky_tap_side_running` | 41 | 动画（4帧） |
-| `sky_tap_top` | 1152 | 旋转族（4副本） |
-| `slab_andesite_brick_side` | 499 |  |
-| `slab_aspen_side` | 484 |  |
-| `slab_brick_side` | 516 |  |
-| `slab_cedar_side` | 483 |  |
-| `slab_cherry_side` | 588 |  |
-| `slab_chiseled_red_sandstone_side` | 513 |  |
-| `slab_chiseled_sandstone_side` | 509 |  |
-| `slab_cobblestone_side` | 489 |  |
-| `slab_cut_red_sandstone_side` | 514 |  |
-| `slab_cut_sandstone_side` | 510 |  |
-| `slab_diorite_brick_side` | 503 |  |
-| `slab_dirt_side` | 487 |  |
-| `slab_dry_grass_top_side` | 983 |  |
-| `slab_engraved_andesite_side` | 498 |  |
-| `slab_engraved_diorite_side` | 502 |  |
-| `slab_engraved_granite_side` | 506 |  |
-| `slab_granite_brick_side` | 507 |  |
-| `slab_grass_top_side` | 488 |  |
-| `slab_ice_brick_side` | 517 |  |
-| `slab_jungle_grass_top_side` | 891 |  |
-| `slab_jungle_side` | 485 |  |
-| `slab_mango_side` | 896 |  |
-| `slab_maple_side` | 480 |  |
-| `slab_mossy_cobblestone_side` | 494 |  |
-| `slab_palm_side` | 486 |  |
-| `slab_pear_side` | 527 |  |
-| `slab_pine_grass_top_side` | 836 |  |
-| `slab_pine_side` | 481 |  |
-| `slab_plum_side` | 482 |  |
-| `slab_red_sandstone_brick_side` | 515 |  |
-| `slab_red_sandstone_side` | 512 |  |
-| `slab_sandstone_brick_side` | 511 |  |
-| `slab_sandstone_normal_side` | 508 |  |
-| `slab_smooth_stone_side` | 491 |  |
-| `slab_spectral_side` | 833 |  |
-| `slab_stone_andesite_side` | 496 |  |
-| `slab_stone_andesite_smooth_side` | 497 |  |
-| `slab_stone_diorite_side` | 500 |  |
-| `slab_stone_diorite_smooth_side` | 501 |  |
-| `slab_stone_granite_side` | 504 |  |
-| `slab_stone_granite_smooth_side` | 505 |  |
-| `slab_stone_side` | 490 |  |
-| `slab_stonebrick_carved_side` | 492 |  |
-| `slab_stonebrick_mossy_side` | 495 |  |
-| `slab_stonebrick_side` | 493 |  |
-| `smelter_back` | 1064 |  |
-| `smelter_front` | 1058 |  |
-| `smelter_side` | 1059 |  |
-| `smelter_side_running` | 29 | 动画（4帧） |
-| `smelter_top` | 1060 | 旋转族（4副本） |
-| `smoke` | 23 | 动画（4帧） |
-| `smooth_stone` | 226 |  |
-| `snow` | 205 |  |
-| `snowy_messy_stone` | 825 |  |
-| `snowy_messy_stone_side` | 826 |  |
-| `solar_panel_bottom` | 967 |  |
-| `solar_panel_side` | 965 |  |
-| `solar_panel_top` | 966 |  |
-| `sorting_gate_slab_side` | 1110 |  |
-| `sorting_gate_top` | 1109 |  |
-| `splitter_slab_side` | 1085 |  |
-| `splitter_top` | 1084 |  |
-| `sponge` | 337 |  |
-| `starframe` | 1169 |  |
-| `stone` | 225 |  |
-| `stone_andesite` | 229 |  |
-| `stone_andesite_smooth` | 230 |  |
-| `stone_deposit` | 1036 |  |
-| `stone_diorite` | 227 |  |
-| `stone_diorite_smooth` | 228 |  |
-| `stone_generator_side` | 1225 |  |
-| `stone_generator_top` | 1226 |  |
-| `stone_granite` | 231 |  |
-| `stone_granite_smooth` | 232 |  |
-| `stonebrick` | 324 |  |
-| `stonebrick_carved` | 329 |  |
-| `stonebrick_cracked` | 331 |  |
-| `stonebrick_mossy` | 330 |  |
-| `storage_silo_side` | 1114 |  |
-| `storage_silo_top` | 1113 |  |
-| `stripped_aspen_log` | 219 |  |
-| `stripped_cedar_log` | 223 |  |
-| `stripped_cherry_log` | 584 |  |
-| `stripped_jungle_log` | 221 |  |
-| `stripped_mango_log` | 893 |  |
-| `stripped_maple_log` | 218 |  |
-| `stripped_palm_log` | 577 |  |
-| `stripped_pear_log` | 578 |  |
-| `stripped_pine_log` | 222 |  |
-| `stripped_plum_log` | 220 |  |
-| `stripped_spectral_log` | 830 |  |
-| `super_compressed_messy_stone` | 533 |  |
-| `super_rocket_block` | 581 |  |
-| `tool_bench_side` | 1121 |  |
-| `tool_bench_top` | 1122 |  |
-| `tools_lucky_block` | 1003 |  |
-| `tools_lucky_block_rare` | 1005 |  |
-| `tools_lucky_block_super` | 1007 |  |
-| `toxic_waste` | 25 | 动画（8帧） |
-| `toxic_waste_barrel_bottom` | 1022 |  |
-| `toxic_waste_barrel_side` | 1021 |  |
-| `toxic_waste_barrel_top` | 24 | 动画（4帧） |
-| `toxin_ball_block` | 681 |  |
-| `trading_terminal_front` | 46 | 动画（8帧） |
-| `trading_terminal_side` | 1223 |  |
-| `trading_terminal_top` | 1224 |  |
-| `tree_cutter_back` | 1131 |  |
-| `tree_cutter_back_running` | 37 | 动画（4帧） |
-| `tree_cutter_front` | 1125 |  |
-| `tree_cutter_side` | 1126 |  |
-| `tree_cutter_side_running` | 36 | 动画（4帧） |
-| `tree_cutter_top` | 1127 | 旋转族（4副本） |
-| `ultra_compressed_messy_stone` | 535 |  |
-| `unloaded` | 197 |  |
-| `volt_engine_side` | 1133 |  |
-| `volt_engine_side_running` | 38 | 动画（4帧） |
-| `volt_engine_top` | 1134 |  |
-| `voltite_deposit` | 1132 |  |
-| `voltite_ore` | 1086 |  |
-| `watermelon_side` | 300 |  |
-| `watermelon_top` | 301 |  |
-| `weapon_lucky_block` | 936 |  |
-| `weapon_lucky_block_rare` | 987 |  |
-| `weapon_lucky_block_super` | 989 |  |
-| `white_concrete` | 292 |  |
-| `white_gen_spawn_coal` | 787 |  |
-| `white_gen_spawn_iron` | 788 |  |
-| `white_gen_spawn_top` | 786 |  |
-| `white_glazed_terracotta` | 370 | 旋转族（4副本） |
-| `white_planks` | 354 |  |
-| `white_portal` | 17 | 动画（4帧） |
-| `white_spawn_block_side` | 691 |  |
-| `white_spawn_block_top` | 687 | 旋转族（4副本） |
-| `wire_mill_back` | 1080 |  |
-| `wire_mill_front` | 1074 |  |
-| `wire_mill_side` | 1075 |  |
-| `wire_mill_side_running` | 32 | 动画（4帧） |
-| `wire_mill_top` | 1076 | 旋转族（4副本） |
-| `wool_colored_black` | 261 |  |
-| `wool_colored_blue` | 257 |  |
-| `wool_colored_brown` | 258 |  |
-| `wool_colored_cyan` | 255 |  |
-| `wool_colored_gray` | 253 |  |
-| `wool_colored_green` | 259 |  |
-| `wool_colored_light_blue` | 249 |  |
-| `wool_colored_light_grey` | 254 |  |
-| `wool_colored_lime` | 251 |  |
-| `wool_colored_magenta` | 248 |  |
-| `wool_colored_orange` | 247 |  |
-| `wool_colored_pink` | 252 |  |
-| `wool_colored_purple` | 256 |  |
-| `wool_colored_red` | 260 |  |
-| `wool_colored_white` | 246 |  |
-| `wool_colored_yellow` | 250 |  |
-| `yellow_concrete` | 294 |  |
-| `yellow_gen_spawn_coal` | 781 |  |
-| `yellow_gen_spawn_iron` | 782 |  |
-| `yellow_gen_spawn_top` | 780 |  |
-| `yellow_glazed_terracotta` | 386 | 旋转族（4副本） |
-| `yellow_lucky_block` | 933 |  |
-| `yellow_lucky_block_rare` | 984 |  |
-| `yellow_lucky_block_super` | 985 |  |
-| `yellow_planks` | 358 |  |
-| `yellow_portal` | 18 | 动画（4帧） |
-| `yellow_spawn_block_side` | 686 |  |
-| `yellow_spawn_block_top` | 682 | 旋转族（4副本） |
+| `alloy_kiln_back` | 1413 |  |
+| `alloy_kiln_front` | 1407 |  |
+| `alloy_kiln_side` | 1408 |  |
+| `alloy_kiln_side_running` | 33 | anim (8 frames) |
+| `alloy_kiln_top` | 1409 | rotation family (4 copies) |
+| `andesite_brick` | 786 |  |
+| `apple_block_bottom` | 762 |  |
+| `apple_block_side` | 760 |  |
+| `apple_block_top` | 761 |  |
+| `armour_lucky_block` | 1317 |  |
+| `armour_lucky_block_rare` | 1319 |  |
+| `armour_lucky_block_super` | 1321 |  |
+| `ash` | 1353 |  |
+| `atomic_bench_side` | 1550 |  |
+| `atomic_bench_top` | 1551 |  |
+| `atomic_bomb_side` | 1595 |  |
+| `atomic_bomb_top` | 1596 |  |
+| `atomic_spire` | 1631 |  |
+| `auto_bench_back` | 1428 |  |
+| `auto_bench_front` | 1422 |  |
+| `auto_bench_side` | 1423 |  |
+| `auto_bench_side_running` | 35 | anim (8 frames) |
+| `auto_bench_top` | 1424 | rotation family (4 copies) |
+| `autocrafter_bottom` | 1284 |  |
+| `autocrafter_lunite_bottom` | 1295 |  |
+| `autocrafter_lunite_side` | 1294 |  |
+| `autocrafter_side` | 1282 |  |
+| `banana_block_side` | 1220 |  |
+| `banana_block_top` | 1221 |  |
+| `battery_casing` | 1598 |  |
+| `battery_cell` | 1599 |  |
+| `battery_cell_bottom` | 1601 |  |
+| `battery_cell_running` | 66 | anim (8 frames) |
+| `battery_cell_top` | 1600 |  |
+| `battery_controller_front` | 1597 |  |
+| `battery_controller_front_running` | 65 | anim (8 frames) |
+| `beacon` | 658 |  |
+| `bedrock` | 662 |  |
+| `beetroot_block_bottom` | 1246 |  |
+| `beetroot_block_side` | 1244 |  |
+| `beetroot_block_top` | 1245 |  |
+| `belt_drop_side` | 1507 |  |
+| `belt_drop_top` | 1506 |  |
+| `belt_lift_side` | 1505 |  |
+| `belt_lift_top` | 1504 |  |
+| `belt_loader_slab_front` | 1432 |  |
+| `belt_loader_top` | 1431 |  |
+| `belt_tunnel_back` | 1521 |  |
+| `belt_tunnel_exit_top` | 1522 | rotation family (4 copies) |
+| `belt_tunnel_mouth` | 1515 |  |
+| `belt_tunnel_side` | 1516 |  |
+| `belt_tunnel_top` | 1517 | rotation family (4 copies) |
+| `black_concrete` | 601 |  |
+| `black_glazed_terracotta` | 750 | rotation family (4 copies) |
+| `black_planks` | 689 |  |
+| `black_portal` | 2 | anim (4 frames) |
+| `black_spawn_block_side` | 1081 |  |
+| `black_spawn_block_top` | 1077 | rotation family (4 copies) |
+| `block_destroyer_tnt_side` | 1339 |  |
+| `block_destroyer_tnt_top` | 1340 |  |
+| `blue_concrete` | 602 |  |
+| `blue_gen_spawn_coal` | 1095 |  |
+| `blue_gen_spawn_iron` | 1096 |  |
+| `blue_gen_spawn_top` | 1094 |  |
+| `blue_glazed_terracotta` | 734 | rotation family (4 copies) |
+| `blue_lucky_block` | 1316 |  |
+| `blue_lucky_block_rare` | 1318 |  |
+| `blue_lucky_block_super` | 1320 |  |
+| `blue_planks` | 685 |  |
+| `blue_portal` | 3 | anim (4 frames) |
+| `blue_spawn_block_side` | 1076 |  |
+| `blue_spawn_block_top` | 1072 | rotation family (4 copies) |
+| `bone_block_side` | 1139 |  |
+| `bone_block_top` | 1140 |  |
+| `bookshelf` | 885 |  |
+| `bookshelf_1` | 887 |  |
+| `bookshelf_2` | 888 |  |
+| `bookshelf_3` | 889 |  |
+| `bookshelf_4` | 890 |  |
+| `bookshelf_5` | 891 |  |
+| `bookshelf_empty` | 886 |  |
+| `bouncy_bomb_block` | 912 |  |
+| `bowling_alley_floor` | 1300 |  |
+| `bread_block_back` | 756 |  |
+| `bread_block_front` | 755 |  |
+| `bread_block_side` | 757 |  |
+| `bread_block_top` | 758 |  |
+| `brick` | 643 |  |
+| `brown_concrete` | 603 |  |
+| `brown_glazed_terracotta` | 738 | rotation family (4 copies) |
+| `brown_mushroom_block` | 857 |  |
+| `brown_planks` | 686 |  |
+| `brown_portal` | 4 | anim (4 frames) |
+| `brown_spawn_block_side` | 1071 |  |
+| `brown_spawn_block_top` | 1067 | rotation family (4 copies) |
+| `building_lucky_block` | 1311 |  |
+| `building_lucky_block_rare` | 1313 |  |
+| `building_lucky_block_super` | 1315 |  |
+| `burner_drill_back` | 1370 |  |
+| `burner_drill_bottom` | 1369 |  |
+| `burner_drill_front` | 1363 |  |
+| `burner_drill_side` | 1364 |  |
+| `burner_drill_side_running` | 27 | anim (8 frames) |
+| `burner_drill_top` | 1365 | rotation family (4 copies) |
+| `cactus_dry` | 673 |  |
+| `cactus_top` | 672 |  |
+| `carrot_block_bottom` | 1242 |  |
+| `carrot_block_side` | 1240 |  |
+| `carrot_block_top` | 1241 |  |
+| `carved_messy_stone` | 1148 |  |
+| `carved_pumpkin` | 864 |  |
+| `centrifuge_back` | 1570 |  |
+| `centrifuge_back_running` | 53 | anim (8 frames) |
+| `centrifuge_bottom` | 1569 |  |
+| `centrifuge_side` | 1564 |  |
+| `centrifuge_side_flip` | 1571 |  |
+| `centrifuge_side_flip_running` | 54 | anim (8 frames) |
+| `centrifuge_side_running` | 52 | anim (8 frames) |
+| `centrifuge_top` | 1565 | rotation family (4 copies) |
+| `chalk` | 1160 |  |
+| `chalk_black` | 1176 |  |
+| `chalk_blue` | 1175 |  |
+| `chalk_bricks_black` | 1192 |  |
+| `chalk_bricks_blue` | 1191 |  |
+| `chalk_bricks_brown` | 1190 |  |
+| `chalk_bricks_cyan` | 1189 |  |
+| `chalk_bricks_gray` | 1188 |  |
+| `chalk_bricks_green` | 1187 |  |
+| `chalk_bricks_light_blue` | 1186 |  |
+| `chalk_bricks_light_gray` | 1185 |  |
+| `chalk_bricks_lime` | 1184 |  |
+| `chalk_bricks_magenta` | 1183 |  |
+| `chalk_bricks_orange` | 1182 |  |
+| `chalk_bricks_pink` | 1181 |  |
+| `chalk_bricks_purple` | 1180 |  |
+| `chalk_bricks_red` | 1179 |  |
+| `chalk_bricks_slab_side_black` | 1208 |  |
+| `chalk_bricks_slab_side_blue` | 1207 |  |
+| `chalk_bricks_slab_side_brown` | 1206 |  |
+| `chalk_bricks_slab_side_cyan` | 1205 |  |
+| `chalk_bricks_slab_side_gray` | 1204 |  |
+| `chalk_bricks_slab_side_green` | 1203 |  |
+| `chalk_bricks_slab_side_light_blue` | 1202 |  |
+| `chalk_bricks_slab_side_light_gray` | 1201 |  |
+| `chalk_bricks_slab_side_lime` | 1200 |  |
+| `chalk_bricks_slab_side_magenta` | 1199 |  |
+| `chalk_bricks_slab_side_orange` | 1198 |  |
+| `chalk_bricks_slab_side_pink` | 1197 |  |
+| `chalk_bricks_slab_side_purple` | 1196 |  |
+| `chalk_bricks_slab_side_red` | 1195 |  |
+| `chalk_bricks_slab_side_white` | 1194 |  |
+| `chalk_bricks_slab_side_yellow` | 1193 |  |
+| `chalk_bricks_white` | 1178 |  |
+| `chalk_bricks_yellow` | 1177 |  |
+| `chalk_brown` | 1174 |  |
+| `chalk_cyan` | 1173 |  |
+| `chalk_gray` | 1172 |  |
+| `chalk_green` | 1171 |  |
+| `chalk_light_blue` | 1170 |  |
+| `chalk_light_gray` | 1169 |  |
+| `chalk_lime` | 1168 |  |
+| `chalk_magenta` | 1167 |  |
+| `chalk_orange` | 1166 |  |
+| `chalk_pink` | 1165 |  |
+| `chalk_purple` | 1164 |  |
+| `chalk_red` | 1163 |  |
+| `chalk_white` | 1162 |  |
+| `chalk_yellow` | 1161 |  |
+| `charge_vault_side` | 1436 |  |
+| `charge_vault_top` | 1435 |  |
+| `charging_pad_side` | 1481 |  |
+| `charging_pad_top` | 1480 |  |
+| `checkpoint_block` | 1082 | rotation family (4 copies) |
+| `cherry_block_bottom` | 911 |  |
+| `cherry_block_side` | 909 |  |
+| `cherry_block_top` | 910 |  |
+| `chest_back` | 670 |  |
+| `chest_double_back_hi` | 1541 |  |
+| `chest_double_back_lo` | 1540 |  |
+| `chest_double_front_hi` | 1535 |  |
+| `chest_double_front_lo` | 1534 |  |
+| `chest_double_top_1_hi` | 1537 |  |
+| `chest_double_top_1_lo` | 1536 |  |
+| `chest_double_top_2_hi` | 1539 |  |
+| `chest_double_top_2_lo` | 1538 |  |
+| `chest_front` | 664 |  |
+| `chest_side` | 665 |  |
+| `chest_top` | 666 | rotation family (4 copies) |
+| `chili_pepper_block_bottom` | 999 |  |
+| `chili_pepper_block_side` | 997 |  |
+| `chili_pepper_block_top` | 998 |  |
+| `chiseled_red_sandstone` | 777 |  |
+| `chiseled_sandstone` | 653 |  |
+| `clay` | 523 |  |
+| `coal_block` | 561 |  |
+| `coal_deposit` | 1354 |  |
+| `coal_ore` | 555 |  |
+| `coarse_dirt` | 519 |  |
+| `coconut_block_bottom` | 843 |  |
+| `coconut_block_side` | 841 |  |
+| `coconut_block_top` | 842 |  |
+| `code_block` | 1000 |  |
+| `collider_bottom` | 1607 |  |
+| `collider_side_off` | 1602 |  |
+| `collider_side_running` | 67 | anim (32 frames) |
+| `collider_top` | 1603 | rotation family (4 copies) |
+| `comet_heart` | 1492 |  |
+| `comet_ore` | 1491 |  |
+| `compressed_messy_stone` | 851 |  |
+| `condenser_back` | 1562 |  |
+| `condenser_back_running` | 50 | anim (8 frames) |
+| `condenser_bottom` | 1561 |  |
+| `condenser_side` | 1556 |  |
+| `condenser_side_flip` | 1563 |  |
+| `condenser_side_flip_running` | 51 | anim (8 frames) |
+| `condenser_side_running` | 49 | anim (8 frames) |
+| `condenser_top` | 1557 | rotation family (4 copies) |
+| `conveyor_belt_bottom` | 1403 |  |
+| `conveyor_belt_slab_side` | 1402 |  |
+| `conveyor_belt_top` | 1401 |  |
+| `conveyor_belt_turn_left` | 1493 |  |
+| `conveyor_belt_turn_right` | 1494 |  |
+| `coolant_channel` | 64 | anim (8 frames) |
+| `coolant_mixer_back` | 1640 |  |
+| `coolant_mixer_back_running` | 69 | anim (8 frames) |
+| `coolant_mixer_bottom` | 1639 |  |
+| `coolant_mixer_side` | 1634 |  |
+| `coolant_mixer_side_flip` | 1641 |  |
+| `coolant_mixer_side_flip_running` | 70 | anim (8 frames) |
+| `coolant_mixer_side_running` | 68 | anim (8 frames) |
+| `coolant_mixer_top` | 1635 | rotation family (4 copies) |
+| `copper_block` | 1647 |  |
+| `copper_deposit` | 1357 |  |
+| `copper_ore` | 1362 |  |
+| `corn_block_bottom` | 915 |  |
+| `corn_block_side` | 913 |  |
+| `corn_block_top` | 914 |  |
+| `crafting_table_top` | 1283 |  |
+| `crate` | 1239 |  |
+| `crop_harvester_back` | 1514 |  |
+| `crop_harvester_back_running` | 45 | anim (4 frames) |
+| `crop_harvester_front` | 1508 |  |
+| `crop_harvester_side` | 1509 |  |
+| `crop_harvester_side_running` | 44 | anim (4 frames) |
+| `crop_harvester_top` | 1510 | rotation family (4 copies) |
+| `crusher_back` | 1377 |  |
+| `crusher_front` | 1371 |  |
+| `crusher_side` | 1372 |  |
+| `crusher_side_running` | 28 | anim (4 frames) |
+| `crusher_top` | 1373 | rotation family (4 copies) |
+| `crystal_block` | 1351 |  |
+| `crystal_vat_back` | 1488 |  |
+| `crystal_vat_front` | 1482 |  |
+| `crystal_vat_side` | 1483 |  |
+| `crystal_vat_side_running` | 42 | anim (8 frames) |
+| `crystal_vat_top` | 1484 | rotation family (4 copies) |
+| `custom_lobby_block_side` | 1090 |  |
+| `custom_lobby_block_top` | 1086 | rotation family (4 copies) |
+| `cut_red_sandstone` | 778 |  |
+| `cut_sandstone` | 774 |  |
+| `cyan_concrete` | 604 |  |
+| `cyan_gen_spawn_coal` | 1104 |  |
+| `cyan_gen_spawn_iron` | 1105 |  |
+| `cyan_gen_spawn_top` | 1103 |  |
+| `cyan_glazed_terracotta` | 726 | rotation family (4 copies) |
+| `cyan_planks` | 683 |  |
+| `cyan_portal` | 5 | anim (4 frames) |
+| `cyan_spawn_block_side` | 1066 |  |
+| `cyan_spawn_block_top` | 1062 | rotation family (4 copies) |
+| `dark_green_bricks` | 781 |  |
+| `darkstone` | 1528 |  |
+| `darkstone_bricks` | 1529 |  |
+| `darkstone_bricks_cracked` | 1530 |  |
+| `darkstone_bricks_lava` | 1531 |  |
+| `darkstone_engraved` | 1532 |  |
+| `darkstone_smooth` | 1533 |  |
+| `deep_drill_back` | 1462 |  |
+| `deep_drill_bottom` | 1461 |  |
+| `deep_drill_front` | 1455 |  |
+| `deep_drill_side` | 1456 |  |
+| `deep_drill_side_running` | 39 | anim (8 frames) |
+| `deep_drill_top` | 1457 | rotation family (4 copies) |
+| `dense_silo_side` | 1618 |  |
+| `dense_silo_top` | 1617 |  |
+| `diamond_block` | 663 |  |
+| `diamond_gen_spawn_side` | 1128 |  |
+| `diamond_gen_spawn_top` | 1127 |  |
+| `diamond_ore` | 560 |  |
+| `diorite_brick` | 784 |  |
+| `dirt` | 518 |  |
+| `drop_location_block_side` | 1135 |  |
+| `drop_location_block_top` | 1134 |  |
+| `drop_pad` | 1360 |  |
+| `dry_grass_block` | 1302 |  |
+| `dry_grass_block_side` | 1301 |  |
+| `electric_drill_back` | 1421 |  |
+| `electric_drill_bottom` | 1420 |  |
+| `electric_drill_front` | 1414 |  |
+| `electric_drill_side` | 1415 |  |
+| `electric_drill_side_running` | 34 | anim (8 frames) |
+| `electric_drill_top` | 1416 | rotation family (4 copies) |
+| `emerald_block` | 565 |  |
+| `emerald_ore` | 559 |  |
+| `end_stone` | 554 |  |
+| `engraved_andesite` | 785 |  |
+| `engraved_diorite` | 783 |  |
+| `engraved_granite` | 787 |  |
+| `evil_lucky_block` | 1344 |  |
+| `evil_lucky_block_face` | 1345 |  |
+| `explosive_paint_black_side` | 947 |  |
+| `explosive_paint_black_top` | 948 |  |
+| `explosive_paint_blue_side` | 945 |  |
+| `explosive_paint_blue_top` | 946 |  |
+| `explosive_paint_brown_side` | 943 |  |
+| `explosive_paint_brown_top` | 944 |  |
+| `explosive_paint_cyan_side` | 941 |  |
+| `explosive_paint_cyan_top` | 942 |  |
+| `explosive_paint_gray_side` | 939 |  |
+| `explosive_paint_gray_top` | 940 |  |
+| `explosive_paint_green_side` | 937 |  |
+| `explosive_paint_green_top` | 938 |  |
+| `explosive_paint_light_blue_side` | 935 |  |
+| `explosive_paint_light_blue_top` | 936 |  |
+| `explosive_paint_light_gray_side` | 933 |  |
+| `explosive_paint_light_gray_top` | 934 |  |
+| `explosive_paint_lime_side` | 931 |  |
+| `explosive_paint_lime_top` | 932 |  |
+| `explosive_paint_magenta_side` | 929 |  |
+| `explosive_paint_magenta_top` | 930 |  |
+| `explosive_paint_orange_side` | 927 |  |
+| `explosive_paint_orange_top` | 928 |  |
+| `explosive_paint_pink_side` | 925 |  |
+| `explosive_paint_pink_top` | 926 |  |
+| `explosive_paint_purple_side` | 923 |  |
+| `explosive_paint_purple_top` | 924 |  |
+| `explosive_paint_quick_black` | 964 |  |
+| `explosive_paint_quick_blue` | 963 |  |
+| `explosive_paint_quick_brown` | 962 |  |
+| `explosive_paint_quick_cyan` | 961 |  |
+| `explosive_paint_quick_gray` | 960 |  |
+| `explosive_paint_quick_green` | 959 |  |
+| `explosive_paint_quick_light_blue` | 958 |  |
+| `explosive_paint_quick_light_gray` | 957 |  |
+| `explosive_paint_quick_lime` | 956 |  |
+| `explosive_paint_quick_magenta` | 955 |  |
+| `explosive_paint_quick_orange` | 954 |  |
+| `explosive_paint_quick_pink` | 953 |  |
+| `explosive_paint_quick_purple` | 952 |  |
+| `explosive_paint_quick_red` | 951 |  |
+| `explosive_paint_quick_white` | 950 |  |
+| `explosive_paint_quick_yellow` | 949 |  |
+| `explosive_paint_red_side` | 921 |  |
+| `explosive_paint_red_top` | 922 |  |
+| `explosive_paint_seeking_black` | 980 |  |
+| `explosive_paint_seeking_blue` | 979 |  |
+| `explosive_paint_seeking_brown` | 978 |  |
+| `explosive_paint_seeking_cyan` | 977 |  |
+| `explosive_paint_seeking_gray` | 976 |  |
+| `explosive_paint_seeking_green` | 975 |  |
+| `explosive_paint_seeking_light_blue` | 974 |  |
+| `explosive_paint_seeking_light_gray` | 973 |  |
+| `explosive_paint_seeking_lime` | 972 |  |
+| `explosive_paint_seeking_magenta` | 971 |  |
+| `explosive_paint_seeking_orange` | 970 |  |
+| `explosive_paint_seeking_pink` | 969 |  |
+| `explosive_paint_seeking_purple` | 968 |  |
+| `explosive_paint_seeking_red` | 967 |  |
+| `explosive_paint_seeking_white` | 966 |  |
+| `explosive_paint_seeking_yellow` | 965 |  |
+| `explosive_paint_sticky_black` | 996 |  |
+| `explosive_paint_sticky_blue` | 995 |  |
+| `explosive_paint_sticky_brown` | 994 |  |
+| `explosive_paint_sticky_cyan` | 993 |  |
+| `explosive_paint_sticky_gray` | 992 |  |
+| `explosive_paint_sticky_green` | 991 |  |
+| `explosive_paint_sticky_light_blue` | 990 |  |
+| `explosive_paint_sticky_light_gray` | 989 |  |
+| `explosive_paint_sticky_lime` | 988 |  |
+| `explosive_paint_sticky_magenta` | 987 |  |
+| `explosive_paint_sticky_orange` | 986 |  |
+| `explosive_paint_sticky_pink` | 985 |  |
+| `explosive_paint_sticky_purple` | 984 |  |
+| `explosive_paint_sticky_red` | 983 |  |
+| `explosive_paint_sticky_white` | 982 |  |
+| `explosive_paint_sticky_yellow` | 981 |  |
+| `explosive_paint_white_side` | 919 |  |
+| `explosive_paint_white_top` | 920 |  |
+| `explosive_paint_yellow_side` | 917 |  |
+| `explosive_paint_yellow_top` | 918 |  |
+| `express_belt_slab_side` | 1620 |  |
+| `express_belt_top` | 1619 |  |
+| `express_belt_turn_left` | 1621 |  |
+| `express_belt_turn_right` | 1622 |  |
+| `extra_compressed_messy_stone` | 852 |  |
+| `fallen_cherry_leaves_side` | 907 |  |
+| `fallen_maple_leaves_side` | 799 |  |
+| `farmland` | 754 |  |
+| `fast_belt_slab_side` | 1479 |  |
+| `fast_belt_top` | 1478 |  |
+| `fast_belt_turn_left` | 1495 |  |
+| `fast_belt_turn_right` | 1496 |  |
+| `fast_loader_slab_front` | 1624 |  |
+| `fast_loader_top` | 1623 |  |
+| `fertilised_soil` | 1247 |  |
+| `finish_block` | 1133 |  |
+| `fireball_block` | 860 |  |
+| `fluid_tank` | 1587 |  |
+| `fluid_tank_fill1` | 71 | anim (8 frames) |
+| `fluid_tank_fill2` | 72 | anim (8 frames) |
+| `fluid_tank_fill3` | 73 | anim (8 frames) |
+| `fluid_tank_fill4` | 74 | anim (8 frames) |
+| `food_lucky_block` | 1329 |  |
+| `food_lucky_block_rare` | 1331 |  |
+| `food_lucky_block_super` | 1333 |  |
+| `forge_hopper_top` | 1490 |  |
+| `fuel_port` | 1591 |  |
+| `fuel_rod` | 63 | anim (8 frames) |
+| `generator_side` | 1385 |  |
+| `generator_side_running` | 30 | anim (8 frames) |
+| `generator_top` | 1386 |  |
+| `ghost_chest_back` | 1277 |  |
+| `ghost_chest_front` | 1274 |  |
+| `ghost_chest_side` | 1275 |  |
+| `ghost_chest_top` | 1276 |  |
+| `ghost_lucky_block` | 1278 |  |
+| `ghost_mystery_block` | 1279 |  |
+| `glass` | 622 |  |
+| `glass_black` | 623 |  |
+| `glass_blue` | 624 |  |
+| `glass_brown` | 625 |  |
+| `glass_cyan` | 626 |  |
+| `glass_gray` | 627 |  |
+| `glass_green` | 629 |  |
+| `glass_light_blue` | 630 |  |
+| `glass_light_gray` | 628 |  |
+| `glass_lime` | 631 |  |
+| `glass_magenta` | 632 |  |
+| `glass_orange` | 633 |  |
+| `glass_pink` | 634 |  |
+| `glass_purple` | 635 |  |
+| `glass_red` | 636 |  |
+| `glass_silver` | 639 |  |
+| `glass_white` | 637 |  |
+| `glass_yellow` | 638 |  |
+| `glow_lamp` | 1629 |  |
+| `glowstone` | 659 |  |
+| `gold_block` | 563 |  |
+| `gold_deposit` | 1358 |  |
+| `gold_ore` | 557 |  |
+| `granite_brick` | 788 |  |
+| `graphite` | 1593 |  |
+| `graphite_block` | 1593 |  |
+| `grass_block_side` | 520 |  |
+| `grass_top` | 521 |  |
+| `gravel` | 524 |  |
+| `gray_concrete` | 599 |  |
+| `gray_gen_spawn_coal` | 1113 |  |
+| `gray_gen_spawn_iron` | 1114 |  |
+| `gray_gen_spawn_top` | 1112 |  |
+| `gray_glazed_terracotta` | 718 | rotation family (4 copies) |
+| `gray_planks` | 681 |  |
+| `gray_portal` | 6 | anim (4 frames) |
+| `gray_spawn_block_side` | 1061 |  |
+| `gray_spawn_block_top` | 1057 | rotation family (4 copies) |
+| `green_bricks` | 780 |  |
+| `green_concrete` | 613 |  |
+| `green_glazed_terracotta` | 742 | rotation family (4 copies) |
+| `green_lucky_block` | 1328 |  |
+| `green_lucky_block_rare` | 1330 |  |
+| `green_lucky_block_super` | 1332 |  |
+| `green_planks` | 687 |  |
+| `green_portal` | 7 | anim (4 frames) |
+| `green_spawn_block_side` | 1056 |  |
+| `green_spawn_block_top` | 1052 | rotation family (4 copies) |
+| `green_stone` | 779 |  |
+| `grenade_block` | 902 |  |
+| `grey_portal` | 8 | anim (4 frames) |
+| `gun_lucky_block` | 1273 |  |
+| `hardened_clay` | 582 |  |
+| `hardened_clay_stained_black` | 598 |  |
+| `hardened_clay_stained_blue` | 594 |  |
+| `hardened_clay_stained_brown` | 595 |  |
+| `hardened_clay_stained_cyan` | 592 |  |
+| `hardened_clay_stained_gray` | 590 |  |
+| `hardened_clay_stained_green` | 596 |  |
+| `hardened_clay_stained_light_blue` | 586 |  |
+| `hardened_clay_stained_lime` | 588 |  |
+| `hardened_clay_stained_magenta` | 585 |  |
+| `hardened_clay_stained_orange` | 584 |  |
+| `hardened_clay_stained_pink` | 589 |  |
+| `hardened_clay_stained_purple` | 593 |  |
+| `hardened_clay_stained_red` | 597 |  |
+| `hardened_clay_stained_silver` | 591 |  |
+| `hardened_clay_stained_white` | 583 |  |
+| `hardened_clay_stained_yellow` | 587 |  |
+| `harvester_bottom` | 1291 |  |
+| `harvester_lunite_bottom` | 1299 |  |
+| `harvester_lunite_side_0` | 1296 |  |
+| `harvester_lunite_side_1` | 1297 |  |
+| `harvester_lunite_top` | 1298 |  |
+| `harvester_side0` | 1288 |  |
+| `harvester_side1` | 1289 |  |
+| `harvester_top` | 1290 |  |
+| `hay_block_side` | 656 |  |
+| `hay_block_top` | 1547 |  |
+| `homestead_core` | 1359 |  |
+| `homestead_core_cap` | 1444 |  |
+| `homestead_core_crown` | 1443 |  |
+| `homestead_core_mid` | 26 | anim (8 frames) |
+| `hyper_compressed_messy_stone` | 854 |  |
+| `ice` | 654 |  |
+| `ice_brick` | 789 |  |
+| `iceball_block` | 861 |  |
+| `invisible_solid` | 642 |  |
+| `iron_block` | 562 |  |
+| `iron_chest_back` | 1238 |  |
+| `iron_chest_front` | 1232 |  |
+| `iron_chest_side` | 1233 |  |
+| `iron_chest_top` | 1234 | rotation family (4 copies) |
+| `iron_deposit` | 1355 |  |
+| `iron_ore` | 556 |  |
+| `iron_watermelon_side` | 867 |  |
+| `iron_watermelon_top` | 868 |  |
+| `isotope_comet_heart` | 1633 |  |
+| `isotope_comet_ore` | 1632 |  |
+| `jetpack_back` | 1630 |  |
+| `jungle_grass_block` | 1210 |  |
+| `jungle_grass_block_side` | 1209 |  |
+| `lapis_block` | 564 |  |
+| `lapis_ore` | 558 |  |
+| `laser_back` | 1610 |  |
+| `laser_front` | 1608 |  |
+| `laser_side` | 1609 |  |
+| `lava` | 1 | anim (16 frames) |
+| `leather_block_side` | 1229 |  |
+| `leather_block_top` | 1230 |  |
+| `leaves_aspen` | 616 |  |
+| `leaves_aspen_autumn` | 1231 |  |
+| `leaves_cedar` | 791 |  |
+| `leaves_cherry` | 1,017 |  |
+| `leaves_cherry_fruity` | 1650 |  |
+| `leaves_jungle` | 618 |  |
+| `leaves_mango` | 1215 |  |
+| `leaves_mango_fruity` | 1228 |  |
+| `leaves_maple` | 617 |  |
+| `leaves_maple_autumn` | 798 |  |
+| `leaves_maple_fruity` | 1222 |  |
+| `leaves_palm` | 792 |  |
+| `leaves_palm_fruity` | 1225 |  |
+| `leaves_pear` | 846 |  |
+| `leaves_pear_fruity` | 1226 |  |
+| `leaves_pine` | 615 |  |
+| `leaves_pine_cone` | 1223 |  |
+| `leaves_plum` | 790 |  |
+| `leaves_plum_fruity` | 1224 |  |
+| `leaves_spectral` | 1152 |  |
+| `light_blue_concrete` | 605 |  |
+| `light_blue_glazed_terracotta` | 702 | rotation family (4 copies) |
+| `light_blue_lucky_block` | 1254 |  |
+| `light_blue_planks` | 677 |  |
+| `light_blue_spawn_block_side` | 1051 |  |
+| `light_blue_spawn_block_top` | 1047 | rotation family (4 copies) |
+| `light_gray_concrete` | 600 |  |
+| `light_gray_glazed_terracotta` | 722 | rotation family (4 copies) |
+| `light_gray_planks` | 682 |  |
+| `light_gray_spawn_block_side` | 1046 |  |
+| `light_gray_spawn_block_top` | 1042 | rotation family (4 copies) |
+| `lightblue_portal` | 9 | anim (4 frames) |
+| `lightgray_portal` | 10 | anim (4 frames) |
+| `lime_concrete` | 606 |  |
+| `lime_gen_spawn_coal` | 1098 |  |
+| `lime_gen_spawn_iron` | 1099 |  |
+| `lime_gen_spawn_top` | 1097 |  |
+| `lime_glazed_terracotta` | 710 | rotation family (4 copies) |
+| `lime_planks` | 679 |  |
+| `lime_portal` | 11 | anim (4 frames) |
+| `lime_spawn_block_side` | 1041 |  |
+| `lime_spawn_block_top` | 1037 | rotation family (4 copies) |
+| `log_ancient_maple` | 1343 |  |
+| `log_aspen` | 530 |  |
+| `log_cedar` | 529 |  |
+| `log_cherry` | 903 |  |
+| `log_jungle` | 531 |  |
+| `log_mango` | 1212 |  |
+| `log_maple` | 526 |  |
+| `log_palm` | 793 |  |
+| `log_pear` | 844 |  |
+| `log_pine` | 527 |  |
+| `log_plum` | 528 |  |
+| `log_spectral` | 1149 |  |
+| `lucky_block_pink_question` | 1280 |  |
+| `lucky_block_pink_question_rare` | 1335 |  |
+| `lucky_block_pink_question_super` | 1337 |  |
+| `lunite_block` | 1293 |  |
+| `lunite_ore` | 1292 |  |
+| `machine_bench_side` | 1437 |  |
+| `machine_bench_top` | 1438 |  |
+| `machine_side` | 1361 |  |
+| `magenta_concrete` | 607 |  |
+| `magenta_glazed_terracotta` | 698 | rotation family (4 copies) |
+| `magenta_planks` | 676 |  |
+| `magenta_portal` | 12 | anim (4 frames) |
+| `magenta_spawn_block_side` | 1036 |  |
+| `magenta_spawn_block_top` | 1032 | rotation family (4 copies) |
+| `magma` | 772 |  |
+| `mailbox_front` | 892 |  |
+| `mailbox_front_full` | 894 |  |
+| `mailbox_side` | 893 |  |
+| `mango_block_bottom` | 1219 |  |
+| `mango_block_side` | 1217 |  |
+| `mango_block_top` | 1218 |  |
+| `mega_compressed_messy_stone` | 856 |  |
+| `melon_side` | 865 |  |
+| `melon_top` | 866 |  |
+| `melting_ice` | 916 |  |
+| `messy_stone` | 544 |  |
+| `mob_farm_back` | 1586 |  |
+| `mob_farm_front` | 1580 |  |
+| `mob_farm_side` | 1581 |  |
+| `mob_farm_side_running` | 58 | anim (8 frames) |
+| `mob_farm_top` | 1582 | rotation family (4 copies) |
+| `mob_spawner_block_empty_side` | 1144 |  |
+| `mob_spawner_block_top` | 1142 |  |
+| `mob_spawner_hostile_block_side` | 1143 |  |
+| `mob_spawner_neutral_block_side` | 1159 |  |
+| `mob_spawner_passive_block_side` | 1141 |  |
+| `moonstone_block` | 771 |  |
+| `moonstone_chest_back` | 770 |  |
+| `moonstone_chest_front` | 764 |  |
+| `moonstone_chest_side` | 765 |  |
+| `moonstone_chest_top` | 766 | rotation family (4 copies) |
+| `moonstone_explosive_side` | 660 |  |
+| `moonstone_explosive_top` | 661 |  |
+| `moonstone_gen_spawn_side` | 1130 |  |
+| `moonstone_gen_spawn_top` | 1129 |  |
+| `moonstone_ore` | 763 |  |
+| `mossy_cobblestone` | 759 |  |
+| `mushroom_stem` | 859 |  |
+| `mystery_block` | 899 |  |
+| `neon_black` | 1272 |  |
+| `neon_blue` | 1271 |  |
+| `neon_brown` | 1270 |  |
+| `neon_cyan` | 1269 |  |
+| `neon_gray` | 1268 |  |
+| `neon_green` | 1267 |  |
+| `neon_light_blue` | 1266 |  |
+| `neon_light_gray` | 1265 |  |
+| `neon_lime` | 1264 |  |
+| `neon_magenta` | 1263 |  |
+| `neon_orange` | 1262 |  |
+| `neon_pink` | 1261 |  |
+| `neon_purple` | 1260 |  |
+| `neon_red` | 1259 |  |
+| `neon_white` | 1258 |  |
+| `neon_yellow` | 1257 |  |
+| `nether_brick` | 645 |  |
+| `netherrack` | 646 |  |
+| `nova_bomb_side` | 1649 |  |
+| `nova_bomb_top` | 1650 |  |
+| `obby_absorb_block` | 1137 |  |
+| `obby_absorb_death_block` | 1138 |  |
+| `obby_death_block` | 1136 |  |
+| `obsidian` | 655 |  |
+| `orange_concrete` | 608 |  |
+| `orange_glazed_terracotta` | 694 | rotation family (4 copies) |
+| `orange_lucky_block` | 1322 |  |
+| `orange_lucky_block_rare` | 1324 |  |
+| `orange_lucky_block_super` | 1326 |  |
+| `orange_planks` | 675 |  |
+| `orange_portal` | 13 | anim (4 frames) |
+| `orange_spawn_block_side` | 1031 |  |
+| `orange_spawn_block_top` | 1027 | rotation family (4 copies) |
+| `ore_gen_spawn_side` | 1132 |  |
+| `ore_gen_spawn_top` | 1131 |  |
+| `output` | 1555 |  |
+| `packed_snow` | 1147 |  |
+| `parts_bench_side` | 1439 |  |
+| `parts_bench_top` | 1440 |  |
+| `patterned_glass_black` | 869 |  |
+| `patterned_glass_blue` | 870 |  |
+| `patterned_glass_brown` | 871 |  |
+| `patterned_glass_cyan` | 872 |  |
+| `patterned_glass_gray` | 873 |  |
+| `patterned_glass_green` | 875 |  |
+| `patterned_glass_light_blue` | 876 |  |
+| `patterned_glass_light_gray` | 874 |  |
+| `patterned_glass_lime` | 877 |  |
+| `patterned_glass_magenta` | 878 |  |
+| `patterned_glass_orange` | 879 |  |
+| `patterned_glass_pink` | 880 |  |
+| `patterned_glass_purple` | 881 |  |
+| `patterned_glass_red` | 882 |  |
+| `patterned_glass_white` | 883 |  |
+| `patterned_glass_yellow` | 884 |  |
+| `pear_block_bottom` | 850 |  |
+| `pear_block_side` | 848 |  |
+| `pear_block_top` | 849 |  |
+| `pet_lucky_block` | 1281 |  |
+| `pine_cone_block_side` | 1157 |  |
+| `pine_cone_block_top` | 1158 |  |
+| `pine_grass_block` | 1155 |  |
+| `pine_grass_block_side` | 1154 |  |
+| `pink_concrete` | 609 |  |
+| `pink_gen_spawn_coal` | 1110 |  |
+| `pink_gen_spawn_iron` | 1111 |  |
+| `pink_gen_spawn_top` | 1109 |  |
+| `pink_glazed_terracotta` | 714 | rotation family (4 copies) |
+| `pink_planks` | 680 |  |
+| `pink_portal` | 14 | anim (4 frames) |
+| `pink_spawn_block_side` | 1026 |  |
+| `pink_spawn_block_top` | 1022 | rotation family (4 copies) |
+| `planks_aspen` | 533 |  |
+| `planks_cedar` | 537 |  |
+| `planks_cherry` | 905 |  |
+| `planks_jungle` | 535 |  |
+| `planks_mango` | 1214 |  |
+| `planks_maple` | 532 |  |
+| `planks_palm` | 794 |  |
+| `planks_pear` | 845 |  |
+| `planks_pine` | 536 |  |
+| `planks_plum` | 534 |  |
+| `planks_spectral` | 1151 |  |
+| `plum_block_bottom` | 840 |  |
+| `plum_block_side` | 838 |  |
+| `plum_block_top` | 839 |  |
+| `podzol_top` | 773 |  |
+| `potato_block` | 1243 |  |
+| `potion_lucky_block` | 1334 |  |
+| `potion_lucky_block_rare` | 1336 |  |
+| `potion_lucky_block_super` | 1338 |  |
+| `press_back` | 1393 |  |
+| `press_front` | 1387 |  |
+| `press_side` | 1388 |  |
+| `press_side_running` | 31 | anim (4 frames) |
+| `press_top` | 1389 | rotation family (4 copies) |
+| `protector` | 671 |  |
+| `protector_faction` | 896 |  |
+| `protector_tribe` | 895 |  |
+| `pump_bottom` | 1554 |  |
+| `pump_side` | 1552 |  |
+| `pump_side_running` | 48 | anim (8 frames) |
+| `pump_top` | 1553 |  |
+| `pumpkin_face_on` | 619 |  |
+| `pumpkin_side` | 862 |  |
+| `pumpkin_top` | 863 |  |
+| `pure_coal_ore` | 1346 |  |
+| `pure_copper_ore` | 1526 |  |
+| `pure_diamond_ore` | 1349 |  |
+| `pure_gold_ore` | 1348 |  |
+| `pure_iron_ore` | 1347 |  |
+| `pure_moonstone_ore` | 1350 |  |
+| `pure_uranium_ore` | 1646 |  |
+| `pure_voltite_ore` | 1527 |  |
+| `purple_concrete` | 610 |  |
+| `purple_glazed_terracotta` | 730 | rotation family (4 copies) |
+| `purple_lucky_block` | 1310 |  |
+| `purple_lucky_block_rare` | 1312 |  |
+| `purple_lucky_block_super` | 1314 |  |
+| `purple_planks` | 684 |  |
+| `purple_portal` | 15 | anim (4 frames) |
+| `purple_spawn_block_side` | 1021 |  |
+| `purple_spawn_block_top` | 1017 | rotation family (4 copies) |
+| `quartz_block_chiseled` | 648 |  |
+| `quartz_block_side` | 647 |  |
+| `radar_bottom` | 1250 |  |
+| `radar_screen` | 19 | anim (8 frames); rotation family (4 copies) |
+| `radar_side_active` | 1248 |  |
+| `radar_side_inactive` | 1251 |  |
+| `radar_top_active` | 1249 |  |
+| `radar_top_inactive` | 1252 |  |
+| `reactor_base` | 1642 |  |
+| `reactor_base_top` | 1643 |  |
+| `reactor_casing` | 1589 |  |
+| `reactor_controller_green` | 59 | anim (4 frames) |
+| `reactor_controller_orange` | 61 | anim (4 frames) |
+| `reactor_controller_red` | 62 | anim (4 frames) |
+| `reactor_controller_yellow` | 60 | anim (4 frames) |
+| `reactor_frame` | 1588 |  |
+| `reactor_glass` | 1590 |  |
+| `reactor_slag` | 1594 |  |
+| `recycler_back` | 1503 |  |
+| `recycler_front` | 1497 |  |
+| `recycler_side` | 1498 |  |
+| `recycler_side_running` | 43 | anim (8 frames) |
+| `recycler_top` | 1499 | rotation family (4 copies) |
+| `red_concrete` | 611 |  |
+| `red_gen_spawn_coal` | 1092 |  |
+| `red_gen_spawn_iron` | 1093 |  |
+| `red_gen_spawn_top` | 1091 |  |
+| `red_glazed_terracotta` | 746 | rotation family (4 copies) |
+| `red_lucky_block` | 1255 |  |
+| `red_lucky_block_rare` | 1306 |  |
+| `red_lucky_block_super` | 1308 |  |
+| `red_mushroom_block` | 858 |  |
+| `red_planks` | 688 |  |
+| `red_portal` | 16 | anim (4 frames) |
+| `red_sand` | 795 |  |
+| `red_sandstone` | 775 |  |
+| `red_sandstone_brick` | 796 |  |
+| `red_sandstone_top` | 776 |  |
+| `red_spawn_block_side` | 1016 |  |
+| `red_spawn_block_top` | 1012 | rotation family (4 copies) |
+| `redstone_lamp_off` | 641 |  |
+| `redstone_lamp_on` | 640 |  |
+| `rocket_block` | 900 |  |
+| `rocky_dirt` | 797 |  |
+| `rope_block` | 1352 |  |
+| `sand` | 522 |  |
+| `sandstone_brick` | 782 |  |
+| `sandstone_normal` | 553 |  |
+| `sandstone_top` | 652 |  |
+| `scaffolding` | 1644 |  |
+| `scorpion_eggs` | 1542 |  |
+| `shatter_mill_back` | 1469 |  |
+| `shatter_mill_front` | 1463 |  |
+| `shatter_mill_side` | 1464 |  |
+| `shatter_mill_side_running` | 40 | anim (4 frames) |
+| `shatter_mill_top` | 1465 | rotation family (4 copies) |
+| `shop_trader_spawn_face` | 1120 |  |
+| `shop_trader_spawn_side` | 1119 |  |
+| `shop_trader_spawn_top` | 1115 | rotation family (4 copies) |
+| `shop_wizard_spawn_face` | 1126 |  |
+| `shop_wizard_spawn_side` | 1125 |  |
+| `shop_wizard_spawn_top` | 1121 | rotation family (4 copies) |
+| `sky_spring` | 47 | anim (8 frames) |
+| `sky_tap_back` | 1477 |  |
+| `sky_tap_bottom` | 1476 |  |
+| `sky_tap_front` | 1470 |  |
+| `sky_tap_side` | 1471 |  |
+| `sky_tap_side_running` | 41 | anim (8 frames) |
+| `sky_tap_top` | 1472 | rotation family (4 copies) |
+| `slab_andesite_brick_side` | 819 |  |
+| `slab_aspen_side` | 804 |  |
+| `slab_brick_side` | 836 |  |
+| `slab_cedar_side` | 803 |  |
+| `slab_cherry_side` | 908 |  |
+| `slab_chiseled_red_sandstone_side` | 833 |  |
+| `slab_chiseled_sandstone_side` | 829 |  |
+| `slab_cobblestone_side` | 809 |  |
+| `slab_cut_red_sandstone_side` | 834 |  |
+| `slab_cut_sandstone_side` | 830 |  |
+| `slab_diorite_brick_side` | 823 |  |
+| `slab_dirt_side` | 807 |  |
+| `slab_dry_grass_top_side` | 1303 |  |
+| `slab_engraved_andesite_side` | 818 |  |
+| `slab_engraved_diorite_side` | 822 |  |
+| `slab_engraved_granite_side` | 826 |  |
+| `slab_granite_brick_side` | 827 |  |
+| `slab_grass_top_side` | 808 |  |
+| `slab_ice_brick_side` | 837 |  |
+| `slab_jungle_grass_top_side` | 1211 |  |
+| `slab_jungle_side` | 805 |  |
+| `slab_mango_side` | 1216 |  |
+| `slab_maple_side` | 800 |  |
+| `slab_mossy_cobblestone_side` | 814 |  |
+| `slab_palm_side` | 806 |  |
+| `slab_pear_side` | 847 |  |
+| `slab_pine_grass_top_side` | 1156 |  |
+| `slab_pine_side` | 801 |  |
+| `slab_plum_side` | 802 |  |
+| `slab_red_sandstone_brick_side` | 835 |  |
+| `slab_red_sandstone_side` | 832 |  |
+| `slab_sandstone_brick_side` | 831 |  |
+| `slab_sandstone_normal_side` | 828 |  |
+| `slab_smooth_stone_side` | 811 |  |
+| `slab_spectral_side` | 1153 |  |
+| `slab_stone_andesite_side` | 816 |  |
+| `slab_stone_andesite_smooth_side` | 817 |  |
+| `slab_stone_diorite_side` | 820 |  |
+| `slab_stone_diorite_smooth_side` | 821 |  |
+| `slab_stone_granite_side` | 824 |  |
+| `slab_stone_granite_smooth_side` | 825 |  |
+| `slab_stone_side` | 810 |  |
+| `slab_stonebrick_carved_side` | 812 |  |
+| `slab_stonebrick_mossy_side` | 815 |  |
+| `slab_stonebrick_side` | 813 |  |
+| `smelter_back` | 1384 |  |
+| `smelter_front` | 1378 |  |
+| `smelter_side` | 1379 |  |
+| `smelter_side_running` | 29 | anim (8 frames) |
+| `smelter_top` | 1380 | rotation family (4 copies) |
+| `smoke` | 23 | anim (8 frames) |
+| `smooth_stone` | 546 |  |
+| `snow` | 525 |  |
+| `snowy_messy_stone` | 1145 |  |
+| `snowy_messy_stone_side` | 1146 |  |
+| `solar_panel_bottom` | 1287 |  |
+| `solar_panel_side` | 1285 |  |
+| `solar_panel_top` | 1286 |  |
+| `sorting_gate_slab_side` | 1430 |  |
+| `sorting_gate_top` | 1429 |  |
+| `sorting_gate_top_right` | 1627 |  |
+| `splitter_slab_side` | 1405 |  |
+| `splitter_top` | 1404 |  |
+| `splitter_top_front_right` | 1626 |  |
+| `splitter_top_left_front` | 1625 |  |
+| `sponge` | 657 |  |
+| `starframe` | 1489 |  |
+| `stone` | 545 |  |
+| `stone_andesite` | 549 |  |
+| `stone_andesite_smooth` | 550 |  |
+| `stone_deposit` | 1356 |  |
+| `stone_diorite` | 547 |  |
+| `stone_diorite_smooth` | 548 |  |
+| `stone_generator_side` | 1545 |  |
+| `stone_generator_top` | 1546 |  |
+| `stone_granite` | 551 |  |
+| `stone_granite_smooth` | 552 |  |
+| `stonebrick` | 644 |  |
+| `stonebrick_carved` | 649 |  |
+| `stonebrick_cracked` | 651 |  |
+| `stonebrick_mossy` | 650 |  |
+| `storage_silo_side` | 1434 |  |
+| `storage_silo_top` | 1433 |  |
+| `stripped_aspen_log` | 539 |  |
+| `stripped_cedar_log` | 543 |  |
+| `stripped_cherry_log` | 904 |  |
+| `stripped_jungle_log` | 541 |  |
+| `stripped_mango_log` | 1213 |  |
+| `stripped_maple_log` | 538 |  |
+| `stripped_palm_log` | 897 |  |
+| `stripped_pear_log` | 898 |  |
+| `stripped_pine_log` | 542 |  |
+| `stripped_plum_log` | 540 |  |
+| `stripped_spectral_log` | 1150 |  |
+| `super_compressed_messy_stone` | 853 |  |
+| `super_rocket_block` | 901 |  |
+| `synthesizer_back` | 1578 |  |
+| `synthesizer_back_running` | 56 | anim (8 frames) |
+| `synthesizer_bottom` | 1577 |  |
+| `synthesizer_side` | 1572 |  |
+| `synthesizer_side_flip` | 1579 |  |
+| `synthesizer_side_flip_running` | 57 | anim (4 frames) |
+| `synthesizer_side_running` | 55 | anim (4 frames) |
+| `synthesizer_top` | 1573 | rotation family (4 copies) |
+| `tool_bench_side` | 1441 |  |
+| `tool_bench_top` | 1442 |  |
+| `tools_lucky_block` | 1323 |  |
+| `tools_lucky_block_rare` | 1325 |  |
+| `tools_lucky_block_super` | 1327 |  |
+| `toxic_waste` | 25 | anim (16 frames) |
+| `toxic_waste_barrel_bottom` | 1342 |  |
+| `toxic_waste_barrel_side` | 1341 |  |
+| `toxic_waste_barrel_top` | 24 | anim (8 frames) |
+| `toxin_ball_block` | 1001 |  |
+| `trading_terminal_front` | 46 | anim (8 frames) |
+| `trading_terminal_side` | 1543 |  |
+| `trading_terminal_top` | 1544 |  |
+| `tree_cutter_back` | 1451 |  |
+| `tree_cutter_back_running` | 37 | anim (4 frames) |
+| `tree_cutter_front` | 1445 |  |
+| `tree_cutter_side` | 1446 |  |
+| `tree_cutter_side_running` | 36 | anim (8 frames) |
+| `tree_cutter_top` | 1447 | rotation family (4 copies) |
+| `ultra_compressed_messy_stone` | 855 |  |
+| `unloaded` | 517 |  |
+| `uranium_block` | 1645 |  |
+| `uranium_deposit` | 1549 |  |
+| `uranium_glass` | 1628 |  |
+| `uranium_ore` | 1548 |  |
+| `volt_engine_side` | 1453 |  |
+| `volt_engine_side_running` | 38 | anim (8 frames) |
+| `volt_engine_top` | 1454 |  |
+| `voltite_block` | 1648 |  |
+| `voltite_deposit` | 1452 |  |
+| `voltite_ore` | 1406 |  |
+| `water_port` | 1592 |  |
+| `watermelon_side` | 620 |  |
+| `watermelon_top` | 621 |  |
+| `weapon_lucky_block` | 1256 |  |
+| `weapon_lucky_block_rare` | 1307 |  |
+| `weapon_lucky_block_super` | 1309 |  |
+| `white_concrete` | 612 |  |
+| `white_gen_spawn_coal` | 1107 |  |
+| `white_gen_spawn_iron` | 1108 |  |
+| `white_gen_spawn_top` | 1106 |  |
+| `white_glazed_terracotta` | 690 | rotation family (4 copies) |
+| `white_planks` | 674 |  |
+| `white_portal` | 17 | anim (4 frames) |
+| `white_spawn_block_side` | 1011 |  |
+| `white_spawn_block_top` | 1007 | rotation family (4 copies) |
+| `wire_mill_back` | 1400 |  |
+| `wire_mill_front` | 1394 |  |
+| `wire_mill_side` | 1395 |  |
+| `wire_mill_side_running` | 32 | anim (8 frames) |
+| `wire_mill_top` | 1396 | rotation family (4 copies) |
+| `wireless_terminal_bottom` | 1616 |  |
+| `wireless_terminal_front` | 1611 |  |
+| `wireless_terminal_top` | 1612 | rotation family (4 copies) |
+| `wool_colored_black` | 581 |  |
+| `wool_colored_blue` | 577 |  |
+| `wool_colored_brown` | 578 |  |
+| `wool_colored_cyan` | 575 |  |
+| `wool_colored_gray` | 573 |  |
+| `wool_colored_green` | 579 |  |
+| `wool_colored_light_blue` | 569 |  |
+| `wool_colored_light_grey` | 574 |  |
+| `wool_colored_lime` | 571 |  |
+| `wool_colored_magenta` | 568 |  |
+| `wool_colored_orange` | 567 |  |
+| `wool_colored_pink` | 572 |  |
+| `wool_colored_purple` | 576 |  |
+| `wool_colored_red` | 580 |  |
+| `wool_colored_white` | 566 |  |
+| `wool_colored_yellow` | 570 |  |
+| `yellow_concrete` | 614 |  |
+| `yellow_gen_spawn_coal` | 1101 |  |
+| `yellow_gen_spawn_iron` | 1102 |  |
+| `yellow_gen_spawn_top` | 1100 |  |
+| `yellow_glazed_terracotta` | 706 | rotation family (4 copies) |
+| `yellow_lucky_block` | 1253 |  |
+| `yellow_lucky_block_rare` | 1304 |  |
+| `yellow_lucky_block_super` | 1305 |  |
+| `yellow_planks` | 678 |  |
+| `yellow_portal` | 18 | anim (4 frames) |
+| `yellow_spawn_block_side` | 1006 |  |
+| `yellow_spawn_block_top` | 1002 | rotation family (4 copies) |
 
 
-### 旋转族 (57 个根)
+### 旋转族（64 个根）
+
 
 这些纹理只以预旋转副本存在 (`name[rot[1..4`)。注册表把它们折叠到下面的根，`bloxdTexel` 在采样时重新应用旋转 — 引用根，绝不引用副本。写成 `[rot[N` 拼写会得到专属的旋转诊断。
-- `alloy_kiln_top` (id 1089)
-- `auto_bench_top` (id 1104)
-- `belt_tunnel_exit_top` (id 1202)
-- `belt_tunnel_top` (id 1197)
-- `black_glazed_terracotta` (id 430)
-- `black_spawn_block_top` (id 757)
-- `blue_glazed_terracotta` (id 414)
-- `blue_spawn_block_top` (id 752)
-- `brown_glazed_terracotta` (id 418)
-- `brown_spawn_block_top` (id 747)
-- `burner_drill_top` (id 1045)
-- `checkpoint_block` (id 762)
-- `chest_top` (id 346)
-- `crop_harvester_top` (id 1190)
-- `crusher_top` (id 1053)
-- `crystal_vat_top` (id 1164)
-- `custom_lobby_block_top` (id 766)
-- `cyan_glazed_terracotta` (id 406)
-- `cyan_spawn_block_top` (id 742)
-- `deep_drill_top` (id 1137)
-- `electric_drill_top` (id 1096)
-- `gray_glazed_terracotta` (id 398)
-- `gray_spawn_block_top` (id 737)
-- `green_glazed_terracotta` (id 422)
-- `green_spawn_block_top` (id 732)
-- `iron_chest_top` (id 914)
-- `light_blue_glazed_terracotta` (id 382)
-- `light_blue_spawn_block_top` (id 727)
-- `light_gray_glazed_terracotta` (id 402)
-- `light_gray_spawn_block_top` (id 722)
-- `lime_glazed_terracotta` (id 390)
-- `lime_spawn_block_top` (id 717)
-- `magenta_glazed_terracotta` (id 378)
-- `magenta_spawn_block_top` (id 712)
-- `moonstone_chest_top` (id 446)
-- `orange_glazed_terracotta` (id 374)
-- `orange_spawn_block_top` (id 707)
-- `pink_glazed_terracotta` (id 394)
-- `pink_spawn_block_top` (id 702)
-- `press_top` (id 1069)
-- `purple_glazed_terracotta` (id 410)
-- `purple_spawn_block_top` (id 697)
+- `alloy_kiln_top` (id 1409)
+- `auto_bench_top` (id 1424)
+- `belt_tunnel_exit_top` (id 1522)
+- `belt_tunnel_top` (id 1517)
+- `black_glazed_terracotta` (id 750)
+- `black_spawn_block_top` (id 1077)
+- `blue_glazed_terracotta` (id 734)
+- `blue_spawn_block_top` (id 1072)
+- `brown_glazed_terracotta` (id 738)
+- `brown_spawn_block_top` (id 1067)
+- `burner_drill_top` (id 1365)
+- `centrifuge_top` (id 1565)
+- `checkpoint_block` (id 1082)
+- `chest_top` (id 666)
+- `collider_top` (id 1603)
+- `condenser_top` (id 1557)
+- `coolant_mixer_top` (id 1635)
+- `crop_harvester_top` (id 1510)
+- `crusher_top` (id 1373)
+- `crystal_vat_top` (id 1484)
+- `custom_lobby_block_top` (id 1086)
+- `cyan_glazed_terracotta` (id 726)
+- `cyan_spawn_block_top` (id 1062)
+- `deep_drill_top` (id 1457)
+- `electric_drill_top` (id 1416)
+- `gray_glazed_terracotta` (id 718)
+- `gray_spawn_block_top` (id 1057)
+- `green_glazed_terracotta` (id 742)
+- `green_spawn_block_top` (id 1052)
+- `iron_chest_top` (id 1234)
+- `light_blue_glazed_terracotta` (id 702)
+- `light_blue_spawn_block_top` (id 1047)
+- `light_gray_glazed_terracotta` (id 722)
+- `light_gray_spawn_block_top` (id 1042)
+- `lime_glazed_terracotta` (id 710)
+- `lime_spawn_block_top` (id 1037)
+- `magenta_glazed_terracotta` (id 698)
+- `magenta_spawn_block_top` (id 1032)
+- `mob_farm_top` (id 1582)
+- `moonstone_chest_top` (id 766)
+- `orange_glazed_terracotta` (id 694)
+- `orange_spawn_block_top` (id 1027)
+- `pink_glazed_terracotta` (id 714)
+- `pink_spawn_block_top` (id 1022)
+- `press_top` (id 1389)
+- `purple_glazed_terracotta` (id 730)
+- `purple_spawn_block_top` (id 1017)
 - `radar_screen` (id 19)
-- `recycler_top` (id 1179)
-- `red_glazed_terracotta` (id 426)
-- `red_spawn_block_top` (id 692)
-- `shatter_mill_top` (id 1145)
-- `shop_trader_spawn_top` (id 795)
-- `shop_wizard_spawn_top` (id 801)
-- `sky_tap_top` (id 1152)
-- `smelter_top` (id 1060)
-- `tree_cutter_top` (id 1127)
-- `white_glazed_terracotta` (id 370)
-- `white_spawn_block_top` (id 687)
-- `wire_mill_top` (id 1076)
-- `yellow_glazed_terracotta` (id 386)
-- `yellow_spawn_block_top` (id 682)
-| `alloy_kiln_side_running` | 33 | 250 ms |
-| `auto_bench_side_running` | 35 | 250 ms |
-| `black_portal` | 2 | 300 ms |
-| `blue_portal` | 3 | 300 ms |
-| `brown_portal` | 4 | 300 ms |
-| `burner_drill_side_running` | 27 | 250 ms |
-| `crop_harvester_back_running` | 45 | 250 ms |
-| `crop_harvester_side_running` | 44 | 250 ms |
-| `crusher_side_running` | 28 | 250 ms |
-| `crystal_vat_side_running` | 42 | 250 ms |
-| `cyan_portal` | 5 | 300 ms |
-| `deep_drill_side_running` | 39 | 250 ms |
-| `electric_drill_side_running` | 34 | 250 ms |
-| `generator_side_running` | 30 | 250 ms |
-| `gray_portal` | 6 | 300 ms |
-| `green_portal` | 7 | 300 ms |
-| `grey_portal` | 8 | 300 ms |
-| `homestead_core_mid` | 26 | 250 ms |
-| `lava` | 1 | 200 ms |
-| `lightblue_portal` | 9 | 300 ms |
-| `lightgray_portal` | 10 | 300 ms |
-| `lime_portal` | 11 | 300 ms |
-| `magenta_portal` | 12 | 300 ms |
-| `orange_portal` | 13 | 300 ms |
-| `pink_portal` | 14 | 300 ms |
-| `press_side_running` | 31 | 250 ms |
-| `purple_portal` | 15 | 300 ms |
-| `radar_screen` | 19 | None ms |
-| `recycler_side_running` | 43 | 250 ms |
-| `red_portal` | 16 | 300 ms |
-| `shatter_mill_side_running` | 40 | 250 ms |
-| `sky_tap_side_running` | 41 | 250 ms |
-| `smelter_side_running` | 29 | 250 ms |
-| `smoke` | 23 | 250 ms |
-| `toxic_waste` | 25 | 200 ms |
-| `toxic_waste_barrel_top` | 24 | 300 ms |
-| `trading_terminal_front` | 46 | 250 ms |
-| `tree_cutter_back_running` | 37 | 250 ms |
-| `tree_cutter_side_running` | 36 | 250 ms |
-| `volt_engine_side_running` | 38 | 250 ms |
-| `white_portal` | 17 | 300 ms |
-| `wire_mill_side_running` | 32 | 250 ms |
-| `yellow_portal` | 18 | 300 ms |
-
-原始数据中可见的结构性说明: 图集容纳 46 个动画根而非 43 — `radar_screen` 的四个预旋转副本各自带一条 4 帧阶梯，这也是 `radar_screen` 成为唯一同时带两条族备注之名称的原因。
+- `recycler_top` (id 1499)
+- `red_glazed_terracotta` (id 746)
+- `red_spawn_block_top` (id 1012)
+- `shatter_mill_top` (id 1465)
+- `shop_trader_spawn_top` (id 1115)
+- `shop_wizard_spawn_top` (id 1121)
+- `sky_tap_top` (id 1472)
+- `smelter_top` (id 1380)
+- `synthesizer_top` (id 1573)
+- `tree_cutter_top` (id 1447)
+- `white_glazed_terracotta` (id 690)
+- `white_spawn_block_top` (id 1007)
+- `wire_mill_top` (id 1396)
+- `wireless_terminal_top` (id 1612)
+- `yellow_glazed_terracotta` (id 706)
+- `yellow_spawn_block_top` (id 1002)
 ## 实测漂移 (cnty9 → ab90qa)
 
 注册表是随构建分发的内容，每次方块更新都会移动。v4 构建 (`cnty9`, 2026-10-27) → v5 构建 (`ab90qa`, 2026-11-03)：
@@ -1071,7 +1145,7 @@
 - 图集条目: 1,210 → 1,220
 - 旋转族 (旋转拼写): 57 (228) → 57 (228) — **不变**
 - 动画族 (帧拼写): 42 (188) → 42 (188) — **不变**
-- 可用具名常量: 896 → **906**
+- 可用具名常量: 896 → **1,017**
 - 幸存名称的 id 变化: **896 个中的 376 个**
 
 完整漂移 (10 个名称 — v5 首发时的每项移除都已回归):
@@ -1088,24 +1162,24 @@
 - 图集条目: 1,220 → 1,232
 - 旋转族 (旋转拼写): 57 (228) → 57 (228) — **不变**
 - 动画族 (帧拼写): 42 (188) → **43 (196)** — 新加入的 `trading_terminal_front` 以 8 帧 / 250 ms 的阶梯运行动画
-- 可用具名常量: 906 → **911**
-- 幸存名称的 id 变化: **906 个中的 864 个** (95%)
+- 可用具名常量: 1,017 → **911**
+- 幸存名称的 id 变化: **1,017 个中的 864 个** (95%)
 
 完整漂移 (5 个名称 — 两个新方块):
 
 - **新增 (5):** `stone_generator_side`, `stone_generator_top`, `trading_terminal_front` (动画, 8帧), `trading_terminal_side`, `trading_terminal_top` — 交易终端 (Trading Terminal) 与石头发电机 (Stone Generator) 方块加入了游戏数据。
 - **移除:** 无。
 
-同一原则一步比一步更有力: 仅这一步就有 906 个幸存名称中的 864 个改了 id — 约二十分之十九。
+同一原则一步比一步更有力: 仅这一步就有 1,017 个幸存名称中的 864 个改了 id — 约二十分之十九。
 
 ## 实测漂移 (bny9u → v98qt8)
 
 注册表在周末又一次移动了 — `bny9u` (2026-11-05) → `v98qt8` (2026-11-08，生产与 preprod 提供同一字节相同的包，md5 `7458fd47ff88331d9f451d1456ff48ac`):
 
-- 图集条目： 1,232 → 1,227
+- 图集条目： 1,232 → 1,650
 - 旋转族（旋转拼写）： 57 (228) → 57 (228) — 不变
 - 动画族（帧拼写）： 43 (196) → 43 (196) — 不变
-- 可用命名常量： 911 → **906**
+- 可用命名常量： 911 → **1,017**
 - 幸存名称的 id 变动： **905 个中的 716 个** (79%)
 
 完整漂移（7 个名称 — 三个方块变成了模型）：

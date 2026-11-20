@@ -1,6 +1,6 @@
 # ゲーム別の適用ポリシー
 
-> 対象API: 5 · 対象ビルド: `v98qt8` (2026-11-08 本番+preprod確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
+> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20 本番+preprod確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
 
 allow 12 タイトル / strict 85+ エントリの実測一覧。vertex フック系の効果が動くのは allow のみ。
 

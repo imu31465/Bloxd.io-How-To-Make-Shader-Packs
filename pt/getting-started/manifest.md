@@ -1,6 +1,6 @@
 # pack.json (manifesto)
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Verified
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção em 2026-11-20) · Estado: Verified
 
 `pack.json` é o manifesto do pacote — exatamente um objeto JSON na raiz do zip.
 

@@ -1,6 +1,6 @@
 # Problemas de modelos
 
-> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Analyzed (territorio nuevo de v5)
+> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Analyzed (territorio nuevo de v5)
 
 Problemas en torno a los nuevos hooks de Model de v5.
 

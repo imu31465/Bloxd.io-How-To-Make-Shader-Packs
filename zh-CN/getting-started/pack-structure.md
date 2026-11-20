@@ -1,6 +1,6 @@
 # 包结构
 
-> 目标API: 5 · 目标构建: `v98qt8` · 状态: Verified
+> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified
 
 ## 分发格式
 

@@ -1,6 +1,6 @@
 # FAQ & legal notes
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified
 
 ## Frequently asked questions
 

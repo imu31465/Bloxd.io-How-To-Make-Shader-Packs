@@ -1,6 +1,6 @@
 # Texture issues
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (messages recorded verbatim from the live validator)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (messages recorded verbatim from the live validator)
 
 Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
 

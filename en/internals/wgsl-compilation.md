@@ -1,6 +1,6 @@
 # WGSL compilation
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored from the live bundle)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored from the live bundle)
 
 The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
 
@@ -10,7 +10,7 @@ Static validation's type-checking is incomplete, so some mistakes only surface h
 
 ## Validation-stub generation
 
-The engine synthesizes stubs for code that passed static validation (restored from module 29866):
+The engine synthesizes stubs for code that passed static validation:
 
 - the type-stub table:
 

@@ -1,6 +1,8 @@
 # 그림자
 
-> 대상 API: 5 · 대상 빌드: `v98qt8` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
+> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
+> **`bbb6l5`부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록·플레이어·몹·아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](../api/functions.md)를 보세요.
+
 
 셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
 

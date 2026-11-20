@@ -1,6 +1,6 @@
 # パック形式
 
-> 対象API: 5 · 対象ビルド: `v98qt8` (2026-11-08 本番+preprod確認) · 検証状況: Verified (ライブローダから再計測)
+> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20 本番+preprod確認) · 検証状況: Verified (ライブローダから再計測)
 
 パックモデルの全体像 — マニフェスト、ローダ制限、per-frame uniform — を1ページにまとめます。入門向きの手順は [はじめに](../getting-started/manifest.md) を参照。
 
@@ -19,6 +19,7 @@
 | `apiVersion` | 数値 | 必須 | **`5` と厳密に (`===`) 一致**。文字列 `"5"` は失敗し JSON 上の表記つきで報告 |
 | `name` | 文字列 | 必須 | トリミング後非空。設定画面に表示 |
 | `author` | 文字列 | 任意 | 存在するなら文字列 |
+| `keepCircleShadows` | boolean | 任意 | **`bbb6l5` の新設** — パックのシェーダーがリアル太陽シャドウ API を使う場合も、プレイヤー/モブの下の従来の円形影を残す ([影の表現](../guides/shadows.md))。既定 `false`。他の型は専用のロードメッセージで拒否 |
 
 それ以外のマニフェスト内容はローダに無視されます。`pack.json` は zip ルートに厳密に1つ、JSON オブジェクトでなければなりません。
 
@@ -39,7 +40,7 @@
 
 ## per-frame uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 引き続き 64 バイト、ただし v5 でメンバが1個増えました (ライブ uniform レイアウトモジュールから):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — **80 バイト** (`bbb6l5` 以降。それ以前は 64)。ライブ uniform レイアウトモジュールから:
 
 | オフセット | フィールド | 型 | 備考 |
 |---|---|---|---|
@@ -48,8 +49,11 @@
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` の裏 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` の裏 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` の裏 |
+| 64 | `shadowDirection` | `vec3f` | **`bbb6l5` の新設** — 影を落とす光の進行方向。`bloxdShadowDirection()` の裏 |
 
-`lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まりました (オフセット 4〜15 は v4 ではアラインメントの隙間。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。よって構造体の合計サイズも他の全メンバのオフセットも不変です。エンジンはこれを `setUint32(4, lit ? 1 : 0)` の 1 命令で書き込みます — これは光量ではなくフラグです (v4 の JS 側名 `terrainLightLevels` / `terrainHeldLight` はバンドルから完全に消えました)。
+`shadowDirection` は `eyePosition` の後のパディングに収まりました (`vec3f` は 12 バイトを占めるためオフセット 60〜63 が隙間。64 の位置は 16 バイト境界で、構造体はちょうど 80 バイト)。エンジンは 3 回の `setFloat32` で書き込みます — 単位ベクトル (昼は太陽、夜は月、太陽がない worlds では既定空の太陽) で、決して水平線より上にはなりません。これにより uniform は 64 から 80 バイトへ増え、`minBindingSize` も 80 になりました。
+
+`lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まりました (オフセット 4〜15 は v4 ではアラインメントの隙間。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。
 
 **パックから uniform を直接参照しないでください。** ヘッダー関数 (`bloxdSeconds()` 等) 経由でのみ使用します。stage 可視性は VERTEX|FRAGMENT のため、ヘッダー関数はモジュールスコープ関数や vertex フックからも呼べます。
 

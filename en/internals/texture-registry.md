@@ -1,26 +1,26 @@
 # Texture registry internals
 
-> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified (extracted by re-running the engine's own registry builder)
+> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified (extracted by re-running the engine's own registry builder; fingerprint match-verified against the shipped pre-built atlas)
 
 The name→id resolution machinery and measured registry drift. The user-facing catalog: [Texture catalog](../api/texture-catalog.md).
 
 ## Methodology
 
-We ran the engine's own registry-building machinery against the shipped block registry's texture data (data module 1351 in the main bundle) inside a mini webpack harness and recorded its output — these numbers are **the production bundle's own computation**, not a re-implementation. On the current build the classifier is module 30048 (carried identically by chunks c59/c60/c61/c9); on `bny9u` it was 29815 in chunk c56, and the atlas-side builder is module 28312 in chunk c49 (29812 in chunks c52–c54 on `bny9u`).
+We ran the engine's own registry-building machinery against the shipped block registry's texture data inside a mini webpack harness and recorded its output — these numbers are **the production build's own computation**, not a re-implementation. On the current build the computed fingerprint matches the shipped pre-built atlas's `builtTextureIndexFingerprint` (`32451195`), byte-for-byte confirming the measurement is the live registry.
 
 ## Output structure
 
-| Output | v5 intended | v5 as shipped on v98qt8 | Meaning |
-|---|---|---|---|
-| `named` | **906** | 1,047 (folding broken — see below) | names referable as `bloxdTextureId<Name>` |
-| `aliases` | 424 | 240 (all rotation) | folded spellings — 196 frame aliases (`lava0`…) and 228 rotation aliases (`chest_top[rot[1`…) |
-| `layers` | 1,227 | 1,227 | the full atlas layer table — 906 named roots, 150 extra animation frames, 171 pre-rotated slots |
+| Output | v5 as shipped on bbb6l5 | Meaning |
+|---|---|---|
+| `named` | **1,017** | names referable as `bloxdTextureId<Name>` |
+| `aliases` | **776** | folded spellings — 520 frame aliases (`lava0`…, including the 208 new `a~b~interval` transition spellings) and 256 rotation aliases (`chest_top[rot[1`…) |
+| `layers` | **1,650** | the full atlas layer table — 1,017 named roots, extra animation frames and transition slots, pre-rotated slots |
 
 ## Folding rules
 
-- **animation families** (43): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time
-- **rotation families** (57): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
-- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 46 animation roots on the atlas, not 43)
+- **animation families** (71): frame spellings (`lava0`–`lava7`) fold to the base name (`lava`); `bloxdTexel` returns the current frame at sample time. New on `bbb6l5`: each consecutive frame pair also occupies a **transition slot** (`lava0~lava1~50`) holding a pre-blended cross-fade — the atlas animates between frames without popping
+- **rotation families** (64): turned slots (`[rot[1..4`) fold to the root name; `bloxdTexel` re-applies per-face `textureRotation`
+- `radar_screen` is the only name in both families (its four pre-rotated copies each carry their own 4-frame ladder — hence 72 animation roots on the atlas, not 71)
 
 ## Drift (cnty9 → ab90qa)
 
@@ -61,7 +61,7 @@ The complete drift (5 names): added (5) `trading_terminal_front` (anim, 8 frames
 
 ## Drift (bny9u → v98qt8)
 
-| Measurement | bny9u (v5) | v98qt8 (v5, current) |
+| Measurement | bny9u (v5) | v98qt8 (v5) |
 |---|---|---|
 | atlas entries | 1,232 | **1,227** |
 | rotation families (turned spellings) | 57 (228) | **57 (228) — unchanged** |
@@ -69,11 +69,31 @@ The complete drift (5 names): added (5) `trading_terminal_front` (anim, 8 frames
 | usable named constants | 911 | **906** |
 | id changes among surviving names | — | **716 of 905** (79%) |
 
-The complete drift (7 names): added (1) `hay_block_top`; removed (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — the Furnace, Workbench (crafting table) and Artisan Bench were converted from terrain-textured blocks to block models, so their terrain textures left the registry (the Workbench kept `crafting_table_top` — its top face is still terrain-textured). Production and preprod serve the same byte-identical bundle (md5 `7458fd47ff88331d9f451d1456ff48ac`).
+The complete drift (7 names): added (1) `hay_block_top`; removed (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — the Furnace, Workbench (crafting table) and Artisan Bench were converted from terrain-textured blocks to block models, so their terrain textures left the registry (the Workbench kept `crafting_table_top` — its top face is still terrain-textured). Production and preprod serve the same bundle. This build shipped the folding regression documented below.
 
-## The v98qt8 folding regression
+## Drift (v98qt8 → bbb6l5)
 
-`v98qt8` ships a byte-verified regression in the texture-constant folding. The data module (1351) now builds `animatedBlockTextures` as a **name-keyed Array** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — hexdump-verified in the live main bundle), while the classifier (module 30048) still expects a **slot-keyed array** in two places:
+| Measurement | v98qt8 (v5) | bbb6l5 (v5, current) |
+|---|---|---|
+| atlas entries | 1,227 | **1,650** (+423 — the largest step ever measured) |
+| atlas strips | 5 | **7** (6×256 + 114 slots) |
+| rotation families (turned spellings) | 57 (228) | **64 (256)** |
+| animation families (frame spellings) | 43 (196) | **71 (520)** — +28 families and the 208 transition spellings |
+| usable named constants | 906 | **1,017** |
+| id changes among surviving names | — | **863 of 906** (95%) |
+| folding | broken (see below) | **fixed** |
+
+The complete drift (+423, −0 — pure addition):
+
+- **added (111 usable):** the **Atomic Age content pack** — reactor machinery (`pump`, `condenser`, `centrifuge`, `synthesizer`, `mob_farm`, `coolant_mixer`, `laser`, `wireless_terminal`, `dense_silo`, `express_belt`, `fast_loader`, `splitter`, `sorting_gate`, `fluid_tank`, `battery_*`, `collider_*`), uranium & materials (`uranium_ore`, `uranium_deposit`, `uranium_block`, `pure_uranium_ore`, `uranium_glass`, `reactor_*`, `fuel_rod`, `fuel_port`, `water_port`, `graphite`, `graphite_block`, `voltite_block`, `copper_block`, `scaffolding`, `reactor_slag`, `atomic_bench_*`, `atomic_bomb_*`, `atomic_spire`, `nova_bomb_*`, `isotope_comet_*`, `jetpack_back`, `glow_lamp`, `sky_spring`) — most machinery gained `*_running` animation families; 7 new rotatable tops grew the rotation count
+- **added (204 alias):** `frameA~frameB~interval` **transition spellings** — pre-blended cross-fade slots between consecutive animation frames (`lava0~lava1~50` = lava0→lava1 over 50 ms), a new atlas feature on top of the 43 pre-existing families
+- **removed:** none
+
+The registry fingerprint moved `13d4e18f` → `32451195`, match-verified against the shipped pre-built atlas.
+
+## The v98qt8 folding regression (fixed on bbb6l5)
+
+`v98qt8` shipped a byte-verified regression in the texture-constant folding: the animated-texture table was built as a **name-keyed Array** while the folding code expects a **slot-keyed array**, so the two fold passes silently skipped every animation family:
 
 1. `hii.forEach((value, key))` — `Array.prototype.forEach` never visits string keys, so the extra-frame slot→base map stays empty
 2. `hii[Qi]` with `Qi` = the atlas slot — bracket access with a slot index never hits a name key, so the base-spelling fold (`lava0` → `lava`) never fires
@@ -85,7 +105,9 @@ Consequences, all measured by running the production classifier and resolver ver
 - the dedicated "names a frame of the animated texture" diagnostic can never fire (no frame aliases exist)
 - the engine's runtime `named` set is 1,047 rows, so the registry hash the engine computes for `HEADER_VERSION` is `694df62c` — not the intended `df6c1915` (folded) — which additionally forces **every saved pack to re-validate** on this build
 
-Control experiment: feeding the same classifier a slot-keyed array (what the code's own fold logic expects, and what `bny9u`'s data module produced) reproduces the documented folded output exactly — 906 named with `lava` at id 1, `lava0`–`lava7` as frame aliases, 424 aliases, 1,227 layers. The folding rules below describe that intended API.
+Control experiment: feeding the same classifier a slot-keyed array (what the code's own fold logic expects, and what `bny9u`'s data module produced) reproduces the documented folded output exactly — 906 named with `lava` at id 1, `lava0`–`lava7` as frame aliases, 424 aliases, 1,227 layers.
+
+**Fixed on `bbb6l5` (2026-11-20):** the current build's animated-texture table is slot-keyed again — running the production folding on it yields the intended output (1,017 named, 776 aliases, `lava` at id 1), the 43 pre-existing animation-family base names validate again, and the registry fingerprint is computed over the folded table. The regression section above is retained as the historical record.
 
 
 ## Effect on HEADER_VERSION
@@ -100,7 +122,9 @@ November 4 (ab90qa → xkg8x, 1 day): entries 1,210 → 1,220 (+10, all returnin
 
 November 5 (xkg8x → bny9u, 1 day): entries 1,220 → 1,232 (+5: the Trading Terminal ×3 and Stone Generator ×2 textures); 864 of 906 names changed id (95%); no removals; rotation families unchanged, animation families 42 → 43 (`trading_terminal_front`, 8 frames at 250 ms). Production and preprod serve the same byte-identical bundle.
 
-November 8 (bny9u → v98qt8, 3 days): entries 1,232 → 1,227 (+1 `hay_block_top`, −6 model-converted block textures: Furnace, Workbench, Artisan Bench); 716 of 905 names changed id (79%); rotation families unchanged, animation families unchanged (43/196). Production and preprod serve the same byte-identical bundle — and the build carries the folding regression documented above.
+November 8 (bny9u → v98qt8, 3 days): entries 1,232 → 1,227 (+1 `hay_block_top`, −6 model-converted block textures: Furnace, Workbench, Artisan Bench); 716 of 905 names changed id (79%); rotation families unchanged, animation families unchanged (43/196). Production and preprod serve the same bundle — and the build carried the folding regression documented above.
+
+November 20 (v98qt8 → bbb6l5, 12 days): entries 1,227 → 1,650 (+423, −0 — the Atomic Age content pack and the transition-slot atlas feature); 863 of 906 names changed id (95%); rotation families 57 → 64, animation families 43 → 71 (+208 transition spellings); the folding regression fixed. Production and preprod serve the same build.
 
 ## Related
 

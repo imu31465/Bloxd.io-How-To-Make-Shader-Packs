@@ -1,6 +1,6 @@
 # Compatibilidade
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified
 
 Como o jogo atual e os pacotes de versões antigas interoperam.
 

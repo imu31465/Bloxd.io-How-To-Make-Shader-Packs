@@ -1,6 +1,6 @@
 # Intérieurs du registre des textures
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
 
 La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](../api/texture-catalog.md).
 

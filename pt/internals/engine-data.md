@@ -1,6 +1,6 @@
 # Ledger de dados do motor
 
-> API alvo: 5 · Build alvo: `v98qt8` (2026-11-08, produção e preprod) · Estado: Verified
+> API alvo: 5 · Build alvo: `bbb6l5` (2026-11-20, produção e preprod) · Estado: Verified
 
 O ledger de medições desta documentação — cada valor confirmado, todos medidos sobre o build alvo atual `bny9u`.
 

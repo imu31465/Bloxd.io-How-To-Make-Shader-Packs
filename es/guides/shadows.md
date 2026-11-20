@@ -1,6 +1,8 @@
 # Sombras
 
-> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Verified (comportamiento de LightEngine sin cambios desde la medición de v4)
+> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Verified (comportamiento de LightEngine sin cambios desde la medición de v4)
+> **Desde `bbb6l5`**: se añadió la API real de sombras solares — `bloxdShadow()` (factor de sombra 0–1; proyectan bloques, jugadores, mobs y objetos, siguiendo al sol), `bloxdAirShadow(t)` (para haces de luz) y `bloxdShadowDirection()` (dirección de la luz). `keepCircleShadows` en pack.json permite conservar también las antiguas sombras circulares. Detalles en [Funciones](../api/functions.md).
+
 
 Las tres formas de hacer «sombras» en un shader pack, y sus límites.
 

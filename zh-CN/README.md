@@ -6,8 +6,8 @@
 
 - 当前 API：**5**（`pack.json` 必须声明 `apiVersion: 5`）
 - 目标：WebGPU 渲染器
-- 最后验证：2026-11-05
-- 目标构建：`v98qt8.main.62d8d238.js`（生产与 preprod，2026-11-08 验证，字节相同的 bundle，md5 `7458fd47ff88331d9f451d1456ff48ac` — 注册表、头部、钩子、限制已重测）
+- 最后验证：2026-11-20
+- 目标构建：`bbb6l5.main.0244a119.js`（生产与 preprod，2026-11-20 验证 — 注册表、头部、钩子、限制与新的阴影 API 已重测）
 - 着色器钩子：9 个（Terrain / Liquid / Model × Vertex / Surface / Light）
 
 初次制作着色器包请从[入门指南](getting-started/)开始；查询 API 请看 [API 参考](api/)。

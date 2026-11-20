@@ -1,6 +1,6 @@
 # Restricciones y nombres reservados
 
-> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Verified (límites de v4 reconfirmados byte a byte en v5)
+> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Verified (límites de v4 reconfirmados byte a byte en v5)
 
 Qué pueden escribir los paquetes, y las reglas completas de reserva de nombres.
 

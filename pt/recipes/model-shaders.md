@@ -1,6 +1,6 @@
 # Shaders de modelo
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Analyzed (escrito contra a especificação do cabeçalho v5)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (escrito contra a especificação do cabeçalho v5)
 
 Receitas usando os hooks de Model do v5 e os novos flags para **seleções de "no que estou olhando" que eram impossíveis antes do v5**. Noções básicas: [Modelos e texturas](../guides/models.md).
 

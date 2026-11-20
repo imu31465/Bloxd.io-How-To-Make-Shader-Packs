@@ -1,8 +1,8 @@
 # Cabeçalho do motor (verbatim)
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Analyzed (restaurado do bundle de produção em execução)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (restaurado do bundle de produção em execução)
 
-O texto exato que o carregador antepõe a cada pacote. Restaurado do bundle de produção em execução (`ab90qa`, chunk c55, renderizando o template com suas 6 interpolações reais — `apiVersion` e as 5 leituras de uniform via `bloxdPackInputs`). 8.954 bytes decodificados, 208 linhas. Nenhuma paráfrase em nenhum ponto. Reverificado idêntico byte a byte no build de produção atual (`bny9u`, chunk c56 (renumerado de c55), 2026-11-05) — os mesmos 8,954 bytes decodificados, 208 linhas. Re-verificado de novo no `v98qt8` (2026-11-08, módulo de cabeçalho 30052 no chunk c63 — renumerado de novo): continua idêntico byte a byte, 8.954 bytes decodificados, 208 linhas.
+O texto exato que o engine anexa a cada pack, renderizado do validador da build ao vivo com suas interpolações aplicadas (`apiVersion` e as 6 leituras de uniform via `bloxdPackInputs`). 216 linhas. Nenhuma paráfrase. Re-verificado nas builds anteriores (`bny9u`, `v98qt8`) — o único acréscimo é o conteúdo de sombras.
 
 Guia de leitura:
 - Explicações campo por campo → [Estruturas](../api/structures.md)
@@ -14,7 +14,6 @@ Guia de leitura:
 - Como o cabeçalho é validado (HEADER_VERSION) → [Validação de shaders](shader-validation.md)
 
 ```wgsl
-
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
@@ -38,8 +37,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -90,7 +98,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -158,7 +166,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {

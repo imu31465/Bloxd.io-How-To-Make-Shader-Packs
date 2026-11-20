@@ -1,6 +1,6 @@
 # Packformat
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (am Live-Loader nachgemessen)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (am Live-Loader nachgemessen)
 
 Das ganze Paketmodell auf einer Seite — Manifest, Loader-Limits, Per-Frame-Uniform. Für die Schritt-für-Schritt-Version siehe [Erste Schritte](../getting-started/manifest.md).
 
@@ -19,6 +19,7 @@ Das ganze Paketmodell auf einer Seite — Manifest, Loader-Limits, Per-Frame-Uni
 | `apiVersion` | Zahl | Pflicht | **muss strikt `5` entsprechen** (`===`). Ein String `"5"` scheitert und wird mit seiner JSON-Schreibweise gemeldet |
 | `name` | String | Pflicht | nach dem Trimmen nicht leer; wird in den Einstellungen angezeigt |
 | `author` | String | optional | muss, falls vorhanden, ein String sein |
+| `keepCircleShadows` | boolean | optional | **neu in `bbb6l5`** — behält die alten kreisförmigen Schatten unter Spielern und Mobs, wenn deine Shader auch die echte Sonnenschatten-API nutzen ([Schatten](../guides/shadows.md)). Standard `false`; jeder andere Typ wird mit eigener Meldung abgelehnt |
 
 Alles andere im Manifest wird ignoriert. `pack.json` muss exakt ein JSON-Objekt im Zip-Root sein.
 
@@ -48,8 +49,11 @@ Der Loader vergleicht `manifest.apiVersion !== 5` mit JavaScript-strikt `!==`. D
 | 16 | `renderOffset` | `vec3i` | unterlegt `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | unterlegt `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | unterlegt `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | **neu in `bbb6l5`** — die Richtung, in die das schattenwerfende Licht läuft; stützt `bloxdShadowDirection()` |
 
-`lit` passte in das Padding, das v4 bereits zwischen `seconds` und `renderOffset` hatte (Offsets 4–15 waren Alignment-Lücken; `vec3i` braucht 16-Byte-Alignment, daher bleibt `renderOffset` bei 16). Gesamtgröße und alle anderen Offsets sind unverändert. Die Engine schreibt es mit einem einzigen `setUint32(4, lit ? 1 : 0)` — es ist ein Flag, keine Lichtstufe (die JS-seitigen Namen `terrainLightLevels` / `terrainHeldLight` von v4 sind komplett aus dem Bundle verschwunden).
+`shadowDirection` füllt die Lücke nach `eyePosition` (ein `vec3f` belegt 12 Byte, also waren Offsets 60–63 Spielraum; `shadowDirection` landet bei 64, einer 16-Byte-Grenze — der Struct bleibt exakt 80 Byte). Die Engine schreibt ihn mit drei `setFloat32` — es ist ein Einheitsvektor (tagsüber von der Sonne, nachts vom Mond, bei sonnenlosen Worlds von der Sonne des Standardhimmels), nie über dem Horizont. Damit wuchs das Uniform von 64 auf 80 Byte und das `minBindingSize` stieg auf 80.
+
+`lit` passte in den Spielraum, den v4 bereits zwischen `seconds` und `renderOffset` hatte.
 
 **Das Uniform nie direkt aus einem Paket referenzieren.** Es über die Header-Funktionen benutzen (`bloxdSeconds()` usw.). Die Stage-Sichtbarkeit ist VERTEX|FRAGMENT, deshalb funktionieren Header-Funktionen auch aus Modul-Funktionen und Vertex-Hooks.
 

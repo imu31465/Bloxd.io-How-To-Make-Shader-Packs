@@ -1,6 +1,6 @@
 # Realism
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
 > Physical recipes for "rebuilding vanilla's look from materials". Read these premises first:
 >
 > 1. **The light hook is called at the final fragment stage**. Its returned colour becomes the final colour as-is. **You must re-apply fog yourself** (R9.10)  
@@ -237,6 +237,9 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ```
 
 ## R9.12 Projected shadows — lift inversion + threshold cut (definitive)
+
+> **On `bbb6l5`+ builds you can skip the threshold cut**: `bloxdShadow()` gives the engine's real sun-following shadow factor (0–1, entity shadows included) directly — see [Shadows](../guides/shadows.md). The recipe below remains the one-route-for-all-builds classic and the stylized half-tone look.
+
 
 > **Premise recheck (section 10)**: `l.skyLight` is not the raw voxel value (n/15) but the value after the engine's "lift curve"  
 > `y = 1-(1-x/(3-2x))³` (an S-curve lifting dark areas).

@@ -1,6 +1,8 @@
 # 影の表現
 
-> 対象API: 5 · 対象ビルド: `v98qt8` · 検証状況: Verified (LightEngine の挙動は v4 実測時から不変)
+> 対象API: 5 · 対象ビルド: `bbb6l5` · 検証状況: Verified (LightEngine の挙動は v4 実測時から不変)
+> **`bbb6l5` 以降**: 本物の太陽シャドウ API が追加されました — `bloxdShadow()` (0〜1 の日陰係数。ブロック・プレイヤー・モブ・アイテムが影を落とし、太陽を追従)、`bloxdAirShadow(t)` (光のシャフト用)、`bloxdShadowDirection()` (光の進行方向)。pack.json の `keepCircleShadows` で従来の円形影との併存も選べます。詳細は [関数](../api/functions.md) と本ガイド末尾の新セクションを参照。
+
 
 シェーダーパックで「影」を作る3つの方法と、その限界。
 

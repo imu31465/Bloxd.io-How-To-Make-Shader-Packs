@@ -1,6 +1,6 @@
 # Compatibility
 
-> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified
+> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified
 
 How the current game and old-version packs interoperate.
 
@@ -38,9 +38,9 @@ The quiet trap this time: packs that keep reading `blockFlags` or wrapping light
 
 ## Saved-pack re-validation ("needs re-check")
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
+`HEADER_VERSION` is `9.<hash>` from the engine's validator, with the texture-registry fingerprint folded into the page-level validation version (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
 
-**v98qt8 caveat:** the current build's folding regression ([Engine Internals: Texture Registry](../internals/texture-registry.md#the-v98qt8-folding-regression)) changes what the engine hashes — the registry suffix it computes is the *unfolded* 1,047-row table (`694df62c`), not the intended folded 906-row one (`df6c1915`, was `e735ebdc` on `bny9u`). Every saved pack therefore re-validates on this build, and packs that reference any of the 43 animation-family base names (`lava`, …) then **fail** re-validation until the engine side is fixed — write the folded names anyway; they are the API.
+**The `v98qt8` folding regression is fixed on `bbb6l5`**: the animated-texture table is slot-keyed again, so the registry fingerprint is computed over the intended folded table, the 43 animation-family base names validate again, and saved packs that reference them no longer fail re-validation. The `bbb6l5` header change (the shadow additions) does force one re-validation pass of every stored pack — a one-time automatic event, not a rejection.
 
 A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
 

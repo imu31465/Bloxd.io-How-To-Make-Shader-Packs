@@ -1,6 +1,6 @@
 # Funciones
 
-> API objetivo: 5 · Build objetivo: `v98qt8` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
+> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](texture-api.md), junto con `bloxdOpaqueBehind`.
 
@@ -139,6 +139,37 @@ La receta de iluminación del propio motor, documentada como WGSL llamable — c
 | `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | la luz del mundo aquí (la más brillante de bloque/cielo/en mano, con suelo en `ambientLightColour`) |
 | `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | el color de la superficie iluminado como lo hace el motor (antes de emisión y niebla) |
 | `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | aplica la niebla de este fragmento (`mix(colour, fogColour, fogAlpha)`) |
+
+## Funciones de sombras
+
+La build `bbb6l5` añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
+
+### bloxdShadow
+
+```wgsl
+fn bloxdShadow() -> f32
+```
+
+- **Devuelve**: la luz de sol o de luna que llega a este fragmento — **0 en sombra, 1 iluminado** — *nuevo en `bbb6l5`*
+- Qué las proyecta: **bloques, jugadores, mobs y objetos** (el objeto sostenido en primera persona queda excluido a propósito)
+- Comportamiento (literal de la descripción del validador): se desvanece a 0 al ponerse el sol o la luna o al volverse la cara; **1 en caras `flags.emissive`**; la luz viaja a lo largo de `bloxdShadowDirection()`, así que hay sombras incluso bajo un cielo sin sol
+- **Llamable desde**: hooks surface / light
+- Receta: `let sun = mix(shadowColour, litColour, bloxdShadow());` — ver [Sombras](../guides/shadows.md)
+
+### bloxdAirShadow
+
+```wgsl
+fn bloxdAirShadow(t: f32) -> f32
+```
+
+- **Devuelve**: como `bloxdShadow()`, pero en un punto **entre la cámara (t = 0) y este fragmento (t = 1)** — *nuevo en `bbb6l5`* — para haces de luz
+- Sólo los bloques las proyectan (jugadores y mobs no), difuminadas a bloques enteros; `t` se recorta a 0–1
+- Receta: muestrear varios `t` a lo largo del rayo de vista y acumular — [Sombras](../guides/shadows.md)
+
+### bloxdShadowDirection
+
+Pertenece conceptualmente a las funciones de sombras, pero vive en la cabecera legible — ver [Funciones de fotograma](#bloxdshadowdirection).
+
 
 ## Funciones especiales
 

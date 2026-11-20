@@ -1,6 +1,6 @@
 # Internas del registro de texturas
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (extraído reejecutando el constructor de registro del propio motor)
 
 La maquinaria de resolución nombre→id y la deriva medida del registro. El catálogo orientado al usuario: [Catálogo de texturas](../api/texture-catalog.md).
 

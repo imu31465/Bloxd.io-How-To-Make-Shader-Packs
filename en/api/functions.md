@@ -1,6 +1,6 @@
 # Functions
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored verbatim from the live header)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored verbatim from the live header; shadow functions restored from the live validator's function table)
 
 Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](texture-api.md), along with `bloxdOpaqueBehind`.
 
@@ -31,15 +31,33 @@ fn bloxdRenderOffset() -> vec3i
 ### bloxdSunDirection
 
 ```wgsl
+// The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f
 ```
 
 - **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
 - **Facts**:
-  - **the moon is always at `-bloxdSunDirection()`** (the engine places it opposite the sun)
+  - **the moon is always at `-bloxdSunDirection()`** (the engine places it opposite the sun) — now also stated in the header itself
   - **never pass the zero vector to `normalize`** — guard with `dot(d, d) < 1e-8` and fall back to a constant direction
   - the current build has no day-night cycle; sun, moon and stars do not move during a session (only opacity toggles). In the default earth sky the sun sits near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°)
 - **Uses**: color temperature, light direction, sun gating, pseudo moonlight
+
+### bloxdShadowDirection
+
+```wgsl
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f
+```
+
+- **Returns**: the travel direction of the light that casts `bloxdShadow()`'s shadows — **new in the `bbb6l5` build** (the uniform's sixth member, `shadowDirection` @ 64)
+- **Facts**:
+  - **not the same as `bloxdSunDirection()`**: the shadow light falls back to the moon at night and to the default sky's sun when the world has no sun, so shadows exist under a sunless sky too
+  - its `y` is never above 0 (0 when the sun is on the horizon) — the light always comes down
+- **Uses**: aligning your own light shafts / god rays with the engine's shadows, shading slanted surfaces consistently with `bloxdShadow()`
 
 ### bloxdSeconds
 
@@ -140,6 +158,41 @@ The engine's own lighting recipe, documented as callable WGSL — compose or ove
 | `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | the surface's color lit as the engine does (before emission and fog) |
 | `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | apply this fragment's fog (`mix(colour, fogColour, fogAlpha)`) |
 
+## Shadow functions
+
+The `bbb6l5` build added the engine's real sun/moon shadow system to the pack API — projected, sun-following shadows cast by blocks, players, mobs and items. These three functions are **injected into every pack's compiled module** (like `bloxdFragmentBlockPosition`) and documented in the validator's function table, but are not part of the readable header text.
+
+### bloxdShadow
+
+```wgsl
+fn bloxdShadow() -> f32
+```
+
+- **Returns**: sunlight or moonlight reaching this fragment — **0 in shadow, 1 lit** — *new in `bbb6l5`*
+- What casts them: **blocks, players, mobs and items** (the engine also excludes the first-person held item — the body you're in would shade it as you turn)
+- Behavior (verbatim from the validator's description):
+  - fades to 0 as the sun or moon sets, or as the face turns away from the light
+  - **1 on `flags.emissive` faces** (a face lit by its own light has no shadow)
+  - the light travels along `bloxdShadowDirection()`, so shadows show under a sky with no sun too
+- **Callable from**: surface / light hooks
+- Recipe: `let sun = mix(shadowColour, litColour, bloxdShadow());` — see [Shadows](../guides/shadows.md)
+
+### bloxdAirShadow
+
+```wgsl
+fn bloxdAirShadow(t: f32) -> f32
+```
+
+- **Returns**: like `bloxdShadow()`, but at a point **between the camera (t = 0) and this fragment (t = 1)** — *new in `bbb6l5`* — for light shafts and volumetric rays
+- **Facts** (verbatim from the validator's description):
+  - **only blocks cast these shadows** (players and mobs do not), **blurred to whole blocks**
+  - `t` is clamped to 0–1
+- Recipe: sample several `t` values along the view ray and accumulate — [Shadows](../guides/shadows.md)
+
+### bloxdShadowDirection
+
+See [Frame functions](#bloxdshadowdirection) above — it belongs with the shadow functions conceptually, but lives in the readable header.
+
 ## Special functions
 
 ### bloxdOpaqueBehind
@@ -157,4 +210,4 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 
 ## Related
 
-- [Lighting](lighting.md) · [Texture API](texture-api.md) · [Pack format](pack-format.md)
+- [Lighting](lighting.md) · [Texture API](texture-api.md) · [Pack format](pack-format.md) · [Shadows](../guides/shadows.md)

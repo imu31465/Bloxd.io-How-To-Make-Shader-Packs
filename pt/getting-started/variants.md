@@ -1,6 +1,6 @@
 # Variantes e guardas
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Analyzed
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção em 2026-11-20) · Estado: Analyzed
 
 ## 6 variantes
 

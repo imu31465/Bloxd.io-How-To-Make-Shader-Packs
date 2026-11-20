@@ -1,8 +1,8 @@
 # Заголовок движка (дословно)
 
-> Целевой API: 5 · Целевой билд: `v98qt8` (проверено в продакшене 2026-11-08) · Статус: Analyzed (восстановлено из живого продакшн-бандла)
+> Целевой API: 5 · Целевой билд: `bbb6l5` (проверено в продакшене 2026-11-20) · Статус: Analyzed (восстановлено из живого продакшн-бандла)
 
-Точный текст, который загрузчик дописывает перед каждым паком. Восстановлен из живого продакшн-бандла (`ab90qa`, чанк c55, шаблон, отрендеренный с его 6 живыми интерполяциями — `apiVersion` и 5 чтениями uniform через `bloxdPackInputs`). 8 954 декодированных байта, 208 строк. Ничего не перефразировано. На текущем продакшн-билде (`bny9u`, чанк c56 (перенумерован с c55), 2026-11-05) перепроверено байт в байт — те же 8,954 декодированных байта, 208 строк. Повторно проверено на `v98qt8` (2026-11-08, модуль заголовка 30052 в чанке c63 — снова перенумерован): по-прежнему побайтово идентичен, 8 954 декодированных байта, 208 строк.
+Точный текст, который движок ставит в начало каждого пака, отрендеренный из валидатора живого билда с применёнными интерполяциями (`apiVersion` и 6 чтений uniform через `bloxdPackInputs`). 216 строк. Без пересказа. Проверен повторно на предыдущих билдах (`bny9u`, `v98qt8`) — единственное изменение — теневое содержимое.
 
 Как читать:
 - Пояснения по каждому полю → [Структуры](../api/structures.md)
@@ -14,7 +14,6 @@
 - Как валидируется заголовок (HEADER_VERSION) → [Валидация шейдеров](shader-validation.md)
 
 ```wgsl
-
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
@@ -38,8 +37,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -90,7 +98,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -158,7 +166,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {

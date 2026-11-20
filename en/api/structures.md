@@ -1,6 +1,6 @@
 # Input & output structures
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored verbatim from the live header)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored verbatim from the live header)
 
 Seven structs are readable/writable by packs. Every field is listed below (`#ifdef` fields are conditional). The full header is in [Engine Internals](../internals/engine-header.md).
 
@@ -26,7 +26,7 @@ struct BloxdVertexIn {
 
 ```wgsl
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 ```
 
@@ -135,7 +135,7 @@ Field-by-field meaning and role in lighting math: see [Lighting](lighting.md).
 
 ```wgsl
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 ```
 
@@ -149,7 +149,7 @@ struct BloxdOpaqueBehind {
 }
 ```
 
-Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef BLOXD_SCENE_DEPTH` guard (the field was `found: bool` in v2).
+Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef BLOXD_SCENE_DEPTH` guard (the field was `found: bool` in v2). The shadow-era additions (`bloxdShadow` / `bloxdAirShadow` return plain `f32`) are documented in [Functions](functions.md).
 
 ## Conditional fields ↔ macros
 

@@ -1,6 +1,6 @@
 # Formato del paquete
 
-> API objetivo: 5 · Build objetivo: `v98qt8` (2026-11-08, producción y preprod) · Estado: Verified (remedido en el cargador en vivo)
+> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (remedido en el cargador en vivo)
 
 El modelo completo del paquete en una sola página — manifiesto, límites del cargador, uniform por fotograma. Para la versión paso a paso ver [Primeros pasos](../getting-started/manifest.md).
 
@@ -19,6 +19,7 @@ El modelo completo del paquete en una sola página — manifiesto, límites del 
 | `apiVersion` | número | obligatorio | **debe ser exactamente `5`** (`===`). Un string `"5"` falla y se informa con su grafía JSON |
 | `name` | string | obligatorio | no vacío tras recortar espacios; se muestra en los ajustes |
 | `author` | string | opcional | debe ser un string si está presente |
+| `keepCircleShadows` | boolean | opcional | **nuevo en `bbb6l5`** — conserva las antiguas sombras circulares bajo jugadores y mobs cuando tus shaders también usan la API real de sombras sol ([Sombras](../guides/shadows.md)). Por defecto `false`; cualquier otro tipo se rechaza con un mensaje dedicado |
 
 Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un objeto JSON en la raíz del zip.
 
@@ -48,6 +49,7 @@ El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScr
 | 16 | `renderOffset` | `vec3i` | respalda `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | respalda `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | respalda `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | **nuevo en `bbb6l5`** — la dirección en que viaja la luz que proyecta sombras; respalda `bloxdShadowDirection()` |
 
 `lit` cupo en el relleno que v4 ya tenía entre `seconds` y `renderOffset` (los desplazamientos 4–15 eran huecos de alineación; `vec3i` necesita alineación de 16 bytes, así que `renderOffset` se queda en 16). El tamaño total y todos los demás desplazamientos no cambian. El motor lo escribe con un único `setUint32(4, lit ? 1 : 0)` — es un flag, no un nivel de luz (los nombres del lado JS de v4 `terrainLightLevels` / `terrainHeldLight` han desaparecido por completo del bundle).
 

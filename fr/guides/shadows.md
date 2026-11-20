@@ -1,6 +1,8 @@
 # Ombres
 
-> API cible : 5 · Build cible : `v98qt8` · État : Verified (comportement du LightEngine inchangé depuis la mesure en v4)
+> API cible : 5 · Build cible : `bbb6l5` · État : Verified (comportement du LightEngine inchangé depuis la mesure en v4)
+> **Depuis `bbb6l5`** : la véritable API d’ombres solaires a été ajoutée — `bloxdShadow()` (facteur d’ombre 0–1 ; blocs, joueurs, mobs et objets projettent et suivent le soleil), `bloxdAirShadow(t)` (pour les rais de lumière) et `bloxdShadowDirection()` (direction de la lumière). `keepCircleShadows` dans pack.json permet de garder aussi les anciennes ombres circulaires. Détails dans [Fonctions](../api/functions.md).
+
 
 Les trois façons de faire des « ombres » dans un pack de shaders, et leurs limites.
 

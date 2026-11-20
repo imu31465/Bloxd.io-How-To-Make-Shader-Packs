@@ -1,6 +1,6 @@
 # Fonctions
 
-> API cible : 5 · Build cible : `v98qt8` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
+> API cible : 5 · Build cible : `bbb6l5` · État : Analyzed (restauré mot à mot depuis l'en-tête en production)
 
 Toutes les fonctions de l'en-tête. L'API de textures (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) est couverte dans [API de textures](texture-api.md), tout comme `bloxdOpaqueBehind`.
 
@@ -139,6 +139,37 @@ La recette d'éclairage propre du moteur, documentée comme WGSL appelable — c
 | `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | la lumière du monde à cet endroit (la plus brillante de bloc/ciel/main, `ambientLightColour` comme plancher) |
 | `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | la couleur de la surface éclairée comme le moteur le fait (avant émission et brouillard) |
 | `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | appliquer le brouillard de ce fragment (`mix(colour, fogColour, fogAlpha)`) |
+
+## Fonctions d’ombres
+
+La build `bbb6l5` a ajouté à l’API des packs le vrai système d’ombres soleil/lune du moteur — des ombres projetées qui suivent le soleil, portées par les blocs, joueurs, mobs et objets. Ces deux fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
+
+### bloxdShadow
+
+```wgsl
+fn bloxdShadow() -> f32
+```
+
+- **Renvoie** : la lumière de soleil ou de lune atteignant ce fragment — **0 à l’ombre, 1 éclairé** — *nouveau dans `bbb6l5`*
+- Qui les porte : **blocs, joueurs, mobs et objets** (l’objet tenu en vue première personne est exclu à dessein)
+- Comportement (littéral de la description du validateur) : s’estompe vers 0 quand le soleil ou la lune descend ou que la face se détourne ; **1 sur les faces `flags.emissive`** ; la lumière suit `bloxdShadowDirection()`, donc des ombres existent même sous un ciel sans soleil
+- **Appelable depuis** : hooks surface / light
+- Recette : `let sun = mix(shadowColour, litColour, bloxdShadow());` — voir [Ombres](../guides/shadows.md)
+
+### bloxdAirShadow
+
+```wgsl
+fn bloxdAirShadow(t: f32) -> f32
+```
+
+- **Renvoie** : comme `bloxdShadow()`, mais en un point **entre la caméra (t = 0) et ce fragment (t = 1)** — *nouveau dans `bbb6l5`* — pour les rais de lumière
+- Seuls les blocs les portent (pas les joueurs/mobs), floutées à des blocs entiers ; `t` est borné à 0–1
+- Recette : échantillonner plusieurs `t` le long du rayon de vue et accumuler — [Ombres](../guides/shadows.md)
+
+### bloxdShadowDirection
+
+Elle appartient conceptuellement aux fonctions d’ombres, mais vit dans l’en-tête lisible — voir [Fonctions d’image](#bloxdshadowdirection).
+
 
 ## Fonctions spéciales
 

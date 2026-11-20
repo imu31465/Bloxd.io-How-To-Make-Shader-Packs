@@ -1,6 +1,6 @@
 # Interioridades do registro de texturas
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
 
 A maquinaria de resolução nome→id e a deriva medida do registro. O catálogo voltado ao usuário: [Catálogo de texturas](../api/texture-catalog.md).
 

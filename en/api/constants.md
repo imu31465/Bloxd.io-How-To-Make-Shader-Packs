@@ -1,6 +1,6 @@
 # Constants
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Analyzed (restored verbatim from the live header)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored verbatim from the live header)
 
 The header provides three constants (texture name constants `bloxdTextureId*` are covered in [Texture API](texture-api.md)).
 

@@ -6,8 +6,8 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 
 - 현재 API: **5** (`pack.json`에 `apiVersion: 5` 선언 필수)
 - 대상: WebGPU 렌더러
-- 최종 확인: 2026-11-05
-- 대상 빌드: `v98qt8.main.62d8d238.js` (프로덕션·preprod, 2026-11-08 검증, 바이트 동일 번들, md5 `7458fd47ff88331d9f451d1456ff48ac` — 레지스트리·헤더·훅·제한 재측정)
+- 최종 확인: 2026-11-20
+- 대상 빌드: `bbb6l5.main.0244a119.js` (프로덕션·preprod, 2026-11-20 검증 — 레지스트리·헤더·훅·제한과 새 섀도 API 재측정)
 - 셰이더 훅: 9개 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 셰이더 팩이 처음이라면 [시작하기](getting-started/)부터, API를 찾는다면 [API 레퍼런스](api/)부터 시작하세요.

@@ -1,6 +1,6 @@
 # Einschränkungen & reservierte Namen
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
 
 Was Pakete schreiben dürfen — und die vollständigen Regeln der Namensreservierung.
 

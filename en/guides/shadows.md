@@ -1,21 +1,58 @@
 # Shadows
 
-> Target API: 5 · Target build: `v98qt8` (2026-11-08, production and preprod) · Status: Verified (LightEngine behavior unchanged since v4 measurement)
+> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (bloxdShadow API re-measured on the live build)
 
-The three ways to make "shadows" in a shader pack, and their limits.
+Two eras of shadow-making: the classic `skyLight` recipe (works on every build since v4), and the **real sun/moon shadows** the `bbb6l5` build added to the API (`bloxdShadow()`). For a new pack on a current build, prefer the real thing.
 
-## Can / cannot
+## Can / cannot (on `bbb6l5`)
 
 | Effect | Possible? | How |
 |---|---|---|
-| Clearly darken under trees/roofs (projected-style) | ◎ | `skyLight` lift inversion + threshold cut (below) |
-| Shadows follow block edits in real time | ◎ | LightEngine recalculates immediately — automatic |
-| Color shadows cool / sunlit warm | ◎ | two-color shift |
-| Shadows rotating with the sun (shadow map) | ✕ | depth is liquid-only; light-ray occlusion is not an input |
-| Physical penumbra | ✕ | capped by voxel-resolution BFS spread |
-| Real-time AO (SSAO) | ✕ | only the AO baked into vertex colors |
+| Real sun-following shadows (blocks, players, mobs, items) | ◎ | `bloxdShadow()` — [the real shadow API](#the-real-shadow-api-bbb6l5) |
+| Light shafts / god rays through the air | ◎ | `bloxdAirShadow(t)` sampled along the view ray |
+| Sun-accurate shading direction for your own math | ◎ | `bloxdShadowDirection()` |
+| The old blob shadows under players kept alongside real shadows | ◎ | `pack.json` → `"keepCircleShadows": true` |
+| Darken under trees/roofs without the shadow API (older builds) | ◎ | `skyLight` lift inversion + threshold cut (below) |
+| Shadows follow block edits in real time | ◎ | both systems recalculate immediately — automatic |
+| Color shadows cool / sunlit warm | ◎ | two-color shift mixed by `bloxdShadow()` |
+| Shadow-map depth access / custom shadow casting | ✕ | the engine's shadow volume is not a pack input; only the final 0-1 factor is |
+| Physical penumbra | △ | block-shadow blur is whole-block; the sky-voxel route is BFS-capped |
 
-## skyLight is a voxel shadow map
+## The real shadow API (`bbb6l5`)
+
+Three additions turned "shadows" from a lighting trick into a first-class input:
+
+- **`bloxdShadow() -> f32`** — sunlight or moonlight reaching this fragment: 0 in shadow, 1 lit. Blocks, players, mobs and items cast these shadows (the first-person held item is excluded on purpose). Fades to 0 as the sun/moon sets or the face turns away; 1 on `flags.emissive` faces.
+- **`bloxdAirShadow(t: f32) -> f32`** — the same light, sampled at a point between the camera (t = 0) and this fragment (t = 1). Only blocks cast (blurred to whole blocks) — built for light shafts.
+- **`bloxdShadowDirection() -> vec3f`** — the travel direction of the light casting them (sun by day, moon by night, the default sky's sun otherwise; `y` never above 0). The uniform grew to 80 bytes for it ([Pack format](../api/pack-format.md)).
+
+The minimal daylight recipe:
+
+```wgsl
+fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(surface, light);
+    // 0 in shadow, 1 lit — mix your own two colors
+    let sun = mix(vec3f(0.62, 0.66, 0.78), vec3f(1.0), bloxdShadow());
+    out.colour *= sun;
+    return out;
+}
+```
+
+Light shafts: sample `bloxdAirShadow` at a few points along the view ray and accumulate the lit fraction, then scatter it into the fog:
+
+```wgsl
+// in a light hook — cheap 4-tap shaft
+var shaft = 0.0;
+for (var i = 1u; i <= 4u; i++) {
+    shaft += bloxdAirShadow(f32(i) / 4.0);
+}
+let rays = shaft / 4.0;   // 0..1 how open the air is between you and this fragment
+out.colour += rayColour * rays * rayStrength;
+```
+
+**`keepCircleShadows`**: when a game casts entity sun shadows and your pack's shaders reach `bloxdShadow()`, the engine drops the old circular blob shadows under players and mobs by default (they would double up with the real ones). Set `"keepCircleShadows": true` in `pack.json` to keep both.
+
+## skyLight is a voxel shadow map (the classic recipe)
 
 `l.skyLight` is not just a brightness parameter. The mesher's LightEngine computes Minecraft-style **"can this position see the sky" voxel occlusion data — a shadow map**:
 
@@ -55,12 +92,14 @@ let lit = sunL * sky;
 
 Dials: **area** = `shTh` (0.93→radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **edge softness** = `shSoft`; **core darkness** = the minimum ambient and sky-scatter two-point shift; long evening shadows ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
+**On current builds you can gate this whole recipe with `bloxdShadow()`** instead of the threshold cut — the sky-voxel route stays useful for stylized half-tone shadows or as a fallback when you want one code path for every build.
+
 ## Honest limits
 
-- Shadows reference the **upward sky**, so they **do not rotate with the sun** (voxel resolution; soft edges come from BFS spread)
-- The engine's lighting template retains an unused `var shadow: f32 = 1.;` (always 1.0 = disabled) — a plausible "future plans" trace for pixel-accurate rotating shadows
-- Pixel-accurate rotating shadows are outside the current API ([Unreachable effects](constraints.md))
+- The sky-voxel route references the **upward sky**, so it **does not rotate with the sun** (soft edges come from BFS spread) — `bloxdShadow()` is the API that does
+- The engine's shadow volume is not exposed — packs consume the final 0-1 factor, never the shadow map itself
+- Pixel-accurate penumbra stays out of reach: `bloxdAirShadow` blurs to whole blocks, and the sky-voxel route is capped by BFS spread
 
 ## Related
 
-- [realism recipes](../recipes/realism.md) (the full projected-shadow recipe) · [Lighting Internals](../internals/lighting-internals.md) · [Debugging tips](debugging.md)
+- [Functions: shadow functions](../api/functions.md) · [realism recipes](../recipes/realism.md) (the classic projected-shadow recipe) · [Lighting Internals](../internals/lighting-internals.md) · [Debugging tips](debugging.md)

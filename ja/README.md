@@ -6,8 +6,8 @@ Bloxd.io の WebGPU レンダラー向けシェーダーパックについて、
 
 - 現行API: **5** (`pack.json` の `apiVersion: 5` が必須)
 - 対象: WebGPU レンダラー
-- 最終確認: 2026-11-05
-- 対象ビルド: `v98qt8.main.62d8d238.js` (本番+preprod、2026-11-08 確認、バイト同一バンドル、md5 `7458fd47ff88331d9f451d1456ff48ac` — レジストリ・ヘッダー・フック・制限を再計測)
+- 最終確認: 2026-11-20
+- 対象ビルド: `bbb6l5.main.0244a119.js` (本番+preprod、2026-11-20 確認 — レジストリ・ヘッダー・フック・制限と新シャドウAPIを再計測)
 - 対応シェーダーフック: 9種 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 新しくシェーダーパックを作成する場合は [はじめに](getting-started/) から、API仕様を調べる場合は [APIリファレンス](api/) から読み進めてください。

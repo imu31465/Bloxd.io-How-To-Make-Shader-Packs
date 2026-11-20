@@ -1,8 +1,8 @@
 # इंजन हेडर (शब्दशः)
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `v98qt8` (2026-11-08 को प्रोडक्शन और preprod में सत्यापित) · स्थिति: Analyzed (लाइव प्रोडक्शन बंडल से बहाल)
+> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bbb6l5` (2026-11-20 को प्रोडक्शन और preprod में सत्यापित) · स्थिति: Analyzed (लाइव प्रोडक्शन बंडल से बहाल)
 
-वह सटीक पाठ जो लोडर हर पैक के आगे जोड़ता है। लाइव प्रोडक्शन बंडल (`ab90qa`, चंक c55, टेम्पलेट को उसके 6 लाइव इंटरपोलेशन के साथ रेंडर करके — `apiVersion` और `bloxdPackInputs` के ज़रिए 5 uniform पठन) से बहाल किया गया। 8,954 बाइट डिकोडेड, 208 पंक्तियाँ। कहीं भी कोई पेराफ़्रेज़ नहीं। मौजूदा प्रोडक्शन बिल्ड (`bny9u`, चंक c56 (c55 से पुनः क्रमांकित), 2026-11-05) पर बाइट-समान पुनः सत्यापित — वही 8,954 डिकोडेड बाइट, 208 पंक्तियाँ। `v98qt8` (2026-11-08, हेडर मॉड्यूल 30052 चंक c63 में — पुनः रीनंबर) पर फिर से सत्यापित: अब भी बाइट-समान, 8,954 डिकोडेड बाइट, 208 पंक्तियाँ।
+वह सटीक पाठ जो इंजन हर पैक के आगे जोड़ता है, लाइव बिल्ड के वैलिडेटर से इंटरपोलेशन लागू कर रेंडर किया गया (`apiVersion` और `bloxdPackInputs` से 6 uniform रीड)। 216 पंक्तियाँ। कहीं भी पैराफ्रेज़ नहीं। पिछले बिल्ड पर दोबारा सत्यापित — एकमात्र बदलाव छाया संबंधी सामग्री है।
 
 पठन गाइड:
 - फ़ील्ड-दर-फ़ील्ड व्याख्याएँ → [स्ट्रक्चर](../api/structures.md)
@@ -14,7 +14,6 @@
 - हेडर का सत्यापन कैसे होता है (HEADER_VERSION) → [शेडर सत्यापन](shader-validation.md)
 
 ```wgsl
-
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
@@ -38,8 +37,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -90,7 +98,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -158,7 +166,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {

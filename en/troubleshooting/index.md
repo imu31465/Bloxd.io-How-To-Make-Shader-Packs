@@ -18,7 +18,7 @@ Errors and visual problems, findable **by symptom**. Pages follow the structure:
 | Slow / dropped by the on-device check | [Performance](performance.md) |
 | Legal, safety, common questions | [FAQ](faq.md) |
 
-> Target API: 5 · Target build: `v98qt8` (verified in production and preprod 2026-11-08) · Status: Verified (messages recorded verbatim from the live validator & loader)
+> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified (messages recorded verbatim from the live validator & loader)
 
 ## Where errors appear
 

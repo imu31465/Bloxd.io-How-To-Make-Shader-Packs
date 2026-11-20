@@ -1,6 +1,6 @@
 # Engine-Daten-Hauptbuch
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08; Produktion und Preprod liefern dasselbe byte-identische Bundle) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20; Produktion und Preprod liefern dasselbe byte-identische Bundle) · Status: Verified
 
 Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `bny9u` gemessen.
 

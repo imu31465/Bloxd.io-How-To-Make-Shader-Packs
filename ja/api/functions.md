@@ -1,6 +1,6 @@
 # 関数
 
-> 対象API: 5 · 対象ビルド: `v98qt8` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
+> 対象API: 5 · 対象ビルド: `bbb6l5` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
 
 ヘッダーが提供する全関数を掲載します。テクスチャAPI (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) は [テクスチャAPI](texture-api.md) で、特殊関数 `bloxdOpaqueBehind` も含めて個別に詳説します。
 
@@ -141,6 +141,42 @@ v4 作者が手で再導出し続けてきたエンジン自身のライティ�
 | `bloxdWorldLight` | `(light: BloxdLightIn) -> vec3f` | このフラグメントのワールドの光 (block/sky/held の最明値、`ambientLightColour` を下限に) |
 | `bloxdLitColour` | `(surface: BloxdSurface, light: BloxdLightIn) -> vec3f` | エンジンと同じ順序で照らされた面の色 (emission とフォグの前) |
 | `bloxdApplyFog` | `(colour: vec3f, light: BloxdLightIn) -> vec3f` | このフラグメントのフォグを色に適用 (`mix(colour, fogColour, fogAlpha)`) |
+
+## シャドウ関数
+
+\u0060bbb6l5\u0060 ビルドは、エンジンの本物の太陽・月シャドウシステム (ブロック・プレイヤー・モブ・アイテムが落とす、太陽追従の投影シャドウ) をパック API に追加しました。この2関数は**パックのコンパイル済みモジュールに注入**され (\u0060bloxdFragmentBlockPosition\u0060 と同様)、バリデータの関数表には記載されていますが、可読ヘッダーの本文には含まれません。
+
+### bloxdShadow
+
+\u0060\u0060\u0060wgsl
+fn bloxdShadow() -> f32
+\u0060\u0060\u0060
+
+- **戻り値**: このフラグメントに届く太陽光または月光 — **影の中で 0、照っていれば 1** — *`bbb6l5` の新設*
+- 何が影を落とすか: **ブロック・プレイヤー・モブ・アイテム** (一人称視点の手持ちアイテムは意図的に除外 — 体が回ると自分が自分に影を落とすため)
+- 挙動 (バリデータの説明から逐語):
+  - 太陽・月の沈み込みや、面が光から背くにつれて 0 へフェード
+  - **\u0060flags.emissive\u0060 の面では 1** (自ら光る面に影はない)
+  - 光は \u0060bloxdShadowDirection()\u0060 に沿って進むため、太陽のない空の下でも影は出る
+- **呼び出し可能**: surface / light フック
+- レシピ: \u0060let sun = mix(shadowColour, litColour, bloxdShadow());\u0060 — [影の表現](../guides/shadows.md) を参照
+
+### bloxdAirShadow
+
+\u0060\u0060\u0060wgsl
+fn bloxdAirShadow(t: f32) -> f32
+\u0060\u0060\u0060
+
+- **戻り値**: \u0060bloxdShadow()\u0060 と同様だが、**カメラ (t = 0) とこのフラグメント (t = 1) の間の点**で評価 — *`bbb6l5` の新設* — 光のシャフト (god ray) 用
+- 特徴 (バリデータの説明から逐語):
+  - **ブロックのみが落とす** (プレイヤー・モブは落とさない)、**ブロック単位にぼかされる**
+  - \u0060t\u0060 は 0〜1 にクランプ
+- レシピ: 視線に沿って複数の \u0060t\u0060 をサンプルして累積 — [影の表現](../guides/shadows.md)
+
+### bloxdShadowDirection
+
+概念としてはシャドウ関数と並びますが、可読ヘッダーに存在するため [フレーム関数](#bloxdshadowdirection) を参照してください。
+
 
 ## 特殊関数
 

@@ -1,8 +1,8 @@
 # 引擎标头 (v5, 逐字)
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Analyzed (从现行生产包复原)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从现行生产包复原)
 
-加载器拼在每个包前面的精确文本。复原自现行生产包 (`ab90qa`，chunk c55，以 6 处现行插值渲染模板 — `apiVersion` 与经 `bloxdPackInputs` 的 5 个 uniform 读取)。解码后 8,954 字节、208 行。没有任何转述。已在当前生产构建 (`bny9u`，分块 c56 （自 c55 重新编号），2026-11-05) 上复核字节一致 — 同样的 8,954 解码字节、208 行。 在 `v98qt8` (2026-11-08，头部模块 30052 位于 chunk c63 — 再次重新编号) 上再次复核：仍然字节相同，解码后 8,954 字节、208 行。
+引擎为每个着色器包前置的**准确文本**，从当前线上构建的验证器渲染并应用插值（`apiVersion` 与通过 `bloxdPackInputs` 的 6 个 uniform 读取）。216 行。没有任何改写。此前的线上构建（`bny9u`、`v98qt8`）上再次验证——唯一的变化是阴影相关内容。
 
 阅读指引:
 - 逐字段说明 → [结构体](../api/structures.md)
@@ -14,7 +14,6 @@
 - 标头如何被验证 (HEADER_VERSION) → [着色器验证](shader-validation.md)
 
 ```wgsl
-
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
@@ -38,8 +37,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -90,7 +98,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -158,7 +166,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {

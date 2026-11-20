@@ -1,8 +1,8 @@
 # エンジンヘッダ (逐語)
 
-> 対象API: 5 · 対象ビルド: `v98qt8` (2026-11-08 本番+preprod確認) · 検証状況: Analyzed (ライブ本番バンドルから復元)
+> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20 本番+preprod確認) · 検証状況: Analyzed (ライブ本番バンドルから復元)
 
-ローダーがすべてのパックの先頭に付す**正確なテキスト**です。ライブ本番バンドル (`ab90qa`、チャンク c55、テンプレートを 6 個のライブ補間 — `apiVersion` と `bloxdPackInputs` 経由の 5 個の uniform 読み出し — でレンダリング) から復元しました。デコード後 8,954 バイト、208 行。言い換えは一箇所もありません。現行の本番ビルド (`bny9u`、チャンク c56 (c55 から再番号)、2026-11-05) でバイト同一を再確認 — 同じデコード後 8,954 バイト・208 行です。 `v98qt8` (2026-11-08、ヘッダーモジュール 30052 はチャンク c63 — さらに再番号) でも再検証: 引き続きバイト同一、デコード後 8,954 バイト・208 行。
+エンジンがすべてのパックの先頭に付す**正確なテキスト**です。ライブビルドのバリデータから補間を適用してレンダリングしました (`apiVersion` と `bloxdPackInputs` 経由の 6 個の uniform 読み出し)。216 行。言い換えは一箇所もありません。過去の本番ビルド (`bny9u`、`v98qt8`) でも再検証済み — 追加されたのはシャドウ関連のみです。
 
 参照用のガイド:
 - 各フィールドの解説 → [入出力構造体](../api/structures.md)
@@ -14,7 +14,6 @@
 - ヘッダーが検証に使われる仕組み (HEADER_VERSION) → [シェーダー検証の内部](shader-validation.md)
 
 ```wgsl
-
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
@@ -38,8 +37,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -90,7 +98,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -158,7 +166,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {

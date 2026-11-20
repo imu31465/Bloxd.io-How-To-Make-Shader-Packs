@@ -1,6 +1,6 @@
 # 引擎内部机制与研究
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 通过分析引擎实现复原的内部规格。这里的一切都直接复原自当前生产构建 (`bny9u`) 的 JavaScript。与公开 API 文档 ([API 参考](../api/)) 分离，以保存精确的内部行为与分析结果。
 
