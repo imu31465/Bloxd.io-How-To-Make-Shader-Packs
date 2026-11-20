@@ -1,8 +1,12 @@
 // Shader Studio シェーダー生成。
 // エンジンの実測仕様 (docs-repo: internals/*) に忠実:
-//   - bloxdPackInputs uniform: @group(3) @binding(0), 64B
-//     (seconds@0, lit@4 u32, renderOffset@16 vec3i, sunDirection@32, eyePosition@48)
+//   - bloxdPackInputs uniform: @group(3) @binding(0), 80B (bbb6l5)
+//     (seconds@0, lit@4 u32, renderOffset@16 vec3i, sunDirection@32,
+//      eyePosition@48, shadowDirection@64)
 //   - group3: 0 uniform / 1 scene depth (liquidのみ) / 2 bloxdSpTextureLayers storage
+//   - bloxdShadow / bloxdAirShadow (bbb6l5 の注入関数) は studio 近似実装:
+//     影ボリュームを持たないため、光源方向・仰角・emissive フラグと
+//     skyLight (LightEngine のブロック専用 BFS) から再現 (docs: guides/shadows.md)
 //   - 6バリアント: strict|allow × terrain|liquid|model (マクロ行列は docs通り)
 //   - bloxdTexel は atlas path (バリアント2) を verbatim 実装:
 //     回転 if-chain はエンジン生成コードと同一、現在フラグメントの
@@ -24,7 +28,9 @@ import ENGINE_HEADER from './engine-header.mjs'
 export function makeTextureIdConstants() {
   const seen = new Set()
   const out = []
-  for (const { name, id } of registry.names) {
+  for (const { name, id, usable } of registry.names) {
+    // bbb6l5: 折り畳み正常化後の使用可能名のみ (frame/回転/~遷移綴りは本番で定数にできない)
+    if (!usable) continue
     const cname = 'bloxdTextureId' + name
       .split(/[^a-zA-Z0-9]+/).filter(Boolean)
       .map(p => p[0].toUpperCase() + p.slice(1)).join('')
@@ -41,6 +47,44 @@ export function makeTextureIdConstants() {
 export const FRAGMENT_BLOCK_POSITION_WGSL = /* wgsl */`
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i {
     return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
+}
+`
+
+// bloxdShadow / bloxdAirShadow — bbb6l5 でパックに開放された本物の太陽・月
+// シャドウ API (docs: api/functions.md「Shadow functions」)。本番は影
+// ボリューム (3D テクスチャ + レイマーチ) から解くが、studio はボリュームを
+// 持たないため挙動に整合する近似で実装する:
+//   - emissive 面は 1 (自ら光る面に影なし — 本番仕様どおり)
+//   - 面が光から背く・太陽/月が沈むにつれ 0 へフェード (smoothstep)
+//   - bloxdAirShadow は「ブロックのみ・ブロック単位ぼかし」= LightEngine の
+//     skyLight (天空可視ボクセル遮蔽、BFS 拡散) を un-lift して使用
+//     (t はクランプのみ効かせない — 近似の旨をコメント明記)
+export const SHADOW_FUNCTIONS_WGSL = /* wgsl */`
+var<private> bloxdSpShadowNormal: vec3f;
+var<private> bloxdSpShadowEmissive: bool;
+var<private> bloxdSpSkyLight: f32;
+
+fn bloxdShadow() -> f32 {
+    // A face lit by its own light
+    if (bloxdSpShadowEmissive) {
+        return 1.0;
+    }
+    let light = -bloxdShadowDirection();
+    let facing = smoothstep(0.0, 0.5, dot(normalize(bloxdSpShadowNormal), light));
+    // Fades to 0 as the sun or moon sets
+    let elevation = smoothstep(0.0, 0.1, light.y);
+    return facing * elevation;
+}
+
+fn bloxdAirShadow(bloxdSpT: f32) -> f32 {
+    // Only blocks cast these shadows, blurred to whole blocks — the studio
+    // approximates with the sky-voxel occlusion (LightEngine BFS) at this
+    // fragment; t is clamped per the spec.
+    let t = clamp(bloxdSpT, 0.0, 1.0);
+    // lift 逆変換 (docs: guides/shadows.md — c=(1-y)^(1/3); x=3(1-c)/(3-2c))
+    let c = pow(1.0 - bloxdSpSkyLight, 1.0 / 3.0);
+    let raw = 3.0 * (1.0 - c) / (3.0 - 2.0 * c);
+    return select(raw, 1.0, bloxdSpShadowEmissive) * (0.5 + 0.5 * t);
 }
 `
 
@@ -92,6 +136,8 @@ struct BloxdPackInputs {
   sunDirection: vec3f,     // @offset(32)
   _pad3: f32,
   eyePosition: vec3f,      // @offset(48)
+  _pad4: f32,
+  shadowDirection: vec3f,  // @offset(64) — bbb6l5 で追加、合計 80B
 };
 @group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs;
 @group(3) @binding(2) var<storage, read> bloxdSpTextureLayers: array<u32>;
@@ -115,15 +161,17 @@ struct ViewUniforms {
   overlay: vec4f,            // xyz = rgb, w = alpha
 };
 @group(0) @binding(0) var<uniform> view: ViewUniforms;
-// アトラスは本番と同じ 5 構成 (imagesPerAtlas [256,256,256,256,203]) —
-// maxTextureArrayLayers の既定下限 256 に合わせ、5 枚 × ≤256 層の
+// アトラスは本番と同じ 7 構成 (imagesPerAtlas [256,256,256,256,256,256,114]) —
+// maxTextureArrayLayers の既定下限 256 に合わせ、7 枚 × ≤256 層の
 // texture_2d_array に分割してバインドする (どのアダプターでも GPU パスが動く)。
 @group(0) @binding(1) var textureAtlas0: texture_2d_array<f32>;
 @group(0) @binding(2) var textureAtlas1: texture_2d_array<f32>;
 @group(0) @binding(3) var textureAtlas2: texture_2d_array<f32>;
 @group(0) @binding(4) var textureAtlas3: texture_2d_array<f32>;
 @group(0) @binding(5) var textureAtlas4: texture_2d_array<f32>;
-@group(0) @binding(6) var textureAtlasSampler: sampler;
+@group(0) @binding(6) var textureAtlas5: texture_2d_array<f32>;
+@group(0) @binding(7) var textureAtlas6: texture_2d_array<f32>;
+@group(0) @binding(8) var textureAtlasSampler: sampler;
 
 // ---- 現在フラグメント情報 (エンジンの bloxdSp* 一時変数の役割) ----
 var<private> bloxdSpTextureRotation: u32;
@@ -197,20 +245,23 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
   // texture_2d_array 版のシグネチャは (t, s, coords, array_index: u32, level: f32)
   // — level は f32 で渡す (旧実装は u32 を渡しており GPU パスが常に壊れていた)
   let level = clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u));
-  // 本番の 5 アトラス構成: スロット → (ストリップ, 行) への分割
+  // 本番の 7 アトラス構成: スロット → (ストリップ, 行) への分割
   let strip = layer / 256u;
   let row = layer % 256u;
   if (strip == 0u) { return textureSampleLevel(textureAtlas0, textureAtlasSampler, bloxdSpTurned, row, level); }
   if (strip == 1u) { return textureSampleLevel(textureAtlas1, textureAtlasSampler, bloxdSpTurned, row, level); }
   if (strip == 2u) { return textureSampleLevel(textureAtlas2, textureAtlasSampler, bloxdSpTurned, row, level); }
   if (strip == 3u) { return textureSampleLevel(textureAtlas3, textureAtlasSampler, bloxdSpTurned, row, level); }
-  return textureSampleLevel(textureAtlas4, textureAtlasSampler, bloxdSpTurned, row, level);
+  if (strip == 4u) { return textureSampleLevel(textureAtlas4, textureAtlasSampler, bloxdSpTurned, row, level); }
+  if (strip == 5u) { return textureSampleLevel(textureAtlas5, textureAtlasSampler, bloxdSpTurned, row, level); }
+  return textureSampleLevel(textureAtlas6, textureAtlasSampler, bloxdSpTurned, row, level);
 }
 
-// ---- bloxdTextureId* 名前付き定数 (911名) + 非公開だが今も注入される
-// bloxdFragmentBlockPosition (api/functions.md 参照) ----
+// ---- bloxdTextureId* 名前付き定数 (使用可能 1,017 名) + 非公開だが今も
+// 注入される bloxdFragmentBlockPosition + bbb6l5 のシャドウ関数 ----
 ${makeTextureIdConstants()}
 ${FRAGMENT_BLOCK_POSITION_WGSL}
+${SHADOW_FUNCTIONS_WGSL}
 `
 
   // ------------------------------------------------ runtime (hooks wiring) ---
@@ -348,6 +399,9 @@ fn fsMain(f: FragmentOut) -> @location(0) vec4f {
   bloxdSpFragPosition = f.vPosition;
   bloxdSpScreenUV = f.pos.xy / view.nearFarViewport.zw;
   bloxdSpFragDepth = f.pos.z;
+  bloxdSpShadowNormal = f.vNormal;
+  bloxdSpShadowEmissive = decodeFlags(f.vFlagsBits).emissive;
+  bloxdSpSkyLight = bloxdSpLift(f32((f.vLightLevels >> 12u) & 15u));
 
   var surface = buildSurfaceIn(f);
   // splice 相当: surface フック → baseColor / alpha の書き戻し

@@ -1,9 +1,11 @@
 // 実アトラス読み込み — bloxd.io 本番と同一のデータ・同一のデコード経路。
 //
-// データ: 本番ビルド v98qt8 の pre-built default atlas (bundle chunk 49,
-// module 28312) から抽出した 5 枚のアトラス縦ストリップ (8 x 2048, 8x8 タイル)。
-// textureNameToIndex (1227 名 → 0 基準スロット) は同ビルドの
-// builtTextureIndexFingerprint (DJB2 = 13d4e18f) と完全一致を検証済み。
+// データ: 本番ビルド bbb6l5 の pre-built default atlas から抽出した 7 枚の
+// アトラス縦ストリップ (8 x 2048, 8x8 タイル、6×256 + 114 使用)。
+// textureNameToIndex (1650 スロット) は同ビルドの
+// builtTextureIndexFingerprint (DJB2 = 32451195) と完全一致を検証済み。
+// 折り畳み後の使用可能名 (registry.names) は 1,017 名 — bbb6l5 で v98qt8 の
+// folding リグレッションが修正されたため、frame/回転/遷移 (~) 綴りは定数にできない。
 //
 // デコード経路は本番ローダー (main.js texture-pack manager) と同一:
 //   fetch → decodeImage (createImageBitmap) → canvas 2D context →
@@ -11,20 +13,21 @@
 // (本番コード: "await Ki.decodeImage(ni), Vi=Ki.createContext(),
 //   Vi.canvas.width=..., Vi.drawImage(Qi,0,0), Vi.getImageData(...).data")
 //
-// レイヤー構成: スロット s → レイヤー s (0..1226)。studio の textureId は
+// レイヤー構成: スロット s → レイヤー s (0..1649)。studio の textureId は
 // s+1 (API 仕様どおり 0 = "no texture")、bloxdSpTextureLayers は恒等写像
 // (layers[id] = id-1)。アニメ族は本番と同じく別位置のフレームスロットを
-// 指す (registry の frames[])。1227..1239 は studio 専用の余白 (アバター)。
+// 指す (registry の frames[] — 遷移スロット含む)。1650..1662 は studio 専用の
+// 余白 (アバター)。
 //
-// registry.json: { build, fingerprint, count, names:[{name,id,anim,frames,interval}], colors }
+// registry.json: { build, fingerprint, count, names:[{name,id,usable,anim,frames,interval}], colors }
 
 import registry from '../../lib/studio/registry.json' with { type: 'json' }
 import { basePath } from '../../lib/paths.mjs'
 
 export const ATLAS_TILE = 8
-export const ATLAS_STRIPS = 5
-export const REAL_LAYERS = registry.count          // 1227 (本番スロット数と一致)
-export const ATLAS_LAYERS = 1240                  // 実 1227 + studio 専用余白 13
+export const ATLAS_STRIPS = 7
+export const REAL_LAYERS = registry.count          // 1650 (本番スロット数と一致)
+export const ATLAS_LAYERS = 1663                  // 実 1650 + studio 専用余白 13
 export const MIP_LEVELS = 4                       // 8, 4, 2, 1
 
 // ---- 簡易ノイズ (決定的。seeded) — 余白タイル (アバター) 専用 ----
@@ -82,12 +85,12 @@ async function decodeStripPixels(url) {
 let _atlasPixelsPromise = null
 
 // 全レイヤー分の生ピクセル (mip0) を一括生成 (本番 blockAtlasPixels 相当)。
-// 実 1227 レイヤーはアトラスから、1227..1239 は余白タイル。
+// 実 1650 レイヤーはアトラスから、1650..1662 は余白タイル。
 export function buildAtlasPixels() {
   if (_atlasPixelsPromise) return _atlasPixelsPromise
   _atlasPixelsPromise = (async () => {
     const pixels = new Uint8ClampedArray(ATLAS_LAYERS * ATLAS_TILE * ATLAS_TILE * 4)
-    // 5 本のストリップを並行デコード (本番: Promise.all(blockAtlasUrls.map(decode)))
+    // 7 本のストリップを並行デコード (本番: Promise.all(blockAtlasUrls.map(decode)))
     const urls = []
     for (let i = 0; i < ATLAS_STRIPS; i++) {
       urls.push(`${basePath}/tools/shader-studio/atlas-${i}.png`)
@@ -118,7 +121,7 @@ export function buildAtlasPixels() {
 
 // --------------------------------------------- custom (studio-only) ------
 // registry の実レイヤーは本番データで埋め尽くされているため、アバターの
-// タイルは余白レイヤー (1227..1239) に置く。id = layer + 1 (1228..1240)。
+// タイルは余白レイヤー (1650..1662) に置く。id = layer + 1 (1651..1663)。
 const CUSTOM_BASE = REAL_LAYERS
 
 export const CUSTOM_LAYERS = {
