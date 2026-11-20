@@ -9,9 +9,9 @@ Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer —
 ---
 
 ## Erste Schritte
-Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom Überblick bis zum Vertrieb. Es vermittelt direkt die fertige Form der API v5 (ältere Versionen zuerst zu lesen ist unnötig — das ist die Aufgabe der [Versionsgeschichte](history/)).
+Dieser Leitfaden führt dich Schritt für Schritt durch die Erstellung deines ersten Shader Packs — von den Grundlagen über Tests bis zur Veröffentlichung. Er basiert auf der aktuellen API v5; die Migration älterer Versionen wird in der [Versionsgeschichte](history/) erklärt.
 
-### Der Weg
+### Aufbau des Leitfadens
 
 1. [Überblick & Voraussetzungen](getting-started/overview.md) — was Shader Packs können und was nicht
 2. [Voraussetzungen](getting-started/requirements.md) — Browser- und Renderer-Anforderungen
@@ -23,10 +23,9 @@ Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom 
 8. [Validierung](getting-started/validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](getting-started/distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/); für fertige Effekte siehe [Rezepte](recipes/).
-
 
 ---
 
@@ -3077,7 +3076,6 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 > Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
 > **Seit `bbb6l5`**: die echte Sonnenschatten-API wurde hinzugefügt — `bloxdShadow()` (0–1-Schattenfaktor; Blöcke, Spieler, Mobs und Items werfen und folgen der Sonne), `bloxdAirShadow(t)` (für Lichtsäulen) und `bloxdShadowDirection()` (Laufrichtung des Lichts). `keepCircleShadows` in pack.json hält optional auch die alten Kreisschatten. Details in [Funktionen](api/functions.md).
 
-
 Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Grenzen.
 
 ### Möglich / unmöglich
@@ -3087,7 +3085,8 @@ Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Gren
 | Unter Bäumen/Dächern klar abdunkeln (projektionsartig) | ◎ | `skyLight`-Lift-Inversion + Schwellenwert-Schnitt (unten) |
 | Schatten folgen Block-Edits in Echtzeit | ◎ | LightEngine rechnet sofort neu — automatisch |
 | Schatten kühl / Sonnenlicht warm färben | ◎ | Zwei-Farb-Verschiebung |
-| Schatten, die mit der Sonne rotieren (Shadow-Map) | ✕ | Tiefe ist liquid-only; Lichtstrahl-Okklusion ist keine Eingabe |
+| Schatten, die Sonne und Mond folgen | ◎ | `bloxdShadow()` |
+| Zugriff auf die Shadowmap-Tiefe | ✕ | Die API liefert nur den fertigen Faktor, nicht die Tiefendaten. |
 | Physische Penumbra | ✕ | begrenzt durch die Voxel-auflösende BFS-Ausbreitung |
 | Echtzeit-AO (SSAO) | ✕ | nur das in Vertex-Farben gebackene AO |
 
@@ -3131,16 +3130,15 @@ let lit = sunL * sky;
 
 Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **Kanten-Weichheit** = `shSoft`; **Kerndunkelheit** = die Zwei-Punkt-Verschiebung aus Mindest-Ambiente und Himmelsstreulicht; lange Abend-Schatten ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-### Ehrliche Grenzen
+### Grenzen der `skyLight`-Methode
 
-- Schatten referenzieren den **Himmel nach oben**, daher **rotieren sie nicht mit der Sonne** (Voxel-Auflösung; weiche Kanten kommen aus der BFS-Ausbreitung)
-- Die Beleuchtungs-Vorlage der Engine behält ein unbenutztes `var shadow: f32 = 1.;` (immer 1.0 = deaktiviert) — eine plausible Spur „geplante Zukunft“ für pixelgenaue rotierende Schatten
+- Diese Einschränkung gilt nur für die ältere `skyLight`-Methode: Sie orientiert sich am Himmel nach oben und **rotiert nicht mit der Sonne**. Die aktuelle API `bloxdShadow()` folgt dem Sonnen- oder Mondlicht.
+
 - Pixelgenaue rotierende Schatten liegen außerhalb der aktuellen API ([Unerreichbare Effekte](guides/constraints.md))
 
 ### Verwandte Seiten
 
 - [Realismus-Rezepte](recipes/realism.md) (das vollständige Projektions-Schatten-Rezept) · [Beleuchtungs-Interna](internals/lighting-internals.md) · [Debugging-Tipps](guides/debugging.md)
-
 
 ---
 
@@ -3340,7 +3338,7 @@ Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erre
 
 - **Farben, Transparenz und Emission pro Fläche** — die drei `Surface`-Hooks liefern colour (plus bedingtes alpha und emission) für Terrain, Flüssigkeiten und Modelle
 - **Ein vollständiger Licht-Rebuild** — die drei `Light`-Hooks und die Lighting-API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) legen das hauseigene Rezept der Engine als komponierbare Funktionen offen ([Lighting](api/lighting.md))
-- **Projektionsartige Schatten, die Block-Edits in Echtzeit folgen** — `skyLight` sind Voxel-Himmelsverdeckungsdaten; Lift-Inversion + Schwellenschnitt macht daraus klare Schatten unter Bäumen und Dächern ([Schatten](guides/shadows.md))
+- **Schatten, die Sonne und Mond folgen** — `bloxdShadow()` gibt den von der Engine berechneten Schattenfaktor zurück; mit `bloxdAirShadow(t)` lässt sich der Schatten zwischen Kamera und Fragment abtasten, und `bloxdShadowDirection()` liefert die Lichtrichtung ([Schatten](guides/shadows.md))
 - **Die Texturen des Spiels selbst lesen** — `bloxdTexel()` sampelt den Block-Textur-Atlas und modell eigene Texturen exakt so wie der Sampler der Engine ([Textur-API](api/texture-api.md))
 - **Effekte pro Modell** — `flags` sagt dir „das ist ein gehaltenes Item“, „das ist ein fallengelassenes Item“, „das ist ein Spieler“, „das ist eine Stufe“ ([Flags](api/flags.md)); `localPosition` liefert modelllokale Koordinaten ([Strukturen](api/structures.md))
 - **Verzauberungs-Glints und Treffer-Blitz-Overlays** — `enchantTier` / `enchantColour` / `enchantSpeed` und `overlayColour` sind lesbar und übersteuerbar ([Verzauberungs-Effekte](recipes/enchant-effects.md))
@@ -3391,20 +3389,8 @@ Der Unterwasser-Schleier ist ein Spezialfall derselben Struktur: ein emissives, 
 | Wasser-Dickenabsorption | `bloxdOpaqueBehind()`-Dicke + Grundprojektion in Liquid-Hooks ([Flüssigkeiten](recipes/liquids.md)) |
 | Unterwasser-Stimmung | Den Schleier akzeptieren; gestalten, was durch ihn sichtbar ist (Terrain/Flüssigkeit rendern unter Wasser weiterhin normal) |
 
-### Die Wahrheit über Schatten — „Baumschatten" sind baubar
-
-Nur **mit der Sonne rotierende pixelgenaue Shadowmaps** sind in der Tabelle oben unmöglich. Die Engine berechnet „Schatten" von Anfang an, und das ist `skyLight`. Die mesh-seitige LightEngine läuft mit Minecraft-artigem Algorithmus:
-
-1. **Spalten-Scan**: jede (x,z)-Spalte von oben nach unten durchgehen. Himmelslicht startet bei 15, wird an opaken Blöcken **0** und dimmt beim Absteigen mit `lightFilter` (Luft 1 / Wasser 3 / opak 15)
-2. **BFS-Flutfüllung**: seitlich zu 6 Nachbarn expandieren (-1 pro Block) — das weicht Schattenkanten auf. Rohwert unter Radius-r-Verdeckung ist (15-r)/15
-3. blockLight (Fackeln etc.) ist separates BFS aus 3 RGB-Kanälen (4bit-gepackt)
-
-`l.skyLight` ist also kein bloßer Helligkeitsparameter, sondern **Voxel-Verdeckungsdaten für „ist von hier Himmel sichtbar" = eine Schattenkarte**. Unterm Baum, unterm Dach und innen ist sie bereits numerisch niedrig und kommt per Vertex-Interpolation geglättet an. Blöcke zu setzen/brechen rechnet sofort neu = **in Echtzeit folgende Schatten**. Vanilla nutzt sie nur „sanft" via `mix(Ambiente, Himmel, skyLight)`.
-
-Die richtigen Werkzeuge sind die zwei Schritte aus [Schatten](guides/shadows.md) (**Rohwerte per Lift-Inversion wiederherstellen → per Schwellen-`smoothstep` binarisieren**; `th = 1 - r/15` wählt direkt den „als Schatten zählenden Verdeckungsradius") plus **direkte Sonne per Sky gaten** (Sonne erreicht nur sichtbaren Himmel = Essenz der Projektion), komponiert mit warmer Sonnen- und kalter Schatten-Tönung.
-
-**Ehrliche Limits**: Diese Schatten basieren auf „Himmel nach oben" und **rotieren daher nicht mit der Sonne**. Auflösung ist pro Block (weiche Kanten kommen aus der BFS-Streuung). Das Licht-Template der Engine enthält noch einen geschlossenen `var shadow: f32 = 1.;`-Stub für Shadowmaps (immer 1.0 = deaktiviert) — als Spur „geplanter" pixelgenauer Rotationsschatten gedeutet. Sind diese unbedingt nötig, bleiben nur API-ferne Wege (z. B. GLSL-Injektion per Userscript, mit Policy-Risiko).
-
+### Die `skyLight`-Methode als Alternative
+Die oben beschriebene `skyLight`-Technik kann Bereiche unter Bäumen und Dächern abdunkeln. Sie basiert jedoch auf der Sicht zum Himmel nach oben und dreht sich nicht mit der Sonne. Für Schatten, die Sonne oder Mond folgen, verwende `bloxdShadow()`.
 ### Unterwasser-Realität
 
 Unterwasser-Looks bestehen aus 3 Schichten:
@@ -3423,7 +3409,6 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 - [Modelle und Texturen](guides/models.md) — was die Modell-Pipeline erreicht
 - [Kompatibilität](api/compatibility.md) — wie sich Pakete alter Versionen verhalten
 - Änderungen dieser Grenzen Version für Version: [Versionsgeschichte](history/)
-
 
 ---
 

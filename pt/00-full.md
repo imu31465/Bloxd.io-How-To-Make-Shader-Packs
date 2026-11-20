@@ -9,9 +9,9 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 ---
 
 ## Primeiros passos
-Um tutorial de trilha única para autores de pacotes de shaders de primeira viagem, da visão geral à distribuição. Ele ensina diretamente a forma completa da API v5 (não é preciso ler as versões antigas primeiro — esse é o trabalho do [Histórico de versões](history/)).
+Este guia apresenta o processo de criação de um shader pack, dos conceitos básicos aos testes e à distribuição. Ele usa a API v5 atual; a migração de versões anteriores está descrita no [Histórico de versões](history/).
 
-### A trilha
+### Conteúdo do guia
 
 1. [Visão geral e pré-requisitos](getting-started/overview.md) — o que pacotes de shaders podem e não podem fazer
 2. [Requisitos](getting-started/requirements.md) — requisitos de navegador e renderizador
@@ -23,10 +23,9 @@ Um tutorial de trilha única para autores de pacotes de shaders de primeira viag
 8. [Validação](getting-started/validation.md) — a verificação de carga em 3 etapas e os testes no dispositivo
 9. [Distribuição](getting-started/distribution.md) — compactação em zip e higiene de lançamento
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Verified/Analyzed
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified/Analyzed
 
 Quando você precisar da especificação completa, siga para a [Referência da API](api/); para efeitos prontos, veja [Receitas](recipes/).
-
 
 ---
 
@@ -3074,7 +3073,6 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 > API alvo: 5 · Build alvo: `bbb6l5` · Estado: Verified (comportamento do LightEngine inalterado desde a medição da v4)
 > **Desde `bbb6l5`**: a API real de sombras solares foi adicionada — `bloxdShadow()` (fator de sombra 0–1; blocos, jogadores, mobs e itens projetam e seguem o sol), `bloxdAirShadow(t)` (para raios de luz) e `bloxdShadowDirection()` (direção da luz). `keepCircleShadows` no pack.json permite manter também as antigas sombras circulares. Detalhes em [Funções](api/functions.md).
 
-
 As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 
 ### Pode / não pode
@@ -3084,7 +3082,8 @@ As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 | Escurecer claramente sob árvores/telhados (estilo projetado) | ◎ | inversão do lift de `skyLight` + corte por limiar (abaixo) |
 | Sombras que acompanham edições de blocos em tempo real | ◎ | o LightEngine recalcula imediatamente — automático |
 | Sombras coloridas frias / áreas ao sol quentes | ◎ | deslocamento em duas cores |
-| Sombras girando com o sol (mapa de sombras) | ✕ | a profundidade é exclusiva de líquidos; a oclusão por raios de luz não é uma entrada |
+| Sombras que acompanham o sol e a lua | ◎ | `bloxdShadow()` |
+| Acesso à profundidade do mapa de sombras | ✕ | A API retorna o fator final, não os dados de profundidade. |
 | Penumbra física | ✕ | limitada pela dispersão BFS em resolução de voxel |
 | AO em tempo real (SSAO) | ✕ | só o AO cozido nas cores de vértice |
 
@@ -3128,16 +3127,15 @@ let lit = sunL * sky;
 
 Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **suavidade de borda** = `shSoft`; **escuridão do núcleo** = o ambiente mínimo e o deslocamento de dois pontos da dispersão do céu; sombras longas de fim de tarde ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-### Limites honestos
+### Limites da técnica `skyLight`
 
-- As sombras têm como referência o **céu para cima**, então elas **não giram com o sol** (resolução de voxel; bordas suaves vêm da dispersão BFS)
-- O template de iluminação do motor retém um `var shadow: f32 = 1.;` não usado (sempre 1.0 = desativado) — um rastro plausível de "planos futuros" para sombras rotativas precisas ao pixel
+- Essa limitação se aplica apenas à técnica antiga baseada em `skyLight`: ela usa o céu acima como referência e **não gira com o sol**. A API atual `bloxdShadow()` acompanha a luz do sol ou da lua.
+
 - Sombras rotativas precisas ao pixel estão fora da API atual ([Looks inalcançáveis](guides/constraints.md))
 
 ### Relacionado
 
 - [receitas de realismo](recipes/realism.md) (a receita completa de sombra projetada) · [Interioridades de iluminação](internals/lighting-internals.md) · [Dicas de depuração](guides/debugging.md)
-
 
 ---
 
@@ -3336,7 +3334,7 @@ O teto de realismo dos pacotes de shaders em uma página: até onde a API atual 
 
 - **Cores, transparência e emissão, por face** — os três hooks de `Surface` devolvem cor (mais alpha e emissão condicionais) para terreno, líquidos e modelos
 - **Uma reiluminação completa** — os três hooks de `Light` e a API de iluminação (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) expõem a própria receita do motor como funções componíveis ([Iluminação](api/lighting.md))
-- **Sombras de estilo projetado que acompanham edições de blocos em tempo real** — `skyLight` é dado de oclusão de céu por voxel; a inversão do lift + corte por limiar o transforma em sombras nítidas sob árvores e telhados ([Sombras](guides/shadows.md))
+- **Sombras que acompanham o sol e a lua** — `bloxdShadow()` retorna o fator de sombra calculado pelo motor; `bloxdAirShadow(t)` permite amostrar a sombra entre a câmera e o fragmento, e `bloxdShadowDirection()` retorna a direção da luz ([Sombras](guides/shadows.md))
 - **Ler as texturas do próprio jogo** — `bloxdTexel()` amostra o atlas de texturas de blocos e as texturas próprias de modelo exatamente como o sampler do motor faz ([API de texturas](api/texture-api.md))
 - **Efeitos por modelo** — `flags` diz "isto é um item na mão", "isto é um item caído", "isto é um jogador", "isto é uma laje" ([Flags](api/flags.md)); `localPosition` dá coordenadas locais de modelo ([Estruturas](api/structures.md))
 - **Brilhos de encantamento e sobreposições de flash de dano** — `enchantTier` / `enchantColour` / `enchantSpeed` e `overlayColour` são legíveis e sobrescrevíveis ([Efeitos de encantamento](recipes/enchant-effects.md))
@@ -3387,20 +3385,8 @@ O véu submarino é um caso especial da mesma estrutura: é um quad emissive de 
 | Absorção por profundidade da água | Espessura via `bloxdOpaqueBehind()` + projeção de fundo em hooks de líquido ([Líquidos](recipes/liquids.md)) |
 | Ambiente submarino | Aceite o véu; estilize o que é visível através dele (terreno/líquido continuam renderizando normalmente debaixo d'água) |
 
-### A verdade sobre as sombras — "sombras de árvores" dá para fazer
-
-Só os **mapas de sombras precisos ao pixel que acompanham o sol** são impossíveis na tabela acima. O motor já calcula "sombras" desde o início, e isso é `skyLight`. O LightEngine do lado da malha roda um algoritmo estilo Minecraft:
-
-1. **Varredura de colunas**: percorre cada coluna (x,z) de cima para baixo. A luz do céu começa em 15, vira **0 nos blocos opacos**, atenuando ao descer com `lightFilter` (ar 1 / água 3 / opaco 15)
-2. **Preenchimento por inundação BFS**: espalha-se lateralmente aos 6 vizinhos (-1 por bloco) — isto é o que suaviza as bordas de sombra. O valor cru sob oclusão de raio r é (15-r)/15
-3. blockLight (tochas etc.) é um BFS separado de 3 canais RGB (empacotado em 4 bits)
-
-Então `l.skyLight` não é um mero parâmetro de brilho, mas **dado de oclusão em resolução de voxel de "se o céu é visível daqui" = um mapa de sombras**. Sob árvores, sob telhados e em interiores já é numericamente baixo, chegando suavizado por interpolação de vértices. Colocar/quebrar blocos recalcula imediatamente = **sombras que acompanham em tempo real**. Vanilla só o usa "suavemente" via `mix(ambiente, céu, skyLight)`.
-
-As ferramentas certas são os dois passos de [Sombras](guides/shadows.md) (**restaurar valores crus via inversão do lift → binarizar com limiar `smoothstep`**; `th = 1 - r/15` ajusta diretamente o "raio de oclusão tratado como sombra") mais **condicionar o sol direto ao céu** (o sol só chega onde o céu é visível = a essência da projeção), composto com tingimento quente ao sol / frio na sombra.
-
-**Limites honestos**: essas sombras têm como base "o céu para cima", então **elas não giram conforme o sol se move ao longo do tempo**. A resolução é por bloco (bordas suaves vêm da dispersão BFS). O template de iluminação do motor ainda contém um stub fechado `var shadow: f32 = 1.;` para mapas de sombras (sempre 1.0 = desativado) — interpretado como rastro de sombras rotativas precisas ao pixel "planejadas". Se sombras rotativas precisas ao pixel forem imprescindíveis, só restam abordagens fora da API (ex. injeção GLSL por userscript, com risco de política).
-
+### A técnica `skyLight` como alternativa
+A técnica `skyLight` descrita acima serve para escurecer áreas sob árvores e telhados, mas usa a visibilidade do céu acima e não gira com o sol. Para sombras que acompanham o sol ou a lua, use `bloxdShadow()`.
 ### Realidade submarina
 
 Os looks submarinos consistem em 3 camadas:
@@ -3419,7 +3405,6 @@ Pontos práticos: os pacotes continuam funcionando debaixo d'água / o véu não
 - [Modelos e texturas](guides/models.md) — até onde chega o pipeline de modelos
 - [Compatibilidade](api/compatibility.md) — como se comportam os pacotes de versões antigas
 - Mudanças nesses limites versão por versão: [Histórico de versões](history/)
-
 
 ---
 

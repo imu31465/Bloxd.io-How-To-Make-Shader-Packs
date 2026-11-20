@@ -1,8 +1,8 @@
 # Erste Schritte
 
-Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom Überblick bis zum Vertrieb. Es vermittelt direkt die fertige Form der API v5 (ältere Versionen zuerst zu lesen ist unnötig — das ist die Aufgabe der [Versionsgeschichte](../history/)).
+Dieser Leitfaden führt dich Schritt für Schritt durch die Erstellung deines ersten Shader Packs — von den Grundlagen über Tests bis zur Veröffentlichung. Er basiert auf der aktuellen API v5; die Migration älterer Versionen wird in der [Versionsgeschichte](../history/) erklärt.
 
-## Der Weg
+## Aufbau des Leitfadens
 
 1. [Überblick & Voraussetzungen](overview.md) — was Shader Packs können und was nicht
 2. [Voraussetzungen](requirements.md) — Browser- und Renderer-Anforderungen
@@ -14,6 +14,6 @@ Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom 
 8. [Validierung](validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](../api/); für fertige Effekte siehe [Rezepte](../recipes/).

@@ -9,9 +9,9 @@ An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from cr
 ---
 
 ## Getting Started
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](history/)'s job).
+Build your first shader pack by following the guide from the basics through testing and distribution. It uses the current API v5; migration from older versions is covered in [Version History](history/).
 
-### The track
+### Guide outline
 
 1. [Overview & prerequisites](getting-started/overview.md) — what shader packs can and cannot do
 2. [Requirements](getting-started/requirements.md) — browser and renderer requirements
@@ -23,10 +23,9 @@ A single-track tutorial for first-time shader pack authors, from overview to dis
 8. [Validation](getting-started/validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](getting-started/distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified/Analyzed
+> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod on 2026-11-20) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](api/); for ready-made effects see [Recipes](recipes/).
-
 
 ---
 
@@ -3411,7 +3410,8 @@ The realism ceiling of shader packs in one page: what the current API reaches, w
 
 - **Colors, transparency and emission, per face** — the three `Surface` hooks return colour (plus conditional alpha and emission) for terrain, liquids and models
 - **A full lighting rebuild** — the three `Light` hooks and the lighting API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) expose the engine's own recipe as composable functions ([Lighting](api/lighting.md))
-- **Projected-style shadows that track block edits in real time** — `skyLight` is voxel sky-occlusion data; lift inversion + threshold cut turns it into clear shadows under trees and roofs ([Shadows](guides/shadows.md))
+- **Sun- and moon-following shadows** — `bloxdShadow()` returns the engine-computed shadow factor; `bloxdAirShadow(t)` samples the shadow along the view ray, and `bloxdShadowDirection()` provides the light direction ([Shadows](guides/shadows.md))
+- **Block-level occlusion effects** — `skyLight` can darken areas under trees and roofs, but this older technique does not rotate with the sun ([Shadows](guides/shadows.md))
 - **Reading the game's own textures** — `bloxdTexel()` samples the block-texture atlas and model-owned textures exactly as the engine's sampler does ([Texture API](api/texture-api.md))
 - **Per-model effects** — `flags` tells you "this is a held item", "this is a dropped item", "this is a player", "this is a slab" ([Flags](api/flags.md)); `localPosition` gives model-local coordinates ([Structures](api/structures.md))
 - **Enchant glints and hurt-flash overlays** — `enchantTier` / `enchantColour` / `enchantSpeed` and `overlayColour` are readable and overridable ([Enchant effects](recipes/enchant-effects.md))
@@ -3421,7 +3421,7 @@ The realism ceiling of shader packs in one page: what the current API reaches, w
 
 | Look | Reason |
 |---|---|
-| Pixel-accurate shadow maps (sun-tracking shadows, penumbra) | Depth textures cannot be referenced (liquid-only `bloxdOpaqueBehind()` is geometry-only and unusable as a shadow map). Light-ray occlusion is not fed into hooks |
+| Custom shadow-map depth / pixel-accurate penumbra | The API exposes the engine-computed final shadow factor through `bloxdShadow()`, but not shadow-map depth or arbitrary occlusion queries. `bloxdAirShadow()` is blurred to whole blocks |
 | SSAO | No scene-depth access (only mesher-baked vertex AO; liquid-only depth is unusable for SSAO) |
 | SSR (reflections) | No scene color. Only pseudo looks blending sky color via fresnel |
 | Bloom / glare | No hook into post-processing |
@@ -3462,19 +3462,9 @@ The underwater veil is a special case of the same structure: it is an emissive f
 | Water depth absorption | `bloxdOpaqueBehind()` thickness + bottom projection in liquid hooks ([Liquids](recipes/liquids.md)) |
 | Underwater mood | Accept the veil; style what is visible through it (terrain/liquid still render normally underwater) |
 
-### The truth about shadows — "tree shadows" are buildable
+### The `skyLight` fallback
 
-Only **sun-tracking pixel-accurate shadow maps** are impossible in the table above. The engine already computes "shadows" from the start, and that is `skyLight`. The mesh-side LightEngine runs a Minecraft-style algorithm:
-
-1. **Column scan**: scan each (x,z) column top to bottom. Light from the sky starts at 15, becomes **0 at opaque blocks**, dimming down with `lightFilter` (air 1 / water 3 / opaque 15)
-2. **BFS flood fill**: spreads sideways to 6 neighbors (-1 per block) — this is what softens shadow edges. Raw value under radius-r occlusion is (15-r)/15
-3. blockLight (torches etc.) is a separate BFS of RGB 3 channels (4bit packed)
-
-So `l.skyLight` is not a mere brightness parameter but **voxel-resolution occlusion data of "whether sky is visible from here" = a shadow map**. Under trees, under roofs, and indoors it is already numerically low, arriving smoothed by vertex interpolation. Placing/breaking blocks recalculates immediately = **real-time-tracking shadows**. Vanilla only uses it "gently" via `mix(ambient, sky, skyLight)`.
-
-The right tools are the two steps in [Shadows](guides/shadows.md) (**restore raw values via lift inversion → binarize with threshold `smoothstep`**; `th = 1 - r/15` directly dials "occlusion radius treated as shadow") plus **gating direct sun by sky** (sun only reaches where sky is visible = the essence of projection), composed with warm sunlit / cool shadow tinting.
-
-**Honest limits**: these shadows are "upward sky" based, so **they don't rotate as the sun moves over time**. Resolution is per block (soft edges come from BFS spread). The engine lighting template still contains a closed `var shadow: f32 = 1.;` stub for shadow maps (always 1.0 = disabled) — interpreted as a trace of "planned" pixel-accurate rotating shadows. If pixel-accurate rotating shadows are a must, only out-of-API approaches remain (e.g. userscript GLSL injection, with policy risk).
+The `skyLight` technique above can darken areas under trees and roofs, but it uses upward sky visibility and does not rotate with the sun. Use `bloxdShadow()` when you need shadows that follow the sun or moon. The step-by-step legacy recipe remains in [Shadows](guides/shadows.md).
 
 ### Underwater reality
 
@@ -3494,7 +3484,6 @@ Practical points: packs keep working underwater / the veil cannot be removed / u
 - [Models and textures](guides/models.md) — what the model pipeline reaches
 - [Compatibility](api/compatibility.md) — how old-version packs behave
 - Version-by-version changes to these limits: [Version History](history/)
-
 
 ---
 

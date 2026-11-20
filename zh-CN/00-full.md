@@ -9,9 +9,9 @@
 ---
 
 ## 入门指南
-面向初次制作着色器包的作者的单线教程，从概览到分发。它直接讲授已完成的 API v5 形态 (无需先读旧版本 — 那是[版本历史](history/)的职责)。
+本指南按步骤介绍如何创建、测试并发布第一个着色器包。内容以当前 API v5 为准；旧版本的迁移方法见[版本历史](history/)。
 
-### 学习路线
+### 学习顺序
 
 1. [概览与前置条件](getting-started/overview.md) — 着色器包能做什么、不能做什么
 2. [环境要求](getting-started/requirements.md) — 浏览器与渲染器要求
@@ -23,10 +23,9 @@
 8. [验证](getting-started/validation.md) — 三阶段加载检查与实机测试
 9. [分发](getting-started/distribution.md) — 打 zip 与发布卫生
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified/Analyzed
+> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](api/)；要现成效果请看[实战配方](recipes/)。
-
 
 ---
 
@@ -3090,7 +3089,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | 树下/屋檐下明确压暗 (投影式) | ◎ | `skyLight` 提升逆变换 + 阈值切割 (见下) |
 | 阴影实时跟随方块编辑 | ◎ | LightEngine 立即重算 — 自动的 |
 | 阴影偏冷 / 向阳偏暖 | ◎ | 双色偏移 |
-| 阴影随太阳旋转 (阴影贴图) | ✕ | 深度仅限液体；光线遮挡不是输入 |
+| 随太阳和月亮移动的阴影 | ◎ | `bloxdShadow()` |
+| 读取阴影贴图深度 | ✕ | API 只提供最终阴影因子，不提供深度数据。 |
 | 物理半影 | ✕ | 受体素分辨率 BFS 扩散所限 |
 | 实时 AO (SSAO) | ✕ | 只有烘焙进顶点色的 AO |
 
@@ -3134,16 +3134,15 @@ let lit = sunL * sky;
 
 旋钮: **面积** = `shTh` (0.93→半径 1.5 / 0.87→2 / 0.80→3 / 0.67→5)；**边缘柔度** = `shSoft`；**影芯暗度** = 最低环境光与天空散射光的两点偏移；傍晚长影 ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`。
 
-### 老实的极限
+### `skyLight` 方案的限制
 
-- 阴影以**上方天空**为基准，因此**不随太阳旋转** (体素分辨率；柔边来自 BFS 扩散)
-- 引擎的光照模板保留着一个未使用的 `var shadow: f32 = 1.;` (恒为 1.0 = 禁用) — 像是像素级旋转阴影「未来计划」的痕迹
+- 这一限制只适用于旧的 `skyLight` 方法：它以**上方天空**为基准，**不会随太阳转动**。当前 API 的 `bloxdShadow()` 可以跟随太阳或月亮。
+
 - 像素级旋转阴影在当前 API 之外 ([达不到的表现](guides/constraints.md))
 
 ### 相关
 
 - [写实系配方](recipes/realism.md) (完整投影阴影配方) · [光照内部](internals/lighting-internals.md) · [调试技巧](guides/debugging.md)
-
 
 ---
 
@@ -3343,7 +3342,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - **逐面控制颜色、透明度与发光** —— 三个 `Surface` 钩子为地形、液体和模型返回颜色 (外加条件性的 alpha 与 emission)
 - **完整重建光照** —— 三个 `Light` 钩子与光照 API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) 把引擎自己的配方作为可组合的函数公开 ([光照 API](api/lighting.md))
-- **实时跟随方块编辑的投影风阴影** —— `skyLight` 是体素级的天空遮蔽数据；提升逆变换 + 阈值切割即可变成树下与屋檐下清晰的阴影 ([阴影](guides/shadows.md))
+- **随太阳与月亮移动的阴影** —— `bloxdShadow()` 返回引擎计算的最终阴影因子；`bloxdAirShadow(t)` 可沿相机到片元之间的视线采样阴影，`bloxdShadowDirection()` 返回光线方向（见[阴影](guides/shadows.md)）
 - **读取游戏自己的纹理** —— `bloxdTexel()` 以与引擎采样器完全相同的方式采样方块纹理图集与模型自有纹理 ([纹理 API](api/texture-api.md))
 - **逐模型特效** —— `flags` 直接告诉你「这是手持物」「这是掉落物」「这是玩家」「这是台阶」 ([flags](api/flags.md))；`localPosition` 提供模型局部坐标 ([输入输出结构体](api/structures.md))
 - **附魔辉光与受击闪光覆盖** —— `enchantTier` / `enchantColour` / `enchantSpeed` 与 `overlayColour` 均可读取、可覆写 ([附魔效果](recipes/enchant-effects.md))
@@ -3394,20 +3393,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | 水深吸收 | 液体钩子内的 `bloxdOpaqueBehind()` 厚度 + 底面投影 ([液体](recipes/liquids.md)) |
 | 水下氛围 | 接受色幕；对幕后可见的内容做文章 (地形/液体在水下仍正常渲染) |
 
-### 阴影的真相 —— 「树影」做得出来
-
-上表中不可能的只是**随太阳旋转的像素级阴影贴图**。引擎从一开始就在算「影」，那就是 `skyLight`。网格侧 LightEngine 运行类 Minecraft 算法：
-
-1. **纵列扫描**：每 (x,z) 列自上而下扫描。天空来光从 15 开始，**不透明方块处归 0**，此后按 `lightFilter` (空气 1 / 水 3 / 不透明 15) 衰减下降
-2. **BFS 泛洪**：向 6 邻横向扩散 (每格 -1) —— 这正是影缘变软的正体。半径 r 遮蔽物下的原始值为 (15-r)/15
-3. blockLight (火把等) 为 RGB 3 通道 (4bit 打包) 的另一路 BFS
-
-于是 `l.skyLight` 不是单纯的亮度参数，而是**「该处能否看见天空」的体素分辨率遮蔽数据 = 阴影贴图**。树下、屋檐下、室内数值本已偏低，经顶点插值平滑到达。放置/破坏方块即刻重算 = **实时跟随的阴影**。原版仅以 `mix(环境色, 空色, skyLight)` 「轻混」使用。
-
-正确的工具是[阴影](guides/shadows.md)中的两步 (**提升逆变换恢复原始值 → 阈值 `smoothstep` 二值化**；`th = 1 - r/15` 直接拨定「视为阴影的遮蔽半径」) 加上**以 sky 门控太阳直射光** (太阳只到达看得见天空之处 = 投影的正体)，再以向阳暖色 / 阴影冷色染色构成。
-
-**如实声明的限制**：该阴影以「上方天空」为基准，**不随太阳移动旋转**。分辨率为方块级 (柔边来自 BFS 扩散)。引擎光照模板中仍残留闭合的 `var shadow: f32 = 1.;` 阴影贴图桩 (恒为 1.0 = 无效)，可解读为「计划中的像素级旋转阴影」的痕迹。若非要像素级旋转阴影，只剩 API 之外的路线 (如 userscript GLSL 注入，有规则风险)。
-
+### `skyLight` 旧方案
+上文的 `skyLight` 方法可以压暗树下和屋檐下的区域，但它依据的是上方天空的可见性，不会随太阳转动。要使用随太阳或月亮移动的阴影，请改用 `bloxdShadow()`。
 ### 水下环境的实情
 
 水中的外观由 3 层构成：
@@ -3426,7 +3413,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - [模型与纹理](guides/models.md) —— 模型管线能到达哪里
 - [兼容性](api/compatibility.md) —— 旧版本包的行为
 - 这些限制逐版本的变化：[版本历史](history/)
-
 
 ---
 

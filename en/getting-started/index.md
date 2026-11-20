@@ -1,8 +1,8 @@
 # Getting Started
 
-A single-track tutorial for first-time shader pack authors, from overview to distribution. It teaches the completed API v5 form directly (there is no need to read older versions first — that is [Version History](../history/)'s job).
+Build your first shader pack by following the guide from the basics through testing and distribution. It uses the current API v5; migration from older versions is covered in [Version History](../history/).
 
-## The track
+## Guide outline
 
 1. [Overview & prerequisites](overview.md) — what shader packs can and cannot do
 2. [Requirements](requirements.md) — browser and renderer requirements
@@ -14,6 +14,6 @@ A single-track tutorial for first-time shader pack authors, from overview to dis
 8. [Validation](validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified/Analyzed
+> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod on 2026-11-20) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
