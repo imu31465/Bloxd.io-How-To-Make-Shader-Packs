@@ -446,7 +446,7 @@ Siehe den [Test-Leitfaden](guides/testing.md) für die vollständige Checkliste 
 ## API-Referenz
 Diese Seite dokumentiert die aktuelle API v5. Die maßgebliche Quelle für die API-Definitionen ist der Engine-Header, den die Engine jedem Pack automatisch voranstellt (den vollständigen Header findest du unter [Engine-Interna](internals/engine-header.md)).
 
-### Map
+### Übersicht
 
 | Seite | Inhalt |
 |---|---|
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` kommen bereits auf 0–1 abgebildet an**: die Stufen 0–15 durch eine Ease-out-Kurve (z. B. `6 → 0.45`, `12 → 0.92`). Alle ohne `ambientLightColour`
 - **Lift-Kurve**: `skyLight` ist in Wahrheit „kann diese Position den Himmel sehen“ — Voxel-Okklusionsdaten, also eine Art Shadow-Map. Schwellenwert-basierte Sonne/Schatten-Trennung kann die inverse Transformation brauchen (siehe den [Realismus-Leitfaden](guides/realism.md))
-- **Fog-Interna**: Im Linear-Modus ist `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (geclampt 0..1), pro Vertex im View-Space berechnet. Der aktuelle Build ist nur linear (Details in [Engine-Interna: Fog-Interna](internals/fog-internals.md))
+- **Nebelverarbeitung**: Im Linear-Modus ist `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (geclampt 0..1), pro Vertex im View-Space berechnet. Der aktuelle Build ist nur linear (Details in [Engine-Interna: Nebelverarbeitung](internals/fog-internals.md))
 
 ### Rezepte
 
@@ -1291,7 +1291,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Verwandte Seiten
 
-- [Funktionen](api/functions.md) · [Leitfäden: Beleuchtung](guides/lighting.md) · [Engine-Interna: Beleuchtungs-Interna](internals/lighting-internals.md)
+- [Funktionen](api/functions.md) · [Leitfäden: Beleuchtung](guides/lighting.md) · [Engine-Interna: interne Beleuchtungsabläufe](internals/lighting-internals.md)
 
 
 ---
@@ -2879,7 +2879,7 @@ Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Reg
 ## Leitfäden
 Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht in [Was Shader Packs können und was nicht](guides/constraints.md); zielgerichtete Codebeispiele leben in den [Rezepten](recipes/).
 
-### Map
+### Übersicht
 
 | Seite | Inhalt |
 |---|---|
@@ -2986,7 +2986,7 @@ Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5
 
 ### Verwandte Seiten
 
-- [Realismus-Rezepte](recipes/realism.md) (das vollständige Projektions-Schatten-Rezept) · [Beleuchtungs-Interna](internals/lighting-internals.md) · [Debugging-Tipps](guides/debugging.md)
+- [Realismus-Rezepte](recipes/realism.md) (das vollständige Projektions-Schatten-Rezept) · [interne Beleuchtungsabläufe](internals/lighting-internals.md) · [Debugging-Tipps](guides/debugging.md)
 
 
 ---
@@ -3360,7 +3360,7 @@ Texturpakete haben ihre eigene Spezifikation (als Referenz): Das Größenlimit l
 ## Rezepte
 Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [Leitfäden](guides/). Alles hier ist auf die v5-Vokabel (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) portiert und mit Guards versehen, um die 6 Varianten (strict × Terrain / Liquid / Model) zu bestehen.
 
-### Map
+### Übersicht
 
 | Seite | Inhalt |
 |---|---|
@@ -4847,7 +4847,7 @@ Kompiliert einwandfrei, sieht aber falsch aus.
 
 ### Verwandte Seiten
 
-- [Beleuchtungsprobleme](troubleshooting/lighting.md) · [Debugging-Tipps](guides/debugging.md) · [Fog-Interna](internals/fog-internals.md)
+- [Beleuchtungsprobleme](troubleshooting/lighting.md) · [Debugging-Tipps](guides/debugging.md) · [Nebelverarbeitung](internals/fog-internals.md)
 
 
 ---
@@ -4972,11 +4972,11 @@ Helligkeits-, Schatten- und Fog-Probleme.
 ### Die Theorie dahinter?
 
 - Schatten: [Schatten](guides/shadows.md) (skyLight = Voxel-Shadow-Map)
-- Fog: [Engine-Interna: Fog-Interna](internals/fog-internals.md)
+- Fog: [Engine-Interna: Nebelverarbeitung](internals/fog-internals.md)
 
 ### Verwandte Seiten
 
-- [Beleuchtung](api/lighting.md) · [Visuelle Probleme](troubleshooting/visual.md) · [Beleuchtungs-Interna](internals/lighting-internals.md)
+- [Beleuchtung](api/lighting.md) · [Visuelle Probleme](troubleshooting/visual.md) · [interne Beleuchtungsabläufe](internals/lighting-internals.md)
 
 
 ---
@@ -5129,19 +5129,19 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 ## Engine-Interna
 Diese Kategorie erläutert das interne Verhalten der Engine, damit sich die Ausführung von Shader-Packs besser verstehen lässt. Diese Implementierungsdetails können sich ändern; stabile Nutzungsregeln und verfügbare APIs stehen in der [API-Referenz](api/).
 
-### Map
+### Übersicht
 
 | Seite | Inhalt |
 |---|---|
 | [Rendering-Pipeline](internals/rendering-pipeline.md) | alphaTest-Position, 2-Licht-Setup, Uniform-Realität, Greedy Meshing |
-| [Hook-Aufruf](internals/hook-invocation.md) | wie Hooks in das WGSL der Engine gespleißt werden |
+| [Hook-Aufruf](internals/hook-invocation.md) | wie Hooks in den WGSL-Code der Engine eingefügt werden |
 | [Engine-Header](internals/engine-header.md) | WGSL-Deklarationen, die Shader-Packs vorangestellt werden |
-| [Shader-Validierung](internals/shader-validation.md) | Analyzer-Interna, die Signaturentabelle, HEADER_VERSION |
+| [Shader-Validierung](internals/shader-validation.md) | interne Abläufe des Analysators, die Signaturentabelle, HEADER_VERSION |
 | [WGSL-Kompilierung](internals/wgsl-compilation.md) | die echte Stufe-2-Kompilierung und Validierungs-Stubs |
 | [Reservierte Bezeichner](internals/reserved-identifiers.md) | die 46 `bloxdSp*`-Symbole |
-| [Beleuchtungs-Interna](internals/lighting-internals.md) | blockLight / heldLight-Struktur |
-| [Fog-Interna](internals/fog-internals.md) | nur linear, das 32-Block-Gradientenband |
-| [Textur-Sampling](internals/texture-sampling.md) | der 3-Varianten-Textur-Codegen |
+| [interne Beleuchtungsabläufe](internals/lighting-internals.md) | blockLight / heldLight-Struktur |
+| [Nebelverarbeitung](internals/fog-internals.md) | rein linear mit einem 32 Blöcke breiten Übergangsbereich |
+| [Textur-Sampling](internals/texture-sampling.md) | die Textur-Codegenerierung für drei Varianten |
 | [Textur-Registry](internals/texture-registry.md) | Namensauflösung sowie Animations- und Rotationsnamen |
 | [Model-Rendering](internals/model-rendering.md) | das v5-Model-Programm |
 | [Engine-Daten](internals/engine-data.md) | API-v5-Funktionen und Pack-Grenzen |
@@ -5271,11 +5271,11 @@ Die Spleiß-Architektur existierte schon im v2-Renderer und blieb über v2 → v
 | `directional` | die vertex-interpolierte Summe der Lambert-Terme je Richtlicht (2-Licht-Setup in [Rendering-Pipeline](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | die richtlicht-RGB-Antwort / der RGB-Glow des Materials |
 | `ambient` | `material.ambient × sceneAmbient` — pro Material, pro Frame |
-| `blockLight` / `skyLight` | die dekodierten Lichtstufen-Varyings ([Beleuchtungs-Interna](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | die dekodierten Lichtstufen-Varyings ([interne Beleuchtungsabläufe](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | die entsprechenden Uniforms |
-| `heldLight` | aus dem Lichtstufen-Varying und den Handlicht-Uniforms gebaut (Kegel-Falloff in [Beleuchtungs-Interna](internals/lighting-internals.md)) |
+| `heldLight` | aus dem Lichtstufen-Varying und den Handlicht-Uniforms gebaut (Kegel-Falloff in [interne Beleuchtungsabläufe](internals/lighting-internals.md)) |
 | `fogColour` | nur in komplett foglosen Szenen schwarz (Modus 0) |
-| `fogAlpha` | der geclampte Fog-Faktor ([Fog-Interna](internals/fog-internals.md)) |
+| `fogAlpha` | der geclampte Fog-Faktor ([Nebelverarbeitung](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | Varyings und flat-interpolierte Werte (dieselben wie `BloxdSurfaceIn` — Werte nach dem Vertex-Hook) |
 
 ### Verwandte Seiten
@@ -5726,7 +5726,7 @@ Custom-Blöcke können `skyLightEmission` (0–15) tragen, das **in den skyLight
 
 ---
 
-## Fog-Interna
+## Nebelverarbeitung
 > Ziel-API: 5 · Typ: technische Referenz
 
 Die Fog-Berechnung ist immer LINEAR-Modus (äquivalent zu `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), mit `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = Fog-Einstellung; nur D = 0 ist speziell mit fogEnd = 5). **Das Gradientenband ist nur 32 Blöcke breit**, und `l.fogAlpha` ist weniger „Distanzdunst" als **normierte Distanz zur Kante der geladenen Welt**. Es variiert pro Spieler mit der Ladedistanz: Distanz-Effekte sollten daher `distance(l.position, bloxdEyePosition())` selbst berechnen (Abschnitt „Ladekanten-Band" unten). (Die Fog-Funktion des Renderers implementiert tatsächlich **vier** Modi — aus / exponentiell / exponentiell-quadratisch / linear —, wobei ausgelieferte Titel den linearen Modus fahren; der restaurierte Quellcode und das Robustheitsargument stehen im [v3-Migrationsleitfaden](history/v3.md).)
@@ -5756,7 +5756,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Textur-Sampling-Interna
 > Ziel-API: 5 · Typ: technische Referenz
 
-Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — der 3-Varianten-Textur-Codegen. Die Nutzerseite: [Textur-API](api/texture-api.md).
+Wie `bloxdTexel` / `bloxdTextureSize` tatsächlich kompilieren — die Textur-Codegenerierung für drei Varianten. Die Nutzerseite: [Textur-API](api/texture-api.md).
 
 ### Die drei Varianten
 
