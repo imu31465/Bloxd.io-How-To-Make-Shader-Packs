@@ -4942,7 +4942,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 #### 引擎标头复原
 
-以现行插值渲染 c55 标头模板 (`${vC}` = apiVersion、经 `${Gq.j}` 的 5 个 uniform 读取) — v5 共 6 处插值 ([引擎标头](internals/engine-header.md))。
 
 #### 纹理注册表重算
 
@@ -4959,7 +4958,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 #### uniform / 管线复原
 
-`BloxdPackInputs` 字段布局来自 uniform 布局模块 (29838)；纹理三变体代码生成来自 WebGPU 生成器 (c56) ([纹理采样](internals/texture-sampling.md))。
 
 ### 漂移观测
 
@@ -5490,7 +5488,6 @@ v4 的变更集一屏速览:
 
 ### 56. pack.json 与 uniform 缓冲 (不变的部分)
 
-整个非纹理的包模型逐字节沿袭 v3，因此 [v3 迁移指南](history/v3.md) 的 §41 仍是参考。v4 的重新测量值，取自线上加载器 chunk (c51):
 
 | 限制 | 值 | 超限时的消息 |
 |---|---|---|
@@ -5917,7 +5914,6 @@ manifest 规则经重新测量、其余不变: `pack.json` 必须是位于 zip �
 
 ### 70. pack.json、加载器与 uniform (不变的部分)
 
-整个包模型逐字节沿袭 v4。加载器限制，在真实加载器 chunk (c53) 上重新测量:
 
 | 限制 | 值 | 超限时的消息 |
 |---|---|---|

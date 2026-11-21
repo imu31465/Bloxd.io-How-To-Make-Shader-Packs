@@ -4938,7 +4938,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 #### 엔진 헤더 복원
 
-c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유의 uniform 읽기 5개) 과 함께 렌더 — v5 에서 보간 6개 ([엔진 헤더](internals/engine-header.md)).
 
 #### 텍스처 레지스트리 재계산
 
@@ -4955,7 +4954,6 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 
 #### uniform · 파이프라인 복원
 
-`BloxdPackInputs` 필드 레이아웃은 uniform-레이아웃 모듈 (29838) 에서. 텍스처 3변형 코드젠은 WebGPU 생성기 (c56) 에서 ([텍스처 샘플링](internals/texture-sampling.md)).
 
 ### 드리프트 관찰
 
@@ -5485,7 +5483,6 @@ v4 변경 세트를 한 화면에:
 
 ### 56. pack.json과 uniform 버퍼 (불변인 것)
 
-텍스처를 제외한 팩 모델 전체가 v3에서 바이트 단위로 이어지므로, [v3 마이그레이션 가이드](history/v3.md)의 §41이 여전히 레퍼런스다. v4 재측정값, 라이브 로더 청크 (c51)에서:
 
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
@@ -5862,7 +5859,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 62. 그 외의 v4 변경과 메모
 
-- **번들 재구성** (숫자는 서두 참조) 은 셰이더 파이프라인을 청크 c49 (로더/지속화), c50–c51 (로더 UI + zip), c53 (검증기 + 헤더 + 레지스트리 빌더), c54 (WGSL 코드 제너레이터 + Lite 렌더러) 로 옮겼다. v3 시대 가이드를 기준으로 번들을 재조사하는 사람에게: 앵커는 전부 움직였지만, 코드는 그렇지 않다.
 - **헤더 텍스트가 명료성을 위해 다시 쓰였다** — 모든 문서 주석이 다듬어지고 (더 짧게, 2인칭), §59 외에는 의미 변화가 없다. 크기 5,637 → 6,021 바이트, 128 → 150 줄; 첫 줄은 이제 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission 순서가 헤더에 공식 기록됐다**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3의 §43 발견이 공식 문구가 되었다.
 - **i18n 면**: 셰이더 팩 기능의 i18n 키는 58개 (v4 빌드); 로더 패밀리 (`load*`) 는 §55–§56에, 상태 패밀리 (`status*`) 는 §55에, 배리언트 라벨은 §60.1에 인용돼 있다.
@@ -5908,7 +5904,6 @@ manifest 규칙은 그 외에는 재측정했고 불변이다: `pack.json`은 zi
 
 ### 70. pack.json, 로더, uniform (불변인 것)
 
-팩 모델 전체가 v4에서 바이트 단위로 이어진다. 로더 제한, 라이브 로더 청크 (c53) 에서 재측정:
 
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
@@ -6281,4 +6276,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **참조된 텍스처 상수만 출력된다.** 헤더의 `bloxdTextureId*` 블록은 실제로 참조한 이름으로 팩마다 생성된다 — 상수 3개를 쓰는 팩에는 3줄의 `const`가 앞에 붙고, 약 900줄 전체가 아니라.
 - **`HEADER_VERSION`가 `9.<hash>.<hash>`로 이동** — v4와 같은 이중 접미사 구조 (헤더 재료의 fnv1a32, 정렬된 이름-id 레지스트리의 fnv1a32), 선행 정수만 8에서 9로. 저장 팩 재검사 논리 ([v4 마이그레이션 가이드](history/v4.md)의 §55) 는 불변: 헤더/레지스트리가 바뀌면 저장 팩이 「재확인 필요」로 넘어간다.
 - **i18n 면**: 셰이더 팩 키 패밀리는 형태가 불변 (v4 가이드 §62의 `load*`, `status*`, 배리언트 라벨 키가 모두 재측정되어 존재; `loadNoWgsl`/`loadNotZip`도 여전히 그대로).
-- **재조사하는 사람을 위한 번들 레이아웃**: 헤더 c55 (불변), 로더/지속화 c51–c53, 검증기 + 레지스트리 빌더 c55, WebGPU 코드젠 c56, 포그 c9, **기본 팩 템플릿 c116** (c124에서 이동), BLOXD_ALPHA 발생지 c51/c52/c53/c55/c9. 청크 형식 메모: 이제 모든 청크가 ES 모듈이다 (`export const modules = {...}`) — c53에는 c52와 c53 양쪽의 모듈까지 들어 있다 — 번들을 텍스트 검색할 때 중요하다 (`1371` 같은 모듈 id는 어떤 청크도 아닌 *main*의 희소 모듈 배열에 산다).
