@@ -104,8 +104,11 @@ function transform(src) {
   let prevBlank = false
   const out = []
   for (const originalLine of lines) {
-    const line = stripBuildMetadataLine(originalLine)
-    if (line === null) continue
+    let line = originalLine
+    if (!inFence) {
+      line = stripBuildMetadataLine(line)
+      if (line === null) continue
+    }
     if (/^\s*(```|~~~)/.test(line)) {
       inFence = !inFence
       prevBlank = false
