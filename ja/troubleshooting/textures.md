@@ -1,8 +1,8 @@
 # テクスチャの問題
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` · 検証状況: Verified (メッセージはライブバリデータから逐語採録)
+> 対象API: 5 · 種別: 技術資料
 
-`bloxdTextureId*` / `bloxdTexel` まわりの問題です。906 件超のテクスチャ名は [テクスチャカタログ](../api/texture-catalog.md) で検索できます。
+`bloxdTextureId*` / `bloxdTexel` まわりの問題です。利用可能なテクスチャ名は [テクスチャカタログ](../api/texture-catalog.md) で検索できます。
 
 ## 「There's no texture called X. Did you mean bloxdTextureIdY?」
 
@@ -53,11 +53,11 @@
 
 ## id を直書きしたらゲーム更新で壊れた
 
-- **原因**: **id はスナップショット**。2ビルド間で 905 生存名のうち 334 名が id を変えた実測がある
-- **解決方法**: `bloxdTextureIdLava` と書け、`19` と書くな ([名前こそ API](../api/texture-catalog.md#ドリフト実測-cnty9--ab90qa))
+- **原因**: **IDは固定値ではありません**。2ビルド間で 905 生存名のうち 334 名が id を変えた実測がある
+- **解決方法**: `bloxdTextureIdLava` と書け、数値IDを直接書かないでください ([名前こそ API](../api/texture-catalog.md#テクスチャカタログ))
 
 ## 関連
 
 - [テクスチャAPI](../api/texture-api.md) — 仕様の全体
-- [テクスチャカタログ](../api/texture-catalog.md) — 896名の検索可能な一覧
+- [テクスチャカタログ](../api/texture-catalog.md) — 利用可能な名前の一覧
 - [エンジン内部: Texture Registry](../internals/texture-registry.md) — レジストリとドリフトの内部

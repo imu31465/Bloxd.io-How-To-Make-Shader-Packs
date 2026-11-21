@@ -1,6 +1,6 @@
 # ライティング
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` · 検証状況: Analyzed (ライブヘッダーから逐語復元)
+> 対象API: 5 · 種別: 技術資料
 
 v5 はライティングAPIを公開しました。エンジンが内部でやってきたこと (`litColour` を作る照明計算) が、ヘッダー関数としてパックから呼べるようになっています。このページは照明系の入力フィールド・関数・処理順序を体系的に説明します。
 
@@ -127,8 +127,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 |---|---|---|---|
 | `litColour` | `vec3f` | 照明・エンチャント済みの RGB (emission とフォグの前) | 光源系ではなく、エンジンが計算した結果値 |
 | `directional` | `f32` | 方向光の合算 Lambert 項 | 方向光がなければ 0 |
-| `diffuse` | `vec3f` | 材質の方向光 RGB 応答 | v5 新設 |
-| `emissive` | `vec3f` | 材質の RGB グロー (directional に加算) | v5 新設 |
+| `diffuse` | `vec3f` | 材質の方向光 RGB 応答 | v5 追加 |
+| `emissive` | `vec3f` | 材質の RGB グロー (directional に加算) | v5 追加 |
 | `ambient` | `vec3f` | RGB 環境色 (directional に加算) | |
 | `blockLight` | `vec3f` | RGB ブロック光 | `!bloxdLit()` で 0 |
 | `skyLight` | `f32` | 天空光 | `!bloxdLit()` で 1 |

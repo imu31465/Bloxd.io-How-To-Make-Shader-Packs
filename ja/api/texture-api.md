@@ -1,6 +1,6 @@
 # テクスチャAPI
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` · 検証状況: Verified (v4 から不変のAPIを v5 ビルドで再確認)
+> 対象API: 5 · 種別: 技術資料
 
 v4 から不変で、現在も同じ形で使える、ゲーム側テクスチャを読むAPIです。関数2種 + 名前付き定数ファミリー + 入力フィールド4個で構成されます。ヘッダー自身の一行要約: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -239,6 +239,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## 関連
 
-- **利用可能896名の全一覧** → [テクスチャカタログ](texture-catalog.md)
+- **利用可能利用可能な名前の全一覧** → [テクスチャカタログ](texture-catalog.md)
 - レジストリの内部 (畳み込み規則、ドリフト) → [エンジン内部: Texture Registry](../internals/texture-registry.md)
 - サンプリングの生成コード → [エンジン内部: Texture Sampling](../internals/texture-sampling.md)
