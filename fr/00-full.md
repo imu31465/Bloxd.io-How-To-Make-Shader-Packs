@@ -1426,7 +1426,7 @@ Les quatre champs de texture sur `BloxdSurfaceIn` / `BloxdLightIn` :
 | `uv` | `vec2f` | la texture couvre 0–1 ; `fract(uv)` est dessiné |
 | `mipLevel` | `f32` | niveau de mip : 0 = pleine taille, 1 = moitié… |
 
-### La subtilité de rotation — un échantillonneur neutre
+### Rotation et échantillonnage neutre
 
 `bloxdTexel` applique une contre-rotation à l'uv que vous passez selon le `textureRotation` **du fragment courant** — quel que soit l'id passé. Deux cas courants :
 
