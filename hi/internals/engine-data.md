@@ -1,48 +1,44 @@
-# इंजन डेटा लेजर
+# इंजन डेटा
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bbb6l5` (2026-11-20 को production और preprod में सत्यापित) · स्थिति: Verified
+> लक्ष्य API: 5 · उद्देश्य: स्पेसिफ़िकेशन सारांश
 
-यह लेजर मौजूदा बिल्ड में shader packs के लिए उपलब्ध API के पुष्टि किए गए मानों को समेटता है। मॉड्यूल ID और chunk नंबर जैसे bundle के आंतरिक विवरण API विनिर्देश का हिस्सा नहीं हैं, इसलिए यहाँ शामिल नहीं किए गए हैं।
+यह पृष्ठ shader packs के लिए उपलब्ध API और pack बनाते समय लागू सीमाओं का सार देता है। परिभाषाओं और उदाहरणों के लिए संबंधित संदर्भ देखें।
 
-## मौजूदा विनिर्देश
+## API का सार
 
-| मद | मौजूदा मान |
+| मद | स्पेसिफ़िकेशन |
 |---|---|
-| `apiVersion` | `5` (संख्या के साथ सख़्त तुलना) |
-| इंजन हेडर | 216 पंक्तियाँ; पूरा पाठ [इंजन हेडर](engine-header.md) में |
+| API संस्करण | `5` |
 | हुक | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| वेरिएंट | 6 (strict × terrain / liquid / model) |
-| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` को v5 में हटाया गया |
-| पैक uniform | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| पैक binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| फ़्लैग | 14 boolean फ़ील्ड वाला `BloxdFlags` स्ट्रक्चर |
-| टेक्सचर एटलस | 1,650 लेयर; 1,017 नाम; 776 उपनाम |
-| टेक्सचर परिवार | 64 रोटेशन और 71 एनीमेशन परिवार |
-| आरक्षित पहचानकर्ता | `/^bloxd/i` से मेल खाते नाम और 88 आंतरिक `bloxdSp*` प्रतीक |
-| गेम परिभाषाएँ | 119 |
-| shader-pack नीति | 12 अनुमत शीर्षक, 28 प्रविष्टियाँ; [गेम-वार नीति](policy.md) देखें |
-| डिफ़ॉल्ट पैक टेम्पलेट | 1,633 bytes |
-| लोडर सीमाएँ | 256 WGSL फ़ाइलें / कुल 256 KB स्रोत / `pack.json` 64 KB / ZIP 32 MB / 1,024 प्रविष्टियाँ |
+| वेरिएंट | 6 (allow / strict × terrain / liquid / model) |
+| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`। `BLOXD_LIGHTING` उपलब्ध नहीं है |
+| Pack uniform | 80 bytes। फ़ील्ड offsets के लिए [Pack format](../api/pack-format.md) देखें |
+| टेक्सचर | `bloxdTextureId<Name>` रूप वाले नामित constants उपयोग करें। संख्यात्मक ID को स्थायी न मानें |
+| आरक्षित नाम | `bloxd` से शुरू होने वाले identifiers इंजन के लिए आरक्षित हैं |
 
-## bbb6l5 में बदलाव
+## Pack सीमाएँ
 
-`bbb6l5` में `apiVersion: 5` वही रहता है, लेकिन packs को दिखाई देने वाला API बढ़ता है:
+| मद | सीमा |
+|---|---:|
+| WGSL फ़ाइलें | 256 |
+| कुल WGSL source | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP archive | 32 MB |
+| ZIP entries | 1,024 |
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` और `bloxdShadowDirection()` इंजन द्वारा गणना की गई सूर्य और चंद्रमा की छाया उपलब्ध कराते हैं।
-- uniform में offset 64 पर `shadowDirection: vec3f` जोड़ा गया; आकार 64 से 80 bytes हुआ।
-- `pack.json` में पुरानी गोल छायाएँ बनाए रखने के लिए वैकल्पिक boolean फ़ील्ड `keepCircleShadows` जोड़ा गया।
-- एटलस 1,227 से 1,650 लेयर और उपलब्ध नाम 906 से 1,017 हुए।
-- `v98qt8` में आई टेक्सचर-स्थिरांक फ़ोल्डिंग प्रतिगमन ठीक की गई।
+ZIP की root में ठीक एक manifest रखें और फ़ाइलें UTF-8 में सहेजें। Duplicate paths और असमर्थित ZIP formats स्वीकार नहीं किए जाते। विवरण के लिए [Pack format](../api/pack-format.md) देखें।
 
-मापन का विवरण और प्रमाण [रिसर्च लॉग](research-log.md) तथा [टेक्सचर रजिस्ट्री का आंतरिक विवरण](texture-registry.md) में हैं।
+## API v5 की मुख्य सुविधाएँ
 
-## पुराने संस्करण
-
-- [संस्करण इतिहास](../history/) — पुराने API के बदलाव और माइग्रेशन
-- [रिसर्च लॉग](research-log.md) — मापन विधि और स्रोत
+- `bloxdShadow()` और `bloxdAirShadow(t)` सूर्य और चंद्रमा की रोशनी से बनने वाली छाया की जानकारी देते हैं।
+- `bloxdShadowDirection()` छाया डालने वाली रोशनी की दिशा लौटाता है।
+- Shadow API का उपयोग करते हुए पारंपरिक गोल छायाएँ बनाए रखने के लिए `pack.json` के वैकल्पिक `keepCircleShadows` फ़ील्ड को `true` करें।
+- रोशनी की स्थिति runtime पर `bloxdLit()` से जाँचें; `BLOXD_LIGHTING` मैक्रो समर्थित नहीं है।
 
 ## संबंधित
 
-- [इंजन हेडर](engine-header.md) — पूरा हेडर पाठ
-- [गेम-वार नीति](policy.md) — allow / strict नीति वाले गेम
-- [टेक्सचर रजिस्ट्री](texture-registry.md) — नाम और ID का मिलान
+- [API संदर्भ](../api/) — फ़ंक्शन, संरचनाएँ और constants
+- [Pack format](../api/pack-format.md) — manifest, uniform और loader सीमाएँ
+- [टेक्सचर कैटलॉग](../api/texture-catalog.md) — उपलब्ध टेक्सचर नाम
+- [गेम-वार नीति](policy.md) — allow / strict दायरा
+- [API v4 माइग्रेशन गाइड](../history/v4.md) — पिछले संस्करण से माइग्रेशन

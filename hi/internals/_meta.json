@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "इंजन इंटर्नल्स और रिसर्च",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "इंजन इंटर्नल्स",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "rendering-pipeline": "रेंडरिंग पाइपलाइन",
   "hook-invocation": "हुक इनवोकेशन इंटर्नल्स",
@@ -18,6 +21,5 @@
   "testing-factors": "पैक-दृश्य मान बदलने वाली चीज़ें",
   "policy": "प्रति-गेम शेडर-पैक पॉलिसी",
   "sun-and-moon": "सूर्य और चंद्र",
-  "debugging": "दोषमार्जन टूल",
-  "research-log": "रिसर्च लॉग"
+  "debugging": "दोषमार्जन टूल"
 }

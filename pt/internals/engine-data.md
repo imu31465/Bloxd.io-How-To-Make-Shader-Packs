@@ -1,48 +1,44 @@
-# Ledger de dados do motor
+# Dados do motor
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified
+> API alvo: 5 · Uso: resumo das especificações
 
-Este ledger reúne os valores confirmados da API visível aos shader packs no build atual. Detalhes internos do bundle, como IDs de módulos e chunks, não fazem parte da especificação e não são listados aqui.
+Esta página resume a API disponível para shader packs e os limites importantes ao criar um pacote. Consulte as referências específicas para definições e exemplos.
 
-## Especificação atual
+## Visão geral da API
 
-| Item | Valor |
+| Item | Especificação |
 |---|---|
-| `apiVersion` | `5` (comparação estrita com número) |
-| Cabeçalho do motor | 216 linhas; texto completo em [Cabeçalho do motor](engine-header.md) |
+| Versão da API | `5` |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` foi removida no v5 |
-| Uniform do pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Binding do pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| Flags | estrutura `BloxdFlags` com 14 campos booleanos |
-| Atlas de texturas | 1.650 camadas; 1.017 nomes; 776 aliases |
-| Famílias de textura | 64 de rotação e 71 de animação |
-| Identificadores reservados | nomes que correspondem a `/^bloxd/i` e 88 símbolos internos `bloxdSp*` |
-| Definições de jogos | 119 |
-| Política de shader packs | 12 títulos permitidos, 28 entradas; veja [Política por jogo](policy.md) |
-| Template padrão do pack | 1.633 bytes |
-| Limites do loader | 256 arquivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
+| Variantes | 6 (allow / strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA` e `BLOXD_SCENE_DEPTH`. `BLOXD_LIGHTING` não está disponível |
+| Uniform do pack | 80 bytes. Consulte [Formato do pack](../api/pack-format.md) para ver os offsets |
+| Texturas | Use constantes nomeadas no formato `bloxdTextureId<Name>`. Não fixe IDs numéricos |
+| Nomes reservados | Identificadores iniciados por `bloxd` são reservados para o motor |
 
-## Mudanças do bbb6l5
+## Limites do pack
 
-O `bbb6l5` mantém `apiVersion: 5`, mas amplia a API visível aos packs:
+| Item | Limite |
+|---|---:|
+| Arquivos WGSL | 256 |
+| Total do código-fonte WGSL | 256 KB |
+| `pack.json` | 64 KB |
+| Arquivo ZIP | 32 MB |
+| Entradas ZIP | 1.024 |
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` e `bloxdShadowDirection()` expõem o sistema de sombras do sol e da lua calculado pelo motor.
-- O uniform recebe `shadowDirection: vec3f` no deslocamento 64 e aumenta de 64 para 80 bytes.
-- `pack.json` aceita o booleano opcional `keepCircleShadows` para manter as antigas sombras circulares.
-- O atlas cresce de 1.227 para 1.650 camadas e passa de 906 para 1.017 nomes disponíveis.
-- A regressão de dobragem de constantes de textura introduzida em `v98qt8` foi corrigida.
+Coloque exatamente um manifesto na raiz do ZIP e salve os arquivos em UTF-8. Caminhos duplicados e formatos ZIP não suportados não são aceitos. Consulte [Formato do pack](../api/pack-format.md) para obter detalhes.
 
-A explicação e as evidências dessas medições estão no [Registro de pesquisa](research-log.md) e nas [Interioridades do registro de texturas](texture-registry.md).
+## Principais recursos da API v5
 
-## Versões anteriores
-
-- [Histórico de versões](../history/) — mudanças e migrações das APIs anteriores
-- [Registro de pesquisa](research-log.md) — método e referências das medições
+- `bloxdShadow()` e `bloxdAirShadow(t)` expõem informações sobre sombras do sol e da lua.
+- `bloxdShadowDirection()` retorna a direção da luz que projeta a sombra.
+- Defina o campo opcional `keepCircleShadows` em `pack.json` como `true` para manter as sombras circulares tradicionais ao usar a API de sombras.
+- Verifique a iluminação em tempo de execução com `bloxdLit()`; a macro `BLOXD_LIGHTING` não é suportada.
 
 ## Relacionado
 
-- [Cabeçalho do motor](engine-header.md) — texto completo do cabeçalho
-- [Política por jogo](policy.md) — títulos com política allow / strict
-- [Registro de texturas](texture-registry.md) — nomes e atribuição de IDs
+- [Referência da API](../api/) — funções, estruturas e constantes
+- [Formato do pack](../api/pack-format.md) — manifesto, uniform e limites do carregador
+- [Catálogo de texturas](../api/texture-catalog.md) — nomes de texturas disponíveis
+- [Política por jogo](policy.md) — cobertura allow / strict
+- [Guia de migração da API v4](../history/v4.md) — migração da versão anterior

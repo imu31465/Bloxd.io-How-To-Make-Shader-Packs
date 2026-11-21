@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "엔진 내부와 연구",
+    "title": "엔진 내부",
     "theme": {
       "toc": false,
       "typesetting": "article"
@@ -21,6 +21,5 @@
   "testing-factors": "팩에 보이는 값을 바꾸는 요인",
   "policy": "게임별 셰이더 팩 정책",
   "sun-and-moon": "태양과 달",
-  "debugging": "디버깅 도구",
-  "research-log": "리서치 로그"
+  "debugging": "디버깅 도구"
 }

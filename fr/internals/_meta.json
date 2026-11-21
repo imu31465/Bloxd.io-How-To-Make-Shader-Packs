@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "Intérieurs du moteur et recherche",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Internes du moteur",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "rendering-pipeline": "Pipeline de rendu",
   "hook-invocation": "Intérieurs de l'invocation des hooks",
@@ -18,6 +21,5 @@
   "testing-factors": "Ce qui change les valeurs visibles des packs",
   "policy": "Politique de shader pack par jeu",
   "sun-and-moon": "Le soleil et la lune",
-  "debugging": "Outils de débogage",
-  "research-log": "Journal de recherche"
+  "debugging": "Outils de débogage"
 }

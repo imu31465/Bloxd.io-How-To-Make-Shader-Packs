@@ -1,7 +1,10 @@
 {
   "index": {
-    "title": "Interior del motor e investigación",
-    "theme": { "toc": false, "typesetting": "article" }
+    "title": "Internas del motor",
+    "theme": {
+      "toc": false,
+      "typesetting": "article"
+    }
   },
   "rendering-pipeline": "Canalización de renderizado",
   "hook-invocation": "Internas de la invocación de hooks",
@@ -18,6 +21,5 @@
   "testing-factors": "Qué cambia los valores visibles para los paquetes",
   "policy": "Política de shader packs por juego",
   "sun-and-moon": "El sol y la luna",
-  "debugging": "Herramientas de depuración",
-  "research-log": "Registro de investigación"
+  "debugging": "Herramientas de depuración"
 }

@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "エンジン内部と研究",
+    "title": "エンジン内部仕様",
     "theme": {
       "toc": false,
       "typesetting": "article"
@@ -21,6 +21,5 @@
   "testing-factors": "パックに見える値を変えるもの",
   "policy": "ゲーム別の適用ポリシー",
   "sun-and-moon": "太陽と月の正体",
-  "debugging": "デバッグツール",
-  "research-log": "リサーチログ"
+  "debugging": "デバッグツール"
 }

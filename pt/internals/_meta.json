@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "Interior do motor e pesquisa",
+    "title": "Internas do motor",
     "theme": {
       "toc": false,
       "typesetting": "article"
@@ -21,6 +21,5 @@
   "testing-factors": "O que muda os valores visíveis para os pacotes",
   "policy": "Política de pacotes de shaders por jogo",
   "sun-and-moon": "O sol e a lua",
-  "debugging": "Ferramentas de depuração",
-  "research-log": "Registro de pesquisa"
+  "debugging": "Ferramentas de depuração"
 }

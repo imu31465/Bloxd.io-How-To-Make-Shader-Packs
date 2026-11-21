@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "引擎内部机制与研究",
+    "title": "引擎内部机制",
     "theme": {
       "toc": false,
       "typesetting": "article"
@@ -21,6 +21,5 @@
   "testing-factors": "会改变包可见值的因素",
   "policy": "各游戏的着色器适用策略",
   "sun-and-moon": "太阳与月亮",
-  "debugging": "调试工具",
-  "research-log": "研究日志"
+  "debugging": "调试工具"
 }

@@ -1,48 +1,44 @@
-# 引擎数据台账
+# 引擎数据
 
-> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified
+> 目标 API：5 · 用途：规格摘要
 
-本台账汇总当前构建中着色器包可见 API 的已确认数值。模块 ID、chunk 编号等 bundle 内部细节不属于 API 规格，因此不在此列出。
+本页汇总着色器包可使用的 API，以及创建着色器包时需要注意的限制。具体定义和示例请参阅对应的参考文档。
 
-## 当前规格
+## API 概览
 
-| 项目 | 当前值 |
+| 项目 | 规格 |
 |---|---|
-| `apiVersion` | `5`（与数值进行严格比较） |
-| 引擎标头 | 216 行；全文见[引擎标头](engine-header.md) |
+| API 版本 | `5` |
 | 钩子 | 9 个（Terrain / Liquid / Model × Vertex / Surface / Light） |
-| 变体 | 6 个（strict × terrain / liquid / model） |
-| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH`；`BLOXD_LIGHTING` 已在 v5 移除 |
-| 包 uniform | 80 字节：`seconds` @0、`lit` @4、`renderOffset` @16、`sunDirection` @32、`eyePosition` @48、`shadowDirection` @64 |
-| 包 binding | `@group(3) @binding(0)`；`minBindingSize` 为 80 |
-| 标志 | `BloxdFlags` 结构体，包含 14 个布尔字段 |
-| 纹理图集 | 1,650 层；1,017 个名称；776 个别名 |
-| 纹理族 | 64 个旋转族、71 个动画族 |
-| 保留标识符 | 匹配 `/^bloxd/i` 的名称，以及 88 个内部 `bloxdSp*` 符号 |
-| 游戏定义 | 119 个 |
-| 着色器包策略 | 12 个允许的游戏标题、28 条目；见[按游戏划分的策略](policy.md) |
-| 默认包模板 | 1,633 字节 |
-| 加载器限制 | 256 个 WGSL 文件 / 源码总计 256 KB / `pack.json` 64 KB / ZIP 32 MB / 1,024 个条目 |
+| 变体 | 6 种（allow / strict × terrain / liquid / model） |
+| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH`。不提供 `BLOXD_LIGHTING` |
+| 包 uniform | 80 字节。字段偏移见[包格式](../api/pack-format.md) |
+| 纹理 | 使用 `bloxdTextureId<Name>` 形式的具名常量。不要固定使用数字 ID |
+| 保留名称 | 以 `bloxd` 开头的标识符由引擎保留 |
 
-## bbb6l5 的变化
+## 着色器包限制
 
-`bbb6l5` 保持 `apiVersion: 5` 不变，但扩展了包可见 API：
+| 项目 | 上限 |
+|---|---:|
+| WGSL 文件数 | 256 |
+| WGSL 源码总量 | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP 文件 | 32 MB |
+| ZIP 条目数 | 1,024 |
 
-- 新增 `bloxdShadow()`、`bloxdAirShadow(t)` 和 `bloxdShadowDirection()`，用于访问引擎计算的太阳与月亮阴影。
-- uniform 在偏移 64 处增加 `shadowDirection: vec3f`，大小从 64 字节增加到 80 字节。
-- `pack.json` 新增可选布尔字段 `keepCircleShadows`，用于保留旧版圆形影子。
-- 图集从 1,227 层增至 1,650 层，可用名称从 906 个增至 1,017 个。
-- 修复了 `v98qt8` 引入的纹理常量折叠回归。
+ZIP 根目录必须且只能放置一个清单文件，所有文件均使用 UTF-8。重复路径和不受支持的 ZIP 格式会被拒绝。详情请参阅[包格式](../api/pack-format.md)。
 
-测量说明与证据见[研究日志](research-log.md)和[纹理注册表内部机制](texture-registry.md)。
+## API v5 的主要功能
 
-## 过往版本
+- `bloxdShadow()` 和 `bloxdAirShadow(t)` 提供太阳光与月光产生的阴影信息。
+- `bloxdShadowDirection()` 返回投射阴影的光线方向。
+- 将 `pack.json` 中可选的 `keepCircleShadows` 字段设为 `true)，即可在使用阴影 API 时保留传统圆形阴影。
+- 使用 `bloxdLit()` 在运行时判断光照是否启用；不支持 `BLOXD_LIGHTING` 宏。
 
-- [版本历史](../history/) — 旧 API 的变化与迁移
-- [研究日志](research-log.md) — 测量方法与依据
+## 相关页面
 
-## 相关
-
-- [引擎标头](engine-header.md) — 完整标头文本
-- [按游戏划分的策略](policy.md) — allow / strict 策略列表
-- [纹理注册表](texture-registry.md) — 名称与 ID 的对应关系
+- [API 参考](../api/) — 函数、结构和常量
+- [包格式](../api/pack-format.md) — 清单、uniform 和加载器限制
+- [纹理目录](../api/texture-catalog.md) — 可用纹理名称
+- [各游戏适用策略](policy.md) — allow / strict 范围
+- [API v4 迁移指南](../history/v4.md) — 从旧版本迁移

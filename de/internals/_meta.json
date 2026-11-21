@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "Engine-Interna & Forschung",
+    "title": "Engine-Interna",
     "theme": {
       "toc": false,
       "typesetting": "article"
@@ -21,6 +21,5 @@
   "testing-factors": "Was paket-sichtbare Werte verändert",
   "policy": "Shader-Pack-Richtlinien je Spiel",
   "sun-and-moon": "Sonne und Mond",
-  "debugging": "Debugging-Werkzeuge",
-  "research-log": "Forschungslog"
+  "debugging": "Debugging-Werkzeuge"
 }
