@@ -1,8 +1,8 @@
 # Проблемы текстур
 
-> Целевой API: 5 · Целевой билд: `bbb6l5` · Статус: Verified (сообщения записаны дословно с живого валидатора)
+> Целевой API: 5 · Тип: техническая справка
 
-Проблемы вокруг `bloxdTextureId*` / `bloxdTexel`. Все 896 имён ищите в [каталоге текстур](../api/texture-catalog.md).
+Проблемы вокруг `bloxdTextureId*` / `bloxdTexel`. Все доступные имена ищите в [каталоге текстур](../api/texture-catalog.md).
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
