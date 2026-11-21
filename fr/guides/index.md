@@ -1,6 +1,6 @@
 # Guides
 
-Contenu « mécanismes et état d'esprit ». Ce qui est possible d'emblée figure dans [Ce que les packs de shaders peuvent et ne peuvent pas faire](constraints.md) ; les exemples de code orientés objectif vivent dans [Recettes](../recipes/).
+Cette section explique le fonctionnement des shader packs et les principes qui les sous-tendent. Pour connaître leurs possibilités et leurs limites, consultez [Ce que les packs de shaders peuvent et ne peuvent pas faire](constraints.md). Les exemples de code classés par objectif se trouvent dans les [Recettes](../recipes/).
 
 ## Carte
 
