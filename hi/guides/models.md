@@ -67,6 +67,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 `bloxdModelLight` वही `BloxdSurface` / `BloxdLightIn` लेता है और `bloxdDefaultLight` / `bloxdLitColour()` के साथ काम करता है। एनचैंट चमक (`enchantColour`) और हर्ट फ़्लैश (`overlayColour`) `bloxdLitColour` के भीतर मिलते हैं, इसलिए **डिफ़ॉल्ट दोनों रूप अपने आप बनाए रखते हैं**; इन्हें नियंत्रित करने के लिए [एनचैंट प्रभाव](../recipes/enchant-effects.md) देखें।
 
-## इंटर्नल्स
+## आंतरिक विवरण
 
-मॉडल कैसे रेंडर होते हैं और फ़्लैग/एनचैंट इनपुट कैसे बहते हैं: [इंजन इंटर्नल्स: मॉडल रेंडरिंग](../internals/model-rendering.md); `bloxdSpItemLocalPosition` और `bloxdSpEnchant` जैसे जनरेटेड प्रतीक [प्रतिबंधों](../api/restrictions.md) में सूचीबद्ध हैं।
+मॉडल कैसे रेंडर होते हैं और फ़्लैग/एनचैंट इनपुट कैसे बहते हैं: [इंजन की आंतरिक संरचना: मॉडल रेंडरिंग](../internals/model-rendering.md); `bloxdSpItemLocalPosition` और `bloxdSpEnchant` जैसे जनरेटेड प्रतीक [प्रतिबंधों](../api/restrictions.md) में सूचीबद्ध हैं।
