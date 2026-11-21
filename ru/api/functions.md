@@ -184,7 +184,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (определён в жидкостных вариантах)
 - **Смысл**: непрозрачная грань позади этого фрагмента (террейн, видимый сквозь воду); `hit == false` для неба
 - **Переименование из v2**: `found` → `hit`
-- **Подробный разбор**: [История версий: v3](../history/v3.md) и [Внутрянка движка](../internals/rendering-pipeline.md)
+- **Подробный разбор**: [История версий: v3](../history/v3.md) и [Внутреннее устройство движка](../internals/rendering-pipeline.md)
 
 ## См. также
 
