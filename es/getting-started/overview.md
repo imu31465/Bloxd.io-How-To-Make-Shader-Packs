@@ -1,6 +1,6 @@
 # Visión general y requisitos previos
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
+> API: 5 · Estado: Verified
 
 ## Qué es un shader pack
 
@@ -18,9 +18,9 @@ Un paquete se engancha al **pipeline de 3 etapas por cara** del renderizador. Lo
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | El agua |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modelos de bloque (losas, escaleras, plantas), ítems, jugadores, mobs, NPC, armaduras, cosmética |
 
-- **Se puede**: cambiar colores, transparencia y emisión; reconstruir la iluminación (la [API de iluminación](../api/lighting.md)); sombras de estilo proyectado (vía `skyLight`); muestrear texturas (`bloxdTexel` — leer el atlas existente de texturas de bloque); efectos por modelo (`flags` te dicen «esto es un ítem en mano», «esto es un jugador»); animación de vértices (solo juegos allow)
-- **No se puede**: añadir texturas propias (eso es tarea del sistema de paquetes de texturas); postprocesado (bloom etc.); sombras con mapa de sombras que giren con el sol; reflejos reales (SSR); afectar al cielo, las nubes o al propio disco solar
-- **Fácil de pasar por alto pero potente**: **sombras de estilo proyectado usando `skyLight` (oclusión de cielo por vóxeles)** — oscurece con claridad las zonas bajo árboles y techos. Romper bloques hace que LightEngine recalcule de inmediato, así que las sombras siguen los cambios en tiempo real
+- **Se puede**: cambiar colores, transparencia y emisión; ajustar la iluminación (la [API de iluminación](../api/lighting.md)); muestrear texturas con `bloxdTexel`; crear efectos por modelo mediante `flags`; animar vértices (solo juegos allow)
+- **No se puede**: añadir texturas propias; crear efectos de posprocesado como bloom; generar un mapa de sombras propio ni acceder a sus datos de profundidad; crear reflejos reales (SSR); ni aplicar sombreado al cielo, las nubes o el disco solar
+- **Sombras**: `bloxdShadow()` proporciona el factor de sombra solar/lunar calculado por el motor, y `bloxdShadowDirection()` indica la dirección en la que viaja la luz que proyecta la sombra. `bloxdAirShadow(t)` evalúa un punto entre la cámara y el fragmento. También sigue disponible el método anterior de oclusión del cielo por vóxeles mediante `skyLight` ([Guía de sombras](../guides/shadows.md))
 
 ## Modos strict y allow
 
@@ -30,4 +30,4 @@ Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayo
 
 - El juego actual solo acepta paquetes `apiVersion: 5`; los paquetes v1–v4 se rechazan al cargar (los guardados quedan inactivos en silencio — [Compatibilidad](../api/compatibility.md))
 - ¿Migras un paquete escrito para una versión antigua? Ver [Historial de versiones](../history/)
-- Las interioridades del motor pueden cambiar con las actualizaciones, así que cada página nombra su build objetivo
+- Las descripciones de los mecanismos internos del motor son material de referencia; consulta la referencia de la API para conocer el contrato compatible
