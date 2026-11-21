@@ -23,9 +23,10 @@ Build your first shader pack by following the guide from the basics through test
 8. [Validation](getting-started/validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](getting-started/distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](api/); for ready-made effects see [Recipes](recipes/).
+
+
 ---
 
 ## Overview & prerequisites
@@ -60,6 +61,8 @@ Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run i
 - The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](api/compatibility.md))
 - Migrating a pack written for an older version? See [Version History](history/)
 - Treat engine-internals explanations as reference material; consult the API reference for the supported API contract
+
+
 ---
 
 ## Requirements
@@ -469,13 +472,14 @@ This page documents the current API v5. The primary source for API definitions i
 > Target API: 5 · Status: Analyzed (reconstructed from the engine header and validator)
 
 Migrating from v4? See [Version History: v5](history/v5.md).
+
+
 ---
 
 ## Pack format
-
 > Target API: 5 · Type: API reference
 
-This page summarizes the manifest, ZIP archive limits, and pack uniform. For setup instructions, see [Getting started](api/getting-started/manifest.md).
+This page summarizes the manifest, ZIP archive limits, and pack uniform. For setup instructions, see [Getting started](getting-started/manifest.md).
 
 ### pack.json
 
@@ -526,9 +530,12 @@ The minimum uniform binding size is 80 bytes. The other bindings in group 3 are 
 
 ### Related
 
-- [Creating the manifest](api/getting-started/manifest.md)
-- [API reference](api/pack-format.md)
-- [API v5 migration guide](api/history/v5.md)
+- [Creating the manifest](getting-started/manifest.md)
+- [API reference](api/)
+- [API v5 migration guide](history/v5.md)
+
+
+---
 
 ## Shader hooks
 > Target API: 5 · Status: Verified
@@ -921,10 +928,9 @@ Return value of `bloxdOpaqueBehind()`. Use in liquid variants behind an `#ifdef 
 ---
 
 ## Functions
-
 > Target API: 5 · Type: technical reference
 
-Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](api/functions.md/texture-api.md), along with `bloxdOpaqueBehind`.
+Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](api/texture-api.md), along with `bloxdOpaqueBehind`.
 
 ### Frame functions (same value for the entire frame)
 
@@ -1037,7 +1043,7 @@ This function is **no longer part of the documented header** (it was in v4's), b
 
 - **Validator**: still listed in the live signature table, so calls pass name validation in every hook (including vertex hooks)
 - **Runtime**: the code generator still injects a definition into the terrain/liquid module and into both model programs — terrain/liquid use `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`; model pipelines use a 1/64-block offset, snapping to the model's cell for placed block models
-- **Caveat**: as an undocumented internal it can disappear in a future version without notice — prefer `bloxdWorldPosition()` for continuous positions and `flags` for "which block is this" (see [Version History: v5](api/history/v5.md) for the removal from the header)
+- **Caveat**: as an undocumented internal it can disappear in a future version without notice — prefer `bloxdWorldPosition()` for continuous positions and `flags` for "which block is this" (see [Version History: v5](history/v5.md) for the removal from the header)
 
 Packs written for v4 that call it keep working; new packs should not adopt it.
 
@@ -1071,7 +1077,7 @@ Literally "apply the engine's recipe, then fog the emission-added result".
 
 ### Lighting recipe functions
 
-The engine's own lighting recipe, documented as callable WGSL — compose or override the stages individually. Explanations and the flow diagram: [Lighting](api/functions.md/lighting.md).
+The engine's own lighting recipe, documented as callable WGSL — compose or override the stages individually. Explanations and the flow diagram: [Lighting](api/lighting.md).
 
 | Function | Signature | Role |
 |---|---|---|
@@ -1097,7 +1103,7 @@ fn bloxdShadow() -> f32
   - **1 on `flags.emissive` faces** (a face lit by its own light has no shadow)
   - the light travels along `bloxdShadowDirection()`, so shadows show under a sky with no sun too
 - **Callable from**: surface / light hooks
-- Recipe: `let sun = mix(shadowColour, litColour, bloxdShadow());` — see [Shadows](api/guides/shadows.md)
+- Recipe: `let sun = mix(shadowColour, litColour, bloxdShadow());` — see [Shadows](guides/shadows.md)
 
 #### bloxdAirShadow
 
@@ -1109,7 +1115,7 @@ fn bloxdAirShadow(t: f32) -> f32
 - **Facts** (verbatim from the validator's description):
   - **only blocks cast these shadows** (players and mobs do not), **blurred to whole blocks**
   - `t` is clamped to 0–1
-- Recipe: sample several `t` values along the view ray and accumulate — [Shadows](api/guides/shadows.md)
+- Recipe: sample several `t` values along the view ray and accumulate — [Shadows](guides/shadows.md)
 
 #### bloxdShadowDirection
 
@@ -1128,14 +1134,16 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (defined in liquid variants)
 - **Meaning**: the opaque face behind this fragment (terrain seen through water); `hit == false` for sky
 - **Rename from v2**: `found` → `hit`
-- **Deep dive**: [Version History: v3](api/history/v3.md) and [Engine Internals](api/internals/rendering-pipeline.md)
+- **Deep dive**: [Version History: v3](history/v3.md) and [Engine Internals](internals/rendering-pipeline.md)
 
 ### Related
 
-- [Lighting](api/functions.md/lighting.md) · [Texture API](api/functions.md/texture-api.md) · [Pack format](api/functions.md/pack-format.md) · [Shadows](api/guides/shadows.md)
+- [Lighting](api/lighting.md) · [Texture API](api/texture-api.md) · [Pack format](api/pack-format.md) · [Shadows](guides/shadows.md)
+
+
+---
 
 ## Lighting
-
 > Target API: 5 · Type: technical reference
 
 v5 published the lighting API. What the engine did internally (building `litColour`) is now callable from packs. This page covers the lighting inputs, functions, and processing order as a system.
@@ -1272,8 +1280,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### Light-level physics (background, skippable)
 
 - **`blockLight` / `skyLight` / `heldLight` arrive mapped to 0–1**: the 0–15 levels through an ease-out curve (e.g. `6 → 0.45`, `12 → 0.92`). All exclude `ambientLightColour`
-- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](api/guides/realism.md))
-- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](api/internals/fog-internals.md))
+- **Lift curve**: `skyLight` is really "can this position see the sky" — voxel occlusion data, i.e. a shadow map. Threshold-based sun/shade separation may need the inverse transform (see the [realism guide](guides/realism.md))
+- **Fog internals**: in linear mode `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamped 0..1), computed per vertex in view space. The current build is linear-only (details in [Engine Internals: Fog Internals](internals/fog-internals.md))
 
 ### Recipes
 
@@ -1314,10 +1322,12 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Related
 
-- [Functions](api/lighting.md/functions.md) · [Guides: lighting](api/guides/lighting.md) · [Engine Internals: Lighting Internals](api/internals/lighting-internals.md)
+- [Functions](api/functions.md) · [Guides: lighting](guides/lighting.md) · [Engine Internals: Lighting Internals](internals/lighting-internals.md)
+
+
+---
 
 ## Texture API
-
 > Target API: 5 · Type: technical reference
 
 The API for reading the game's own textures: two functions, a named-constant family, and four input fields. The header's own one-liner: *"This face's texture. Compare with `bloxdTextureId*`."*
@@ -1424,18 +1434,13 @@ Every usable texture name becomes a comparable `const`. **Spelling is the file n
 #### Name-resolution errors (verbatim from the validator)
 
 > **Prefix misspelling / case:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
->
 > **Animation frame:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
->
 > **Turned copy:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
->
 > **Ambiguous after folding:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
->
 > **Not found (with suggestion):** `There's no texture called X. Did you mean bloxdTextureIdY?` — suggestion threshold is Levenshtein distance `max(2, floor(len/4)) + 1`
->
 > **Not found (no suggestion):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
-> `BLOCK_TEXTURES.md` in that message is the game's own internal texture-name list, referenced by the engine's validator — it is not a page on this site. The equivalent here is the [Texture catalog](api/texture-api.md/texture-catalog.md).
+> `BLOCK_TEXTURES.md` in that message is the game's own internal texture-name list, referenced by the engine's validator — it is not a page on this site. The equivalent here is the [Texture catalog](api/texture-catalog.md).
 
 #### Only referenced constants are emitted
 
@@ -1541,8 +1546,11 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Related
 
-- **All 896 usable names** → [Texture catalog](api/texture-api.md/texture-catalog.md)
-- [Engine Internals: Texture Registry](api/internals/texture-registry.md) · [Texture Sampling](api/internals/texture-sampling.md)
+- **All 896 usable names** → [Texture catalog](api/texture-catalog.md)
+- [Engine Internals: Texture Registry](internals/texture-registry.md) · [Texture Sampling](internals/texture-sampling.md)
+
+
+---
 
 ## Constants
 > Target API: 5 · Status: Analyzed (restored verbatim from the live header)
@@ -1750,7 +1758,6 @@ Identifiers starting `bloxdTextureId` are resolved as texture-name constants ([T
 ---
 
 ## Compatibility
-
 > Target API: 5 · Type: API reference
 
 This page explains which shader-pack API versions the current game accepts and how older saved packs are handled.
@@ -1775,8 +1782,8 @@ Saved packs are revalidated when engine-provided headers or texture-name definit
 ### Runtime compatibility
 
 - **WebGPU:** Shader packs require a WebGPU renderer.
-- **Mobile:** Shader packs are unavailable in environments without WebGPU support ([Requirements](api/getting-started/requirements.md)).
-- **Texture access:** In renderer configurations that do not use the texture atlas, `bloxdTexel` and `bloxdTextureSize` do not provide normal atlas-texture access ([Texture API](api/compatibility.md/texture-api.md)).
+- **Mobile:** Shader packs are unavailable in environments without WebGPU support ([Requirements](getting-started/requirements.md)).
+- **Texture access:** In renderer configurations that do not use the texture atlas, `bloxdTexel` and `bloxdTextureSize` do not provide normal atlas-texture access ([Texture API](api/texture-api.md)).
 
 ### API version support
 
@@ -1790,11 +1797,13 @@ Saved packs are revalidated when engine-provided headers or texture-name definit
 
 ### Related
 
-- [Migrating from v4 to v5](api/history/v5.md)
-- [Version history](api/history)
+- [Migrating from v4 to v5](history/v5.md)
+- [Version history](history/)
+
+
+---
 
 ## Texture catalog
-
 ### How to read
 
 The **name** column contains the texture name to use. For example, `grass_top` is referenced as `bloxdTextureIdGrassTop`. Case and underscores are not distinguished.
@@ -2894,9 +2903,12 @@ These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry 
 
 ### Related
 
-- [Texture API](api/texture-catalog.md/texture-api.md) — name lookup and sampling
-- [How the texture registry works](api/internals/texture-registry.md) — named-constant behavior
-- [Texture sampling internals](api/internals/texture-sampling.md) — sampling behavior
+- [Texture API](api/texture-api.md) — name lookup and sampling
+- [How the texture registry works](internals/texture-registry.md) — named-constant behavior
+- [Texture sampling internals](internals/texture-sampling.md) — sampling behavior
+
+
+---
 
 ## Guides
 "Mechanism and mindset" material. What is possible in the first place is on [What shader packs can and cannot do](guides/constraints.md); goal-oriented code examples live in [Recipes](recipes/).
@@ -2945,7 +2957,6 @@ Engine default lighting is "multiplication only" — no specular, fresnel, warm/
 ---
 
 ## Shadows
-
 > Target API: 5 · Type: technical reference
 
 Two eras of shadow-making: the classic `skyLight` recipe (works on every build since v4), and the **real sun/moon shadows** the API v5 added to the API (`bloxdShadow()`). For a new pack on a current build, prefer the real thing.
@@ -2970,7 +2981,7 @@ Three additions turned "shadows" from a lighting trick into a first-class input:
 
 - **`bloxdShadow() -> f32`** — sunlight or moonlight reaching this fragment: 0 in shadow, 1 lit. Blocks, players, mobs and items cast these shadows (the first-person held item is excluded on purpose). Fades to 0 as the sun/moon sets or the face turns away; 1 on `flags.emissive` faces.
 - **`bloxdAirShadow(t: f32) -> f32`** — the same light, sampled at a point between the camera (t = 0) and this fragment (t = 1). Only blocks cast (blurred to whole blocks) — built for light shafts.
-- **`bloxdShadowDirection() -> vec3f`** — the travel direction of the light casting them (sun by day, moon by night, the default sky's sun otherwise; `y` never above 0). The uniform grew to 80 bytes for it ([Pack format](guides/api/pack-format.md)).
+- **`bloxdShadowDirection() -> vec3f`** — the travel direction of the light casting them (sun by day, moon by night, the default sky's sun otherwise; `y` never above 0). The uniform grew to 80 bytes for it ([Pack format](api/pack-format.md)).
 
 The minimal daylight recipe:
 
@@ -3025,7 +3036,7 @@ Under trees, roofs and inside buildings the value is already low and interpolate
 
 The curve is monotonic and inverts exactly: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Restore the raw value, then binarize with a **`smoothstep` threshold**. LightEngine's BFS spread is "-1 per adjacent block", so `th = 1 - r/15` is directly the "occlusion radius counted as shadow" dial.
 
-The complete implementation (sun gating + warm/cool split + blockLight passthrough) is in [realism recipes](guides/recipes/realism.md). Key steps:
+The complete implementation (sun gating + warm/cool split + blockLight passthrough) is in [realism recipes](recipes/realism.md). Key steps:
 
 ```wgsl
 // 1. restore the raw value (skipping this means shadows never appear)
@@ -3048,7 +3059,10 @@ Dials: **area** = `shTh` (0.93→radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); *
 
 ### Related
 
-- [Functions: shadow functions](guides/api/functions.md) · [realism recipes](guides/recipes/realism.md) (the classic projected-shadow recipe) · [Lighting Internals](guides/internals/lighting-internals.md) · [Debugging tips](guides/shadows.md/debugging.md)
+- [Functions: shadow functions](api/functions.md) · [realism recipes](recipes/realism.md) (the classic projected-shadow recipe) · [Lighting Internals](internals/lighting-internals.md) · [Debugging tips](guides/debugging.md)
+
+
+---
 
 ## Making water look natural
 > Target API: 5 · Status: Verified (ported to the current API — on-device re-check recommended)
@@ -3221,7 +3235,6 @@ How models render and how flags/enchant inputs flow: [Engine Internals: Model Re
 ---
 
 ## Realism: two schools
-
 > Target API: 5 · Type: technical reference
 **School A: additive fixes (from defaultLight)** — use `engineColour` (finished color) as the base and add warm glow or rim. Easy and safe, but the lighting model stays default.
 
@@ -3230,7 +3243,10 @@ How models render and how flags/enchant inputs flow: [Engine Internals: Model Re
 1. **Re-apply fog**: the light hook runs post-fog, so apply `mix(l.fogColour, col, (1.0 - l.fogAlpha))` yourself (R9.10). When fog is too dense, floor it with `min(l.fogAlpha, 0.70)`. Conversely, mixing more fog color onto engineColour-based packs double-fogs into white distance
 2. **Unlit fallback**: pass through to `defaultLight` outside `#ifdef BLOXD_LIGHTING`
 3. **Guard whole shared functions**: wrap shared functions taking `BloxdLightIn` in `#ifdef BLOXD_LIGHTING` as entire functions (guarding only call sites is not enough)
-4. **When there is no sun direction**: if `bloxdSunDirection()` is zero, don't compute directional specular. `l.directional` is a light-amount scalar, not a direction vector, so it cannot restore highlight direction. Switch to weak directionless ambient as needed. Moon direction is available via `-bloxdSunDirection()` (only moves in day/night-cycle worlds — [The sun and the moon](guides/internals/sun-and-moon.md))
+4. **When there is no sun direction**: if `bloxdSunDirection()` is zero, don't compute directional specular. `l.directional` is a light-amount scalar, not a direction vector, so it cannot restore highlight direction. Switch to weak directionless ambient as needed. Moon direction is available via `-bloxdSunDirection()` (only moves in day/night-cycle worlds — [The sun and the moon](internals/sun-and-moon.md))
+
+
+---
 
 ## What shader packs can and cannot do
 > Target API: 5 · Status: Verified (ported to the current API — on-device re-check recommended)
@@ -3315,6 +3331,7 @@ Practical points: packs keep working underwater / the veil cannot be removed / u
 - [Models and textures](guides/models.md) — what the model pipeline reaches
 - [Compatibility](api/compatibility.md) — how old-version packs behave
 - Version-by-version changes to these limits: [Version History](history/)
+
 
 ---
 
@@ -3938,7 +3955,6 @@ let phase = t * 0.15;
 ## Realism
 > Target API: 5 · Status: Verified (ported to the current API — on-device re-check recommended)
 > Physical recipes for "rebuilding vanilla's look from materials". Read these premises first:
-> 
 > 1. **The light hook is called at the final fragment stage**. Its returned colour becomes the final colour as-is. **You must re-apply fog yourself** (R9.10)  
 > 2. **The engine's default lighting is multiplication only**. Specular / fresnel / warm-cool separation / hemisphere ambient can all be built from zero  
 > 3. `l.engineColour` is the finished color (already fogged). Rebuilding from `s.colour` (albedo) is the full-fledged approach  
@@ -4179,14 +4195,12 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > **Premise recheck (section 10)**: `l.skyLight` is not the raw voxel value (n/15) but the value after the engine's "lift curve"  
 > `y = 1-(1-x/(3-2x))³` (an S-curve lifting dark areas).
-> 
 > | Place | raw voxel | lifted (= l.skyLight) | pow( · , 5.0) |  
 > |---|---|---|---|  
 > | open sky | 1.00 | 1.00 | 1.00 |  
 > | under tree (radius 2) | 0.87 | **0.97** | **0.86** ← nearly untouched |  
 > | radius 3 | 0.80 | **0.92** | 0.66 |  
 > | radius 5 | 0.67 | 0.78 | 0.29 |
-> 
 > **This is the proven root cause of "shadows won't deepen no matter the gamma"**. But the curve is monotonic, so it can be inverted algebraically:  
 > `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. After restoring raw values, just binarize with a threshold cut (`smoothstep`).  
 > LightEngine's BFS lateral spread is "1 block = -1", so the threshold `th = 1 - r/15` directly dials  
@@ -4237,7 +4251,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > Edge hardness is `shSoft` (0.02 = hard / 0.08 = soft). Shadow core darkness is the two-point shift of `0.09` (minimum ambient) and `0.16` (sky scatter).  
 > To widen shadows at dusk, add `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (long-dusk-shadow approximation.  
 > `sunDir` is `bloxdSunDirection() / length(bloxdSunDirection())`). For bluer shadows raise the B of `vec3f(0.72, 0.82, 1.05)`.
-> 
 
 
 ---
@@ -4896,22 +4909,21 @@ Compiles fine but looks wrong.
 ---
 
 ## Texture issues
-
 > Target API: 5 · Type: technical reference
 
-Problems around `bloxdTextureId*` / `bloxdTexel`. Search all available names in the [texture catalog](troubleshooting/api/texture-catalog.md).
+Problems around `bloxdTextureId*` / `bloxdTexel`. Search all available names in the [texture catalog](api/texture-catalog.md).
 
 ### "There's no texture called X. Did you mean bloxdTextureIdY?"
 
 - **Cause**: a misspelling; the validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
-- **Fix**: accept the suggestion; cross-check the [catalog](troubleshooting/api/texture-catalog.md)
+- **Fix**: accept the suggestion; cross-check the [catalog](api/texture-catalog.md)
 - **Prevention**: copy-paste names from the catalog
 
 ### "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
 
 - **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
 - **Fix**: use the base name — sampling returns the current frame automatically
-- **Prevention**: never write frame suffixes for the 43 animation families ([naming](troubleshooting/api/texture-api.md#spelling-rules-and-naming-freedom))
+- **Prevention**: never write frame suffixes for the 43 animation families ([naming](api/texture-api.md#spelling-rules-and-naming-freedom))
 
 ### "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
@@ -4930,30 +4942,33 @@ Problems around `bloxdTextureId*` / `bloxdTexel`. Search all available names in 
 
 ### "Case and underscores are not distinguished" — how do both rules coexist?
 
-Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](troubleshooting/api/texture-api.md#spelling-rules-and-naming-freedom)).
+Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](api/texture-api.md#spelling-rules-and-naming-freedom)).
 
 ### bloxdTexel always returns white on models
 
 - **By design**: most models use `textureId: 0` (no texture — player skins etc.); `bloxdTexel(0, ...)` returns `vec4f(1.0)`
-- **Fix**: select with `surface.textureId != 0u` ([model-owned textures](troubleshooting/api/texture-api.md#model-owned-textures-textureid-0))
+- **Fix**: select with `surface.textureId != 0u` ([model-owned textures](api/texture-api.md#model-owned-textures-textureid-0))
 
 ### Wanting to add textures
 
-- **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](troubleshooting/guides/combinations.md))
+- **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](guides/combinations.md))
 
 ### "Packs can't use X: the engine binds every texture and sampler..."
 
 - **Cause**: declaring `texture_*` / `sampler` types directly
-- **Fix**: go through `bloxdTexel()` ([Restrictions](troubleshooting/api/restrictions.md))
+- **Fix**: go through `bloxdTexel()` ([Restrictions](api/restrictions.md))
 
 ### Raw ids broke after a game update
 
 - **Cause**: **ids are snapshots** — measured, 334 of 905 surviving names changed id between two builds
-- **Fix**: write `bloxdTextureIdLava`, not `19` ([names are the API](troubleshooting/api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- **Fix**: write `bloxdTextureIdLava`, not `19` ([names are the API](api/texture-catalog.md#measured-drift-cnty9--ab90qa))
 
 ### Related
 
-- [Texture API](troubleshooting/api/texture-api.md) · [Texture catalog](troubleshooting/api/texture-catalog.md) · [Texture Registry internals](troubleshooting/internals/texture-registry.md)
+- [Texture API](api/texture-api.md) · [Texture catalog](api/texture-catalog.md) · [Texture Registry internals](internals/texture-registry.md)
+
+
+---
 
 ## Lighting issues
 > Target API: 5 · Status: Verified
@@ -5108,7 +5123,6 @@ Speed problems and their fixes.
 ---
 
 ## FAQ & legal notes
-
 > Target API: 5 · Type: technical reference
 
 ### Frequently asked questions
@@ -5119,75 +5133,79 @@ The shader-pack feature is accessible from the in-game UI and pack-making appear
 
 #### Q. Can packs do anything dangerous?
 
-Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](troubleshooting/api/restrictions.md)).
+Packs are pure WGSL — **JS execution and network access are impossible by design**. Only code that passes validation and compilation runs ([Restrictions](api/restrictions.md)).
 
 #### Q. Which games do packs work in?
 
-Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](troubleshooting/internals/policy.md).
+Most games run in strict mode (no vertex animation, no `discard`). Vertex animation works only in allow-listed games. The per-title list is in [Engine Internals: policy](internals/policy.md).
 
 #### Q. Do packs work on mobile?
 
-Only on WebGPU-capable environments ([Requirements](troubleshooting/getting-started/requirements.md)).
+Only on WebGPU-capable environments ([Requirements](getting-started/requirements.md)).
 
 #### Q. Can I ship my own textures?
 
-Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](troubleshooting/guides/combinations.md)).
+Not in a shader pack (the atlas is read-only). That is the texture-pack system's job ([combinations](guides/combinations.md)).
 
 #### Q. Can I keep using an old-version pack?
 
-The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](troubleshooting/api/compatibility.md)). Migrate via [Version History](troubleshooting/history).
+The current game accepts only `apiVersion: 5`; older packs are silently deactivated ([Compatibility](api/compatibility.md)). Migrate via [Version History](history/).
 
 #### Q. Will the API change again?
 
-Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](troubleshooting/api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+Engine internals may change with updates — every page names its target build. Saved packs re-validate automatically when the header or registry changes ([Compatibility](api/compatibility.md#saved-pack-re-validation-needs-re-check)).
 
 #### Q. What about "cinematic shader" distributions?
 
-A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](troubleshooting/guides/combinations.md)).
+A community "cinematic shader" distribution we analyzed turned out to be a texture pack (128×128 textures, no `pack.json` / `.wgsl`). Most "shadowy shader-like" looks are texture-side craft ([combinations](guides/combinations.md)).
 
 ### Legal & notes
 
 - This is an unofficial guide and does not represent the developers' views. The API may change without notice
 - Created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior
-- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](troubleshooting/api/texture-catalog.md#measured-drift-cnty9--ab90qa))
+- Measured values (texture ids etc.) are snapshots of specific builds and change between builds ([names are the API](api/texture-catalog.md#measured-drift-cnty9--ab90qa))
 
 ### Related
 
-- [Documentation entry](troubleshooting) · [Version History](troubleshooting/history)
+- [Documentation entry](./) · [Version History](history/)
 
-## Engine Internals
 
-This category explains engine behavior that may help when understanding shader-pack execution. These implementation details can change; for stable usage rules and supported APIs, see the [API reference](internals/api).
+---
+
+## Engine Internals & Research
+This category explains engine behavior that may help when understanding shader-pack execution. These implementation details can change; for stable usage rules and supported APIs, see the [API reference](api/).
 ### Map
 | Page | Contents |
 |---|---|
-| [Rendering pipeline](internals/index.md/rendering-pipeline.md) | alphaTest position, 2-light setup, uniform reality, greedy meshing |
-| [Hook invocation](internals/index.md/hook-invocation.md) | how hooks are spliced into the engine's WGSL |
-| [Engine header](internals/index.md/engine-header.md) | WGSL declarations prepended to shader packs |
-| [Shader validation](internals/index.md/shader-validation.md) | analyzer internals, the signature table, HEADER_VERSION |
-| [WGSL compilation](internals/index.md/wgsl-compilation.md) | the stage-2 real compilation and validation stubs |
-| [Reserved identifiers](internals/index.md/reserved-identifiers.md) | the 46 `bloxdSp*` symbols |
-| [Lighting internals](internals/index.md/lighting-internals.md) | blockLight / heldLight structure |
-| [Fog internals](internals/index.md/fog-internals.md) | linear-only, the 32-block gradient band |
-| [Texture sampling](internals/index.md/texture-sampling.md) | the 3-variant texture codegen |
-| [Texture registry](internals/index.md/texture-registry.md) | Named texture lookup, animation, and rotation names |
-| [Model rendering](internals/index.md/model-rendering.md) | the v5 Model program |
-| [Engine data](internals/index.md/engine-data.md) | API v5 features and pack limits |
-| [Testing factors](internals/index.md/testing-factors.md) | what world/player settings change pack-visible values |
-| [Policy](internals/index.md/policy.md) | shaderPackPolicy — the 12 allow titles |
-| [Sun & moon](internals/index.md/sun-and-moon.md) | what feeds bloxdSunDirection |
-| [Debugging](internals/index.md/debugging.md) | URL parameters, stats panels |
+| [Rendering pipeline](internals/rendering-pipeline.md) | alphaTest position, 2-light setup, uniform reality, greedy meshing |
+| [Hook invocation](internals/hook-invocation.md) | how hooks are spliced into the engine's WGSL |
+| [Engine header](internals/engine-header.md) | WGSL declarations prepended to shader packs |
+| [Shader validation](internals/shader-validation.md) | analyzer internals, the signature table, HEADER_VERSION |
+| [WGSL compilation](internals/wgsl-compilation.md) | the stage-2 real compilation and validation stubs |
+| [Reserved identifiers](internals/reserved-identifiers.md) | the 46 `bloxdSp*` symbols |
+| [Lighting internals](internals/lighting-internals.md) | blockLight / heldLight structure |
+| [Fog internals](internals/fog-internals.md) | linear-only, the 32-block gradient band |
+| [Texture sampling](internals/texture-sampling.md) | the 3-variant texture codegen |
+| [Texture registry](internals/texture-registry.md) | Named texture lookup, animation, and rotation names |
+| [Model rendering](internals/model-rendering.md) | the v5 Model program |
+| [Engine data](internals/engine-data.md) | API v5 features and pack limits |
+| [Testing factors](internals/testing-factors.md) | what world/player settings change pack-visible values |
+| [Policy](internals/policy.md) | shaderPackPolicy — the 12 allow titles |
+| [Sun & moon](internals/sun-and-moon.md) | what feeds bloxdSunDirection |
+| [Debugging](internals/debugging.md) | URL parameters, stats panels |
 Internal implementation details are not a stable API contract. Prefer the public API reference when writing packs.
 
-## Rendering pipeline
 
+---
+
+## Rendering pipeline
 > Target API: 5 · Type: technical reference
 - **Surface hooks run "before" alphaTest**: `out.alpha` feeds the discard test directly. Cutout materials (grass, leaves) allow dissolve-style dither effects (recipe R-C). For liquids (blended) `out.alpha` is the real transparency (recipe R-D). No effect on normal opaque terrain — don't misunderstand
 - **`l.ambient` content** is `material.ambient × sceneAmbient`, differing per material. The scene side ties to the graphics setting "Ambient Lighting Intensity" (default 0.5) — never hardcode defaults
 - **The scene's directional lights are a 2-light setup**: the Lambert sum of the main light (direction from the sky setting's sun position, intensity 1.0) and the fill light (direction `[-0.5, -1, -1]`, intensity 0.35) reaches `l.directional`. The fill light points downward, so it contributes nothing to top faces and picks up downward-facing surfaces (cave ceilings etc.). Terrain considers only lights added in `_initScene`; lights added to the scene after startup are ignored by terrain and block models (an official warning message says so)
 - **`bloxdSeconds()` is really `performance.now()`**: the browser's uptime wrapped at 1 hour. Unrelated to in-game day/night and world elapsed time. To animate synced to a game clock, estimate time from the `bloxdSunDirection()` azimuth in day/night-cycle worlds
-- **Header functions read one uniform**: the engine places the 64-byte `bloxdPackInputs` uniform at `@group(3) @binding(0)` (5 slots — seconds / lit / renderOffset / sunDirection / eyePosition, little-endian), and `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` correspond to reading those slots ([Pack format: per-frame uniform](internals/api/pack-format.md#per-frame-uniform-bloxdpackinputs)). Packs cannot write this uniform, and since pack and engine WGSL merge into a single module, declaring the same group/binding yourself is also impossible. `@group(3) @binding(1)` carries the liquid scene-depth texture, and `@binding(2)` the `bloxdSpTextureLayers` storage buffer
-- **Vertex data is built by the mesher (Web Worker)**: block terrain is interleaved at 28 bytes per vertex (32 bytes when the atlas is on) — position = float32×3 / normal = 8-bit signed integer×4 / colour = 8-bit normalized integer×4 (the substance of `s.colour` — tint × AO is baked into 8-bit at the mesher stage, so separating or restoring it pack-side is impossible in principle) / UV = float32×2 / atlasIndex = float32. Only the light levels travel in a separate 4-byte vertex buffer (measured values: [Engine data ledger](internals/rendering-pipeline.md/engine-data.md)). Vertices are drawn with per-chunk instancing
+- **Header functions read one uniform**: the engine places the 64-byte `bloxdPackInputs` uniform at `@group(3) @binding(0)` (5 slots — seconds / lit / renderOffset / sunDirection / eyePosition, little-endian), and `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` correspond to reading those slots ([Pack format: per-frame uniform](api/pack-format.md#per-frame-uniform-bloxdpackinputs)). Packs cannot write this uniform, and since pack and engine WGSL merge into a single module, declaring the same group/binding yourself is also impossible. `@group(3) @binding(1)` carries the liquid scene-depth texture, and `@binding(2)` the `bloxdSpTextureLayers` storage buffer
+- **Vertex data is built by the mesher (Web Worker)**: block terrain is interleaved at 28 bytes per vertex (32 bytes when the atlas is on) — position = float32×3 / normal = 8-bit signed integer×4 / colour = 8-bit normalized integer×4 (the substance of `s.colour` — tint × AO is baked into 8-bit at the mesher stage, so separating or restoring it pack-side is impossible in principle) / UV = float32×2 / atlasIndex = float32. Only the light levels travel in a separate 4-byte vertex buffer (measured values: [Engine data ledger](internals/engine-data.md)). Vertices are drawn with per-chunk instancing
 - Fine checker patterns at chunk borders during loading are the engine's screen-space Bayer 4×4 dither chunk fade, not pack bugs (disable via the graphics setting `chunkFadeIn`)
 - **`mod` is a reserved word**: rejected with `pack.wgsl:3 'mod' is a reserved word in WGSL.` Write remainders with the `%` operator
 
@@ -5249,8 +5267,10 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Hook invocation internals
 
+---
+
+## Hook invocation internals
 > Target API: 5 · Type: technical reference
 
 How the engine calls hooks at runtime. This changes nothing about the code you write, but removes the guesswork about what hooks receive.
@@ -5268,9 +5288,9 @@ The renderer does not "call" hooks from JavaScript. Once a pack passes validatio
 
 ### What the splice forces
 
-- **strict terrain ignores surface-hook alpha changes.** The `alpha = bloxdSpSurface.alpha` write-back is grafted only for the liquid program or non-strict variants — the implementation behind the macro table ([Preprocessor](internals/api/preprocessor.md))
+- **strict terrain ignores surface-hook alpha changes.** The `alpha = bloxdSpSurface.alpha` write-back is grafted only for the liquid program or non-strict variants — the implementation behind the macro table ([Preprocessor](api/preprocessor.md))
 - **A strict variant that declares a vertex hook never runs it.** The engine reports at build time: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. Hence the template's `#ifndef BLOXD_STRICT`
-- **`bloxdSp*` identifiers** are engine temporaries — invisible to your code but present in diagnostics and reverse-engineering output ([Reserved identifiers](internals/hook-invocation.md/reserved-identifiers.md) — 46 in v5)
+- **`bloxdSp*` identifiers** are engine temporaries — invisible to your code but present in diagnostics and reverse-engineering output ([Reserved identifiers](internals/reserved-identifiers.md) — 46 in v5)
 - **The default-surface shortcut.** If a variant's surface hook is literally `bloxdDefaultSurface`, the engine omits the `baseColor` / `alpha` write-back graft entirely — the default already produces those values, so the assignments are dead code. **Unmodified hook chains cost nothing**
 
 ### What changed in v5
@@ -5279,8 +5299,8 @@ The splice architecture existed in the v2 renderer and stayed stable across v2 �
 
 - `vBlockFlags` (bits) → the **`BloxdFlags` struct** (delivered via `bloxdSpFlags`)
 - the `litColour` capture went from engine-internal to **public API** (`bloxdLitColour()` — v4's `bloxdSpLitColour` promoted)
-- `BloxdLightIn` gained `diffuse` / `emissive`, and `bloxdShading()` rebuilds the material response ([Lighting](internals/api/lighting.md))
-- delivery of `localPosition` (`bloxdSpItemLocalPosition`), enchant inputs (`bloxdSpEnchant`) and `overlayColour` ([Model rendering](internals/hook-invocation.md/model-rendering.md))
+- `BloxdLightIn` gained `diffuse` / `emissive`, and `bloxdShading()` rebuilds the material response ([Lighting](api/lighting.md))
+- delivery of `localPosition` (`bloxdSpItemLocalPosition`), enchant inputs (`bloxdSpEnchant`) and `overlayColour` ([Model rendering](internals/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (inverted)
 - the Model program joined the variant matrix (3 programs × 2 modes = 6 variants)
 
@@ -5289,34 +5309,36 @@ The splice architecture existed in the v2 renderer and stayed stable across v2 �
 | Field | Engine-side source |
 |---|---|
 | `litColour` | the fragment color captured just before the fog mix — "before emission and fog" in header terms |
-| `directional` | the vertex-interpolated sum of per-directional-light Lambert (2-light setup in [Rendering pipeline](internals/hook-invocation.md/rendering-pipeline.md)) |
+| `directional` | the vertex-interpolated sum of per-directional-light Lambert (2-light setup in [Rendering pipeline](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | the material's directional RGB response / RGB glow |
 | `ambient` | `material.ambient × sceneAmbient` — per material, per frame |
-| `blockLight` / `skyLight` | the decoded light-level varyings ([Lighting internals](internals/hook-invocation.md/lighting-internals.md)) |
+| `blockLight` / `skyLight` | the decoded light-level varyings ([Lighting internals](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | the corresponding uniforms |
-| `heldLight` | built from the light-level varying and held-light uniforms (cone falloff in [Lighting internals](internals/hook-invocation.md/lighting-internals.md)) |
+| `heldLight` | built from the light-level varying and held-light uniforms (cone falloff in [Lighting internals](internals/lighting-internals.md)) |
 | `fogColour` | black only in entirely fog-less scenes (mode 0) |
-| `fogAlpha` | the clamped fog factor ([Fog internals](internals/hook-invocation.md/fog-internals.md)) |
+| `fogAlpha` | the clamped fog factor ([Fog internals](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings and flat-interpolated values (same as `BloxdSurfaceIn` — post-vertex-hook values) |
 
 ### Related
 
-- [Shader hooks](internals/api/hooks.md) · [Rendering pipeline](internals/hook-invocation.md/rendering-pipeline.md) · [Reserved identifiers](internals/hook-invocation.md/reserved-identifiers.md) · [Version History: v3](internals/history/v3.md)
+- [Shader hooks](api/hooks.md) · [Rendering pipeline](internals/rendering-pipeline.md) · [Reserved identifiers](internals/reserved-identifiers.md) · [Version History: v3](history/v3.md)
+
+
+---
 
 ## Engine header (verbatim)
-
 > Target API: 5 · Type: technical reference
 
-A reference listing of the WGSL header prepended to shader packs. See the [API reference](internals/api) for explanations of individual fields and functions.
+A reference listing of the WGSL header prepended to shader packs. See the [API reference](api/) for explanations of individual fields and functions.
 
 Reading guide:
-- Field-by-field explanations → [Structures](internals/api/structures.md)
-- Function-by-function → [Functions](internals/api/functions.md) / [Lighting](internals/api/lighting.md)
-- Flags (BloxdFlags) → [Flags](internals/api/flags.md)
-- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](internals/api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](internals/api/preprocessor.md))
-- Differences from the v4 header (6,021B) → [Version History: v5](internals/history/v5.md)
-- How the header is validated (HEADER_VERSION) → [Shader Validation](internals/engine-header.md/shader-validation.md)
+- Field-by-field explanations → [Structures](api/structures.md)
+- Function-by-function → [Functions](api/functions.md) / [Lighting](api/lighting.md)
+- Flags (BloxdFlags) → [Flags](api/flags.md)
+- The `bloxdTextureId*` block is **not** in this header — it is generated per pack from referenced names ([Texture API](api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` marks conditional fields ([Preprocessor](api/preprocessor.md))
+- Differences from the v4 header (6,021B) → [Version History: v5](history/v5.md)
+- How the header is validated (HEADER_VERSION) → [Shader Validation](internals/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5538,21 +5560,23 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Related
 
-- [API Reference](internals/api) — the annotated version of this header
-- [Shader Validation](internals/engine-header.md/shader-validation.md) — HEADER_VERSION and saved-pack re-validation
-- [Engine Data](internals/engine-header.md/engine-data.md) — the measurement ledger
+- [API Reference](api/) — the annotated version of this header
+- [Shader Validation](internals/shader-validation.md) — HEADER_VERSION and saved-pack re-validation
+- [Engine Data](internals/engine-data.md) — the measurement ledger
+
+
+---
 
 ## Shader validation
-
 > Target API: 5 · Type: technical reference
 
-The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](internals/troubleshooting/validation.md).
+The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](troubleshooting/validation.md).
 
 ### The stages
 
-1. **Loader limits** (zip / pack.json shape) → [Pack format](internals/api/pack-format.md)
+1. **Loader limits** (zip / pack.json shape) → [Pack format](api/pack-format.md)
 2. **Static validation (analyzer)** — this page; syntax, types, reserved names, hook contracts across all 6 variants
-3. **Real browser compilation** → [WGSL compilation](internals/shader-validation.md/wgsl-compilation.md)
+3. **Real browser compilation** → [WGSL compilation](internals/wgsl-compilation.md)
 4. **Runtime re-validation on game join** — actually compiles every existing terrain material (stricter than the settings-screen check); failing it drops the pack for that game
 
 ### The special-function signature table
@@ -5582,7 +5606,7 @@ Note: `bloxdFragmentBlockPosition` is gone from the header generation, but its e
 
 ### Texture-name resolution & diagnostics
 
-`bloxdTextureId*` resolution has a dedicated path ([the messages](internals/api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
+`bloxdTextureId*` resolution has a dedicated path ([the messages](api/texture-api.md#name-resolution-errors-verbatim-from-the-validator)):
 
 - **folding**: split on non-alphanumerics, CamelCase, prefix with `bloxdTextureId`; reverse matching is case/underscore-insensitive
 - **spelling suggestions** (new in v5): unmatched names get Levenshtein proposals at threshold `max(2, floor(len/4)) + 1`
@@ -5596,34 +5620,36 @@ Note: `bloxdFragmentBlockPosition` is gone from the header generation, but its e
 
 ### The Y-derivative rewrite
 
-The analyzer's token-rewrite pass rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (the dpdy family is explicitly enumerated as the inversion set). `dpdx` and `fwidth` are untouched ([Restrictions](internals/api/restrictions.md#automatic-rewrites)).
+The analyzer's token-rewrite pass rewrites every `dpdy` / `dpdyCoarse` / `dpdyFine` call to `(-dpdy(...))` (the dpdy family is explicitly enumerated as the inversion set). `dpdx` and `fwidth` are untouched ([Restrictions](api/restrictions.md#automatic-rewrites)).
 
 ### Header & texture-constant generation
 
-- the header is prepended read-only ([Engine header](internals/shader-validation.md/engine-header.md))
+- the header is prepended read-only ([Engine header](internals/engine-header.md))
 - the `bloxdTextureId*` block is generated **per pack** from referenced names
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (leading integer 8 → 9 from v4). The two fnv1a32 suffixes fingerprint the header material and the sorted name-id registry. Saved-pack re-validation uses this fingerprint to decide "needs re-check" ([Compatibility](internals/api/compatibility.md#saved-pack-re-validation-needs-re-check)).
+`HEADER_VERSION` is `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (leading integer 8 → 9 from v4). The two fnv1a32 suffixes fingerprint the header material and the sorted name-id registry. Saved-pack re-validation uses this fingerprint to decide "needs re-check" ([Compatibility](api/compatibility.md#saved-pack-re-validation-needs-re-check)).
 
 ### Validation stubs
 
-Code that passes static validation gets stub code synthesized before the real browser-WGSL check: `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — the type-stub table (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) builds input structs and invokes the hooks. Details: [WGSL compilation](internals/shader-validation.md/wgsl-compilation.md).
+Code that passes static validation gets stub code synthesized before the real browser-WGSL check: `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — the type-stub table (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) builds input structs and invokes the hooks. Details: [WGSL compilation](internals/wgsl-compilation.md).
 
 ### Related
 
-- [Validation errors](internals/troubleshooting/validation.md) · [WGSL compilation](internals/shader-validation.md/wgsl-compilation.md) · [Texture registry](internals/shader-validation.md/texture-registry.md) · [Engine data](internals/shader-validation.md/engine-data.md)
+- [Validation errors](troubleshooting/validation.md) · [WGSL compilation](internals/wgsl-compilation.md) · [Texture registry](internals/texture-registry.md) · [Engine data](internals/engine-data.md)
+
+
+---
 
 ## WGSL compilation
-
 > Target API: 5 · Type: technical reference
 
 The second validation stage — real compilation through the browser's WGSL compiler — and v5's validation stubs.
 
 ### Why two stages
 
-Static validation's type-checking is incomplete, so some mistakes only surface here (e.g. WGSL operator-precedence requirements like `mixing '*' and '^' requires parenthesis`). Errors surface in-game with the variant name ([Compilation errors](internals/troubleshooting/compilation.md)).
+Static validation's type-checking is incomplete, so some mistakes only surface here (e.g. WGSL operator-precedence requirements like `mixing '*' and '^' requires parenthesis`). Errors surface in-game with the variant name ([Compilation errors](troubleshooting/compilation.md)).
 
 ### Validation-stub generation
 
@@ -5676,17 +5702,19 @@ When splicing hook calls the engine keeps an identifier mapping (`originalNames`
 
 ### Runtime re-validation on join
 
-`checkCompilation` runs per game join and actually compiles every existing terrain material (stricter than the settings-screen check). Failing drops the pack for that game. The check has a 60-second forced timeout ([Performance](internals/troubleshooting/performance.md)).
+`checkCompilation` runs per game join and actually compiles every existing terrain material (stricter than the settings-screen check). Failing drops the pack for that game. The check has a 60-second forced timeout ([Performance](troubleshooting/performance.md)).
 
 ### Related
 
-- [Compilation errors](internals/troubleshooting/compilation.md) · [Shader validation](internals/wgsl-compilation.md/shader-validation.md) · [Getting Started: Validation](internals/getting-started/validation.md)
+- [Compilation errors](troubleshooting/compilation.md) · [Shader validation](internals/shader-validation.md) · [Getting Started: Validation](getting-started/validation.md)
+
+
+---
 
 ## Reserved identifier internals
-
 > Target API: 5 · Type: technical reference
 
-The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](internals/api/restrictions.md).
+The `bloxdSp*` namespace — symbols the generators may inject and packs therefore cannot redeclare. The pack-author summary: [Restrictions](api/restrictions.md).
 
 ### The 88 symbols
 
@@ -5709,36 +5737,40 @@ All 42 new symbols come from the engine's sun/moon shadow implementation, which 
 - `bloxdSpFlags` — delivery of the `BloxdFlags` struct
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — the new inputs (enchant, model-local position)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — the cell-sampling texture-pack path
-- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](internals/reserved-identifiers.md/texture-sampling.md))
+- `bloxdSpQuarterTurns` — the rotation chain ([Texture sampling](internals/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — extended-hook locals
 
 ### The pack-level rule
 
-Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](internals/troubleshooting/validation.md)).
+Broader than this namespace: **everything matching `/^bloxd/i` (case-insensitive)**. Only the 9 hook function names may be declared ([Validation errors](troubleshooting/validation.md)).
 
-`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](internals/troubleshooting/textures.md)).
+`bloxdTextureId`-prefixed identifiers resolve as texture names with their dedicated error family ([Texture issues](troubleshooting/textures.md)).
 
 ### Related
 
-- [Restrictions](internals/api/restrictions.md) · [Texture sampling](internals/reserved-identifiers.md/texture-sampling.md) · [Version History: v5](internals/history/v5.md)
+- [Restrictions](api/restrictions.md) · [Texture sampling](internals/texture-sampling.md) · [Version History: v5](history/v5.md)
+
+
+---
 
 ## Lighting internals
-
 > Target API: 5 · Type: technical reference
 `blockLight` is **colored light** with three RGB channels. Each light-emitting block defines an emission color `[R, G, B]` (0–15 each) that becomes the light color as-is (regular torch = warm white (14,14,12) / lava = orange (14,8,2) / beacon = cyan (5,14,14) / white torch = (15,15,15), etc.). At the vertex stage it arrives packed as 4 nibbles — r / g / b / sky — in one float attribute. Handling the three channels separately inside the light hook enables colored local lighting — the warm-torch recipe (R9.1) is calibrated against this behavior.
 
 When decoding `aPackedLightLevels`, the engine floors each channel at **35% of the brightest RGB channel**. E.g. a "pure red light" is lifted to (1.00, 0.35, 0) at vertices before interpolation and lift. Torch orange looking "whitish-pink rather than red" in game comes from this — tune warm-torch recipe (R9.1) saturation against this default.
 
-Light composition is not additive. Internally the engine takes the **max** of block light (after the 35% floor) and sky light built as `mix(ambient colour, sky colour, skyLight)`, then takes max again with held light (after ambient boost). The channel values in this composition are the **post-lift** values — the engine composes from the same lifted light levels that reach hook inputs (`terrainLightLevels` after the lift curve), Therefore `blockLight` and `skyLight` never cancel each other out — the darker side's contribution is simply discarded — so weakening sky light barely darkens spots dominated by block light. Design exposure/decay recipes around this structure (the local-light protection in [Designing night looks](internals/guides/night.md) exists to compensate for it).
+Light composition is not additive. Internally the engine takes the **max** of block light (after the 35% floor) and sky light built as `mix(ambient colour, sky colour, skyLight)`, then takes max again with held light (after ambient boost). The channel values in this composition are the **post-lift** values — the engine composes from the same lifted light levels that reach hook inputs (`terrainLightLevels` after the lift curve), Therefore `blockLight` and `skyLight` never cancel each other out — the darker side's contribution is simply discarded — so weakening sky light barely darkens spots dominated by block light. Design exposure/decay recipes around this structure (the local-light protection in [Designing night looks](guides/night.md) exists to compensate for it).
 
 Handheld light (`heldLight`) range follows the brightest light-color channel (max 15 blocks) with `dist^0.75` preprocessing, the same 35% channel floor, and `l.heldLight` is the pre-ambient-boost value. The cone falloff, restored from the engine's light module: the beam's angular attenuation is `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))` where `t` is the normalized angle from the cone axis (0 = center, 1 = edge); the reach is `(rangeOverride > 0 ? rangeOverride : brightest channel) × cone falloff` with `rangeOverride` read from the held-light colour's alpha; inside the reach, an override attenuates by `(range − dist) / range` while the default subtracts the (preprocessed) distance channel-wise; then comes the 35% floor, division by 15, the lift curve, and finally the ambient boost. Custom items can set `spotlightRange` and cone angle — a "beam while held" mode whose cone position follows the camera. Packs cannot know beam direction.
 
 Custom blocks may carry `skyLightEmission` (0–15), which **injects into the skyLight channel itself, separately from blockLight BFS**. R9.12-style packs judging sun/shadow by skyLight threshold can misjudge in worlds where artificial lights lift skyLight. Distribution packs should judge combined with blockLight to stay robust.
 
-## Fog internals
 
+---
+
+## Fog internals
 > Target API: 5 · Type: technical reference
-Fog computation is always LINEAR mode (equivalent to `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), with `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = fog distance setting; only D = 0 is special with fogEnd = 5). **The fog gradient band is only 32 blocks wide**, and `l.fogAlpha` is less "distance haze" than a **normalized distance to the edge of the loaded world**. It varies per player with load distance, so distance-based effects should compute `distance(l.position, bloxdEyePosition())` themselves (the "Load-border band" section below). (the renderer's fog function actually implements **four** modes — off / exponential / exponential-squared / linear — with shipped titles driving the linear one; the restored source and the robustness argument are preserved in [Version History: v3](internals/history/v3.md).)
+Fog computation is always LINEAR mode (equivalent to `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), with `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = fog distance setting; only D = 0 is special with fogEnd = 5). **The fog gradient band is only 32 blocks wide**, and `l.fogAlpha` is less "distance haze" than a **normalized distance to the edge of the loaded world**. It varies per player with load distance, so distance-based effects should compute `distance(l.position, bloxdEyePosition())` themselves (the "Load-border band" section below). (the renderer's fog function actually implements **four** modes — off / exponential / exponential-squared / linear — with shipped titles driving the linear one; the restored source and the robustness argument are preserved in [Version History: v3](history/v3.md).)
 
 Default fog color is `rgb(183, 191, 195)` (pale blue-gray). World creators can change it via `fogColourOverride` (hex). With fog mode 0 (NONE), **fogColour arrives black**. The standard `bloxdApplyFog(col, l)` form is safe since fog color is unused when fogAlpha is 0. The script API has two more options, `fogChunkDistanceOverride` and `fogOnSkybox`: custom games can set the fog distance (the D value) and fog application to the skybox independently. By default the skybox is not affected by fog (only in games enabling `fogOnSkybox` does the skybox get tinted by the fog color as well).
 
@@ -5759,11 +5791,13 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Texture sampling internals
 
+---
+
+## Texture sampling internals
 > Target API: 5 · Type: technical reference
 
-How `bloxdTexel` / `bloxdTextureSize` actually compile — the 3-variant texture codegen. The user side: [Texture API](internals/api/texture-api.md).
+How `bloxdTexel` / `bloxdTextureSize` actually compile — the 3-variant texture codegen. The user side: [Texture API](api/texture-api.md).
 
 ### The three variants
 
@@ -5804,7 +5838,7 @@ Code written for the real atlas still compiles and runs here — it just sees wh
 
 ### The animation frame ladder
 
-Animated textures (43 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](internals/api/texture-catalog.md#animation-families-43-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
+Animated textures (43 families) advance at fixed per-family intervals (200 / 250 / 300 ms — the interval column in the [texture catalog](api/texture-catalog.md#animation-families-43-names)). Passing an animation-family id to `bloxdTexel` samples the current frame.
 
 ### Sampler settings
 
@@ -5816,13 +5850,41 @@ The mesher merges faces with matching material/AO/light into single rectangles (
 
 ### Related
 
-- [Texture API](internals/api/texture-api.md) · [Texture registry](internals/texture-sampling.md/texture-registry.md) · [Rendering pipeline](internals/texture-sampling.md/rendering-pipeline.md)
+- [Texture API](api/texture-api.md) · [Texture registry](internals/texture-registry.md) · [Rendering pipeline](internals/rendering-pipeline.md)
+
+
+---
+
+## How the texture registry works
+> Target API: 5 · Purpose: using named textures
+
+Shader packs refer to textures through named constants, not numeric IDs. Constants use the `bloxdTextureId<Name>` form. See the [Texture catalog](api/texture-catalog.md) for available names.
+
+### Name resolution
+
+When a pack is loaded, the loader resolves each named constant against the available texture names. If the internal layout changes while a name remains available, the pack can continue to refer to that texture by name.
+
+**Do not write numeric texture IDs directly in WGSL.** Internal IDs and atlas positions may change as game content is updated. Named constants keep pack code independent of those internal positions.
+
+### Animation and rotation
+
+- **Animation:** Refer to the base name, such as `lava`, rather than frame spellings such as `lava0`–`lava7`. Sampling selects the current frame.
+- **Rotation:** Use the base name listed in the catalog instead of internal rotation slots. Sampling applies the face's rotation.
+- **Frame transitions:** The engine has internal slots for blending adjacent animation frames. Packs should continue to use the regular named constants.
+
+### Related
+
+- [Texture catalog](api/texture-catalog.md) — available names and constants
+- [Texture API](api/texture-api.md) — texture lookup and sampling
+- [Texture sampling internals](internals/texture-sampling.md) — how sampling works
+
+
+---
 
 ## Model rendering internals
-
 > Target API: 5 · Type: technical reference
 
-The internals of the v5 Model program. The user-facing guide: [Models and textures](internals/guides/models.md).
+The internals of the v5 Model program. The user-facing guide: [Models and textures](guides/models.md).
 
 ### What the Model program is
 
@@ -5840,7 +5902,7 @@ Before v5, packs could only plug into terrain / liquid; block models (slabs, sta
 
 ### Enchant computation
 
-The engine animates the glint sweep and delivers it as `enchantColour.a` to the surface/light hooks ([Enchant effects](internals/recipes/enchant-effects.md)). The mixing happens inside `bloxdLitColour()` — right after shading, before world light ([Lighting](internals/api/lighting.md#the-full-pipeline)).
+The engine animates the glint sweep and delivers it as `enchantColour.a` to the surface/light hooks ([Enchant effects](recipes/enchant-effects.md)). The mixing happens inside `bloxdLitColour()` — right after shading, before world light ([Lighting](api/lighting.md#the-full-pipeline)).
 
 ### The overlay (hurt flash etc.)
 
@@ -5848,18 +5910,67 @@ The engine animates the glint sweep and delivers it as `enchantColour.a` to the 
 
 ### The texture path
 
-Most model faces use `textureId: 0` (no texture) — player skins and mob textures are not in the block-texture-atlas namespace. `surface.colour` arrives with skin × tint baked in, so model-face processing starts from `colour` ([model-owned textures](internals/api/texture-api.md#model-owned-textures-textureid-0)).
+Most model faces use `textureId: 0` (no texture) — player skins and mob textures are not in the block-texture-atlas namespace. `surface.colour` arrives with skin × tint baked in, so model-face processing starts from `colour` ([model-owned textures](api/texture-api.md#model-owned-textures-textureid-0)).
 
 ### Variants
 
-The Model program forms one axis of the variant matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` is defined only in allow.model ([Preprocessor](internals/api/preprocessor.md#macro--variant-matrix)); strict.model has no vertex hooks.
+The Model program forms one axis of the variant matrix: `strict.model` / `allow.model`. `BLOXD_ALPHA` is defined only in allow.model ([Preprocessor](api/preprocessor.md#macro--variant-matrix)); strict.model has no vertex hooks.
 
 ### Related
 
-- [Models and textures](internals/guides/models.md) · [Model shader recipes](internals/recipes/model-shaders.md) · [Flags](internals/api/flags.md) · [Rendering pipeline](internals/model-rendering.md/rendering-pipeline.md)
+- [Models and textures](guides/models.md) · [Model shader recipes](recipes/model-shaders.md) · [Flags](api/flags.md) · [Rendering pipeline](internals/rendering-pipeline.md)
+
+
+---
+
+## Engine data
+> Target API: 5 · Purpose: specification summary
+
+This page summarizes the API exposed to shader packs and the limits that matter when creating a pack. See the individual references for definitions and examples.
+
+### API overview
+
+| Item | Specification |
+|---|---|
+| API version | `5` |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Variants | 6 (allow / strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, and `BLOXD_SCENE_DEPTH`. `BLOXD_LIGHTING` is not available |
+| Pack uniform | 80 bytes. See [Pack format](api/pack-format.md) for field offsets |
+| Textures | Use named constants in the `bloxdTextureId<Name>` form. Never hard-code numeric IDs |
+| Reserved names | Identifiers beginning with `bloxd` are reserved for the engine |
+
+### Pack limits
+
+| Item | Limit |
+|---|---:|
+| WGSL files | 256 |
+| Total WGSL source | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP archive | 32 MB |
+| ZIP entries | 1,024 |
+
+Place exactly one manifest at the ZIP root and save files as UTF-8. Duplicate paths and unsupported ZIP formats are not accepted. See [Pack format](api/pack-format.md) for details.
+
+### Main API v5 features
+
+- `bloxdShadow()` and `bloxdAirShadow(t)` expose shadow information from sunlight and moonlight.
+- `bloxdShadowDirection()` returns the direction of the light casting the shadow.
+- Set the optional `keepCircleShadows` field in `pack.json` to `true` to retain the traditional circular shadows while using the shadow API.
+- Check lighting at runtime with `bloxdLit()`; `BLOXD_LIGHTING` is not a supported macro.
+
+### Related
+
+- [API reference](api/) — functions, structures, and constants
+- [Pack format](api/pack-format.md) — manifest, uniform, and loader limits
+- [Texture catalog](api/texture-catalog.md) — available texture names
+- [Per-game policy](internals/policy.md) — allow / strict coverage
+- [API v4 migration guide](history/v4.md) — migrating from the previous version
+
+
+---
 
 ## What changes pack-visible values
-
 > Target API: 5 · Type: technical reference
 The same pack renders differently across **world and player settings**. Check at least these 3 environments before distribution:
 
@@ -5869,8 +5980,10 @@ The same pack renders differently across **world and player settings**. Check at
 
 Main variance sources: `lightingOverride` (forced lighting) / `skyLightColourOverride`, `ambientLightColourOverride` (hex swaps) / `visionMinLightColour` ("darkest visible color". Implemented as a per-component max against both `uSkyLightColour` and `uAmbientLightColour`; Night Vision uses it — "pitch-dark cave" packs won't get as dark as intended, and the sky color itself is lifted) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (bloxdSunDirection() presence). `uSkyLightColour` default = (1,1,1) white, `uAmbientLightColour` default = (0.25,0.25,0.30). `l.ambient` scene component = graphics setting "Ambient Lighting Intensity" (default 0.5). `(1.0 - l.fogAlpha)` follows player fog/chunk distance settings. Also `cameraTint` (RGBA tint over the whole screen) and `proximityFadeDistance` / `proximityFadeMinOpacity` (camera proximity fade for entities) are world-setting variance factors — `cameraTint` in particular is a final pass composited **over** pack output. Many of these can also be set via the script API (`serverOption`) and updated while the game runs.
 
-## Per-game shader-pack policy
 
+---
+
+## Per-game shader-pack policy
 > Target API: 5 · Type: technical reference
 This page pins down what `allow / strict` means at the title level. Only titles whose game definition explicitly carries `shaderPackPolicy: "allow"` run in full mode (vertex hooks, `discard`, terrain `alpha`); titles with no setting (or any non-allow value) are strict — `BLOXD_STRICT` is defined and guarded code is disabled automatically. The pack side cannot choose this, so knowing which titles run what is a prerequisite for distribution.
 
@@ -5895,8 +6008,10 @@ Note that in strict titles the pack itself is still loaded and compiled, and fra
 
 Before distributing a pack, test it in the target game and confirm that the hooks you rely on work there.
 
-## The sun and the moon
 
+---
+
+## The sun and the moon
 > Target API: 5 · Type: technical reference
 The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
 
@@ -5911,60 +6026,6 @@ The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector com
 
 Day/night cycles are not built into the engine — inclination is a static number, and worlds with moving day/night update it game-side. `bloxdSunDirection()` follows each update.
 
-
-Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and bloxdSunDirection()**, so packs darkening terrain at night must estimate the time band from bloxdSunDirection() themselves (the `sunPresent` technique in [Designing night looks](internals/guides/night.md)).
-
-### R-A. Directional moonlight — moonDir = −bloxdSunDirection()
-
-Adds bluish-white Lambert and weak specular only while the moon is up. `moonUp` is 0 in static-sun default worlds, so nothing happens there — **moonlight that only fires in day/night-cycle worlds, hence safe**.
-
-```wgsl
-fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
-    var out = bloxdDefaultLight(s, l);
-    if (bloxdLit()) {
-        // the moon is always exactly opposite the sun; auto-off in daytime via moonDir.y < 0
-        let moonDir = -bloxdSunDirection();
-        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
-        if (moonUp > 0.0) {
-            let n     = normalize(l.normal);
-            let diff  = max(0.0, dot(n, moonDir));
-            let view  = normalize(bloxdEyePosition() - l.position);
-            let halfV = normalize(moonDir + view);
-            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
-            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
-        }
-}
-    return out;
-}
-```
-
-## Debugging tools
-
-> Target API: 5 · Type: technical reference
-- URL parameter `?renderer=lite` — force the Lite (WebGPU) renderer (`webgl2` / `babylon` also work; `babylon` is the old name for webgl2). Priority: URL parameter > localStorage `bloxdRenderer` > settings screen > default (webgl2). Invalid values are ignored with a warning. Overrides left in the URL or localStorage can break scenes that need WebGPU (lite) with "needs the new WebGPU renderer, so remove the renderer override..." ([Loading errors](internals/troubleshooting/loading.md))
-- URL parameter `?vconsole` — on-screen console (VConsole). Handy for mobile device verification
-- URL parameter `?drawcalls=1` — adds a draw-statistics debug panel. Pick game objects from the debug console, or use `drawCalls()` / `why()` / `configureDrawCallWatching()`, to inspect overdrawing by large mechanisms (pack and otherwise) and approaches to the ~65,000-vertex limit per draw call — useful for isolating performance bottlenecks
-- Console shows `noa-engine v0.33.0` and `Renderer: lite from <source>` — check these first to avoid render-path misdiagnosis
-- The WebGPU renderer locks "forced ON" while a pack applies. The "Disable Block Texture Atlas" setting also locks (atlas stays ON), and packs can't apply at all on WebGPU-less devices. The basis for writing "needs a WebGPU browser" on distribution pages
-- Block textures are a 2D array texture (`texture_2d_array`), and the terrain sampler is nearest + repeat. The mesher also merges faces with matching material / AO / light into one rectangle (**greedy meshing**), so a merged face's UV can exceed one tile width (edges inset by 0.0015). Hardware repeat addressing handles the tiling, so merged faces look seamless. Note that procedural detail keyed to `vUV` can break at merged-face boundaries — key it to world position (`s.position` + `bloxdRenderOffset()`) instead
-- Per-game-join runtime re-validation (`checkCompilation`) compiles real terrain materials in browser WebGPU (stricter than settings-screen static validation). Packs failing here are excluded from that game
-
-## The sun and the moon
-> Target API: 5 · Status: Analyzed (production-bundle JavaScript analysis)
-The `bloxdSunDirection()` source is a sun-direction buffer rewritten only when the skybox type changes — the criterion is not "whether the sky has a sun" but **"whether the skybox is the earth type"**.
-
-| Skybox | `bloxdSunDirection()` |
-|---|---|
-| `default` (procedural sky) | Non-zero (defaults below) |
-| `gloomy` / `interstellar` / `space_*` (cube textures) | **Always (0,0,0)** |
-
-**The moon is always `-bloxdSunDirection()`** (the engine computes the moon position as the exact opposite of the sun). Night is judged by sun elevation — the moon is up when `bloxdSunDirection().y < 0` (sun below horizon). But in default worlds the sun is static, so the moon is static too; only worlds implementing a day/night cycle see it move.
-
-The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector computed from inclination = −0.2 / azimuth = 0.55, static). A practical reference for predicting highlight directions on paper when testing distribution packs.
-
-Day/night cycles are not built into the engine — inclination is a static number, and worlds with moving day/night update it game-side. `bloxdSunDirection()` follows each update.
-
-**The shadow-casting light is a third thing (`bbb6l5`+)**: `bloxdShadowDirection()` is not `bloxdSunDirection()`. It is the travel direction of the light behind `bloxdShadow()` — from the sun by day, the moon by night, and the default sky's sun when the world has no sun — so real shadows exist under sunless skies too. Its `y` is never above 0: the light always comes down. `sunPresent`-style night estimation and moonlight recipes stay correct; sun/shadow gating now has a first-class input.
 
 Terrain directional lights are just 2 lamps created at scene start with **fixed direction and intensity, unchanging day and night**. In short, **no terrain-brightness factor depends on time. Day/night "looks" come only from the skybox and bloxdSunDirection()**, so packs darkening terrain at night must estimate the time band from bloxdSunDirection() themselves (the `sunPresent` technique in [Designing night looks](guides/night.md)).
 
@@ -5996,7 +6057,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Debugging tools
-> Target API: 5 · Status: Analyzed (production-bundle JavaScript analysis)
+> Target API: 5 · Type: technical reference
 - URL parameter `?renderer=lite` — force the Lite (WebGPU) renderer (`webgl2` / `babylon` also work; `babylon` is the old name for webgl2). Priority: URL parameter > localStorage `bloxdRenderer` > settings screen > default (webgl2). Invalid values are ignored with a warning. Overrides left in the URL or localStorage can break scenes that need WebGPU (lite) with "needs the new WebGPU renderer, so remove the renderer override..." ([Loading errors](troubleshooting/loading.md))
 - URL parameter `?vconsole` — on-screen console (VConsole). Handy for mobile device verification
 - URL parameter `?drawcalls=1` — adds a draw-statistics debug panel. Pick game objects from the debug console, or use `drawCalls()` / `why()` / `configureDrawCallWatching()`, to inspect overdrawing by large mechanisms (pack and otherwise) and approaches to the ~65,000-vertex limit per draw call — useful for isolating performance bottlenecks
@@ -6008,8 +6069,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## Version history
-
+## Version History
 > Type: Historical · API v1–v5 migration guides
 
 This section preserves the changes, migration steps, and removed APIs from versions v1 through v5. It focuses on API behavior and migration paths rather than build identifiers or verification dates.
@@ -6018,11 +6078,11 @@ This section preserves the changes, migration steps, and removed APIs from versi
 
 | Version | Migration guide | Main changes |
 |---|---|---|
-| v1 | [v1](history/index.md/v1.md) | Initial shader-pack API |
-| v2 | [v2](history/index.md/v2.md) | Identifier renames, `blockId`, and scene-depth access |
-| v3 | [v3](history/index.md/v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau`, and liquid hooks |
-| v4 | [v4](history/index.md/v4.md) | Texture API and strict-game restrictions |
-| **v5** | [v5](history/index.md/v5.md) | **Current** — `BloxdFlags`, Model hooks, lighting API, and shadow API |
+| v1 | [v1](history/v1.md) | Initial shader-pack API |
+| v2 | [v2](history/v2.md) | Identifier renames, `blockId`, and scene-depth access |
+| v3 | [v3](history/v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau`, and liquid hooks |
+| v4 | [v4](history/v4.md) | Texture API and strict-game restrictions |
+| **v5** | [v5](history/v5.md) | **Current** — `BloxdFlags`, Model hooks, lighting API, and shadow API |
 
 ### How older versions are handled
 
@@ -6030,12 +6090,15 @@ The current game accepts only packs with `apiVersion: 5`. Older packs cannot be 
 
 ### Migration paths
 
-- v4 pack → [v5 migration guide](history/index.md/v5.md)
-- v3 pack → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
-- v2 pack → [v3](history/index.md/v3.md) → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
-- v1 pack → [v2](history/index.md/v2.md) → [v3](history/index.md/v3.md) → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
+- v4 pack → [v5 migration guide](history/v5.md)
+- v3 pack → [v4](history/v4.md) → [v5](history/v5.md)
+- v2 pack → [v3](history/v3.md) → [v4](history/v4.md) → [v5](history/v5.md)
+- v1 pack → [v2](history/v2.md) → [v3](history/v3.md) → [v4](history/v4.md) → [v5](history/v5.md)
 
-For the current API, see the [API reference](history/api).
+For the current API, see the [API reference](api/).
+
+
+---
 
 ## API v1
 > Status: **Historical** — the first era of the shader-pack mechanism. Every v1 pack is rejected by the current game.
@@ -6074,7 +6137,6 @@ Then apply v3 → v4 → v5 in order ([the fast path](history/index.md#fast-path
 ---
 
 ## API v2 migration guide
-
 > Version: 2 · Status: Historical (migration guide from v1 to v2)
 
 ### 31. Fate of v1 packs (conclusion first)
@@ -6242,41 +6304,29 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 The code printed in this guide contains none of this pattern (the `+`/`*` mixing in `pack_hash3` and `h ^ (h >> 16u)` are already parenthesised, hence spec-compliant). When you write a pack, pass both the first and the second stage.
 
-## API v3 migration guide
-> **Superseded 2026-10-26: the live API is now version 5** — v3 packs are rejected at load exactly as described here for v2. Apply this part *and then* [the v4 guide](history/v4.md) (v3 → v4: the texture API, the `fogAlpha` rename, `bloxdFragmentBlockPosition`, `hit`). This part's internals (§49–§54) remain accurate for the v3 build they were measured on. Then apply [the v5 guide](history/v5.md) as well (v4 → v5).
 
-Target build: `3ymzdd.main.fae4743f.js` — **the live production build since 2026-10-19**. The bundle bloxd.io serves in production is byte-identical (md5-checked, main bundle and shader-pack chunks alike) to the preprod deploy this part was originally researched against, so everything here applies to production as-is. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
+---
+
+## API v3 migration guide
+> Version: 3 · Status: Historical (migration guide from v2 to v3)
+
+This page is a historical guide for migrating API v2 packs to v3. To move from v3 to v4, apply the [API v4 migration guide](history/v4.md), then use the [API v5 migration guide](history/v5.md) to move to the current version. For new packs, see the current [API reference](api/).
 
 Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [the v2 guide](history/v2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but only one change actually alters behavior — the default light now attenuates emission with fog (§43) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.
-
 New in this revision: sections **§49–§54** go past the migration itself into engine internals restored from the production build — how the Lite renderer actually invokes your hooks, the real four-mode fog function, the exact `bloxdOpaqueBehind()` implementation, the complete blockFlags delivery path from block registration to your hook, and the validation pipeline with its measured header hash. These are the deepest publicly documented facts about the pack system to date, and they settle several questions other guides still list as open.
-
 ### 40. Fate of v2 packs (conclusion first)
-
-**Update 2026-10-19: v3 left preprod and is now what the live site serves.** Every v2 pack saved before the rollout — including every pack distributed as v2 — now fails on production exactly as described below, so the §47 migration is no longer optional for anyone distributing packs today.
-
 The build requires the manifest `apiVersion` to **match 3 exactly**, and there is **no parallel v2/v3 support**. A v2 pack is rejected at load with the "wrong API version" messages (i18n keys, placeholder text):
-
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
-> 
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
-> 
-
 Saved packs keep the v2 lifecycle ([the v2 guide](history/v2.md) §31): every build hashes its engine header, engine updates auto-mark saved packs "needs re-check", and a saved pack whose `apiVersion` is any version other than the current one is flagged won't-run (with the status message above pointing at the replacement) instead of erroring.
-
 ### 41. pack.json and the uniform buffer (what stays unchanged)
-
 - Required manifest fields are unchanged: `{ apiVersion, name, author }`.
 - Loader limits are unchanged: 32MB zip / 1024 entries / 256 `.wgsl` files / 256KB total code / 64KB manifest.
 - The engine uniform block is unchanged in shape: `@group(3) @binding(0)`, 64 B, holding — in declaration order — the time, the render offset, the sun direction, and the eye position. The layout is registered with `minBindingSize: 64`, and the exact field layout is `seconds: f32` @ byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48. Two internal field names changed: `time` → `seconds`, `originOffset` → `renderOffset`. The **byte layout is identical to v2**, and nothing changes for pack code anyway, because packs are not allowed to name the uniform directly (the engine header marks it engine-provided and read-only, "which packs can't name"); keep going through the header functions `bloxdSeconds()` / `bloxdRenderOffset()`.
 - The pack's group 3 gained a documented second occupant: `@group(3) @binding(1)` is the scene-depth texture that `bloxdOpaqueBehind()` reads (full implementation in §51). The 64 B uniform stays at binding 0; packs still cannot name either binding.
-
 ### 42. blockId becomes blockFlags: per-block materials as bit flags (the headline)
-
 In all three hook input structs (`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn`), the v2 field `blockId: u32` is **replaced** by `blockFlags: u32`. Engine text on the field: *"What kind of block this face is: `bloxdBlockFlag*` bits, the same across the face."* The engine now ships the material data itself, so the v2 way of guessing materials from numeric-id ranges or maintaining in-world id tables ([the v2 guide](history/v2.md) §34) is no longer needed.
-
 The bits are exposed as named constants:
-
 ```wgsl
 // Test one with (blockFlags & bloxdBlockFlagRock) != 0.
 const bloxdBlockFlagOpaque: u32 = 1;
@@ -6286,7 +6336,6 @@ const bloxdBlockFlagDirt: u32 = 8;
 const bloxdBlockFlagSand: u32 = 16;
 const bloxdBlockFlagRock: u32 = 32;
 ```
-
 | Value | Constant | Meaning (engine notes, condensed) |
 |---|---|---|
 | 1 | `bloxdBlockFlagOpaque` | Fully opaque — leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks. |
@@ -6295,29 +6344,18 @@ const bloxdBlockFlagRock: u32 = 32;
 | 8 | `bloxdBlockFlagDirt` | Dirt and soil, grass blocks included. Rocky Dirt is rock too. |
 | 16 | `bloxdBlockFlagSand` | Sand, Red Sand, and every sandstone — which is rock too. |
 | 32 | `bloxdBlockFlagRock` | Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma. |
-
 A block made of several materials carries **each** matching flag (the engine's own example: sandstone is sand and rock, so it gets both). Leaves are vegetation but not dirt; grass blocks are vegetation and dirt at once.
-
 The vegetation / dirt / sand / rock flags are assigned from the block's registered **display name** (opaque / emissive come from the engine's own opacity and emission data instead): names ending in `Leaves`, or `Grass Block`, are vegetation; `Dirt` / `Soil` names (and every `Grass Block`) are dirt; exactly `Sand` and `Red Sand`, plus any name containing `Sandstone`, are sand; names containing `Stone` / `Andesite` / `Diorite` / `Granite`, any `Ore`, plus Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (and sandstone) are rock.
-
-
 #### The exact name rules (derive any block's flags yourself)
-
 The four material bits come from a fixed classifier over the block's registered display name. Variant names (anything after `|`) are stripped first, so variants inherit the base block's flags. Then:
-
 | Bit | Rule (evaluated on the stripped name) |
 |---|---|
 | vegetation | the name **ends with** ` Leaves`, or **ends with** ` Grass Block` |
 | dirt | the name **is exactly** `Dirt`, **ends with** ` Dirt` or ` Soil`, or **ends with** ` Grass Block` |
 | sand | the name **is exactly** `Sand` or `Red Sand`, or **contains** `Sandstone` |
 | rock | the name **is exactly** one of `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt`, **contains** `Sandstone`, **ends with** ` Ore`, or contains `Stone` / `Andesite` / `Diorite` / `Granite` as a standalone word |
-
 Yellowstone is listed explicitly because `Stone` is not a standalone word inside `Yellowstone`. Opaque and emissive do **not** come from the name — they come from the engine's own opacity and block-light-emission data, so they cannot be derived with these rules.
-
-Source: the engine's name classifier (module 28537, bundle `3ymzdd`); verified against all 7,861 named blocks, 2026-10-20.
-
 Example — per-block tint by material:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -6327,33 +6365,24 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 Effect on v2 recipes: R-H's 22-entry leaf-id array ([the v2 guide](history/v2.md) §34) collapses to `(blockFlags & bloxdBlockFlagVegetation) != 0`. The id ↔ block-name reference at [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) stays useful for non-shader purposes, but no longer needs in-world looking-up for material styling.
-
 #### Leaves without the grass (the question everyone asks)
-
 `vegetation` alone matches leaves **and** the grass on grass blocks, which also
 carry `dirt`. Exclude dirt to sway only leaves — the discriminator the engine's
 own field notes spell out:
-
 ```wgsl
 // Leaves only: vegetation without dirt. Grass blocks are vegetation AND dirt.
 let isLeaf = (blockFlags & bloxdBlockFlagVegetation) != 0u
            && (blockFlags & bloxdBlockFlagDirt) == 0u;
-
 // Grass blocks only (the grassy faces of the terrain surface):
 let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
-
-Verified against the live registry (2026-10-20, bundle `3ymzdd`):
 `vegetation && !dirt` matches exactly the 45 leaf registrations (22 base types —
 the same 22 the v2 R-H id array measured); `vegetation && dirt` matches exactly
 the 8 grass blocks. No exceptions in either direction — registry counts as of that build; new blocks grow the numbers without changing the rule. Pair with `vertex.normal`
 (up/down) to pick faces, e.g. grass-block tops only.
-
 ### 43. Function renames and semantic changes
-
 | v2 | v3 | Notes |
 |---|---|---|
 | `bloxdTime()` | `bloxdSeconds()` | Seconds since the page loaded (f32 precision note below) |
@@ -6361,41 +6390,31 @@ the 8 grass blocks. No exceptions in either direction — registry counts as of 
 | `const bloxdTimeWrap: f32 = 3600` | **removed** | Define periods yourself on the pack side |
 | `engineColour` (in `BloxdLightIn`) | **removed** (14 → 13 fields) | Rebuild from `litColour` + fog |
 | hook params `v` / `s` / `l` | `vertex` / `surface` / `light` | Template spelling; signatures unchanged |
-
 - **`bloxdSeconds()`** — seconds since the page loaded. In f32 it counts in steps of under 1 ms for the first 4.5 hours, and of about 4 ms from 9 to 18 hours. The header recommends the idiom `bloxdSeconds() % period`, which counts from 0 up to `period`, then starts again — a clean replacement for the removed wrap constant.
 - **`bloxdRenderOffset()`** — whole blocks: "a render position plus this is a world position." It changes as the player travels, so render positions stay close to the player — and so precise. Guide-wide, what v2 text called the noa-local offset is now consistently called the **render position** / render offset; it is the same quantity `bloxdOriginOffset()` returned.
 - **`bloxdTimeWrap` removed** — a pack that wrapped time at 3600 s declares its own constant now, e.g. `const timeWrap: f32 = 3600.0;` and `% timeWrap`.
 - **Default light semantics** — v2's default was `engineColour + emission × fogVisibility`; the v3 default composes it as `bloxdApplyFog(litColour + emission, light)` — **emission is attenuated by fog inside the default** now, so the combined output passes through the fog blend together. Port table:
-
   | v2 expression | v3 port |
   |---|---|
   | `l.engineColour` | `bloxdApplyFog(l.litColour, l)` |
   | `l.engineColour + s.emission * l.fogVisibility` | `bloxdApplyFog(l.litColour + s.emission, l)` |
-
   ```wgsl
   // v3 port of the v2 read `l.engineColour + s.emission * l.fogVisibility`:
   out.colour = bloxdApplyFog(light.litColour + surface.emission, light);
   ```
 - **Unchanged in name and meaning**: `bloxdEyePosition()`, `bloxdSunDirection()`, `bloxdFaceBlock()`, `bloxdApplyFog()`, `bloxdWorldPosition()`.
-
 ### 44. New header constants: `bloxdPi` and `bloxdTau`
-
 ```wgsl
 // Half a turn and a full turn, in radians.
 const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;
 ```
-
 Useful both for trig magic and because packs no longer need to hardcode π. Watch name reuse: a pack-local constant of the same name now collides with the header duplicate-identifier check — drop or rename any `bloxdPi` / `bloxdTau` re-declaration in your code.
-
 ### 45. The six-hook template (liquid hooks officially shown)
-
 The default pack text published with the build now ships **all six hooks** — terrain / liquid × vertex / surface / light — each returning its engine default. The engine comments introduce it: *"Every hook returns its engine default. Copy a hook and change its output to start a shader pack."*
-
 ```wgsl
 // Every hook returns its engine default. Copy a hook and change its
 // output to start a shader pack.
-
 // Strict games keep terrain where it is: unguarded, this hook would turn
 // the whole shader pack off there.
 #ifndef BLOXD_STRICT
@@ -6403,53 +6422,40 @@ fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-
 // Water uses these. If deleted, water uses your terrain hooks instead.
 #ifndef BLOXD_STRICT
 fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 ```
-
 - The hooks' comments state the liquid rules directly: **water needs the trio; delete it and water reuses your terrain hooks** (the fallback behavior known from v2, [the v2 guide](history/v2.md) §36, now written into the template itself).
 - `bloxdLiquidVertex` sits inside the same `#ifndef BLOXD_STRICT` guard as `bloxdTerrainVertex` — unguarded, it would switch the whole pack off in strict games just like terrain-side vertex effects do.
 - Template spellings are now the full parameter names `vertex` / `surface` / `light` (v2's template used the short `v` / `s` / `l`). Your own code's parameter names are free — only signatures matter.
-
 ### 46. Variant matrix: the program axis and macro changes
-
 Variants are generated over a matrix of **strict × lighting × program** — the same 8 combinations as v2, but with terrain / liquid now an explicit axis of the matrix. Variant names spell it out as `allow|strict · unlit|lit · terrain|liquid`, surfaced in the UI as ``terrain`` / `liquid`, `strict` / `non-strict`, `lighting on` / `lighting off` (and error displays may append "(only in {{variants}})").
-
 | Macro | Defined in |
 |---|---|
 | `BLOXD_STRICT` | strict variants (both programs) |
 | `BLOXD_LIGHTING` | lighting-on variants (both programs) |
 | `BLOXD_ALPHA` | **all liquid variants** plus non-strict **terrain** variants |
 | `BLOXD_SCENE_DEPTH` | **all liquid variants** |
-
 Two things change for authors versus the v2 rules ([the v2 guide](history/v2.md) §36):
-
 - **`BLOXD_ALPHA` is unchanged from v2.** The variant generator carries the literal line `"liquid"!==program&&strict||push("BLOXD_ALPHA")` — JS operator precedence makes *(terrain **and** strict)* the only case that skips the push, so the macro is defined in **every liquid variant (strict or non-strict) and in non-strict terrain**; only strict terrain omits it. Liquid-side `#ifdef BLOXD_ALPHA` code compiles in exactly as it always did, and §49's alpha write-back (spliced for liquid programs or non-strict variants) matches this set precisely.
 - **`BLOXD_SCENE_DEPTH` is always defined in liquid variants**, so depth use stays unguarded-OK there, exactly as in v2 (§35); in terrain hooks it keeps needing the `#ifdef BLOXD_SCENE_DEPTH` wrap.
-
 ### 47. v2 to v3 migration checklist
-
 1. **pack.json**: `"apiVersion": 2` → `"apiVersion": 3`
 2. **`blockId` → `blockFlags`** in all three input structs; express material styling as bit tests against `bloxdBlockFlag*` constants (§42); drop id-range heuristics from v2
 3. **`bloxdTime()` → `bloxdSeconds()`**; declare your own period instead of the removed `bloxdTimeWrap` (`% period`)
@@ -6460,9 +6466,7 @@ Two things change for authors versus the v2 rules ([the v2 guide](history/v2.md)
 8. **Use `bloxdPi` / `bloxdTau`** where trig-related constants were hardcoded; remove pack-local re-declarations that now duplicate the header
 9. **Keep strict guards**: vertex hooks and `discard` stay wrapped in `#ifndef BLOXD_STRICT`; the template guards `bloxdLiquidVertex` the same way as terrain
 10. **Validate in-game** — compile and test the pack in a game that supports shader packs
-
 ### 48. Other v3 changes and notes
-
 - **Validation stays two-stage** ([the v2 guide](history/v2.md) §38): static validation first, then the browser's real WebGPU compilation through generated stub snippets that call your hooks, with errors mapped back to source files / lines, and diagnostics restore the original names of engine-side identifiers through a mapping.
 - **Strict diagnostics name the reason**: a vertex hook moving terrain reports "… moves terrain, which strict games prevent." and `discard` in surface / light hooks reports "discard makes terrain see-through, which strict games prevent."; the settings UI keeps the "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." guidance (`offInStrict`).
 - **Loader messages**: error kinds and limits are unchanged; "Zip64 archives aren't supported." is surfaced as a UI message (`loadZip64`). The pack-UI string inventory totals 57 `shaderPack:*` keys; among load-stage errors, `loadNoWgsl` (a zip containing zero `.wgsl` files) and `loadNotZip` (a file without a zip end-of-archive signature) round out the set.
@@ -6472,406 +6476,16 @@ Two things change for authors versus the v2 rules ([the v2 guide](history/v2.md)
 - **Wording**: text about games that accept shader packs now reads "in games that **support** them".
 - **Scope of titles**: the set of games where packs run is unchanged from the previous build.
 
-### 49. Engine internals: how the Lite renderer invokes your hooks
-
-Everything in §40–§48 is what the loader and the header tell you. This section and the four after it document what the engine actually does at run time, restored from the production bundle (the Lite renderer — a 175 KB chunk; the integration source file's real name `lite/terrainShaderPack.ts` survives inside its error strings). None of it changes what you write, but it removes the guesswork about what your hooks receive — and it settles several questions other community guides still list as open.
-
-The renderer does not "call" your hooks from JavaScript. When a pack passes validation, the engine **splices your hook calls into its own terrain WGSL** by replacing fixed anchor lines in its shader text. An anchor must match exactly once — zero or multiple matches abort with `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`.
-
-| Stage | Anchor line in the engine shader | What gets spliced in |
-|---|---|---|
-| vertex | a four-line block from `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);` through `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);` | build `BloxdVertexIn`, call your vertex hook, write `worldPos` back — the splice also rewrites `let worldPos` to `var worldPos` |
-| surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | build `BloxdSurfaceIn`, call your surface hook, write `baseColor` / `alpha` back |
-| lit colour | just before `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` | `let bloxdSpLitColour = color.rgb;` — captures the pre-fog colour |
-| light | the fragment shader's final `return color;` line | build `BloxdLightIn`, call your light hook, write `color` back — after the fog mix |
-
-The spliced code, restored from the shipped bundle (light-level sample expressions abbreviated where the engine's own formatting runs long):
-
-```wgsl
-// vertex stage — non-strict variants carrying a vertex hook
-{
-    let bloxdSpVertexIn = BloxdVertexIn(worldPos.xyz, vertexOutputs.vNormalW,
-                                        vertexOutputs.vBlockFlags);
-    let bloxdSpVertex = /* your bloxdTerrainVertex / bloxdLiquidVertex */(bloxdSpVertexIn);
-    worldPos = vec4f(bloxdSpVertex.position, worldPos.w);
-}
-```
-
-```wgsl
-// fragment stage — surface
-let bloxdSpSurfaceIn = BloxdSurfaceIn(baseColor.rgb, alpha,
-        normalize(fragmentInputs.vNormalW), fragmentInputs.vPositionW,
-        fragmentInputs.vBlockFlags);
-let bloxdSpSurface = /* your surface hook */(bloxdSpSurfaceIn);
-baseColor = vec4f(bloxdSpSurface.colour, baseColor.a);
-alpha = bloxdSpSurface.alpha;   // spliced only when the program is liquid or the variant is non-strict
-```
-
-```wgsl
-// fragment stage — light
-{
-    let bloxdSpLightIn = BloxdLightIn(
-        bloxdSpLitColour,                        // litColour
-        fragmentInputs.vTerrainLambert,          // directional
-        ambient,                                 // ambient
-        /* light-level varying */.rgb,           // blockLight
-        /* sky channel of the same varying */,   // skyLight
-        uniforms.uAmbientLightColour,            // ambientLightColour
-        uniforms.uSkyLightColour,                // skyLightColour
-        /* held-light term (see below) */,       // heldLight
-        select(vec3f(0.0), uniforms.vFogColor,
-               uniforms.vFogInfos.x != 0.0),     // fogColour — black only with no fog at all
-        fog,                                     // fogVisibility
-        fragmentInputs.vPositionW,               // position
-        normalize(fragmentInputs.vNormalW),      // normal
-        fragmentInputs.vBlockFlags);             // blockFlags
-    let bloxdSpLight = /* your light hook */(bloxdSpSurface, bloxdSpLightIn);
-    color = vec4f(bloxdSpLight.colour, color.a);
-}
-```
-
-Four enforcement facts come straight out of this splicing:
-
-- **Strict terrain ignores surface-hook alpha changes.** The `alpha = bloxdSpSurface.alpha` write-back is spliced only for liquid programs or non-strict variants — the implementation behind §46's macro table. (In strict terrain your `#ifdef BLOXD_ALPHA` code doesn't compile in anyway; now it is also confirmed that unguarded alpha writes are dropped there.)
-- **A strict variant that still declares a vertex hook never runs it** — the engine reports it at build time: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. That is why the official template (§45) wraps `bloxdLiquidVertex` in the same `#ifndef BLOXD_STRICT` as its terrain twin.
-- The `bloxdSp*` identifiers — **14 in total**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — are engine-side temporaries. Your code never sees them, but they surface in diagnostics and in anyone's reverse-engineering output, so they are worth recognizing on sight.
-- **The default-surface shortcut.** When a variant's surface hook is literally `bloxdDefaultSurface`, the engine skips splicing the `baseColor` / `alpha` write-back lines entirely — the default already produces those values, so the assignment would be dead code. Unmodified hook chains cost nothing.
-
-**What actually feeds `BloxdLightIn`** — field by field, from the spliced code:
-
-| Field | Engine-side source |
-|---|---|
-| `litColour` | the fragment colour captured just before the fog mix (the `bloxdSpLitColour` anchor) — "before emission and fog", as the header puts it |
-| `directional` | `vTerrainLambert` — a vertex-interpolated sum of `max(0, dot(normal, lightDirection)) × intensity` over the scene's directional lights (formula in §54); 0 when the scene has none |
-| `ambient` | `material.ambientAndCutoff.xyz × uniforms.sceneAmbient` — per material, per frame |
-| `blockLight` | the `.rgb` of the decoded light-level varying (decode in §54) |
-| `skyLight` | the sky channel of that same light-level varying — *"Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING"* (header text) |
-| `ambientLightColour` / `skyLightColour` | `uniforms.uAmbientLightColour` / `uniforms.uSkyLightColour` |
-| `heldLight` | the held-light term, built from the light-level varying's w channel together with the `uHeldLightPos` / `uHeldLightColour` frame uniforms ([Lighting internals](internals/lighting-internals.md) documents the falloff and channel-floor behavior) |
-| `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)` — **black only in a scene with no fog at all** (mode 0, §50) |
-| `fogVisibility` | the clamped fog coefficient — the exact value §50's function returns |
-| `position` / `normal` | the `vPositionW` / `vNormalW` varyings (normal re-normalized per fragment) |
-| `blockFlags` | the `vBlockFlags` flat varying — §52's full delivery path |
-
-For orientation when reading older material: the identical splicing architecture existed in the v2 renderer, and v3's only integration differences are `vBlockId` → `vBlockFlags` and the added liquid variants. The hook system is architecturally stable across the v2 → v3 break.
-
-### 50. The fog function: four modes, one field
-
-Restored verbatim from the production terrain shader:
-
-```wgsl
-fn calcFogFactor(fogDistance: vec3f) -> f32 {
-    var fogCoeff: f32 = 1.0;
-    let fogStart   = uniforms.vFogInfos.y;
-    let fogEnd     = uniforms.vFogInfos.z;
-    let fogDensity = uniforms.vFogInfos.w;
-    let dist = length(fogDistance);
-    if (uniforms.vFogInfos.x == 3.0) {        // linear
-        fogCoeff = (fogEnd - dist) / (fogEnd - fogStart);
-    } else if (uniforms.vFogInfos.x == 1.0) { // exponential
-        fogCoeff = 1.0 / pow(2.71828, dist * fogDensity);
-    } else if (uniforms.vFogInfos.x == 2.0) { // exponential squared
-        fogCoeff = 1.0 / pow(2.71828, dist * dist * fogDensity * fogDensity);
-    }                                          // 0.0 = fog off (coeff stays 1.0)
-    return clamp(fogCoeff, 0.0, 1.0);
-}
-```
-
-- `vFogInfos = vec4f(mode, start, end, density)` — one vec4 drives everything.
-- **Four modes exist in the shader: 0 = off, 1 = exponential, 2 = exponential-squared, 3 = linear.** `fogVisibility` is the clamped coefficient whichever mode runs — there is exactly one field, and no mode flag is ever exposed to packs.
-- Bloxd's own titles drive mode 3 (linear) with the 32-block band described in [Fog internals](internals/fog-internals.md) (`fogStart = 32 × D`, `fogEnd = 32 × (D + 1)`), so that part's "always linear" observation still describes shipped gameplay. The exponential modes are real, live engine code, though — a title can flip `vFogInfos.x` and change the ramp without any client update. Distance recipes that compute `distance(l.position, bloxdEyePosition())` themselves (recipe R-B) are the robust way to write distance-driven looks, since they cannot be moved by a mode switch.
-- This settles the "which fog ramp does the engine actually use" question from source: all four are implemented; shipped titles use linear. (The same function also explains the header's fogColour comment — mode 0 is the only case where `fogColour` arrives black, and Bloxd's games never ship mode 0; they push fog far out instead, [Fog internals](internals/fog-internals.md).)
-
-### 51. bloxdOpaqueBehind(): the exact implementation
-
-The whole function, restored verbatim from the production build:
-
-```wgsl
-@group(3) @binding(1) var bloxdSpSceneDepth: texture_2d<f32>;
-var<private> bloxdSpPixel: vec2i;
-var<private> bloxdSpPositionW: vec3f;
-
-fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
-    let bloxdSpZ = textureLoad(bloxdSpSceneDepth, bloxdSpPixel, 0).r;
-    if (bloxdSpZ <= 0.0) {
-        return BloxdOpaqueBehind(false, vec3f(0.0), 0.0);
-    }
-    let bloxdSpEye = bloxdPackInputs.eyePosition;
-    let bloxdSpScale = max(bloxdSpZ / (scene.view * vec4f(bloxdSpPositionW, 1.0)).z, 1.0);
-    let bloxdSpBehind = bloxdSpEye + (bloxdSpPositionW - bloxdSpEye) * bloxdSpScale;
-    return BloxdOpaqueBehind(true, bloxdSpBehind, distance(bloxdSpBehind, bloxdSpEye));
-}
-```
-
-- **The depth texture lives at `@group(3) @binding(1)`** — group 3 is the pack's own group: binding 0 is the 64 B `bloxdPackInputs` uniform (§41), binding 1 is this depth texture. Both are engine-provided and unnamed from your side.
-- **The depth texture is an unfilterable-float, fragment-only resource.** The bind-group layout registers it as `texture: { sampleType: "unfilterable-float" }` with `GPUShaderStage.FRAGMENT` visibility alone — which is exactly why `bloxdOpaqueBehind()` is built on `textureLoad` (explicit texel coordinates, mip level 0) instead of `textureSample`: hardware filtering is simply unavailable on this texture.
-- `z ≤ 0` means the depth sample hit nothing (far plane / sky): `found = false`, and `position` / `distance` are meaningless — check `found` first, always.
-- The returned position is a **ray-scale intersection**: the opaque surface is placed at `eye + (fragment − eye) × max(z / viewDepth, 1)`. `distance` is measured from the eye to that point — for water-surface packs this is effectively "how much water the ray crossed before hitting something solid", which is what makes depth-tinted water recipes work without a second depth buffer.
-
-### 52. blockFlags end-to-end: from registration to your hook
-
-§42 tells you what the bits mean. This section is the complete path a flag bit travels from block registration to your hook — every hop confirmed from the production source, which also proves the header's "the same across the face" down to the byte level.
-
-**1. Registration (block-definition database).** Each block's flags are computed once, at registration:
-
-```js
-flags[id] = nameFlags                     // display-name rules (§42): vegetation / dirt / sand / rock
-          | (definition.opaque === true ? 1 : 0)   // opaque bit — engine opacity data
-          | (anyFaceEmission >= 1       ? 2 : 0);  // emissive bit — block-light emission data
-```
-
-The display-name rules cover only the four material bits; the two physics bits come from separate engine data — `opaque` straight from the block definition, `emissive` from the per-face block-light emission array. The header's "Glowing ores count, however faint" is literal: any face with emission ≥ 1 sets the bit.
-
-**2. Per-block → per-material (mesher initialization).** Terrain is drawn per *material*, not per block id, so the flags are re-tabulated into a material table (a `Uint16Array` indexed by material id, each material taking the flags of its owning block's first face). The table ships to the meshing Web Worker — but **only in configurations where the pack pipeline is enabled**; otherwise the table is `null` and no flag bytes are ever written. Players without packs pay zero overhead, by construction.
-
-**3. Into the vertex bytes (mesher worker).** The flags ride two spare bytes of the existing interleaved vertex data:
-
-```js
-addBlockFlagValues(buffer, stride, faceIndex, flags) {
-    for (var base = 4*faceIndex*stride, v = 0; v < 4; v++) {
-        var o = base + v*stride;
-        buffer[o + colorOffset  + 3] = 255 & flags;   // low  8 bits → the colour attribute's alpha byte
-        buffer[o + normalOffset + 3] = flags >> 8;    // high 8 bits → the normal attribute's w byte
-    }
-}
-```
-
-All four vertices of a face receive the same value — the implementation-level meaning of "the same across the face".
-
-**4. GPU-side decode (Lite terrain shader).** The two bytes travel as the `blockFlagWords: vec2u` vertex attribute (location 7, present only when the pack pipeline is on) and are reassembled in the vertex stage:
-
-```wgsl
-vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
-                          |  (vertexInputs.blockFlagWords.y >> 24u);
-```
-
-`vBlockFlags` is declared `@interpolate(flat)` — per-face constant all the way into the fragment stage, which is why §42's bit tests are stable within a face and can never produce a mid-face blend.
-
-- The pipeline reserves **16 bits** of capacity (that decode reassembles two full bytes) while v3 defines only 6 — future flags can appear without another vertex-format change or API bump.
-- In the packed-vertex mode, the same two bytes ride inside `packed.y` and the colour word's upper byte instead of a dedicated attribute — same values, different container.
-- For the leaf-vs-grass question these flags are most often asked about, see [Leaves without the grass](#leaves-without-the-grass-the-question-everyone-asks) under §42.
-
-### 53. Validation internals: HEADER_VERSION, signatures, reserved names
-
-**The measured header hash.** Every pack validation is stamped with the engine's `HEADER_VERSION`. Executing the production validation module directly (see the harness note at the end of §54) measures it:
-
-```
-v2 (sjr0p7):  6.bc5e8338
-v3 (3ymzdd):  6.5bc26a63   ← measured from the live production bundle
-```
-
-It is an FNV-1a-32 hash (prefixed `6.`) over five inputs: the engine header preprocessed and tokenized **per variant** (one entry for each of the 8 variants), the parser's full WGSL lexical universe, the four macro names, the special-function map, and the `BloxdPackInputs` declaration together with its `@group(3) @binding(0)` uniform line. Two consequences for authors:
-
-- **Any engine-side header edit re-hashes it** — this is the mechanism behind the automatic "needs re-check" flag saved packs receive after engine updates ([the v2 guide](history/v2.md) §31).
-- The hash covers the *engine header*, not your code. A pack that keeps loading across an engine update isn't "still valid" — it just hasn't tripped a header change yet. The only version check your manifest participates in is the `apiVersion` gate (§40).
-
-**Hook signature checking: token-exact on types, free on names.** The validator holds one signature per hook slot:
-
-```js
-{
-  vertex:  { params: [{ type: "BloxdVertexIn" }],                      returns: "BloxdVertex"  },
-  surface: { params: [{ type: "BloxdSurfaceIn" }],                     returns: "BloxdSurface" },
-  light:   { params: [{ type: "BloxdSurface" }, { type: "BloxdLightIn" }], returns: "BloxdLight" }
-}
-```
-
-Matching is **token by token**: parameter type names must match exactly, `->` and the return type must match exactly, and parameter count and comma placement are checked. Parameter *names* are free — any identifier in the parameter position is accepted, which is why your `fn bloxdTerrainLight(s, l)` compiles even though the template spells it `(surface, light)`. The light hook takes exactly two parameters.
-
-**Reserved names.** The rule is a single regex: `/^bloxd/i`. Any identifier starting with `bloxd` is reserved — everything `bloxd*` is engine-provided, and a pack cannot declare into that namespace (this is also why §44's `bloxdPi` / `bloxdTau` re-declarations collide).
-
-**Special functions.** Exactly one is registered in v3:
-
-```js
-["bloxdOpaqueBehind", { returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }]
-```
-
-"Special" means *tied to a macro* — an engine function whose availability depends on a variant symbol. Two guard diagnostics enforce correct use:
-
-> `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — a vertex hook reaching a surface/light-only function.
-> 
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — for example terrain-side `bloxdOpaqueBehind()` without an `#ifdef BLOXD_SCENE_DEPTH` wrap.
-
-**The engine header (prelude), pinned.** The v3 header is a 5,637-byte string beginning `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` It carries `#if` / `#ifdef` directives that the engine's own WGSL preprocessor evaluates per variant — the engine genuinely runs `#if` expression evaluation, and a malformed expression errors with `Cannot evaluate #if ...`. Every struct, function signature, and quoted comment in this guide comes from this rendered text, so the guide and the shipping header cannot drift apart. The full text follows, verbatim, at the end of §54.
-
-**Parser notes for authors.**
-
-- Pack-side functions are renamed with a `pack_` prefix when merged into the engine shader (collision avoidance); diagnostics map them back to your original names — the same mechanism [the v2 guide](history/v2.md) §38 describes for the second validation stage.
-- The undeclared-identifier message reads `'${name}' isn't declared. Packs can use their own names, WGSL built-ins and the Bloxd header.`; `_ can only be the target of a phony assignment, as in _ = f();` and `'${name}' is a WGSL keyword or reserved word, so it can't be a member name.` round out the newly confirmed set.
-- The parser's lexical universe includes identifiers that are **not standard WGSL**: `bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin`. The engine knows them as built-ins, but whether a given browser's WGSL implementation provides them is not guaranteed — never build a distribution pack on them.
-
-### 54. Confirmed constants, limits, and layouts
-
-The terrain program's complete resource layout, straight from the production Lite renderer:
-
-| Binding | Contents |
-|---|---|
-| `@group(0) @binding(0)` | `scene`: `LiteSceneUniforms` — `viewProjection` mat4x4f, `view` mat4x4f, `vEyePosition` |
-| `@group(1) @binding(0)` | `uniforms`: `TerrainFrameUniforms` — `uHeldLightColour` / `uHeldLightPos`, `uSkyLightColour`, `uAmbientLightColour`, **`vFogInfos`**, `vFogColor`, `outputHeight`, `sceneAmbient`, **`uDirLights: array<vec4f, 4>`** |
-| `@group(1) @binding(1)` | `chunks`: storage `array<vec4f>` — xyz = translation into the render frame, w = fade-in visibility |
-| `@group(2) @binding(0)` | `material`: `vDiffuseColor`, `ambientAndCutoff`, `emissiveAndLevel`, `anim` |
-| `@group(3) @binding(0)` | `bloxdPackInputs` — the pack uniform (§41) |
-| `@group(3) @binding(1)` | `bloxdSpSceneDepth` — the depth texture (§51) |
-
-- **Directional lights are hard-capped at four.** The renderer errors out with `Terrain supports 4 directional lights, not ${n}` if a scene tries to register more. `l.directional` is the summed Lambert over however many exist (0–4; Bloxd's own scenes use 2 — [Lighting internals](internals/lighting-internals.md)). Terrain also warns about lights it cannot honour, verbatim: a late-added light — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; a tinted one — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; and a mesh-filtering one — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
-- **Terrain program naming**: pipeline cache keys read `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}` — a pack shows up as the `-sp{variant}` suffix, one program per §46 variant. A watcher (`watchPipelineFailures`) matches live pipeline names against `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/` and re-checks the matching pack variant when a pipeline compilation fails; GPU device loss (`device.lost`) skips the check.
-- **`BLOXD_TERRAIN_DIRECTIONAL` is an engine-internal macro** (defined when dirLightCount > 0). It is *not* one of the prelude's four and never reaches pack code — but it appears in WGSL dumps of the engine's own shaders, so recognizing it saves confusion.
-- **Light-level decode**: the `aPackedLightLevels` vertex attribute is one f32 packing four nibbles, each divided by 15: rgb = the colored block light, a = the sky/held channel. The vertex stage decodes it into the `vLightLevels` varying; `blockLight` reads `.rgb`, the sky/held channel reads `.w`. The engine floors the rgb channels at 35% of the brightest channel before interpolation — the engine-side anchor of the lift [Lighting internals](internals/lighting-internals.md) documents from gameplay.
-- **`vTerrainLambert`** (the `directional` source, §49) is generated as a sum over the active directional lights: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, guarded by `BLOXD_TERRAIN_DIRECTIONAL`.
-- **Index buffers go 32-bit at the first large mesh.** The Lite renderer picks `Uint16Array` indices only while every index value stays ≤ 65,534 — as soon as any index reaches 65,535 the buffer becomes a `Uint32Array` (tracked per buffer with an `is32Bits` flag). In practice: a chunk mesh with at most 65,535 vertices fits in 16-bit indices; one with exactly 65,536 vertices necessarily emits an index of 65,535 and switches the whole buffer to 32-bit.
-- **Manifest loading details**: zip entries under `__MACOSX/`, files prefixed `._`, and `.DS_Store` are filtered out (macOS archive noise); `pack.json` is located by lowercased path comparison — zero matches → `loadNoManifest`, two or more → `loadDuplicateManifest`; the manifest read is capped at 65,536 bytes.
-- **How all of this was verified**: the production bundle's modules were restored (165 chunks; the webpack registry counts 4,951 modules in this bundle — module counts shift by a few depending on whether async child dependencies are included, so treat the exact number as bundle-specific) and executed in a webpack-compatible harness under Node.js. The measured `HEADER_VERSION` (§53), the rendered 5,637-byte header, the variant table's canonical order, and the special-function map all come from *running the shipped code*, not from reading strings. The same harness is the natural core for a community `pack_check` v6 — executing the engine's own validator against a pack reproduces its verdicts exactly.
-#### The v3 engine header, verbatim
-
-The pinned 5,637-byte, 127-line text itself — the artefact §53 above describes — restored verbatim from build `3ymzdd`, the v3 production build this part targets. It is the v3 counterpart of [the texture catalog](api/texture-catalog.md) §67's v4 header, embedded whole for the same reason: a v3 pack can be debugged against exactly what the engine prepended to it, and every v3 → v4 difference ([the v4 guide](history/v4.md) §58–§59) can be read off the two texts side by side.
-
-```wgsl
-
-// Engine-provided and read-only, prepended to all packs. apiVersion 3.
-
-// Half a turn and a full turn, in radians.
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
-// uniforms, which packs can't name. Any function can call them, not only a hook.
-
-// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
-// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
-// stay close to the player, and so precise.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Unit, towards the sun, in world orientation; zero when the sky has no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// A render position's world position. In f32, so it loses fine detail far from the world's origin.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
-fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
-// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
-// (blockFlags & bloxdBlockFlagRock) != 0.
-const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
-const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
-const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
-const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
-
-struct BloxdVertexIn {
-    position: vec3f,     // A render position: world minus bloxdRenderOffset().
-    normal: vec3f,
-    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
-}
-
-struct BloxdVertex {
-    position: vec3f,     // A render position.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,       // Texture * vertex colour (tint * AO).
-    alpha: f32,
-    normal: vec3f,
-    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdSurface {
-    colour: vec3f,
-#ifdef BLOXD_ALPHA
-    alpha: f32,
-#endif
-    emission: vec3f,     // Added after lighting, then fogged.
-}
-
-struct BloxdLightIn {
-    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
-    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
-    ambient: vec3f,      // Ambient light, added to directional.
-    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
-    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
-    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
-    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-                         // or without BLOXD_LIGHTING.
-    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
-                         // turns it off; black only in a scene with no fog at all.
-    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
-    position: vec3f,     // As in BloxdSurfaceIn.
-    normal: vec3f,
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdLight {
-    colour: vec3f,
-}
-
-// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
-struct BloxdOpaqueBehind {
-    found: bool,         // False where nothing opaque is behind (sky).
-    position: vec3f,     // A render position; meaningless when !found.
-    distance: f32,       // From the eye; meaningless when !found.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Fogs colour as the engine fogs this fragment.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(light.fogColour, colour, light.fogVisibility);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
----
-
-Researched by ltf_ahel (researched with glm)
-
 
 ---
 
 ## API v4 migration guide
-> **Superseded 2026-11-03: the live API is now version 5** — v4 packs are rejected at load exactly as described here for v3. Apply this part *and then* the [v5 guide](history/v5.md) (v4 → v5: the `BloxdFlags` struct replaces `blockFlags`, `bloxdLit()` and the public lighting recipe, the enchant/overlay inputs, the 9-hook default pack). This part's internals (§56–§66) remain accurate for the v4 builds they were measured on.
+> Version: 4 · Status: Historical (migration guide from v3 to v4)
 
-Target build: `cnty9.main.669f8081.js` — **live on production and preprod simultaneously since 2026-10-26**. Unlike the v3 rollout (a preprod build promoted to production), v4 flipped both environments to the same new bundle in one move, and the two bundles are byte-identical (main and every shader-pack chunk md5-checked), so everything here applies to production as-is. The bundle was also reorganised around this release — the main bundle shrank from 4.73 MB to 3.03 MB (-36%), the chunk count grew from 169 to 193, and the whole shader-pack pipeline (loader, validator, code generator, WebGPU compiler) now lives in a contiguous c49–c54 cluster. The pack model itself keeps its shape: same `pack.json` fields, same loader limits, same 64 B uniform, same six hooks.
-
-**Re-verified on `tcwczu.main.357faec1.js` (2026-10-30, production and preprod again byte-identical): the whole v4 API surface is unchanged.** The engine header (6,021 B decoded), the default pack template (1,122 B as shipped), the 27 `bloxdSp*` symbols, the blockFlags bits, the loader limits, and the 12 allow titles are all byte-identical to the `cnty9` baseline this part documents — the v4 freeze held through the first post-v4 bundle refresh. The bundle layout moved on: the main bundle grew to 3.28 MB, the chunk map now has 202 ids (195 emitted), the shader pipeline cluster sits at c51–c56 with the default pack in c124, and the §66 "chunk c8" references for the lift/cone constants are now c9. None of that is visible to a pack. The one thing this re-verification did *not* re-measure is the texture-name registry (§68): its `cnty9` ids remain a snapshot, and names remain the stable API.
+This page is a historical guide for migrating API v3 packs to v4. To move from v4 to the current version, apply the [API v5 migration guide](history/v5.md). For new packs, see the current [API reference](api/).
 
 One thing changed around this release that is *not* in the bundle: **the engine now cites reference files by name.** Its own error messages point at `bloxd-api.wgsl` (the annotated engine header) and `BLOCK_TEXTURES.md` (the complete texture-name list) — `...BLOCK_TEXTURES.md lists them.` This guide carries the content of both instead of pointing you elsewhere: the complete header, restored verbatim from the live build, is embedded in [Engine Internals: Engine header](internals/engine-header.md), and the complete catalogue of usable texture names (905 in the v4 build) is the [Texture catalog](api/texture-catalog.md). Every pack-facing fact in this part was restored from the production bundle.
-
 The v4 change set in one screen:
-
 | Area | v3 | v4 |
 |---|---|---|
 | `pack.json` `apiVersion` | `3` (strict) | **`4` (strict)** — v3 packs are rejected at load |
@@ -6882,34 +6496,21 @@ The v4 change set in one screen:
 | `BloxdOpaqueBehind.found` | `found` | renamed **`hit`** |
 | Strict games | policy + guards documented | now **enforced by the bundled validator** with exact diagnostics (§60) |
 | Everything else | — | frozen: 6 hooks, `blockFlags` bits, uniform layout, loader limits, variant matrix, pack `@group(3)` bindings |
-
 Conversion from v3 is mechanical (§61) except for one silent trap: if you port everything but ignore the `fogAlpha` inversion, your fog-dependent code runs with inverted fog and *compiles fine*. As always, verify with an in-game compile before distributing.
-
 ### 55. Fate of v3 packs (conclusion first)
-
 **Every v3 pack — including every pack distributed as v3 — now fails on production exactly at load.** The loader compares `manifest.apiVersion !== 4` with strict JavaScript `!==`, so the comparison is type- and value-exact: the JSON must carry the *number* `4`. A string `"4"` fails and is reported with its JSON spelling (`{{packVersion}}` is `JSON.stringify`-ed, so the settings screen shows `This pack is for shader pack API version "4"...` with quotes — a useful tell that you wrote a string).
-
 The two load-time messages, verbatim from the live i18n dictionary:
-
-> 
 > `This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key is present but doesn't equal 4.
-
 A stored (previously working) v3 pack doesn't throw anything at the player. The stored-pack outcome resolves to `{kind: "none", reason: "otherApiVersion"}`, the pack is silently inactive, and the shader-pack settings tab explains itself with the status line:
-
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-
 The manifest rules around `apiVersion` are otherwise unchanged and worth re-stating because the loader enforces them before anything else:
-
 - `pack.json` must be a JSON object at the root of the pack (not an array, not a number).
 - `apiVersion` must be present and `=== 4`.
 - `name` is required, a string, and non-empty after trimming.
 - `author` is optional, but if present it must be a string — explicit `null` is rejected (`pack.json's "author" must be a string.`).
 - Everything else in the manifest is ignored by the loader.
-
 ### 56. pack.json and the uniform buffer (what stays unchanged)
-
 The whole non-texture pack model carries over from v3 byte-for-byte, so §41 of the [v3 guide](history/v3.md) remains the reference. The v4 re-measurements, from the live loader chunk (c51):
-
 | Limit | Value | Message when exceeded |
 |---|---|---|
 | `.wgsl` files per pack | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6918,22 +6519,17 @@ The whole non-texture pack model carries over from v3 byte-for-byte, so §41 of 
 | Zip size | 32 MB | `The zip is over 32 MB.` |
 | Zip entries | 1,024 | `The zip has more than 1024 entries.` |
 | Zip shape | — | split zips, Zip64, encrypted entries, and unsupported compression methods are each rejected with a dedicated message; every file must be valid UTF-8; exactly one `pack.json`; no duplicate paths |
-
 The per-frame uniform is untouched: `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`, 64 bytes, std140-style layout:
-
 | Offset | Field | Type | Note |
 |---|---|---|---|
 | 0 | `seconds` | `f32` | backs `bloxdSeconds()` |
 | 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
-
 The six-hook template ships with only comment polish (1059 → 1122 bytes; the v3 behaviour described in §45 is unchanged). The v4 template, verbatim — still the best starting skeleton, and still the strict-games pattern to copy:
-
 ```wgsl
 // Every hook here returns its engine default.
 // Copy a hook and change its output to start a shader pack.
-
 // Strict games keep terrain where it is. We use #ifndef to define the hook for
 // non-strict games, but to disable it in strict games, so our pack can stay on.
 #ifndef BLOXD_STRICT
@@ -6941,93 +6537,63 @@ fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-
 // Water uses liquid hooks. If deleted, water uses your terrain hooks instead.
 #ifndef BLOXD_STRICT
 fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 ```
-
 ### 57. The texture API: `bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` (the headline)
-
 v3 packs could read a face's *colour* but not its *texture*. v4 opens the block-texture atlas itself: three new engine functions, one named-constant family, and four new input fields (§58). The engine header's own one-line summary of the headline: *"This face's texture. Compare with `bloxdTextureId*`."*
-
 #### 57.1 `bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f`
-
 Samples the block-texture atlas **exactly as the engine's own sampler does** — the same `texture_2d_array<f32>` atlases, the same `atlasSampler`, `textureSampleLevel` at `round(mipLevel)` — so a texel you read and the texel the engine rendered agree by construction. Semantics, all restored from the generated WGSL (§63 has the verbatim source):
-
 - **`textureId == 0` returns `vec4f(1.0)`** — white. That is the "no texture" id, and it is also what the four input fields carry when a face has no texture, so `bloxdTexel(surface.textureId, ...)` is always safe to call.
 - **Animated textures return the current frame, automatically.** The frame advances with the game's animation clock — you cannot freeze or step it, and you don't need to: sampling an animated texture's id *is* sampling its live frame (§63.3 for the frame math).
 - **`mipLevel` is clamped the way the engine clamps its own:** `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`. Out-of-range mips saturate instead of erroring.
 - **The current fragment's `textureRotation` is applied to the uv you pass** — see 57.4; this is the one subtlety with real visual consequences.
-
 `textureId` is **1-based**: `bloxdTextureIdGrassTop` is the id, and the atlas layer the engine samples for it is `id - 1`. Ids are stable per texture *name*, not per atlas layout — the engine re-lays-out the atlas freely across builds while your `bloxdTextureId*` comparisons keep meaning "this texture".
-
 #### 57.2 `bloxdTextureSize(mipLevel: f32) -> vec2u`
-
 `textureDimensions(textureAtlas0, <clamped mip>)` — the size in texels of the atlas at that mip level. Since every texture occupies one array layer of that atlas, this is also *the texel size of any one texture at that mip* (all block textures in an atlas tier are the same square size). Pair it with `bloxdTexel` when you want texel-grid effects:
-
 ```wgsl
 // A texel-aligned "pixel art" re-sample of this face's own texture.
 let size = bloxdTextureSize(surface.mipLevel);
 let uv = fract(surface.uv);
 let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 ```
-
 #### 57.3 `bloxdTextureId*`: named texture constants
-
 Every usable texture name becomes a `const` you can compare against — spelled **CamelCase over the texture's file name**:
-
 | Texture file | Constant | Note |
 |---|---|---|
 | `grass_top.png` | `bloxdTextureIdGrassTop` | the engine's own example |
 | `lava0.png` (frames `lava0`–`lava7`) | `bloxdTextureIdLava` | animated family: the frame suffix is dropped from the canonical name |
 | `black_portal0.png` (frames 0–3) | `bloxdTextureIdBlackPortal` | same rule |
 | `radar_screen0` (turned copies `[rot[1`–`[rot[4`) | `bloxdTextureIdRadarScreen0` | turned family: folds to the root name |
-
 The spelling rule, restored from the validator: split the name on every non-alphanumeric run, capitalise each part, concatenate after the `bloxdTextureId` prefix. Lookup is **case- and underscore-insensitive** in the other direction (the engine folds your spelling the same way before matching), with three dedicated error families when a spelling doesn't resolve — all verbatim from the live validator:
-
 > **Misspelt prefix / wrong case:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
-> 
 > **A frame of an animated texture:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
-> 
 > **A turned copy:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
-> 
 > **Ambiguous after folding:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
-> 
 > **Not found, with a suggestion:** `There's no texture called X. Did you mean bloxdTextureIdY?` — the suggestion threshold is Levenshtein distance `max(2, floor(len/4)) + 1`.
-> 
 > **Not found, no suggestion:** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
-
 That last message points at a file this guide embeds instead: the complete measured catalogue — every one of the 905 usable names with its then-current id, plus the turned and animated family tables — is §68 below; §64 has the registry measurement and the folding rules behind it. The live successor of that catalogue is the [Texture catalog](api/texture-catalog.md).
-
 #### 57.4 The rotation subtlety — and the neutral-sampling helper
-
 `bloxdTexel` un-rotates the uv you pass by the **current fragment's** `textureRotation`, whatever id you hand it. For the two common cases this is exactly right:
-
 - **Re-sampling this face's own texture** with `surface.uv` — the uv is in the face's rotated frame, the un-rotation converts it to the atlas frame, and you get the true texel. This is the intended primary use.
 - **Sampling with a uv you computed in *atlas* terms** for a *different* texture on a face whose rotation isn't 0 — the un-rotation still fires, and your sample lands rotated. This is the trap.
-
 The engine has no per-texture rotation to consult (rotation is face geometry data, §63.2), so it always uses the fragment's. To sample another texture rotation-neutrally, pre-rotate your uv by the same quarter-turn — the inverse of the un-rotation — which cancels it:
-
 ```wgsl
 // Rotation-neutral texel sampling: pre-turn the uv so bloxdTexel's
 // un-turn (by this face's textureRotation) cancels out.
@@ -7043,18 +6609,13 @@ fn texelNeutral(id: u32, uv: vec2f, mip: f32, r: u32) -> vec4f {
     }
     return bloxdTexel(id, turned, mip);
 }
-
 // usage, inside a surface hook:
 //   let t = texelNeutral(bloxdTextureIdLava, fract(surface.uv),
 //                        surface.mipLevel, surface.textureRotation);
 ```
-
 (When `textureRotation == 0` no compensation is needed. In practice most faces carry 0; turned faces are the minority — but a distribution pack should not assume it.)
-
 #### 57.5 Worked examples
-
 **Emission from texel luminance.** The engine already multiplies texture × tint × AO into `surface.colour`; here we instead drive emission from the texture's own brightness, sampling one mip *above* the face's for a soft, blocky average that survives distance:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -7068,9 +6629,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 **Texture-specific effects.** Compare `textureId` and act only on chosen textures — the v4 replacement for "guess from colour", and the sanctioned way to make e.g. ores glint:
-
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(surface, light);
@@ -7083,9 +6642,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 **Depth-of-field-style distance blur on terrain detail** — read a high mip far away, the native mip up close:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -7104,19 +6661,13 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 (The ratio trick keeps the engine's `colour = texture × tint × AO` intact: dividing the blurred texel by the native texel cancels the texture content, leaving a blur factor you multiply back into `surface.colour`. On white `vec4f(1.0)` reads — untextured faces and anti-X-ray-culled faces — the guard skips the effect entirely.)
-
 #### 57.6 Where the texture API does *not* reach
-
 - **Vertex hooks cannot call it.** `bloxdTexel` / `bloxdTextureSize` are surface/light-hook functions; a vertex hook reaching them is rejected with the "reaches" diagnostic (§65.3).
 - **You cannot add textures.** The atlas is the engine's; the API reads it, nothing more. Custom textures remain the texture-pack system's job, not the shader pack's.
 - **Non-atlas renderer configurations degrade to stubs.** On a configuration where the terrain material isn't atlas-based, the engine compiles `bloxdTextureSize() -> vec2u(1u)` and `bloxdTexel(...) -> vec4f(1.0)` and feeds the four input fields as `0u, 0u, vec2f(0.0), 0.0`. Code written against the real atlas still compiles and runs there — it just sees white texels and a 1×1 size. Write such code to tolerate `textureId == 0` and it tolerates this too.
-
 ### 58. The four new input fields
-
 Both `BloxdSurfaceIn` and `BloxdLightIn` gain the same four trailing fields, quoted from the v4 header (the light struct carries the same quartet the surface struct does — your light hook can act on the texture without plumbing anything through the surface hook):
-
 ```wgsl
     // These are 0 if the face has no texture.
     textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
@@ -7124,14 +6675,11 @@ Both `BloxdSurfaceIn` and `BloxdLightIn` gain the same four trailing fields, quo
     uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
     mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
 ```
-
 - **`textureId`** — the stable, name-derived id (§57.3). `0` on untextured faces; otherwise never `0`.
 - **`textureRotation`** — `0`–`3`, quarter turns **clockwise** as the face *displays* the texture. Comes from geometry/texture-pack overrides (§63.2); same value in both hooks.
 - **`uv`** — the interpolated texture coordinate in **block units**: one block of face area maps to one `1.0` of uv span, so `fract(uv)` is the within-block texture tile — the header's own phrasing. On a wall of repeated stone, `uv` grows along the wall while `fract(uv)` tiles.
 - **`mipLevel`** — the engine's own choice of mip for this fragment, derived from screen-space derivatives of the texel position and clamped to the atlas' level range (§63.1 has the exact formula). `0` on screen-filling faces, rising with distance/obliquity. It is a *read* — you can't steer the engine's sampling with it, but you can pass it (or `± n`) to `bloxdTexel`.
-
 Recipe idea unique to v4 — **uv-anchored detail patterns that respect the block grid without world coordinates**:
-
 ```wgsl
 // Fine grid keyed to the texture's own tiling: visible on every textured
 // face, stable under camera motion, and free of floating-point world drift.
@@ -7143,22 +6691,16 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 ### 59. Renames and semantic changes
-
 Four renames, one of which inverts its meaning. Everything else in the header — `bloxdPi`, `bloxdTau`, the six `bloxdBlockFlag*` constants and their bits (1/2/4/8/16/32), `bloxdEyePosition` / `bloxdRenderOffset` / `bloxdSunDirection` / `bloxdSeconds`, `bloxdWorldPosition`, the default hooks, the `BLOXD_*` macro matrix, the 8-variant matrix — is unchanged from v3, and the `blockFlags` name-classifier rules of §42 carry over verbatim.
-
 | v3 | v4 | Note |
 |---|---|---|
 | `l.fogVisibility` | `l.fogAlpha` | **meaning inverted** — port expressions, don't just rename |
 | `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` | identical body: `vec3i(floor(pos - nrm * 0.5)) + bloxdRenderOffset()` |
 | `behind.found` | `behind.hit` | `BloxdOpaqueBehind` field rename |
 | header first line | — | `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` → `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` |
-
 #### 59.1 `fogVisibility` → `fogAlpha`: the inverted one
-
 v3: `fogVisibility: f32, // 1 = no fog, 0 = fully fogged.` v4: `fogAlpha: f32, // 0 = no fog, 1 = only fogColour.` The default fog application flipped with it:
-
 ```wgsl
 // v3
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -7169,63 +6711,37 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
     return mix(colour, light.fogColour, light.fogAlpha);
 }
 ```
-
 Port table — every v3 fog idiom has a mechanical v4 replacement:
-
 | v3 expression | v4 port |
 |---|---|
 | `l.fogVisibility` | `1.0 - l.fogAlpha` |
 | `mix(l.fogColour, col, l.fogVisibility)` | `mix(col, l.fogColour, l.fogAlpha)` (or `bloxdApplyFog(col, l)`) |
 | `mix(l.fogColour, col, max(l.fogVisibility, 0.15))` (fog floor) | `mix(col, l.fogColour, min(l.fogAlpha, 0.85))` |
 | "fog visibility is 1 up close" | "fogAlpha is 0 up close" |
-
 The fog-*distance* behaviour is unchanged — same curve, same colours; only the field's polarity and name moved. Note also the comment change on `fogColour`: v3 said games "always have fog"; v4 documents `0 when the game has no fog` (and the engine indeed feeds `vec3f(0.0)` when the scene's fog is off) — relevant if you divide by or compare against `fogColour`.
-
 #### 59.2 `bloxdFaceBlock` → `bloxdFragmentBlockPosition`
-
 A pure rename — the engine's own doc comment changed from "the world block the face ... belongs to" to "identify the block's world position", the body is byte-identical, and parameter names remain free. Recipe R4 and every `bloxdFaceBlock(l.position, l.normal)` call site ports by search-and-replace.
-
 #### 59.3 `found` → `hit`
-
 `bloxdOpaqueBehind()` still returns `BloxdOpaqueBehind`, still compiled only where `BLOXD_SCENE_DEPTH` is defined (liquid programs — §60.4), and its implementation is unchanged apart from the field name. Port `behind.found` → `behind.hit` and re-read the semantics from the v4 header comments: `position` and `distance` are `0` (not "meaningless") when `!hit`. R-E (water absorption) and friends port mechanically.
-
 ### 60. The strict-games contract: vertex hooks, `discard`, and X-ray
-
-Strict games are the rule, not the exception: **everything defaults to strict**, and only the 12 allow titles enumerated in [the game policy list](internals/policy.md) opt out (re-verified verbatim on the v4 bundle, 2026-10-27 — the same 12 titles: Test Gym, Doodle Cube, Rocket Obby, Creative, Bloxd Hop, Fishing, Dress Up, Evil Tower, Plots, Test Mode, Tsunami Steal Brainrots, Work at a Restaurant; every other title — survival, bedwars, skywars, custom games, ... — is strict). v4 turns what used to be a documentation-level contract into an **enforced** one: the bundled validator analyses every strict variant and emits dedicated diagnostics.
-
 #### 60.1 The two enforced rules and their exact diagnostics
-
 > `bloxdTerrainVertex moves terrain, which strict games prevent.`
-> 
 > `discard makes terrain see-through, which strict games prevent.`
-
 The mechanics, restored from the validator:
-
 - A **vertex hook defined in a strict variant** (i.e. not wrapped in `#ifndef BLOXD_STRICT`) triggers the first message. "Moves terrain" is taken literally: any vertex hook that isn't the exact default passthrough counts (the check is `movesVertices = vertexHook && !isExactDefault` — even a hook that returns the input unchanged but through different spelling counts as movement).
 - A **`discard` reachable from the surface or light hooks** triggers the second. `discard` itself is *newly legal* in v4 for non-strict games — the v1–v3 hard prohibition is gone — but strict games treat it as X-ray (see below).
 - **One trip disables everything in strict games.** If a strict variant's analysis produces any such diagnostic, the validator nulls *all three* hooks for the strict variants: the pack still loads, still runs in allow games, and in strict games does exactly nothing. An unguarded vertex hook therefore doesn't just lose the sway — it loses your lighting too.
 - **Guarded code keeps the rest alive.** With the template's `#ifndef BLOXD_STRICT` wraps, the strict variants define no vertex hook, produce no diagnostic, and your surface/light hooks keep running in strict games. That is the entire point of the template's comment: *"so our pack can stay on."*
-
 The settings UI walks the author through exactly this. The status line, verbatim:
-
 > `Off in strict games. To run any other parts of the pack in them, wrap each one listed below in #ifndef BLOXD_STRICT ... #endif`
-
 …followed by the offending hook list, each entry optionally suffixed `(only in {{variants}})` with the variant axes spelled `strict / non-strict`, `lighting on / off`, `terrain / liquid`. And in-game, when a pack has nothing left to run under the current mode, the chat shows: `Your shader pack is off in this game.`
-
 #### 60.2 Why: X-ray
-
 Both rules exist for the same reason — in competitive games, a shader that moves terrain or punches holes in it can reveal buried structures and ores: a vertex hook that pulls occluding blocks aside is a wall-hack, and `discard` on selected fragments is a pinhole X-ray. This is also why the engine's own template guards *only* the vertex hooks: surface/light effects (colour, lighting, emission) can't move geometry, so they're safe everywhere. The community tutorial channel confirms the policy from the player side — grass-sway packs are the canonical "doesn't work in strict games" example, and the anti-X-ray culling that strict games perform also hides some textures from the render path entirely, so even texel reads can come back white there. Design for strict-first: treat allow-games-only effects (sway, holes) as progressive enhancement, never as the headline feature.
-
 #### 60.3 What's *not* in v4: the shadow API
-
 The same community channel records the engine author as having a shadow-API draft (a `bloxd-api` companion file) that did **not** ship in this release, with block/grass shadows expected to arrive together with a future shader-pack API update. Nothing shadow-related exists in the v4 bundle (no shadow symbols, no reserved names beyond §63.4's list) — treat shadows as announced-but-unshipped, and don't build distribution packs against them yet. The `skyLight`-based projected-shadow recipes of R9.12 remain the only shadow look available in v4.
-
 #### 60.4 Strict recap for liquid authors
-
 The macro matrix is unchanged from §46: `BLOXD_ALPHA` in every liquid variant plus non-strict terrain; `BLOXD_SCENE_DEPTH` in every liquid variant; `BLOXD_STRICT` / `BLOXD_LIGHTING` on their axes. Strict liquid programs still give you alpha and depth — only terrain alpha is strict-gated.
-
 ### 61. v3 → v4 migration checklist
-
 1. **`pack.json`**: `"apiVersion": 4` — the number, not a string.
 2. **Rename** `bloxdFaceBlock` → `bloxdFragmentBlockPosition` everywhere (arguments unchanged; parameter names free as always).
 3. **Port fog** (the silent one — a pack that skips this compiles and looks wrong):
@@ -7237,9 +6753,7 @@ The macro matrix is unchanged from §46: `BLOXD_ALPHA` in every liquid variant p
 6. **Strict audit** (required for distribution): wrap every vertex hook in `#ifndef BLOXD_STRICT ... #endif`; if you use `discard`, wrap it (or the hook containing it) the same way, or accept that strict games disable the whole pack's hooks.
 7. **In-game compile check** across the 8 variants: the loader screen's "Checking the pack..." validates every variant at once — strict/non-strict × lighting on/off × terrain/liquid — so one pass covers it. Then eyeball one allow game (Test Mode is the fastest) and one strict game.
 8. **Bump your own version metadata** and re-distribute: stored v3 copies on players' machines are silently inactive (§55) and only the settings tab says why.
-
 #### 61.1 A complete v3 → v4 port, before and after
-
 ```wgsl
 // ---- v3 pack: hot sand shimmer + fog-aware emission ----
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -7250,7 +6764,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     }
     return out;
 }
-
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     // v3: keep glowing at distance by adding emission AFTER fog
@@ -7259,7 +6772,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 ```wgsl
 // ---- v4 port: same look, plus texel-aware sand and a texture guard ----
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -7276,7 +6788,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     }
     return out;
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(surface, light);
     // v4: fogAlpha port — emission added after fog, gated by (1 - fogAlpha)
@@ -7285,11 +6796,8 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 Both hooks are surface/light-only, so this pack needs no `#ifndef BLOXD_STRICT` wraps and runs (with its new texel effects) in strict games too. The `textureId != 0u` guard covers untextured faces; for strict games' anti-X-ray culling, style effects should also degrade gracefully if a texel read comes back white despite a non-zero id — branch on ranges and ratios, never on one expected texel value.
-
 ### 62. Other v4 changes and notes
-
 - **The bundle reorg** (numbers in the intro) moved the shader pipeline into chunks c49 (loader/persistence), c50–c51 (loader UI + zip), c53 (validator + header + registry builder), c54 (WGSL code generator + Lite renderer). For anyone re-researching the bundle after a v3-era guide: the anchors all moved, the code didn't.
 - **The header text was rewritten for clarity** — every doc comment re-worded (terser, second person), no semantic change beyond §59. Size 5,637 → 6,021 bytes, 128 → 150 lines; the first line is now `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **Emission ordering is now documented in-header**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3's §43 finding, now official wording.
@@ -7298,1507 +6806,10 @@ Both hooks are surface/light-only, so this pack needs no `#ifndef BLOXD_STRICT` 
 - **Auto-recheck now also fires on texture-registry changes** (§65.1) — a consequence of the registry hash joining HEADER_VERSION. A saved pack can flip to "needs re-check" after an engine update that merely *adds textures*, even when the header text didn't change. This is by design: your `bloxdTextureId*` constants are baked at validation time.
 - **`bloxdSp*` reservation expanded to 27 symbols** (§63.4) — the engine-private namespace inside generated shaders. The pack-level reservation rule is unchanged and broader: anything matching `/^bloxd/i` (case-insensitive) is reserved.
 
-### 63. Engine internals: how `bloxdTexel` actually samples
-
-As with §49–§51 for v3, the following is restored verbatim from the production bundle (chunk c54's code generator, build `cnty9`, 2026-10-26) and is the deepest public account of the mechanism. Nothing in §57 goes beyond what these snippets prove.
-
-#### 63.1 The generated functions, verbatim
-
-On renderer configurations with the atlas texture mode and no animation, the engine emits exactly:
-
-```wgsl
-var<private> bloxdSpTextureRotation: u32;
-@group(3) @binding(2) var<storage, read> bloxdSpTextureLayers: array<u32>;
-
-fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
-    return textureDimensions(textureAtlas0,
-        u32(clamp(round(bloxdSpMipLevel), 0.0,
-                  f32(textureNumLevels(textureAtlas0) - 1u))));
-}
-
-fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
-    if (bloxdSpTextureId == 0u) {
-        return vec4f(1.0);
-    }
-    // Each quarter turn clockwise the face shows its texture at reads the
-    // unturned texture at (v, 1 - u)
-    var bloxdSpTurned = bloxdSpUv;
-    if (bloxdSpTextureRotation == 1u) {
-        bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
-    } else if (bloxdSpTextureRotation == 2u) {
-        bloxdSpTurned = 1.0 - bloxdSpUv;
-    } else if (bloxdSpTextureRotation == 3u) {
-        bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
-    }
-    let bloxdSpLayer = bloxdSpTextureId - 1u;
-    return textureSampleLevel(textureAtlas0, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer, round(bloxdSpMipLevel));
-}
-```
-
-With more than one atlas, the tail becomes a layer-window ladder — atlas *k* owns layers `[k * layersPerAtlas, (k+1) * layersPerAtlas)`:
-
-```wgsl
-    if (bloxdSpLayer < 2u * layersPerAtlas) {
-        return textureSampleLevel(textureAtlas1, atlasSampler, bloxdSpTurned,
-                                  bloxdSpLayer - layersPerAtlas, round(bloxdSpMipLevel));
-    }
-    // ... one rung per atlas, the last one unguarded ...
-    return textureSampleLevel(textureAtlasLast, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer - N * layersPerAtlas, round(bloxdSpMipLevel));
-```
-
-Note what this proves: `textureId` is the **global 1-based layer index across all atlases** (`bloxdSpLayer = textureId - 1u`), and `bloxdTextureSize` reads atlas 0 only — valid because all atlas tiers share dimensions.
-
-#### 63.2 Where the fragment's texture quartet comes from
-
-The per-vertex attribute `texAtlasIndices` (the geometry's texture-slot index) is resolved **through the storage buffer**, not used directly:
-
-```wgsl
-// vertex stage (injected):
-vertexOutputs.vPackTexture = bloxdSpTextureLayers[
-    min(u32(vertexInputs.texAtlasIndices), arrayLength(&bloxdSpTextureLayers) - 1u)];
-```
-
-`bloxdSpTextureLayers` is filled on the JS side, one `u32` per slot, packed exactly as:
-
-```js
-layers[slot] = (id & 0xffff) | ((rotation & 3) << 16);
-```
-
-The fragment stage unpacks both halves before your surface hook runs:
-
-```wgsl
-// fragment stage (injected, ahead of the surface hook):
-let bloxdSpTexture = fragmentInputs.vPackTexture;
-bloxdSpTextureRotation = bloxdSpTexture >> 16u;      // -> textureRotation field
-// BloxdSurfaceIn constructor tail:
-//   bloxdSpTexture & 0xffffu,        // textureId
-//   bloxdSpTextureRotation,          // textureRotation
-//   fragmentInputs.vMainUV1,         // uv
-//   bloxdSpMipLevel                  // mipLevel (derived below)
-```
-
-and the mip is derived exactly as the engine derives its own:
-
-```wgsl
-let bloxdSpTexelUV = fragmentInputs.vMainUV1 * atlasWidth;
-let bloxdSpDdx = dpdx(bloxdSpTexelUV);
-let bloxdSpDdy = dpdy(bloxdSpTexelUV);
-let bloxdSpLod = 0.5 * log2(max(max(dot(bloxdSpDdx, bloxdSpDdx),
-                                    dot(bloxdSpDdy, bloxdSpDdy)), 1e-10));
-let bloxdSpMipLevel = clamp(bloxdSpLod, 0.0,
-                            f32(textureNumLevels(textureAtlas0) - 1u));
-```
-
-Two consequences worth internalising: the rotation really is **per-slot geometry data** (there is no rotation-per-texture lookup anywhere — which is *why* §57.4's subtlety exists), and the *default* (pack-less) terrain shader samples the atlas differently — it uses the pre-rotated layer copies directly at the raw uv, while the pack path normalises to the unturned layer and re-applies rotation in `bloxdTexel`. Same pixels, two representations.
-
-#### 63.3 Animation: the frame ladder
-
-For animated textures the layer assignment grows a frame computation (this is the *entire* difference — sampling, rotation, and mip logic are unchanged):
-
-```wgsl
-    let atlasIdxIn = f32(bloxdSpTextureId - 1u);
-    let animTick = material.anim.x;               // animation clock
-    let animTickStride = material.anim.y;
-    let numAnimTextures = material.anim.z;
-    let animParamIndex = 3.0 * min(numAnimTextures, floor(atlasIdxIn));
-    let animStateMask = animDataPerTex[i32(animParamIndex)];        // frames - 1
-    let animTexIndexStart = animDataPerTex[i32(animParamIndex + 1.0)];
-    let animInterval = max(animTickStride, animDataPerTex[i32(animParamIndex + 2.0)]);
-    let animTickForTex = floor((animTickStride / animInterval) * animTick);
-    let animState = animTickForTex
-        - (animStateMask + 1.0) * floor(animTickForTex / (animStateMask + 1.0));
-    let isAnimTex = min(1.0, animState);
-    let bloxdSpFrame = (1.0 - isAnimTex) * atlasIdxIn
-                     + isAnimTex * (animTexIndexStart + animState - 1.0);
-    let bloxdSpLayer = u32(round(bloxdSpFrame));
-```
-
-`animDataPerTex` (group 2, `array<f32>`) carries one `{mask, startLayer, interval}` triplet per animated texture, frames are **power-of-two counted** (a JS-side build check rejects non-power-of-2 frame counts with `<block> has N animation states, which is not a power of 2`), and the static-sentinel design means non-animated indices resolve through the same arithmetic without a branch. Pack-facing summary, once more: *the id is stable, the frame is automatic.* The intervals are engine content, and measured on `cnty9` they take exactly three values — 200 ms (`lava`, `toxic_waste`, `radar_screen`), 250 ms (`smoke`, `homestead_core_mid`, the machine `*_running` families), 300 ms (the seventeen portals, `toxic_waste_barrel_top`) — the per-family column is §68.4.
-
-#### 63.4 The `bloxdSp*` namespace — all 27 symbols
-
-Everything the generator can inject into your shader, i.e. everything you cannot redeclare (the pack-level `/^bloxd/i` reservation makes most of this moot, but for engine-source readers this is the complete v4 set, extracted from the generator's templates):
-
-`bloxdSpBehind` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpEye` · `bloxdSpFrame` · `bloxdSpLayer` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLitColour` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpPixel` · `bloxdSpPositionW` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpZ`
-
-#### 63.5 The full bind-group layout (Lite renderer, pack variant)
-
-| Group | Binding | Resource | Notes |
-|---|---|---|---|
-| 0 | 0 | `uniform` scene | `LiteSceneUniforms` — viewProjection / view / vEyePosition |
-| 1 | 2–3 | `storage` quads, quadLight | chunk geometry |
-| 2 | 0 | `uniform` material | `TerrainMaterialUniforms`; `anim` drives §63.3 |
-| 2 | 1+ | `storage` `animDataPerTex` | animated-texture triplets (animated configs only) |
-| 2 | next | `textureAtlas0..N-1` | `texture_2d_array<f32>`, one layer per texture |
-| 2 | next | `sampler atlasSampler` | the one sampler `bloxdTexel` uses |
-| 3 | 0 | `uniform bloxdPackInputs` | the pack's 64 B per-frame uniform (§56) |
-| 3 | 1 | `texture_2d<f32>` scene depth | liquid programs; backs `bloxdOpaqueBehind()` (§51) |
-| 3 | 2 | `storage bloxdSpTextureLayers` | the id+rotation table (§63.2) |
-
-Group 3 is the pack's group: three engine-provided slots, none of them nameable by pack code.
-
-### 64. The texture name registry
-
-The engine builds the name catalogue once per session from the block registry — the same pipeline that produced the texture-pack system's `textureNameToIndex`. The builder (module 28833 in the bundle), restored as pseudocode:
-
-```
-for each (name, index) in textureNameToIndex:           # e.g. ("lava0", 0), ("radar_screen0[rot[2", 19)
-    if name matches /(.*)\[rot\[([1-4])$/ :              # a turned copy slot
-        turnedSlot → { id: rootUnturnedId, rotation: N-1 }   # §63.2's table entry
-        register alias: name  → root,  kind "rotation"
-    else if index is an animation frame (not the base):  # via animDataPerTex
-        register alias: name  → base,  kind "frame"
-    else:
-        canonical name = strip trailing "_?0" if this texture is animated
-        named[canonical] = index + 1                     # the bloxdTextureId* value
-```
-
-The rules that matter to an author, deduplicated:
-
-1. **Usable names are canonical names**: animation bases drop their frame suffix (`lava0` → `lava`), turned families fold to their root (`chest_top[rot[1..4]` → `chest_top`), and the two folds compose (`radar_screen0[rot[1..4]` → `radar_screen`, because that family is animated as well). Every other file name is itself. The constant spelling then CamelCases the canonical name (§57.3).
-2. **Frame and turned aliases are known and error-explained** — using one isn't a "did you mean" guess, it gets the specific frame/turned message (§57.3). This is deliberate API shaping: `bloxdTexel` handles both animation and turning for you, so addressing a frame or a turned copy directly is always the wrong move.
-3. **Ambiguity kills the name**: two names that fold to the same case/underscore-insensitive key are both unusable (`could name X and Y ... it can't be used`). Rare, but real — if a name you expect isn't in the §68 catalogue, this is one reason.
-4. **The id is 1-based and equals "atlas layer + 1"**; the no-texture id 0 is reserved as white.
-
-Measured on the live registry (build `cnty9`, 2026-10-27, by running the engine's own builder module on the shipped data): **1,219 atlas entries**, folding **57 turned families** (228 turned spellings) and **42 animated families** (188 frame spellings), leaving **905 usable named constants** — the complete list, with per-name ids and both family tables, is embedded as §68 below (and, in its current form, as the [Texture catalog](api/texture-catalog.md)). The registry-hash mechanism in §65.1 is what keeps baked `bloxdTextureId*` values from silently going stale as those numbers drift.
-
-### 65. Validation internals v4: HEADER_VERSION, the registry hash, special functions
-
-#### 65.1 HEADER_VERSION grows a second hash
-
-The v3 format was `6.<fnv1a32>` over five inputs (§53). v4 keeps the same five inputs — per-variant header tokens, the parser's lexical universe, the four macro names, the special-function map, and the `BloxdPackInputs` declaration — but the prefix moves to `8.` **and a second FNV-1a-32 is appended, hashed over the sorted `"<name> <id>"` list of the entire texture registry**:
-
-```
-v2 (sjr0p7):   6.bc5e8338
-v3 (3ymzdd):   6.5bc26a63
-v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the bundle
-```
-
-(The concrete v4 hashes weren't measured for this guide — they're runtime-computed — but the format is exact, and the v2/v3 values above are the previously published measurements. Any pack settings screen after an engine update shows the current one.)
-
-The consequence is the important part: **a stored pack's saved validation now also invalidates when the texture registry changes** — engine adds textures, renames, re-orders — because your `bloxdTextureId*` comparisons were resolved against the old registry. The "needs re-check" flow that v3 triggered on header edits now has a second, content-driven trigger. Authors don't act on this (the engine re-validates automatically); distributors should just expect it.
-
-#### 65.2 Reserved names, again, precisely
-
-The rule is the regex `/^bloxd/i` — **case-insensitive**, so `BloxdFoo` is as reserved as `bloxdFoo`, and `bloxdTextureIdAnything` falls under it even when it names nothing (that's why the misspelt-prefix diagnostic in §57.3 exists as its own message family). The 27-symbol `bloxdSp*` set of §63.4 is the engine-side complement inside generated code.
-
-#### 65.3 Special functions: now three
-
-The validator's special-function registry grew from v3's one entry to three — the texture API's two functions registered alongside depth:
-
-```js
-[
-  ["bloxdOpaqueBehind", { params: "", returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }],
-  ["bloxdTexel",        { params: "textureId: u32, uv: vec2f, mipLevel: f32", returns: "vec4f", symbol: null }],
-  ["bloxdTextureSize",  { params: "mipLevel: f32", returns: "vec2u", symbol: null }]
-]
-```
-
-`symbol: null` means "no variant gate" — callable wherever the function exists (surface/light hooks). The two "reaches" diagnostics carry over verbatim, now also covering texture misuse:
-
-> `${hook} reaches ${name}, which only surface and light hooks can use.` — e.g. `bloxdTexel` from a vertex hook.
-> 
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — e.g. `bloxdOpaqueBehind()` from terrain hooks without the wrap (unchanged from v3 §53).
-
-#### 65.4 What else carries over from v3 §53 unchanged
-
-Hook signature checking (token-exact on types, free on names — the three signature entries are byte-identical to v3's), the `pack_`-prefix renaming with diagnostic mapping, the undeclared-identifier message family, the parser's extra lexical universe (`bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin` — still not guaranteed in browsers), and the two-stage validation (built-in parser, then the browser's WGSL compiler — still stricter; §38's lessons hold).
-
-### 66. Confirmed constants, limits, and layouts (v4)
-
-The v4 row of the guide's measurement ledger — everything here measured on `cnty9` (2026-10-26, prod = preprod, byte-identical) unless a date is given:
-
-| Item | Value |
-|---|---|
-| `apiVersion` | `4` (strict `===`, number) |
-| Engine header | 6,021 B / 150 lines; first line `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` — full text embedded in §67 |
-| Hooks | 6 (terrain/liquid × vertex/surface/light); template comment-polished only |
-| Variants | 8 (strict × lighting × program); names `strict\|allow.lit\|unlit.terrain\|liquid` |
-| Macros | `BLOXD_STRICT` (strict) · `BLOXD_LIGHTING` (lit) · `BLOXD_ALPHA` (all liquid + non-strict terrain) · `BLOXD_SCENE_DEPTH` (all liquid) |
-| Pack uniform | `@group(3) @binding(0)`, 64 B: seconds@0, renderOffset@16, sunDirection@32, eyePosition@48 |
-| Pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage |
-| blockFlags bits | opaque 1 · emissive 2 · vegetation 4 · dirt 8 · sand 16 · rock 32 (unchanged; §42 name rules carry over) |
-| Loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 zip entries; UTF-8; one manifest; unique paths |
-| Texture registry | 1,219 entries (measured 2026-10-27, build `cnty9`) → 905 usable names; complete catalogue: §68 below (current form: [Texture catalog](api/texture-catalog.md)) |
-| Light curve | 0–15 levels → 0–1 on the ease-out curve (`6 → 0.45`, `12 → 0.92`) — in-header, unchanged |
-| Lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged, now in chunk c8 |
-| Directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged, now in chunk c8 |
-| Fog colour | `vec3f(183/255, 191/255, 195/255)` — unchanged; `fogAlpha` is the v4 name (§59.1) |
-| Reserved names | `/^bloxd/i` (case-insensitive) + 27 `bloxdSp*` engine symbols |
-| HEADER_VERSION | `8.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| Strict titles | everything except the 12 allow titles listed in [Game policy](internals/policy.md) (re-verified 2026-10-27, unchanged) |
-
-
----
-
-### 67. The complete v4 engine header, verbatim
-
-This is the 6,021-byte, 150-line header the engine prepends to every pack, exactly as shipped in `cnty9` — the same text whose first line opens `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` (§66). It is reproduced here in full because a pack author should never have to wonder what the engine declares on their behalf: every free function you may call, every `const` you may compare against, and both input structs with all their fields and comments are below, in engine order.
-
-Two things are *not* in this text and never were, because they are generated per renderer configuration at compile time rather than prepended per pack: the `bloxdTexel`/`bloxdTextureSize` pair (§63.1 has the verbatim generated WGSL) and the 27 `bloxdSp*` engine symbols (§63.4). The `#ifdef BLOXD_ALPHA` gate you see in `BloxdSurface` and `bloxdDefaultSurface` is resolved by the engine's own preprocessor per variant — the canonical text keeps the gate, and §59.1/§56 explain which variants define it.
-
-```wgsl
-
-// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.
-
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// These functions return 1 value per frame, the same for every call site.
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Changes as the player travels, so render positions stay close to 0,0,0.
-// Integer distance, in blocks. Render position + this offset = world position.
-// See bloxdWorldPosition for how this can be used.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// This unit vector points towards the sun, in world orientation; 0 when no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// Seconds since the page loaded. As an f32, it has sub-millisecond precision
-// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Each bit of the binary representation of blockFlags is a flag corresponding
-// to a collection of blocks. The collections overlap, so blocks can be in 0-2+.
-// (blockFlags & bloxdBlockFlagRock) != 0 // The block has this flag.
-// (blockFlags & bloxdBlockFlagRock) == 0 // The block doesn't have this flag.
-
-// Opaque blocks, leaves and ice included. Not glass, water, spawners, etc.
-const bloxdBlockFlagOpaque: u32 = 1;
-
-// These blocks emit light, e.g. neon, portals, lamps, lava, and glowing ores.
-const bloxdBlockFlagEmissive: u32 = 2;
-
-// 'Leafy', e.g. leaves, and grass blocks. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagVegetation: u32 = 4;
-
-// Dirt and soil, grass blocks included. Rocky Dirt is both dirt and rock.
-const bloxdBlockFlagDirt: u32 = 8;
-
-// Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagSand: u32 = 16;
-
-// Stone variants, and more, e.g. gravel, ores, sandstone, magma and obsidian.
-const bloxdBlockFlagRock: u32 = 32;
-
-// Convert a render position to a world position, with possible f32 inaccuracy.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// Using a fragment's position and normal, identify the block's world position.
-fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-struct BloxdVertexIn {
-    position: vec3f, // Render position.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-}
-
-struct BloxdVertex {
-    position: vec3f, // The render position output.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,   // RGB colour = texture * tint * ambient occlusion.
-    alpha: f32,      // Opacity.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    position: vec3f, // Render position.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdSurface {
-    colour: vec3f,   // RGB colour output.
-#ifdef BLOXD_ALPHA
-    alpha: f32,      // Opacity output.
-#endif
-    emission: vec3f, // Emissive RGB output, added after lighting, before fog.
-}
-
-// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
-// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
-struct BloxdLightIn {
-    litColour: vec3f,  // RGB surface colour, lit, before emission and fog.
-    directional: f32,  // Summed Lambert from directional lights; 0 when off.
-    ambient: vec3f,    // RGB ambient colour, added to directional light.
-    blockLight: vec3f, // RGB block light; 0 without BLOXD_LIGHTING.
-    skyLight: f32,     // Sky light; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // Minimum RGB light; 1 without BLOXD_LIGHTING.
-    skyLightColour: vec3f, // RGB colour of skyLight; 1 without BLOXD_LIGHTING.
-    heldLight: vec3f,  // 0 without BLOXD_LIGHTING. 0 with no light source held.
-    fogColour: vec3f,  // The game's RGB fog colour. 0 when the game has no fog.
-    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
-    position: vec3f,   // Render position.
-    normal: vec3f,     // Unit vector direction pointing away from the face.
-    blockFlags: u32,   // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdLight {
-    colour: vec3f, // RGB colour output.
-}
-
-struct BloxdOpaqueBehind {
-    hit: bool,       // False where nothing opaque is behind (sky).
-    position: vec3f, // The render position; 0 when !hit.
-    distance: f32,   // From the camera; 0 when !hit.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Applies this fragment's fog to colour, as the engine does.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(colour, light.fogColour, light.fogAlpha);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
-
-### 68. The complete texture catalogue (905 names, measured)
-
-#### 68.1 How to read it
-
-The **Name** column is the registry name — the handle you actually write. The constant spelling then CamelCases it on `_` and `-` boundaries exactly as §57.3 documents: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`, `chest_double_top_1_lo` → `bloxdTextureIdChestDoubleTop1Lo`. Names are the API; they survive registry drift because the validator re-resolves them against the live registry at load.
-
-The **id** column is what that constant compares equal to — the atlas layer + 1, measured on `cnty9`. Use it to interpret `surface.textureId` dumps and debug output, and to cross-check a misbehaving pack against today's build. Do not hardcode it in WGSL: it is a snapshot of one build's atlas order (§68.5 shows how fast it moves).
-
-The **Notes** column marks the two folded families. `animated (N frames)` means sampling this name returns the current animation frame automatically — never address a frame suffix (`lava0`, `radar_screen2`), those are known aliases with dedicated diagnostics. `turned (4 rotated copies)` means the texture exists only as pre-rotated atlas slots; the name addresses the root and `bloxdTexel` re-applies the rotation (§57.4). One name carries both notes (`radar_screen`).
-
-What is deliberately *absent*: the other 416 registry spellings — 188 frame aliases and 228 turned aliases — are not usable constants, and the engine explains each with its specific error message family when you try them (§57.3). The 1,219-row layer table behind everything (including the 171 pre-rotated slots) is engine-internal and covered in §63.2/§63.4.
-
-#### 68.2 The catalogue
-
-Every usable name, alphabetically. The id column is the `bloxdTextureId*` value — the atlas layer + 1, measured on build `cnty9` (2026-10-27). **Treat ids as a snapshot, names as the API**: between the two October builds measured for this guide, 779 of 1121 unchanged names got a different id (§68.5). The engine resolves names at validation time, so a pack written with names survives registry drift; a pack written with raw ids does not.
-
-| Name | id (cnty9) | Notes |
-|---|---|---|
-| `alloy_kiln_back` | 1091 |  |
-| `alloy_kiln_front` | 1085 |  |
-| `alloy_kiln_side` | 1086 |  |
-| `alloy_kiln_side_running` | 33 | animated (4 frames) |
-| `alloy_kiln_top` | 1087 | turned (4 rotated copies) |
-| `andesite_brick` | 465 |  |
-| `apple_block_bottom` | 441 |  |
-| `apple_block_side` | 439 |  |
-| `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 995 |  |
-| `armour_lucky_block_rare` | 997 |  |
-| `armour_lucky_block_super` | 999 |  |
-| `artisan_table_side` | 367 |  |
-| `artisan_table_top` | 368 |  |
-| `ash` | 1031 |  |
-| `auto_bench_back` | 1106 |  |
-| `auto_bench_front` | 1100 |  |
-| `auto_bench_side` | 1101 |  |
-| `auto_bench_side_running` | 35 | animated (4 frames) |
-| `auto_bench_top` | 1102 | turned (4 rotated copies) |
-| `autocrafter_bottom` | 962 |  |
-| `autocrafter_lunite_bottom` | 973 |  |
-| `autocrafter_lunite_side` | 972 |  |
-| `autocrafter_side` | 961 |  |
-| `banana_block_side` | 899 |  |
-| `banana_block_top` | 900 |  |
-| `beacon` | 330 |  |
-| `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 925 |  |
-| `beetroot_block_side` | 923 |  |
-| `beetroot_block_top` | 924 |  |
-| `belt_drop_side` | 1185 |  |
-| `belt_drop_top` | 1184 |  |
-| `belt_lift_side` | 1183 |  |
-| `belt_lift_top` | 1182 |  |
-| `belt_loader_slab_front` | 1110 |  |
-| `belt_loader_top` | 1109 |  |
-| `belt_tunnel_back` | 1199 |  |
-| `belt_tunnel_exit_top` | 1200 | turned (4 rotated copies) |
-| `belt_tunnel_mouth` | 1193 |  |
-| `belt_tunnel_side` | 1194 |  |
-| `belt_tunnel_top` | 1195 | turned (4 rotated copies) |
-| `black_concrete` | 273 |  |
-| `black_glazed_terracotta` | 429 | turned (4 rotated copies) |
-| `black_planks` | 366 |  |
-| `black_portal` | 2 | animated (4 frames) |
-| `black_spawn_block_side` | 760 |  |
-| `black_spawn_block_top` | 756 | turned (4 rotated copies) |
-| `block_destroyer_tnt_side` | 1017 |  |
-| `block_destroyer_tnt_top` | 1018 |  |
-| `blue_concrete` | 274 |  |
-| `blue_gen_spawn_coal` | 774 |  |
-| `blue_gen_spawn_iron` | 775 |  |
-| `blue_gen_spawn_top` | 773 |  |
-| `blue_glazed_terracotta` | 413 | turned (4 rotated copies) |
-| `blue_lucky_block` | 994 |  |
-| `blue_lucky_block_rare` | 996 |  |
-| `blue_lucky_block_super` | 998 |  |
-| `blue_planks` | 362 |  |
-| `blue_portal` | 3 | animated (4 frames) |
-| `blue_spawn_block_side` | 755 |  |
-| `blue_spawn_block_top` | 751 | turned (4 rotated copies) |
-| `bone_block_side` | 818 |  |
-| `bone_block_top` | 819 |  |
-| `bookshelf` | 564 |  |
-| `bookshelf_1` | 566 |  |
-| `bookshelf_2` | 567 |  |
-| `bookshelf_3` | 568 |  |
-| `bookshelf_4` | 569 |  |
-| `bookshelf_5` | 570 |  |
-| `bookshelf_empty` | 565 |  |
-| `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 978 |  |
-| `bread_block_back` | 435 |  |
-| `bread_block_front` | 434 |  |
-| `bread_block_side` | 436 |  |
-| `bread_block_top` | 437 |  |
-| `brick` | 315 |  |
-| `brown_concrete` | 275 |  |
-| `brown_glazed_terracotta` | 417 | turned (4 rotated copies) |
-| `brown_mushroom_block` | 536 |  |
-| `brown_planks` | 363 |  |
-| `brown_portal` | 4 | animated (4 frames) |
-| `brown_spawn_block_side` | 750 |  |
-| `brown_spawn_block_top` | 746 | turned (4 rotated copies) |
-| `building_lucky_block` | 989 |  |
-| `building_lucky_block_rare` | 991 |  |
-| `building_lucky_block_super` | 993 |  |
-| `burner_drill_back` | 1048 |  |
-| `burner_drill_bottom` | 1047 |  |
-| `burner_drill_front` | 1041 |  |
-| `burner_drill_side` | 1042 |  |
-| `burner_drill_side_running` | 27 | animated (4 frames) |
-| `burner_drill_top` | 1043 | turned (4 rotated copies) |
-| `cactus_dry` | 350 |  |
-| `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 921 |  |
-| `carrot_block_side` | 919 |  |
-| `carrot_block_top` | 920 |  |
-| `carved_messy_stone` | 827 |  |
-| `carved_pumpkin` | 543 |  |
-| `chalk` | 839 |  |
-| `chalk_black` | 855 |  |
-| `chalk_blue` | 854 |  |
-| `chalk_bricks_black` | 871 |  |
-| `chalk_bricks_blue` | 870 |  |
-| `chalk_bricks_brown` | 869 |  |
-| `chalk_bricks_cyan` | 868 |  |
-| `chalk_bricks_gray` | 867 |  |
-| `chalk_bricks_green` | 866 |  |
-| `chalk_bricks_light_blue` | 865 |  |
-| `chalk_bricks_light_gray` | 864 |  |
-| `chalk_bricks_lime` | 863 |  |
-| `chalk_bricks_magenta` | 862 |  |
-| `chalk_bricks_orange` | 861 |  |
-| `chalk_bricks_pink` | 860 |  |
-| `chalk_bricks_purple` | 859 |  |
-| `chalk_bricks_red` | 858 |  |
-| `chalk_bricks_slab_side_black` | 887 |  |
-| `chalk_bricks_slab_side_blue` | 886 |  |
-| `chalk_bricks_slab_side_brown` | 885 |  |
-| `chalk_bricks_slab_side_cyan` | 884 |  |
-| `chalk_bricks_slab_side_gray` | 883 |  |
-| `chalk_bricks_slab_side_green` | 882 |  |
-| `chalk_bricks_slab_side_light_blue` | 881 |  |
-| `chalk_bricks_slab_side_light_gray` | 880 |  |
-| `chalk_bricks_slab_side_lime` | 879 |  |
-| `chalk_bricks_slab_side_magenta` | 878 |  |
-| `chalk_bricks_slab_side_orange` | 877 |  |
-| `chalk_bricks_slab_side_pink` | 876 |  |
-| `chalk_bricks_slab_side_purple` | 875 |  |
-| `chalk_bricks_slab_side_red` | 874 |  |
-| `chalk_bricks_slab_side_white` | 873 |  |
-| `chalk_bricks_slab_side_yellow` | 872 |  |
-| `chalk_bricks_white` | 857 |  |
-| `chalk_bricks_yellow` | 856 |  |
-| `chalk_brown` | 853 |  |
-| `chalk_cyan` | 852 |  |
-| `chalk_gray` | 851 |  |
-| `chalk_green` | 850 |  |
-| `chalk_light_blue` | 849 |  |
-| `chalk_light_gray` | 848 |  |
-| `chalk_lime` | 847 |  |
-| `chalk_magenta` | 846 |  |
-| `chalk_orange` | 845 |  |
-| `chalk_pink` | 844 |  |
-| `chalk_purple` | 843 |  |
-| `chalk_red` | 842 |  |
-| `chalk_white` | 841 |  |
-| `chalk_yellow` | 840 |  |
-| `charge_vault_side` | 1114 |  |
-| `charge_vault_top` | 1113 |  |
-| `charging_pad_side` | 1159 |  |
-| `charging_pad_top` | 1158 |  |
-| `checkpoint_block` | 761 | turned (4 rotated copies) |
-| `cherry_block_bottom` | 590 |  |
-| `cherry_block_side` | 588 |  |
-| `cherry_block_top` | 589 |  |
-| `chest_back` | 347 |  |
-| `chest_double_back_hi` | 1219 |  |
-| `chest_double_back_lo` | 1218 |  |
-| `chest_double_front_hi` | 1213 |  |
-| `chest_double_front_lo` | 1212 |  |
-| `chest_double_top_1_hi` | 1215 |  |
-| `chest_double_top_1_lo` | 1214 |  |
-| `chest_double_top_2_hi` | 1217 |  |
-| `chest_double_top_2_lo` | 1216 |  |
-| `chest_front` | 341 |  |
-| `chest_side` | 342 |  |
-| `chest_top` | 343 | turned (4 rotated copies) |
-| `chili_pepper_block_bottom` | 678 |  |
-| `chili_pepper_block_side` | 676 |  |
-| `chili_pepper_block_top` | 677 |  |
-| `chiseled_red_sandstone` | 456 |  |
-| `chiseled_sandstone` | 325 |  |
-| `clay` | 195 |  |
-| `coal_block` | 233 |  |
-| `coal_deposit` | 1032 |  |
-| `coal_ore` | 227 |  |
-| `coarse_dirt` | 191 |  |
-| `coconut_block_bottom` | 522 |  |
-| `coconut_block_side` | 520 |  |
-| `coconut_block_top` | 521 |  |
-| `code_block` | 679 |  |
-| `comet_heart` | 1170 |  |
-| `comet_ore` | 1169 |  |
-| `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1081 |  |
-| `conveyor_belt_slab_side` | 1080 |  |
-| `conveyor_belt_top` | 1079 |  |
-| `conveyor_belt_turn_left` | 1171 |  |
-| `conveyor_belt_turn_right` | 1172 |  |
-| `copper_deposit` | 1035 |  |
-| `copper_ore` | 1040 |  |
-| `corn_block_bottom` | 594 |  |
-| `corn_block_side` | 592 |  |
-| `corn_block_top` | 593 |  |
-| `crafting_table_side` | 338 |  |
-| `crafting_table_top` | 339 |  |
-| `crate` | 918 |  |
-| `crop_harvester_back` | 1192 |  |
-| `crop_harvester_back_running` | 45 | animated (4 frames) |
-| `crop_harvester_front` | 1186 |  |
-| `crop_harvester_side` | 1187 |  |
-| `crop_harvester_side_running` | 44 | animated (4 frames) |
-| `crop_harvester_top` | 1188 | turned (4 rotated copies) |
-| `crusher_back` | 1055 |  |
-| `crusher_front` | 1049 |  |
-| `crusher_side` | 1050 |  |
-| `crusher_side_running` | 28 | animated (4 frames) |
-| `crusher_top` | 1051 | turned (4 rotated copies) |
-| `crystal_block` | 1029 |  |
-| `crystal_vat_back` | 1166 |  |
-| `crystal_vat_front` | 1160 |  |
-| `crystal_vat_side` | 1161 |  |
-| `crystal_vat_side_running` | 42 | animated (4 frames) |
-| `crystal_vat_top` | 1162 | turned (4 rotated copies) |
-| `custom_lobby_block_side` | 769 |  |
-| `custom_lobby_block_top` | 765 | turned (4 rotated copies) |
-| `cut_red_sandstone` | 457 |  |
-| `cut_sandstone` | 453 |  |
-| `cyan_concrete` | 276 |  |
-| `cyan_gen_spawn_coal` | 783 |  |
-| `cyan_gen_spawn_iron` | 784 |  |
-| `cyan_gen_spawn_top` | 782 |  |
-| `cyan_glazed_terracotta` | 405 | turned (4 rotated copies) |
-| `cyan_planks` | 360 |  |
-| `cyan_portal` | 5 | animated (4 frames) |
-| `cyan_spawn_block_side` | 745 |  |
-| `cyan_spawn_block_top` | 741 | turned (4 rotated copies) |
-| `dark_green_bricks` | 460 |  |
-| `darkstone` | 1206 |  |
-| `darkstone_bricks` | 1207 |  |
-| `darkstone_bricks_cracked` | 1208 |  |
-| `darkstone_bricks_lava` | 1209 |  |
-| `darkstone_engraved` | 1210 |  |
-| `darkstone_smooth` | 1211 |  |
-| `deep_drill_back` | 1140 |  |
-| `deep_drill_bottom` | 1139 |  |
-| `deep_drill_front` | 1133 |  |
-| `deep_drill_side` | 1134 |  |
-| `deep_drill_side_running` | 39 | animated (4 frames) |
-| `deep_drill_top` | 1135 | turned (4 rotated copies) |
-| `diamond_block` | 340 |  |
-| `diamond_gen_spawn_side` | 807 |  |
-| `diamond_gen_spawn_top` | 806 |  |
-| `diamond_ore` | 232 |  |
-| `diorite_brick` | 463 |  |
-| `dirt` | 190 |  |
-| `drop_location_block_side` | 814 |  |
-| `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1038 |  |
-| `dry_grass_block` | 980 |  |
-| `dry_grass_block_side` | 979 |  |
-| `electric_drill_back` | 1099 |  |
-| `electric_drill_bottom` | 1098 |  |
-| `electric_drill_front` | 1092 |  |
-| `electric_drill_side` | 1093 |  |
-| `electric_drill_side_running` | 34 | animated (4 frames) |
-| `electric_drill_top` | 1094 | turned (4 rotated copies) |
-| `emerald_block` | 237 |  |
-| `emerald_ore` | 231 |  |
-| `end_stone` | 226 |  |
-| `engraved_andesite` | 464 |  |
-| `engraved_diorite` | 462 |  |
-| `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1022 |  |
-| `evil_lucky_block_face` | 1023 |  |
-| `explosive_paint_black_side` | 626 |  |
-| `explosive_paint_black_top` | 627 |  |
-| `explosive_paint_blue_side` | 624 |  |
-| `explosive_paint_blue_top` | 625 |  |
-| `explosive_paint_brown_side` | 622 |  |
-| `explosive_paint_brown_top` | 623 |  |
-| `explosive_paint_cyan_side` | 620 |  |
-| `explosive_paint_cyan_top` | 621 |  |
-| `explosive_paint_gray_side` | 618 |  |
-| `explosive_paint_gray_top` | 619 |  |
-| `explosive_paint_green_side` | 616 |  |
-| `explosive_paint_green_top` | 617 |  |
-| `explosive_paint_light_blue_side` | 614 |  |
-| `explosive_paint_light_blue_top` | 615 |  |
-| `explosive_paint_light_gray_side` | 612 |  |
-| `explosive_paint_light_gray_top` | 613 |  |
-| `explosive_paint_lime_side` | 610 |  |
-| `explosive_paint_lime_top` | 611 |  |
-| `explosive_paint_magenta_side` | 608 |  |
-| `explosive_paint_magenta_top` | 609 |  |
-| `explosive_paint_orange_side` | 606 |  |
-| `explosive_paint_orange_top` | 607 |  |
-| `explosive_paint_pink_side` | 604 |  |
-| `explosive_paint_pink_top` | 605 |  |
-| `explosive_paint_purple_side` | 602 |  |
-| `explosive_paint_purple_top` | 603 |  |
-| `explosive_paint_quick_black` | 643 |  |
-| `explosive_paint_quick_blue` | 642 |  |
-| `explosive_paint_quick_brown` | 641 |  |
-| `explosive_paint_quick_cyan` | 640 |  |
-| `explosive_paint_quick_gray` | 639 |  |
-| `explosive_paint_quick_green` | 638 |  |
-| `explosive_paint_quick_light_blue` | 637 |  |
-| `explosive_paint_quick_light_gray` | 636 |  |
-| `explosive_paint_quick_lime` | 635 |  |
-| `explosive_paint_quick_magenta` | 634 |  |
-| `explosive_paint_quick_orange` | 633 |  |
-| `explosive_paint_quick_pink` | 632 |  |
-| `explosive_paint_quick_purple` | 631 |  |
-| `explosive_paint_quick_red` | 630 |  |
-| `explosive_paint_quick_white` | 629 |  |
-| `explosive_paint_quick_yellow` | 628 |  |
-| `explosive_paint_red_side` | 600 |  |
-| `explosive_paint_red_top` | 601 |  |
-| `explosive_paint_seeking_black` | 659 |  |
-| `explosive_paint_seeking_blue` | 658 |  |
-| `explosive_paint_seeking_brown` | 657 |  |
-| `explosive_paint_seeking_cyan` | 656 |  |
-| `explosive_paint_seeking_gray` | 655 |  |
-| `explosive_paint_seeking_green` | 654 |  |
-| `explosive_paint_seeking_light_blue` | 653 |  |
-| `explosive_paint_seeking_light_gray` | 652 |  |
-| `explosive_paint_seeking_lime` | 651 |  |
-| `explosive_paint_seeking_magenta` | 650 |  |
-| `explosive_paint_seeking_orange` | 649 |  |
-| `explosive_paint_seeking_pink` | 648 |  |
-| `explosive_paint_seeking_purple` | 647 |  |
-| `explosive_paint_seeking_red` | 646 |  |
-| `explosive_paint_seeking_white` | 645 |  |
-| `explosive_paint_seeking_yellow` | 644 |  |
-| `explosive_paint_sticky_black` | 675 |  |
-| `explosive_paint_sticky_blue` | 674 |  |
-| `explosive_paint_sticky_brown` | 673 |  |
-| `explosive_paint_sticky_cyan` | 672 |  |
-| `explosive_paint_sticky_gray` | 671 |  |
-| `explosive_paint_sticky_green` | 670 |  |
-| `explosive_paint_sticky_light_blue` | 669 |  |
-| `explosive_paint_sticky_light_gray` | 668 |  |
-| `explosive_paint_sticky_lime` | 667 |  |
-| `explosive_paint_sticky_magenta` | 666 |  |
-| `explosive_paint_sticky_orange` | 665 |  |
-| `explosive_paint_sticky_pink` | 664 |  |
-| `explosive_paint_sticky_purple` | 663 |  |
-| `explosive_paint_sticky_red` | 662 |  |
-| `explosive_paint_sticky_white` | 661 |  |
-| `explosive_paint_sticky_yellow` | 660 |  |
-| `explosive_paint_white_side` | 598 |  |
-| `explosive_paint_white_top` | 599 |  |
-| `explosive_paint_yellow_side` | 596 |  |
-| `explosive_paint_yellow_top` | 597 |  |
-| `extra_compressed_messy_stone` | 531 |  |
-| `fallen_cherry_leaves_side` | 586 |  |
-| `fallen_maple_leaves_side` | 478 |  |
-| `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1157 |  |
-| `fast_belt_top` | 1156 |  |
-| `fast_belt_turn_left` | 1173 |  |
-| `fast_belt_turn_right` | 1174 |  |
-| `fertilised_soil` | 926 |  |
-| `finish_block` | 812 |  |
-| `fireball_block` | 539 |  |
-| `food_lucky_block` | 1007 |  |
-| `food_lucky_block_rare` | 1009 |  |
-| `food_lucky_block_super` | 1011 |  |
-| `forge_hopper_top` | 1168 |  |
-| `furnace_front` | 335 |  |
-| `furnace_side` | 336 |  |
-| `furnace_top` | 337 |  |
-| `generator_side` | 1063 |  |
-| `generator_side_running` | 30 | animated (4 frames) |
-| `generator_top` | 1064 |  |
-| `ghost_chest_back` | 956 |  |
-| `ghost_chest_front` | 953 |  |
-| `ghost_chest_side` | 954 |  |
-| `ghost_chest_top` | 955 |  |
-| `ghost_lucky_block` | 957 |  |
-| `ghost_mystery_block` | 958 |  |
-| `glass` | 294 |  |
-| `glass_black` | 295 |  |
-| `glass_blue` | 296 |  |
-| `glass_brown` | 297 |  |
-| `glass_cyan` | 298 |  |
-| `glass_gray` | 299 |  |
-| `glass_green` | 301 |  |
-| `glass_light_blue` | 302 |  |
-| `glass_light_gray` | 300 |  |
-| `glass_lime` | 303 |  |
-| `glass_magenta` | 304 |  |
-| `glass_orange` | 305 |  |
-| `glass_pink` | 306 |  |
-| `glass_purple` | 307 |  |
-| `glass_red` | 308 |  |
-| `glass_silver` | 311 |  |
-| `glass_white` | 309 |  |
-| `glass_yellow` | 310 |  |
-| `glowstone` | 331 |  |
-| `gold_block` | 235 |  |
-| `gold_deposit` | 1036 |  |
-| `gold_ore` | 229 |  |
-| `granite_brick` | 467 |  |
-| `grass_block_side` | 192 |  |
-| `grass_top` | 193 |  |
-| `gravel` | 196 |  |
-| `gray_concrete` | 271 |  |
-| `gray_gen_spawn_coal` | 792 |  |
-| `gray_gen_spawn_iron` | 793 |  |
-| `gray_gen_spawn_top` | 791 |  |
-| `gray_glazed_terracotta` | 397 | turned (4 rotated copies) |
-| `gray_planks` | 358 |  |
-| `gray_portal` | 6 | animated (4 frames) |
-| `gray_spawn_block_side` | 740 |  |
-| `gray_spawn_block_top` | 736 | turned (4 rotated copies) |
-| `green_bricks` | 459 |  |
-| `green_concrete` | 285 |  |
-| `green_glazed_terracotta` | 421 | turned (4 rotated copies) |
-| `green_lucky_block` | 1006 |  |
-| `green_lucky_block_rare` | 1008 |  |
-| `green_lucky_block_super` | 1010 |  |
-| `green_planks` | 364 |  |
-| `green_portal` | 7 | animated (4 frames) |
-| `green_spawn_block_side` | 735 |  |
-| `green_spawn_block_top` | 731 | turned (4 rotated copies) |
-| `green_stone` | 458 |  |
-| `grenade_block` | 581 |  |
-| `grey_portal` | 8 | animated (4 frames) |
-| `gun_lucky_block` | 952 |  |
-| `hardened_clay` | 254 |  |
-| `hardened_clay_stained_black` | 270 |  |
-| `hardened_clay_stained_blue` | 266 |  |
-| `hardened_clay_stained_brown` | 267 |  |
-| `hardened_clay_stained_cyan` | 264 |  |
-| `hardened_clay_stained_gray` | 262 |  |
-| `hardened_clay_stained_green` | 268 |  |
-| `hardened_clay_stained_light_blue` | 258 |  |
-| `hardened_clay_stained_lime` | 260 |  |
-| `hardened_clay_stained_magenta` | 257 |  |
-| `hardened_clay_stained_orange` | 256 |  |
-| `hardened_clay_stained_pink` | 261 |  |
-| `hardened_clay_stained_purple` | 265 |  |
-| `hardened_clay_stained_red` | 269 |  |
-| `hardened_clay_stained_silver` | 263 |  |
-| `hardened_clay_stained_white` | 255 |  |
-| `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 969 |  |
-| `harvester_lunite_bottom` | 977 |  |
-| `harvester_lunite_side_0` | 974 |  |
-| `harvester_lunite_side_1` | 975 |  |
-| `harvester_lunite_top` | 976 |  |
-| `harvester_side0` | 966 |  |
-| `harvester_side1` | 967 |  |
-| `harvester_top` | 968 |  |
-| `hay_block_side` | 328 |  |
-| `homestead_core` | 1037 |  |
-| `homestead_core_cap` | 1122 |  |
-| `homestead_core_crown` | 1121 |  |
-| `homestead_core_mid` | 26 | animated (4 frames) |
-| `hyper_compressed_messy_stone` | 533 |  |
-| `ice` | 326 |  |
-| `ice_brick` | 468 |  |
-| `iceball_block` | 540 |  |
-| `invisible_solid` | 314 |  |
-| `iron_block` | 234 |  |
-| `iron_chest_back` | 917 |  |
-| `iron_chest_front` | 911 |  |
-| `iron_chest_side` | 912 |  |
-| `iron_chest_top` | 913 | turned (4 rotated copies) |
-| `iron_deposit` | 1033 |  |
-| `iron_ore` | 228 |  |
-| `iron_watermelon_side` | 546 |  |
-| `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 889 |  |
-| `jungle_grass_block_side` | 888 |  |
-| `lapis_block` | 236 |  |
-| `lapis_ore` | 230 |  |
-| `lava` | 1 | animated (8 frames) |
-| `leather_block_side` | 908 |  |
-| `leather_block_top` | 909 |  |
-| `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 910 |  |
-| `leaves_cedar` | 470 |  |
-| `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 906 |  |
-| `leaves_jungle` | 290 |  |
-| `leaves_mango` | 894 |  |
-| `leaves_mango_fruity` | 907 |  |
-| `leaves_maple` | 289 |  |
-| `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 901 |  |
-| `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 904 |  |
-| `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 905 |  |
-| `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 902 |  |
-| `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 903 |  |
-| `leaves_spectral` | 831 |  |
-| `light_blue_concrete` | 277 |  |
-| `light_blue_glazed_terracotta` | 381 | turned (4 rotated copies) |
-| `light_blue_lucky_block` | 933 |  |
-| `light_blue_planks` | 354 |  |
-| `light_blue_spawn_block_side` | 730 |  |
-| `light_blue_spawn_block_top` | 726 | turned (4 rotated copies) |
-| `light_gray_concrete` | 272 |  |
-| `light_gray_glazed_terracotta` | 401 | turned (4 rotated copies) |
-| `light_gray_planks` | 359 |  |
-| `light_gray_spawn_block_side` | 725 |  |
-| `light_gray_spawn_block_top` | 721 | turned (4 rotated copies) |
-| `lightblue_portal` | 9 | animated (4 frames) |
-| `lightgray_portal` | 10 | animated (4 frames) |
-| `lime_concrete` | 278 |  |
-| `lime_gen_spawn_coal` | 777 |  |
-| `lime_gen_spawn_iron` | 778 |  |
-| `lime_gen_spawn_top` | 776 |  |
-| `lime_glazed_terracotta` | 389 | turned (4 rotated copies) |
-| `lime_planks` | 356 |  |
-| `lime_portal` | 11 | animated (4 frames) |
-| `lime_spawn_block_side` | 720 |  |
-| `lime_spawn_block_top` | 716 | turned (4 rotated copies) |
-| `log_ancient_maple` | 1021 |  |
-| `log_aspen` | 202 |  |
-| `log_cedar` | 201 |  |
-| `log_cherry` | 582 |  |
-| `log_jungle` | 203 |  |
-| `log_mango` | 891 |  |
-| `log_maple` | 198 |  |
-| `log_palm` | 472 |  |
-| `log_pear` | 523 |  |
-| `log_pine` | 199 |  |
-| `log_plum` | 200 |  |
-| `log_spectral` | 828 |  |
-| `lucky_block_pink_question` | 959 |  |
-| `lucky_block_pink_question_rare` | 1013 |  |
-| `lucky_block_pink_question_super` | 1015 |  |
-| `lunite_block` | 971 |  |
-| `lunite_ore` | 970 |  |
-| `machine_bench_side` | 1115 |  |
-| `machine_bench_top` | 1116 |  |
-| `machine_side` | 1039 |  |
-| `magenta_concrete` | 279 |  |
-| `magenta_glazed_terracotta` | 377 | turned (4 rotated copies) |
-| `magenta_planks` | 353 |  |
-| `magenta_portal` | 12 | animated (4 frames) |
-| `magenta_spawn_block_side` | 715 |  |
-| `magenta_spawn_block_top` | 711 | turned (4 rotated copies) |
-| `magma` | 451 |  |
-| `mailbox_front` | 571 |  |
-| `mailbox_front_full` | 573 |  |
-| `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 898 |  |
-| `mango_block_side` | 896 |  |
-| `mango_block_top` | 897 |  |
-| `mega_compressed_messy_stone` | 535 |  |
-| `melon_side` | 544 |  |
-| `melon_top` | 545 |  |
-| `melting_ice` | 595 |  |
-| `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 823 |  |
-| `mob_spawner_block_top` | 821 |  |
-| `mob_spawner_hostile_block_side` | 822 |  |
-| `mob_spawner_neutral_block_side` | 838 |  |
-| `mob_spawner_passive_block_side` | 820 |  |
-| `moonstone_block` | 450 |  |
-| `moonstone_chest_back` | 449 |  |
-| `moonstone_chest_front` | 443 |  |
-| `moonstone_chest_side` | 444 |  |
-| `moonstone_chest_top` | 445 | turned (4 rotated copies) |
-| `moonstone_explosive_side` | 332 |  |
-| `moonstone_explosive_top` | 333 |  |
-| `moonstone_gen_spawn_side` | 809 |  |
-| `moonstone_gen_spawn_top` | 808 |  |
-| `moonstone_ore` | 442 |  |
-| `mossy_cobblestone` | 438 |  |
-| `mushroom_stem` | 538 |  |
-| `mystery_block` | 578 |  |
-| `neon_black` | 951 |  |
-| `neon_blue` | 950 |  |
-| `neon_brown` | 949 |  |
-| `neon_cyan` | 948 |  |
-| `neon_gray` | 947 |  |
-| `neon_green` | 946 |  |
-| `neon_light_blue` | 945 |  |
-| `neon_light_gray` | 944 |  |
-| `neon_lime` | 943 |  |
-| `neon_magenta` | 942 |  |
-| `neon_orange` | 941 |  |
-| `neon_pink` | 940 |  |
-| `neon_purple` | 939 |  |
-| `neon_red` | 938 |  |
-| `neon_white` | 937 |  |
-| `neon_yellow` | 936 |  |
-| `nether_brick` | 317 |  |
-| `netherrack` | 318 |  |
-| `obby_absorb_block` | 816 |  |
-| `obby_absorb_death_block` | 817 |  |
-| `obby_death_block` | 815 |  |
-| `obsidian` | 327 |  |
-| `orange_concrete` | 280 |  |
-| `orange_glazed_terracotta` | 373 | turned (4 rotated copies) |
-| `orange_lucky_block` | 1000 |  |
-| `orange_lucky_block_rare` | 1002 |  |
-| `orange_lucky_block_super` | 1004 |  |
-| `orange_planks` | 352 |  |
-| `orange_portal` | 13 | animated (4 frames) |
-| `orange_spawn_block_side` | 710 |  |
-| `orange_spawn_block_top` | 706 | turned (4 rotated copies) |
-| `ore_gen_spawn_side` | 811 |  |
-| `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 826 |  |
-| `parts_bench_side` | 1117 |  |
-| `parts_bench_top` | 1118 |  |
-| `patterned_glass_black` | 548 |  |
-| `patterned_glass_blue` | 549 |  |
-| `patterned_glass_brown` | 550 |  |
-| `patterned_glass_cyan` | 551 |  |
-| `patterned_glass_gray` | 552 |  |
-| `patterned_glass_green` | 554 |  |
-| `patterned_glass_light_blue` | 555 |  |
-| `patterned_glass_light_gray` | 553 |  |
-| `patterned_glass_lime` | 556 |  |
-| `patterned_glass_magenta` | 557 |  |
-| `patterned_glass_orange` | 558 |  |
-| `patterned_glass_pink` | 559 |  |
-| `patterned_glass_purple` | 560 |  |
-| `patterned_glass_red` | 561 |  |
-| `patterned_glass_white` | 562 |  |
-| `patterned_glass_yellow` | 563 |  |
-| `pear_block_bottom` | 529 |  |
-| `pear_block_side` | 527 |  |
-| `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 960 |  |
-| `pine_cone_block_side` | 836 |  |
-| `pine_cone_block_top` | 837 |  |
-| `pine_grass_block` | 834 |  |
-| `pine_grass_block_side` | 833 |  |
-| `pink_concrete` | 281 |  |
-| `pink_gen_spawn_coal` | 789 |  |
-| `pink_gen_spawn_iron` | 790 |  |
-| `pink_gen_spawn_top` | 788 |  |
-| `pink_glazed_terracotta` | 393 | turned (4 rotated copies) |
-| `pink_planks` | 357 |  |
-| `pink_portal` | 14 | animated (4 frames) |
-| `pink_spawn_block_side` | 705 |  |
-| `pink_spawn_block_top` | 701 | turned (4 rotated copies) |
-| `planks_aspen` | 205 |  |
-| `planks_cedar` | 209 |  |
-| `planks_cherry` | 584 |  |
-| `planks_jungle` | 207 |  |
-| `planks_mango` | 893 |  |
-| `planks_maple` | 204 |  |
-| `planks_palm` | 473 |  |
-| `planks_pear` | 524 |  |
-| `planks_pine` | 208 |  |
-| `planks_plum` | 206 |  |
-| `planks_spectral` | 830 |  |
-| `plum_block_bottom` | 519 |  |
-| `plum_block_side` | 517 |  |
-| `plum_block_top` | 518 |  |
-| `podzol_top` | 452 |  |
-| `potato_block` | 922 |  |
-| `potion_lucky_block` | 1012 |  |
-| `potion_lucky_block_rare` | 1014 |  |
-| `potion_lucky_block_super` | 1016 |  |
-| `press_back` | 1071 |  |
-| `press_front` | 1065 |  |
-| `press_side` | 1066 |  |
-| `press_side_running` | 31 | animated (4 frames) |
-| `press_top` | 1067 | turned (4 rotated copies) |
-| `protector` | 348 |  |
-| `protector_faction` | 575 |  |
-| `protector_tribe` | 574 |  |
-| `pumpkin_face_on` | 291 |  |
-| `pumpkin_side` | 541 |  |
-| `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1024 |  |
-| `pure_copper_ore` | 1204 |  |
-| `pure_diamond_ore` | 1027 |  |
-| `pure_gold_ore` | 1026 |  |
-| `pure_iron_ore` | 1025 |  |
-| `pure_moonstone_ore` | 1028 |  |
-| `pure_voltite_ore` | 1205 |  |
-| `purple_concrete` | 282 |  |
-| `purple_glazed_terracotta` | 409 | turned (4 rotated copies) |
-| `purple_lucky_block` | 988 |  |
-| `purple_lucky_block_rare` | 990 |  |
-| `purple_lucky_block_super` | 992 |  |
-| `purple_planks` | 361 |  |
-| `purple_portal` | 15 | animated (4 frames) |
-| `purple_spawn_block_side` | 700 |  |
-| `purple_spawn_block_top` | 696 | turned (4 rotated copies) |
-| `quartz_block_chiseled` | 320 |  |
-| `quartz_block_side` | 319 |  |
-| `radar_bottom` | 929 |  |
-| `radar_screen` | 19 | animated (4 frames) · turned (4 rotated copies) |
-| `radar_side_active` | 927 |  |
-| `radar_side_inactive` | 930 |  |
-| `radar_top_active` | 928 |  |
-| `radar_top_inactive` | 931 |  |
-| `recycler_back` | 1181 |  |
-| `recycler_front` | 1175 |  |
-| `recycler_side` | 1176 |  |
-| `recycler_side_running` | 43 | animated (4 frames) |
-| `recycler_top` | 1177 | turned (4 rotated copies) |
-| `red_concrete` | 283 |  |
-| `red_gen_spawn_coal` | 771 |  |
-| `red_gen_spawn_iron` | 772 |  |
-| `red_gen_spawn_top` | 770 |  |
-| `red_glazed_terracotta` | 425 | turned (4 rotated copies) |
-| `red_lucky_block` | 934 |  |
-| `red_lucky_block_rare` | 984 |  |
-| `red_lucky_block_super` | 986 |  |
-| `red_mushroom_block` | 537 |  |
-| `red_planks` | 365 |  |
-| `red_portal` | 16 | animated (4 frames) |
-| `red_sand` | 474 |  |
-| `red_sandstone` | 454 |  |
-| `red_sandstone_brick` | 475 |  |
-| `red_sandstone_top` | 455 |  |
-| `red_spawn_block_side` | 695 |  |
-| `red_spawn_block_top` | 691 | turned (4 rotated copies) |
-| `redstone_lamp_off` | 313 |  |
-| `redstone_lamp_on` | 312 |  |
-| `rocket_block` | 579 |  |
-| `rocky_dirt` | 476 |  |
-| `rope_block` | 1030 |  |
-| `sand` | 194 |  |
-| `sandstone_brick` | 461 |  |
-| `sandstone_normal` | 225 |  |
-| `sandstone_top` | 324 |  |
-| `shatter_mill_back` | 1147 |  |
-| `shatter_mill_front` | 1141 |  |
-| `shatter_mill_side` | 1142 |  |
-| `shatter_mill_side_running` | 40 | animated (4 frames) |
-| `shatter_mill_top` | 1143 | turned (4 rotated copies) |
-| `shop_trader_spawn_face` | 799 |  |
-| `shop_trader_spawn_side` | 798 |  |
-| `shop_trader_spawn_top` | 794 | turned (4 rotated copies) |
-| `shop_wizard_spawn_face` | 805 |  |
-| `shop_wizard_spawn_side` | 804 |  |
-| `shop_wizard_spawn_top` | 800 | turned (4 rotated copies) |
-| `sky_tap_back` | 1155 |  |
-| `sky_tap_bottom` | 1154 |  |
-| `sky_tap_front` | 1148 |  |
-| `sky_tap_side` | 1149 |  |
-| `sky_tap_side_running` | 41 | animated (4 frames) |
-| `sky_tap_top` | 1150 | turned (4 rotated copies) |
-| `slab_andesite_brick_side` | 498 |  |
-| `slab_aspen_side` | 483 |  |
-| `slab_brick_side` | 515 |  |
-| `slab_cedar_side` | 482 |  |
-| `slab_cherry_side` | 587 |  |
-| `slab_chiseled_red_sandstone_side` | 512 |  |
-| `slab_chiseled_sandstone_side` | 508 |  |
-| `slab_cobblestone_side` | 488 |  |
-| `slab_cut_red_sandstone_side` | 513 |  |
-| `slab_cut_sandstone_side` | 509 |  |
-| `slab_diorite_brick_side` | 502 |  |
-| `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 981 |  |
-| `slab_engraved_andesite_side` | 497 |  |
-| `slab_engraved_diorite_side` | 501 |  |
-| `slab_engraved_granite_side` | 505 |  |
-| `slab_granite_brick_side` | 506 |  |
-| `slab_grass_top_side` | 487 |  |
-| `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 890 |  |
-| `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 895 |  |
-| `slab_maple_side` | 479 |  |
-| `slab_mossy_cobblestone_side` | 493 |  |
-| `slab_palm_side` | 485 |  |
-| `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 835 |  |
-| `slab_pine_side` | 480 |  |
-| `slab_plum_side` | 481 |  |
-| `slab_red_sandstone_brick_side` | 514 |  |
-| `slab_red_sandstone_side` | 511 |  |
-| `slab_sandstone_brick_side` | 510 |  |
-| `slab_sandstone_normal_side` | 507 |  |
-| `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 832 |  |
-| `slab_stone_andesite_side` | 495 |  |
-| `slab_stone_andesite_smooth_side` | 496 |  |
-| `slab_stone_diorite_side` | 499 |  |
-| `slab_stone_diorite_smooth_side` | 500 |  |
-| `slab_stone_granite_side` | 503 |  |
-| `slab_stone_granite_smooth_side` | 504 |  |
-| `slab_stone_side` | 489 |  |
-| `slab_stonebrick_carved_side` | 491 |  |
-| `slab_stonebrick_mossy_side` | 494 |  |
-| `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1062 |  |
-| `smelter_front` | 1056 |  |
-| `smelter_side` | 1057 |  |
-| `smelter_side_running` | 29 | animated (4 frames) |
-| `smelter_top` | 1058 | turned (4 rotated copies) |
-| `smoke` | 23 | animated (4 frames) |
-| `smooth_stone` | 218 |  |
-| `snow` | 197 |  |
-| `snowy_messy_stone` | 824 |  |
-| `snowy_messy_stone_side` | 825 |  |
-| `solar_panel_bottom` | 965 |  |
-| `solar_panel_side` | 963 |  |
-| `solar_panel_top` | 964 |  |
-| `sorting_gate_slab_side` | 1108 |  |
-| `sorting_gate_top` | 1107 |  |
-| `splitter_slab_side` | 1083 |  |
-| `splitter_top` | 1082 |  |
-| `sponge` | 329 |  |
-| `starframe` | 1167 |  |
-| `stone` | 217 |  |
-| `stone_andesite` | 221 |  |
-| `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1034 |  |
-| `stone_diorite` | 219 |  |
-| `stone_diorite_smooth` | 220 |  |
-| `stone_granite` | 223 |  |
-| `stone_granite_smooth` | 224 |  |
-| `stonebrick` | 316 |  |
-| `stonebrick_carved` | 321 |  |
-| `stonebrick_cracked` | 323 |  |
-| `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1112 |  |
-| `storage_silo_top` | 1111 |  |
-| `stripped_aspen_log` | 211 |  |
-| `stripped_cedar_log` | 215 |  |
-| `stripped_cherry_log` | 583 |  |
-| `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 892 |  |
-| `stripped_maple_log` | 210 |  |
-| `stripped_palm_log` | 576 |  |
-| `stripped_pear_log` | 577 |  |
-| `stripped_pine_log` | 214 |  |
-| `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 829 |  |
-| `super_compressed_messy_stone` | 532 |  |
-| `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1119 |  |
-| `tool_bench_top` | 1120 |  |
-| `tools_lucky_block` | 1001 |  |
-| `tools_lucky_block_rare` | 1003 |  |
-| `tools_lucky_block_super` | 1005 |  |
-| `toxic_waste` | 25 | animated (8 frames) |
-| `toxic_waste_barrel_bottom` | 1020 |  |
-| `toxic_waste_barrel_side` | 1019 |  |
-| `toxic_waste_barrel_top` | 24 | animated (4 frames) |
-| `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1129 |  |
-| `tree_cutter_back_running` | 37 | animated (4 frames) |
-| `tree_cutter_front` | 1123 |  |
-| `tree_cutter_side` | 1124 |  |
-| `tree_cutter_side_running` | 36 | animated (4 frames) |
-| `tree_cutter_top` | 1125 | turned (4 rotated copies) |
-| `ultra_compressed_messy_stone` | 534 |  |
-| `unloaded` | 189 |  |
-| `volt_engine_side` | 1131 |  |
-| `volt_engine_side_running` | 38 | animated (4 frames) |
-| `volt_engine_top` | 1132 |  |
-| `voltite_deposit` | 1130 |  |
-| `voltite_ore` | 1084 |  |
-| `watermelon_side` | 292 |  |
-| `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 935 |  |
-| `weapon_lucky_block_rare` | 985 |  |
-| `weapon_lucky_block_super` | 987 |  |
-| `white_concrete` | 284 |  |
-| `white_gen_spawn_coal` | 786 |  |
-| `white_gen_spawn_iron` | 787 |  |
-| `white_gen_spawn_top` | 785 |  |
-| `white_glazed_terracotta` | 369 | turned (4 rotated copies) |
-| `white_planks` | 351 |  |
-| `white_portal` | 17 | animated (4 frames) |
-| `white_spawn_block_side` | 690 |  |
-| `white_spawn_block_top` | 686 | turned (4 rotated copies) |
-| `wire_mill_back` | 1078 |  |
-| `wire_mill_front` | 1072 |  |
-| `wire_mill_side` | 1073 |  |
-| `wire_mill_side_running` | 32 | animated (4 frames) |
-| `wire_mill_top` | 1074 | turned (4 rotated copies) |
-| `wool_colored_black` | 253 |  |
-| `wool_colored_blue` | 249 |  |
-| `wool_colored_brown` | 250 |  |
-| `wool_colored_cyan` | 247 |  |
-| `wool_colored_gray` | 245 |  |
-| `wool_colored_green` | 251 |  |
-| `wool_colored_light_blue` | 241 |  |
-| `wool_colored_light_grey` | 246 |  |
-| `wool_colored_lime` | 243 |  |
-| `wool_colored_magenta` | 240 |  |
-| `wool_colored_orange` | 239 |  |
-| `wool_colored_pink` | 244 |  |
-| `wool_colored_purple` | 248 |  |
-| `wool_colored_red` | 252 |  |
-| `wool_colored_white` | 238 |  |
-| `wool_colored_yellow` | 242 |  |
-| `yellow_concrete` | 286 |  |
-| `yellow_gen_spawn_coal` | 780 |  |
-| `yellow_gen_spawn_iron` | 781 |  |
-| `yellow_gen_spawn_top` | 779 |  |
-| `yellow_glazed_terracotta` | 385 | turned (4 rotated copies) |
-| `yellow_lucky_block` | 932 |  |
-| `yellow_lucky_block_rare` | 982 |  |
-| `yellow_lucky_block_super` | 983 |  |
-| `yellow_planks` | 355 |  |
-| `yellow_portal` | 18 | animated (4 frames) |
-| `yellow_spawn_block_side` | 685 |  |
-| `yellow_spawn_block_top` | 681 | turned (4 rotated copies) |
-
-#### 68.3 Turned families (57 roots)
-
-These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry folds them to the root below; `bloxdTexel` re-applies the rotation when sampling (§57.4), so you address the root and never the copies. Aliasing one of the `[rot[N` spellings gets the dedicated turned-name diagnostic (§57.3).
-
-- `alloy_kiln_top` (id 1087)
-- `auto_bench_top` (id 1102)
-- `belt_tunnel_exit_top` (id 1200)
-- `belt_tunnel_top` (id 1195)
-- `black_glazed_terracotta` (id 429)
-- `black_spawn_block_top` (id 756)
-- `blue_glazed_terracotta` (id 413)
-- `blue_spawn_block_top` (id 751)
-- `brown_glazed_terracotta` (id 417)
-- `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1043)
-- `checkpoint_block` (id 761)
-- `chest_top` (id 343)
-- `crop_harvester_top` (id 1188)
-- `crusher_top` (id 1051)
-- `crystal_vat_top` (id 1162)
-- `custom_lobby_block_top` (id 765)
-- `cyan_glazed_terracotta` (id 405)
-- `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1135)
-- `electric_drill_top` (id 1094)
-- `gray_glazed_terracotta` (id 397)
-- `gray_spawn_block_top` (id 736)
-- `green_glazed_terracotta` (id 421)
-- `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 913)
-- `light_blue_glazed_terracotta` (id 381)
-- `light_blue_spawn_block_top` (id 726)
-- `light_gray_glazed_terracotta` (id 401)
-- `light_gray_spawn_block_top` (id 721)
-- `lime_glazed_terracotta` (id 389)
-- `lime_spawn_block_top` (id 716)
-- `magenta_glazed_terracotta` (id 377)
-- `magenta_spawn_block_top` (id 711)
-- `moonstone_chest_top` (id 445)
-- `orange_glazed_terracotta` (id 373)
-- `orange_spawn_block_top` (id 706)
-- `pink_glazed_terracotta` (id 393)
-- `pink_spawn_block_top` (id 701)
-- `press_top` (id 1067)
-- `purple_glazed_terracotta` (id 409)
-- `purple_spawn_block_top` (id 696)
-- `radar_screen0` (id 19) · also animated
-- `recycler_top` (id 1177)
-- `red_glazed_terracotta` (id 425)
-- `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1143)
-- `shop_trader_spawn_top` (id 794)
-- `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1150)
-- `smelter_top` (id 1058)
-- `tree_cutter_top` (id 1125)
-- `white_glazed_terracotta` (id 369)
-- `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1074)
-- `yellow_glazed_terracotta` (id 385)
-- `yellow_spawn_block_top` (id 681)
-
-#### 68.4 Animated families (42 names)
-
-Sampling one of these names returns the current animation frame automatically (§63.3's frame ladder). The engine advances frames per texture at a fixed, per-family interval — measured on `cnty9` it takes exactly three values: **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, every machine `*_running` family), **300 ms** (the seventeen portals and `toxic_waste_barrel_top`) — see the Interval column — so packs never address a frame suffix (`lava0` is an error; `lava` is the name).
-
-| Name | Frames | Interval | Registry base |
-|---|---|---|---|
-| `lava` | 8 | 200 ms | `lava0` |
-| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
-| `black_portal` | 4 | 300 ms | `black_portal0` |
-| `blue_portal` | 4 | 300 ms | `blue_portal0` |
-| `brown_portal` | 4 | 300 ms | `brown_portal0` |
-| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
-| `gray_portal` | 4 | 300 ms | `gray_portal0` |
-| `green_portal` | 4 | 300 ms | `green_portal0` |
-| `grey_portal` | 4 | 300 ms | `grey_portal0` |
-| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
-| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
-| `lime_portal` | 4 | 300 ms | `lime_portal0` |
-| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
-| `orange_portal` | 4 | 300 ms | `orange_portal0` |
-| `pink_portal` | 4 | 300 ms | `pink_portal0` |
-| `press_side_running` | 4 | 250 ms | `press_side_running0` |
-| `purple_portal` | 4 | 300 ms | `purple_portal0` |
-| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
-| `red_portal` | 4 | 300 ms | `red_portal0` |
-| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
-| `smoke` | 4 | 250 ms | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
-| `white_portal` | 4 | 300 ms | `white_portal0` |
-| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
-
-One structural note the raw data makes visible: the atlas holds 45 animated roots, not 42 — `radar_screen`'s four pre-rotated copies each carry their own 4-frame ladder, which is also why `radar_screen` is the one name bearing both family notes.
-
-#### 68.5 Registry drift, measured (sjr0p7 → cnty9)
-
-The registry is content shipped with the build, so it drifts with block updates. The two builds this guide measured (2026-10-17 and 2026-10-27, ten days apart) show exactly how fast:
-
-- Entries: 1200 → 1219 (98 added, 79 removed)
-- Names that kept their spelling: 1121 — of which **779 changed id** (69%)
-- A naming convention migrated mid-month: 68 `_rot1..4` suffix names (e.g. `chest_top_rot1`) became `[rot[1..4` slots (e.g. `chest_top[rot[1`), and the double-chest textures (`chest_double_*`, 8 entries) appeared with them
-- The usable-name count moved 900 → 905, and the registry hash in `HEADER_VERSION` (§65.1) re-invalidated every saved pack that had baked ids
-
-That last point is the operational lesson: **write `bloxdTextureIdLava`, not `19`** — a name-constant survives every one of those bullets unchanged, because the validator re-resolves it against the live registry at load.
-
-#### 68.6 The drift lists, in full (98 added, 79 removed)
-
-§68.5's headline numbers, spelled out name by name — because a texture-pack author updating an October pack needs to know exactly which file names stopped matching. The lists compare the *spelling* layer (the file names texture packs use); §64's folding rules are what turn spellings into the usable constants of §68.2.
-
-**Turned-fold migration — 17 machine tops (68 spellings out, 68 slots in).** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top` moved from `_rot1..4` variant spellings to `[rot[1..4` pre-rotated slots; the folded root is the usable name, so a texture pack now ships one `X_top.png` instead of four `X_top_rotN.png` files.
-
-**Chest tops folded — 3 families (6 spellings out, 12 slots in).** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top`: the two-variant spellings became pre-rotated slots under the root — rename the PNG files accordingly.
-
-**New textures — 17 names.** The double chest (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), the darkstone family (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore`, and `forge_hopper_top`.
-
-**One plain fold.** `ghost_chest_top_1`/`ghost_chest_top_2` collapsed to a single `ghost_chest_top`.
-
-**Removed outright — 3 names.** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top` have no successor spelling in the new registry — the content left the game with this build. `forge_hopper_top` is a genuinely new texture, not a verified rename.
-
-The raw spelling diff, for verification:
-
-```text
-+ 98 added (cnty9):
-alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
-auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
-belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
-burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
-chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
-chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
-crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
-crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
-darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
-electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
-iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
-moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
-pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
-shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
-sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
-tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
-wire_mill_top[rot[3, wire_mill_top[rot[4
-
-- 79 removed (sjr0p7):
-alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
-auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
-belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
-burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
-crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
-crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
-deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
-ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
-press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
-recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
-shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
-smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
-tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
-wire_mill_top_rot4
-```
-
 
 ---
 
 ## API v5 migration guide
-
 ### 69. v4 pack compatibility
 
 Packs created for API v4 are not compatible with API v5 without migration. Update the pack for v5 and set `apiVersion` in the manifest to the number `5`. It must be a JSON number, not the string `"5"`.
@@ -9180,4 +7191,4 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Y-derivatives are auto-negated in pack code.** The analyzer rewrites every call to `dpdy`, `dpdyCoarse` or `dpdyFine` into `(-dpdy(...))` — the screen-space y axis points down, so the negation makes "derivative with respect to up" match intuition. You write `dpdy(h)` expecting "how does h change going up"; the emitted code negates it for you. `dpdx` and the `fwidth` family are untouched. (Measured in the validator's token-rewrite pass; the dpdy family is specifically listed as the negation set.)
 - **Texture-name diagnostics got a spelling engine.** A name that starts with `bloxdTextureId` but doesn't resolve now gets a Levenshtein-powered suggestion: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?`"* — plus dedicated messages for frame spellings (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) and turned spellings (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*). The general reservation rule is restated in the diagnostics: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*, and *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 - **Only referenced texture constants are emitted.** The header's `bloxdTextureId*` block is generated per pack from the names you actually reference — a pack that uses three constants gets three `const` lines prepended, not the full ~900.
-- **`HEADER_VERSION` moved to `9.<hash>.<hash>`** — same two-suffix structure as v4 (fnv1a32 of the header material, fnv1a32 of the sorted name-id registry), with the leading integer bumped from 8 to 9. The stored-pack recheck logic (§55 of the [v4 guide](history/v5.md/v4.md)) is unchanged: a header/registry change flips stored packs to "needs re-check".
+- **`HEADER_VERSION` moved to `9.<hash>.<hash>`** — same two-suffix structure as v4 (fnv1a32 of the header material, fnv1a32 of the sorted name-id registry), with the leading integer bumped from 8 to 9. The stored-pack recheck logic (§55 of the [v4 guide](history/v4.md)) is unchanged: a header/registry change flips stored packs to "needs re-check".

@@ -25,6 +25,8 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 
 
 전체 사양이 필요하면 [API 레퍼런스](api/) 로, 완성품 효과는 [레시피](recipes/) 로 계속하라.
+
+
 ---
 
 ## 개요와 전제
@@ -59,6 +61,8 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 - 현행 게임은 `apiVersion: 5` 팩만 받는다. v1–v4 팩은 로드 시 거부된다 (저장 팩은 조용히 비활성 — [호환성](api/compatibility.md))
 - 구버전용으로 쓴 팩을 이주하고 있는가? [버전 히스토리](history/) 를 보라
 - 엔진 내부 설명은 참고 자료다. 지원되는 API 사양은 API 레퍼런스를 확인한다
+
+
 ---
 
 ## 요구 사항
@@ -468,77 +472,67 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 > 대상 API: 5 · 검증 상태: Analyzed (엔진 헤더와 검증기에서 복원)
 
 v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 보라.
+
+
 ---
 
 ## 팩 형식
-> 대상 API: 5 · preprod 확인) · 상태: Verified (라이브 로더에서 재실측)
+> 대상 API: 5 · 유형: API 참조
 
-매니페스트, 로더 제한, 프레임별 uniform — 팩 모델 전체를 한 페이지에 담는다. 단계별 버전은 [시작하기](getting-started/manifest.md) 에 있다.
+매니페스트, ZIP 아카이브 제한, 팩 uniform을 정리합니다. 설정 절차는 [시작하기](getting-started/manifest.md)를 확인하세요.
 
 ### pack.json
+
+`pack.json`을 ZIP 아카이브 루트에 두세요. JSON 객체여야 합니다.
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
-| 필드 | 형 | 필수 | 설명 |
+| 필드 | 형식 | 필수 | 설명 |
 |---|---|---|---|
-| `apiVersion` | number | 필수 | **`5` 와 엄밀히 같아야 한다** (`===`). 문자열 `"5"` 는 실패하며, JSON 철자 그대로 보고된다 |
-| `name` | string | 필수 | 트림 후 비어 있지 않을 것. 설정 화면에 표시된다 |
-| `author` | string | 선택 | 있으면 string 이어야 한다 |
-| `keepCircleShadows` | boolean | 선택 | **`bbb6l5` 신규** — 팩 셰이더가 실제 태양 섀도 API를 쓸 때도 플레이어/몹 아래의 옛 원형 섀도를 유지 ([섀도](guides/shadows.md)). 기본 `false`. 다른 타입은 전용 로드 메시지로 거부 |
+| `apiVersion` | number | 예 | 숫자 `5`를 지정합니다. 문자열은 허용되지 않습니다 |
+| `name` | string | 예 | 앞뒤 공백을 제거한 뒤 비어 있지 않은 이름 |
+| `author` | string | 아니요 | 작성자 이름 |
+| `keepCircleShadows` | boolean | 아니요 | `true`로 설정하면 그림자 API를 사용할 때도 기존 원형 그림자를 유지합니다 |
 
-매니페스트의 나머지는 모두 무시된다. `pack.json` 은 zip 루트에 정확히 하나의 JSON 객체여야 한다.
+### 로더 제한
 
-### 로더 제한 (라이브 c53 에서 재실측)
+| 항목 | 제한 |
+|---|---:|
+| 팩당 `.wgsl` 파일 수 | 256 |
+| 전체 `.wgsl` 소스 | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP 아카이브 | 32 MB |
+| ZIP 항목 수 | 1,024 |
 
-| 제한 | 값 | 초과 시 메시지 |
+분할 ZIP, Zip64, 암호화된 항목, 지원하지 않는 압축 방식은 지원하지 않습니다. 모든 파일을 UTF-8로 저장하고 아카이브에 중복 경로를 포함하지 마세요.
+
+### 팩 uniform
+
+팩 uniform은 80바이트이며 `@group(3) @binding(0)`에 바인딩됩니다.
+
+| 오프셋 | 필드 | 형식 |
 |---|---|---|
-| 팩당 `.wgsl` 파일 수 | 256 | `The pack has more than 256 .wgsl files.` |
-| `.wgsl` 소스 총량 | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` 크기 | 64 KB | `pack.json is over 64 KB.` |
-| zip 크기 | 32 MB | `The zip is over 32 MB.` |
-| zip 엔트리 수 | 1,024 | `The zip has more than 1024 entries.` |
-| zip 형태 | — | 분할 zip / zip64 / 암호화 / 미지원 압축은 각각 전용 메시지로 거부. 모든 파일은 유효한 UTF-8. `pack.json` 은 정확히 하나. 중복 경로 금지 |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-### API 버전 검사
+uniform의 최소 바인딩 크기는 80바이트입니다. 그룹 3의 다른 바인딩은 Liquid 베리언트용 씬 깊이 텍스처와 `bloxdSpTextureLayers` 스토리지 버퍼입니다.
 
-로더는 `manifest.apiVersion !== 5` 를 JavaScript 엄격 `!==` 로 비교한다. 버전 상수 `5` 와 헤더 템플릿은 같은 모듈 (c55 / 모듈 29836) 에 있으므로, 검증과 검증이 전제하는 헤더는 함께 움직인다. 불일치 메시지: [호환성](api/compatibility.md) 참조.
+### 관련 문서
 
-### 프레임별 uniform: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 64 바이트. 다만 v5 에서 멤버가 하나 늘었다 (라이브 uniform-레이아웃 모듈에서):
-
-| 오프셋 | 필드 | 형 | 비고 |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | `bloxdSeconds()` 의 기반 |
-| 4 | `lit` | `u32` | 블록/하늘 라이팅이 켜져 있으면 1. `bloxdLit()` 의 기반 |
-| 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` 의 기반 |
-| 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` 의 기반 |
-| 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` 의 기반 |
-| 64 | `shadowDirection` | `vec3f` | **`bbb6l5` 신규** — 그림자를 만드는 빛의 진행 방향. `bloxdShadowDirection()`의 뒷받침 |
-
-`lit` 은 v4 부터 있던 `seconds` 와 `renderOffset` 사이의 패딩에 들어갔다 (오프셋 4–15 는 정렬 틈이었고, `vec3i` 는 16바이트 정렬이 필요해 `renderOffset` 은 16 그대로다). 총 크기와 다른 모든 오프셋은 불변. 엔진은 `setUint32(4, lit ? 1 : 0)` 한 번으로 쓴다 — 라이트 레벨이 아니라 플래그다 (v4 의 JS 측 이름 `terrainLightLevels` / `terrainHeldLight` 는 번들에서 완전히 사라졌다).
-
-**팩에서 이 uniform 을 직접 참조하지 마라.** 헤더 함수 (`bloxdSeconds()` 등) 를 통해 쓴다. 스테이지 가시성이 VERTEX|FRAGMENT 이므로, 헤더 함수는 모듈 스코프 함수와 버텍스 훅에서도 동작한다.
-
-### 바인드 그룹 레이아웃
-
-| binding | 내용 |
-|---|---|
-| 0 | `bloxdPackInputs` uniform (80 B) |
-| 1 | 씬 깊이 텍스처 (액체 베리언트) |
-| 2 | `bloxdSpTextureLayers` 스토리지 버퍼 |
-
-`minBindingSize` 는 64 그대로다. 깊이 텍스처 (binding 1) 는 FRAGMENT 전용이며, 이것이 `bloxdOpaqueBehind()` 가 서피스/light 훅 전용인 이유다.
-
-### wgsl 연결
-
-여러 `.wgsl` 파일은 **경로명의 사전 순**으로 하나의 모듈에 연결된다. 모듈 스코프 선언은 순서 무관. `var` 초기화 순서만 영향을 줄 수 있다. `.wgsl` 이 아닌 파일은 무시된다.
+- [매니페스트 만들기](getting-started/manifest.md)
+- [API 참조](api/)
+- [API v5 마이그레이션 가이드](history/v5.md)
 
 
 ---
@@ -934,7 +928,7 @@ struct BloxdOpaqueBehind {
 ---
 
 ## 함수
-> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 유형: 기술 참조
 
 헤더의 모든 함수이다. 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 와 `bloxdOpaqueBehind` 는 [텍스처 API](api/texture-api.md) 에서 다룬다.
 
@@ -1076,7 +1070,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ### 섀도 함수
 
-\u0060bbb6l5\u0060 빌드는 엔진의 실제 태양/달 섀도 시스템(블록·플레이어·몹·아이템이 드리우는, 태양을 따라가는 투영 섀도)을 팩 API에 추가했습니다. 이 두 함수는 (\u0060bloxdFragmentBlockPosition\u0060처럼) **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+\u0060API v5\u0060 빌드는 엔진의 실제 태양/달 섀도 시스템(블록·플레이어·몹·아이템이 드리우는, 태양을 따라가는 투영 섀도)을 팩 API에 추가했습니다. 이 두 함수는 (\u0060bloxdFragmentBlockPosition\u0060처럼) **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
 
 #### bloxdShadow
 
@@ -1084,7 +1078,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 fn bloxdShadow() -> f32
 \u0060\u0060\u0060
 
-- **반환값**: 이 프래그먼트에 닿는 햇빛 또는 달빛 — **섀도에서 0, 비치면 1** — *`bbb6l5` 신규*
+- **반환값**: 이 프래그먼트에 닿는 햇빛 또는 달빛 — **섀도에서 0, 비치면 1** — *API v5 신규*
 - 섀도를 드리우는 것: **블록, 플레이어, 몹, 아이템** (1인칭 손에 든 아이템은 의도적으로 제외 — 몸이 돌면 자기가 자기를 가리기 때문)
 - 동작 (검증기 설명에서 그대로):
   - 해나 달이 지거나 면이 빛에서 돌아설 때 0으로 페이드
@@ -1099,7 +1093,7 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 \u0060\u0060\u0060
 
-- **반환값**: \u0060bloxdShadow()\u0060와 같지만 **카메라 (t = 0)와 이 프래그먼트 (t = 1) 사이의 점**에서 평가 — *`bbb6l5` 신규* — 빛 기둥용
+- **반환값**: \u0060bloxdShadow()\u0060와 같지만 **카메라 (t = 0)와 이 프래그먼트 (t = 1) 사이의 점**에서 평가 — *API v5 신규* — 빛 기둥용
 - 특성 (검증기 설명에서 그대로):
   - **블록만 드리움** (플레이어·몹은 제외), **블록 단위로 블러**
   - \u0060t\u0060는 0–1로 클램프
@@ -1133,7 +1127,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## 라이팅
-> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 유형: 기술 참조
 
 v5 는 라이팅 API 를 공개했다. 엔진이 내부에서 하던 일 (`litColour` 를 만드는 것) 을 이제 팩에서 호출할 수 있다. 이 페이지는 라이팅의 입력·함수·처리 순서를 하나의 체계로 다룬다.
 
@@ -1317,7 +1311,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 API
-> 대상 API: 5 · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
+> 대상 API: 5 · 유형: 기술 참조
 
 게임 자신의 텍스처를 읽는 API: 함수 2개, 이름 상수 계열, 입력 필드 4개. 헤더 자신의 한 줄 요약: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1423,15 +1417,10 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 #### 이름 해석 오류 (검증기에서 그대로)
 
 > **접두사 오철자 / 대소문자:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
-> 
 > **애니메이션 프레임:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
-> 
 > **회전 사본:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
-> 
 > **접은 뒤 모호:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
-> 
 > **미발견 (제안 있음):** `There's no texture called X. Did you mean bloxdTextureIdY?` — 제안 임계값은 레벤슈타인 거리 `max(2, floor(len/4)) + 1`
-> 
 > **미발견 (제안 없음):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
 > 이 메시지의 `BLOCK_TEXTURES.md` 는 게임 자신의 내부 텍스처명 목록으로, 엔진 검증기가 참조하는 것이다 — 이 사이트의 페이지가 아니다. 여기서의 대응물은 [텍스처 카탈로그](api/texture-catalog.md) 다.
@@ -1752,81 +1741,52 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 호환성
-> 대상 API: 5 · preprod 확인) · 상태: Verified
+> 대상 API: 5 · 유형: API 참조
 
-현행 게임과 구버전 팩이 서로 어떻게 맞물리는지에 대한 설명이다.
+현재 게임에서 허용하는 셰이더 팩 API 버전과 이전 버전으로 저장한 팩의 처리 방식을 설명합니다.
 
-### 받아들이는 버전
+### 허용되는 API 버전
 
-**`apiVersion: 5` 뿐이다.** 로더는 `manifest.apiVersion !== 5` 를 엄격히 비교하며, v1/v2/v3/v4 팩은 **로드하는 그 순간 실패한다**. 다중 버전 병행 수용은 존재하지 않는다.
+현재 게임은 매니페스트의 `apiVersion`이 숫자 `5`인 팩만 허용합니다. 문자열 `"5"`는 허용되지 않습니다. API v1~v4용으로 만든 팩은 마이그레이션해야 로드할 수 있습니다.
 
-### 로드 시점 메시지 (라이브 i18n 사전에서 그대로 인용)
+### 로드 시 메시지
 
-- `pack.json needs "apiVersion": {{version}}.` — `apiVersion` 키가 빠져 있다
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 키는 있지만 5가 아니다
+- `pack.json needs "apiVersion": {{version}}.` — `apiVersion` 키가 없는 경우
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 지정한 버전이 현재 버전과 다른 경우
 
-### 저장된 구버전 팩 (예외 없음 — 조용한 비활성화)
+### 이전 버전으로 저장한 팩
 
-과거에 저장한 v1–v4 팩은 예외를 던지지 않는다. 저장 팩의 결과는:
+이전 API 버전으로 저장한 팩은 현재 게임에서 실행되지 않습니다. 셰이더 팩 설정 화면에 지원되지 않는 버전이라는 안내가 표시됩니다. 해당 마이그레이션 가이드에 따라 팩을 업데이트하세요.
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+### 저장된 팩 재검증
 
-로 귀결되며, 팩은 **조용히 비활성**이 된다. 이유를 설명해 주는 곳은 셰이더 팩 설정 탭뿐이다:
+엔진이 제공하는 헤더나 텍스처 이름 정의가 바뀌면 저장된 팩을 다시 검증합니다. 재검증은 게임을 불러올 때 자동으로 수행됩니다. 팩 코드에서는 변경될 수 있는 숫자 ID 대신 이름 상수로 텍스처를 참조하세요.
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+### 실행 환경 호환성
 
-### v4 → v5 변환의 성격
+- **WebGPU:** 셰이더 팩에는 WebGPU를 지원하는 렌더러가 필요합니다.
+- **모바일:** WebGPU를 지원하지 않는 환경에서는 셰이더 팩을 사용할 수 없습니다 ([요구 사항](getting-started/requirements.md)).
+- **텍스처 접근:** 텍스처 아틀라스를 사용하지 않는 렌더러 구성에서는 `bloxdTexel`과 `bloxdTextureSize`가 일반적인 아틀라스 텍스처 접근을 제공하지 않습니다 ([텍스처 API](api/texture-api.md)).
 
-변환은 대부분 기계적이다 (전체 체크리스트는 [v5 마이그레이션 가이드](history/v5.md) 에 있다):
+### API 버전 지원
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 개명)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 호출 지점은 여전히 컴파일된다 (엔진이 주입한다). 다만 이제는 문서화되지 않았으므로, 여기서 벗어나 이주하는 것이 안전한 선택이다 ([함수](api/functions.md#bloxdfragmentblockposition--문서화되지-않았지만-여전히-주입된다))
-- `pack.json` 을 `"apiVersion": 5` 로 올린다
-
-이번 판의 조용한 함정: `blockFlags` 를 계속 읽거나 light 훅을 `#ifdef BLOXD_LIGHTING` 으로 감싼 채인 팩은 **전용 메시지와 함께 검증에 실패한다** (분석기가 이제 이 두 경우를 모두 설명한다). 즉 조용히 오동작하는 일은 없고, 이주할 때까지 계속 거부될 뿐이다.
-
-### 저장 팩 재검증 (「재확인 필요」)
-
-`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` 이다 (선두 정수는 v4 의 8 에서 9 로 올라갔다). 엔진의 헤더나 텍스처 레지스트리가 바뀌면 (게임 업데이트 때 흔하다) 저장 팩은 「재확인 필요」 로 표시되고, 페이지 로드 시 자동으로 재검증된다.
-
-**v98qt8 유의사항:** 현행 빌드의 폴딩 회귀([엔진 내부: 텍스처 레지스트리](internals/texture-registry.md#the-v98qt8-folding-regression))가 엔진이 해시하는 대상을 바꿉니다 — 계산되는 레지스트리 접미사는 *폴딩되지 않은* 1,047행 표(`694df62c`)이지 의도된 폴디드 906행 표(`df6c1915`, `bny9u`에서는 `e735ebdc`)가 아닙니다. 그래서 저장된 모든 팩이 이 빌드에서 재검증되며, 43개 애니메이션 계열 기본 이름(`lava` 등) 중 하나를 참조하는 팩은 엔진 측이 고쳐질 때까지 재검증에 **실패**합니다 — 그래도 폴디드 이름으로 쓰십시오. 그것이 API입니다.
-
-
-레지스트리 이동의 실측 예 (10일 간격의 두 빌드): 엔트리 1200 → 1219 (98개 추가, 79개 삭제). 그리고 철자를 유지한 이름 중에서 **1121개 가운데 779개가 id 가 바뀌었다**. 다시 말해:
-
-- **이름 (`bloxdTextureIdLava`) 으로 쓴 팩은 드리프트를 견딘다** (로더가 라이브 레지스트리에 대해 다시 해석한다)
-- **원시 id (`19`) 로 쓴 팩은 재검증에서 깨진다**
-
-상세는 [엔진 내부와 연구: 텍스처 레지스트리](internals/texture-registry.md).
-
-### 실행 환경
-
-- **WebGPU 렌더러 전용**: 팩을 설치하면 WebGPU 렌더러가 강제로 켜진다
-- **모바일**: WebGPU가 제한된 환경에서는 팩을 아예 실행할 수 없다 ([요구 사항](getting-started/requirements.md))
-- **비아틀라스 렌더러 구성**: `bloxdTexel` / `bloxdTextureSize` 는 스텁으로 퇴화한다 (흰 텍셀, 1×1). 코드 자체는 여전히 컴파일되고 실행된다 ([텍스처 API](api/texture-api.md#텍스처-api-가-갈-수-없는-곳))
-
-### 버전 지원 요약
-
-| API 버전 | 가동 개시 | 현행 게임에서의 취급 |
-|---|---|---|
-| v1 | — | 로드 시 거부 ([v2](history/v2.md) 경유로 이주) |
-| v2 | — | 로드 시 거부 |
-| v3 | 2026-10-19 | 로드 시 거부 |
-| v4 | 2026-10-26 | 로드 시 거부 |
-| **v5** | **2026-11-03** | **현행** |
+| API 버전 | 현재 게임 지원 |
+|---|---|
+| v1 | 로드 시 거부 |
+| v2 | 로드 시 거부 |
+| v3 | 로드 시 거부 |
+| v4 | 로드 시 거부 |
+| **v5** | **현재 버전** |
 
 ### 관련 문서
 
-- [v5 마이그레이션 체크리스트](history/v5.md) · [버전 히스토리](history/)
+- [v4에서 v5로 마이그레이션](history/v5.md)
+- [버전 히스토리](history/)
 
 
 ---
 
 ## 텍스처 카탈로그
-
 ### 읽는 법
 
 **이름** 열에는 사용할 텍스처 이름이 표시됩니다. 예를 들어 `grass_top`은 `bloxdTextureIdGrassTop`으로 참조합니다. 대소문자와 밑줄은 구별하지 않습니다.
@@ -2927,9 +2887,12 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 ### 관련 문서
 
-- [텍스처 API](api/texture-catalog.md/texture-api.md) — 이름 해석과 샘플링
-- [텍스처 레지스트리 작동 방식](api/internals/texture-registry.md) — 이름 상수의 동작
-- [텍스처 샘플링 내부](api/internals/texture-sampling.md) — 샘플링 방식
+- [텍스처 API](api/texture-api.md) — 이름 해석과 샘플링
+- [텍스처 레지스트리 작동 방식](internals/texture-registry.md) — 이름 상수의 동작
+- [텍스처 샘플링 내부](internals/texture-sampling.md) — 샘플링 방식
+
+
+---
 
 ## 가이드
 「구조와 사고방식」을 설명하는 자료다. 애초에 무엇이 가능한지는 [셰이더 팩으로 되는 것과 안 되는 것](guides/constraints.md) 에 정리되어 있다. 목적별 코드 예시는 [레시피](recipes/) 로 나뉘어 있다.
@@ -2979,8 +2942,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 그림자
-> 대상 API: 5 · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
-> **`bbb6l5`부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록 · 플레이어 · 몹 · 아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](api/functions.md)를 보세요.
+> 대상 API: 5 · 유형: 기술 참조
+> **API v5부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록 · 플레이어 · 몹 · 아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](api/functions.md)를 보세요.
 
 
 셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
@@ -3046,6 +3009,7 @@ let lit = sunL * sky;
 ### 관련 문서
 
 - [리얼화 레시피](recipes/realism.md) (투영 그림자 전체 레시피) · [라이팅의 내부](internals/lighting-internals.md) · [디버깅 팁](guides/debugging.md)
+
 
 ---
 
@@ -3222,7 +3186,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 리얼화의 두 유파
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · 유형: 기술 참조
 
 **유파 A: 가산 수정 (defaultLight 기점)** — `engineColour` (완성색) 를 바탕으로, 난색 글로우나 림을 더한다. 간편하고 안전하지만 조명 모델 자체는 기존 그대로.
 
@@ -3316,6 +3280,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - [모델과 텍스처](guides/models.md) — 모델 파이프라인이 어디까지 닿는가
 - [호환성](api/compatibility.md) — 구버전 팩의 거동
 - 이 제한들의 버전별 변화: [버전 히스토리](history/)
+
 
 ---
 
@@ -3948,7 +3913,6 @@ let phase = t * 0.15;
 ## 리얼화
 > 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 「바닐라의 겉모습을 소재에서 다시 짜는」 물리계 레시피집. 먼저 이 전제들을 읽을 것:
-> 
 > 1. **light 훅은 프래그먼트의 최종단에서 불린다**. 반환한 colour 가 그대로 최종색. **직접 포그를 다시 걸 필요가 있다** (R9.10)  
 > 2. **엔진 기존의 조명은 곱셈뿐**. 스페큘러 / 프레넬 / 난색-냉색 분리 / 반구 환경광은 제로에서 만든다  
 > 3. `l.engineColour` 는 완성색 (포그 완료). 버리고 `s.colour` (알베도) 에서 다시 짜는 것이 본격파  
@@ -4186,14 +4150,12 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > **전제 재확인 (10장)**: `l.skyLight` 는 생 voxel 값 (n/15) 이 아니라 엔진이 「리프트 곡선」  
 > `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 통과시킨 후의 값.
-> 
 > | 장소 | voxel 생값 | 리프트 후 (= l.skyLight) | pow( · , 5.0) |  
 > |---|---|---|---|  
 > | 열린 하늘 | 1.00 | 1.00 | 1.00 |  
 > | 나무 밑 (반경2) | 0.87 | **0.97** | **0.86** ← 거의 무손상 |  
 > | 반경3 | 0.80 | **0.92** | 0.66 |  
 > | 반경5 | 0.67 | 0.78 | 0.29 |
-> 
 > **이것이 「감마를 올려도 그림자가 짙어지지 않는다」 의 원인** (수치로 증명). 그러나 곡선은 단조이므로 대수적으로 엄밀히 역변환할 수 있다:  
 > `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. 생값을 복원하면, 후는**임계값 커트** (`smoothstep`) 로 이값화할 뿐.  
 > LightEngine 의 BFS 옆확산은 「인접 1 블록 = -1」 이므로, 임계값 `th = 1 - r/15` 는 그대로  
@@ -4903,7 +4865,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 문제
-> 대상 API: 5 · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
+> 대상 API: 5 · 유형: 기술 참조
 
 `bloxdTextureId*` / `bloxdTexel` 관련 문제. 896 이름 전체는 [텍스처 카탈로그](api/texture-catalog.md) 에서 검색하라.
 
@@ -5117,7 +5079,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ와 법적 주석
-> 대상 API: 5 · preprod 확인) · 상태: Verified
+> 대상 API: 5 · 유형: 기술 참조
 
 ### 자주 묻는 질문
 
@@ -5166,44 +5128,45 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 ---
 
-## 엔진 내부
-
-이 분류는 셰이더 팩의 실행을 이해하는 데 도움이 되는 엔진 내부 동작을 설명합니다. 구현 세부 사항은 게임 업데이트에 따라 바뀔 수 있습니다. 안정적인 사용 규칙과 지원 API는 [API 참조](internals/api)를 확인하세요.
+## 엔진 내부와 연구
+이 분류는 셰이더 팩의 실행을 이해하는 데 도움이 되는 엔진 내부 동작을 설명합니다. 구현 세부 사항은 게임 업데이트에 따라 바뀔 수 있습니다. 안정적인 사용 규칙과 지원 API는 [API 참조](api/)를 확인하세요.
 
 ### 구성
 
 | 페이지 | 내용 |
 |---|---|
-| [렌더링 파이프라인](internals/index.md/rendering-pipeline.md) | alphaTest 위치, 2광원 구성, uniform 의 실상, greedy 메싱 |
-| [훅 호출](internals/index.md/hook-invocation.md) | 훅이 엔진의 WGSL 에 어떻게 이어지는가 |
-| [엔진 헤더](internals/index.md/engine-header.md) | 셰이더 팩 앞에 추가되는 WGSL 선언 |
-| [셰이더 검증](internals/index.md/shader-validation.md) | 분석기 내부, 시그니처 표, HEADER_VERSION |
-| [WGSL 컴파일](internals/index.md/wgsl-compilation.md) | 2단계 진짜 컴파일과 검증 스텁 |
-| [예약 식별자](internals/index.md/reserved-identifiers.md) | 46개 `bloxdSp*` 심볼 |
-| [라이팅의 내부](internals/index.md/lighting-internals.md) | blockLight / heldLight 의 구조 |
-| [포그의 내부](internals/index.md/fog-internals.md) | 선형뿐, 32블록 기울기대 |
-| [텍스처 샘플링](internals/index.md/texture-sampling.md) | 3변형 텍스처 코드젠 |
-| [텍스처 레지스트리](internals/index.md/texture-registry.md) | 이름 해석, 애니메이션 및 회전 이름 |
-| [모델 렌더링](internals/index.md/model-rendering.md) | v5 의 Model 프로그램 |
-| [엔진 데이터](internals/index.md/engine-data.md) | API v5 기능 및 팩 제한 |
-| [테스트 요인](internals/index.md/testing-factors.md) | 월드·플레이어 설정 중 팩 가시값을 바꾸는 것 |
-| [정책](internals/index.md/policy.md) | shaderPackPolicy — allow 12 타이틀 |
-| [태양과 달](internals/index.md/sun-and-moon.md) | bloxdSunDirection 에 무엇이 흐르는가 |
-| [디버깅](internals/index.md/debugging.md) | URL 파라미터, 통계 패널 |
+| [렌더링 파이프라인](internals/rendering-pipeline.md) | alphaTest 위치, 2광원 구성, uniform 의 실상, greedy 메싱 |
+| [훅 호출](internals/hook-invocation.md) | 훅이 엔진의 WGSL 에 어떻게 이어지는가 |
+| [엔진 헤더](internals/engine-header.md) | 셰이더 팩 앞에 추가되는 WGSL 선언 |
+| [셰이더 검증](internals/shader-validation.md) | 분석기 내부, 시그니처 표, HEADER_VERSION |
+| [WGSL 컴파일](internals/wgsl-compilation.md) | 2단계 진짜 컴파일과 검증 스텁 |
+| [예약 식별자](internals/reserved-identifiers.md) | 46개 `bloxdSp*` 심볼 |
+| [라이팅의 내부](internals/lighting-internals.md) | blockLight / heldLight 의 구조 |
+| [포그의 내부](internals/fog-internals.md) | 선형뿐, 32블록 기울기대 |
+| [텍스처 샘플링](internals/texture-sampling.md) | 3변형 텍스처 코드젠 |
+| [텍스처 레지스트리](internals/texture-registry.md) | 이름 해석, 애니메이션 및 회전 이름 |
+| [모델 렌더링](internals/model-rendering.md) | v5 의 Model 프로그램 |
+| [엔진 데이터](internals/engine-data.md) | API v5 기능 및 팩 제한 |
+| [테스트 요인](internals/testing-factors.md) | 월드·플레이어 설정 중 팩 가시값을 바꾸는 것 |
+| [정책](internals/policy.md) | shaderPackPolicy — allow 12 타이틀 |
+| [태양과 달](internals/sun-and-moon.md) | bloxdSunDirection 에 무엇이 흐르는가 |
+| [디버깅](internals/debugging.md) | URL 파라미터, 통계 패널 |
 
 
-엔진 내부 구현은 안정적인 API 계약이 아닙니다. 팩을 작성할 때는 [API 참조](internals/api)의 공개 사양을 우선하세요.
+엔진 내부 구현은 안정적인 API 계약이 아닙니다. 팩을 작성할 때는 [API 참조](api/)의 공개 사양을 우선하세요.
+
+
+---
 
 ## 렌더링 파이프라인
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 - **surface 훅은 alphaTest 의 「앞」 에서 돈다**: `out.alpha` 가 그대로 discard 판정에 쓰인다. 컷아웃 소재 (풀·잎) 에서는 디더 패턴으로 녹는 듯한 이펙트를 만들 수 있다 (레시피 R-C). 액체 (블렌딩) 에서는 `out.alpha` 가 실제 투명도가 된다 (레시피 R-D). 통상 불투명 지형에서는 alpha 가 끝내 무시된다
 - **`l.ambient` 의 내용**은 `material.ambient × sceneAmbient` 로 소재마다 다른 값이다. 씬측은 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5) 에 직결되어 있으므로, 기본값 때려박기를 하지 않는다
 - **씬의 방위광은 2등 구성**: 주광 (방향은 스카이 설정의 태양 위치에 유래·강도 1.0) 과 필광 (방향 `[-0.5, -1, -1]`·강도 0.35) 의 Lambert 합이 `l.directional` 로 도착한다. 필광은 방향이 아래를 향하므로 윗면에는 기여하지 않고, 아래를 향한 면 (동굴 천장 등) 을 집는다. 지형이 고려하는 것은 `_initScene` 으로 추가된 등뿐이며, 기동 후에 씬에 추가한 등은 지형·블록 모델에서 무시된다 (공식 경고 문구가 있다)
 - **`bloxdSeconds()` 의 정체는 `performance.now()`** 이다: 브라우저의 기동 경과 시간을 1시간으로 감은 값. 게임 안 낮밤이나 월드 경과 시간과 무관하다. 게임 안 시계와 동기된 애니메이션을 만들고 싶으면, 낮밤 사이클 구현 월드의 `bloxdSunDirection()` 방위각에서 추정하는 것이 현실적이다
-- **헤더 함수는 uniform 하나를 읽는다**: 엔진은 `@group(3) @binding(0)` 에 64바이트 `bloxdPackInputs` uniform (seconds / lit / renderOffset / sunDirection / eyePosition 의 5슬롯·little-endian) 을 두고 있으며, `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 이 각 슬롯의 읽기에 해당한다 ([팩 형식: 프레임당 uniform](internals/api/pack-format.md#프레임별-uniform-bloxdpackinputs)). 팩에서 이 uniform 을 고쳐 쓸 수는 없고, 팩과 엔진의 WGSL은 같은 모듈로 합성되므로, 같은 group/binding 을 자신이 선언할 수도 없다. `@group(3) @binding(1)` 에는 액체의 씬 깊이 텍스처가, `@binding(2)` 에는 `bloxdSpTextureLayers` 스토리지 버퍼가 실린다.
-- **정점 데이터는 메셔 (Web Worker) 가 만든다**: 블록의 지형을 1정점 28바이트 (아틀라스 있음은 32바이트) 의 인터리브로 정리하고, 위치 = float32×3 / 법선 = 8bit 신호 정수×4 / 색 = 8bit 준정수×4 (`s.colour` 의 실체 — tint × AO 가 메셔 시점에 8bit 로 구워져, 팩에서 분리·복원은 원리적으로 불가) / UV = float32×2 / atlasIndex = float32. 라이트 레벨만은 독립된 4바이트 정점 버퍼로 운반된다 (실측값: [엔진 데이터 장부](internals/rendering-pipeline.md/engine-data.md)). 정점은 청크 단위의 instancing 으로 그려진다
+- **헤더 함수는 uniform 하나를 읽는다**: 엔진은 `@group(3) @binding(0)` 에 64바이트 `bloxdPackInputs` uniform (seconds / lit / renderOffset / sunDirection / eyePosition 의 5슬롯·little-endian) 을 두고 있으며, `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 이 각 슬롯의 읽기에 해당한다 ([팩 형식: 프레임당 uniform](api/pack-format.md#프레임별-uniform-bloxdpackinputs)). 팩에서 이 uniform 을 고쳐 쓸 수는 없고, 팩과 엔진의 WGSL은 같은 모듈로 합성되므로, 같은 group/binding 을 자신이 선언할 수도 없다. `@group(3) @binding(1)` 에는 액체의 씬 깊이 텍스처가, `@binding(2)` 에는 `bloxdSpTextureLayers` 스토리지 버퍼가 실린다.
+- **정점 데이터는 메셔 (Web Worker) 가 만든다**: 블록의 지형을 1정점 28바이트 (아틀라스 있음은 32바이트) 의 인터리브로 정리하고, 위치 = float32×3 / 법선 = 8bit 신호 정수×4 / 색 = 8bit 준정수×4 (`s.colour` 의 실체 — tint × AO 가 메셔 시점에 8bit 로 구워져, 팩에서 분리·복원은 원리적으로 불가) / UV = float32×2 / atlasIndex = float32. 라이트 레벨만은 독립된 4바이트 정점 버퍼로 운반된다 (실측값: [엔진 데이터 장부](internals/engine-data.md)). 정점은 청크 단위의 instancing 으로 그려진다
 - 로딩 때 청크 경계의 미세 체크무늬는 엔진의 화면 공간 Bayer 4×4 디더 청크 페이드이며, 팩 유래 버그가 아니다 (그래픽 설정의 `chunkFadeIn` 을 끄면 무효화할 수 있다)
 - **`mod` 는 예약어**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` 로 거부된다. 나머지는 `%` 연산자로 쓴다
 
@@ -5265,8 +5228,10 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 훅 호출의 내부
 
+---
+
+## 훅 호출의 내부
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 엔진이 런타임에 훅을 부르는 방식. 쓰는 코드에는 아무것도 바뀌지 않지만, 훅이 무엇을 받는지에 대한 추측이 사라진다.
@@ -5284,9 +5249,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 접합이 강제하는 것
 
-- **strict 지형은 서피스 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되돌리기 쓰기는 액체 프로그램이나 비strict 베리언트에만 이식된다 — 매크로 표 뒤의 구현이다 ([전처리기](internals/api/preprocessor.md))
+- **strict 지형은 서피스 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되돌리기 쓰기는 액체 프로그램이나 비strict 베리언트에만 이식된다 — 매크로 표 뒤의 구현이다 ([전처리기](api/preprocessor.md))
 - **버텍스 훅을 선언한 strict 베리언트는 그것을 결코 실행하지 않는다.** 엔진이 빌드 시점에 보고한다: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. 템플릿의 `#ifndef BLOXD_STRICT` 이 이 때문이다
-- **`bloxdSp*` 식별자**는 엔진 임시변수다 — 당신의 코드에는 보이지 않지만 진단과 리버스 엔지니어링 출력에는 나타난다 ([예약 식별자](internals/hook-invocation.md/reserved-identifiers.md) — v5 에서 46개)
+- **`bloxdSp*` 식별자**는 엔진 임시변수다 — 당신의 코드에는 보이지 않지만 진단과 리버스 엔지니어링 출력에는 나타난다 ([예약 식별자](internals/reserved-identifiers.md) — v5 에서 46개)
 - **기본 서피스 지름길.** 어떤 베리언트의 서피스 훅이 문자 그대로 `bloxdDefaultSurface` 면, 엔진은 `baseColor` / `alpha` 되돌리기 이식을 통째로 생략한다 — 기본값이 이미 그 값을 만들므로 대입은 죽은 코드다. **손대지 않은 훅 체인은 비용이 없다**
 
 ### v5 에서 바뀐 것
@@ -5295,8 +5260,8 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - `vBlockFlags` (비트) → **`BloxdFlags` 구조체** (`bloxdSpFlags` 경유 전달)
 - `litColour` 캡처가 엔진 내부물에서 **공개 API** 로 (`bloxdLitColour()` — v4 의 `bloxdSpLitColour` 승격)
-- `BloxdLightIn` 이 `diffuse` / `emissive` 를 얻었고, `bloxdShading()` 이 머티리얼 응답을 재구축한다 ([라이팅](internals/api/lighting.md))
-- `localPosition` (`bloxdSpItemLocalPosition`), 인챈트 입력 (`bloxdSpEnchant`), `overlayColour` 의 전달 ([모델 렌더링](internals/hook-invocation.md/model-rendering.md))
+- `BloxdLightIn` 이 `diffuse` / `emissive` 를 얻었고, `bloxdShading()` 이 머티리얼 응답을 재구축한다 ([라이팅](api/lighting.md))
+- `localPosition` (`bloxdSpItemLocalPosition`), 인챈트 입력 (`bloxdSpEnchant`), `overlayColour` 의 전달 ([모델 렌더링](internals/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (반전)
 - Model 프로그램이 베리언트 매트릭스에 합류 (3 프로그램 × 2 모드 = 6베리언트)
 
@@ -5305,34 +5270,36 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | 필드 | 엔진 측 출처 |
 |---|---|
 | `litColour` | 포그 믹스 직전에 캡처된 프래그먼트색 — 헤더 표현으로 「emission 과 포그 이전」 |
-| `directional` | 방향광별 Lambert 의 버텍스 보간 합 ([렌더링 파이프라인](internals/hook-invocation.md/rendering-pipeline.md) 의 2광원 구성) |
+| `directional` | 방향광별 Lambert 의 버텍스 보간 합 ([렌더링 파이프라인](internals/rendering-pipeline.md) 의 2광원 구성) |
 | `diffuse` / `emissive` | 머티리얼의 방향광 RGB 응답 / RGB 발광 |
 | `ambient` | `material.ambient × sceneAmbient` — 머티리얼별, 프레임별 |
-| `blockLight` / `skyLight` | 디코딩된 라이트 레벨 베리링 ([라이팅의 내부](internals/hook-invocation.md/lighting-internals.md)) |
+| `blockLight` / `skyLight` | 디코딩된 라이트 레벨 베리링 ([라이팅의 내부](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | 대응하는 uniform |
-| `heldLight` | 라이트 레벨 베리링과 held-light uniform 으로 구축 (원뿔 감쇠는 [라이팅의 내부](internals/hook-invocation.md/lighting-internals.md)) |
+| `heldLight` | 라이트 레벨 베리링과 held-light uniform 으로 구축 (원뿔 감쇠는 [라이팅의 내부](internals/lighting-internals.md)) |
 | `fogColour` | 완전히 포그 없는 장면 (모드 0) 에서만 검정 |
-| `fogAlpha` | 클램프된 포그 계수 ([포그의 내부](internals/hook-invocation.md/fog-internals.md)) |
+| `fogAlpha` | 클램프된 포그 계수 ([포그의 내부](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | 베리링과 플랫 보간값 (`BloxdSurfaceIn` 과 동일 — 버텍스 훅 적용 후의 값) |
 
 ### 관련 문서
 
-- [셰이더 훅](internals/api/hooks.md) · [렌더링 파이프라인](internals/hook-invocation.md/rendering-pipeline.md) · [예약 식별자](internals/hook-invocation.md/reserved-identifiers.md) · [버전 히스토리: v3](internals/history/v3.md)
+- [셰이더 훅](api/hooks.md) · [렌더링 파이프라인](internals/rendering-pipeline.md) · [예약 식별자](internals/reserved-identifiers.md) · [버전 히스토리: v3](history/v3.md)
+
+
+---
 
 ## 엔진 헤더 (그대로)
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-엔진이 셰이더 팩 앞에 추가하는 WGSL 헤더의 참조 텍스트입니다. 각 필드와 함수의 의미는 [API 참조](internals/api)를 확인하세요.
+엔진이 셰이더 팩 앞에 추가하는 WGSL 헤더의 참조 텍스트입니다. 각 필드와 함수의 의미는 [API 참조](api/)를 확인하세요.
 
 읽기용 가이드:
-- 필드별 해설 → [구조체](internals/api/structures.md)
-- 함수별 해설 → [함수](internals/api/functions.md) / [라이팅](internals/api/lighting.md)
-- 플래그 (BloxdFlags) → [플래그](internals/api/flags.md)
-- `bloxdTextureId*` 블록은 이 헤더에 **없다** — 참조된 이름에서 팩마다 생성된다 ([텍스처 API](internals/api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` 는 조건부 필드를 표시한다 ([전처리기](internals/api/preprocessor.md))
-- v4 헤더 (6,021B) 와의 차분 → [버전 히스토리: v5](internals/history/v5.md)
-- 헤더가 검증에 쓰이는 구조 (HEADER_VERSION) → [셰이더 검증](internals/engine-header.md/shader-validation.md)
+- 필드별 해설 → [구조체](api/structures.md)
+- 함수별 해설 → [함수](api/functions.md) / [라이팅](api/lighting.md)
+- 플래그 (BloxdFlags) → [플래그](api/flags.md)
+- `bloxdTextureId*` 블록은 이 헤더에 **없다** — 참조된 이름에서 팩마다 생성된다 ([텍스처 API](api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` 는 조건부 필드를 표시한다 ([전처리기](api/preprocessor.md))
+- v4 헤더 (6,021B) 와의 차분 → [버전 히스토리: v5](history/v5.md)
+- 헤더가 검증에 쓰이는 구조 (HEADER_VERSION) → [셰이더 검증](internals/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5554,21 +5521,23 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 관련 문서
 
-- [API 레퍼런스](internals/api) — 이 헤더의 주석 달린 버전
-- [셰이더 검증](internals/engine-header.md/shader-validation.md) — HEADER_VERSION 과 저장 팩 재검증
-- [엔진 데이터](internals/engine-header.md/engine-data.md) — 실측 대장
+- [API 레퍼런스](api/) — 이 헤더의 주석 달린 버전
+- [셰이더 검증](internals/shader-validation.md) — HEADER_VERSION 과 저장 팩 재검증
+- [엔진 데이터](internals/engine-data.md) — 실측 대장
+
+
+---
 
 ## 셰이더 검증의 내부
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](internals/troubleshooting/validation.md).
+정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](troubleshooting/validation.md).
 
 ### 단계들
 
-1. **로더 제한** (zip / pack.json 형태) → [팩 형식](internals/api/pack-format.md)
+1. **로더 제한** (zip / pack.json 형태) → [팩 형식](api/pack-format.md)
 2. **정적 검증 (분석기)** — 이 페이지. 구문, 형, 예약명, 6베리언트 전체의 훅 계약
-3. **브라우저의 진짜 컴파일** → [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md)
+3. **브라우저의 진짜 컴파일** → [WGSL 컴파일](internals/wgsl-compilation.md)
 4. **게임 참가 시점의 런타임 재검증** — 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다
 
 ### 특수 함수 시그니처 표
@@ -5598,7 +5567,7 @@ const Jq = new Map([
 
 ### 텍스처명 해석과 진단
 
-`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](internals/api/texture-api.md#이름-해석-오류-검증기에서-그대로)):
+`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](api/texture-api.md#이름-해석-오류-검증기에서-그대로)):
 
 - **접기**: 비영숫자로 분할, CamelCase, `bloxdTextureId` 접두. 역방향 대조는 대소문자/언더스코어 무관
 - **철자 제안** (v5 신규): 일치하지 않는 이름에 임계값 `max(2, floor(len/4)) + 1` 의 레벤슈타인 제안
@@ -5612,34 +5581,36 @@ const Jq = new Map([
 
 ### Y 도함수 재작성
 
-분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](internals/api/restrictions.md#자동-재작성)).
+분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](api/restrictions.md#자동-재작성)).
 
 ### 헤더·텍스처 상수 생성
 
-- 헤더는 읽기 전용으로 앞에 붙는다 ([엔진 헤더](internals/shader-validation.md/engine-header.md))
+- 헤더는 읽기 전용으로 앞에 붙는다 ([엔진 헤더](internals/engine-header.md))
 - `bloxdTextureId*` 블록은 참조된 이름에서 **팩마다** 생성된다
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](internals/api/compatibility.md#저장-팩-재검증-재확인-필요)).
+`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 ### 검증 스텁
 
-정적 검증을 통과한 코드에는, 브라우저의 진짜 WGSL 검사 전에 스텁 코드가 합성된다: `var<private> bloxdValidationP: vec4f` 와 `bloxdValidateVertex` / `bloxdValidateFragment` — 형 스텁 표 (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) 가 입력 구조체를 구축해 훅을 부른다. 상세: [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md).
+정적 검증을 통과한 코드에는, 브라우저의 진짜 WGSL 검사 전에 스텁 코드가 합성된다: `var<private> bloxdValidationP: vec4f` 와 `bloxdValidateVertex` / `bloxdValidateFragment` — 형 스텁 표 (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) 가 입력 구조체를 구축해 훅을 부른다. 상세: [WGSL 컴파일](internals/wgsl-compilation.md).
 
 ### 관련 문서
 
-- [검증 오류](internals/troubleshooting/validation.md) · [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md) · [텍스처 레지스트리](internals/shader-validation.md/texture-registry.md) · [엔진 데이터](internals/shader-validation.md/engine-data.md)
+- [검증 오류](troubleshooting/validation.md) · [WGSL 컴파일](internals/wgsl-compilation.md) · [텍스처 레지스트리](internals/texture-registry.md) · [엔진 데이터](internals/engine-data.md)
+
+
+---
 
 ## WGSL 컴파일의 내부
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 두 번째 검증 단계 — 브라우저의 WGSL 컴파일러를 통한 진짜 컴파일 — 과 v5 의 검증 스텁.
 
 ### 두 단계인 이유
 
-정적 검증의 형 검사는 불완전하므로, 어떤 실수는 여기서만 드러난다 (예: `mixing '*' and '^' requires parenthesis` 같은 WGSL 연산자 우선순위 요건). 오류는 게임 안에 베리언트명과 함께 나타난다 ([컴파일 오류](internals/troubleshooting/compilation.md)).
+정적 검증의 형 검사는 불완전하므로, 어떤 실수는 여기서만 드러난다 (예: `mixing '*' and '^' requires parenthesis` 같은 WGSL 연산자 우선순위 요건). 오류는 게임 안에 베리언트명과 함께 나타난다 ([컴파일 오류](troubleshooting/compilation.md)).
 
 ### 검증 스텁 생성
 
@@ -5692,17 +5663,19 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ### 참가 시점의 런타임 재검증
 
-`checkCompilation` 은 게임 참가마다 돌며, 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다. 이 검사에는 60초 강제 타임아웃이 있다 ([퍼포먼스](internals/troubleshooting/performance.md)).
+`checkCompilation` 은 게임 참가마다 돌며, 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다. 이 검사에는 60초 강제 타임아웃이 있다 ([퍼포먼스](troubleshooting/performance.md)).
 
 ### 관련 문서
 
-- [컴파일 오류](internals/troubleshooting/compilation.md) · [셰이더 검증의 내부](internals/wgsl-compilation.md/shader-validation.md) · [시작하기: 검증](internals/getting-started/validation.md)
+- [컴파일 오류](troubleshooting/compilation.md) · [셰이더 검증의 내부](internals/shader-validation.md) · [시작하기: 검증](getting-started/validation.md)
+
+
+---
 
 ## 예약 식별자의 내부
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-`bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](internals/api/restrictions.md).
+`bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](api/restrictions.md).
 ### 88 심볼
 
 
@@ -5724,38 +5697,42 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 - `bloxdSpFlags` — `BloxdFlags` 구조체의 전달
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — 새 입력 (인챈트, 모델 로컬 위치)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — 셀 샘플링 텍스처팩 경로
-- `bloxdSpQuarterTurns` — 회전 체인 ([텍스처 샘플링](internals/reserved-identifiers.md/texture-sampling.md))
+- `bloxdSpQuarterTurns` — 회전 체인 ([텍스처 샘플링](internals/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — 확장 훅 로컬
 
 ### 팩 수준 규칙
 
-이 네임스페이스보다 넓다: **`/^bloxd/i` (대소문자 무관) 에 맞는 전부**. 선언할 수 있는 것은 9개 훅 함수명뿐이다 ([검증 오류](internals/troubleshooting/validation.md)).
+이 네임스페이스보다 넓다: **`/^bloxd/i` (대소문자 무관) 에 맞는 전부**. 선언할 수 있는 것은 9개 훅 함수명뿐이다 ([검증 오류](troubleshooting/validation.md)).
 
-`bloxdTextureId` 접두 식별자는 텍스처 이름으로 해석되며, 전용 오류 계열이 붙는다 ([텍스처 문제](internals/troubleshooting/textures.md)).
+`bloxdTextureId` 접두 식별자는 텍스처 이름으로 해석되며, 전용 오류 계열이 붙는다 ([텍스처 문제](troubleshooting/textures.md)).
 
 ### 관련 문서
 
-- [제한과 예약명](internals/api/restrictions.md) · [텍스처 샘플링](internals/reserved-identifiers.md/texture-sampling.md) · [버전 히스토리: v5](internals/history/v5.md)
+- [제한과 예약명](api/restrictions.md) · [텍스처 샘플링](internals/texture-sampling.md) · [버전 히스토리: v5](history/v5.md)
+
+
+---
 
 ## 라이팅 내부
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 - `blockLight` 는 RGB 3채널의 **색 있는 빛**이다. 광원 블록마다 발광색 `[R, G, B]` (각 0-15) 가 정의되어 있고, 그것이 그대로 빛의 색이 된다 (통상 횃불 = 온백 (14,14,12) / 라바 = 오렌지 (14,8,2) / 비콘 = 시안 (5,14,14) / 흰 횃불 = (15,15,15) 등). 정점단에서는 1개의 float 속성에 r / g / b / sky 의 4 니블로 팩되어 도착한다. light 훅 안에서는 3채널을 따로따로 다루는 것으로 색 있는 국소 조명을 만들 수 있다 — 난색 토치 계열 레시피 (R9.1) 가 기준으로 하는 거동의 실체는 이것이다.
 
 `aPackedLightLevels` 를 디코딩할 때, 엔진은 각 채널에 **RGB 가장 밝은 채널의 35% 를 하한으로 까는 「35% 채널 바닥」** 을 깐다. 예를 들어 「순수 빨간 광원」 은 정점에서 (1.00, 0.35, 0) 으로 들려서 보간·리프트를 탄다. 횃불 오렌지가 게임 안에서 「빨강이라기보다 하얀 핑크」 로 보이는 것은 이 때문이다. 난색 토치 계열 레시피 (R9.1) 의 채도는 이 기본 동작을 기준으로 조정하면 좋다.
-- 조명의 합성은 가산이 아니다. 엔진 내부에서는, 35% 바닥을 깐 블록 빛과 `mix(앰비언트색, 스카이색, skyLight)` 로 만든 하늘 빛의 **max** 를 취하고, 손에 든 빛 (앰비언트 부스트 적용 후) 를 더 max 로 얹는다. 이 합성에 쓰이는 채널값은 **리프트 후**의 값이다 — 엔진은 훅 입력에 도착하는 것과 같은, 리프트 곡선을 거친 `terrainLightLevels` 로 합성한다. 따라서 `blockLight` 와 `skyLight` 는 서로 상쇄하지 않고, 어두운 쪽의 기여는 버려진다 — 하늘 빛을 약하게 해도 블록 빛이 지배적인 곳은 거의 어두워지지 않는다. 노출이나 감쇠의 레시피는 이 구조를 전제로 설계한다 ([야간 표현 설계](internals/guides/night.md)의 국소광 보호는 이 구조에 대한 보상이다).
+- 조명의 합성은 가산이 아니다. 엔진 내부에서는, 35% 바닥을 깐 블록 빛과 `mix(앰비언트색, 스카이색, skyLight)` 로 만든 하늘 빛의 **max** 를 취하고, 손에 든 빛 (앰비언트 부스트 적용 후) 를 더 max 로 얹는다. 이 합성에 쓰이는 채널값은 **리프트 후**의 값이다 — 엔진은 훅 입력에 도착하는 것과 같은, 리프트 곡선을 거친 `terrainLightLevels` 로 합성한다. 따라서 `blockLight` 와 `skyLight` 는 서로 상쇄하지 않고, 어두운 쪽의 기여는 버려진다 — 하늘 빛을 약하게 해도 블록 빛이 지배적인 곳은 거의 어두워지지 않는다. 노출이나 감쇠의 레시피는 이 구조를 전제로 설계한다 ([야간 표현 설계](guides/night.md)의 국소광 보호는 이 구조에 대한 보상이다).
 
 
 손에 든 빛 (`heldLight`) 의 범위는 가장 밝은 빛색 채널을 따르며 (최대 15 블록), `dist^0.75` 전처리가 들어가고, 같은 35% 채널 바닥이 적용되며, `l.heldLight` 는 앰비언트 부스트 **전** 값이다. 원뿔 감쇠는 엔진의 light 모듈에서 복원했다: 빔의 각도 감쇠는 `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))` 이며, 여기서 `t` 는 원뿔 축에서 잰 정규화 각도다 (0 = 중심, 1 = 가장자리). 도달 거리는 `(rangeOverride > 0 ? rangeOverride : 가장 밝은 채널) × 원뿔 감쇠` 이고, `rangeOverride` 는 held-light 색의 alpha에서 읽는다. 도달 거리 안에서 override는 `(range − dist) / range` 로 감쇠하고, 기본값은 (전처리된) 거리를 채널별로 뺀다. 그다음 35% 바닥, 15로 나누기, 리프트 곡선, 마지막으로 앰비언트 부스트가 이어진다. 커스텀 아이템에는 `spotlightRange` (사정) 와 원뿔각을 정할 수 있어, 「들고 있는 동안 지향성 빔을 쏜다」 모드가 존재하며 그 원뿔은 카메라를 따라간다. 팩측에서는 빔 방향을 알 방법이 없다.
 
 커스텀 블록에는 `skyLightEmission` (0~15) 이 달릴 수 있어, **blockLight BFS 와는 별개로 skyLight 채널 자체를 주입할 수 있다**. R9.12 같은 「skyLight 임계값으로 낮/그림자를 판별하는」 팩은, 인공광으로 skyLight 가 들려 있는 월드에서는 오판할 수 있다. 배포 팩은 blockLight 와 조합해 판정하는 편이 견고하다.
 
-## 포그 내부
 
+---
+
+## 포그 내부
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](internals/history/v3.md)에 보존되어 있다.)
+포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](history/v3.md)에 보존되어 있다.)
 
 - 기본 포그색은 `rgb(183, 191, 195)` (엷은 청회색). 월드 작성자는 `fogColourOverride` (hex) 로 바꾼다. 포그 모드가 0 (NONE) 인 상태에서는 **fogColour 는 흑으로 도착한다**. 표준형 `bloxdApplyFog(col, l)` 은 fogAlpha 가 0 일 때 안개색이 쓰이지 않으므로 안전하다. 스크립트 API 측에는 그 외에 `fogChunkDistanceOverride` 와 `fogOnSkybox` 옵션이 있어, 커스텀 게임은 포그 거리 (D 에 해당하는 값) 와 스카이박스로의 포그 적용을 개별 설정할 수 있다. 기본에서는 스카이박스는 포그의 영향을 받지 않는다 (`fogOnSkybox` 를 유효화한 게임에서만, 스카이박스도 포그색으로 물든다).
 
@@ -5776,11 +5753,13 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 텍스처 샘플링의 내부
 
+---
+
+## 텍스처 샘플링의 내부
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-`bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](internals/api/texture-api.md).
+`bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](api/texture-api.md).
 
 ### 세 가지 변형
 
@@ -5821,7 +5800,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 애니메이션 프레임 사다리
 
-애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](internals/api/texture-catalog.md#애니메이션-계열-43-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
+애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](api/texture-catalog.md#애니메이션-계열-43-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
 
 ### 샘플러 설정
 
@@ -5833,13 +5812,41 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 관련 문서
 
-- [텍스처 API](internals/api/texture-api.md) · [텍스처 레지스트리](internals/texture-sampling.md/texture-registry.md) · [렌더링 파이프라인](internals/texture-sampling.md/rendering-pipeline.md)
+- [텍스처 API](api/texture-api.md) · [텍스처 레지스트리](internals/texture-registry.md) · [렌더링 파이프라인](internals/rendering-pipeline.md)
+
+
+---
+
+## 텍스처 레지스트리 작동 방식
+> 대상 API: 5 · 용도: 이름으로 텍스처 참조하기
+
+셰이더 팩은 숫자 ID가 아니라 이름 상수로 텍스처를 참조합니다. 상수 형식은 `bloxdTextureId<Name>`입니다. 사용할 수 있는 이름은 [텍스처 카탈로그](api/texture-catalog.md)를 확인하세요.
+
+### 이름 해석
+
+팩을 로드할 때 로더는 각 이름 상수를 사용 가능한 텍스처 이름에 대응시킵니다. 내부 배치가 바뀌더라도 이름이 계속 제공되면 팩은 해당 이름으로 텍스처를 참조할 수 있습니다.
+
+**WGSL에 숫자 텍스처 ID를 직접 작성하지 마세요.** 게임 콘텐츠가 업데이트되면 내부 ID와 아틀라스 위치가 바뀔 수 있습니다. 이름 상수를 사용하면 팩 코드가 이러한 내부 위치에 의존하지 않습니다.
+
+### 애니메이션과 회전
+
+- **애니메이션:** `lava0`–`lava7` 같은 프레임 표기 대신 `lava` 같은 기본 이름을 사용하세요. 샘플링할 때 현재 프레임이 선택됩니다.
+- **회전:** 내부 회전 슬롯 대신 카탈로그에 있는 기본 이름을 사용하세요. 샘플링 과정에서 면의 회전이 적용됩니다.
+- **프레임 전환:** 엔진은 인접한 애니메이션 프레임을 보간하기 위한 내부 슬롯을 사용합니다. 팩에서는 일반 이름 상수를 계속 사용하면 됩니다.
+
+### 관련 문서
+
+- [텍스처 카탈로그](api/texture-catalog.md) — 사용 가능한 이름과 상수
+- [텍스처 API](api/texture-api.md) — 텍스처 조회와 샘플링
+- [텍스처 샘플링 내부](internals/texture-sampling.md) — 샘플링 방식
+
+
+---
 
 ## 모델 렌더링의 내부
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](internals/guides/models.md).
+v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](guides/models.md).
 
 ### Model 프로그램이란
 
@@ -5857,7 +5864,7 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ### 인챈트 계산
 
-엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](internals/recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](internals/api/lighting.md#전체-파이프라인)).
+엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](api/lighting.md#전체-파이프라인)).
 
 ### 오버레이 (피격 플래시 등)
 
@@ -5865,18 +5872,67 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ### 텍스처 경로
 
-대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](internals/api/texture-api.md#모델-자체-텍스처-textureid-0)).
+대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](api/texture-api.md#모델-자체-텍스처-textureid-0)).
 
 ### 베리언트
 
-Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](internals/api/preprocessor.md#매크로--베리언트-매트릭스)). strict.model 에는 버텍스 훅이 없다.
+Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](api/preprocessor.md#매크로--베리언트-매트릭스)). strict.model 에는 버텍스 훅이 없다.
 
 ### 관련 문서
 
-- [모델과 텍스처](internals/guides/models.md) · [모델 셰이더 레시피](internals/recipes/model-shaders.md) · [플래그](internals/api/flags.md) · [렌더링 파이프라인](internals/model-rendering.md/rendering-pipeline.md)
+- [모델과 텍스처](guides/models.md) · [모델 셰이더 레시피](recipes/model-shaders.md) · [플래그](api/flags.md) · [렌더링 파이프라인](internals/rendering-pipeline.md)
+
+
+---
+
+## 엔진 데이터
+> 대상 API: 5 · 용도: 사양 요약
+
+이 페이지에서는 셰이더 팩에서 사용할 수 있는 API와 팩 제작 시 알아야 할 제한을 정리합니다. 구체적인 정의와 예시는 각 참조 문서를 확인하세요.
+
+### API 개요
+
+| 항목 | 사양 |
+|---|---|
+| API 버전 | `5` |
+| 훅 | 9개 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| 베리언트 | 6개 (allow / strict × terrain / liquid / model) |
+| 매크로 | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`. `BLOXD_LIGHTING`은 사용할 수 없습니다 |
+| 팩 uniform | 80바이트. 필드 오프셋은 [팩 형식](api/pack-format.md) 참조 |
+| 텍스처 | `bloxdTextureId<Name>` 형식의 이름 상수를 사용하세요. 숫자 ID를 고정하지 마세요 |
+| 예약 이름 | `bloxd`로 시작하는 식별자는 엔진용으로 예약되어 있습니다 |
+
+### 팩 제한
+
+| 항목 | 제한 |
+|---|---:|
+| WGSL 파일 수 | 256 |
+| WGSL 소스 총량 | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP 파일 | 32 MB |
+| ZIP 항목 수 | 1,024 |
+
+ZIP 루트에 매니페스트를 하나만 두고 파일은 UTF-8로 저장하세요. 중복 경로나 지원하지 않는 ZIP 형식은 허용되지 않습니다. 자세한 내용은 [팩 형식](api/pack-format.md)을 참조하세요.
+
+### API v5 주요 기능
+
+- `bloxdShadow()` 및 `bloxdAirShadow(t)`로 태양광과 달빛에 의한 그림자 정보를 가져올 수 있습니다.
+- `bloxdShadowDirection()`은 그림자를 만드는 빛의 방향을 반환합니다.
+- 그림자 API를 사용하면서 기존 원형 그림자를 유지하려면 `pack.json`의 선택 항목 `keepCircleShadows`를 `true`로 설정하세요.
+- 광원 활성 상태는 `BLOXD_LIGHTING`이 아니라 `bloxdLit()`으로 런타임에 확인하세요.
+
+### 관련 문서
+
+- [API 참조](api/) — 함수, 구조체, 상수
+- [팩 형식](api/pack-format.md) — 매니페스트, uniform, 로더 제한
+- [텍스처 카탈로그](api/texture-catalog.md) — 사용할 수 있는 텍스처 이름
+- [게임별 적용 정책](internals/policy.md) — allow / strict 범위
+- [API v4 마이그레이션 가이드](history/v4.md) — 이전 버전에서 마이그레이션
+
+
+---
 
 ## 팩에 보이는 값을 바꾸는 요인
-
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
@@ -5887,8 +5943,10 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 
 - 주된 변동원: `lightingOverride` (조명 강제) / `skyLightColourOverride`·`ambientLightColourOverride` (hex 교체) / `visionMinLightColour` (시인 최암색. 구현은 `uSkyLightColour` 와 `uAmbientLightColour` 쌍방에의 성분별 max 이며, Night Vision 이 사용한다. 「동굴을 깜깜하게」 계열은 예상보다 어두워지지 않고, 하늘색 자체도 바닥 올림이 된다) / `heldLightColourOverride`·`Range`·`ConeAngle` / `fogChunkDistanceOverride`·`fogColourOverride`·`fogOnSkybox` / `skyBox` (bloxdSunDirection() 유무). `uSkyLightColour` 기본 = (1,1,1) 흰색, `uAmbientLightColour` 기본 = (0.25,0.25,0.30). `l.ambient` 의 씬측 = 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5). `(1.0 - l.fogAlpha)` 는 플레이어의 포그/청크 거리 설정을 따라간다. 그 외에 `cameraTint` (화면 전체로의 RGBA 틴트) 와 `proximityFadeDistance`·`proximityFadeMinOpacity` (엔티티의 카메라 근접 페이드) 도 월드 설정 유래의 변동 요인이며, 특히 `cameraTint` 는 팩 출력 위에 얹히는 최종 처리이다. 이것들의 다수는 스크립트 API (`serverOption`) 경유로도 설정할 수 있어, 게임 실행 중에도 갱신될 수 있다.
 
-## 게임별 셰이더 팩 정책
 
+---
+
+## 게임별 셰이더 팩 정책
 > 대상 API: 5 · 문서 유형: 기술 참조
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
@@ -5916,63 +5974,11 @@ strict 측에서 특히 오해하기 쉬운 점:
 
 팩을 배포하기 전에 대상 게임에서 직접 테스트하고 필요한 훅이 해당 게임에서 작동하는지 확인하세요.
 
-## 태양과 달
 
-> 대상 API: 5 · 문서 유형: 기술 참조
-
-`bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
-
-| 스카이박스 | `bloxdSunDirection()` |
-|---|---|
-| `default` (절차 하늘) | 0이 아님 (기존값 아래) |
-| `gloomy` / `interstellar` / `space_*` (큐브 텍스처) | **항상 (0,0,0)** |
-
-**달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 밤낮 판정은 태양 고도로 한다 — `bloxdSunDirection().y < 0` (태양이 지평선 밑) 일 때 달이 위에 있다. 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다.
-
-기존 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 에서 계산되는 단위 벡터, 정지). 배포 팩 테스트 때 하이라이트 방향을 미리 예측할 수 있는 실용 기준값이다.
-
-낮밤 사이클은 엔진에 내장되어 있지 않다 — inclination 은 정적인 수치이며, 낮밤이 움직이는 월드는 게임측이 갱신한다. 그 갱신 때마다 `bloxdSunDirection()` 도 다시 쓰이므로 따라간다.
-
-지형의 방향광은 씬 기동시에 만들어지는 2등뿐이며 **방향도 강도도 고정, 낮밤에 변하지 않는다**. 정리하면 **지형 밝기를 정하는 요소는 어느 것도 시간에 의존하지 않는다. 낮밤의 「겉모습」 은 스카이박스와 bloxdSunDirection() 뿐**이며, 밤에 지형을 어둡게 하고 싶은 팩은 bloxdSunDirection() 에서 직접 시간대를 추정할 수밖에 없다 ([야간 표현 설계](internals/guides/night.md)의 `sunPresent` 수법).
-
-### R-A. 방향성 달빛 — moonDir = −bloxdSunDirection()
-
-달이 위에 있을 때만 푸르스름한 흰 Lambert 와 약한 스페큘러를 더한다. `moonUp` 이 0인 세계 (기존 정지 태양 월드) 에서는 아무 일도 일어나지 않으므로, **낮밤 사이클 있는 월드에서만 발동하는 안전한 달빛**이 된다.
-
-```wgsl
-fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
-    var out = bloxdDefaultLight(s, l);
-    if (bloxdLit()) {
-        // 달은 항상 태양의 정반대. 낮 동안은 moonDir.y < 0 으로 자동 소등된다
-        let moonDir = -bloxdSunDirection();
-        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
-        if (moonUp > 0.0) {
-            let n     = normalize(l.normal);
-            let diff  = max(0.0, dot(n, moonDir));
-            let view  = normalize(bloxdEyePosition() - l.position);
-            let halfV = normalize(moonDir + view);
-            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
-            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
-        }
-}
-    return out;
-}
-```
-
-## 디버깅 도구
-
-> 대상 API: 5 · 문서 유형: 기술 참조
-
-- URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](internals/troubleshooting/loading.md) 참조)
-- URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다
-- URL 파라미터 `?drawcalls=1` — 그리기 통계의 디버그 패널이 추가된다. 디버그용 콘솔에서 게임 오브젝트를 고르거나, `drawCalls()`·`why()`·`configureDrawCallWatching()` 를 써서, 팩에 한정되지 않은 대규모 기믹의 중복 그리기 (오버드로) 나 1 도면당 약 6.5만 정점의 상한 도달을 확인해, 성능 부족의 원인을 가를 수 있다
-- 콘솔에는 `noa-engine v0.33.0` 과 `Renderer: lite from <소스>` 가 나온다 — 그리기 경로 오진단 방지에 먼저 이것을 확인할 것
-- WebGPU 렌더러는 팩 적용 중 「강제 ON」 으로 잠긴다. 「Disable Block Texture Atlas」 설정도 잠기며 (아틀라스 ON 유지), WebGPU 미대응 환경에서는 애초 팩이 적용되지 않는다. 배포 페이지에 「WebGPU 대응 브라우저가 필요」 라고 쓰는 근거는 여기이다
-- 블록 텍스처의 실체는 2D 배열 텍스처 (`texture_2d_array`) 로, 지형의 샘플러는 nearest 이며 repeat 로 설정되어 있다. 더 나아가 메셔는 재질·AO·라이트가 일치하는 면을 1개의 구형으로 묶는 (**greedy meshing**) 때문에, 정점의 UV는 병합면 위에서는 타일 폭을 넘을 수 있다 (가장자리에 0.0015 의 인셋). 반복 측은 하드의 repeat 어드레싱이 담당하므로, 병합면은 심 없이 보인다. 단 `vUV` 를 기준으로 절차적 디테일을 얹으면, 병합면의 경계에서 불연속이 될 수 있으므로, 월드 위치 (`s.position` + `bloxdRenderOffset()`) 를 기준으로 설계하는 것이 안전하다
-- 게임 참가 때마다 런타임 재검증 (`checkCompilation`) 이 돌아, 실재하는 전 지형 소재를 브라우저 WebGPU 로 실컴파일한다 (설정 화면의 정적 검증보다 엄격). 여기서 떨어지면 팩은 그 게임에서 제외된다
+---
 
 ## 태양과 달
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 `bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
 
@@ -6017,7 +6023,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 디버깅 도구
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 - URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](troubleshooting/loading.md) 참조)
 - URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다
@@ -6031,31 +6037,32 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 버전 히스토리
+> 유형: 기록 · API v1~v5 마이그레이션 가이드
 
-v1 부터 v5 까지의 변경 내용·이주 절차·폐지된 API. 구형 팩의 이주와, 시대별 사양의 보존 자료로 쓴다.
+이 섹션은 v1부터 v5까지의 변경 사항, 마이그레이션 단계, 제거된 API를 보존합니다. 빌드 식별자나 검증 날짜가 아니라 API 동작과 마이그레이션 경로를 설명합니다.
 
-### 연표
+### 버전
 
-| 버전 | 가동 개시 | 가이드 | 주요 변경 |
-|---|---|---|---|
-| v1 | (최초) | [v1](history/v1.md) | 셰이더 팩 API 의 첫 등장. 6훅 (terrain/liquid × vertex/surface), `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` 어휘 |
-| v2 | — | [v2](history/v2.md) | 식별자 전면 개명, `blockId`, `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](history/v3.md) | `blockId` → `blockFlags` 비트 플래그, `bloxdPi` / `bloxdTau`, 액체 훅의 공식화, 훅 호출 내부의 분석 |
-| v4 | 2026-10-26 | [v4](history/v4.md) | 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict 계약, 엔진 헤더·레지스트리 분석 |
-| **v5** | **2026-11-03** | [v5](history/v5.md) | **현행** — `BloxdFlags` 구조체 (14 bool), Model 훅 (합계 9훅), `bloxdLit()` / `bloxdLitColour()` 라이팅 API, `localPosition`, 인챈트/오버레이 입출력, 6베리언트 |
+| 버전 | 마이그레이션 가이드 | 주요 변경 사항 |
+|---|---|---|
+| v1 | [v1](history/v1.md) | 셰이더 팩 초기 API |
+| v2 | [v2](history/v2.md) | 식별자 이름 변경, `blockId`, 씬 깊이 접근 |
+| v3 | [v3](history/v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau`, Liquid 훅 |
+| v4 | [v4](history/v4.md) | 텍스처 API, strict 게임 제한 |
+| **v5** | [v5](history/v5.md) | **현재 버전** — `BloxdFlags`, Model 훅, 라이팅 및 그림자 API |
 
-### 공통 서두
+### 이전 버전의 처리
 
-현행 게임은 `apiVersion: 5` 만 받으며, **구버전 팩은 로드하는 순간 실패한다** (저장 팩은 조용히 비활성 — [호환성](api/compatibility.md)). 각 가이드는 「이전 → 다음」 변환을 다룬다. 여러 버전을 건너뛸 때는 오래된 것부터 순서대로 적용하라.
+현재 게임은 `apiVersion: 5`인 팩만 허용합니다. 이전 버전의 팩은 그대로 로드할 수 없습니다. 여러 버전을 거쳐 마이그레이션할 때는 가장 오래된 버전부터 각 가이드를 순서대로 적용하세요.
 
-### 체크리스트로 가는 지름길
+### 마이그레이션 경로
 
-- v4 팩 → [v5 가이드](history/v5.md) §77 (거의 기계적)
-- v3 팩 → [v4](history/v4.md) §61 → [v5](history/v5.md) §77
-- v2 팩 → [v3](history/v3.md) §47 → v4 → v5
-- v1 팩 → [v2](history/v2.md) §37 부터 순서대로
+- v4 팩 → [v5 마이그레이션 가이드](history/v5.md)
+- v3 팩 → [v4](history/v4.md) → [v5](history/v5.md)
+- v2 팩 → [v3](history/v3.md) → [v4](history/v4.md) → [v5](history/v5.md)
+- v1 팩 → [v2](history/v2.md) → [v3](history/v3.md) → [v4](history/v4.md) → [v5](history/v5.md)
 
-> 현행 사양 자체는 [API 레퍼런스](api/) 를, 현행 빌드의 내부 분석은 [엔진 내부와 연구](internals/) 를 보라.
+현재 API는 [API 참조](api/)에서 확인하세요.
 
 
 ---
@@ -6097,9 +6104,8 @@ v1 은 최초의 셰이더 팩 API 다. v2 가 식별자를 전면 개명했으�
 ---
 
 ## API v2 마이그레이션 가이드
+> 버전: 2 · 상태: 기록 (v1에서 v2로 마이그레이션하는 안내서)
 
-
-대상 빌드: `6qxffk.main.5912a15f.js` (2026-10-16 시점의 정식 배포). 당시 가이드의 입문~내부 각 부는 v2 기준으로 다시 쓴 상태였으며, 본 가이드는 v1에서의 이전 포인트와 v2의 새로운 기능을 모은 것이다. 새 기능의 코드 예제는 v2 컴파일러에 의한 8/8 베리언트 검증과 브라우저 WGSL 컴파일러 (Tint) 검증 (§38)을 통과한 것이며, 기존 레시피의 v2 변환은 기계적인 식별자 교체이므로, 배포 전에는 반드시 실기 컴파일로 확인할 것.
 
 ### 31. v1 팩의 운명 (먼저 결론)
 
@@ -6149,7 +6155,6 @@ v1에서는 `time` / `eyePosition` / `sunDirection` / `originOffset` 이 구조�
 
 **참고**: 필자가 게임 내 엔트리 목록을 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data)에 공개했다 (`entries.json`: id ↔ 블록 이름 대응표. `Furnace|meta|rot2` 같은 회전/meta 변종도 별개 ID로 수록). 대응은 게임 업데이트로 바뀔 수 있으므로 최종 확정은 실기기에서 확인할 것.
 
-자주 쓰는 블록의 예 (entries.json 에서, 2026-10-18 시점. id 가 낮은 지형계만 발췌):
 
 | ID | 블록 이름 | ID | 블록 이름 |
 |---|---|---|---|
@@ -6181,67 +6186,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return result;
 }
 ```
-
-#### R-G. blockId 의 실측 — 비트 평면 표시 팩
-
-대응표에 실리지 않은 블록의 id 를 월드 안에서 조사하는 디버그 레시피. 선두의 `plane` 을 `0, 1, 2, …` 로 바꿔 가며, 조사하고 싶은 블록의 면 색을 읽는다.
-
-```wgsl
-const plane: u32 = 0u;
-
-fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
-    var out = bloxdDefaultSurface(s);
-    let d = (s.blockId >> (plane * 3u)) & 7u;
-    var palette = array<vec3f, 8>(
-        vec3f(0.0, 0.0, 0.0), vec3f(1.0, 0.0, 0.0), vec3f(0.0, 1.0, 0.0), vec3f(1.0, 1.0, 0.0),
-        vec3f(0.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(0.0, 1.0, 1.0), vec3f(1.0, 1.0, 1.0));
-    out.colour = palette[d];
-    return out;
-}
-```
-
-면의 색은 blockId 의 3비트를 그대로 RGB 로 나타낸다 (흑 = 0 / 적 = 1 / 녹 = 2 / 황 = 3 / 청 = 4 / 마젠타 = 5 / 시안 = 6 / 백 = 7). 1회의 관찰로 8진수 1자리를 읽을 수 있다. p0 → p3 순으로 3, 2, 7, 2 로 읽혔다면, 위 자리부터 나열한 8진 2723 = 1491 이 id 가 된다 (Lava). id 가 낮은 지형계는 p0 과 p1 의 2회로 족하다. surface 훅만으로 구성되어 있으므로, strict 타이틀에서도 움직인다.
-
-#### R-H. 잎만 흔들기 — blockId 에 의한 vertex 훅의 한정
-
-R7 의 바람 레시피 ([레시피](recipes/)) 는 지형 전체를 물결치게 하지만, vertex 훅에서도 `blockId` 를 읽을 수 있으므로, 대상을 잎 블록만으로 한정할 수 있다. id 일람과 WGSL 용 배열은 다음과 같다 (2026-10-18 시점의 실측. Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / 과실 변종 / Autumn Aspen 의 22종):
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// vertex 훅은 strict 타이틀에서 자동 무효 (§36 참조)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // 변위는 월드 위치의 매끄러운 함수로 한다. 월드 위의 같은 지점을 가리키는
-        // 공유 정점이 같은 값으로 움직이므로, 면이 뜯기지 않는다 ([레시피](recipes/) R7 도 같은 원리)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- id 일람은 엔진의 갱신으로 늘어난다 (실측에서도 새 빌드로 50종의 블록이 추가됐다). 계속 쓰는 경우는 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 나 R-G 의 비트 평면 표시로 추가분을 조사해 배열에 더할 것
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) 는 지면에 까는 비고체의 깔개 잎이다. 흔들면 지면에서 뜨는 것처럼 보이므로, 배열에서 빼서 제외하는 것도 하나의 선택
-- strict 타이틀에서는 vertex 훅이 통째로 무효가 되지만, 위의 가드가 있으면 「흔들림이 멎을 뿐」 이고, 프래그먼트 측의 효과는 계속 산다
 
 ### 35. 새 기능 ②: `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` (본명)
 
@@ -6328,53 +6272,29 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 이 책의 게재 코드는 이 패턴을 포함하지 않는다 (`pack_hash3` 의 `+`/`*` 혼재와 `h ^ (h >> 16u)` 는 괄호 처리되어 있어 사양 적합). 팩을 쓰면 제1단계와 제2단계를 둘 다 통과시킬 것.
 
-### 39. 독립적인 유사 자료에 대하여
-
-내용이 거의 같은 커뮤니티 자료가 존재한다: [GlitchHunterCoder/Bloxd-Essay 의 Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). 이 가이드보다 먼저 공개되었지만, **이 가이드 내용은 glm 이 Bloxd 의 실제 번들 파일 (webpack 청크 묶음) 을 독자 해석한 것으로 — 베끼기가 아니다**. 둘이 일치하는 것은, 같은 구현을 독자 조사하면 같은 결론에 이르기 때문이다.
-
----
-
-조사: ltf_ahel (glm 을 사용해 조사)
-
 
 ---
 
 ## API v3 마이그레이션 가이드
+> 버전: 3 · 상태: 기록 (v2에서 v3로 마이그레이션하는 안내서)
 
-> **2026-10-26 대체됨: 현행 API는 버전 5** — v3 팩은 여기서 v2에 대해 서술한 것과 똑같이 로드 시 거부된다. 본 가이드를 적용한 뒤 [v4 마이그레이션 가이드](history/v4.md) (v3 → v4: 텍스처 API, `fogAlpha` 개명, `bloxdFragmentBlockPosition`, `hit`) 를 적용할 것. 이어서 [v5 마이그레이션 가이드](history/v5.md) (v4 → v5)도 적용할 것.
-
-대상 빌드: `3ymzdd.main.fae4743f.js` — **2026-10-19부터 정식 프로덕션 빌드**. bloxd.io가 프로덕션에서 제공하는 번들은 이 부를 처음 조사할 때 사용한 프리프로드 배포와 바이트 단위로 동일하다 (md5로 확인했으며, 메인 번들과 셰이더 팩 청크 모두 그러하다). 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 팩 모델은 v2 형태를 유지한다 (`pack.json` 필드, 로더 제한, uniform 레이아웃이 모두 같다).
+이 페이지는 API v2 팩을 v3로 마이그레이션하기 위한 역사적 안내서입니다. v3에서 v4로 옮기려면 [API v4 마이그레이션 가이드](history/v4.md)를 적용하고, 현재 버전으로 옮기려면 [API v5 마이그레이션 가이드](history/v5.md)도 적용하세요. 새 팩을 만들 때는 [API 참조](api/)를 확인하세요.
 
 당시의 입문~내부 각 부는 여전히 v2 기준으로 작성되어 있었다. 본 가이드는 [v2 마이그레이션 가이드](history/v2.md)와 같은 순서로 v2 → v3 이전 포인트와 v3의 새 기능을 모은다. 변환은 대부분 기계적이지만 (§47), 실제 동작을 바꾸는 변경은 하나뿐이다 — 기본 light가 이제 emission을 포그로 감쇠시킨다 (§43) — 그리고 `blockId`가 `blockFlags`로 전면 교체되었으므로 (§42), 배포 전에는 반드시 게임 내 컴파일로 확인할 것.
-
 이번 개정에서 새로 추가된 **§49–§54**는 이전 자체를 넘어 프로덕션 빌드에서 복원한 엔진 내부로 들어간다 — Lite 렌더러가 실제로 훅을 호출하는 방식, 실제 4모드 포그 함수, `bloxdOpaqueBehind()`의 정확한 구현, 블록 등록에서 훅까지 이어지는 blockFlags의 완전한 전달 경로, 그리고 실측 헤더 해시가 포함된 검증 파이프라인이다. 이는 현재까지 팩 시스템에 관해 공개된 가장 깊은 사실이며, 다른 가이드가 아직 미해결로 남겨 둔 여러 질문에 답한다.
-
 ### 40. v2 팩의 운명 (먼저 결론)
-
-**2026-10-19 업데이트: v3가 프리프로드를 떠나 이제 정식 사이트가 제공하는 버전이 되었다.** v2로 배포된 모든 팩을 포함해, 롤아웃 전에 저장된 모든 v2 팩은 아래 설명대로 프로덕션에서 실패한다. 따라서 오늘 팩을 배포하는 사람에게 §47의 이전은 더 이상 선택이 아니다.
-
 이 빌드는 manifest의 `apiVersion`이 **3과 엄밀히 일치**할 것을 요구하며, **v2/v3 병행 지원은 없다**. v2 팩은 로드 시 「API 버전 불일치」 메시지로 거부된다 (i18n 키와 플레이스홀더 텍스트):
-
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
-> 
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
-> 
-
 저장된 팩은 v2 라이프사이클을 그대로 따른다 ([v2 마이그레이션 가이드](history/v2.md) §31): 모든 빌드는 엔진 헤더의 해시를 계산하고, 엔진 업데이트는 저장된 팩을 자동으로 「재확인 필요」로 표시하며, `apiVersion`이 현재 버전이 아닌 저장 팩은 오류를 내는 대신 실행되지 않음으로 표시된다 (위 상태 메시지가 대체 팩을 가리킨다).
-
 ### 41. pack.json과 uniform 버퍼 (변하지 않는 부분)
-
 - 필수 manifest 필드는 그대로다: `{ apiVersion, name, author }`.
 - 로더 제한도 그대로다: 32MB zip / 1024개 항목 / `.wgsl` 파일 256개 / 코드 총량 256KB / manifest 64KB.
 - 엔진 uniform 블록의 형태는 그대로다: `@group(3) @binding(0)`, 64 B, 선언 순서대로 시간, 렌더 오프셋, 태양 방향, 눈 위치를 담는다. 레이아웃은 `minBindingSize: 64`로 등록되며, 정확한 필드 배치는 `seconds: f32` @ 바이트 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48이다. 내부 필드 이름 두 개가 바뀌었다: `time` → `seconds`, `originOffset` → `renderOffset`. **바이트 레이아웃은 v2와 동일**하며, 팩 코드에는 어차피 영향이 없다. 팩은 이 uniform을 직접 이름 붙일 수 없기 때문이다 (엔진 헤더가 엔진 제공·읽기 전용으로 표시하며, 「팩은 이름을 붙일 수 없다」). 계속 헤더 함수 `bloxdSeconds()` / `bloxdRenderOffset()`을 사용할 것.
 - 팩의 group 3에는 문서화된 두 번째 점유자가 생겼다: `@group(3) @binding(1)`은 `bloxdOpaqueBehind()`가 읽는 씬 깊이 텍스처다 (전체 구현은 §51). 64 B uniform은 binding 0에 그대로 있으며, 팩은 여전히 어느 binding도 이름 붙일 수 없다.
-
 ### 42. blockId가 blockFlags로: 블록별 머티리얼을 비트 플래그로 (핵심)
-
 세 훅 입력 구조체 모두에서 (`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn`) v2 필드 `blockId: u32`가 `blockFlags: u32`로 **교체**되었다. 이 필드에 대한 엔진 설명: *「이 면이 어떤 종류의 블록인지: `bloxdBlockFlag*` 비트이며, 면 전체에서 같다.」* 이제 엔진이 머티리얼 데이터를 직접 제공하므로, 숫자 id 범위로 머티리얼을 추측하거나 월드 내 id 표를 유지하던 v2 방식 ([v2 마이그레이션 가이드](history/v2.md) §34)은 필요 없다.
-
 비트는 이름 있는 상수로 공개된다:
-
 ```wgsl
 // (blockFlags & bloxdBlockFlagRock) != 0 으로 검사한다.
 const bloxdBlockFlagOpaque: u32 = 1;
@@ -6384,7 +6304,6 @@ const bloxdBlockFlagDirt: u32 = 8;
 const bloxdBlockFlagSand: u32 = 16;
 const bloxdBlockFlagRock: u32 = 32;
 ```
-
 | 값 | 상수 | 의미 (엔진 주석 요약) |
 |---|---|---|
 | 1 | `bloxdBlockFlagOpaque` | 완전히 불투명 — 나뭇잎과 얼음도 포함. 유리, 물, 용암, 스포너, 고스트·투명 블록은 제외. |
@@ -6393,29 +6312,18 @@ const bloxdBlockFlagRock: u32 = 32;
 | 8 | `bloxdBlockFlagDirt` | 흙과 토양, 잔디 블록 포함. Rocky Dirt는 암석이기도 하다. |
 | 16 | `bloxdBlockFlagSand` | 모래, 붉은 모래, 그리고 모든 사암 — 사암은 암석이기도 하다. |
 | 32 | `bloxdBlockFlagRock` | 돌과 그 종류, 안산암, 섬록암, 화강암, 자갈, 광석, 사암, Rocky Dirt, 기반암, 흑요석, 마그마. |
-
 여러 머티리얼로 이루어진 블록은 **각각** 일치하는 플래그를 모두 가진다 (엔진 자신의 예: 사암은 모래이자 암석이므로 둘 다 가진다). 나뭇잎은 vegetation이지만 dirt는 아니고, 잔디 블록은 vegetation과 dirt를 동시에 가진다.
-
 vegetation / dirt / sand / rock 플래그는 블록의 등록된 **표시명**으로부터 부여된다 (opaque / emissive는 대신 엔진 자체의 불투명도·발광 데이터에서 온다): 이름이 `Leaves`로 끝나거나 `Grass Block`인 것은 vegetation; `Dirt` / `Soil` 이름 (그리고 모든 `Grass Block`)은 dirt; 정확히 `Sand`와 `Red Sand`, 그리고 `Sandstone`을 포함하는 모든 이름은 sand; `Stone` / `Andesite` / `Diorite` / `Granite`를 포함하는 이름, 모든 `Ore`, 그리고 Yellowstone, Gravel, Bedrock, Obsidian, Magma, Rocky Dirt (와 사암)는 rock이다.
-
-
 #### 정확한 이름 규칙 (모든 블록의 플래그를 직접 도출하기)
-
 네 머티리얼 비트는 블록의 등록된 표시명에 대한 고정 분류기에서 나온다. 베리언트 이름(`|` 뒤의 모든 것)은 먼저 잘라내므로, 베리언트는 기본 블록의 플래그를 물려받는다. 그다음:
-
 | 비트 | 규칙 (잘라낸 이름에 대해 평가) |
 |---|---|
 | vegetation | 이름이 ` Leaves`로 **끝나거나**, ` Grass Block`으로 **끝난다** |
 | dirt | 이름이 정확히 `Dirt`이거나, ` Dirt` 또는 ` Soil`로 **끝나거나**, ` Grass Block`으로 **끝난다** |
 | sand | 이름이 정확히 `Sand` 또는 `Red Sand`이거나, `Sandstone`을 **포함한다** |
 | rock | 이름이 정확히 `Yellowstone` / `Gravel` / `Bedrock` / `Obsidian` / `Magma` / `Rocky Dirt` 중 하나이거나, `Sandstone`을 **포함하거나**, ` Ore`로 **끝나거나**, `Stone` / `Andesite` / `Diorite` / `Granite`를 독립 단어로 포함한다 |
-
 Yellowstone이 명시된 이유는 `Stone`이 `Yellowstone` 안에서 독립 단어가 아니기 때문이다. Opaque와 emissive는 이름에서 오지 **않는다** — 엔진 자체의 불투명도와 블록 광 방출 데이터에서 오므로, 이 규칙으로는 도출할 수 없다.
-
-출처: 엔진의 이름 분류기 (모듈 28537, 번들 `3ymzdd`); 이름이 있는 7,861개 블록 전체에 대해 검증했다, 2026-10-20.
-
 예 — 머티리얼별로 블록에 색을 입힌다:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -6425,31 +6333,22 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 v2 레시피에 미치는 영향: R-H의 22개 항목 나뭇잎 id 배열 ([v2 마이그레이션 가이드](history/v2.md) §34)은 `(blockFlags & bloxdBlockFlagVegetation) != 0`으로 줄어든다. [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data)의 id ↔ 블록 이름 대응표는 셰이더 이외의 용도에는 여전히 유용하지만, 머티리얼 스타일링을 위해 월드 내에서 조회할 필요는 없어졌다.
-
 #### 잔디 없는 나뭇잎 (모두가 묻는 질문)
-
 `vegetation`만 사용하면 나뭇잎**과** 잔디 블록의 잔디를 모두 일치시킨다. 잔디 블록은 `dirt`도 가지기 때문이다. dirt를 제외하면 나뭇잎만 흔들 수 있다 — 엔진의 필드 주석이 명시하는 판별식은 다음과 같다:
-
 ```wgsl
 // 나뭇잎만: dirt가 없는 vegetation. 잔디 블록은 vegetation AND dirt.
 let isLeaf = (blockFlags & bloxdBlockFlagVegetation) != 0u
            && (blockFlags & bloxdBlockFlagDirt) == 0u;
-
 // 잔디 블록만 (지형 표면의 잔디 면):
 let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
-
-실제 레지스트리로 확인했다 (2026-10-20, 번들 `3ymzdd`):
 `vegetation && !dirt`는 정확히 45개의 나뭇잎 등록 (22개 기본 타입 —
 v2 R-H id 배열이 측정한 것과 같은 22개)과 일치하고, `vegetation && dirt`는 정확히
 8개의 잔디 블록과 일치한다. 어느 방향으로도 예외는 없다 — 레지스트리 집계는 해당 빌드 시점 기준이며, 새 블록이 추가되면 규칙은 그대로인 채 숫자만 늘어난다. `vertex.normal`
 (위/아래)과 조합하면 면을 고를 수 있다. 예를 들어 잔디 블록의 윗면만 고른다.
-
 ### 43. 함수 이름 변경과 의미 변화
-
 | v2 | v3 | 비고 |
 |---|---|---|
 | `bloxdTime()` | `bloxdSeconds()` | 페이지 로드 후 경과 초 (f32 정밀도 주의는 아래) |
@@ -6457,41 +6356,31 @@ v2 R-H id 배열이 측정한 것과 같은 22개)과 일치하고, `vegetation 
 | `const bloxdTimeWrap: f32 = 3600` | **삭제** | 주기는 팩 쪽에서 직접 정의한다 |
 | `engineColour` (`BloxdLightIn` 안) | **삭제** (14 → 13 필드) | `litColour` + 포그로 다시 구성한다 |
 | 훅 매개변수 `v` / `s` / `l` | `vertex` / `surface` / `light` | 템플릿 표기이며 시그니처는 그대로 |
-
 - **`bloxdSeconds()`** — 페이지 로드 후 경과 초. f32에서는 처음 4.5시간 동안 1ms보다 작은 단위로, 9~18시간 구간에서는 약 4ms 단위로 증가한다. 헤더는 `bloxdSeconds() % period` 관용구를 권장한다. 이는 0에서 `period`까지 세다가 다시 시작하므로, 삭제된 wrap 상수를 깔끔하게 대체한다.
 - **`bloxdRenderOffset()`** — 블록 단위: 「렌더 위치에 이 값을 더하면 월드 위치가 된다.」 플레이어가 이동하면 이 값도 바뀌므로 렌더 위치는 플레이어 가까이에 유지되고, 그만큼 정밀하다. 가이드 전체에서 v2 문장에서 「noa 로컬 오프셋」이라고 부르던 값은 이제 일관되게 **렌더 위치** / 렌더 오프셋이라고 부른다. `bloxdOriginOffset()`이 반환하던 것과 같은 양이다.
 - **`bloxdTimeWrap` 삭제** — 3600초에서 시간을 wrap하던 팩은 이제 자체 상수를 선언한다. 예: `const timeWrap: f32 = 3600.0;` 그리고 `% timeWrap`.
 - **기본 light의 의미 변화** — v2의 기본값은 `engineColour + emission × fogVisibility`였고, v3의 기본값은 `bloxdApplyFog(litColour + emission, light)`로 구성된다. **이제 기본값 안에서 emission이 포그로 감쇠**되므로, 합성된 출력 전체가 함께 포그 블렌드를 통과한다. 이전 표:
-
   | v2 식 | v3 이전 |
   |---|---|
   | `l.engineColour` | `bloxdApplyFog(l.litColour, l)` |
   | `l.engineColour + s.emission * l.fogVisibility` | `bloxdApplyFog(l.litColour + s.emission, l)` |
-
   ```wgsl
   // v2의 `l.engineColour + s.emission * l.fogVisibility`를 v3로 이전:
   out.colour = bloxdApplyFog(light.litColour + surface.emission, light);
   ```
 - **이름과 의미가 그대로인 것**: `bloxdEyePosition()`, `bloxdSunDirection()`, `bloxdFaceBlock()`, `bloxdApplyFog()`, `bloxdWorldPosition()`.
-
 ### 44. 새 헤더 상수: `bloxdPi`와 `bloxdTau`
-
 ```wgsl
 // 반 바퀴와 한 바퀴, 라디안 단위.
 const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;
 ```
-
 삼각함수 계산에 유용하고, 팩이 더 이상 π를 하드코딩할 필요도 없다. 이름 재사용에 주의할 것: 같은 이름의 팩 로컬 상수는 이제 헤더의 중복 식별자 검사와 충돌한다. 코드에서 `bloxdPi` / `bloxdTau`를 다시 선언한 부분이 있으면 삭제하거나 이름을 바꿀 것.
-
 ### 45. 6훅 템플릿 (액체 훅 공식 공개)
-
 빌드와 함께 공개된 기본 팩 텍스트는 이제 **여섯 훅 모두**를 제공한다 — terrain / liquid × vertex / surface / light이며, 각각 엔진 기본값을 반환한다. 엔진 주석이 소개한다: *「모든 훅은 엔진 기본값을 반환한다. 훅을 복사해 출력을 바꾸면 셰이더 팩을 만들 수 있다.」*
-
 ```wgsl
 // 모든 훅은 엔진 기본값을 반환한다. 훅을 복사해
 // 출력을 바꾸면 셰이더 팩을 만들 수 있다.
-
 // strict 게임은 지형을 그대로 둔다. 가드가 없으면 이 훅은
 // 그런 게임에서 셰이더 팩 전체를 꺼 버린다.
 #ifndef BLOXD_STRICT
@@ -6499,53 +6388,40 @@ fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-
 // 물은 이 훅들을 사용한다. 삭제하면 물은 대신 terrain 훅을 사용한다.
 #ifndef BLOXD_STRICT
 fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 ```
-
 - 훅 주석이 액체 규칙을 직접 말한다: **물에는 세 훅이 필요하며, 삭제하면 물은 terrain 훅을 재사용한다** (v2에서 알려진 폴백 동작이며, 이제 [v2 마이그레이션 가이드](history/v2.md) §36의 내용이 템플릿 자체에 적혀 있다).
 - `bloxdLiquidVertex`는 `bloxdTerrainVertex`와 같은 `#ifndef BLOXD_STRICT` 가드 안에 있다 — 가드가 없으면 terrain 쪽 vertex 효과와 마찬가지로 strict 게임에서 팩 전체를 꺼 버린다.
 - 템플릿 표기는 이제 전체 매개변수 이름 `vertex` / `surface` / `light`를 쓴다 (v2 템플릿은 짧은 `v` / `s` / `l`이었다). 자신의 코드에서 매개변수 이름은 자유이며, 시그니처만 중요하다.
-
 ### 46. 베리언트 매트릭스: 프로그램 축과 매크로 변화
-
 베리언트는 **strict × lighting × program** 매트릭스 위에서 생성된다 — v2와 같은 8가지 조합이지만, 이제 terrain / liquid가 매트릭스의 명시적 축이다. 베리언트 이름은 `allow|strict · unlit|lit · terrain|liquid`로 이를 드러내며, UI에서는 ``terrain`` / `liquid`, `strict` / `non-strict`, `lighting on` / `lighting off`로 표시된다 (오류 표시에는 `"(only in {{variants}})"`가 덧붙을 수 있다).
-
 | 매크로 | 정의되는 곳 |
 |---|---|
 | `BLOXD_STRICT` | strict 베리언트 (두 프로그램 모두) |
 | `BLOXD_LIGHTING` | lighting-on 베리언트 (두 프로그램 모두) |
 | `BLOXD_ALPHA` | **모든 액체 베리언트**에 더해 non-strict **terrain** 베리언트 |
 | `BLOXD_SCENE_DEPTH` | **모든 액체 베리언트** |
-
 v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 작성자에게 바뀌는 점은 두 가지다:
-
 - **`BLOXD_ALPHA`는 v2에서 그대로다.** 베리언트 생성기는 `"liquid"!==program&&strict||push("BLOXD_ALPHA")`라는 줄을 그대로 담고 있다 — JS 연산자 우선순위상 push를 건너뛰는 경우는 *(terrain **이면서** strict)* 하나뿐이므로, 매크로는 **모든 액체 베리언트 (strict든 non-strict든)와 non-strict terrain**에 정의되고, strict terrain만 이를 생략한다. 액체 쪽 `#ifdef BLOXD_ALPHA` 코드는 예전과 똑같이 컴파일되며, §49의 alpha 되쓰기 (liquid 프로그램이나 non-strict 베리언트에 이어 붙는다)가 이 집합과 정확히 일치한다.
 - **`BLOXD_SCENE_DEPTH`는 액체 베리언트에서 항상 정의된다.** 따라서 깊이 사용은 v2와 똑같이 액체 쪽에서 가드 없이 괜찮고 (§35), terrain 훅에서는 계속 `#ifdef BLOXD_SCENE_DEPTH`로 감싸야 한다.
-
 ### 47. v2 → v3 마이그레이션 체크리스트
-
 1. **pack.json**: `"apiVersion": 2` → `"apiVersion": 3`
 2. **`blockId` → `blockFlags`**: 세 입력 구조체 모두에서 바꾸고, 머티리얼 스타일링을 `bloxdBlockFlag*` 상수에 대한 비트 검사로 표현한다 (§42). v2의 id 범위 휴리스틱은 버린다.
 3. **`bloxdTime()` → `bloxdSeconds()`**: 삭제된 `bloxdTimeWrap` 대신 자체 주기를 선언한다 (`% period`).
@@ -6556,9 +6432,7 @@ v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 �
 8. **`bloxdPi` / `bloxdTau` 사용**: 삼각함수 관련 상수를 하드코딩하던 곳에서 사용하고, 이제 헤더와 중복되는 팩 로컬 재선언은 삭제한다.
 9. **strict 가드 유지**: vertex 훅과 `discard`는 계속 `#ifndef BLOXD_STRICT`로 감싼다. 템플릿은 `bloxdLiquidVertex`도 terrain 쪽과 같은 방식으로 가드한다.
 10. **게임 내 검증**: 셰이더 팩을 지원하는 게임에서 팩을 컴파일하고 테스트한다.
-
 ### 48. 기타 v3 변경과 주의사항
-
 - **검증은 여전히 2단계**다 ([v2 마이그레이션 가이드](history/v2.md) §38): 먼저 정적 검증, 그 다음 훅을 호출하는 생성 스텁 스니펫을 통한 브라우저의 실제 WebGPU 컴파일. 오류는 원본 파일 / 줄로 매핑되고, 진단은 매핑을 통해 엔진 쪽 식별자의 원래 이름을 복원한다.
 - **strict 진단은 이유를 말한다**: 지형을 움직이는 vertex 훅은 「… moves terrain, which strict games prevent.」를 보고하고, surface / light 훅의 `discard`는 「discard makes terrain see-through, which strict games prevent.」를 보고한다. 설정 UI는 「wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`.」 안내를 유지한다 (`offInStrict`).
 - **로더 메시지**: 오류 종류와 제한은 그대로다. "Zip64 archives aren't supported."는 UI 메시지로 표시된다 (`loadZip64`). 팩 UI 문자열 인벤토리는 총 57개의 `shaderPack:*` 키다. 로드 단계 오류로는 `.wgsl` 파일이 하나도 없는 zip을 뜻하는 `loadNoWgsl`과 zip 종료 시그니처가 없는 파일을 뜻하는 `loadNotZip`이 이 집합을 마무리한다.
@@ -6568,406 +6442,16 @@ v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 �
 - **문구**: 셰이더 팩을 받아들이는 게임에 대한 문장이 이제 「in games that **support** them」으로 표기된다.
 - **적용 범위**: 팩이 동작하는 게임의 범위는 이전 빌드와 같다.
 
-### 49. 엔진 내부: Lite 렌더러가 훅을 호출하는 방식
-
-§40–§48은 로더와 헤더가 알려 주는 내용이다. 이 절과 뒤따르는 절들은 엔진이 실행 시 실제로 하는 일을 프로덕션 번들에서 복원해 기록한다 (Lite 렌더러는 175 KB 청크이며, 통합 소스 파일의 실제 이름 `lite/terrainShaderPack.ts`가 오류 문자열 안에 남아 있다). 이 중 어느 것도 작성하는 코드를 바꾸지는 않지만, 훅이 무엇을 받는지에 대한 추측을 없애고, 다른 커뮤니티 가이드가 아직 미해결로 남겨 둔 여러 질문을 정리한다.
-
-렌더러는 JavaScript에서 훅을 「호출」하지 않는다. 팩이 검증을 통과하면 엔진은 셰이더 텍스트의 고정 앵커 줄을 교체해 **훅 호출을 자체 terrain WGSL에 이어 붙인다**. 앵커는 정확히 한 번만 일치해야 한다 — 0회 또는 여러 회 일치하면 `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`로 중단한다.
-
-| 단계 | 엔진 셰이더의 앵커 줄 | 이어 붙는 내용 |
-|---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);`부터 `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);`까지의 네 줄 블록 | `BloxdVertexIn`을 만들고 vertex 훅을 호출한 뒤 `worldPos`를 다시 쓴다 — 이어 붙이기는 `let worldPos`를 `var worldPos`로도 바꾼다 |
-| surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | `BloxdSurfaceIn`을 만들고 surface 훅을 호출한 뒤 `baseColor` / `alpha`를 다시 쓴다 |
-| lit colour | `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` 바로 앞 | `let bloxdSpLitColour = color.rgb;` — 포그 전 색을 캡처한다 |
-| light | fragment 셰이더의 마지막 `return color;` 줄 | `BloxdLightIn`을 만들고 light 훅을 호출한 뒤 `color`를 다시 쓴다 — 포그 블렌드 이후 |
-
-출하된 번들에서 복원한, 훅을 이어 붙이는 코드 (엔진 자체 서식이 길어지는 light-level 샘플 식은 축약):
-
-```wgsl
-// vertex 단계 — vertex 훅을 가진 non-strict 베리언트
-{
-    let bloxdSpVertexIn = BloxdVertexIn(worldPos.xyz, vertexOutputs.vNormalW,
-                                        vertexOutputs.vBlockFlags);
-    let bloxdSpVertex = /* your bloxdTerrainVertex / bloxdLiquidVertex */(bloxdSpVertexIn);
-    worldPos = vec4f(bloxdSpVertex.position, worldPos.w);
-}
-```
-
-```wgsl
-// fragment 단계 — surface
-let bloxdSpSurfaceIn = BloxdSurfaceIn(baseColor.rgb, alpha,
-        normalize(fragmentInputs.vNormalW), fragmentInputs.vPositionW,
-        fragmentInputs.vBlockFlags);
-let bloxdSpSurface = /* your surface hook */(bloxdSpSurfaceIn);
-baseColor = vec4f(bloxdSpSurface.colour, baseColor.a);
-alpha = bloxdSpSurface.alpha;   // 프로그램이 liquid이거나 베리언트가 non-strict일 때만 이어 붙는다
-```
-
-```wgsl
-// fragment 단계 — light
-{
-    let bloxdSpLightIn = BloxdLightIn(
-        bloxdSpLitColour,                        // litColour
-        fragmentInputs.vTerrainLambert,          // directional
-        ambient,                                 // ambient
-        /* light-level varying */.rgb,           // blockLight
-        /* sky channel of the same varying */,   // skyLight
-        uniforms.uAmbientLightColour,            // ambientLightColour
-        uniforms.uSkyLightColour,                // skyLightColour
-        /* held-light term (see below) */,       // heldLight
-        select(vec3f(0.0), uniforms.vFogColor,
-               uniforms.vFogInfos.x != 0.0),     // fogColour — 포그가 전혀 없을 때만 검정
-        fog,                                     // fogVisibility
-        fragmentInputs.vPositionW,               // position
-        normalize(fragmentInputs.vNormalW),      // normal
-        fragmentInputs.vBlockFlags);             // blockFlags
-    let bloxdSpLight = /* your light hook */(bloxdSpSurface, bloxdSpLightIn);
-    color = vec4f(bloxdSpLight.colour, color.a);
-}
-```
-
-이 이어 붙이는 코드에서 곧바로 나오는 네 가지 강제 사실:
-
-- **strict terrain은 surface 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되쓰기는 liquid 프로그램이나 non-strict 베리언트에만 이어 붙는다 — §46 매크로 표의 구현이다. (strict terrain에서는 `#ifdef BLOXD_ALPHA` 코드가 어차피 컴파일 대상에서 빠지며, 이제 가드 없는 alpha 쓰기도 거기서 버려진다는 점이 확인되었다.)
-- **vertex 훅을 선언한 strict 베리언트는 그 훅을 절대 실행하지 않는다** — 엔진은 빌드 시점에 `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`를 보고한다. 공식 템플릿 (§45)이 `bloxdLiquidVertex`를 terrain 쪽과 같은 `#ifndef BLOXD_STRICT`로 감싸는 이유다.
-- `bloxdSp*` 식별자 — **총 14개**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — 는 엔진 쪽 임시 변수다. 작성하는 코드에는 보이지 않지만 진단과 누군가의 리버스 엔지니어링 출력에 나타나므로, 보는 즉시 알아볼 가치가 있다.
-- **기본 surface 지름길.** 베리언트의 surface 훅이 문자 그대로 `bloxdDefaultSurface`이면, 엔진은 `baseColor` / `alpha` 되쓰기 줄을 아예 이어 붙이지 않는다 — 기본값이 이미 그 값들을 만들어 내므로 대입은 죽은 코드가 된다. 수정하지 않은 훅 체인은 비용이 들지 않는다.
-
-**`BloxdLightIn`에 실제로 들어가는 값** — 이어 붙는 코드 기준, 필드별:
-
-| 필드 | 엔진 쪽 공급원 |
-|---|---|
-| `litColour` | 포그 블렌드 직전에 캡처한 프래그먼트 색 (`bloxdSpLitColour` 앵커) — 헤더가 말하는 「emission과 포그 전」 |
-| `directional` | `vTerrainLambert` — 씬의 방향광에 대한 `max(0, dot(normal, lightDirection)) × intensity` 합을 vertex에서 보간한 값 (식은 §54); 씬에 방향광이 없으면 0 |
-| `ambient` | `material.ambientAndCutoff.xyz × uniforms.sceneAmbient` — 머티리얼별, 프레임별 |
-| `blockLight` | 디코드된 light-level varying의 `.rgb` (디코드는 §54) |
-| `skyLight` | 같은 light-level varying의 스카이 채널 — *「Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING」* (헤더 텍스트) |
-| `ambientLightColour` / `skyLightColour` | `uniforms.uAmbientLightColour` / `uniforms.uSkyLightColour` |
-| `heldLight` | light-level varying의 w 채널과 프레임 uniform `uHeldLightPos` / `uHeldLightColour`로 만든 held-light 항 ([라이팅 내부](internals/lighting-internals.md)이 감쇠와 채널 하한 동작을 기록한다) |
-| `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)` — **포그가 전혀 없는 씬에서만 검정** (모드 0, §50) |
-| `fogVisibility` | 클램프된 포그 계수 — §50 함수가 반환하는 정확한 값 |
-| `position` / `normal` | `vPositionW` / `vNormalW` varying (normal은 프래그먼트마다 다시 정규화) |
-| `blockFlags` | `vBlockFlags` flat varying — §52의 전체 전달 경로 |
-
-오래된 자료를 읽을 때 방향을 잡기 위해: 동일한 이어 붙이기 구조는 v2 렌더러에도 있었고, v3의 통합 차이는 `vBlockId` → `vBlockFlags`와 액체 베리언트 추가뿐이다. 훅 시스템은 v2 → v3 단절을 거쳐도 구조적으로 안정적이다.
-
-### 50. 포그 함수: 네 가지 모드, 하나의 필드
-
-프로덕션 terrain 셰이더에서 그대로 복원:
-
-```wgsl
-fn calcFogFactor(fogDistance: vec3f) -> f32 {
-    var fogCoeff: f32 = 1.0;
-    let fogStart   = uniforms.vFogInfos.y;
-    let fogEnd     = uniforms.vFogInfos.z;
-    let fogDensity = uniforms.vFogInfos.w;
-    let dist = length(fogDistance);
-    if (uniforms.vFogInfos.x == 3.0) {        // 선형
-        fogCoeff = (fogEnd - dist) / (fogEnd - fogStart);
-    } else if (uniforms.vFogInfos.x == 1.0) { // 지수
-        fogCoeff = 1.0 / pow(2.71828, dist * fogDensity);
-    } else if (uniforms.vFogInfos.x == 2.0) { // 지수 제곱
-        fogCoeff = 1.0 / pow(2.71828, dist * dist * fogDensity * fogDensity);
-    }                                          // 0.0 = 포그 꺼짐 (계수는 1.0 유지)
-    return clamp(fogCoeff, 0.0, 1.0);
-}
-```
-
-- `vFogInfos = vec4f(mode, start, end, density)` — 하나의 vec4가 모든 것을 구동한다.
-- **셰이더에는 네 가지 모드가 있다: 0 = 꺼짐, 1 = 지수, 2 = 지수 제곱, 3 = 선형.** 어느 모드가 실행되든 `fogVisibility`는 클램프된 계수다 — 필드는 정확히 하나뿐이고, 모드 플래그는 팩에 노출되지 않는다.
-- Bloxd 자체 타이틀은 [포그 내부](internals/fog-internals.md)에 설명된 32블록 대역으로 모드 3 (선형)을 구동하므로 (`fogStart = 32 × D`, `fogEnd = 32 × (D + 1)`), 그 관찰의 「항상 선형」이라는 부분은 여전히 출하된 게임플레이를 설명한다. 그러나 지수 모드도 실제로 살아 있는 엔진 코드다 — 타이틀은 클라이언트 업데이트 없이 `vFogInfos.x`를 바꿔 램프를 바꿀 수 있다. 거리 기반 레시피에서 `distance(l.position, bloxdEyePosition())`를 직접 계산하는 방식 (레시피 R-B)은 모드 전환에 영향을 받지 않으므로 거리 기반 외형을 쓰는 견고한 방법이다.
-- 이로써 「엔진이 실제로 어느 포그 램프를 쓰는가」라는 질문이 소스로 정리된다: 네 가지가 모두 구현되어 있고, 출하된 타이틀은 선형을 쓴다. (같은 함수가 헤더의 fogColour 주석도 설명한다 — 모드 0은 `fogColour`가 검정으로 도착하는 유일한 경우이며, Bloxd 게임은 모드 0을 출하하지 않고 대신 포그를 멀리 밀어낸다, [포그 내부](internals/fog-internals.md).)
-
-### 51. bloxdOpaqueBehind(): 정확한 구현
-
-프로덕션 빌드에서 그대로 복원한 함수 전체:
-
-```wgsl
-@group(3) @binding(1) var bloxdSpSceneDepth: texture_2d<f32>;
-var<private> bloxdSpPixel: vec2i;
-var<private> bloxdSpPositionW: vec3f;
-
-fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
-    let bloxdSpZ = textureLoad(bloxdSpSceneDepth, bloxdSpPixel, 0).r;
-    if (bloxdSpZ <= 0.0) {
-        return BloxdOpaqueBehind(false, vec3f(0.0), 0.0);
-    }
-    let bloxdSpEye = bloxdPackInputs.eyePosition;
-    let bloxdSpScale = max(bloxdSpZ / (scene.view * vec4f(bloxdSpPositionW, 1.0)).z, 1.0);
-    let bloxdSpBehind = bloxdSpEye + (bloxdSpPositionW - bloxdSpEye) * bloxdSpScale;
-    return BloxdOpaqueBehind(true, bloxdSpBehind, distance(bloxdSpBehind, bloxdSpEye));
-}
-```
-
-- **깊이 텍스처는 `@group(3) @binding(1)`에 있다** — group 3은 팩 자신의 그룹이다: binding 0은 64 B `bloxdPackInputs` uniform (§41), binding 1은 이 깊이 텍스처다. 둘 다 엔진이 제공하며 팩 쪽에서는 이름을 붙일 수 없다.
-- **깊이 텍스처는 unfilterable-float, fragment 전용 리소스다.** 바인드 그룹 레이아웃은 이를 `texture: { sampleType: "unfilterable-float" }`로 등록하며 가시성은 `GPUShaderStage.FRAGMENT`뿐이다 — `bloxdOpaqueBehind()`가 `textureSample` 대신 `textureLoad` (명시적 텍셀 좌표, 밉 레벨 0)로 구현된 이유가 바로 이것이다: 이 텍스처에는 하드웨어 필터링이 아예 없다.
-- `z ≤ 0`은 깊이 샘플이 아무것도 맞히지 못했다는 뜻이다 (원거리 평면 / 하늘): `found = false`이며 `position` / `distance`는 의미가 없다 — 항상 `found`를 먼저 확인할 것.
-- 반환되는 위치는 **광선 스케일 교차점**이다: 불투명 표면은 `eye + (fragment − eye) × max(z / viewDepth, 1)`에 놓인다. `distance`는 눈에서 그 점까지의 거리다 — 물 표면 팩에서는 「광선이 단단한 표면에 닿기 전에 물을 얼마나 통과했는가」가 되며, 이것이 두 번째 깊이 버퍼 없이 깊이 틴트 물 레시피를 가능하게 한다.
-
-### 52. blockFlags 전달 경로: 등록에서 훅까지
-
-§42는 비트의 의미를 설명한다. 이 절은 플래그 비트가 블록 등록에서 훅까지 이동하는 완전한 경로다 — 모든 단계는 프로덕션 소스에서 확인했으며, 헤더의 「면 전체에서 같다」가 바이트 수준에서도 성립함을 증명한다.
-
-**1. 등록 (블록 정의 데이터베이스).** 각 블록의 플래그는 등록 시 한 번 계산된다:
-
-```js
-flags[id] = nameFlags                     // 표시명 규칙 (§42): vegetation / dirt / sand / rock
-          | (definition.opaque === true ? 1 : 0)   // 불투명 비트 — 엔진 불투명도 데이터
-          | (anyFaceEmission >= 1       ? 2 : 0);  // 발광 비트 — 블록 광 방출 데이터
-```
-
-표시명 규칙은 네 가지 머티리얼 비트만 담당하고, 두 물리 비트는 별도 엔진 데이터에서 온다 — `opaque`는 블록 정의에서 곧바로, `emissive`는 면별 블록 광 방출 배열에서 온다. 헤더의 「빛나는 광석도 아무리 약해도 포함」은 문자 그대로다: 방출이 1 이상인 면이 있으면 비트가 설정된다.
-
-**2. 블록별 → 머티리얼별 (메셔 초기화).** 지형은 블록 id가 아니라 *머티리얼* 단위로 그려지므로, 플래그는 머티리얼 표로 다시 정리된다 (머티리얼 id로 인덱스하는 `Uint16Array`이며, 각 머티리얼은 소유 블록의 첫 면 플래그를 가진다). 이 표는 메싱 Web Worker로 전달되지만 — **팩 파이프라인이 활성화된 구성에서만** 그렇다. 그 외에는 표가 `null`이고 플래그 바이트가 전혀 기록되지 않는다. 팩이 없는 플레이어는 구조적으로 오버헤드가 0이다.
-
-**3. 정점 바이트로 (메셔 워커).** 플래그는 기존 인터리브 정점 데이터의 여유 바이트 두 개를 탄다:
-
-```js
-addBlockFlagValues(buffer, stride, faceIndex, flags) {
-    for (var base = 4*faceIndex*stride, v = 0; v < 4; v++) {
-        var o = base + v*stride;
-        buffer[o + colorOffset  + 3] = 255 & flags;   // 하위 8비트 → color 속성의 alpha 바이트
-        buffer[o + normalOffset + 3] = flags >> 8;    // 상위 8비트 → normal 속성의 w 바이트
-    }
-}
-```
-
-면의 네 정점 모두 같은 값을 받는다 — 「면 전체에서 같다」의 구현 수준 의미다.
-
-**4. GPU 쪽 디코드 (Lite terrain 셰이더).** 두 바이트는 `blockFlagWords: vec2u` 정점 속성 (location 7, 팩 파이프라인이 켜졌을 때만 존재)으로 이동하고 vertex 단계에서 재조립된다:
-
-```wgsl
-vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
-                          |  (vertexInputs.blockFlagWords.y >> 24u);
-```
-
-`vBlockFlags`는 `@interpolate(flat)`으로 선언된다 — 면마다 일정한 값이 fragment 단계까지 이어지므로, §42의 비트 검사가 면 안에서 안정적이고 면 중간 블렌드가 생길 수 없다.
-
-- 파이프라인은 **16비트** 용량을 예약하지만 (위 디코드는 두 바이트 전체를 재조립한다) v3는 6비트만 정의한다 — 향후 플래그가 정점 형식 변경이나 API 범프 없이 등장할 수 있다.
-- packed-vertex 모드에서는 같은 두 바이트가 전용 속성 대신 `packed.y`와 color 워드의 상위 바이트 안에 들어간다 — 값은 같고 컨테이너만 다르다.
-- 이 플래그에 가장 자주 묻는 나뭇잎 대 잔디 질문은 §42 아래의 [잔디 없는 나뭇잎](#잔디-없는-나뭇잎-모두가-묻는-질문)을 참조.
-
-### 53. 검증 내부: HEADER_VERSION, 서명, 예약 이름
-
-**실측 헤더 해시.** 모든 팩 검증에는 엔진의 `HEADER_VERSION`이 찍힌다. 프로덕션 검증 모듈을 직접 실행하면 (§54 끝의 하네스 주석 참조) 다음과 같이 측정된다:
-
-```
-v2 (sjr0p7):  6.bc5e8338
-v3 (3ymzdd):  6.5bc26a63   ← 라이브 프로덕션 번들에서 측정
-```
-
-FNV-1a-32 해시이며 (`6.` 접두사), 다섯 입력을 해시한다: 베리언트별로 전처리·토큰화한 엔진 헤더 (8개 베리언트 각각 한 항목), 파서의 전체 WGSL 어휘 우주, 네 매크로 이름, 특수 함수 맵, 그리고 `BloxdPackInputs` 선언과 그 `@group(3) @binding(0)` uniform 줄. 작성자에게 중요한 두 가지 결과:
-
-- **엔진 쪽 헤더가 바뀌면 해시도 바뀐다** — 엔진 업데이트 후 저장 팩이 받는 자동 「재확인 필요」 플래그의 메커니즘이다 ([v2 마이그레이션 가이드](history/v2.md) §31).
-- 해시는 *엔진 헤더*를 덮으며 작성하는 코드는 덮지 않는다. 엔진 업데이트를 넘겨 계속 로드되는 팩이 「여전히 유효」한 것은 아니다 — 아직 헤더 변경에 걸리지 않았을 뿐이다. manifest가 참여하는 유일한 버전 검사는 `apiVersion` 게이트다 (§40).
-
-**훅 시그니처 검사: 타입은 토큰 단위로 엄밀, 이름은 자유.** 검증기는 훅 슬롯마다 시그니처 하나를 가진다:
-
-```js
-{
-  vertex:  { params: [{ type: "BloxdVertexIn" }],                      returns: "BloxdVertex"  },
-  surface: { params: [{ type: "BloxdSurfaceIn" }],                     returns: "BloxdSurface" },
-  light:   { params: [{ type: "BloxdSurface" }, { type: "BloxdLightIn" }], returns: "BloxdLight" }
-}
-```
-
-일치는 **토큰 단위**다: 매개변수 타입 이름이 정확히 일치해야 하고, `->`와 반환 타입도 정확히 일치해야 하며, 매개변수 개수와 쉼표 위치도 검사한다. 매개변수 *이름*은 자유다 — 매개변수 자리에 어떤 식별자든 허용되므로, 템플릿이 `(surface, light)`라고 써도 `fn bloxdTerrainLight(s, l)`이 컴파일된다. light 훅은 정확히 매개변수 두 개를 받는다.
-
-**예약 이름.** 규칙은 정규식 하나다: `/^bloxd/i`. `bloxd`로 시작하는 모든 식별자는 예약된다 — `bloxd*`는 모두 엔진 제공이며, 팩은 그 네임스페이스에 선언할 수 없다 (그래서 §44의 `bloxdPi` / `bloxdTau` 재선언이 충돌한다).
-
-**특수 함수.** v3에는 정확히 하나가 등록되어 있다:
-
-```js
-["bloxdOpaqueBehind", { returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }]
-```
-
-「특수」는 *매크로에 묶였다*는 뜻이다 — 가용성이 베리언트 심볼에 달린 엔진 함수다. 올바른 사용을 강제하는 가드 진단은 두 가지다:
-
-> `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — vertex 훅이 surface/light 전용 함수에 닿은 경우.
-> 
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예를 들어 `#ifdef BLOXD_SCENE_DEPTH`로 감싸지 않은 terrain 쪽 `bloxdOpaqueBehind()`.
-
-**엔진 헤더 (프렐류드), 고정.** v3 헤더는 `// Engine-provided and read-only, prepended to all packs. apiVersion 3.`로 시작하는 5,637바이트 문자열이다. 엔진 자체 WGSL 전처리기가 베리언트별로 평가하는 `#if` / `#ifdef` 지시문을 담는다 — 엔진은 실제로 `#if` 식 평가를 실행하며, 잘못된 식은 `Cannot evaluate #if ...`로 오류를 낸다. 이 가이드의 모든 구조체, 함수 시그니처, 인용 주석은 이 렌더링된 텍스트에서 나왔으므로, 가이드와 출하 헤더가 어긋날 수 없다. 전문은 §54 끝에 그대로 실린다.
-
-**작성자를 위한 파서 주의사항.**
-
-- 팩 쪽 함수는 엔진 셰이더에 병합될 때 `pack_` 접두사로 이름이 바뀐다 (충돌 회피). 진단은 이를 원래 이름으로 되돌린다 — [v2 마이그레이션 가이드](history/v2.md) §38이 설명하는 제2 검증 단계와 같은 메커니즘이다.
-- 미선언 식별자 메시지는 `'${name}' isn't declared. Packs can use their own names, WGSL built-ins and the Bloxd header.`다. `_ can only be the target of a phony assignment, as in _ = f();`와 `'${name}' is a WGSL keyword or reserved word, so it can't be a member name.`가 새로 확인된 메시지 집합을 이룬다.
-- 파서의 어휘 우주에는 **표준 WGSL이 아닌** 식별자도 들어 있다: `bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin`. 엔진은 이를 내장으로 알지만, 특정 브라우저의 WGSL 구현이 이를 제공한다고 보장할 수 없다 — 배포용 팩을 이것들에 기대어 만들지 말 것.
-
-### 54. 확인된 상수, 제한, 레이아웃
-
-프로덕션 Lite 렌더러에서 그대로 가져온 terrain 프로그램의 전체 리소스 레이아웃:
-
-| Binding | 내용 |
-|---|---|
-| `@group(0) @binding(0)` | `scene`: `LiteSceneUniforms` — `viewProjection` mat4x4f, `view` mat4x4f, `vEyePosition` |
-| `@group(1) @binding(0)` | `uniforms`: `TerrainFrameUniforms` — `uHeldLightColour` / `uHeldLightPos`, `uSkyLightColour`, `uAmbientLightColour`, **`vFogInfos`**, `vFogColor`, `outputHeight`, `sceneAmbient`, **`uDirLights: array<vec4f, 4>`** |
-| `@group(1) @binding(1)` | `chunks`: storage `array<vec4f>` — xyz = 렌더 프레임으로의 평행 이동, w = 페이드인 가시성 |
-| `@group(2) @binding(0)` | `material`: `vDiffuseColor`, `ambientAndCutoff`, `emissiveAndLevel`, `anim` |
-| `@group(3) @binding(0)` | `bloxdPackInputs` — 팩 uniform (§41) |
-| `@group(3) @binding(1)` | `bloxdSpSceneDepth` — 깊이 텍스처 (§51) |
-
-- **방향광은 최대 네 개로 하드 캡된다.** 씬이 더 등록하려 하면 렌더러는 `Terrain supports 4 directional lights, not ${n}`으로 오류를 낸다. `l.directional`은 존재하는 만큼 (0–4개, Bloxd 자체 씬은 2개 사용 — [라이팅 내부](internals/lighting-internals.md))의 Lambert 합이다. terrain은 또한 처리할 수 없는 light에 대해 다음과 같이 경고한다, 그대로 옮기면: 늦게 추가된 light — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; 색이 입혀진 light — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; 메시 필터링 light — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
-- **terrain 프로그램 이름**: 파이프라인 캐시 키는 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`로 읽힌다 — 팩은 `-sp{variant}` 접미사로 나타나며, §46 베리언트마다 프로그램 하나다. 감시자 (`watchPipelineFailures`)는 살아 있는 파이프라인 이름을 `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/`와 대조해 파이프라인 컴파일이 실패하면 일치하는 팩 베리언트를 다시 검사한다; GPU 장치 손실 (`device.lost`)은 검사를 건너뛴다.
-- **`BLOXD_TERRAIN_DIRECTIONAL`은 엔진 내부 매크로**다 (dirLightCount > 0일 때 정의). 프렐류드의 네 매크로 중 하나가 아니며 팩 코드에 절대 도달하지 않지만, 엔진 자체 셰이더의 WGSL 덤프에는 나타나므로 알아 두면 혼동을 줄일 수 있다.
-- **light-level 디코드**: `aPackedLightLevels` 정점 속성은 니블 네 개를 담은 f32 하나이며, 각각 15로 나뉜다: rgb = 유색 블록 광, a = 스카이 / held 채널. vertex 단계는 이를 `vLightLevels` varying으로 디코드하고, `blockLight`는 `.rgb`를, 스카이 / held 채널은 `.w`를 읽는다. 엔진은 보간 전에 rgb 채널을 가장 밝은 채널의 35%로 바닥 처리한다 — [라이팅 내부](internals/lighting-internals.md)이 게임플레이에서 기록한 리프트의 엔진 쪽 기준점이다.
-- **`vTerrainLambert`** (`directional`의 공급원, §49)는 활성 방향광에 대한 합으로 생성된다: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, `BLOXD_TERRAIN_DIRECTIONAL`로 가드된다.
-- **인덱스 버퍼는 첫 대형 메시에서 32비트가 된다.** Lite 렌더러는 모든 인덱스 값이 65,534 이하로 유지되는 동안만 `Uint16Array` 인덱스를 고른다 — 어떤 인덱스든 65,535에 도달하는 순간 버퍼는 `Uint32Array`가 된다 (버퍼마다 `is32Bits` 플래그로 추적한다). 실제로는: 정점이 최대 65,535개인 청크 메시는 16비트 인덱스에 들어가고, 정확히 65,536개인 메시는 반드시 인덱스 65,535를 내보내 버퍼 전체가 32비트로 전환된다.
-- **manifest 로딩 세부**: `__MACOSX/` 아래 zip 항목, `._` 접두사 파일, `.DS_Store`는 필터링된다 (macOS 아카이브 노이즈). `pack.json`은 소문자 경로 비교로 찾는다 — 0개 일치 → `loadNoManifest`, 2개 이상 → `loadDuplicateManifest`; manifest 읽기는 65,536바이트로 제한된다.
-- **이 모든 것을 어떻게 검증했는가**: 프로덕션 번들의 모듈을 복원하고 (165개 청크; 이 번들의 webpack 레지스트리는 4,951개 모듈을 세지만 — 비동기 자식 의존성을 포함하는지에 따라 모듈 수는 몇 개씩 달라지므로 정확한 숫자는 번들별로 다루는 것이 좋다) Node.js의 webpack 호환 하네스에서 실행했다. 측정된 `HEADER_VERSION` (§53), 렌더링된 5,637바이트 헤더, 베리언트 표의 정규 순서, 특수 함수 맵은 모두 문자열을 읽은 것이 아니라 *출하된 코드를 실행*해 얻은 것이다. 같은 하네스는 커뮤니티 `pack_check` v6의 자연스러운 핵심이다 — 엔진 자체 검증기를 팩에 대해 실행하면 판정을 정확히 재현한다.
-#### v3 엔진 헤더, 그대로
-
-고정된 5,637바이트 (127줄) 텍스트 자체 — 위 §53이 설명한 그 유물이다 — 본 가이드가 대상으로 하는 v3 프로덕션 빌드 `3ymzdd`에서 그대로 복원했다. [v4 마이그레이션 가이드](history/v4.md) §67의 v4 헤더에 대한 v3 대응물이며 (현행 형태는 [텍스처 카탈로그](api/texture-catalog.md)), 같은 이유로 전체를 싣는다: v3 팩을 엔진이 실제로 앞에 붙인 바로 그 텍스트 기준으로 디버깅하고, 모든 v3 → v4 차이 ([v4 마이그레이션 가이드](history/v4.md) §58–§59)를 두 텍스트를 나란히 놓고 직접 읽을 수 있게 하기 위함이다.
-
-```wgsl
-
-// Engine-provided and read-only, prepended to all packs. apiVersion 3.
-
-// Half a turn and a full turn, in radians.
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
-// uniforms, which packs can't name. Any function can call them, not only a hook.
-
-// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
-// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
-// stay close to the player, and so precise.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Unit, towards the sun, in world orientation; zero when the sky has no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// A render position's world position. In f32, so it loses fine detail far from the world's origin.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
-fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
-// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
-// (blockFlags & bloxdBlockFlagRock) != 0.
-const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
-const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
-const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
-const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
-
-struct BloxdVertexIn {
-    position: vec3f,     // A render position: world minus bloxdRenderOffset().
-    normal: vec3f,
-    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
-}
-
-struct BloxdVertex {
-    position: vec3f,     // A render position.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,       // Texture * vertex colour (tint * AO).
-    alpha: f32,
-    normal: vec3f,
-    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdSurface {
-    colour: vec3f,
-#ifdef BLOXD_ALPHA
-    alpha: f32,
-#endif
-    emission: vec3f,     // Added after lighting, then fogged.
-}
-
-struct BloxdLightIn {
-    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
-    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
-    ambient: vec3f,      // Ambient light, added to directional.
-    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
-    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
-    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
-    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-                         // or without BLOXD_LIGHTING.
-    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
-                         // turns it off; black only in a scene with no fog at all.
-    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
-    position: vec3f,     // As in BloxdSurfaceIn.
-    normal: vec3f,
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdLight {
-    colour: vec3f,
-}
-
-// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
-struct BloxdOpaqueBehind {
-    found: bool,         // False where nothing opaque is behind (sky).
-    position: vec3f,     // A render position; meaningless when !found.
-    distance: f32,       // From the eye; meaningless when !found.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Fogs colour as the engine fogs this fragment.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(light.fogColour, colour, light.fogVisibility);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
----
-
-조사: ltf_ahel (glm 을 사용해 조사)
-
 
 ---
 
 ## API v4 마이그레이션 가이드
-> **2026-11-03 대체됨: 현행 API는 버전 5** — v4 팩은 여기서 v3에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 가이드를 적용한 뒤 [v5 마이그레이션 가이드](history/v5.md)를 적용할 것 (v4 → v5: `BloxdFlags` 구조체가 `blockFlags`를 대체, `bloxdLit()`와 공개 조명 레시피, 인챈트/오버레이 입력, 9-훅 기본 팩). 이 가이드의 내부 분석 (§56–§66)은 측정 대상이었던 v4 빌드에 대해서는 정확한 상태로 남는다.
+> 버전: 4 · 상태: 기록 (v3에서 v4로 마이그레이션하는 안내서)
 
-대상 빌드: `cnty9.main.669f8081.js` — **2026-10-26부터 프로덕션과 프리프로드에 동시 적용**. v3 롤아웃 (프리프로드 빌드를 프로덕션으로 승격)과 달리 v4는 한 번의 조치로 양쪽 환경을 같은 새 번들로 전환했고, 두 번들은 바이트 단위로 동일하다 (메인과 모든 셰이더 팩 청크를 md5로 확인), 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 번들도 이 릴리스를 전후로 재구성되었다 — 메인 번들은 4.73 MB에서 3.03 MB (-36%)로 줄었고, 청크 수는 169에서 193으로 늘었으며, 셰이더 팩 파이프라인 전체 (로더, 검증기, 코드 제너레이터, WebGPU 컴파일러)는 이제 연속된 c49–c54 클러스터에 자리한다. 팩 모델 자체는 형태를 유지한다: 같은 `pack.json` 필드, 같은 로더 제한, 같은 64 B uniform, 같은 6개 훅.
-
-**`tcwczu.main.357faec1.js` (2026-10-30, 프로덕션과 프리프로드가 다시 바이트 동일)로 재검증: v4 API 면 전체는 불변.** 엔진 헤더 (디코딩 6,021 B), 기본 팩 템플릿 (출시 형태 1,122 B), 27개 `bloxdSp*` 심볼, blockFlags 비트, 로더 제한, 12개 allow 타이틀은 모두 이 가이드가 기록한 `cnty9` 기준과 바이트 단위로 동일하다 — v4 동결은 v4 이후 첫 번째 번들 갱신까지 유지됐다. 번들 구성은 계속 움직였다: 메인 번들은 3.28 MB로 커졌고, 청크 맵은 202개 id (195개 출력)가 되었으며, 셰이더 파이프라인 클러스터는 c51–c56 (기본 팩은 c124)로 옮겨갔고, §66의 리프트/콘 상수에 대한 「청크 c8」 참조는 이제 c9이다. 그 어느 것도 팩에는 보이지 않는다. 이 재검증에서 다시 재지 *않은* 것은 텍스처 이름 레지스트리 (§68)뿐이다: `cnty9`의 id는 스냅샷으로 남으며, 이름이 여전히 안정적인 API다.
+이 페이지는 API v3 팩을 v4로 마이그레이션하기 위한 역사적 안내서입니다. 현재 버전으로 옮기려면 [API v5 마이그레이션 가이드](history/v5.md)를 적용하세요. 새 팩을 만들 때는 [API 참조](api/)를 확인하세요.
 
 이 릴리스 전후로 번들 밖에서 바뀐 것이 하나 있다: **엔진이 참조 파일을 이름으로 인용한다.** 엔진 자신의 에러 메시지가 `bloxd-api.wgsl` (주석 달린 엔진 헤더)과 `BLOCK_TEXTURES.md` (텍스처 이름 전체 목록)을 가리킨다 — `...BLOCK_TEXTURES.md lists them.` 이 가이드는 그 두 파일을 다른 곳으로 안내하는 대신 내용을 싣는다: 라이브 빌드에서 그대로 복원한 완전한 헤더는 [엔진 내부와 연구: 엔진 헤더](internals/engine-header.md)에, 사용 가능한 텍스처 이름의 완전한 카탈로그 (v4 빌드에서 905개)는 [텍스처 카탈로그](api/texture-catalog.md)이다. 이 가이드의 팩 대면 사실은 모두 프로덕션 번들에서 복원했다.
-
 v4 변경 세트를 한 화면에:
-
 | 영역 | v3 | v4 |
 |---|---|---|
 | `pack.json` `apiVersion` | `3` (엄격) | **`4` (엄격)** — v3 팩은 로드 시 거부 |
@@ -6978,33 +6462,21 @@ v4 변경 세트를 한 화면에:
 | `BloxdOpaqueBehind.found` | `found` | **`hit`**으로 개명 |
 | strict 게임 | 정책 + 가드를 문서화 | 번들 내장 **검증기가 강제**, 정확한 진단 (§60) |
 | 그 외 전부 | — | 동결: 6 훅, `blockFlags` 비트, uniform 레이아웃, 로더 제한, 배리언트 행렬, 팩 `@group(3)` 바인딩 |
-
 v3에서의 변환은 기계적이다 (§61). 단 하나의 조용한 함정이 있을 뿐: `fogAlpha` 반전을 무시한 채 나머지를 전부 이식하면, 포그 의존 코드는 포그가 반전된 채 동작하고 *컴파일은 깨끗이 통과*한다. 언제나처럼 배포 전에는 게임 내 컴파일로 확인할 것.
-
 ### 55. v3 팩의 운명 (먼저 결론)
-
 **v3 팩 전부 — v3로 배포된 팩도 포함 — 는 이제 프로덕션에서 로드 시점에 정확히 실패한다.** 로더는 `manifest.apiVersion !== 4`를 JavaScript 엄격 비교 `!==`로 판정하므로, 비교는 타입·값이 완전히 일치해야 한다: JSON은 *숫자* `4`를 담아야 한다. 문자열 `"4"`는 실패하며 JSON 상의 표기 그대로 보고된다 (`{{packVersion}}`는 `JSON.stringify`되므로, 설정 화면에는 `This pack is for shader pack API version "4"...`처럼 따옴표가 붙어 나온다 — 문자열을 썼다는 유용한 신호).
-
 로드 시점의 두 메시지, 라이브 i18n 사전에서 그대로:
-
 > `This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 키는 존재하지만 4와 같지 않다.
-
 저장된 (이전까지 동작하던) v3 팩은 플레이어에게 아무것도 던지지 않는다. 저장 팩의 판정은 `{kind: "none", reason: "otherApiVersion"}`으로 해결되고, 팩은 조용히 비활성이며, 셰이더 팩 설정 탭은 상태 줄로 이유를 설명한다:
-
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-
 `apiVersion` 주변의 manifest 규칙은 그 외에는 불변이며, 로더가 무엇보다 먼저 강제하므로 다시 적는다:
-
 - `pack.json`은 팩 루트에 있는 JSON 객체여야 한다 (배열도 숫자도 아니다).
 - `apiVersion`은 존재하고 `=== 4`여야 한다.
 - `name`은 필수이며 문자열이고, 앞뒤 공백을 제거한 뒤에도 비어 있지 않아야 한다.
 - `author`는 선택이지만, 있다면 문자열이어야 한다 — 명시적 `null`은 거부된다 (`pack.json's "author" must be a string.`).
 - manifest의 나머지는 전부 로더가 무시한다.
-
 ### 56. pack.json과 uniform 버퍼 (불변인 것)
-
 텍스처를 제외한 팩 모델 전체가 v3에서 바이트 단위로 이어지므로, [v3 마이그레이션 가이드](history/v3.md)의 §41이 여전히 레퍼런스다. v4 재측정값, 라이브 로더 청크 (c51)에서:
-
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
 | 팩당 `.wgsl` 파일 | 256 | `The pack has more than 256 .wgsl files.` |
@@ -7013,22 +6485,17 @@ v3에서의 변환은 기계적이다 (§61). 단 하나의 조용한 함정이 
 | zip 크기 | 32 MB | `The zip is over 32 MB.` |
 | zip 엔트리 | 1,024 | `The zip has more than 1024 entries.` |
 | zip 형태 | — | 분할 zip, Zip64, 암호화 엔트리, 미지원 압축 방식은 각각 전용 메시지로 거부; 모든 파일은 유효한 UTF-8; `pack.json`은 정확히 1개; 경로 중복 불가 |
-
 프레임당 uniform은 무변: `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`, 64바이트, std140풍 레이아웃:
-
 | 오프셋 | 필드 | 타입 | 비고 |
 |---|---|---|---|
 | 0 | `seconds` | `f32` | `bloxdSeconds()`의 기반 |
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()`의 기반 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()`의 기반 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()`의 기반 |
-
 6-훅 템플릿은 주석 다듬기만 받은 채 출시됐다 (1059 → 1122 바이트; §45의 v3 거동은 불변). v4 템플릿, 그대로 — 여전히 최고의 출발용 스켈레톤이자 복사할 strict 게임 패턴이다:
-
 ```wgsl
 // Every hook here returns its engine default.
 // Copy a hook and change its output to start a shader pack.
-
 // Strict games keep terrain where it is. We use #ifndef to define the hook for
 // non-strict games, but to disable it in strict games, so our pack can stay on.
 #ifndef BLOXD_STRICT
@@ -7036,93 +6503,63 @@ fn bloxdTerrainVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
-
 // Water uses liquid hooks. If deleted, water uses your terrain hooks instead.
 #ifndef BLOXD_STRICT
 fn bloxdLiquidVertex(vertex: BloxdVertexIn) -> BloxdVertex {
     return bloxdDefaultVertex(vertex);
 }
 #endif
-
 fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return bloxdDefaultSurface(surface);
 }
-
 fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 ```
-
 ### 57. 텍스처 API: `bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` (헤드라인)
-
 v3 팩은 면의 *색*은 읽을 수 있었지만 *텍스처*는 읽을 수 없었다. v4는 블록 텍스처 아틀라스 자체를 연다: 엔진 함수 3개, 명명 상수 패밀리 1개, 새 입력 필드 4개 (§58). 헤드라인에 대한 엔진 헤더 자신의 한 줄 요약: *"This face's texture. Compare with `bloxdTextureId*`."*
-
 #### 57.1 `bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f`
-
 블록 텍스처 아틀라스를 **엔진 자신의 샘플러와 정확히 같은 방식으로** 샘플링한다 — 같은 `texture_2d_array<f32>` 아틀라스, 같은 `atlasSampler`, `round(mipLevel)`에서의 `textureSampleLevel` — 이므로, 당신이 읽은 텍셀과 엔진이 렌더링한 텍셀은 구성상 일치한다. 시맨틱, 생성된 WGSL에서 전부 복원 (§63에 전문이 있다):
-
 - **`textureId == 0`은 `vec4f(1.0)`을 반환** — 흰색. 그것이 「텍스처 없음」 id이며, 면에 텍스처가 없을 때 4개 입력 필드가 담는 값이기도 하다. 따라서 `bloxdTexel(surface.textureId, ...)`은 항상 안전하게 호출할 수 있다.
 - **애니메이션 텍스처는 현재 프레임을 자동으로 반환한다.** 프레임은 게임의 애니메이션 시계와 함께 진행된다 — 멈추거나 한 프레임씩 밟을 수 없고, 그럴 필요도 없다: 애니메이션 텍스처의 id를 샘플링하는 것은 곧 살아 있는 프레임을 샘플링하는 것이다 (프레임 수식은 §63.3).
 - **`mipLevel`은 엔진이 자기 것을 다루는 방식으로 클램프된다:** `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`. 범위 밖 밉은 에러 대신 포화한다.
 - **현재 프래그먼트의 `textureRotation`이 당신이 넘긴 uv에 적용된다** — 57.4 참조; 실제 시각적 결과가 걸려 있는 유일한 미묘한 부분이다.
-
 `textureId`는 **1-베이스**다: `bloxdTextureIdGrassTop`가 id이고, 엔진이 그것을 위해 샘플링하는 아틀라스 레이어는 `id - 1`이다. id는 아틀라스 레이아웃이 아니라 텍스처 *이름*에 대해 안정적이다 — 엔진은 빌드마다 아틀라스를 자유롭게 재배치하지만, 당신의 `bloxdTextureId*` 비교는 계속 「이 텍스처」를 의미한다.
-
 #### 57.2 `bloxdTextureSize(mipLevel: f32) -> vec2u`
-
 `textureDimensions(textureAtlas0, <클램프된 밉>)` — 해당 밉 레벨에서 아틀라스의 텍셀 단위 크기. 모든 텍스처가 그 아틀라스의 배열 레이어 하나를 차지하므로, 이것은 곧 *그 밉에서 임의의 텍스처 하나의 텍셀 크기*이기도 하다 (아틀라스 티어의 모든 블록 텍스처는 같은 정사각 크기다). 텍셀 격자 효과를 원할 때 `bloxdTexel`과 짝지어 쓴다:
-
 ```wgsl
 // A texel-aligned "pixel art" re-sample of this face's own texture.
 let size = bloxdTextureSize(surface.mipLevel);
 let uv = fract(surface.uv);
 let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 ```
-
 #### 57.3 `bloxdTextureId*`: 명명 텍스처 상수
-
 사용 가능한 모든 텍스처 이름이 비교 가능한 `const`가 된다 — 텍스처 파일 이름을 **CamelCase로 표기**한다:
-
 | 텍스처 파일 | 상수 | 비고 |
 |---|---|---|
 | `grass_top.png` | `bloxdTextureIdGrassTop` | 엔진 자신의 예시 |
 | `lava0.png` (프레임 `lava0`–`lava7`) | `bloxdTextureIdLava` | 애니메이션 패밀리: 프레임 접미사는 정규명에서 떨어진다 |
 | `black_portal0.png` (프레임 0–3) | `bloxdTextureIdBlackPortal` | 같은 규칙 |
 | `radar_screen0` (회전 복사 `[rot[1`–`[rot[4`) | `bloxdTextureIdRadarScreen0` | 회전 패밀리: 루트 이름으로 접힌다 |
-
 표기 규칙, 검증기에서 복원: 이름을 비영숫자 연속 부분마다 쪼개 각 부분의 첫 글자를 대문자로 바꾸고 `bloxdTextureId` 접두사 뒤에 이어 붙인다. 반대 방향의 조회는 **대소문자·언더스코어 무감각**이다 (엔진이 매칭 전에 당신의 표기를 같은 방식으로 접는다). 표기가 해석되지 않을 때는 3개의 전용 에러 패밀리가 나온다 — 라이브 검증기에서 그대로:
-
 > **접두사 오기 / 대소문자 오류:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
-> 
 > **애니메이션 텍스처의 프레임:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
-> 
 > **회전 복사:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
-> 
 > **접은 뒤 모호:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
-> 
 > **미발견, 제안 있음:** `There's no texture called X. Did you mean bloxdTextureIdY?` — 제안 임계값은 레벤슈타인 거리 `max(2, floor(len/4)) + 1`.
-> 
 > **미발견, 제안 없음:** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
-
 마지막 메시지가 가리키는 파일을 이 가이드는 대신 싣는다: 완전한 실측 카탈로그 — 905개 사용 가능 이름 각각과 당시의 id, 회전·애니메이션 패밀리 표 — 는 아래 §68이고; §64에는 레지스트리 측정과 그 배후의 접기 규칙이 있다. 그 카탈로그의 라이브 후속판이 [텍스처 카탈로그](api/texture-catalog.md)이다.
-
 #### 57.4 회전의 미묘함 — 그리고 중립 샘플링 헬퍼
-
 `bloxdTexel`은 당신이 어떤 id를 넘기든, 넘긴 uv를 **현재 프래그먼트의** `textureRotation`만큼 역회전한다. 두 가지 흔한 경우에는 이것이 정확히 옳다:
-
 - **이 면 자신의 텍스처를 `surface.uv`로 재샘플링** — uv는 면의 회전된 좌표계에 있고, 역회전이 그것을 아틀라스 좌표계로 바꾸므로 진짜 텍셀을 얻는다. 이것이 의도된 주 용법이다.
 - **회전이 0이 아닌 면에서, *아틀라스* 좌표로 계산한 uv로 *다른* 텍스처를 샘플링** — 역회전은 여전히 발동하고, 샘플은 회전된 채 떨어진다. 이것이 함정이다.
-
 엔진에는 참조할 텍스처별 회전이 없으므로 (회전은 면의 기하 데이터다, §63.2), 항상 프래그먼트의 것을 쓴다. 다른 텍스처를 회전 중립적으로 샘플링하려면, uv를 같은 4분회전만큼 미리 돌려라 — 역회전의 역 — 그러면 상쇄된다:
-
 ```wgsl
 // Rotation-neutral texel sampling: pre-turn the uv so bloxdTexel's
 // un-turn (by this face's textureRotation) cancels out.
@@ -7138,18 +6575,13 @@ fn texelNeutral(id: u32, uv: vec2f, mip: f32, r: u32) -> vec4f {
     }
     return bloxdTexel(id, turned, mip);
 }
-
 // usage, inside a surface hook:
 //   let t = texelNeutral(bloxdTextureIdLava, fract(surface.uv),
 //                        surface.mipLevel, surface.textureRotation);
 ```
-
 (`textureRotation == 0`이면 보정이 필요 없다. 실제로는 대부분의 면이 0을 담는다; 회전된 면은 소수다 — 하지만 배포 팩은 그렇다고 가정해서는 안 된다.)
-
 #### 57.5 작동 예시
-
 **텍셀 휘도에서의 발광.** 엔진은 이미 texture × tint × AO를 `surface.colour`에 곱해 넣었다; 여기서는 대신 텍스처 자신의 밝기로 emission을 구동한다 — 면의 것보다 한 밉 *위*를 샘플링해서, 거리에도 견디는 부드럽고 블록풍의 평균을 얻는다:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -7163,9 +6595,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 **텍스처 특정 효과.** `textureId`를 비교해 고른 텍스처에만 작용한다 — 「색에서 추측」의 v4 대체이며, 이를테면 광석을 반짝이게 만드는 공식적인 방법이다:
-
 ```wgsl
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(surface, light);
@@ -7178,9 +6608,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 **지형 디테일에 대한 피사계 심도풍 거리 블러** — 멀리서는 높은 밉을 읽고, 가까이서는 네이티브 밉을 읽는다:
-
 ```wgsl
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
@@ -7199,19 +6627,13 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 (비율 트릭은 엔진의 `colour = texture × tint × AO`를 지킨다: 흐려진 텍셀을 네이티브 텍셀로 나누면 텍스처 내용이 상쇄되고, `surface.colour`에 다시 곱할 블러 인자만 남는다. 흰색 `vec4f(1.0)` 판독 — 텍스처 없는 면과 엑스레이 방지 컬링이 제외한 면 — 에서는 가드가 효과 전체를 건너뛴다.)
-
 #### 57.6 텍스처 API가 닿지 *않는* 곳
-
 - **버텍스 훅에서는 호출할 수 없다.** `bloxdTexel` / `bloxdTextureSize`는 surface/light 훅용 함수다; 버텍스 훅에서 도달하면 「reaches」 진단으로 거부된다 (§65.3).
 - **텍스처를 추가할 수 없다.** 아틀라스는 엔진의 것; API는 그것을 읽을 뿐 그 이상은 아니다. 커스텀 텍스처는 셰이더 팩이 아니라 텍스처 팩 시스템의 담당으로 남는다.
 - **비아틀라스 렌더러 구성은 스텁으로 열화된다.** 지형 머티리얼이 아틀라스 기반이 아닌 구성에서는 엔진이 `bloxdTextureSize() -> vec2u(1u)`와 `bloxdTexel(...) -> vec4f(1.0)`로 컴파일하고, 4개 입력 필드에는 `0u, 0u, vec2f(0.0), 0.0`을 넣는다. 진짜 아틀라스를 상대로 쓴 코드도 거기서는 컴파일되고 동작한다 — 흰 텍셀과 1×1 크기가 보일 뿐이다. `textureId == 0`을 견디도록 쓴 코드는 이 구성도 함께 견딘다.
-
 ### 58. 새 입력 필드 4개
-
 `BloxdSurfaceIn`과 `BloxdLightIn` 양쪽이 똑같은 4개의 후행 필드를 얻는다, v4 헤더에서 인용한다 (light 구조체는 surface 구조체와 같은 4조를 담는다 — light 훅이 surface 훅을 통해 아무것도 넘길 필요 없이 텍스처에 작용할 수 있다):
-
 ```wgsl
     // These are 0 if the face has no texture.
     textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
@@ -7219,14 +6641,11 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
     mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
 ```
-
 - **`textureId`** — 안정적인, 이름 유래 id (§57.3). 텍스처 없는 면에서는 `0`; 그 외의 경우 절대 `0`이 아니다.
 - **`textureRotation`** — `0`–`3`, 면이 텍스처를 *표시*하는 대로의 **시계방향** 4분회전 수. 기하/텍스처 팩 오버라이드에서 온다 (§63.2); 두 훅에서 같은 값이다.
 - **`uv`** — **블록 단위**의 보간된 텍스처 좌표: 면적 1블록이 uv 폭 `1.0`에 대응하므로 `fract(uv)`가 블록 내 텍스처 타일이다 — 헤더 자신의 표현이다. 반복되는 돌 벽에서는 `uv`가 벽을 따라 자라나고 `fract(uv)`가 타일을 이룬다.
 - **`mipLevel`** — 이 프래그먼트에 대한 엔진 자신의 밉 선택. 텍셀 위치의 스크린 공간 도함수에서 유도되고 아틀라스의 레벨 범위로 클램프된다 (정확한 수식은 §63.1). 화면을 채우는 면에서는 `0`, 거리·비스듬함에 따라 상승한다. 이것은 *판독값*이다 — 엔진의 샘플링을 조향하는 데 쓸 수는 없지만, 그것 (또는 `± n`)을 `bloxdTexel`에 넘길 수는 있다.
-
 v4만의 레시피 아이디어 — **월드 좌표 없이 블록 격자를 존중하는, uv에 앵커된 디테일 패턴**:
-
 ```wgsl
 // Fine grid keyed to the texture's own tiling: visible on every textured
 // face, stable under camera motion, and free of floating-point world drift.
@@ -7238,22 +6657,16 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return out;
 }
 ```
-
 ### 59. 개명과 의미 변화
-
 4개의 개명, 그중 하나는 의미가 반전된다. 헤더의 나머지 전부 — `bloxdPi`, `bloxdTau`, 6개 `bloxdBlockFlag*` 상수와 그 비트 (1/2/4/8/16/32), `bloxdEyePosition` / `bloxdRenderOffset` / `bloxdSunDirection` / `bloxdSeconds`, `bloxdWorldPosition`, 기본 훅들, `BLOXD_*` 매크로 행렬, 8-배리언트 행렬 — 은 v3에서 불변이며, §42의 `blockFlags` 이름 분류 규칙도 그대로 이어진다.
-
 | v3 | v4 | 비고 |
 |---|---|---|
 | `l.fogVisibility` | `l.fogAlpha` | **의미 반전** — 개명만 하지 말고 식을 이식할 것 |
 | `bloxdFaceBlock(pos, nrm)` | `bloxdFragmentBlockPosition(pos, nrm)` | 본체 동일: `vec3i(floor(pos - nrm * 0.5)) + bloxdRenderOffset()` |
 | `behind.found` | `behind.hit` | `BloxdOpaqueBehind` 필드 개명 |
 | 헤더 첫 줄 | — | `// Engine-provided and read-only, prepended to all packs. apiVersion 3.` → `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` |
-
 #### 59.1 `fogVisibility` → `fogAlpha`: 반전된 것
-
 v3: `fogVisibility: f32, // 1 = no fog, 0 = fully fogged.` v4: `fogAlpha: f32, // 0 = no fog, 1 = only fogColour.` 기본 포그 적용도 함께 뒤집혔다:
-
 ```wgsl
 // v3
 fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
@@ -7264,63 +6677,37 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
     return mix(colour, light.fogColour, light.fogAlpha);
 }
 ```
-
 이식표 — v3 포그 관용구에는 하나같이 기계적인 v4 대응이 있다:
-
 | v3 표현 | v4 이식 |
 |---|---|
 | `l.fogVisibility` | `1.0 - l.fogAlpha` |
 | `mix(l.fogColour, col, l.fogVisibility)` | `mix(col, l.fogColour, l.fogAlpha)` (또는 `bloxdApplyFog(col, l)`) |
 | `mix(l.fogColour, col, max(l.fogVisibility, 0.15))` (포그 바닥) | `mix(col, l.fogColour, min(l.fogAlpha, 0.85))` |
 | 「가까이에서는 fog visibility가 1」 | 「가까이에서는 fogAlpha가 0」 |
-
 포그의 *거리* 거동은 불변이다 — 같은 곡선, 같은 색; 바뀐 것은 필드의 극성과 이름뿐이다. `fogColour`의 주석 변화도 주목하라: v3는 게임이 「항상 포그를 가진다」고 했지만, v4는 `0 when the game has no fog`를 기록한다 (씬의 포그가 꺼져 있으면 엔진은 실제로 `vec3f(0.0)`을 넣는다) — `fogColour`로 나누거나 비교하는 코드에 관련된다.
-
 #### 59.2 `bloxdFaceBlock` → `bloxdFragmentBlockPosition`
-
 순수한 개명이다 — 엔진 자신의 문서 주석이 "the world block the face ... belongs to"에서 "identify the block's world position"으로 바뀌었고, 본체는 바이트 동일이며, 매개변수 이름은 여전히 자유다. 레시피 R4와 모든 `bloxdFaceBlock(l.position, l.normal)` 호출 지점은 검색·치환으로 이식된다.
-
 #### 59.3 `found` → `hit`
-
 `bloxdOpaqueBehind()`는 여전히 `BloxdOpaqueBehind`를 반환하고, 여전히 `BLOXD_SCENE_DEPTH`가 정의된 곳에서만 컴파일되며 (액체 프로그램 — §60.4), 구현은 필드 이름 외에는 불변이다. `behind.found` → `behind.hit`으로 이식하고, v4 헤더 주석에서 시맨틱을 다시 읽을 것: `!hit`일 때 `position`과 `distance`는 `0`이다 (「무의미」가 아니다). R-E (물 흡수)와 그 친구들은 기계적으로 이식된다.
-
 ### 60. strict 게임 계약: 버텍스 훅, `discard`, 엑스레이
-
-strict 게임은 예외가 아니라 규칙이다: **모든 것이 기본적으로 strict**이며, [게임별 셰이더 팩 정책](internals/policy.md)에 열거된 12개 allow 타이틀만 빠져나간다 (v4 번들에서 2026-10-27 다시 그대로 확인 — 같은 12 타이틀: Test Gym, Doodle Cube, Rocket Obby, Creative, Bloxd Hop, Fishing, Dress Up, Evil Tower, Plots, Test Mode, Tsunami Steal Brainrots, Work at a Restaurant; 그 외 모든 타이틀 — 서바이벌, 배드워즈, 스카이워즈, 커스텀 게임, ... — 은 strict다). v4는 지금까지 문서 수준의 계약이었던 것을 **강제되는** 계약으로 바꾼다: 번들 내장 검증기가 모든 strict 배리언트를 분석해 전용 진단을 낸다.
-
 #### 60.1 강제되는 두 규칙과 그 정확한 진단
-
 > `bloxdTerrainVertex moves terrain, which strict games prevent.`
-> 
 > `discard makes terrain see-through, which strict games prevent.`
-
 메커니즘, 검증기에서 복원:
-
 - **strict 배리언트에서 정의된 버텍스 훅** (즉 `#ifndef BLOXD_STRICT`로 감싸지 않은 것) 이 첫 번째 메시지를 낸다. 「지형을 움직인다」는 문자 그대로 받아들여진다: 정확한 기본 통과가 아닌 버텍스 훅은 전부 해당된다 (검사는 `movesVertices = vertexHook && !isExactDefault` — 입력을 그대로 반환하되 다른 표기로 반환하는 훅조차 움직임으로 센다).
 - **surface 또는 light 훅에서 도달 가능한 `discard`** 가 두 번째를 낸다. `discard` 자체는 비 strict 게임에서 v4에 *새로 합법*이다 — v1–v3의 완전 금지는 사라졌다 — 하지만 strict 게임은 이를 엑스레이로 다룬다 (아래 참조).
 - **한 번 적발되면 strict 게임에서 전부 비활성화.** strict 배리언트의 분석이 이런 진단을 하나라도 내면, 검증기는 strict 배리언트의 *세 훅 모두*를 무효화한다: 팩은 여전히 로드되고, allow 게임에서는 동작하며, strict 게임에서는 정확히 아무것도 하지 않는다. 따라서 가드 없는 버텍스 훅은 흔들림만 잃는 게 아니라, 당신의 조명까지 잃는다.
 - **가드된 코드는 나머지를 살린다.** 템플릿의 `#ifndef BLOXD_STRICT` 랩이 있으면 strict 배리언트는 버텍스 훅을 정의하지 않고, 진단을 내지 않으며, surface/light 훅은 strict 게임에서도 계속 돈다. 그것이 템플릿 주석의 요점 전부다: *"so our pack can stay on."*
-
 설정 UI는 저자를 정확히 이 과정으로 안내한다. 상태 줄, 그대로:
-
 > `Off in strict games. To run any other parts of the pack in them, wrap each one listed below in #ifndef BLOXD_STRICT ... #endif`
-
 …이어서 문제의 훅 목록이 따르고, 각 항목에는 배리언트 축을 `strict / non-strict`, `lighting on / off`, `terrain / liquid`로 풀어 쓴 `(only in {{variants}})` 접미사가 선택적으로 붙는다. 그리고 게임 안에서, 현재 모드에서 돌릴 것이 남아 있지 않은 팩은 채팅에 이렇게 표시한다: `Your shader pack is off in this game.`
-
 #### 60.2 이유: 엑스레이
-
 두 규칙은 같은 이유로 존재한다 — 경쟁 게임에서 지형을 움직이거나 구멍을 내는 셰이더는 묻힌 구조물과 광석을 드러낼 수 있다는 것이다. 가림 블록을 옆으로 당기는 버텍스 훅은 월핵이며, 고른 프래그먼트에 `discard`를 쓰는 것은 바늘구멍 엑스레이다. 엔진 자신의 템플릿이 *오직* 버텍스 훅만 가드하는 것도 이 때문이다: surface/light 효과 (색, 조명, 발광)는 기하를 움직일 수 없으므로 어디서든 안전하다. 커뮤니티 튜토리얼 채널도 플레이어 쪽에서 이 정책을 확인해 준다 — 풀 흔들림 팩이 「strict 게임에서 안 된다」는 정전의 예시이며, strict 게임이 수행하는 엑스레이 방지 컬링은 일부 텍스처를 렌더 경로에서 완전히 숨기므로, 거기서는 텍셀 판독조차 흰색으로 돌아올 수 있다. strict-퍼스트로 설계하라: allow 게임 전용 효과 (흔들림, 구멍) 는 점진적 향상으로 취급하고, 절대 헤드라인 기능으로 삼지 말 것.
-
 #### 60.3 v4에 *없는* 것: 섀도 API
-
 같은 커뮤니티 채널은 엔진 작가가 섀도 API 초안 (`bloxd-api` 동반 파일)을 가지고 있었지만 이 릴리스에 **싣지 않았다**고 기록한다 — 블록/풀 그림자는 장래의 셰이더 팩 API 갱신과 함께 도착할 것으로 보인다. v4 번들에는 섀도 관련이 아무것도 없다 (섀도 심볼도 없고, §63.4의 목록을 넘는 예약 이름도 없다) — 섀도는 「발표는 되었으나 미출시」로 다루고, 그것에 기대고 배포 팩을 만들지 말라. `skyLight` 기반 투영 그림자 레시피 (R9.12) 가 v4에서 이용 가능한 유일한 그림자 표현으로 남는다.
-
 #### 60.4 액체 작가를 위한 strict 요약
-
 매크로 행렬은 §46과 불변이다: `BLOXD_ALPHA`는 모든 액체 배리언트와 비 strict 지형에서; `BLOXD_SCENE_DEPTH`는 모든 액체 배리언트에서; `BLOXD_STRICT` / `BLOXD_LIGHTING`는 각자의 축에서. strict 액체 프로그램도 alpha와 깊이는 준다 — strict 게이트에 걸리는 것은 지형 alpha뿐이다.
-
 ### 61. v3 → v4 마이그레이션 체크리스트
-
 1. **`pack.json`**: `"apiVersion": 4` — 문자열이 아니라 숫자.
 2. **개명** `bloxdFaceBlock` → `bloxdFragmentBlockPosition`, 모든 곳에서 (인수는 불변; 매개변수 이름은 언제나처럼 자유).
 3. **포그 이식** (조용한 함정 — 이걸 건너뛴 팩은 컴파일되고 잘못 보인다):
@@ -7332,9 +6719,7 @@ strict 게임은 예외가 아니라 규칙이다: **모든 것이 기본적으�
 6. **strict 감사** (배포에는 필수): 모든 버텍스 훅을 `#ifndef BLOXD_STRICT ... #endif`로 감쌀 것; `discard`를 쓴다면 그것 (또는 그것을 담은 훅) 도 같은 방식으로 감싸거나, strict 게임이 팩의 훅 전부를 비활성화한다는 사실을 받아들일 것.
 7. **8개 배리언트에 걸친 게임 내 컴파일 확인**: 로더 화면의 "Checking the pack..."은 모든 배리언트를 한 번에 검증한다 — strict/비 strict × 조명 on/off × 지형/액체 — 한 패스로 전부 덮는다. 그런 다음 allow 게임 하나 (Test Mode가 가장 빠르다)와 strict 게임 하나를 눈으로 확인한다.
 8. **자신의 버전 메타데이터를 올리고 재배포**: 플레이어 기계에 저장된 v3 사본은 조용히 비활성이며 (§55), 이유를 말해 주는 것은 설정 탭뿐이다.
-
 #### 61.1 완전한 v3 → v4 이식, 전과 후
-
 ```wgsl
 // ---- v3 pack: hot sand shimmer + fog-aware emission ----
 fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
@@ -7345,7 +6730,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
     }
     return out;
 }
-
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     // v3: keep glowing at distance by adding emission AFTER fog
@@ -7354,7 +6738,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 ```wgsl
 // ---- v4 port: same look, plus texel-aware sand and a texture guard ----
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
@@ -7371,7 +6754,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     }
     return out;
 }
-
 fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(surface, light);
     // v4: fogAlpha port — emission added after fog, gated by (1 - fogAlpha)
@@ -7380,11 +6762,8 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return out;
 }
 ```
-
 두 훅 모두 surface/light 뿐이므로, 이 팩은 `#ifndef BLOXD_STRICT` 랩이 필요 없고 (새 텍셀 효과와 함께) strict 게임에서도 돈다. `textureId != 0u` 가드가 텍스처 없는 면을 덮는다; strict 게임의 엑스레이 방지 컬링을 고려해, 스타일 효과는 0이 아닌 id인데도 텍셀 판독이 흰색으로 돌아오는 경우에도 우아하게 열화되어야 한다 — 범위와 비율로 분기하고, 기대한 텍셀 값 하나로 분기하지 말 것.
-
 ### 62. 그 외의 v4 변경과 메모
-
 - **번들 재구성** (숫자는 서두 참조) 은 셰이더 파이프라인을 청크 c49 (로더/지속화), c50–c51 (로더 UI + zip), c53 (검증기 + 헤더 + 레지스트리 빌더), c54 (WGSL 코드 제너레이터 + Lite 렌더러) 로 옮겼다. v3 시대 가이드를 기준으로 번들을 재조사하는 사람에게: 앵커는 전부 움직였지만, 코드는 그렇지 않다.
 - **헤더 텍스트가 명료성을 위해 다시 쓰였다** — 모든 문서 주석이 다듬어지고 (더 짧게, 2인칭), §59 외에는 의미 변화가 없다. 크기 5,637 → 6,021 바이트, 128 → 150 줄; 첫 줄은 이제 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission 순서가 헤더에 공식 기록됐다**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3의 §43 발견이 공식 문구가 되었다.
@@ -7393,1506 +6772,10 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **자동 재검사가 이제 텍스처 레지스트리 변화에도 발동한다** (§65.1) — 레지스트리 해시가 HEADER_VERSION에 합류한 결과다. 헤더 텍스트가 변하지 않았더라도, 단지 *텍스처를 추가*하기만 하는 엔진 업데이트로도 저장 팩이 「재확인 필요」로 넘어갈 수 있다. 의도된 동작이다: 당신의 `bloxdTextureId*` 상수는 검증 시점에 굳어진다.
 - **`bloxdSp*` 예약이 27 심볼로 확장됐다** (§63.4) — 생성된 셰이더 안쪽의 엔진 전용 네임스페이스. 팩 수준의 예약 규칙은 불변이고 더 넓다: `/^bloxd/i` (대소문자 무시) 에 맞는 것은 무엇이든 예약이다.
 
-### 63. 엔진 내부: `bloxdTexel`은 실제로 어떻게 샘플링하는가
-
-v3의 §49–§51과 마찬가지로, 이하는 프로덕션 번들 (청크 c54의 코드 제너레이터, 빌드 `cnty9`, 2026-10-26) 에서 그대로 복원했으며, 이 메커니즘에 대해 공개된 가장 깊은 기술이다. §57의 어떤 내용도 이 스니펫들이 증명하는 것을 넘지 않는다.
-
-#### 63.1 생성된 함수, 그대로
-
-아틀라스 텍스처 모드이고 애니메이션이 없는 렌더러 구성에서, 엔진은 정확히 이것을 뿜는다:
-
-```wgsl
-var<private> bloxdSpTextureRotation: u32;
-@group(3) @binding(2) var<storage, read> bloxdSpTextureLayers: array<u32>;
-
-fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
-    return textureDimensions(textureAtlas0,
-        u32(clamp(round(bloxdSpMipLevel), 0.0,
-                  f32(textureNumLevels(textureAtlas0) - 1u))));
-}
-
-fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
-    if (bloxdSpTextureId == 0u) {
-        return vec4f(1.0);
-    }
-    // Each quarter turn clockwise the face shows its texture at reads the
-    // unturned texture at (v, 1 - u)
-    var bloxdSpTurned = bloxdSpUv;
-    if (bloxdSpTextureRotation == 1u) {
-        bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
-    } else if (bloxdSpTextureRotation == 2u) {
-        bloxdSpTurned = 1.0 - bloxdSpUv;
-    } else if (bloxdSpTextureRotation == 3u) {
-        bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
-    }
-    let bloxdSpLayer = bloxdSpTextureId - 1u;
-    return textureSampleLevel(textureAtlas0, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer, round(bloxdSpMipLevel));
-}
-```
-
-아틀라스가 둘 이상이면 꼬리는 레이어 창 사다리가 된다 — 아틀라스 *k*는 레이어 `[k * layersPerAtlas, (k+1) * layersPerAtlas)`를 소유한다:
-
-```wgsl
-    if (bloxdSpLayer < 2u * layersPerAtlas) {
-        return textureSampleLevel(textureAtlas1, atlasSampler, bloxdSpTurned,
-                                  bloxdSpLayer - layersPerAtlas, round(bloxdSpMipLevel));
-    }
-    // ... one rung per atlas, the last one unguarded ...
-    return textureSampleLevel(textureAtlasLast, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer - N * layersPerAtlas, round(bloxdSpMipLevel));
-```
-
-이것이 증명하는 것: `textureId`는 **모든 아틀라스를 통틀은 전역 1-베이스 레이어 인덱스**이며 (`bloxdSpLayer = textureId - 1u`), `bloxdTextureSize`는 아틀라스 0만 읽는다 — 모든 아틀라스 티어가 치수를 공유하므로 유효하다.
-
-#### 63.2 프래그먼트의 텍스처 4조는 어디서 오는가
-
-버텍스별 속성 `texAtlasIndices` (기하의 텍스처 슬롯 인덱스) 는 **스토리지 버퍼를 통해** 해석되며, 직접 쓰이지 않는다:
-
-```wgsl
-// vertex stage (injected):
-vertexOutputs.vPackTexture = bloxdSpTextureLayers[
-    min(u32(vertexInputs.texAtlasIndices), arrayLength(&bloxdSpTextureLayers) - 1u)];
-```
-
-`bloxdSpTextureLayers`는 JS 쪽에서 채워진다, 슬롯당 `u32` 하나, 정확히 이렇게 패킹된다:
-
-```js
-layers[slot] = (id & 0xffff) | ((rotation & 3) << 16);
-```
-
-프래그먼트 스테이지는 surface 훅이 돌기 전에 두 절반을 풀어낸다:
-
-```wgsl
-// fragment stage (injected, ahead of the surface hook):
-let bloxdSpTexture = fragmentInputs.vPackTexture;
-bloxdSpTextureRotation = bloxdSpTexture >> 16u;      // -> textureRotation field
-// BloxdSurfaceIn constructor tail:
-//   bloxdSpTexture & 0xffffu,        // textureId
-//   bloxdSpTextureRotation,          // textureRotation
-//   fragmentInputs.vMainUV1,         // uv
-//   bloxdSpMipLevel                  // mipLevel (derived below)
-```
-
-그리고 밉은 엔진이 자기 것을 유도하는 방식과 정확히 같이 유도된다:
-
-```wgsl
-let bloxdSpTexelUV = fragmentInputs.vMainUV1 * atlasWidth;
-let bloxdSpDdx = dpdx(bloxdSpTexelUV);
-let bloxdSpDdy = dpdy(bloxdSpTexelUV);
-let bloxdSpLod = 0.5 * log2(max(max(dot(bloxdSpDdx, bloxdSpDdx),
-                                    dot(bloxdSpDdy, bloxdSpDdy)), 1e-10));
-let bloxdSpMipLevel = clamp(bloxdSpLod, 0.0,
-                            f32(textureNumLevels(textureAtlas0) - 1u));
-```
-
-새겨 둘 만한 귀결이 두 가지 있다: 회전은 정말로 **슬롯별 기하 데이터**라는 것 (어디에도 텍스처별 회전 조회는 없다 — 이것이 §57.4의 미묘함이 존재하는 *이유*다), 그리고 (팩 없는) *기본* 지형 셰이더는 아틀라스를 다르게 샘플링한다는 것 — 미리 회전해 둔 레이어 복사본을 날것의 uv로 직접 쓰는 반면, 팩 경로는 회전 안 된 레이어로 정규화해서 `bloxdTexel`이 회전을 다시 적용한다. 같은 픽셀, 두 개의 표현이다.
-
-#### 63.3 애니메이션: 프레임 사다리
-
-애니메이션 텍스처에서는 레이어 할당에 프레임 계산이 하나 자라난다 (이것이 *전부* 다른 점이다 — 샘플링, 회전, 밉 논리는 불변이다):
-
-```wgsl
-    let atlasIdxIn = f32(bloxdSpTextureId - 1u);
-    let animTick = material.anim.x;               // animation clock
-    let animTickStride = material.anim.y;
-    let numAnimTextures = material.anim.z;
-    let animParamIndex = 3.0 * min(numAnimTextures, floor(atlasIdxIn));
-    let animStateMask = animDataPerTex[i32(animParamIndex)];        // frames - 1
-    let animTexIndexStart = animDataPerTex[i32(animParamIndex + 1.0)];
-    let animInterval = max(animTickStride, animDataPerTex[i32(animParamIndex + 2.0)]);
-    let animTickForTex = floor((animTickStride / animInterval) * animTick);
-    let animState = animTickForTex
-        - (animStateMask + 1.0) * floor(animTickForTex / (animStateMask + 1.0));
-    let isAnimTex = min(1.0, animState);
-    let bloxdSpFrame = (1.0 - isAnimTex) * atlasIdxIn
-                     + isAnimTex * (animTexIndexStart + animState - 1.0);
-    let bloxdSpLayer = u32(round(bloxdSpFrame));
-```
-
-`animDataPerTex` (그룹 2, `array<f32>`) 는 애니메이션 텍스처마다 `{mask, startLayer, interval}` 삼중항을 하나씩 나르며, 프레임 수는 **2의 거듭제곱으로 센다** (JS 쪽 빌드 검사가 2의 거듭제곱이 아닌 프레임 수를 `<block> has N animation states, which is not a power of 2`로 거부한다), 정적 센티넬 설계 덕분에 비애니메이션 인덱스도 분기 없이 같은 연산으로 해석된다. 팩 대면 요약, 다시 한 번: *id는 안정적이고, 프레임은 자동이다.* 인터벌은 엔진 콘텐츠이며, `cnty9`에서 실측하면 정확히 세 값을 가진다 — 200 ms (`lava`, `toxic_waste`, `radar_screen`), 250 ms (`smoke`, `homestead_core_mid`, 기계 `*_running` 패밀리들), 300 ms (열일곱 개의 포털, `toxic_waste_barrel_top`) — 패밀리별 칼럼은 §68.4에 있다.
-
-#### 63.4 `bloxdSp*` 네임스페이스 — 27 심볼 전부
-
-제너레이터가 당신의 셰이더에 주입할 수 있는 모든 것, 즉 당신이 다시 선언할 수 없는 모든 것 (팩 수준의 `/^bloxd/i` 예약이 대부분을 무의미하게 만들지만, 엔진 소스를 읽는 사람을 위해 이것이 제너레이터의 템플릿에서 뽑은 완전한 v4 세트다):
-
-`bloxdSpBehind` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpEye` · `bloxdSpFrame` · `bloxdSpLayer` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLitColour` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpPixel` · `bloxdSpPositionW` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpZ`
-
-#### 63.5 완전한 바인드 그룹 레이아웃 (Lite 렌더러, 팩 배리언트)
-
-| 그룹 | 바인딩 | 리소스 | 비고 |
-|---|---|---|---|
-| 0 | 0 | `uniform` 씬 | `LiteSceneUniforms` — viewProjection / view / vEyePosition |
-| 1 | 2–3 | `storage` quads, quadLight | 청크 기하 |
-| 2 | 0 | `uniform` 머티리얼 | `TerrainMaterialUniforms`; `anim`이 §63.3을 구동 |
-| 2 | 1+ | `storage` `animDataPerTex` | 애니메이션 텍스처 삼중항 (애니메이션 구성만) |
-| 2 | next | `textureAtlas0..N-1` | `texture_2d_array<f32>`, 텍스처마다 레이어 하나 |
-| 2 | next | `sampler atlasSampler` | `bloxdTexel`이 쓰는 유일한 샘플러 |
-| 3 | 0 | `uniform bloxdPackInputs` | 팩의 64 B 프레임당 uniform (§56) |
-| 3 | 1 | `texture_2d<f32>` 씬 깊이 | 액체 프로그램; `bloxdOpaqueBehind()`의 기반 (§51) |
-| 3 | 2 | `storage bloxdSpTextureLayers` | id+회전 테이블 (§63.2) |
-
-그룹 3은 팩의 그룹이다: 엔진이 제공하는 슬롯 세 개이며, 어느 것도 팩 코드가 이름을 지을 수 없다.
-
-### 64. 텍스처 이름 레지스트리
-
-엔진은 세션마다 한 번 블록 레지스트리에서 이름 카탈로그를 만든다 — 텍스처 팩 시스템의 `textureNameToIndex`를 만들어 낸 것과 같은 파이프라인이다. 빌더 (번들의 모듈 28833), 의사코드로 복원:
-
-```
-for each (name, index) in textureNameToIndex:           # e.g. ("lava0", 0), ("radar_screen0[rot[2", 19)
-    if name matches /(.*)\[rot\[([1-4])$/ :              # a turned copy slot
-        turnedSlot → { id: rootUnturnedId, rotation: N-1 }   # §63.2's table entry
-        register alias: name  → root,  kind "rotation"
-    else if index is an animation frame (not the base):  # via animDataPerTex
-        register alias: name  → base,  kind "frame"
-    else:
-        canonical name = strip trailing "_?0" if this texture is animated
-        named[canonical] = index + 1                     # the bloxdTextureId* value
-```
-
-작가에게 중요한 규칙, 중복을 제거하면:
-
-1. **사용 가능한 이름은 정규명이다**: 애니메이션 베이스는 프레임 접미사를 떨어뜨리고 (`lava0` → `lava`), 회전 패밀리는 루트로 접히며 (`chest_top[rot[1..4]` → `chest_top`), 두 접기는 합성된다 (`radar_screen0[rot[1..4]` → `radar_screen`, 이 패밀리는 애니메이션이기도 하므로). 그 외의 모든 파일 이름은 그 자체가 이름이다. 상수 표기는 정규명을 CamelCase화한다 (§57.3).
-2. **프레임·회전 별칭은 알려져 있고 에러로 설명된다** — 하나를 쓰면 「이걸 말했나?」 추측이 아니라 전용 프레임/회전 메시지를 받는다 (§57.3). 의도적인 API 설계다: `bloxdTexel`이 애니메이션과 회전을 모두 대신 처리하므로, 프레임이나 회전 복사를 직접 지목하는 것은 언제나 잘못된 선택이다.
-3. **모호함은 이름을 죽인다**: 같은 대소문자/언더스코어 무감각 키로 접히는 두 이름은 둘 다 사용 불가다 (`could name X and Y ... it can't be used`). 드물지만 실재한다 — 기대한 이름이 §68 카탈로그에 없다면 이것이 이유 중 하나다.
-4. **id는 1-베이스이고 「아틀라스 레이어 + 1」과 같다**; 텍스처 없음 id 0은 흰색으로 예약되어 있다.
-
-라이브 레지스트리에서 실측 (빌드 `cnty9`, 2026-10-27, 출하된 데이터에 엔진 자신의 빌더 모듈을 돌려서): **아틀라스 엔트리 1,219개**, **57개 회전 패밀리** (회전 표기 228개) 와 **42개 애니메이션 패밀리** (프레임 표기 188개) 를 접고, **905개 사용 가능한 명명 상수**가 남는다 — 이름별 id와 두 패밀리 표를 갖춘 완전한 목록은 아래 §68로 들어 있다 (그리고 현재형으로는 [텍스처 카탈로그](api/texture-catalog.md)). §65.1의 레지스트리 해시 기구가, 이 숫자들이 흘러가도 굽어진 `bloxdTextureId*` 값이 조용히 낡아버리는 일을 막는다.
-
-### 65. 검증 내부 v4: HEADER_VERSION, 레지스트리 해시, 특수 함수
-
-#### 65.1 HEADER_VERSION이 두 번째 해시를 얻는다
-
-v3 형식은 5개 입력에 대한 `6.<fnv1a32>`였다 (§53). v4는 같은 5개 입력 — 배리언트별 헤더 토큰, 파서의 어휘 우주, 4개 매크로 이름, 특수 함수 맵, `BloxdPackInputs` 선언 — 을 유지하지만 접두사가 `8.`로 옮겨지고, **두 번째 FNV-1a-32가 추가로 붙는다 — 텍스처 레지스트리 전체의 정렬된 `"<name> <id>"` 목록에 대한 해시다**:
-
-```
-v2 (sjr0p7):   6.bc5e8338
-v3 (3ymzdd):   6.5bc26a63
-v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the bundle
-```
-
-(구체적인 v4 해시는 이 가이드를 위해 측정하지 않았다 — 런타임에 계산되는 값이므로 — 하지만 형식은 정확하며, 위의 v2/v3 값은 이전에 공개된 측정값이다. 엔진 업데이트 뒤의 팩 설정 화면이 현재 값을 보여 준다.)
-
-중요한 것은 귀결이다: **저장된 팩의 저장 검증은 이제 텍스처 레지스트리가 변할 때도 무효화된다** — 엔진이 텍스처를 추가하거나, 이름을 바꾸거나, 순서를 바꿀 때 — 당신의 `bloxdTextureId*` 비교가 낡은 레지스트리를 기준으로 해석됐기 때문이다. v3가 헤더 편집에 발동하던 「재확인 필요」 흐름에, 두 번째이자 콘텐츠 구동인 트리거가 생겼다. 작가는 여기에 대해 아무것도 할 필요가 없고 (엔진이 자동으로 재검증한다); 배포자는 그저 이것을 예상하면 된다.
-
-#### 65.2 예약 이름, 다시, 정확하게
-
-규칙은 정규식 `/^bloxd/i` — **대소문자 무시**이므로 `BloxdFoo`도 `bloxdFoo`만큼 예약이며, `bloxdTextureIdAnything`은 아무것도 가리키지 않을 때조차 여기에 든다 (그래서 §57.3의 오기 접두사 진단이 자기만의 메시지 패밀리로 존재한다). §63.4의 27-심볼 `bloxdSp*` 세트는 생성된 코드 안쪽에 있는 엔진 측 짝이다.
-
-#### 65.3 특수 함수: 이제 세 개
-
-검증기의 특수 함수 레지스트리는 v3의 1항목에서 3개로 자랐다 — 텍스처 API의 두 함수가 깊이와 함께 등록된다:
-
-```js
-[
-  ["bloxdOpaqueBehind", { params: "", returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }],
-  ["bloxdTexel",        { params: "textureId: u32, uv: vec2f, mipLevel: f32", returns: "vec4f", symbol: null }],
-  ["bloxdTextureSize",  { params: "mipLevel: f32", returns: "vec2u", symbol: null }]
-]
-```
-
-`symbol: null`은 「배리언트 게이트 없음」을 뜻한다 — 함수가 존재하는 곳 (surface/light 훅) 이면 어디서든 호출할 수 있다. 두 「reaches」 진단은 그대로 이어지며, 이제 텍스처 오용도 덮는다:
-
-> `${hook} reaches ${name}, which only surface and light hooks can use.` — 예: 버텍스 훅에서의 `bloxdTexel`.
-> 
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예: 랩 없이 지형 훅에서 호출하는 `bloxdOpaqueBehind()` (v3 §53에서 불변).
-
-#### 65.4 v3 §53에서 그대로 이어지는 것들
-
-훅 서명 검사 (타입은 토큰 정확, 이름은 자유 — 세 서명 항목은 v3와 바이트 동일), 진단 매핑이 딸린 `pack_` 접두사 개명, 미선언 식별자 메시지 패밀리, 파서의 추가 어휘 우주 (`bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin` — 여전히 브라우저에서 보장되지 않는다), 그리고 2단계 검증 (내장 파서, 그다음 브라우저의 WGSL 컴파일러 — 여전히 더 엄격하다; §38의 교훈은 유효하다).
-
-### 66. 확인된 상수·제한·레이아웃 (v4)
-
-가이드의 측정 장부에 있는 v4 행 — 날짜가 명시되지 않는 한, 여기 모든 것은 `cnty9` (2026-10-26, prod = preprod, 바이트 동일) 에서 측정했다:
-
-| 항목 | 값 |
-|---|---|
-| `apiVersion` | `4` (엄격 `===`, 숫자) |
-| 엔진 헤더 | 6,021 B / 150 줄; 첫 줄 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` — 전문은 §67에 내장 |
-| 훅 | 6 (지형/액체 × 버텍스/surface/light); 템플릿은 주석 다듬기뿐 |
-| 배리언트 | 8 (strict × 조명 × 프로그램); 이름 `strict\|allow.lit\|unlit.terrain\|liquid` |
-| 매크로 | `BLOXD_STRICT` (strict) · `BLOXD_LIGHTING` (조명 on) · `BLOXD_ALPHA` (모든 액체 + 비 strict 지형) · `BLOXD_SCENE_DEPTH` (모든 액체) |
-| 팩 uniform | `@group(3) @binding(0)`, 64 B: seconds@0, renderOffset@16, sunDirection@32, eyePosition@48 |
-| 팩 바인딩 | 그룹 3: 0 uniform · 1 씬 깊이 (액체) · 2 `bloxdSpTextureLayers` 스토리지 |
-| blockFlags 비트 | opaque 1 · emissive 2 · vegetation 4 · dirt 8 · sand 16 · rock 32 (불변; §42의 이름 규칙은 그대로 이식됨) |
-| 로더 제한 | 256 `.wgsl` / 256 KB 소스 / 64 KB `pack.json` / 32 MB zip / 1,024 zip 엔트리; UTF-8; 매니페스트 1개; 경로 유일 |
-| 텍스처 레지스트리 | 1,219 엔트리 (2026-10-27 실측, 빌드 `cnty9`) → 905개 사용 가능 이름; 완전한 카탈로그: 아래 §68 (현재형: [텍스처 카탈로그](api/texture-catalog.md)) |
-| 라이트 곡선 | 0–15 레벨 → 이즈아웃 곡선으로 0–1 (`6 → 0.45`, `12 → 0.92`) — 헤더 내, 불변 |
-| 리프트 곡선 | `1 - (1 - x / (3 - 2x))^3` — 불변, 이제 청크 c8 |
-| 방향 콘 | `0.12 / 0.65 / 0.62 / 0.95` — 불변, 이제 청크 c8 |
-| 포그 색 | `vec3f(183/255, 191/255, 195/255)` — 불변; `fogAlpha`가 v4의 이름 (§59.1) |
-| 예약 이름 | `/^bloxd/i` (대소문자 무시) + 27 `bloxdSp*` 엔진 심볼 |
-| HEADER_VERSION | `8.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 타이틀 | [게임별 셰이더 팩 정책](internals/policy.md)의 12개 allow 타이틀 외 전부 (2026-10-27 재확인, 불변) |
-
-
----
-
-### 67. 완전한 v4 엔진 헤더, 그대로
-
-엔진이 모든 팩 앞에 붙이는 6,021바이트·150줄 헤더, `cnty9`에 출시된 그대로 — 첫 줄이 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`로 열리는 바로 그 텍스트다 (§66). 팩 작가가 엔진이 자신을 대신해 무엇을 선언하는지 궁금해할 일이 없도록 여기 전문을 싣는다: 호출해도 되는 모든 자유 함수, 비교할 수 있는 모든 `const`, 모든 필드와 주석을 갖춘 두 입력 구조체가 엔진 순서 그대로 아래에 있다.
-
-이 텍스트에 없고 애초에 없었던 것이 둘 있다 — 팩마다 앞에 붙는 게 아니라 렌더러 구성별로 컴파일 시점에 생성되기 때문이다: `bloxdTexel`/`bloxdTextureSize` 쌍 (§63.1에 생성된 WGSL 전문) 과 27개 `bloxdSp*` 엔진 심볼 (§63.4). `BloxdSurface`와 `bloxdDefaultSurface`에 보이는 `#ifdef BLOXD_ALPHA` 게이트는 엔진 자신의 프리프로세서가 배리언트별로 해석한다 — 정규 텍스트는 게이트를 유지하며, 어느 배리언트가 그것을 정의하는지는 §59.1/§56가 설명한다.
-
-```wgsl
-
-// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.
-
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// These functions return 1 value per frame, the same for every call site.
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Changes as the player travels, so render positions stay close to 0,0,0.
-// Integer distance, in blocks. Render position + this offset = world position.
-// See bloxdWorldPosition for how this can be used.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// This unit vector points towards the sun, in world orientation; 0 when no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// Seconds since the page loaded. As an f32, it has sub-millisecond precision
-// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Each bit of the binary representation of blockFlags is a flag corresponding
-// to a collection of blocks. The collections overlap, so blocks can be in 0-2+.
-// (blockFlags & bloxdBlockFlagRock) != 0 // The block has this flag.
-// (blockFlags & bloxdBlockFlagRock) == 0 // The block doesn't have this flag.
-
-// Opaque blocks, leaves and ice included. Not glass, water, spawners, etc.
-const bloxdBlockFlagOpaque: u32 = 1;
-
-// These blocks emit light, e.g. neon, portals, lamps, lava, and glowing ores.
-const bloxdBlockFlagEmissive: u32 = 2;
-
-// 'Leafy', e.g. leaves, and grass blocks. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagVegetation: u32 = 4;
-
-// Dirt and soil, grass blocks included. Rocky Dirt is both dirt and rock.
-const bloxdBlockFlagDirt: u32 = 8;
-
-// Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagSand: u32 = 16;
-
-// Stone variants, and more, e.g. gravel, ores, sandstone, magma and obsidian.
-const bloxdBlockFlagRock: u32 = 32;
-
-// Convert a render position to a world position, with possible f32 inaccuracy.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// Using a fragment's position and normal, identify the block's world position.
-fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-struct BloxdVertexIn {
-    position: vec3f, // Render position.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-}
-
-struct BloxdVertex {
-    position: vec3f, // The render position output.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,   // RGB colour = texture * tint * ambient occlusion.
-    alpha: f32,      // Opacity.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    position: vec3f, // Render position.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdSurface {
-    colour: vec3f,   // RGB colour output.
-#ifdef BLOXD_ALPHA
-    alpha: f32,      // Opacity output.
-#endif
-    emission: vec3f, // Emissive RGB output, added after lighting, before fog.
-}
-
-// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
-// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
-struct BloxdLightIn {
-    litColour: vec3f,  // RGB surface colour, lit, before emission and fog.
-    directional: f32,  // Summed Lambert from directional lights; 0 when off.
-    ambient: vec3f,    // RGB ambient colour, added to directional light.
-    blockLight: vec3f, // RGB block light; 0 without BLOXD_LIGHTING.
-    skyLight: f32,     // Sky light; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // Minimum RGB light; 1 without BLOXD_LIGHTING.
-    skyLightColour: vec3f, // RGB colour of skyLight; 1 without BLOXD_LIGHTING.
-    heldLight: vec3f,  // 0 without BLOXD_LIGHTING. 0 with no light source held.
-    fogColour: vec3f,  // The game's RGB fog colour. 0 when the game has no fog.
-    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
-    position: vec3f,   // Render position.
-    normal: vec3f,     // Unit vector direction pointing away from the face.
-    blockFlags: u32,   // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdLight {
-    colour: vec3f, // RGB colour output.
-}
-
-struct BloxdOpaqueBehind {
-    hit: bool,       // False where nothing opaque is behind (sky).
-    position: vec3f, // The render position; 0 when !hit.
-    distance: f32,   // From the camera; 0 when !hit.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Applies this fragment's fog to colour, as the engine does.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(colour, light.fogColour, light.fogAlpha);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
-### 68. 텍스처 카탈로그 전체 (905개 이름, 실측)
-
-#### 68.1 읽는 법
-
-**이름** 열은 레지스트리명 — 실제로 코드에 쓰는 핸들이다. 상수 철자는 그 이름을 `_`와 `-` 경계에서 CamelCase화한 것으로, §57.3이 문서화한 규칙을 정확히 따른다: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`, `chest_double_top_1_lo` → `bloxdTextureIdChestDoubleTop1Lo`. 이름이 곧 API다 — 검증기가 로드 시 라이브 레지스트리에 대해 다시 해석하므로, 이름은 레지스트리 드리프트를 견딘다.
-
-**id** 열은 그 상수가 비교되는 값 — 아틀라스 레이어 + 1, `cnty9`에서 실측했다. `surface.textureId` 덤프를 해독하고 디버그 출력을 판독하는 데, 그리고 오작동하는 팩을 오늘의 빌드와 교차 확인하는 데 쓴다. WGSL에 하드코딩하지 마라: 이 값은 한 빌드의 아틀라스 순서 스냅샷이다 (그것이 얼마나 빨리 움직이는지는 §68.5가 보여 준다).
-
-**참고** 열은 접힌 두 패밀리를 표시한다. `animated (N frames)`는 이 이름을 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다는 뜻이다 — 프레임 접미사를 절대 쓰지 마라 (`lava0`, `radar_screen2`는 전용 진단이 딸린 알려진 별칭이다). `turned (4 rotated copies)`는 그 텍스처가 미리 회전된 아틀라스 슬롯으로만 존재한다는 뜻이다 — 이름은 루트를 가리키고 `bloxdTexel`이 회전을 다시 적용한다 (§57.4). 정확히 한 이름 (`radar_screen`) 만이 두 비고를 모두 가진다.
-
-일부러 싣지 *않은* 것: 나머지 416개 레지스트리 철자 — 프레임 별칭 188개와 회전 별칭 228개 — 는 사용 가능한 상수가 아니며, 하나를 쓰려 들면 엔진이 각각을 전용 에러 메시지 패밀리로 설명한다 (§57.3). 모든 것의 기반이 되는 1,219행 레이어 표 (미리 회전된 슬롯 171개 포함) 는 엔진 내부물이며 §63.2/§63.4에서 다룬다.
-
-#### 68.2 카탈로그
-
-사용 가능한 모든 이름, 알파벳순. id 열은 `bloxdTextureId*` 값 — 아틀라스 레이어 + 1, 빌드 `cnty9` (2026-10-27) 에서 실측. **id는 스냅샷, 이름을 API로 다뤄라**: 이 가이드가 실측한 10월의 두 빌드 사이에서 철자를 유지한 1121개 이름 중 779개가 다른 id를 받았다 (§68.5). 엔진은 검증 시점에 이름을 해석하므로, 이름으로 쓴 팩은 레지스트리 드리프트를 견디고 원시 id로 쓴 팩은 그러지 못한다.
-
-| 이름 | id (cnty9) | 참고 |
-|---|---|---|
-| `alloy_kiln_back` | 1091 |  |
-| `alloy_kiln_front` | 1085 |  |
-| `alloy_kiln_side` | 1086 |  |
-| `alloy_kiln_side_running` | 33 | anim (4 프레임) |
-| `alloy_kiln_top` | 1087 | 회전 패밀리 (4 사본) |
-| `andesite_brick` | 465 |  |
-| `apple_block_bottom` | 441 |  |
-| `apple_block_side` | 439 |  |
-| `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 995 |  |
-| `armour_lucky_block_rare` | 997 |  |
-| `armour_lucky_block_super` | 999 |  |
-| `artisan_table_side` | 367 |  |
-| `artisan_table_top` | 368 |  |
-| `ash` | 1031 |  |
-| `auto_bench_back` | 1106 |  |
-| `auto_bench_front` | 1100 |  |
-| `auto_bench_side` | 1101 |  |
-| `auto_bench_side_running` | 35 | anim (4 프레임) |
-| `auto_bench_top` | 1102 | 회전 패밀리 (4 사본) |
-| `autocrafter_bottom` | 962 |  |
-| `autocrafter_lunite_bottom` | 973 |  |
-| `autocrafter_lunite_side` | 972 |  |
-| `autocrafter_side` | 961 |  |
-| `banana_block_side` | 899 |  |
-| `banana_block_top` | 900 |  |
-| `beacon` | 330 |  |
-| `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 925 |  |
-| `beetroot_block_side` | 923 |  |
-| `beetroot_block_top` | 924 |  |
-| `belt_drop_side` | 1185 |  |
-| `belt_drop_top` | 1184 |  |
-| `belt_lift_side` | 1183 |  |
-| `belt_lift_top` | 1182 |  |
-| `belt_loader_slab_front` | 1110 |  |
-| `belt_loader_top` | 1109 |  |
-| `belt_tunnel_back` | 1199 |  |
-| `belt_tunnel_exit_top` | 1200 | 회전 패밀리 (4 사본) |
-| `belt_tunnel_mouth` | 1193 |  |
-| `belt_tunnel_side` | 1194 |  |
-| `belt_tunnel_top` | 1195 | 회전 패밀리 (4 사본) |
-| `black_concrete` | 273 |  |
-| `black_glazed_terracotta` | 429 | 회전 패밀리 (4 사본) |
-| `black_planks` | 366 |  |
-| `black_portal` | 2 | anim (4 프레임) |
-| `black_spawn_block_side` | 760 |  |
-| `black_spawn_block_top` | 756 | 회전 패밀리 (4 사본) |
-| `block_destroyer_tnt_side` | 1017 |  |
-| `block_destroyer_tnt_top` | 1018 |  |
-| `blue_concrete` | 274 |  |
-| `blue_gen_spawn_coal` | 774 |  |
-| `blue_gen_spawn_iron` | 775 |  |
-| `blue_gen_spawn_top` | 773 |  |
-| `blue_glazed_terracotta` | 413 | 회전 패밀리 (4 사본) |
-| `blue_lucky_block` | 994 |  |
-| `blue_lucky_block_rare` | 996 |  |
-| `blue_lucky_block_super` | 998 |  |
-| `blue_planks` | 362 |  |
-| `blue_portal` | 3 | anim (4 프레임) |
-| `blue_spawn_block_side` | 755 |  |
-| `blue_spawn_block_top` | 751 | 회전 패밀리 (4 사본) |
-| `bone_block_side` | 818 |  |
-| `bone_block_top` | 819 |  |
-| `bookshelf` | 564 |  |
-| `bookshelf_1` | 566 |  |
-| `bookshelf_2` | 567 |  |
-| `bookshelf_3` | 568 |  |
-| `bookshelf_4` | 569 |  |
-| `bookshelf_5` | 570 |  |
-| `bookshelf_empty` | 565 |  |
-| `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 978 |  |
-| `bread_block_back` | 435 |  |
-| `bread_block_front` | 434 |  |
-| `bread_block_side` | 436 |  |
-| `bread_block_top` | 437 |  |
-| `brick` | 315 |  |
-| `brown_concrete` | 275 |  |
-| `brown_glazed_terracotta` | 417 | 회전 패밀리 (4 사본) |
-| `brown_mushroom_block` | 536 |  |
-| `brown_planks` | 363 |  |
-| `brown_portal` | 4 | anim (4 프레임) |
-| `brown_spawn_block_side` | 750 |  |
-| `brown_spawn_block_top` | 746 | 회전 패밀리 (4 사본) |
-| `building_lucky_block` | 989 |  |
-| `building_lucky_block_rare` | 991 |  |
-| `building_lucky_block_super` | 993 |  |
-| `burner_drill_back` | 1048 |  |
-| `burner_drill_bottom` | 1047 |  |
-| `burner_drill_front` | 1041 |  |
-| `burner_drill_side` | 1042 |  |
-| `burner_drill_side_running` | 27 | anim (4 프레임) |
-| `burner_drill_top` | 1043 | 회전 패밀리 (4 사본) |
-| `cactus_dry` | 350 |  |
-| `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 921 |  |
-| `carrot_block_side` | 919 |  |
-| `carrot_block_top` | 920 |  |
-| `carved_messy_stone` | 827 |  |
-| `carved_pumpkin` | 543 |  |
-| `chalk` | 839 |  |
-| `chalk_black` | 855 |  |
-| `chalk_blue` | 854 |  |
-| `chalk_bricks_black` | 871 |  |
-| `chalk_bricks_blue` | 870 |  |
-| `chalk_bricks_brown` | 869 |  |
-| `chalk_bricks_cyan` | 868 |  |
-| `chalk_bricks_gray` | 867 |  |
-| `chalk_bricks_green` | 866 |  |
-| `chalk_bricks_light_blue` | 865 |  |
-| `chalk_bricks_light_gray` | 864 |  |
-| `chalk_bricks_lime` | 863 |  |
-| `chalk_bricks_magenta` | 862 |  |
-| `chalk_bricks_orange` | 861 |  |
-| `chalk_bricks_pink` | 860 |  |
-| `chalk_bricks_purple` | 859 |  |
-| `chalk_bricks_red` | 858 |  |
-| `chalk_bricks_slab_side_black` | 887 |  |
-| `chalk_bricks_slab_side_blue` | 886 |  |
-| `chalk_bricks_slab_side_brown` | 885 |  |
-| `chalk_bricks_slab_side_cyan` | 884 |  |
-| `chalk_bricks_slab_side_gray` | 883 |  |
-| `chalk_bricks_slab_side_green` | 882 |  |
-| `chalk_bricks_slab_side_light_blue` | 881 |  |
-| `chalk_bricks_slab_side_light_gray` | 880 |  |
-| `chalk_bricks_slab_side_lime` | 879 |  |
-| `chalk_bricks_slab_side_magenta` | 878 |  |
-| `chalk_bricks_slab_side_orange` | 877 |  |
-| `chalk_bricks_slab_side_pink` | 876 |  |
-| `chalk_bricks_slab_side_purple` | 875 |  |
-| `chalk_bricks_slab_side_red` | 874 |  |
-| `chalk_bricks_slab_side_white` | 873 |  |
-| `chalk_bricks_slab_side_yellow` | 872 |  |
-| `chalk_bricks_white` | 857 |  |
-| `chalk_bricks_yellow` | 856 |  |
-| `chalk_brown` | 853 |  |
-| `chalk_cyan` | 852 |  |
-| `chalk_gray` | 851 |  |
-| `chalk_green` | 850 |  |
-| `chalk_light_blue` | 849 |  |
-| `chalk_light_gray` | 848 |  |
-| `chalk_lime` | 847 |  |
-| `chalk_magenta` | 846 |  |
-| `chalk_orange` | 845 |  |
-| `chalk_pink` | 844 |  |
-| `chalk_purple` | 843 |  |
-| `chalk_red` | 842 |  |
-| `chalk_white` | 841 |  |
-| `chalk_yellow` | 840 |  |
-| `charge_vault_side` | 1114 |  |
-| `charge_vault_top` | 1113 |  |
-| `charging_pad_side` | 1159 |  |
-| `charging_pad_top` | 1158 |  |
-| `checkpoint_block` | 761 | 회전 패밀리 (4 사본) |
-| `cherry_block_bottom` | 590 |  |
-| `cherry_block_side` | 588 |  |
-| `cherry_block_top` | 589 |  |
-| `chest_back` | 347 |  |
-| `chest_double_back_hi` | 1219 |  |
-| `chest_double_back_lo` | 1218 |  |
-| `chest_double_front_hi` | 1213 |  |
-| `chest_double_front_lo` | 1212 |  |
-| `chest_double_top_1_hi` | 1215 |  |
-| `chest_double_top_1_lo` | 1214 |  |
-| `chest_double_top_2_hi` | 1217 |  |
-| `chest_double_top_2_lo` | 1216 |  |
-| `chest_front` | 341 |  |
-| `chest_side` | 342 |  |
-| `chest_top` | 343 | 회전 패밀리 (4 사본) |
-| `chili_pepper_block_bottom` | 678 |  |
-| `chili_pepper_block_side` | 676 |  |
-| `chili_pepper_block_top` | 677 |  |
-| `chiseled_red_sandstone` | 456 |  |
-| `chiseled_sandstone` | 325 |  |
-| `clay` | 195 |  |
-| `coal_block` | 233 |  |
-| `coal_deposit` | 1032 |  |
-| `coal_ore` | 227 |  |
-| `coarse_dirt` | 191 |  |
-| `coconut_block_bottom` | 522 |  |
-| `coconut_block_side` | 520 |  |
-| `coconut_block_top` | 521 |  |
-| `code_block` | 679 |  |
-| `comet_heart` | 1170 |  |
-| `comet_ore` | 1169 |  |
-| `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1081 |  |
-| `conveyor_belt_slab_side` | 1080 |  |
-| `conveyor_belt_top` | 1079 |  |
-| `conveyor_belt_turn_left` | 1171 |  |
-| `conveyor_belt_turn_right` | 1172 |  |
-| `copper_deposit` | 1035 |  |
-| `copper_ore` | 1040 |  |
-| `corn_block_bottom` | 594 |  |
-| `corn_block_side` | 592 |  |
-| `corn_block_top` | 593 |  |
-| `crafting_table_side` | 338 |  |
-| `crafting_table_top` | 339 |  |
-| `crate` | 918 |  |
-| `crop_harvester_back` | 1192 |  |
-| `crop_harvester_back_running` | 45 | anim (4 프레임) |
-| `crop_harvester_front` | 1186 |  |
-| `crop_harvester_side` | 1187 |  |
-| `crop_harvester_side_running` | 44 | anim (4 프레임) |
-| `crop_harvester_top` | 1188 | 회전 패밀리 (4 사본) |
-| `crusher_back` | 1055 |  |
-| `crusher_front` | 1049 |  |
-| `crusher_side` | 1050 |  |
-| `crusher_side_running` | 28 | anim (4 프레임) |
-| `crusher_top` | 1051 | 회전 패밀리 (4 사본) |
-| `crystal_block` | 1029 |  |
-| `crystal_vat_back` | 1166 |  |
-| `crystal_vat_front` | 1160 |  |
-| `crystal_vat_side` | 1161 |  |
-| `crystal_vat_side_running` | 42 | anim (4 프레임) |
-| `crystal_vat_top` | 1162 | 회전 패밀리 (4 사본) |
-| `custom_lobby_block_side` | 769 |  |
-| `custom_lobby_block_top` | 765 | 회전 패밀리 (4 사본) |
-| `cut_red_sandstone` | 457 |  |
-| `cut_sandstone` | 453 |  |
-| `cyan_concrete` | 276 |  |
-| `cyan_gen_spawn_coal` | 783 |  |
-| `cyan_gen_spawn_iron` | 784 |  |
-| `cyan_gen_spawn_top` | 782 |  |
-| `cyan_glazed_terracotta` | 405 | 회전 패밀리 (4 사본) |
-| `cyan_planks` | 360 |  |
-| `cyan_portal` | 5 | anim (4 프레임) |
-| `cyan_spawn_block_side` | 745 |  |
-| `cyan_spawn_block_top` | 741 | 회전 패밀리 (4 사본) |
-| `dark_green_bricks` | 460 |  |
-| `darkstone` | 1206 |  |
-| `darkstone_bricks` | 1207 |  |
-| `darkstone_bricks_cracked` | 1208 |  |
-| `darkstone_bricks_lava` | 1209 |  |
-| `darkstone_engraved` | 1210 |  |
-| `darkstone_smooth` | 1211 |  |
-| `deep_drill_back` | 1140 |  |
-| `deep_drill_bottom` | 1139 |  |
-| `deep_drill_front` | 1133 |  |
-| `deep_drill_side` | 1134 |  |
-| `deep_drill_side_running` | 39 | anim (4 프레임) |
-| `deep_drill_top` | 1135 | 회전 패밀리 (4 사본) |
-| `diamond_block` | 340 |  |
-| `diamond_gen_spawn_side` | 807 |  |
-| `diamond_gen_spawn_top` | 806 |  |
-| `diamond_ore` | 232 |  |
-| `diorite_brick` | 463 |  |
-| `dirt` | 190 |  |
-| `drop_location_block_side` | 814 |  |
-| `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1038 |  |
-| `dry_grass_block` | 980 |  |
-| `dry_grass_block_side` | 979 |  |
-| `electric_drill_back` | 1099 |  |
-| `electric_drill_bottom` | 1098 |  |
-| `electric_drill_front` | 1092 |  |
-| `electric_drill_side` | 1093 |  |
-| `electric_drill_side_running` | 34 | anim (4 프레임) |
-| `electric_drill_top` | 1094 | 회전 패밀리 (4 사본) |
-| `emerald_block` | 237 |  |
-| `emerald_ore` | 231 |  |
-| `end_stone` | 226 |  |
-| `engraved_andesite` | 464 |  |
-| `engraved_diorite` | 462 |  |
-| `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1022 |  |
-| `evil_lucky_block_face` | 1023 |  |
-| `explosive_paint_black_side` | 626 |  |
-| `explosive_paint_black_top` | 627 |  |
-| `explosive_paint_blue_side` | 624 |  |
-| `explosive_paint_blue_top` | 625 |  |
-| `explosive_paint_brown_side` | 622 |  |
-| `explosive_paint_brown_top` | 623 |  |
-| `explosive_paint_cyan_side` | 620 |  |
-| `explosive_paint_cyan_top` | 621 |  |
-| `explosive_paint_gray_side` | 618 |  |
-| `explosive_paint_gray_top` | 619 |  |
-| `explosive_paint_green_side` | 616 |  |
-| `explosive_paint_green_top` | 617 |  |
-| `explosive_paint_light_blue_side` | 614 |  |
-| `explosive_paint_light_blue_top` | 615 |  |
-| `explosive_paint_light_gray_side` | 612 |  |
-| `explosive_paint_light_gray_top` | 613 |  |
-| `explosive_paint_lime_side` | 610 |  |
-| `explosive_paint_lime_top` | 611 |  |
-| `explosive_paint_magenta_side` | 608 |  |
-| `explosive_paint_magenta_top` | 609 |  |
-| `explosive_paint_orange_side` | 606 |  |
-| `explosive_paint_orange_top` | 607 |  |
-| `explosive_paint_pink_side` | 604 |  |
-| `explosive_paint_pink_top` | 605 |  |
-| `explosive_paint_purple_side` | 602 |  |
-| `explosive_paint_purple_top` | 603 |  |
-| `explosive_paint_quick_black` | 643 |  |
-| `explosive_paint_quick_blue` | 642 |  |
-| `explosive_paint_quick_brown` | 641 |  |
-| `explosive_paint_quick_cyan` | 640 |  |
-| `explosive_paint_quick_gray` | 639 |  |
-| `explosive_paint_quick_green` | 638 |  |
-| `explosive_paint_quick_light_blue` | 637 |  |
-| `explosive_paint_quick_light_gray` | 636 |  |
-| `explosive_paint_quick_lime` | 635 |  |
-| `explosive_paint_quick_magenta` | 634 |  |
-| `explosive_paint_quick_orange` | 633 |  |
-| `explosive_paint_quick_pink` | 632 |  |
-| `explosive_paint_quick_purple` | 631 |  |
-| `explosive_paint_quick_red` | 630 |  |
-| `explosive_paint_quick_white` | 629 |  |
-| `explosive_paint_quick_yellow` | 628 |  |
-| `explosive_paint_red_side` | 600 |  |
-| `explosive_paint_red_top` | 601 |  |
-| `explosive_paint_seeking_black` | 659 |  |
-| `explosive_paint_seeking_blue` | 658 |  |
-| `explosive_paint_seeking_brown` | 657 |  |
-| `explosive_paint_seeking_cyan` | 656 |  |
-| `explosive_paint_seeking_gray` | 655 |  |
-| `explosive_paint_seeking_green` | 654 |  |
-| `explosive_paint_seeking_light_blue` | 653 |  |
-| `explosive_paint_seeking_light_gray` | 652 |  |
-| `explosive_paint_seeking_lime` | 651 |  |
-| `explosive_paint_seeking_magenta` | 650 |  |
-| `explosive_paint_seeking_orange` | 649 |  |
-| `explosive_paint_seeking_pink` | 648 |  |
-| `explosive_paint_seeking_purple` | 647 |  |
-| `explosive_paint_seeking_red` | 646 |  |
-| `explosive_paint_seeking_white` | 645 |  |
-| `explosive_paint_seeking_yellow` | 644 |  |
-| `explosive_paint_sticky_black` | 675 |  |
-| `explosive_paint_sticky_blue` | 674 |  |
-| `explosive_paint_sticky_brown` | 673 |  |
-| `explosive_paint_sticky_cyan` | 672 |  |
-| `explosive_paint_sticky_gray` | 671 |  |
-| `explosive_paint_sticky_green` | 670 |  |
-| `explosive_paint_sticky_light_blue` | 669 |  |
-| `explosive_paint_sticky_light_gray` | 668 |  |
-| `explosive_paint_sticky_lime` | 667 |  |
-| `explosive_paint_sticky_magenta` | 666 |  |
-| `explosive_paint_sticky_orange` | 665 |  |
-| `explosive_paint_sticky_pink` | 664 |  |
-| `explosive_paint_sticky_purple` | 663 |  |
-| `explosive_paint_sticky_red` | 662 |  |
-| `explosive_paint_sticky_white` | 661 |  |
-| `explosive_paint_sticky_yellow` | 660 |  |
-| `explosive_paint_white_side` | 598 |  |
-| `explosive_paint_white_top` | 599 |  |
-| `explosive_paint_yellow_side` | 596 |  |
-| `explosive_paint_yellow_top` | 597 |  |
-| `extra_compressed_messy_stone` | 531 |  |
-| `fallen_cherry_leaves_side` | 586 |  |
-| `fallen_maple_leaves_side` | 478 |  |
-| `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1157 |  |
-| `fast_belt_top` | 1156 |  |
-| `fast_belt_turn_left` | 1173 |  |
-| `fast_belt_turn_right` | 1174 |  |
-| `fertilised_soil` | 926 |  |
-| `finish_block` | 812 |  |
-| `fireball_block` | 539 |  |
-| `food_lucky_block` | 1007 |  |
-| `food_lucky_block_rare` | 1009 |  |
-| `food_lucky_block_super` | 1011 |  |
-| `forge_hopper_top` | 1168 |  |
-| `furnace_front` | 335 |  |
-| `furnace_side` | 336 |  |
-| `furnace_top` | 337 |  |
-| `generator_side` | 1063 |  |
-| `generator_side_running` | 30 | anim (4 프레임) |
-| `generator_top` | 1064 |  |
-| `ghost_chest_back` | 956 |  |
-| `ghost_chest_front` | 953 |  |
-| `ghost_chest_side` | 954 |  |
-| `ghost_chest_top` | 955 |  |
-| `ghost_lucky_block` | 957 |  |
-| `ghost_mystery_block` | 958 |  |
-| `glass` | 294 |  |
-| `glass_black` | 295 |  |
-| `glass_blue` | 296 |  |
-| `glass_brown` | 297 |  |
-| `glass_cyan` | 298 |  |
-| `glass_gray` | 299 |  |
-| `glass_green` | 301 |  |
-| `glass_light_blue` | 302 |  |
-| `glass_light_gray` | 300 |  |
-| `glass_lime` | 303 |  |
-| `glass_magenta` | 304 |  |
-| `glass_orange` | 305 |  |
-| `glass_pink` | 306 |  |
-| `glass_purple` | 307 |  |
-| `glass_red` | 308 |  |
-| `glass_silver` | 311 |  |
-| `glass_white` | 309 |  |
-| `glass_yellow` | 310 |  |
-| `glowstone` | 331 |  |
-| `gold_block` | 235 |  |
-| `gold_deposit` | 1036 |  |
-| `gold_ore` | 229 |  |
-| `granite_brick` | 467 |  |
-| `grass_block_side` | 192 |  |
-| `grass_top` | 193 |  |
-| `gravel` | 196 |  |
-| `gray_concrete` | 271 |  |
-| `gray_gen_spawn_coal` | 792 |  |
-| `gray_gen_spawn_iron` | 793 |  |
-| `gray_gen_spawn_top` | 791 |  |
-| `gray_glazed_terracotta` | 397 | 회전 패밀리 (4 사본) |
-| `gray_planks` | 358 |  |
-| `gray_portal` | 6 | anim (4 프레임) |
-| `gray_spawn_block_side` | 740 |  |
-| `gray_spawn_block_top` | 736 | 회전 패밀리 (4 사본) |
-| `green_bricks` | 459 |  |
-| `green_concrete` | 285 |  |
-| `green_glazed_terracotta` | 421 | 회전 패밀리 (4 사본) |
-| `green_lucky_block` | 1006 |  |
-| `green_lucky_block_rare` | 1008 |  |
-| `green_lucky_block_super` | 1010 |  |
-| `green_planks` | 364 |  |
-| `green_portal` | 7 | anim (4 프레임) |
-| `green_spawn_block_side` | 735 |  |
-| `green_spawn_block_top` | 731 | 회전 패밀리 (4 사본) |
-| `green_stone` | 458 |  |
-| `grenade_block` | 581 |  |
-| `grey_portal` | 8 | anim (4 프레임) |
-| `gun_lucky_block` | 952 |  |
-| `hardened_clay` | 254 |  |
-| `hardened_clay_stained_black` | 270 |  |
-| `hardened_clay_stained_blue` | 266 |  |
-| `hardened_clay_stained_brown` | 267 |  |
-| `hardened_clay_stained_cyan` | 264 |  |
-| `hardened_clay_stained_gray` | 262 |  |
-| `hardened_clay_stained_green` | 268 |  |
-| `hardened_clay_stained_light_blue` | 258 |  |
-| `hardened_clay_stained_lime` | 260 |  |
-| `hardened_clay_stained_magenta` | 257 |  |
-| `hardened_clay_stained_orange` | 256 |  |
-| `hardened_clay_stained_pink` | 261 |  |
-| `hardened_clay_stained_purple` | 265 |  |
-| `hardened_clay_stained_red` | 269 |  |
-| `hardened_clay_stained_silver` | 263 |  |
-| `hardened_clay_stained_white` | 255 |  |
-| `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 969 |  |
-| `harvester_lunite_bottom` | 977 |  |
-| `harvester_lunite_side_0` | 974 |  |
-| `harvester_lunite_side_1` | 975 |  |
-| `harvester_lunite_top` | 976 |  |
-| `harvester_side0` | 966 |  |
-| `harvester_side1` | 967 |  |
-| `harvester_top` | 968 |  |
-| `hay_block_side` | 328 |  |
-| `homestead_core` | 1037 |  |
-| `homestead_core_cap` | 1122 |  |
-| `homestead_core_crown` | 1121 |  |
-| `homestead_core_mid` | 26 | anim (4 프레임) |
-| `hyper_compressed_messy_stone` | 533 |  |
-| `ice` | 326 |  |
-| `ice_brick` | 468 |  |
-| `iceball_block` | 540 |  |
-| `invisible_solid` | 314 |  |
-| `iron_block` | 234 |  |
-| `iron_chest_back` | 917 |  |
-| `iron_chest_front` | 911 |  |
-| `iron_chest_side` | 912 |  |
-| `iron_chest_top` | 913 | 회전 패밀리 (4 사본) |
-| `iron_deposit` | 1033 |  |
-| `iron_ore` | 228 |  |
-| `iron_watermelon_side` | 546 |  |
-| `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 889 |  |
-| `jungle_grass_block_side` | 888 |  |
-| `lapis_block` | 236 |  |
-| `lapis_ore` | 230 |  |
-| `lava` | 1 | anim (8 프레임) |
-| `leather_block_side` | 908 |  |
-| `leather_block_top` | 909 |  |
-| `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 910 |  |
-| `leaves_cedar` | 470 |  |
-| `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 906 |  |
-| `leaves_jungle` | 290 |  |
-| `leaves_mango` | 894 |  |
-| `leaves_mango_fruity` | 907 |  |
-| `leaves_maple` | 289 |  |
-| `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 901 |  |
-| `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 904 |  |
-| `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 905 |  |
-| `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 902 |  |
-| `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 903 |  |
-| `leaves_spectral` | 831 |  |
-| `light_blue_concrete` | 277 |  |
-| `light_blue_glazed_terracotta` | 381 | 회전 패밀리 (4 사본) |
-| `light_blue_lucky_block` | 933 |  |
-| `light_blue_planks` | 354 |  |
-| `light_blue_spawn_block_side` | 730 |  |
-| `light_blue_spawn_block_top` | 726 | 회전 패밀리 (4 사본) |
-| `light_gray_concrete` | 272 |  |
-| `light_gray_glazed_terracotta` | 401 | 회전 패밀리 (4 사본) |
-| `light_gray_planks` | 359 |  |
-| `light_gray_spawn_block_side` | 725 |  |
-| `light_gray_spawn_block_top` | 721 | 회전 패밀리 (4 사본) |
-| `lightblue_portal` | 9 | anim (4 프레임) |
-| `lightgray_portal` | 10 | anim (4 프레임) |
-| `lime_concrete` | 278 |  |
-| `lime_gen_spawn_coal` | 777 |  |
-| `lime_gen_spawn_iron` | 778 |  |
-| `lime_gen_spawn_top` | 776 |  |
-| `lime_glazed_terracotta` | 389 | 회전 패밀리 (4 사본) |
-| `lime_planks` | 356 |  |
-| `lime_portal` | 11 | anim (4 프레임) |
-| `lime_spawn_block_side` | 720 |  |
-| `lime_spawn_block_top` | 716 | 회전 패밀리 (4 사본) |
-| `log_ancient_maple` | 1021 |  |
-| `log_aspen` | 202 |  |
-| `log_cedar` | 201 |  |
-| `log_cherry` | 582 |  |
-| `log_jungle` | 203 |  |
-| `log_mango` | 891 |  |
-| `log_maple` | 198 |  |
-| `log_palm` | 472 |  |
-| `log_pear` | 523 |  |
-| `log_pine` | 199 |  |
-| `log_plum` | 200 |  |
-| `log_spectral` | 828 |  |
-| `lucky_block_pink_question` | 959 |  |
-| `lucky_block_pink_question_rare` | 1013 |  |
-| `lucky_block_pink_question_super` | 1015 |  |
-| `lunite_block` | 971 |  |
-| `lunite_ore` | 970 |  |
-| `machine_bench_side` | 1115 |  |
-| `machine_bench_top` | 1116 |  |
-| `machine_side` | 1039 |  |
-| `magenta_concrete` | 279 |  |
-| `magenta_glazed_terracotta` | 377 | 회전 패밀리 (4 사본) |
-| `magenta_planks` | 353 |  |
-| `magenta_portal` | 12 | anim (4 프레임) |
-| `magenta_spawn_block_side` | 715 |  |
-| `magenta_spawn_block_top` | 711 | 회전 패밀리 (4 사본) |
-| `magma` | 451 |  |
-| `mailbox_front` | 571 |  |
-| `mailbox_front_full` | 573 |  |
-| `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 898 |  |
-| `mango_block_side` | 896 |  |
-| `mango_block_top` | 897 |  |
-| `mega_compressed_messy_stone` | 535 |  |
-| `melon_side` | 544 |  |
-| `melon_top` | 545 |  |
-| `melting_ice` | 595 |  |
-| `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 823 |  |
-| `mob_spawner_block_top` | 821 |  |
-| `mob_spawner_hostile_block_side` | 822 |  |
-| `mob_spawner_neutral_block_side` | 838 |  |
-| `mob_spawner_passive_block_side` | 820 |  |
-| `moonstone_block` | 450 |  |
-| `moonstone_chest_back` | 449 |  |
-| `moonstone_chest_front` | 443 |  |
-| `moonstone_chest_side` | 444 |  |
-| `moonstone_chest_top` | 445 | 회전 패밀리 (4 사본) |
-| `moonstone_explosive_side` | 332 |  |
-| `moonstone_explosive_top` | 333 |  |
-| `moonstone_gen_spawn_side` | 809 |  |
-| `moonstone_gen_spawn_top` | 808 |  |
-| `moonstone_ore` | 442 |  |
-| `mossy_cobblestone` | 438 |  |
-| `mushroom_stem` | 538 |  |
-| `mystery_block` | 578 |  |
-| `neon_black` | 951 |  |
-| `neon_blue` | 950 |  |
-| `neon_brown` | 949 |  |
-| `neon_cyan` | 948 |  |
-| `neon_gray` | 947 |  |
-| `neon_green` | 946 |  |
-| `neon_light_blue` | 945 |  |
-| `neon_light_gray` | 944 |  |
-| `neon_lime` | 943 |  |
-| `neon_magenta` | 942 |  |
-| `neon_orange` | 941 |  |
-| `neon_pink` | 940 |  |
-| `neon_purple` | 939 |  |
-| `neon_red` | 938 |  |
-| `neon_white` | 937 |  |
-| `neon_yellow` | 936 |  |
-| `nether_brick` | 317 |  |
-| `netherrack` | 318 |  |
-| `obby_absorb_block` | 816 |  |
-| `obby_absorb_death_block` | 817 |  |
-| `obby_death_block` | 815 |  |
-| `obsidian` | 327 |  |
-| `orange_concrete` | 280 |  |
-| `orange_glazed_terracotta` | 373 | 회전 패밀리 (4 사본) |
-| `orange_lucky_block` | 1000 |  |
-| `orange_lucky_block_rare` | 1002 |  |
-| `orange_lucky_block_super` | 1004 |  |
-| `orange_planks` | 352 |  |
-| `orange_portal` | 13 | anim (4 프레임) |
-| `orange_spawn_block_side` | 710 |  |
-| `orange_spawn_block_top` | 706 | 회전 패밀리 (4 사본) |
-| `ore_gen_spawn_side` | 811 |  |
-| `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 826 |  |
-| `parts_bench_side` | 1117 |  |
-| `parts_bench_top` | 1118 |  |
-| `patterned_glass_black` | 548 |  |
-| `patterned_glass_blue` | 549 |  |
-| `patterned_glass_brown` | 550 |  |
-| `patterned_glass_cyan` | 551 |  |
-| `patterned_glass_gray` | 552 |  |
-| `patterned_glass_green` | 554 |  |
-| `patterned_glass_light_blue` | 555 |  |
-| `patterned_glass_light_gray` | 553 |  |
-| `patterned_glass_lime` | 556 |  |
-| `patterned_glass_magenta` | 557 |  |
-| `patterned_glass_orange` | 558 |  |
-| `patterned_glass_pink` | 559 |  |
-| `patterned_glass_purple` | 560 |  |
-| `patterned_glass_red` | 561 |  |
-| `patterned_glass_white` | 562 |  |
-| `patterned_glass_yellow` | 563 |  |
-| `pear_block_bottom` | 529 |  |
-| `pear_block_side` | 527 |  |
-| `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 960 |  |
-| `pine_cone_block_side` | 836 |  |
-| `pine_cone_block_top` | 837 |  |
-| `pine_grass_block` | 834 |  |
-| `pine_grass_block_side` | 833 |  |
-| `pink_concrete` | 281 |  |
-| `pink_gen_spawn_coal` | 789 |  |
-| `pink_gen_spawn_iron` | 790 |  |
-| `pink_gen_spawn_top` | 788 |  |
-| `pink_glazed_terracotta` | 393 | 회전 패밀리 (4 사본) |
-| `pink_planks` | 357 |  |
-| `pink_portal` | 14 | anim (4 프레임) |
-| `pink_spawn_block_side` | 705 |  |
-| `pink_spawn_block_top` | 701 | 회전 패밀리 (4 사본) |
-| `planks_aspen` | 205 |  |
-| `planks_cedar` | 209 |  |
-| `planks_cherry` | 584 |  |
-| `planks_jungle` | 207 |  |
-| `planks_mango` | 893 |  |
-| `planks_maple` | 204 |  |
-| `planks_palm` | 473 |  |
-| `planks_pear` | 524 |  |
-| `planks_pine` | 208 |  |
-| `planks_plum` | 206 |  |
-| `planks_spectral` | 830 |  |
-| `plum_block_bottom` | 519 |  |
-| `plum_block_side` | 517 |  |
-| `plum_block_top` | 518 |  |
-| `podzol_top` | 452 |  |
-| `potato_block` | 922 |  |
-| `potion_lucky_block` | 1012 |  |
-| `potion_lucky_block_rare` | 1014 |  |
-| `potion_lucky_block_super` | 1016 |  |
-| `press_back` | 1071 |  |
-| `press_front` | 1065 |  |
-| `press_side` | 1066 |  |
-| `press_side_running` | 31 | anim (4 프레임) |
-| `press_top` | 1067 | 회전 패밀리 (4 사본) |
-| `protector` | 348 |  |
-| `protector_faction` | 575 |  |
-| `protector_tribe` | 574 |  |
-| `pumpkin_face_on` | 291 |  |
-| `pumpkin_side` | 541 |  |
-| `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1024 |  |
-| `pure_copper_ore` | 1204 |  |
-| `pure_diamond_ore` | 1027 |  |
-| `pure_gold_ore` | 1026 |  |
-| `pure_iron_ore` | 1025 |  |
-| `pure_moonstone_ore` | 1028 |  |
-| `pure_voltite_ore` | 1205 |  |
-| `purple_concrete` | 282 |  |
-| `purple_glazed_terracotta` | 409 | 회전 패밀리 (4 사본) |
-| `purple_lucky_block` | 988 |  |
-| `purple_lucky_block_rare` | 990 |  |
-| `purple_lucky_block_super` | 992 |  |
-| `purple_planks` | 361 |  |
-| `purple_portal` | 15 | anim (4 프레임) |
-| `purple_spawn_block_side` | 700 |  |
-| `purple_spawn_block_top` | 696 | 회전 패밀리 (4 사본) |
-| `quartz_block_chiseled` | 320 |  |
-| `quartz_block_side` | 319 |  |
-| `radar_bottom` | 929 |  |
-| `radar_screen` | 19 | anim (4 프레임) · 회전 패밀리 (4 사본) |
-| `radar_side_active` | 927 |  |
-| `radar_side_inactive` | 930 |  |
-| `radar_top_active` | 928 |  |
-| `radar_top_inactive` | 931 |  |
-| `recycler_back` | 1181 |  |
-| `recycler_front` | 1175 |  |
-| `recycler_side` | 1176 |  |
-| `recycler_side_running` | 43 | anim (4 프레임) |
-| `recycler_top` | 1177 | 회전 패밀리 (4 사본) |
-| `red_concrete` | 283 |  |
-| `red_gen_spawn_coal` | 771 |  |
-| `red_gen_spawn_iron` | 772 |  |
-| `red_gen_spawn_top` | 770 |  |
-| `red_glazed_terracotta` | 425 | 회전 패밀리 (4 사본) |
-| `red_lucky_block` | 934 |  |
-| `red_lucky_block_rare` | 984 |  |
-| `red_lucky_block_super` | 986 |  |
-| `red_mushroom_block` | 537 |  |
-| `red_planks` | 365 |  |
-| `red_portal` | 16 | anim (4 프레임) |
-| `red_sand` | 474 |  |
-| `red_sandstone` | 454 |  |
-| `red_sandstone_brick` | 475 |  |
-| `red_sandstone_top` | 455 |  |
-| `red_spawn_block_side` | 695 |  |
-| `red_spawn_block_top` | 691 | 회전 패밀리 (4 사본) |
-| `redstone_lamp_off` | 313 |  |
-| `redstone_lamp_on` | 312 |  |
-| `rocket_block` | 579 |  |
-| `rocky_dirt` | 476 |  |
-| `rope_block` | 1030 |  |
-| `sand` | 194 |  |
-| `sandstone_brick` | 461 |  |
-| `sandstone_normal` | 225 |  |
-| `sandstone_top` | 324 |  |
-| `shatter_mill_back` | 1147 |  |
-| `shatter_mill_front` | 1141 |  |
-| `shatter_mill_side` | 1142 |  |
-| `shatter_mill_side_running` | 40 | anim (4 프레임) |
-| `shatter_mill_top` | 1143 | 회전 패밀리 (4 사본) |
-| `shop_trader_spawn_face` | 799 |  |
-| `shop_trader_spawn_side` | 798 |  |
-| `shop_trader_spawn_top` | 794 | 회전 패밀리 (4 사본) |
-| `shop_wizard_spawn_face` | 805 |  |
-| `shop_wizard_spawn_side` | 804 |  |
-| `shop_wizard_spawn_top` | 800 | 회전 패밀리 (4 사본) |
-| `sky_tap_back` | 1155 |  |
-| `sky_tap_bottom` | 1154 |  |
-| `sky_tap_front` | 1148 |  |
-| `sky_tap_side` | 1149 |  |
-| `sky_tap_side_running` | 41 | anim (4 프레임) |
-| `sky_tap_top` | 1150 | 회전 패밀리 (4 사본) |
-| `slab_andesite_brick_side` | 498 |  |
-| `slab_aspen_side` | 483 |  |
-| `slab_brick_side` | 515 |  |
-| `slab_cedar_side` | 482 |  |
-| `slab_cherry_side` | 587 |  |
-| `slab_chiseled_red_sandstone_side` | 512 |  |
-| `slab_chiseled_sandstone_side` | 508 |  |
-| `slab_cobblestone_side` | 488 |  |
-| `slab_cut_red_sandstone_side` | 513 |  |
-| `slab_cut_sandstone_side` | 509 |  |
-| `slab_diorite_brick_side` | 502 |  |
-| `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 981 |  |
-| `slab_engraved_andesite_side` | 497 |  |
-| `slab_engraved_diorite_side` | 501 |  |
-| `slab_engraved_granite_side` | 505 |  |
-| `slab_granite_brick_side` | 506 |  |
-| `slab_grass_top_side` | 487 |  |
-| `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 890 |  |
-| `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 895 |  |
-| `slab_maple_side` | 479 |  |
-| `slab_mossy_cobblestone_side` | 493 |  |
-| `slab_palm_side` | 485 |  |
-| `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 835 |  |
-| `slab_pine_side` | 480 |  |
-| `slab_plum_side` | 481 |  |
-| `slab_red_sandstone_brick_side` | 514 |  |
-| `slab_red_sandstone_side` | 511 |  |
-| `slab_sandstone_brick_side` | 510 |  |
-| `slab_sandstone_normal_side` | 507 |  |
-| `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 832 |  |
-| `slab_stone_andesite_side` | 495 |  |
-| `slab_stone_andesite_smooth_side` | 496 |  |
-| `slab_stone_diorite_side` | 499 |  |
-| `slab_stone_diorite_smooth_side` | 500 |  |
-| `slab_stone_granite_side` | 503 |  |
-| `slab_stone_granite_smooth_side` | 504 |  |
-| `slab_stone_side` | 489 |  |
-| `slab_stonebrick_carved_side` | 491 |  |
-| `slab_stonebrick_mossy_side` | 494 |  |
-| `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1062 |  |
-| `smelter_front` | 1056 |  |
-| `smelter_side` | 1057 |  |
-| `smelter_side_running` | 29 | anim (4 프레임) |
-| `smelter_top` | 1058 | 회전 패밀리 (4 사본) |
-| `smoke` | 23 | anim (4 프레임) |
-| `smooth_stone` | 218 |  |
-| `snow` | 197 |  |
-| `snowy_messy_stone` | 824 |  |
-| `snowy_messy_stone_side` | 825 |  |
-| `solar_panel_bottom` | 965 |  |
-| `solar_panel_side` | 963 |  |
-| `solar_panel_top` | 964 |  |
-| `sorting_gate_slab_side` | 1108 |  |
-| `sorting_gate_top` | 1107 |  |
-| `splitter_slab_side` | 1083 |  |
-| `splitter_top` | 1082 |  |
-| `sponge` | 329 |  |
-| `starframe` | 1167 |  |
-| `stone` | 217 |  |
-| `stone_andesite` | 221 |  |
-| `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1034 |  |
-| `stone_diorite` | 219 |  |
-| `stone_diorite_smooth` | 220 |  |
-| `stone_granite` | 223 |  |
-| `stone_granite_smooth` | 224 |  |
-| `stonebrick` | 316 |  |
-| `stonebrick_carved` | 321 |  |
-| `stonebrick_cracked` | 323 |  |
-| `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1112 |  |
-| `storage_silo_top` | 1111 |  |
-| `stripped_aspen_log` | 211 |  |
-| `stripped_cedar_log` | 215 |  |
-| `stripped_cherry_log` | 583 |  |
-| `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 892 |  |
-| `stripped_maple_log` | 210 |  |
-| `stripped_palm_log` | 576 |  |
-| `stripped_pear_log` | 577 |  |
-| `stripped_pine_log` | 214 |  |
-| `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 829 |  |
-| `super_compressed_messy_stone` | 532 |  |
-| `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1119 |  |
-| `tool_bench_top` | 1120 |  |
-| `tools_lucky_block` | 1001 |  |
-| `tools_lucky_block_rare` | 1003 |  |
-| `tools_lucky_block_super` | 1005 |  |
-| `toxic_waste` | 25 | anim (8 프레임) |
-| `toxic_waste_barrel_bottom` | 1020 |  |
-| `toxic_waste_barrel_side` | 1019 |  |
-| `toxic_waste_barrel_top` | 24 | anim (4 프레임) |
-| `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1129 |  |
-| `tree_cutter_back_running` | 37 | anim (4 프레임) |
-| `tree_cutter_front` | 1123 |  |
-| `tree_cutter_side` | 1124 |  |
-| `tree_cutter_side_running` | 36 | anim (4 프레임) |
-| `tree_cutter_top` | 1125 | 회전 패밀리 (4 사본) |
-| `ultra_compressed_messy_stone` | 534 |  |
-| `unloaded` | 189 |  |
-| `volt_engine_side` | 1131 |  |
-| `volt_engine_side_running` | 38 | anim (4 프레임) |
-| `volt_engine_top` | 1132 |  |
-| `voltite_deposit` | 1130 |  |
-| `voltite_ore` | 1084 |  |
-| `watermelon_side` | 292 |  |
-| `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 935 |  |
-| `weapon_lucky_block_rare` | 985 |  |
-| `weapon_lucky_block_super` | 987 |  |
-| `white_concrete` | 284 |  |
-| `white_gen_spawn_coal` | 786 |  |
-| `white_gen_spawn_iron` | 787 |  |
-| `white_gen_spawn_top` | 785 |  |
-| `white_glazed_terracotta` | 369 | 회전 패밀리 (4 사본) |
-| `white_planks` | 351 |  |
-| `white_portal` | 17 | anim (4 프레임) |
-| `white_spawn_block_side` | 690 |  |
-| `white_spawn_block_top` | 686 | 회전 패밀리 (4 사본) |
-| `wire_mill_back` | 1078 |  |
-| `wire_mill_front` | 1072 |  |
-| `wire_mill_side` | 1073 |  |
-| `wire_mill_side_running` | 32 | anim (4 프레임) |
-| `wire_mill_top` | 1074 | 회전 패밀리 (4 사본) |
-| `wool_colored_black` | 253 |  |
-| `wool_colored_blue` | 249 |  |
-| `wool_colored_brown` | 250 |  |
-| `wool_colored_cyan` | 247 |  |
-| `wool_colored_gray` | 245 |  |
-| `wool_colored_green` | 251 |  |
-| `wool_colored_light_blue` | 241 |  |
-| `wool_colored_light_grey` | 246 |  |
-| `wool_colored_lime` | 243 |  |
-| `wool_colored_magenta` | 240 |  |
-| `wool_colored_orange` | 239 |  |
-| `wool_colored_pink` | 244 |  |
-| `wool_colored_purple` | 248 |  |
-| `wool_colored_red` | 252 |  |
-| `wool_colored_white` | 238 |  |
-| `wool_colored_yellow` | 242 |  |
-| `yellow_concrete` | 286 |  |
-| `yellow_gen_spawn_coal` | 780 |  |
-| `yellow_gen_spawn_iron` | 781 |  |
-| `yellow_gen_spawn_top` | 779 |  |
-| `yellow_glazed_terracotta` | 385 | 회전 패밀리 (4 사본) |
-| `yellow_lucky_block` | 932 |  |
-| `yellow_lucky_block_rare` | 982 |  |
-| `yellow_lucky_block_super` | 983 |  |
-| `yellow_planks` | 355 |  |
-| `yellow_portal` | 18 | anim (4 프레임) |
-| `yellow_spawn_block_side` | 685 |  |
-| `yellow_spawn_block_top` | 681 | 회전 패밀리 (4 사본) |
-
-#### 68.3 회전 계열 (57 루트)
-
-이 텍스처들은 미리 회전된 사본 (`name[rot[1..4`) 으로만 존재한다. 레지스트리는 이들을 아래 루트로 접고, `bloxdTexel`이 샘플 시점에 회전을 다시 적용한다 (§57.4) — 그러므로 참조하는 것은 루트이지 결코 사본이 아니다. `[rot[N` 철자 중 하나를 쓰면 전용 회전 이름 진단이 나온다 (§57.3).
-
-- `alloy_kiln_top` (id 1087)
-- `auto_bench_top` (id 1102)
-- `belt_tunnel_exit_top` (id 1200)
-- `belt_tunnel_top` (id 1195)
-- `black_glazed_terracotta` (id 429)
-- `black_spawn_block_top` (id 756)
-- `blue_glazed_terracotta` (id 413)
-- `blue_spawn_block_top` (id 751)
-- `brown_glazed_terracotta` (id 417)
-- `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1043)
-- `checkpoint_block` (id 761)
-- `chest_top` (id 343)
-- `crop_harvester_top` (id 1188)
-- `crusher_top` (id 1051)
-- `crystal_vat_top` (id 1162)
-- `custom_lobby_block_top` (id 765)
-- `cyan_glazed_terracotta` (id 405)
-- `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1135)
-- `electric_drill_top` (id 1094)
-- `gray_glazed_terracotta` (id 397)
-- `gray_spawn_block_top` (id 736)
-- `green_glazed_terracotta` (id 421)
-- `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 913)
-- `light_blue_glazed_terracotta` (id 381)
-- `light_blue_spawn_block_top` (id 726)
-- `light_gray_glazed_terracotta` (id 401)
-- `light_gray_spawn_block_top` (id 721)
-- `lime_glazed_terracotta` (id 389)
-- `lime_spawn_block_top` (id 716)
-- `magenta_glazed_terracotta` (id 377)
-- `magenta_spawn_block_top` (id 711)
-- `moonstone_chest_top` (id 445)
-- `orange_glazed_terracotta` (id 373)
-- `orange_spawn_block_top` (id 706)
-- `pink_glazed_terracotta` (id 393)
-- `pink_spawn_block_top` (id 701)
-- `press_top` (id 1067)
-- `purple_glazed_terracotta` (id 409)
-- `purple_spawn_block_top` (id 696)
-- `radar_screen0` (id 19) · 애니메이션이기도 함
-- `recycler_top` (id 1177)
-- `red_glazed_terracotta` (id 425)
-- `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1143)
-- `shop_trader_spawn_top` (id 794)
-- `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1150)
-- `smelter_top` (id 1058)
-- `tree_cutter_top` (id 1125)
-- `white_glazed_terracotta` (id 369)
-- `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1074)
-- `yellow_glazed_terracotta` (id 385)
-- `yellow_spawn_block_top` (id 681)
-
-#### 68.4 애니메이션 계열 (42 이름)
-
-이 이름들 중 하나를 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다 (§63.3의 프레임 사다리). 엔진은 텍스처마다 패밀리별 고정 간격으로 프레임을 진행한다 — `cnty9`에서 실측하면 정확히 세 값을 가진다: **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, 모든 기계 `*_running` 패밀리), **300 ms** (열일곱 개의 포털과 `toxic_waste_barrel_top`) — 간격 열을 보라 — 그러므로 팩은 프레임 접미사를 절대 쓰지 않는다 (`lava0`은 오류, `lava`가 이름이다).
-
-| 이름 | 프레임 | 간격 | 레지스트리 베이스 |
-|---|---|---|---|
-| `lava` | 8 | 200 ms | `lava0` |
-| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
-| `black_portal` | 4 | 300 ms | `black_portal0` |
-| `blue_portal` | 4 | 300 ms | `blue_portal0` |
-| `brown_portal` | 4 | 300 ms | `brown_portal0` |
-| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
-| `gray_portal` | 4 | 300 ms | `gray_portal0` |
-| `green_portal` | 4 | 300 ms | `green_portal0` |
-| `grey_portal` | 4 | 300 ms | `grey_portal0` |
-| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
-| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
-| `lime_portal` | 4 | 300 ms | `lime_portal0` |
-| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
-| `orange_portal` | 4 | 300 ms | `orange_portal0` |
-| `pink_portal` | 4 | 300 ms | `pink_portal0` |
-| `press_side_running` | 4 | 250 ms | `press_side_running0` |
-| `purple_portal` | 4 | 300 ms | `purple_portal0` |
-| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
-| `red_portal` | 4 | 300 ms | `red_portal0` |
-| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
-| `smoke` | 4 | 250 ms | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
-| `white_portal` | 4 | 300 ms | `white_portal0` |
-| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
-
-원시 데이터가 드러내는 구조적 비고 하나: 아틀라스는 42가 아니라 45개의 애니메이션 루트를 담는다 — `radar_screen`의 미리 회전된 사본 4개가 저마다 자기만의 4프레임 사다리를 가지며, 이것이 `radar_screen`이 두 패밀리 비고를 함께 지니는 유일한 이름인 이유이기도 하다.
-
-#### 68.5 실측 드리프트 (sjr0p7 → cnty9)
-
-레지스트리는 빌드에 동봉되는 콘텐츠이므로 블록 업데이트와 함께 흘러간다. 이 가이드가 실측한 두 빌드 (2026-10-17과 2026-10-27, 열흘 간격) 가 그 속도를 정확히 보여 준다:
-
-- 엔트리: 1200 → 1219 (98 추가, 79 제거)
-- 철자를 유지한 이름: 1121 — 이 중 **779개가 id를 바꿨다** (69%)
-- 명명 규칙 하나가 달 중간에 이행했다: `_rot1..4` 접미사 이름 68개 (예: `chest_top_rot1`) 가 `[rot[1..4` 슬롯 (예: `chest_top[rot[1`) 이 되었고, 더블 체스트 텍스처 (`chest_double_*`, 8 엔트리) 가 그와 함께 나타났다
-- 사용 가능 이름 수는 900 → 905로 옮겨갔고, `HEADER_VERSION` (§65.1) 의 레지스트리 해시가 id를 구워 넣은 저장 팩 전부를 다시 무효화했다
-
-마지막 항목이 운용상의 교훈이다: **`19`가 아니라 `bloxdTextureIdLava`를 써라** — 이름 상수는 위 항목 전부를 변함없이 견디는데, 검증기가 로드 시 라이브 레지스트리에 대해 다시 해석해 주기 때문이다.
-
-#### 68.6 드리프트 목록 전문 (98 추가, 79 제거)
-
-§68.5의 헤드라인 숫자를 이름 하나하나로 풀어 쓴 것이다 — 10월 팩을 업데이트하는 텍스처 팩 작가는 정확히 어떤 파일 이름이 더는 맞지 않게 됐는지 알아야 하기 때문이다. 목록들이 비교하는 것은 *철자* 층 (텍스처 팩이 쓰는 파일 이름) 이며, 철자를 §68.2의 사용 가능 상수로 바꾸는 것은 §64의 접기 규칙이다.
-
-**회전 접기 이행 — 기계 윗면 17개 (철자 68개 제거, 슬롯 68개 추가).** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top`은 `_rot1..4` 배리언트 철자에서 `[rot[1..4` 미리 회전된 슬롯으로 옮겨갔다; 접힌 루트가 사용 가능한 이름이므로, 텍스처 팩은 이제 `X_top_rotN.png` 파일 네 개 대신 `X_top.png` 하나를 싣는다.
-
-**체스트 윗면 접기 — 3 패밀리 (철자 6개 제거, 슬롯 12개 추가).** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top`: 두 배리언트 철자가 루트 아래의 미리 회전된 슬롯이 되었다 — PNG 파일 이름을 그에 맞게 바꿔라.
-
-**새 텍스처 — 17 이름.** 더블 체스트 (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), 다크스톤 패밀리 (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore`, 그리고 `forge_hopper_top`.
-
-**단순 접기 한 건.** `ghost_chest_top_1`/`ghost_chest_top_2`가 단일 `ghost_chest_top`로 합쳐졌다.
-
-**완전 삭제 — 3 이름.** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top`은 새 레지스트리에 후계 철자가 없다 — 그 콘텐츠는 이 빌드와 함께 게임을 떠났다. `forge_hopper_top`은 검증된 개명이 아니라 정말로 새로운 텍스처이다.
-
-검증용 원시 철자 diff:
-
-```text
-+ 98 added (cnty9):
-alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
-auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
-belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
-burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
-chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
-chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
-crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
-crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
-darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
-electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
-iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
-moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
-pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
-shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
-sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
-tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
-wire_mill_top[rot[3, wire_mill_top[rot[4
-
-- 79 removed (sjr0p7):
-alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
-auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
-belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
-burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
-crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
-crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
-deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
-ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
-press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
-recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
-shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
-smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
-tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
-wire_mill_top_rot4
-```
-
 
 ---
 
 ## API v5 마이그레이션 가이드
-
 ### 69. v4 팩의 호환성
 
 API v4용으로 만든 팩은 마이그레이션하지 않으면 API v5와 호환되지 않습니다. 팩을 v5에 맞게 수정하고 매니페스트의 `apiVersion`을 숫자 `5`로 설정하세요. 문자열 `"5"`가 아니라 JSON 숫자여야 합니다.
@@ -9276,6 +7159,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Y 도함수는 팩 코드에서 자동으로 부호 반전된다.** 분석기는 `dpdy`, `dpdyCoarse`, `dpdyFine` 호출을 모두 `(-dpdy(...))`로 다시 쓴다 — 스크린 공간 y축은 아래를 향하므로, 반전이 「위쪽으로 갈 때의 변화율」을 직관에 맞춰 준다. `dpdy(h)`를 「높아질 때 h가 어떻게 변하나」로 쓰면, 출력된 코드가 대신 부호를 뒤집는다. `dpdx`와 `fwidth` 패밀리는 무손상. (검증기의 토큰 재작성 패스에서 실측; dpdy 패밀리가 특별히 반전 집합으로 지정되어 있다.)
 - **텍스처 이름 진단에 철자 엔진이 붙었다.** `bloxdTextureId`로 시작하지만 해석되지 않는 이름은 이제 레벤슈타인 기반 제안을 받는다: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?`"* — 프레임 표기 (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) 와 회전 표기 (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*) 에도 전용 메시지가 있다. 일반 예약 규칙이 진단에 재진술되어 있다: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*, 그리고 *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 - **참조된 텍스처 상수만 출력된다.** 헤더의 `bloxdTextureId*` 블록은 실제로 참조한 이름으로 팩마다 생성된다 — 상수 3개를 쓰는 팩에는 3줄의 `const`가 앞에 붙고, 약 900줄 전체가 아니라.
-- **`HEADER_VERSION`가 `9.<hash>.<hash>`로 이동** — v4와 같은 이중 접미사 구조 (헤더 재료의 fnv1a32, 정렬된 이름-id 레지스트리의 fnv1a32), 선행 정수만 8에서 9로. 저장 팩 재검사 논리 ([v4 마이그레이션 가이드](history/v5.md/v4.md)의 §55) 는 불변: 헤더/레지스트리가 바뀌면 저장 팩이 「재확인 필요」로 넘어간다.
+- **`HEADER_VERSION`가 `9.<hash>.<hash>`로 이동** — v4와 같은 이중 접미사 구조 (헤더 재료의 fnv1a32, 정렬된 이름-id 레지스트리의 fnv1a32), 선행 정수만 8에서 9로. 저장 팩 재검사 논리 ([v4 마이그레이션 가이드](history/v4.md)의 §55) 는 불변: 헤더/레지스트리가 바뀌면 저장 팩이 「재확인 필요」로 넘어간다.
 - **i18n 면**: 셰이더 팩 키 패밀리는 형태가 불변 (v4 가이드 §62의 `load*`, `status*`, 배리언트 라벨 키가 모두 재측정되어 존재; `loadNoWgsl`/`loadNotZip`도 여전히 그대로).
 - **재조사하는 사람을 위한 번들 레이아웃**: 헤더 c55 (불변), 로더/지속화 c51–c53, 검증기 + 레지스트리 빌더 c55, WebGPU 코드젠 c56, 포그 c9, **기본 팩 템플릿 c116** (c124에서 이동), BLOXD_ALPHA 발생지 c51/c52/c53/c55/c9. 청크 형식 메모: 이제 모든 청크가 ES 모듈이다 (`export const modules = {...}`) — c53에는 c52와 c53 양쪽의 모듈까지 들어 있다 — 번들을 텍스트 검색할 때 중요하다 (`1371` 같은 모듈 id는 어떤 청크도 아닌 *main*의 희소 모듈 배열에 산다).
