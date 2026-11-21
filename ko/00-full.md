@@ -23,14 +23,12 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 8. [검증](getting-started/validation.md) — 3단계 로드 검사와 실기기 테스트
 9. [배포](getting-started/distribution.md) — zipping 과 릴리스 위생
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified/Analyzed
 
 전체 사양이 필요하면 [API 레퍼런스](api/) 로, 완성품 효과는 [레시피](recipes/) 로 계속하라.
 
 ---
 
 ## 개요와 전제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 ### 셰이더 팩이란
 
@@ -48,9 +46,9 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 물 |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 블록 모델 (반 블록, 계단, 식물), 아이템, 플레이어, 몹, NPC, 방어구, 화장품 |
 
-- **할 수 있다**: 색·투명도·발광 변경, 라이팅 재구축 ([라이팅 API](api/lighting.md)), 투영형 그림자 (`skyLight` 경유), 텍스처 샘플 (`bloxdTexel` — 기존 블록 텍스처 아틀라스 읽기), 모델별 효과 (`flags` 가 「손에 든 아이템이다」「플레이어다」를 알려준다), 정점 애니메이션 (allow 게임만)
-- **할 수 없다**: 자신의 텍스처 추가 (그것은 텍스처팩 시스템의 임무), 후처리 (블룸 등), 태양과 함께 도는 섀도맵 그림자, 진짜 반사 (SSR), 하늘·구름·태양 원반 자체에 영향
-- **놓치기 쉽지만 강력**: **`skyLight` (복셀 하늘 가림) 을 쓴 투영형 그림자** — 나무 밑과 지붕 밑을 뚜렷하게 어둡게 한다. 블록을 부수면 LightEngine 이 즉시 재계산하므로, 그림자는 실시간으로 따라간다
+- **할 수 있다**: 색·투명도·발광 변경, 라이팅 재구축 ([라이팅 API](api/lighting.md)), 엔진이 계산한 태양·달 그림자 사용 (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`), 복셀 하늘 가림 (`skyLight`) 사용, `bloxdTexel`로 텍스처 샘플링, `flags`를 이용한 모델별 효과, allow 게임에서 정점 애니메이션
+- **할 수 없다**: 자체 텍스처 추가 (텍스처팩 시스템의 역할), 최종 프레임 후처리 (블룸 등), 섀도맵 깊이 데이터 접근 또는 자체 섀도맵 생성, 실제 반사 (SSR) 추가, 하늘·구름·태양 원반 자체 변경
+- **그림자 방식 선택**: 태양과 달을 따라가는 엔진 그림자에는 `bloxdShadow()`를 사용한다. `skyLight`는 나무 밑과 지붕 밑을 어둡게 하는 이전 방식이며 태양이나 달의 움직임을 따라가지 않는다. [그림자](guides/shadows.md)를 참조한다.
 
 ### strict 와 allow 모드
 
@@ -101,7 +99,6 @@ URL 파라미터나 localStorage 에 남은 렌더러 오버라이드는 팩의 
 ---
 
 ## 퀵 스타트
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 5분 만에 첫 팩을 만든다.
 
@@ -160,7 +157,6 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## 팩 구조
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified
 
 ### 배포 형식
 
@@ -189,7 +185,6 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## pack.json (매니페스트)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 `pack.json` 은 팩의 매니페스트다 — zip 루트에 정확히 하나의 JSON 객체.
 
@@ -228,7 +223,6 @@ v1–v4 에서의 이주는 [버전 히스토리](history/) 를 보라.
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 팩은 **9개의 훅**에 끼어들 수 있다: 3개 렌더 대상 (Terrain / Liquid / Model) × 3개 파이프라인 단계 (Vertex / Surface / Light). 모두 선택 사항이다 — 정의하지 않은 훅은 엔진 기본값으로 폴백한다.
 
@@ -357,7 +351,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 베리언트와 가드
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed
 
 ### 6개 베리언트
 
@@ -396,7 +389,6 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## 검증
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 ### 3단계 로드 검사
 
@@ -449,7 +441,6 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## API 레퍼런스
-현행 API v5 의 체계적인 사양서이다. 모두 대상 빌드 `bny9u` (2026-11-05; 프로덕션과 preprod 가 동일 번들) 에서의 실측에 기반한다. 모든 팩 앞에 엔진이 자동으로 붙이는 헤더 (전문은 [엔진 내부와 연구](internals/engine-header.md)) 가 이 절의 1차 자료다.
 
 ### 구성
 
@@ -468,7 +459,6 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 | [호환성](api/compatibility.md) | 구버전 팩의 취급, 저장 팩 재검증 |
 | [텍스처 카탈로그](api/texture-catalog.md) | 사용 가능 896 이름의 실측 카탈로그 (검색 가능) |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (헤더·검증기에서 그대로 복원)
 
 v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 보라.
 
@@ -476,7 +466,6 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 ---
 
 ## 팩 형식
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (라이브 로더에서 재실측)
 
 매니페스트, 로더 제한, 프레임별 uniform — 팩 모델 전체를 한 페이지에 담는다. 단계별 버전은 [시작하기](getting-started/manifest.md) 에 있다.
 
@@ -495,7 +484,6 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 | `apiVersion` | number | 필수 | **`5` 와 엄밀히 같아야 한다** (`===`). 문자열 `"5"` 는 실패하며, JSON 철자 그대로 보고된다 |
 | `name` | string | 필수 | 트림 후 비어 있지 않을 것. 설정 화면에 표시된다 |
 | `author` | string | 선택 | 있으면 string 이어야 한다 |
-| `keepCircleShadows` | boolean | 선택 | **`bbb6l5` 신규** — 팩 셰이더가 실제 태양 섀도 API를 쓸 때도 플레이어/몹 아래의 옛 원형 섀도를 유지 ([섀도](guides/shadows.md)). 기본 `false`. 다른 타입은 전용 로드 메시지로 거부 |
 
 매니페스트의 나머지는 모두 무시된다. `pack.json` 은 zip 루트에 정확히 하나의 JSON 객체여야 한다.
 
@@ -525,7 +513,6 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` 의 기반 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` 의 기반 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` 의 기반 |
-| 64 | `shadowDirection` | `vec3f` | **`bbb6l5` 신규** — 그림자를 만드는 빛의 진행 방향. `bloxdShadowDirection()`의 뒷받침 |
 
 `lit` 은 v4 부터 있던 `seconds` 와 `renderOffset` 사이의 패딩에 들어갔다 (오프셋 4–15 는 정렬 틈이었고, `vec3i` 는 16바이트 정렬이 필요해 `renderOffset` 은 16 그대로다). 총 크기와 다른 모든 오프셋은 불변. 엔진은 `setUint32(4, lit ? 1 : 0)` 한 번으로 쓴다 — 라이트 레벨이 아니라 플래그다 (v4 의 JS 측 이름 `terrainLightLevels` / `terrainHeldLight` 는 번들에서 완전히 사라졌다).
 
@@ -549,7 +536,6 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified
 
 팩은 **9개의 훅** — 3개의 렌더 대상 (프로그램) × 3개의 파이프라인 단계 — 을 정의할 수 있다. 모두 선택 사항이다 (정의하지 않으면 엔진 기본값).
 
@@ -641,7 +627,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 플래그 (BloxdFlags)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 면을 이름 붙은 bool 구조체로 식별한다. v4 의 `blockFlags: u32` 비트마스크와 그 6개 `bloxdBlockFlag*` 상수는 사라졌다.
 
@@ -765,7 +750,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 입출력 구조체
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 7개의 구조체를 팩이 읽고 쓸 수 있다. 모든 필드를 아래에 실었다 (`#ifdef` 필드는 조건부). 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 있다.
 
@@ -939,7 +923,6 @@ struct BloxdOpaqueBehind {
 ---
 
 ## 함수
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더의 모든 함수이다. 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 와 `bloxdOpaqueBehind` 는 [텍스처 API](api/texture-api.md) 에서 다룬다.
 
@@ -1089,7 +1072,6 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 fn bloxdShadow() -> f32
 \u0060\u0060\u0060
 
-- **반환값**: 이 프래그먼트에 닿는 햇빛 또는 달빛 — **섀도에서 0, 비치면 1** — *`bbb6l5` 신규*
 - 섀도를 드리우는 것: **블록, 플레이어, 몹, 아이템** (1인칭 손에 든 아이템은 의도적으로 제외 — 몸이 돌면 자기가 자기를 가리기 때문)
 - 동작 (검증기 설명에서 그대로):
   - 해나 달이 지거나 면이 빛에서 돌아설 때 0으로 페이드
@@ -1104,7 +1086,6 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 \u0060\u0060\u0060
 
-- **반환값**: \u0060bloxdShadow()\u0060와 같지만 **카메라 (t = 0)와 이 프래그먼트 (t = 1) 사이의 점**에서 평가 — *`bbb6l5` 신규* — 빛 기둥용
 - 특성 (검증기 설명에서 그대로):
   - **블록만 드리움** (플레이어·몹은 제외), **블록 단위로 블러**
   - \u0060t\u0060는 0–1로 클램프
@@ -1138,7 +1119,6 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## 라이팅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 라이팅 API 를 공개했다. 엔진이 내부에서 하던 일 (`litColour` 를 만드는 것) 을 이제 팩에서 호출할 수 있다. 이 페이지는 라이팅의 입력·함수·처리 순서를 하나의 체계로 다룬다.
 
@@ -1322,7 +1302,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 API
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
 
 게임 자신의 텍스처를 읽는 API: 함수 2개, 이름 상수 계열, 입력 필드 4개. 헤더 자신의 한 줄 요약: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1552,7 +1531,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 상수
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더는 세 개의 상수를 제공한다 (텍스처 이름 상수 `bloxdTextureId*` 는 [텍스처 API](api/texture-api.md) 에서 다룬다).
 
@@ -1608,7 +1586,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 전처리기
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 검증기에서 복원)
 
 조건부 컴파일이 지원하는 것은 `#define NAME` (값 없음) / `#ifdef` / `#ifndef` / `#else` / `#endif` 뿐이다. `#` 은 행 머리에 붙인다 (함수 안도 상관없다). 플래그명 대조는 대소문자를 구별하지 않으며, 틀린 `#ifdef` 이름을 쓰면 오류 메시지가 공식 목록을 보여준다.
 
@@ -1690,7 +1667,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 제한과 예약명
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (v4 제한을 v5 에서 바이트 동일로 재확인)
 
 팩이 쓸 수 있는 것과, 이름 예약 규칙의 전모.
 
@@ -1757,7 +1733,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 호환성
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 현행 게임과 구버전 팩이 서로 어떻게 맞물리는지에 대한 설명이다.
 
@@ -1797,8 +1772,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 `HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` 이다 (선두 정수는 v4 의 8 에서 9 로 올라갔다). 엔진의 헤더나 텍스처 레지스트리가 바뀌면 (게임 업데이트 때 흔하다) 저장 팩은 「재확인 필요」 로 표시되고, 페이지 로드 시 자동으로 재검증된다.
 
-**v98qt8 유의사항:** 현행 빌드의 폴딩 회귀([엔진 내부: 텍스처 레지스트리](internals/texture-registry.md#the-v98qt8-folding-regression))가 엔진이 해시하는 대상을 바꿉니다 — 계산되는 레지스트리 접미사는 *폴딩되지 않은* 1,047행 표(`694df62c`)이지 의도된 폴디드 906행 표(`df6c1915`, `bny9u`에서는 `e735ebdc`)가 아닙니다. 그래서 저장된 모든 팩이 이 빌드에서 재검증되며, 43개 애니메이션 계열 기본 이름(`lava` 등) 중 하나를 참조하는 팩은 엔진 측이 고쳐질 때까지 재검증에 **실패**합니다 — 그래도 폴디드 이름으로 쓰십시오. 그것이 API입니다.
-
 
 레지스트리 이동의 실측 예 (10일 간격의 두 빌드): 엔트리 1200 → 1219 (98개 추가, 79개 삭제). 그리고 철자를 유지한 이름 중에서 **1121개 가운데 779개가 id 가 바뀌었다**. 다시 말해:
 
@@ -1819,9 +1792,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 |---|---|---|
 | v1 | — | 로드 시 거부 ([v2](history/v2.md) 경유로 이주) |
 | v2 | — | 로드 시 거부 |
-| v3 | 2026-10-19 | 로드 시 거부 |
-| v4 | 2026-10-26 | 로드 시 거부 |
-| **v5** | **2026-11-03** | **현행** |
 
 ### 관련 문서
 
@@ -1831,1199 +1801,17 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 텍스처 카탈로그
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 사용 가능한 텍스처 이름 상수 (`bloxdTextureId*`) 의 완전한 카탈로그. **1,017 이름**, 알파벳순.
 
-**폴딩 상태 (`bbb6l5`, 2026-11-20):** `v98qt8`가 실었던 애니메이션 상수 폴딩 회귀는 **수리되었습니다** — 애니메이션 텍스처 테이블이 다시 슬롯 키로 구축되어, 아래 애니메이션 계열 기본 이름(`lava`, 모든 `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front` 등)이 정상적으로 검증을 통과합니다. 샘플링하면 현재 프레임이 반환됩니다. 아래는 라이브 빌드에서 재측정한 폴딩(의도된) 뷰입니다.
 
 ### 읽는 법
 
 **이름** 열이 레지스트리명 — 실제로 코드에 쓰는 핸들이다. 상수 철자는 파일명의 CamelCase 다: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **대소문자와 언더스코어는 구별되지 않는다** (`bloxdTextureId_grass_top` 은 `bloxdTextureIdGrassTop` 과 똑같이 해석된다). 이름이 API 다 — 로더가 로드 시 라이브 레지스트리에 대해 다시 해석하므로, 이름은 레지스트리 드리프트를 견딘다 ([텍스처 API](api/texture-api.md)).
 
-**id** 열은 상수가 비교되는 값 — `bbb6l5` 에서 실측 (아틀라스 레이어 + 1). `surface.textureId` 덤프를 해독하고, 그날의 빌드에 대해 디버그 출력을 교차 확인하는 데 쓴다. **WGSL 에 id 를 절대 쓰지 마라** — id 는 한 빌드의 아틀라스 순서 스냅샷이다 (아래 드리프트 실측 참조).
 
 **비고** 열은 두 접기 계열을 표시한다. 「애니메이션(4프레임)」은 이 이름을 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다는 뜻이다 — **프레임 접미사를 절대 쓰지 마라** (`lava0` 은 전용 진단이 붙은 알려진 별명이다). 「회전 계열(4사본)」은 그 텍스처가 미리 회전된 슬롯으로만 존재한다는 뜻이다 — 이름은 루트를 가리키고 `bloxdTexel` 이 회전을 다시 적용한다. 정확히 한 이름 (`radar_screen`) 만이 두 비고를 모두 가진다.
 
-1,650개 레이어로 구성된 아틀라스 표는 엔진 내부 데이터입니다. 구조와 측정 방법은 [엔진 내부와 연구: 텍스처 레지스트리](internals/texture-registry.md)를 참고하세요.
-
-#### 수치의 관계
-
-이 숫자들은 서로 다른 집합을 세므로, 단순 합산되지 않는다:
-
-| 개수 | 세는 것 |
-|---|---|
-| **1,017** | 사용 가능한 이름 상수 — `bloxdTextureId*` 로 쓸 수 있는 텍스처 이름 |
-| **776** | 별명 (프레임 520 + 회전 256) — 인식은 되지만 기본명 안내와 함께 *거부*되는 철자. 상수가 아니라 이름이며, id 를 추가하지 않는다 |
-| **1,650** | 아틀라스 엔트리 — 텍스처 아틀라스의 실제 슬롯 (id 1–1650) |
-
-카탈로그에는 사용 가능한 이름 1,017개가 알파벳순으로 정리되어 있습니다. id 열은 `bbb6l5`에서 측정한 값입니다. 빌드마다 ID가 바뀔 수 있으므로 WGSL에서는 이름으로 텍스처를 참조하세요.
-
-### 카탈로그
-
-카탈로그에는 사용 가능한 이름 1,017개가 알파벳순으로 정리되어 있습니다. id 열은 `bbb6l5`에서 측정한 값입니다. 빌드마다 ID가 바뀔 수 있으므로 WGSL에서는 이름으로 텍스처를 참조하세요.
-
-| 이름 | id (bbb6l5) | 비고 |
-|---|---|---|
-| `alloy_kiln_back` | 1413 |  |
-| `alloy_kiln_front` | 1407 |  |
-| `alloy_kiln_side` | 1408 |  |
-| `alloy_kiln_side_running` | 33 | anim (8 frames) |
-| `alloy_kiln_top` | 1409 | rotation family (4 copies) |
-| `andesite_brick` | 786 |  |
-| `apple_block_bottom` | 762 |  |
-| `apple_block_side` | 760 |  |
-| `apple_block_top` | 761 |  |
-| `armour_lucky_block` | 1317 |  |
-| `armour_lucky_block_rare` | 1319 |  |
-| `armour_lucky_block_super` | 1321 |  |
-| `ash` | 1353 |  |
-| `atomic_bench_side` | 1550 |  |
-| `atomic_bench_top` | 1551 |  |
-| `atomic_bomb_side` | 1595 |  |
-| `atomic_bomb_top` | 1596 |  |
-| `atomic_spire` | 1631 |  |
-| `auto_bench_back` | 1428 |  |
-| `auto_bench_front` | 1422 |  |
-| `auto_bench_side` | 1423 |  |
-| `auto_bench_side_running` | 35 | anim (8 frames) |
-| `auto_bench_top` | 1424 | rotation family (4 copies) |
-| `autocrafter_bottom` | 1284 |  |
-| `autocrafter_lunite_bottom` | 1295 |  |
-| `autocrafter_lunite_side` | 1294 |  |
-| `autocrafter_side` | 1282 |  |
-| `banana_block_side` | 1220 |  |
-| `banana_block_top` | 1221 |  |
-| `battery_casing` | 1598 |  |
-| `battery_cell` | 1599 |  |
-| `battery_cell_bottom` | 1601 |  |
-| `battery_cell_running` | 66 | anim (8 frames) |
-| `battery_cell_top` | 1600 |  |
-| `battery_controller_front` | 1597 |  |
-| `battery_controller_front_running` | 65 | anim (8 frames) |
-| `beacon` | 658 |  |
-| `bedrock` | 662 |  |
-| `beetroot_block_bottom` | 1246 |  |
-| `beetroot_block_side` | 1244 |  |
-| `beetroot_block_top` | 1245 |  |
-| `belt_drop_side` | 1507 |  |
-| `belt_drop_top` | 1506 |  |
-| `belt_lift_side` | 1505 |  |
-| `belt_lift_top` | 1504 |  |
-| `belt_loader_slab_front` | 1432 |  |
-| `belt_loader_top` | 1431 |  |
-| `belt_tunnel_back` | 1521 |  |
-| `belt_tunnel_exit_top` | 1522 | rotation family (4 copies) |
-| `belt_tunnel_mouth` | 1515 |  |
-| `belt_tunnel_side` | 1516 |  |
-| `belt_tunnel_top` | 1517 | rotation family (4 copies) |
-| `black_concrete` | 601 |  |
-| `black_glazed_terracotta` | 750 | rotation family (4 copies) |
-| `black_planks` | 689 |  |
-| `black_portal` | 2 | anim (4 frames) |
-| `black_spawn_block_side` | 1081 |  |
-| `black_spawn_block_top` | 1077 | rotation family (4 copies) |
-| `block_destroyer_tnt_side` | 1339 |  |
-| `block_destroyer_tnt_top` | 1340 |  |
-| `blue_concrete` | 602 |  |
-| `blue_gen_spawn_coal` | 1095 |  |
-| `blue_gen_spawn_iron` | 1096 |  |
-| `blue_gen_spawn_top` | 1094 |  |
-| `blue_glazed_terracotta` | 734 | rotation family (4 copies) |
-| `blue_lucky_block` | 1316 |  |
-| `blue_lucky_block_rare` | 1318 |  |
-| `blue_lucky_block_super` | 1320 |  |
-| `blue_planks` | 685 |  |
-| `blue_portal` | 3 | anim (4 frames) |
-| `blue_spawn_block_side` | 1076 |  |
-| `blue_spawn_block_top` | 1072 | rotation family (4 copies) |
-| `bone_block_side` | 1139 |  |
-| `bone_block_top` | 1140 |  |
-| `bookshelf` | 885 |  |
-| `bookshelf_1` | 887 |  |
-| `bookshelf_2` | 888 |  |
-| `bookshelf_3` | 889 |  |
-| `bookshelf_4` | 890 |  |
-| `bookshelf_5` | 891 |  |
-| `bookshelf_empty` | 886 |  |
-| `bouncy_bomb_block` | 912 |  |
-| `bowling_alley_floor` | 1300 |  |
-| `bread_block_back` | 756 |  |
-| `bread_block_front` | 755 |  |
-| `bread_block_side` | 757 |  |
-| `bread_block_top` | 758 |  |
-| `brick` | 643 |  |
-| `brown_concrete` | 603 |  |
-| `brown_glazed_terracotta` | 738 | rotation family (4 copies) |
-| `brown_mushroom_block` | 857 |  |
-| `brown_planks` | 686 |  |
-| `brown_portal` | 4 | anim (4 frames) |
-| `brown_spawn_block_side` | 1071 |  |
-| `brown_spawn_block_top` | 1067 | rotation family (4 copies) |
-| `building_lucky_block` | 1311 |  |
-| `building_lucky_block_rare` | 1313 |  |
-| `building_lucky_block_super` | 1315 |  |
-| `burner_drill_back` | 1370 |  |
-| `burner_drill_bottom` | 1369 |  |
-| `burner_drill_front` | 1363 |  |
-| `burner_drill_side` | 1364 |  |
-| `burner_drill_side_running` | 27 | anim (8 frames) |
-| `burner_drill_top` | 1365 | rotation family (4 copies) |
-| `cactus_dry` | 673 |  |
-| `cactus_top` | 672 |  |
-| `carrot_block_bottom` | 1242 |  |
-| `carrot_block_side` | 1240 |  |
-| `carrot_block_top` | 1241 |  |
-| `carved_messy_stone` | 1148 |  |
-| `carved_pumpkin` | 864 |  |
-| `centrifuge_back` | 1570 |  |
-| `centrifuge_back_running` | 53 | anim (8 frames) |
-| `centrifuge_bottom` | 1569 |  |
-| `centrifuge_side` | 1564 |  |
-| `centrifuge_side_flip` | 1571 |  |
-| `centrifuge_side_flip_running` | 54 | anim (8 frames) |
-| `centrifuge_side_running` | 52 | anim (8 frames) |
-| `centrifuge_top` | 1565 | rotation family (4 copies) |
-| `chalk` | 1160 |  |
-| `chalk_black` | 1176 |  |
-| `chalk_blue` | 1175 |  |
-| `chalk_bricks_black` | 1192 |  |
-| `chalk_bricks_blue` | 1191 |  |
-| `chalk_bricks_brown` | 1190 |  |
-| `chalk_bricks_cyan` | 1189 |  |
-| `chalk_bricks_gray` | 1188 |  |
-| `chalk_bricks_green` | 1187 |  |
-| `chalk_bricks_light_blue` | 1186 |  |
-| `chalk_bricks_light_gray` | 1185 |  |
-| `chalk_bricks_lime` | 1184 |  |
-| `chalk_bricks_magenta` | 1183 |  |
-| `chalk_bricks_orange` | 1182 |  |
-| `chalk_bricks_pink` | 1181 |  |
-| `chalk_bricks_purple` | 1180 |  |
-| `chalk_bricks_red` | 1179 |  |
-| `chalk_bricks_slab_side_black` | 1208 |  |
-| `chalk_bricks_slab_side_blue` | 1207 |  |
-| `chalk_bricks_slab_side_brown` | 1206 |  |
-| `chalk_bricks_slab_side_cyan` | 1205 |  |
-| `chalk_bricks_slab_side_gray` | 1204 |  |
-| `chalk_bricks_slab_side_green` | 1203 |  |
-| `chalk_bricks_slab_side_light_blue` | 1202 |  |
-| `chalk_bricks_slab_side_light_gray` | 1201 |  |
-| `chalk_bricks_slab_side_lime` | 1200 |  |
-| `chalk_bricks_slab_side_magenta` | 1199 |  |
-| `chalk_bricks_slab_side_orange` | 1198 |  |
-| `chalk_bricks_slab_side_pink` | 1197 |  |
-| `chalk_bricks_slab_side_purple` | 1196 |  |
-| `chalk_bricks_slab_side_red` | 1195 |  |
-| `chalk_bricks_slab_side_white` | 1194 |  |
-| `chalk_bricks_slab_side_yellow` | 1193 |  |
-| `chalk_bricks_white` | 1178 |  |
-| `chalk_bricks_yellow` | 1177 |  |
-| `chalk_brown` | 1174 |  |
-| `chalk_cyan` | 1173 |  |
-| `chalk_gray` | 1172 |  |
-| `chalk_green` | 1171 |  |
-| `chalk_light_blue` | 1170 |  |
-| `chalk_light_gray` | 1169 |  |
-| `chalk_lime` | 1168 |  |
-| `chalk_magenta` | 1167 |  |
-| `chalk_orange` | 1166 |  |
-| `chalk_pink` | 1165 |  |
-| `chalk_purple` | 1164 |  |
-| `chalk_red` | 1163 |  |
-| `chalk_white` | 1162 |  |
-| `chalk_yellow` | 1161 |  |
-| `charge_vault_side` | 1436 |  |
-| `charge_vault_top` | 1435 |  |
-| `charging_pad_side` | 1481 |  |
-| `charging_pad_top` | 1480 |  |
-| `checkpoint_block` | 1082 | rotation family (4 copies) |
-| `cherry_block_bottom` | 911 |  |
-| `cherry_block_side` | 909 |  |
-| `cherry_block_top` | 910 |  |
-| `chest_back` | 670 |  |
-| `chest_double_back_hi` | 1541 |  |
-| `chest_double_back_lo` | 1540 |  |
-| `chest_double_front_hi` | 1535 |  |
-| `chest_double_front_lo` | 1534 |  |
-| `chest_double_top_1_hi` | 1537 |  |
-| `chest_double_top_1_lo` | 1536 |  |
-| `chest_double_top_2_hi` | 1539 |  |
-| `chest_double_top_2_lo` | 1538 |  |
-| `chest_front` | 664 |  |
-| `chest_side` | 665 |  |
-| `chest_top` | 666 | rotation family (4 copies) |
-| `chili_pepper_block_bottom` | 999 |  |
-| `chili_pepper_block_side` | 997 |  |
-| `chili_pepper_block_top` | 998 |  |
-| `chiseled_red_sandstone` | 777 |  |
-| `chiseled_sandstone` | 653 |  |
-| `clay` | 523 |  |
-| `coal_block` | 561 |  |
-| `coal_deposit` | 1354 |  |
-| `coal_ore` | 555 |  |
-| `coarse_dirt` | 519 |  |
-| `coconut_block_bottom` | 843 |  |
-| `coconut_block_side` | 841 |  |
-| `coconut_block_top` | 842 |  |
-| `code_block` | 1000 |  |
-| `collider_bottom` | 1607 |  |
-| `collider_side_off` | 1602 |  |
-| `collider_side_running` | 67 | anim (32 frames) |
-| `collider_top` | 1603 | rotation family (4 copies) |
-| `comet_heart` | 1492 |  |
-| `comet_ore` | 1491 |  |
-| `compressed_messy_stone` | 851 |  |
-| `condenser_back` | 1562 |  |
-| `condenser_back_running` | 50 | anim (8 frames) |
-| `condenser_bottom` | 1561 |  |
-| `condenser_side` | 1556 |  |
-| `condenser_side_flip` | 1563 |  |
-| `condenser_side_flip_running` | 51 | anim (8 frames) |
-| `condenser_side_running` | 49 | anim (8 frames) |
-| `condenser_top` | 1557 | rotation family (4 copies) |
-| `conveyor_belt_bottom` | 1403 |  |
-| `conveyor_belt_slab_side` | 1402 |  |
-| `conveyor_belt_top` | 1401 |  |
-| `conveyor_belt_turn_left` | 1493 |  |
-| `conveyor_belt_turn_right` | 1494 |  |
-| `coolant_channel` | 64 | anim (8 frames) |
-| `coolant_mixer_back` | 1640 |  |
-| `coolant_mixer_back_running` | 69 | anim (8 frames) |
-| `coolant_mixer_bottom` | 1639 |  |
-| `coolant_mixer_side` | 1634 |  |
-| `coolant_mixer_side_flip` | 1641 |  |
-| `coolant_mixer_side_flip_running` | 70 | anim (8 frames) |
-| `coolant_mixer_side_running` | 68 | anim (8 frames) |
-| `coolant_mixer_top` | 1635 | rotation family (4 copies) |
-| `copper_block` | 1647 |  |
-| `copper_deposit` | 1357 |  |
-| `copper_ore` | 1362 |  |
-| `corn_block_bottom` | 915 |  |
-| `corn_block_side` | 913 |  |
-| `corn_block_top` | 914 |  |
-| `crafting_table_top` | 1283 |  |
-| `crate` | 1239 |  |
-| `crop_harvester_back` | 1514 |  |
-| `crop_harvester_back_running` | 45 | anim (4 frames) |
-| `crop_harvester_front` | 1508 |  |
-| `crop_harvester_side` | 1509 |  |
-| `crop_harvester_side_running` | 44 | anim (4 frames) |
-| `crop_harvester_top` | 1510 | rotation family (4 copies) |
-| `crusher_back` | 1377 |  |
-| `crusher_front` | 1371 |  |
-| `crusher_side` | 1372 |  |
-| `crusher_side_running` | 28 | anim (4 frames) |
-| `crusher_top` | 1373 | rotation family (4 copies) |
-| `crystal_block` | 1351 |  |
-| `crystal_vat_back` | 1488 |  |
-| `crystal_vat_front` | 1482 |  |
-| `crystal_vat_side` | 1483 |  |
-| `crystal_vat_side_running` | 42 | anim (8 frames) |
-| `crystal_vat_top` | 1484 | rotation family (4 copies) |
-| `custom_lobby_block_side` | 1090 |  |
-| `custom_lobby_block_top` | 1086 | rotation family (4 copies) |
-| `cut_red_sandstone` | 778 |  |
-| `cut_sandstone` | 774 |  |
-| `cyan_concrete` | 604 |  |
-| `cyan_gen_spawn_coal` | 1104 |  |
-| `cyan_gen_spawn_iron` | 1105 |  |
-| `cyan_gen_spawn_top` | 1103 |  |
-| `cyan_glazed_terracotta` | 726 | rotation family (4 copies) |
-| `cyan_planks` | 683 |  |
-| `cyan_portal` | 5 | anim (4 frames) |
-| `cyan_spawn_block_side` | 1066 |  |
-| `cyan_spawn_block_top` | 1062 | rotation family (4 copies) |
-| `dark_green_bricks` | 781 |  |
-| `darkstone` | 1528 |  |
-| `darkstone_bricks` | 1529 |  |
-| `darkstone_bricks_cracked` | 1530 |  |
-| `darkstone_bricks_lava` | 1531 |  |
-| `darkstone_engraved` | 1532 |  |
-| `darkstone_smooth` | 1533 |  |
-| `deep_drill_back` | 1462 |  |
-| `deep_drill_bottom` | 1461 |  |
-| `deep_drill_front` | 1455 |  |
-| `deep_drill_side` | 1456 |  |
-| `deep_drill_side_running` | 39 | anim (8 frames) |
-| `deep_drill_top` | 1457 | rotation family (4 copies) |
-| `dense_silo_side` | 1618 |  |
-| `dense_silo_top` | 1617 |  |
-| `diamond_block` | 663 |  |
-| `diamond_gen_spawn_side` | 1128 |  |
-| `diamond_gen_spawn_top` | 1127 |  |
-| `diamond_ore` | 560 |  |
-| `diorite_brick` | 784 |  |
-| `dirt` | 518 |  |
-| `drop_location_block_side` | 1135 |  |
-| `drop_location_block_top` | 1134 |  |
-| `drop_pad` | 1360 |  |
-| `dry_grass_block` | 1302 |  |
-| `dry_grass_block_side` | 1301 |  |
-| `electric_drill_back` | 1421 |  |
-| `electric_drill_bottom` | 1420 |  |
-| `electric_drill_front` | 1414 |  |
-| `electric_drill_side` | 1415 |  |
-| `electric_drill_side_running` | 34 | anim (8 frames) |
-| `electric_drill_top` | 1416 | rotation family (4 copies) |
-| `emerald_block` | 565 |  |
-| `emerald_ore` | 559 |  |
-| `end_stone` | 554 |  |
-| `engraved_andesite` | 785 |  |
-| `engraved_diorite` | 783 |  |
-| `engraved_granite` | 787 |  |
-| `evil_lucky_block` | 1344 |  |
-| `evil_lucky_block_face` | 1345 |  |
-| `explosive_paint_black_side` | 947 |  |
-| `explosive_paint_black_top` | 948 |  |
-| `explosive_paint_blue_side` | 945 |  |
-| `explosive_paint_blue_top` | 946 |  |
-| `explosive_paint_brown_side` | 943 |  |
-| `explosive_paint_brown_top` | 944 |  |
-| `explosive_paint_cyan_side` | 941 |  |
-| `explosive_paint_cyan_top` | 942 |  |
-| `explosive_paint_gray_side` | 939 |  |
-| `explosive_paint_gray_top` | 940 |  |
-| `explosive_paint_green_side` | 937 |  |
-| `explosive_paint_green_top` | 938 |  |
-| `explosive_paint_light_blue_side` | 935 |  |
-| `explosive_paint_light_blue_top` | 936 |  |
-| `explosive_paint_light_gray_side` | 933 |  |
-| `explosive_paint_light_gray_top` | 934 |  |
-| `explosive_paint_lime_side` | 931 |  |
-| `explosive_paint_lime_top` | 932 |  |
-| `explosive_paint_magenta_side` | 929 |  |
-| `explosive_paint_magenta_top` | 930 |  |
-| `explosive_paint_orange_side` | 927 |  |
-| `explosive_paint_orange_top` | 928 |  |
-| `explosive_paint_pink_side` | 925 |  |
-| `explosive_paint_pink_top` | 926 |  |
-| `explosive_paint_purple_side` | 923 |  |
-| `explosive_paint_purple_top` | 924 |  |
-| `explosive_paint_quick_black` | 964 |  |
-| `explosive_paint_quick_blue` | 963 |  |
-| `explosive_paint_quick_brown` | 962 |  |
-| `explosive_paint_quick_cyan` | 961 |  |
-| `explosive_paint_quick_gray` | 960 |  |
-| `explosive_paint_quick_green` | 959 |  |
-| `explosive_paint_quick_light_blue` | 958 |  |
-| `explosive_paint_quick_light_gray` | 957 |  |
-| `explosive_paint_quick_lime` | 956 |  |
-| `explosive_paint_quick_magenta` | 955 |  |
-| `explosive_paint_quick_orange` | 954 |  |
-| `explosive_paint_quick_pink` | 953 |  |
-| `explosive_paint_quick_purple` | 952 |  |
-| `explosive_paint_quick_red` | 951 |  |
-| `explosive_paint_quick_white` | 950 |  |
-| `explosive_paint_quick_yellow` | 949 |  |
-| `explosive_paint_red_side` | 921 |  |
-| `explosive_paint_red_top` | 922 |  |
-| `explosive_paint_seeking_black` | 980 |  |
-| `explosive_paint_seeking_blue` | 979 |  |
-| `explosive_paint_seeking_brown` | 978 |  |
-| `explosive_paint_seeking_cyan` | 977 |  |
-| `explosive_paint_seeking_gray` | 976 |  |
-| `explosive_paint_seeking_green` | 975 |  |
-| `explosive_paint_seeking_light_blue` | 974 |  |
-| `explosive_paint_seeking_light_gray` | 973 |  |
-| `explosive_paint_seeking_lime` | 972 |  |
-| `explosive_paint_seeking_magenta` | 971 |  |
-| `explosive_paint_seeking_orange` | 970 |  |
-| `explosive_paint_seeking_pink` | 969 |  |
-| `explosive_paint_seeking_purple` | 968 |  |
-| `explosive_paint_seeking_red` | 967 |  |
-| `explosive_paint_seeking_white` | 966 |  |
-| `explosive_paint_seeking_yellow` | 965 |  |
-| `explosive_paint_sticky_black` | 996 |  |
-| `explosive_paint_sticky_blue` | 995 |  |
-| `explosive_paint_sticky_brown` | 994 |  |
-| `explosive_paint_sticky_cyan` | 993 |  |
-| `explosive_paint_sticky_gray` | 992 |  |
-| `explosive_paint_sticky_green` | 991 |  |
-| `explosive_paint_sticky_light_blue` | 990 |  |
-| `explosive_paint_sticky_light_gray` | 989 |  |
-| `explosive_paint_sticky_lime` | 988 |  |
-| `explosive_paint_sticky_magenta` | 987 |  |
-| `explosive_paint_sticky_orange` | 986 |  |
-| `explosive_paint_sticky_pink` | 985 |  |
-| `explosive_paint_sticky_purple` | 984 |  |
-| `explosive_paint_sticky_red` | 983 |  |
-| `explosive_paint_sticky_white` | 982 |  |
-| `explosive_paint_sticky_yellow` | 981 |  |
-| `explosive_paint_white_side` | 919 |  |
-| `explosive_paint_white_top` | 920 |  |
-| `explosive_paint_yellow_side` | 917 |  |
-| `explosive_paint_yellow_top` | 918 |  |
-| `express_belt_slab_side` | 1620 |  |
-| `express_belt_top` | 1619 |  |
-| `express_belt_turn_left` | 1621 |  |
-| `express_belt_turn_right` | 1622 |  |
-| `extra_compressed_messy_stone` | 852 |  |
-| `fallen_cherry_leaves_side` | 907 |  |
-| `fallen_maple_leaves_side` | 799 |  |
-| `farmland` | 754 |  |
-| `fast_belt_slab_side` | 1479 |  |
-| `fast_belt_top` | 1478 |  |
-| `fast_belt_turn_left` | 1495 |  |
-| `fast_belt_turn_right` | 1496 |  |
-| `fast_loader_slab_front` | 1624 |  |
-| `fast_loader_top` | 1623 |  |
-| `fertilised_soil` | 1247 |  |
-| `finish_block` | 1133 |  |
-| `fireball_block` | 860 |  |
-| `fluid_tank` | 1587 |  |
-| `fluid_tank_fill1` | 71 | anim (8 frames) |
-| `fluid_tank_fill2` | 72 | anim (8 frames) |
-| `fluid_tank_fill3` | 73 | anim (8 frames) |
-| `fluid_tank_fill4` | 74 | anim (8 frames) |
-| `food_lucky_block` | 1329 |  |
-| `food_lucky_block_rare` | 1331 |  |
-| `food_lucky_block_super` | 1333 |  |
-| `forge_hopper_top` | 1490 |  |
-| `fuel_port` | 1591 |  |
-| `fuel_rod` | 63 | anim (8 frames) |
-| `generator_side` | 1385 |  |
-| `generator_side_running` | 30 | anim (8 frames) |
-| `generator_top` | 1386 |  |
-| `ghost_chest_back` | 1277 |  |
-| `ghost_chest_front` | 1274 |  |
-| `ghost_chest_side` | 1275 |  |
-| `ghost_chest_top` | 1276 |  |
-| `ghost_lucky_block` | 1278 |  |
-| `ghost_mystery_block` | 1279 |  |
-| `glass` | 622 |  |
-| `glass_black` | 623 |  |
-| `glass_blue` | 624 |  |
-| `glass_brown` | 625 |  |
-| `glass_cyan` | 626 |  |
-| `glass_gray` | 627 |  |
-| `glass_green` | 629 |  |
-| `glass_light_blue` | 630 |  |
-| `glass_light_gray` | 628 |  |
-| `glass_lime` | 631 |  |
-| `glass_magenta` | 632 |  |
-| `glass_orange` | 633 |  |
-| `glass_pink` | 634 |  |
-| `glass_purple` | 635 |  |
-| `glass_red` | 636 |  |
-| `glass_silver` | 639 |  |
-| `glass_white` | 637 |  |
-| `glass_yellow` | 638 |  |
-| `glow_lamp` | 1629 |  |
-| `glowstone` | 659 |  |
-| `gold_block` | 563 |  |
-| `gold_deposit` | 1358 |  |
-| `gold_ore` | 557 |  |
-| `granite_brick` | 788 |  |
-| `graphite` | 1593 |  |
-| `graphite_block` | 1593 |  |
-| `grass_block_side` | 520 |  |
-| `grass_top` | 521 |  |
-| `gravel` | 524 |  |
-| `gray_concrete` | 599 |  |
-| `gray_gen_spawn_coal` | 1113 |  |
-| `gray_gen_spawn_iron` | 1114 |  |
-| `gray_gen_spawn_top` | 1112 |  |
-| `gray_glazed_terracotta` | 718 | rotation family (4 copies) |
-| `gray_planks` | 681 |  |
-| `gray_portal` | 6 | anim (4 frames) |
-| `gray_spawn_block_side` | 1061 |  |
-| `gray_spawn_block_top` | 1057 | rotation family (4 copies) |
-| `green_bricks` | 780 |  |
-| `green_concrete` | 613 |  |
-| `green_glazed_terracotta` | 742 | rotation family (4 copies) |
-| `green_lucky_block` | 1328 |  |
-| `green_lucky_block_rare` | 1330 |  |
-| `green_lucky_block_super` | 1332 |  |
-| `green_planks` | 687 |  |
-| `green_portal` | 7 | anim (4 frames) |
-| `green_spawn_block_side` | 1056 |  |
-| `green_spawn_block_top` | 1052 | rotation family (4 copies) |
-| `green_stone` | 779 |  |
-| `grenade_block` | 902 |  |
-| `grey_portal` | 8 | anim (4 frames) |
-| `gun_lucky_block` | 1273 |  |
-| `hardened_clay` | 582 |  |
-| `hardened_clay_stained_black` | 598 |  |
-| `hardened_clay_stained_blue` | 594 |  |
-| `hardened_clay_stained_brown` | 595 |  |
-| `hardened_clay_stained_cyan` | 592 |  |
-| `hardened_clay_stained_gray` | 590 |  |
-| `hardened_clay_stained_green` | 596 |  |
-| `hardened_clay_stained_light_blue` | 586 |  |
-| `hardened_clay_stained_lime` | 588 |  |
-| `hardened_clay_stained_magenta` | 585 |  |
-| `hardened_clay_stained_orange` | 584 |  |
-| `hardened_clay_stained_pink` | 589 |  |
-| `hardened_clay_stained_purple` | 593 |  |
-| `hardened_clay_stained_red` | 597 |  |
-| `hardened_clay_stained_silver` | 591 |  |
-| `hardened_clay_stained_white` | 583 |  |
-| `hardened_clay_stained_yellow` | 587 |  |
-| `harvester_bottom` | 1291 |  |
-| `harvester_lunite_bottom` | 1299 |  |
-| `harvester_lunite_side_0` | 1296 |  |
-| `harvester_lunite_side_1` | 1297 |  |
-| `harvester_lunite_top` | 1298 |  |
-| `harvester_side0` | 1288 |  |
-| `harvester_side1` | 1289 |  |
-| `harvester_top` | 1290 |  |
-| `hay_block_side` | 656 |  |
-| `hay_block_top` | 1547 |  |
-| `homestead_core` | 1359 |  |
-| `homestead_core_cap` | 1444 |  |
-| `homestead_core_crown` | 1443 |  |
-| `homestead_core_mid` | 26 | anim (8 frames) |
-| `hyper_compressed_messy_stone` | 854 |  |
-| `ice` | 654 |  |
-| `ice_brick` | 789 |  |
-| `iceball_block` | 861 |  |
-| `invisible_solid` | 642 |  |
-| `iron_block` | 562 |  |
-| `iron_chest_back` | 1238 |  |
-| `iron_chest_front` | 1232 |  |
-| `iron_chest_side` | 1233 |  |
-| `iron_chest_top` | 1234 | rotation family (4 copies) |
-| `iron_deposit` | 1355 |  |
-| `iron_ore` | 556 |  |
-| `iron_watermelon_side` | 867 |  |
-| `iron_watermelon_top` | 868 |  |
-| `isotope_comet_heart` | 1633 |  |
-| `isotope_comet_ore` | 1632 |  |
-| `jetpack_back` | 1630 |  |
-| `jungle_grass_block` | 1210 |  |
-| `jungle_grass_block_side` | 1209 |  |
-| `lapis_block` | 564 |  |
-| `lapis_ore` | 558 |  |
-| `laser_back` | 1610 |  |
-| `laser_front` | 1608 |  |
-| `laser_side` | 1609 |  |
-| `lava` | 1 | anim (16 frames) |
-| `leather_block_side` | 1229 |  |
-| `leather_block_top` | 1230 |  |
-| `leaves_aspen` | 616 |  |
-| `leaves_aspen_autumn` | 1231 |  |
-| `leaves_cedar` | 791 |  |
-| `leaves_cherry` | 1,017 |  |
-| `leaves_cherry_fruity` | 1650 |  |
-| `leaves_jungle` | 618 |  |
-| `leaves_mango` | 1215 |  |
-| `leaves_mango_fruity` | 1228 |  |
-| `leaves_maple` | 617 |  |
-| `leaves_maple_autumn` | 798 |  |
-| `leaves_maple_fruity` | 1222 |  |
-| `leaves_palm` | 792 |  |
-| `leaves_palm_fruity` | 1225 |  |
-| `leaves_pear` | 846 |  |
-| `leaves_pear_fruity` | 1226 |  |
-| `leaves_pine` | 615 |  |
-| `leaves_pine_cone` | 1223 |  |
-| `leaves_plum` | 790 |  |
-| `leaves_plum_fruity` | 1224 |  |
-| `leaves_spectral` | 1152 |  |
-| `light_blue_concrete` | 605 |  |
-| `light_blue_glazed_terracotta` | 702 | rotation family (4 copies) |
-| `light_blue_lucky_block` | 1254 |  |
-| `light_blue_planks` | 677 |  |
-| `light_blue_spawn_block_side` | 1051 |  |
-| `light_blue_spawn_block_top` | 1047 | rotation family (4 copies) |
-| `light_gray_concrete` | 600 |  |
-| `light_gray_glazed_terracotta` | 722 | rotation family (4 copies) |
-| `light_gray_planks` | 682 |  |
-| `light_gray_spawn_block_side` | 1046 |  |
-| `light_gray_spawn_block_top` | 1042 | rotation family (4 copies) |
-| `lightblue_portal` | 9 | anim (4 frames) |
-| `lightgray_portal` | 10 | anim (4 frames) |
-| `lime_concrete` | 606 |  |
-| `lime_gen_spawn_coal` | 1098 |  |
-| `lime_gen_spawn_iron` | 1099 |  |
-| `lime_gen_spawn_top` | 1097 |  |
-| `lime_glazed_terracotta` | 710 | rotation family (4 copies) |
-| `lime_planks` | 679 |  |
-| `lime_portal` | 11 | anim (4 frames) |
-| `lime_spawn_block_side` | 1041 |  |
-| `lime_spawn_block_top` | 1037 | rotation family (4 copies) |
-| `log_ancient_maple` | 1343 |  |
-| `log_aspen` | 530 |  |
-| `log_cedar` | 529 |  |
-| `log_cherry` | 903 |  |
-| `log_jungle` | 531 |  |
-| `log_mango` | 1212 |  |
-| `log_maple` | 526 |  |
-| `log_palm` | 793 |  |
-| `log_pear` | 844 |  |
-| `log_pine` | 527 |  |
-| `log_plum` | 528 |  |
-| `log_spectral` | 1149 |  |
-| `lucky_block_pink_question` | 1280 |  |
-| `lucky_block_pink_question_rare` | 1335 |  |
-| `lucky_block_pink_question_super` | 1337 |  |
-| `lunite_block` | 1293 |  |
-| `lunite_ore` | 1292 |  |
-| `machine_bench_side` | 1437 |  |
-| `machine_bench_top` | 1438 |  |
-| `machine_side` | 1361 |  |
-| `magenta_concrete` | 607 |  |
-| `magenta_glazed_terracotta` | 698 | rotation family (4 copies) |
-| `magenta_planks` | 676 |  |
-| `magenta_portal` | 12 | anim (4 frames) |
-| `magenta_spawn_block_side` | 1036 |  |
-| `magenta_spawn_block_top` | 1032 | rotation family (4 copies) |
-| `magma` | 772 |  |
-| `mailbox_front` | 892 |  |
-| `mailbox_front_full` | 894 |  |
-| `mailbox_side` | 893 |  |
-| `mango_block_bottom` | 1219 |  |
-| `mango_block_side` | 1217 |  |
-| `mango_block_top` | 1218 |  |
-| `mega_compressed_messy_stone` | 856 |  |
-| `melon_side` | 865 |  |
-| `melon_top` | 866 |  |
-| `melting_ice` | 916 |  |
-| `messy_stone` | 544 |  |
-| `mob_farm_back` | 1586 |  |
-| `mob_farm_front` | 1580 |  |
-| `mob_farm_side` | 1581 |  |
-| `mob_farm_side_running` | 58 | anim (8 frames) |
-| `mob_farm_top` | 1582 | rotation family (4 copies) |
-| `mob_spawner_block_empty_side` | 1144 |  |
-| `mob_spawner_block_top` | 1142 |  |
-| `mob_spawner_hostile_block_side` | 1143 |  |
-| `mob_spawner_neutral_block_side` | 1159 |  |
-| `mob_spawner_passive_block_side` | 1141 |  |
-| `moonstone_block` | 771 |  |
-| `moonstone_chest_back` | 770 |  |
-| `moonstone_chest_front` | 764 |  |
-| `moonstone_chest_side` | 765 |  |
-| `moonstone_chest_top` | 766 | rotation family (4 copies) |
-| `moonstone_explosive_side` | 660 |  |
-| `moonstone_explosive_top` | 661 |  |
-| `moonstone_gen_spawn_side` | 1130 |  |
-| `moonstone_gen_spawn_top` | 1129 |  |
-| `moonstone_ore` | 763 |  |
-| `mossy_cobblestone` | 759 |  |
-| `mushroom_stem` | 859 |  |
-| `mystery_block` | 899 |  |
-| `neon_black` | 1272 |  |
-| `neon_blue` | 1271 |  |
-| `neon_brown` | 1270 |  |
-| `neon_cyan` | 1269 |  |
-| `neon_gray` | 1268 |  |
-| `neon_green` | 1267 |  |
-| `neon_light_blue` | 1266 |  |
-| `neon_light_gray` | 1265 |  |
-| `neon_lime` | 1264 |  |
-| `neon_magenta` | 1263 |  |
-| `neon_orange` | 1262 |  |
-| `neon_pink` | 1261 |  |
-| `neon_purple` | 1260 |  |
-| `neon_red` | 1259 |  |
-| `neon_white` | 1258 |  |
-| `neon_yellow` | 1257 |  |
-| `nether_brick` | 645 |  |
-| `netherrack` | 646 |  |
-| `nova_bomb_side` | 1649 |  |
-| `nova_bomb_top` | 1650 |  |
-| `obby_absorb_block` | 1137 |  |
-| `obby_absorb_death_block` | 1138 |  |
-| `obby_death_block` | 1136 |  |
-| `obsidian` | 655 |  |
-| `orange_concrete` | 608 |  |
-| `orange_glazed_terracotta` | 694 | rotation family (4 copies) |
-| `orange_lucky_block` | 1322 |  |
-| `orange_lucky_block_rare` | 1324 |  |
-| `orange_lucky_block_super` | 1326 |  |
-| `orange_planks` | 675 |  |
-| `orange_portal` | 13 | anim (4 frames) |
-| `orange_spawn_block_side` | 1031 |  |
-| `orange_spawn_block_top` | 1027 | rotation family (4 copies) |
-| `ore_gen_spawn_side` | 1132 |  |
-| `ore_gen_spawn_top` | 1131 |  |
-| `output` | 1555 |  |
-| `packed_snow` | 1147 |  |
-| `parts_bench_side` | 1439 |  |
-| `parts_bench_top` | 1440 |  |
-| `patterned_glass_black` | 869 |  |
-| `patterned_glass_blue` | 870 |  |
-| `patterned_glass_brown` | 871 |  |
-| `patterned_glass_cyan` | 872 |  |
-| `patterned_glass_gray` | 873 |  |
-| `patterned_glass_green` | 875 |  |
-| `patterned_glass_light_blue` | 876 |  |
-| `patterned_glass_light_gray` | 874 |  |
-| `patterned_glass_lime` | 877 |  |
-| `patterned_glass_magenta` | 878 |  |
-| `patterned_glass_orange` | 879 |  |
-| `patterned_glass_pink` | 880 |  |
-| `patterned_glass_purple` | 881 |  |
-| `patterned_glass_red` | 882 |  |
-| `patterned_glass_white` | 883 |  |
-| `patterned_glass_yellow` | 884 |  |
-| `pear_block_bottom` | 850 |  |
-| `pear_block_side` | 848 |  |
-| `pear_block_top` | 849 |  |
-| `pet_lucky_block` | 1281 |  |
-| `pine_cone_block_side` | 1157 |  |
-| `pine_cone_block_top` | 1158 |  |
-| `pine_grass_block` | 1155 |  |
-| `pine_grass_block_side` | 1154 |  |
-| `pink_concrete` | 609 |  |
-| `pink_gen_spawn_coal` | 1110 |  |
-| `pink_gen_spawn_iron` | 1111 |  |
-| `pink_gen_spawn_top` | 1109 |  |
-| `pink_glazed_terracotta` | 714 | rotation family (4 copies) |
-| `pink_planks` | 680 |  |
-| `pink_portal` | 14 | anim (4 frames) |
-| `pink_spawn_block_side` | 1026 |  |
-| `pink_spawn_block_top` | 1022 | rotation family (4 copies) |
-| `planks_aspen` | 533 |  |
-| `planks_cedar` | 537 |  |
-| `planks_cherry` | 905 |  |
-| `planks_jungle` | 535 |  |
-| `planks_mango` | 1214 |  |
-| `planks_maple` | 532 |  |
-| `planks_palm` | 794 |  |
-| `planks_pear` | 845 |  |
-| `planks_pine` | 536 |  |
-| `planks_plum` | 534 |  |
-| `planks_spectral` | 1151 |  |
-| `plum_block_bottom` | 840 |  |
-| `plum_block_side` | 838 |  |
-| `plum_block_top` | 839 |  |
-| `podzol_top` | 773 |  |
-| `potato_block` | 1243 |  |
-| `potion_lucky_block` | 1334 |  |
-| `potion_lucky_block_rare` | 1336 |  |
-| `potion_lucky_block_super` | 1338 |  |
-| `press_back` | 1393 |  |
-| `press_front` | 1387 |  |
-| `press_side` | 1388 |  |
-| `press_side_running` | 31 | anim (4 frames) |
-| `press_top` | 1389 | rotation family (4 copies) |
-| `protector` | 671 |  |
-| `protector_faction` | 896 |  |
-| `protector_tribe` | 895 |  |
-| `pump_bottom` | 1554 |  |
-| `pump_side` | 1552 |  |
-| `pump_side_running` | 48 | anim (8 frames) |
-| `pump_top` | 1553 |  |
-| `pumpkin_face_on` | 619 |  |
-| `pumpkin_side` | 862 |  |
-| `pumpkin_top` | 863 |  |
-| `pure_coal_ore` | 1346 |  |
-| `pure_copper_ore` | 1526 |  |
-| `pure_diamond_ore` | 1349 |  |
-| `pure_gold_ore` | 1348 |  |
-| `pure_iron_ore` | 1347 |  |
-| `pure_moonstone_ore` | 1350 |  |
-| `pure_uranium_ore` | 1646 |  |
-| `pure_voltite_ore` | 1527 |  |
-| `purple_concrete` | 610 |  |
-| `purple_glazed_terracotta` | 730 | rotation family (4 copies) |
-| `purple_lucky_block` | 1310 |  |
-| `purple_lucky_block_rare` | 1312 |  |
-| `purple_lucky_block_super` | 1314 |  |
-| `purple_planks` | 684 |  |
-| `purple_portal` | 15 | anim (4 frames) |
-| `purple_spawn_block_side` | 1021 |  |
-| `purple_spawn_block_top` | 1017 | rotation family (4 copies) |
-| `quartz_block_chiseled` | 648 |  |
-| `quartz_block_side` | 647 |  |
-| `radar_bottom` | 1250 |  |
-| `radar_screen` | 19 | anim (8 frames); rotation family (4 copies) |
-| `radar_side_active` | 1248 |  |
-| `radar_side_inactive` | 1251 |  |
-| `radar_top_active` | 1249 |  |
-| `radar_top_inactive` | 1252 |  |
-| `reactor_base` | 1642 |  |
-| `reactor_base_top` | 1643 |  |
-| `reactor_casing` | 1589 |  |
-| `reactor_controller_green` | 59 | anim (4 frames) |
-| `reactor_controller_orange` | 61 | anim (4 frames) |
-| `reactor_controller_red` | 62 | anim (4 frames) |
-| `reactor_controller_yellow` | 60 | anim (4 frames) |
-| `reactor_frame` | 1588 |  |
-| `reactor_glass` | 1590 |  |
-| `reactor_slag` | 1594 |  |
-| `recycler_back` | 1503 |  |
-| `recycler_front` | 1497 |  |
-| `recycler_side` | 1498 |  |
-| `recycler_side_running` | 43 | anim (8 frames) |
-| `recycler_top` | 1499 | rotation family (4 copies) |
-| `red_concrete` | 611 |  |
-| `red_gen_spawn_coal` | 1092 |  |
-| `red_gen_spawn_iron` | 1093 |  |
-| `red_gen_spawn_top` | 1091 |  |
-| `red_glazed_terracotta` | 746 | rotation family (4 copies) |
-| `red_lucky_block` | 1255 |  |
-| `red_lucky_block_rare` | 1306 |  |
-| `red_lucky_block_super` | 1308 |  |
-| `red_mushroom_block` | 858 |  |
-| `red_planks` | 688 |  |
-| `red_portal` | 16 | anim (4 frames) |
-| `red_sand` | 795 |  |
-| `red_sandstone` | 775 |  |
-| `red_sandstone_brick` | 796 |  |
-| `red_sandstone_top` | 776 |  |
-| `red_spawn_block_side` | 1016 |  |
-| `red_spawn_block_top` | 1012 | rotation family (4 copies) |
-| `redstone_lamp_off` | 641 |  |
-| `redstone_lamp_on` | 640 |  |
-| `rocket_block` | 900 |  |
-| `rocky_dirt` | 797 |  |
-| `rope_block` | 1352 |  |
-| `sand` | 522 |  |
-| `sandstone_brick` | 782 |  |
-| `sandstone_normal` | 553 |  |
-| `sandstone_top` | 652 |  |
-| `scaffolding` | 1644 |  |
-| `scorpion_eggs` | 1542 |  |
-| `shatter_mill_back` | 1469 |  |
-| `shatter_mill_front` | 1463 |  |
-| `shatter_mill_side` | 1464 |  |
-| `shatter_mill_side_running` | 40 | anim (4 frames) |
-| `shatter_mill_top` | 1465 | rotation family (4 copies) |
-| `shop_trader_spawn_face` | 1120 |  |
-| `shop_trader_spawn_side` | 1119 |  |
-| `shop_trader_spawn_top` | 1115 | rotation family (4 copies) |
-| `shop_wizard_spawn_face` | 1126 |  |
-| `shop_wizard_spawn_side` | 1125 |  |
-| `shop_wizard_spawn_top` | 1121 | rotation family (4 copies) |
-| `sky_spring` | 47 | anim (8 frames) |
-| `sky_tap_back` | 1477 |  |
-| `sky_tap_bottom` | 1476 |  |
-| `sky_tap_front` | 1470 |  |
-| `sky_tap_side` | 1471 |  |
-| `sky_tap_side_running` | 41 | anim (8 frames) |
-| `sky_tap_top` | 1472 | rotation family (4 copies) |
-| `slab_andesite_brick_side` | 819 |  |
-| `slab_aspen_side` | 804 |  |
-| `slab_brick_side` | 836 |  |
-| `slab_cedar_side` | 803 |  |
-| `slab_cherry_side` | 908 |  |
-| `slab_chiseled_red_sandstone_side` | 833 |  |
-| `slab_chiseled_sandstone_side` | 829 |  |
-| `slab_cobblestone_side` | 809 |  |
-| `slab_cut_red_sandstone_side` | 834 |  |
-| `slab_cut_sandstone_side` | 830 |  |
-| `slab_diorite_brick_side` | 823 |  |
-| `slab_dirt_side` | 807 |  |
-| `slab_dry_grass_top_side` | 1303 |  |
-| `slab_engraved_andesite_side` | 818 |  |
-| `slab_engraved_diorite_side` | 822 |  |
-| `slab_engraved_granite_side` | 826 |  |
-| `slab_granite_brick_side` | 827 |  |
-| `slab_grass_top_side` | 808 |  |
-| `slab_ice_brick_side` | 837 |  |
-| `slab_jungle_grass_top_side` | 1211 |  |
-| `slab_jungle_side` | 805 |  |
-| `slab_mango_side` | 1216 |  |
-| `slab_maple_side` | 800 |  |
-| `slab_mossy_cobblestone_side` | 814 |  |
-| `slab_palm_side` | 806 |  |
-| `slab_pear_side` | 847 |  |
-| `slab_pine_grass_top_side` | 1156 |  |
-| `slab_pine_side` | 801 |  |
-| `slab_plum_side` | 802 |  |
-| `slab_red_sandstone_brick_side` | 835 |  |
-| `slab_red_sandstone_side` | 832 |  |
-| `slab_sandstone_brick_side` | 831 |  |
-| `slab_sandstone_normal_side` | 828 |  |
-| `slab_smooth_stone_side` | 811 |  |
-| `slab_spectral_side` | 1153 |  |
-| `slab_stone_andesite_side` | 816 |  |
-| `slab_stone_andesite_smooth_side` | 817 |  |
-| `slab_stone_diorite_side` | 820 |  |
-| `slab_stone_diorite_smooth_side` | 821 |  |
-| `slab_stone_granite_side` | 824 |  |
-| `slab_stone_granite_smooth_side` | 825 |  |
-| `slab_stone_side` | 810 |  |
-| `slab_stonebrick_carved_side` | 812 |  |
-| `slab_stonebrick_mossy_side` | 815 |  |
-| `slab_stonebrick_side` | 813 |  |
-| `smelter_back` | 1384 |  |
-| `smelter_front` | 1378 |  |
-| `smelter_side` | 1379 |  |
-| `smelter_side_running` | 29 | anim (8 frames) |
-| `smelter_top` | 1380 | rotation family (4 copies) |
-| `smoke` | 23 | anim (8 frames) |
-| `smooth_stone` | 546 |  |
-| `snow` | 525 |  |
-| `snowy_messy_stone` | 1145 |  |
-| `snowy_messy_stone_side` | 1146 |  |
-| `solar_panel_bottom` | 1287 |  |
-| `solar_panel_side` | 1285 |  |
-| `solar_panel_top` | 1286 |  |
-| `sorting_gate_slab_side` | 1430 |  |
-| `sorting_gate_top` | 1429 |  |
-| `sorting_gate_top_right` | 1627 |  |
-| `splitter_slab_side` | 1405 |  |
-| `splitter_top` | 1404 |  |
-| `splitter_top_front_right` | 1626 |  |
-| `splitter_top_left_front` | 1625 |  |
-| `sponge` | 657 |  |
-| `starframe` | 1489 |  |
-| `stone` | 545 |  |
-| `stone_andesite` | 549 |  |
-| `stone_andesite_smooth` | 550 |  |
-| `stone_deposit` | 1356 |  |
-| `stone_diorite` | 547 |  |
-| `stone_diorite_smooth` | 548 |  |
-| `stone_generator_side` | 1545 |  |
-| `stone_generator_top` | 1546 |  |
-| `stone_granite` | 551 |  |
-| `stone_granite_smooth` | 552 |  |
-| `stonebrick` | 644 |  |
-| `stonebrick_carved` | 649 |  |
-| `stonebrick_cracked` | 651 |  |
-| `stonebrick_mossy` | 650 |  |
-| `storage_silo_side` | 1434 |  |
-| `storage_silo_top` | 1433 |  |
-| `stripped_aspen_log` | 539 |  |
-| `stripped_cedar_log` | 543 |  |
-| `stripped_cherry_log` | 904 |  |
-| `stripped_jungle_log` | 541 |  |
-| `stripped_mango_log` | 1213 |  |
-| `stripped_maple_log` | 538 |  |
-| `stripped_palm_log` | 897 |  |
-| `stripped_pear_log` | 898 |  |
-| `stripped_pine_log` | 542 |  |
-| `stripped_plum_log` | 540 |  |
-| `stripped_spectral_log` | 1150 |  |
-| `super_compressed_messy_stone` | 853 |  |
-| `super_rocket_block` | 901 |  |
-| `synthesizer_back` | 1578 |  |
-| `synthesizer_back_running` | 56 | anim (8 frames) |
-| `synthesizer_bottom` | 1577 |  |
-| `synthesizer_side` | 1572 |  |
-| `synthesizer_side_flip` | 1579 |  |
-| `synthesizer_side_flip_running` | 57 | anim (4 frames) |
-| `synthesizer_side_running` | 55 | anim (4 frames) |
-| `synthesizer_top` | 1573 | rotation family (4 copies) |
-| `tool_bench_side` | 1441 |  |
-| `tool_bench_top` | 1442 |  |
-| `tools_lucky_block` | 1323 |  |
-| `tools_lucky_block_rare` | 1325 |  |
-| `tools_lucky_block_super` | 1327 |  |
-| `toxic_waste` | 25 | anim (16 frames) |
-| `toxic_waste_barrel_bottom` | 1342 |  |
-| `toxic_waste_barrel_side` | 1341 |  |
-| `toxic_waste_barrel_top` | 24 | anim (8 frames) |
-| `toxin_ball_block` | 1001 |  |
-| `trading_terminal_front` | 46 | anim (8 frames) |
-| `trading_terminal_side` | 1543 |  |
-| `trading_terminal_top` | 1544 |  |
-| `tree_cutter_back` | 1451 |  |
-| `tree_cutter_back_running` | 37 | anim (4 frames) |
-| `tree_cutter_front` | 1445 |  |
-| `tree_cutter_side` | 1446 |  |
-| `tree_cutter_side_running` | 36 | anim (8 frames) |
-| `tree_cutter_top` | 1447 | rotation family (4 copies) |
-| `ultra_compressed_messy_stone` | 855 |  |
-| `unloaded` | 517 |  |
-| `uranium_block` | 1645 |  |
-| `uranium_deposit` | 1549 |  |
-| `uranium_glass` | 1628 |  |
-| `uranium_ore` | 1548 |  |
-| `volt_engine_side` | 1453 |  |
-| `volt_engine_side_running` | 38 | anim (8 frames) |
-| `volt_engine_top` | 1454 |  |
-| `voltite_block` | 1648 |  |
-| `voltite_deposit` | 1452 |  |
-| `voltite_ore` | 1406 |  |
-| `water_port` | 1592 |  |
-| `watermelon_side` | 620 |  |
-| `watermelon_top` | 621 |  |
-| `weapon_lucky_block` | 1256 |  |
-| `weapon_lucky_block_rare` | 1307 |  |
-| `weapon_lucky_block_super` | 1309 |  |
-| `white_concrete` | 612 |  |
-| `white_gen_spawn_coal` | 1107 |  |
-| `white_gen_spawn_iron` | 1108 |  |
-| `white_gen_spawn_top` | 1106 |  |
-| `white_glazed_terracotta` | 690 | rotation family (4 copies) |
-| `white_planks` | 674 |  |
-| `white_portal` | 17 | anim (4 frames) |
-| `white_spawn_block_side` | 1011 |  |
-| `white_spawn_block_top` | 1007 | rotation family (4 copies) |
-| `wire_mill_back` | 1400 |  |
-| `wire_mill_front` | 1394 |  |
-| `wire_mill_side` | 1395 |  |
-| `wire_mill_side_running` | 32 | anim (8 frames) |
-| `wire_mill_top` | 1396 | rotation family (4 copies) |
-| `wireless_terminal_bottom` | 1616 |  |
-| `wireless_terminal_front` | 1611 |  |
-| `wireless_terminal_top` | 1612 | rotation family (4 copies) |
-| `wool_colored_black` | 581 |  |
-| `wool_colored_blue` | 577 |  |
-| `wool_colored_brown` | 578 |  |
-| `wool_colored_cyan` | 575 |  |
-| `wool_colored_gray` | 573 |  |
-| `wool_colored_green` | 579 |  |
-| `wool_colored_light_blue` | 569 |  |
-| `wool_colored_light_grey` | 574 |  |
-| `wool_colored_lime` | 571 |  |
-| `wool_colored_magenta` | 568 |  |
-| `wool_colored_orange` | 567 |  |
-| `wool_colored_pink` | 572 |  |
-| `wool_colored_purple` | 576 |  |
-| `wool_colored_red` | 580 |  |
-| `wool_colored_white` | 566 |  |
-| `wool_colored_yellow` | 570 |  |
-| `yellow_concrete` | 614 |  |
-| `yellow_gen_spawn_coal` | 1101 |  |
-| `yellow_gen_spawn_iron` | 1102 |  |
-| `yellow_gen_spawn_top` | 1100 |  |
-| `yellow_glazed_terracotta` | 706 | rotation family (4 copies) |
-| `yellow_lucky_block` | 1253 |  |
-| `yellow_lucky_block_rare` | 1304 |  |
-| `yellow_lucky_block_super` | 1305 |  |
-| `yellow_planks` | 678 |  |
-| `yellow_portal` | 18 | anim (4 frames) |
-| `yellow_spawn_block_side` | 1006 |  |
-| `yellow_spawn_block_top` | 1002 | rotation family (4 copies) |
-
-#### 회전족 (64 루트)
-
-
-이 텍스처들은 미리 회전된 사본 (`name[rot[1..4`) 으로만 존재한다. 레지스트리는 아래 루트로 접고, `bloxdTexel` 이 샘플 시점에 회전을 다시 적용한다 — 사본이 아니라 루트를 참조하라. `[rot[N` 철자를 쓰면 전용 회전 진단이 나온다.
-- `alloy_kiln_top` (id 1409)
-- `auto_bench_top` (id 1424)
-- `belt_tunnel_exit_top` (id 1522)
-- `belt_tunnel_top` (id 1517)
-- `black_glazed_terracotta` (id 750)
-- `black_spawn_block_top` (id 1077)
-- `blue_glazed_terracotta` (id 734)
-- `blue_spawn_block_top` (id 1072)
-- `brown_glazed_terracotta` (id 738)
-- `brown_spawn_block_top` (id 1067)
-- `burner_drill_top` (id 1365)
-- `centrifuge_top` (id 1565)
-- `checkpoint_block` (id 1082)
-- `chest_top` (id 666)
-- `collider_top` (id 1603)
-- `condenser_top` (id 1557)
-- `coolant_mixer_top` (id 1635)
-- `crop_harvester_top` (id 1510)
-- `crusher_top` (id 1373)
-- `crystal_vat_top` (id 1484)
-- `custom_lobby_block_top` (id 1086)
-- `cyan_glazed_terracotta` (id 726)
-- `cyan_spawn_block_top` (id 1062)
-- `deep_drill_top` (id 1457)
-- `electric_drill_top` (id 1416)
-- `gray_glazed_terracotta` (id 718)
-- `gray_spawn_block_top` (id 1057)
-- `green_glazed_terracotta` (id 742)
-- `green_spawn_block_top` (id 1052)
-- `iron_chest_top` (id 1234)
-- `light_blue_glazed_terracotta` (id 702)
-- `light_blue_spawn_block_top` (id 1047)
-- `light_gray_glazed_terracotta` (id 722)
-- `light_gray_spawn_block_top` (id 1042)
-- `lime_glazed_terracotta` (id 710)
-- `lime_spawn_block_top` (id 1037)
-- `magenta_glazed_terracotta` (id 698)
-- `magenta_spawn_block_top` (id 1032)
-- `mob_farm_top` (id 1582)
-- `moonstone_chest_top` (id 766)
-- `orange_glazed_terracotta` (id 694)
-- `orange_spawn_block_top` (id 1027)
-- `pink_glazed_terracotta` (id 714)
-- `pink_spawn_block_top` (id 1022)
-- `press_top` (id 1389)
-- `purple_glazed_terracotta` (id 730)
-- `purple_spawn_block_top` (id 1017)
-- `radar_screen` (id 19)
-- `recycler_top` (id 1499)
-- `red_glazed_terracotta` (id 746)
-- `red_spawn_block_top` (id 1012)
-- `shatter_mill_top` (id 1465)
-- `shop_trader_spawn_top` (id 1115)
-- `shop_wizard_spawn_top` (id 1121)
-- `sky_tap_top` (id 1472)
-- `smelter_top` (id 1380)
-- `synthesizer_top` (id 1573)
-- `tree_cutter_top` (id 1447)
-- `white_glazed_terracotta` (id 690)
-- `white_spawn_block_top` (id 1007)
-- `wire_mill_top` (id 1396)
-- `wireless_terminal_top` (id 1612)
-- `yellow_glazed_terracotta` (id 706)
-- `yellow_spawn_block_top` (id 1002)
-### 실측 드리프트 (cnty9 → ab90qa)
-
-레지스트리는 빌드에 동봉되는 콘텐츠로, 블록 업데이트마다 움직인다. v4 빌드 (`cnty9`, 2026-10-27) → v5 빌드 (`ab90qa`, 2026-11-03):
-
-- 아틀라스 엔트리: 1,219 → 1,210
-- 회전 계열 (회전 철자): 57 (228) → 57 (228) — **불변**
-- 애니메이션 계열 (프레임 철자): 42 (188) → 42 (188) — **불변**
-- 사용 가능 이름 상수: 905 → **896**
-- 생존 이름 중 id 변화: **905 중 334**
-
-드리프트 전체 (11 이름):
-
-- **추가 (1):** `scorpion_eggs`.
-- **삭제 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트 (8면) 가 게임 데이터에서 떠났고 (싱글 체스트 `chest_*` 계열은 온전히 생존), 스포너는 `mob_spawner_block_top` 을 유지한 채 변형 옆면 텍스처가 사라졌다.
-
-**이름이 API, id 는 스냅샷이다.** 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다 — `351` 이 아니라 `bloxdTextureIdStone` 을 써라. 엔진은 검증 시점에 이름을 해석하므로, 이름으로 쓴 팩은 드리프트를 견디고 원시 id 팩은 그렇지 못하다.
-
-### 실측 드리프트 (ab90qa → xkg8x)
-
-레지스트리는 v5 출시 다음 날 다시 움직였다 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, 프로덕션 라이브; preprod `2lcqcl` 은 셰이더 팩의 모든 표면에서 동일하게 실측됨):
-
-- 아틀라스 엔트리: 1,210 → 1,220
-- 회전 계열 (회전 철자): 57 (228) → 57 (228) — **변화 없음**
-- 애니메이션 계열 (프레임 철자): 42 (188) → 42 (188) — **변화 없음**
-- 사용 가능 이름 상수: 896 → **1,017**
-- 생존 이름의 id 변화: **896개 중 376개**
-
-전체 드리프트 (10 이름 — v5 출시 때의 제거가 전부 복귀):
-
-- **추가 (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — 더블 체스트가 게임 데이터로 돌아왔고 몹 스포너 옆면 변형도 함께 복귀했다.
-- **제거:** 없음.
-
-같은 원칙이 더 큰 힘으로 적용된다: 이 한 단계에서만 생존 896개 중 376개가 id 를 바꿨다.
-
-### 실측 드리프트 (xkg8x → bny9u)
-
-레지스트리는 다음 날 또 움직였다 — `xkg8x` (2026-11-04) → `bny9u` (2026-11-05, 프로덕션과 preprod 가 같은 바이트 동일 번들로 라이브):
-
-- 아틀라스 엔트리: 1,220 → 1,232
-- 회전 계열 (회전 철자): 57 (228) → 57 (228) — **변화 없음**
-- 애니메이션 계열 (프레임 철자): 42 (188) → **43 (196)** — 새로 온 `trading_terminal_front` 는 8프레임 / 250 ms 사다리를 돈다
-- 사용 가능 이름 상수: 1,017 → **911**
-- 생존 이름의 id 변화: **1,017개 중 864개** (95%)
-
-전체 드리프트 (5 이름 — 새 블록 2종):
-
-- **추가 (5):** `stone_generator_side`, `stone_generator_top`, `trading_terminal_front` (애니메이션, 8프레임), `trading_terminal_side`, `trading_terminal_top` — Trading Terminal 과 Stone Generator 블록이 게임 데이터에 합류했다.
-- **제거:** 없음.
-
-같은 원칙은 한 걸음마다 더 세게 적용된다: 이 한 단계에서만 생존 906개 중 864개가 id 를 바꿨다 — 20개 중 19개 꼴이다.
-
-### 실측 드리프트 (bny9u → v98qt8)
-
-레지스트리는 주말을 지나 또 움직였습니다 — `bny9u` (2026-11-05) → `v98qt8` (2026-11-08, 프로덕션과 preprod가 동일한 바이트-동일 번들을 제공, md5 `7458fd47ff88331d9f451d1456ff48ac`):
-
-- 아틀라스 항목: 1,232 → 1,650
-- 회전 계열 (회전 스펠링): 57 (228) → 57 (228) — 불변
-- 애니메이션 계열 (프레임 스펠링): 43 (196) → 43 (196) — 불변
-- 사용 가능한 명명 상수: 911 → **1,017**
-- 생존명의 id 변화: **905명 중 716명** (79%)
-
-전체 드리프트 (7 이름 — 블록 3종이 모델화):
-
-- **추가 (1):** `hay_block_top` — 건초 블록 계열에 전용 상면 텍스처가 생겼습니다.
-- **제거 (6):** `artisan_table_side`, `artisan_table_top`, `crafting_table_side`, `furnace_front`, `furnace_side`, `furnace_top` — Furnace, Workbench(제작대), Artisan Bench가 텍스처 입힌 지형 블록에서 블록 모델로 전환되면서 지형 텍스처가 레지스트리를 떠났습니다 (Workbench 는 `crafting_table_top` 를 유지 — 윗면은 여전히 지형 텍스처).
-
-늘 그렇듯 같은 원리입니다: 이 한 걸음만에 생존 905명 중 716명이 id를 바꿨습니다 — `bloxdTextureIdStone`으로 쓰고 날것 숫자는 쓰지 마세요.
-
-### 관련 문서
-
-- [텍스처 API](api/texture-api.md) · [엔진 내부와 연구: 텍스처 레지스트리](internals/texture-registry.md) · [버전 히스토리: v4](history/v4.md)
-
----
 
 ## 가이드
 「구조와 사고방식」을 설명하는 자료다. 애초에 무엇이 가능한지는 [셰이더 팩으로 되는 것과 안 되는 것](guides/constraints.md) 에 정리되어 있다. 목적별 코드 예시는 [레시피](recipes/) 로 나뉘어 있다.
@@ -3044,13 +1832,10 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [텍스처팩과의 조합](guides/combinations.md) | 텍스처팩과의 역할 분담 |
 | [디버깅 팁](guides/debugging.md) | 증상 → 원인의 진단 가이드 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인)
-
 
 ---
 
 ## 조명이 작동하는 방식
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 엔진 기존의 조명은 곱셈뿐이며, 스페큘러·프레넬·난색-냉색 분리·반구 환경광은 존재하지 않는다. 아래가 재구축 가능한 범위이다:
 
@@ -3073,8 +1858,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 그림자
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
-> **`bbb6l5`부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록·플레이어·몹·아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](api/functions.md)를 보세요.
 
 
 셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
@@ -3144,7 +1927,6 @@ let lit = sunL * sky;
 ---
 
 ## 물을 자연스럽게 보이게 하기
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 이 API는 씬색을 샘플링할 수 없으므로, 이것은 **진짜 반사·굴절이 아니라 프레넬풍 색 블렌드와 태양 하이라이트에 의한 유사 스타일링**이다 (깊이 계산에는 액체 한정의 `bloxdOpaqueBehind()`를 쓴다 — 두께 흡수 레시피는 이 페이지의 뒷부분에). 아래 샘플은 베이스 색을 남기면서 얕은 시선 각도에서 하늘빛에 가까운 색을 조금 섞고, 태양이 있을 때만 작은 글린트를 더한다.
 
@@ -3210,7 +1992,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 야간 표현 설계
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 그림자만 어둡게 하면, 태양 없을 때 엔진 완성색 (`engineColour`) 이 밝은 채 남아, 면과 그림자의 차이가 부자연스러워질 수 있다. 그림자의 색조가 아니라 완성색 전체에 감쇠를 걸 필요가 있다.
 
@@ -3241,7 +2022,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델과 텍스처
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (헤더·검증기에서 복원)
 
 v5 의 새 Model 훅이 그리는 것과 읽는 것.
 
@@ -3316,7 +2096,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 리얼화의 두 유파
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 **유파 A: 가산 수정 (defaultLight 기점)** — `engineColour` (완성색) 를 바탕으로, 난색 글로우나 림을 더한다. 간편하고 안전하지만 조명 모델 자체는 기존 그대로.
 
@@ -3331,7 +2110,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 셰이더 팩으로 가능한 것과 불가능한 것
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩의 리얼화 「천장」을 한 페이지에 정리한다: 현재 API가 어디까지 닿는지, 원리적으로 불가능한 것은 무엇인지, 조건부인 것은 무엇인지, 제한이 존재하는 이유, 그리고 가장 가까운 대체 수단. 만들기 시작하기 전에 여기서 구상한 표현이 실현 가능한지 확인한다.
 
@@ -3414,7 +2192,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 퍼포먼스
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (실측 기반 실천)
 
 팩의 훅은 모든 프래그먼트 (지형 / 액체 / 모델의 모든 픽셀) 에서 돌므로, 스타일 선택이 프레임 레이트를 크게 움직인다.
 
@@ -3461,7 +2238,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 게임 내 테스트 체크리스트
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 컴파일 성공과 「보기 좋다」는 별개다. 다음 순서로 확인한다.
 
@@ -3485,7 +2261,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 텍스처 팩과의 조합
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩측에서 텍스처를 추가·샘플링할 수 없다는 제약이 있으므로, 소재 그 자체의 미세한 요철이나 하늘의 화상을 바꾸고 싶으면 셰이더만으로 해결하려 하지 않는다. Bloxd.io용 공개 텍스처팩 리포지토리 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 에는 텍스처, skybox, 모델 등을 다루는 별도 방식이 있다.
 
@@ -3499,7 +2274,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 디버깅 요령
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 - 동굴이 너무 밝다 → `skyLight` 의 비선형 커브가 부족하다 (R2 동굴 레시피 / R9.9)
 - 낮이 하얗게 날린다 → ACES 앞의 노출을 낮춘다
@@ -3535,13 +2309,10 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [모델 셰이더](recipes/model-shaders.md) | v5 — 손에 든 아이템, 스킨, 식물 흔들림 |
 | [인챈트 효과](recipes/enchant-effects.md) | v5 — 글린트 제거·증폭·재색 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (원본 레시피의 v5 이식 — 배포 전에는 게임 내 컴파일로 재확인할 것)
-
 
 ---
 
 ## 색
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 단색 틴트 (가장 기본)
 
@@ -3622,7 +2393,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 조명
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 콘트라스트 S자 커브
 
@@ -3736,7 +2506,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 발광
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > `emission` 은 조명 계산 후에 가산되지만, 기존 처리에서는 **포그량 (`fogAlpha`) 이 곱해져 감쇠한다. 즉 완전히 안개에 잠긴 원경에서는 emission 도 사라진다. 원경에서도 빛나게 하고 싶은 성분은 emission 에 더하지 말고, light 훅 안에서 `out.colour += ...` 로 직접 가산한다** (기본 출력은 이미 포그된 상태이므로, 원경에서는 안개색 위에 빛이 얹힌다)
 
 ### 등불의 맥동 (횃불이 숨쉰다)
@@ -3787,7 +2556,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 좌표
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 월드 좌표
 
@@ -3842,7 +2610,6 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 시간과 애니메이션
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > `bloxdSeconds()` 은 3600초 (1시간) 마다 감긴다. 셰이더 경과 시간이며 게임 안의 태양·낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `bloxdSunDirection()` 이나 조명 입력을 우선한다.
 
 ### 낮밤 사이클 (1시간에 1일)
@@ -3881,7 +2648,6 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 액체
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 수면의 잔물결 (색의 명멸)
 
@@ -3943,7 +2709,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 버텍스 (allow 전용)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
 > 정확한 조건 (allow 타이틀 일람; Custom Games 는 strict) 은 [게임별 셰이더 팩 정책](internals/policy.md) 참조
 
@@ -4008,7 +2773,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 수식 도구 상자
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 
 ```wgsl
@@ -4040,7 +2804,6 @@ let phase = t * 0.15;
 ---
 
 ## 리얼화
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 「바닐라의 겉모습을 소재에서 다시 짜는」 물리계 레시피집. 먼저 이 전제들을 읽을 것:
 >
 > 1. **light 훅은 프래그먼트의 최종단에서 불린다**. 반환한 colour 가 그대로 최종색. **직접 포그를 다시 걸 필요가 있다** (R9.10)  
@@ -4344,7 +3107,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 셰이더
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (v5 헤더 사양에 맞춰 작성)
 
 v5 Model 훅과 새 플래그로, **v5 이전에는 불가능했던 「지금 무엇을 보고 있는가」 선택**을 하는 레시피. 기초: [모델과 텍스처](guides/models.md).
 
@@ -4496,7 +3258,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 인챈트 효과
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (라이브 헤더에서 복원)
 
 v5 는 인챈트 파이프라인을 입력과 출력 양쪽으로 열었다. 엔진의 수식을 보존하면서 인챈트 아이템과 방어구의 글린트를 제어하는 레시피.
 
@@ -4641,7 +3402,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 느림 / 실기기 검사에서 탈락 | [퍼포먼스](troubleshooting/performance.md) |
 | 법적·안전·자주 묻는 질문 | [FAQ](troubleshooting/faq.md) |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (메시지는 라이브 검증기·로더에서 그대로 기록)
 
 ### 오류가 나타나는 곳
 
@@ -4718,7 +3478,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 버전 오류
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (라이브 i18n 사전에서 그대로)
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
@@ -4997,7 +3756,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 문제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
 
 `bloxdTextureId*` / `bloxdTexel` 관련 문제. 896 이름 전체는 [텍스처 카탈로그](api/texture-catalog.md) 에서 검색하라.
 
@@ -5049,7 +3807,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 게임 업데이트 후 원시 id 가 깨졌다
 
 - **원인**: **id 는 스냅샷이다** — 실측으로, 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다
-- **해결**: `19` 이 아니라 `bloxdTextureIdLava` 를 쓴다 ([이름이 API](api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ### 관련 문서
 
@@ -5113,7 +3870,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 문제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (v5 의 새 영역)
 
 새로운 v5 Model 훅 관련 문제.
 
@@ -5211,7 +3967,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ와 법적 주석
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
 
 ### 자주 묻는 질문
 
@@ -5251,7 +4006,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 - 이것은 비공식 가이드이며 개발사의 견해를 대변하지 않는다. API 는 예고 없이 바뀔 수 있다
 - AI 지원으로 작성되었으며 정확성은 보장되지 않는다. 실제 게임 동작으로 검증하라
-- 실측값 (텍스처 id 등) 은 특정 빌드의 스냅샷이며 빌드마다 바뀐다 ([이름이 API](api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ### 관련 문서
 
@@ -5261,7 +4015,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 ---
 
 ## 엔진 내부와 연구
-엔진 구현을 분석해 복원한 내부 사양. 여기의 모든 것은 현행 프로덕션 빌드 (`bny9u`) 의 JavaScript 에서 직접 회수했다. 정확한 내부 동작과 분석 결과를 보존하기 위해 공개 API 문서 ([API 레퍼런스](api/)) 와 분리해 두었다.
 
 ### 구성
 
@@ -5285,7 +4038,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 | [디버깅](internals/debugging.md) | URL 파라미터, 통계 패널 |
 | [리서치 로그](internals/research-log.md) | 방법론, 빌드 이력, 미검증 항목 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인)
 
 내부 사양은 안정된 API 계약이 아니다 — 엔진 업데이트로 바뀔 수 있으며, 각 페이지는 근거 빌드를 명시한다 ([리서치 로그](internals/research-log.md)).
 
@@ -5293,7 +4045,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 ---
 
 ## 렌더링 파이프라인
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - **surface 훅은 alphaTest 의 「앞」 에서 돈다**: `out.alpha` 가 그대로 discard 판정에 쓰인다. 컷아웃 소재 (풀·잎) 에서는 디더 패턴으로 녹는 듯한 이펙트를 만들 수 있다 (레시피 R-C). 액체 (블렌딩) 에서는 `out.alpha` 가 실제 투명도가 된다 (레시피 R-D). 통상 불투명 지형에서는 alpha 가 끝내 무시된다
 - **`l.ambient` 의 내용**은 `material.ambient × sceneAmbient` 로 소재마다 다른 값이다. 씬측은 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5) 에 직결되어 있으므로, 기본값 때려박기를 하지 않는다
@@ -5366,7 +4117,6 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 훅 호출의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
 
 엔진이 런타임에 훅을 부르는 방식. 쓰는 코드에는 아무것도 바뀌지 않지만, 훅이 무엇을 받는지에 대한 추측이 사라진다.
 
@@ -5422,9 +4172,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 엔진 헤더 (그대로)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
 
-엔진이 모든 팩 앞에 붙이는**정확한 텍스트**입니다. 라이브 빌드의 검증기에서 보간을 적용해 렌더링했습니다 (`apiVersion`과 `bloxdPackInputs`를 통한 6개 uniform 읽기). 216행. 바꿔 쓴 곳은 없습니다. 이전 프로덕션 빌드(`bny9u`, `v98qt8`)에서도 재검증했습니다 — 추가된 것은 섀도 관련 뿐입니다.
 
 읽기용 가이드:
 - 필드별 해설 → [구조체](api/structures.md)
@@ -5663,7 +4411,6 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 셰이더 검증의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 검증기에서 복원)
 
 정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](troubleshooting/validation.md).
 
@@ -5738,7 +4485,6 @@ const Jq = new Map([
 ---
 
 ## WGSL 컴파일의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들에서 복원)
 
 두 번째 검증 단계 — 브라우저의 WGSL 컴파일러를 통한 진짜 컴파일 — 과 v5 의 검증 스텁.
 
@@ -5807,16 +4553,13 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 예약 식별자의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들의 생성기에서 복원)
 
 `bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](api/restrictions.md).
 ### 88 심볼
 
-v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 폐기 0. 역사상 유일한 폐기는 `bloxdSpLitColour` — 공개 `bloxdLitColour()`로 승격):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### 새 이름 ↔ `bbb6l5` 섀도 시스템
 
 새 42 심볼은 모두 `bloxdShadow()` / `bloxdAirShadow()`를 뒷받침하는 엔진의 태양/달 섀도 구현에서 왔습니다:
 
@@ -5850,7 +4593,6 @@ v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 
 ---
 
 ## 라이팅 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - `blockLight` 는 RGB 3채널의 **색 있는 빛**이다. 광원 블록마다 발광색 `[R, G, B]` (각 0-15) 가 정의되어 있고, 그것이 그대로 빛의 색이 된다 (통상 횃불 = 온백 (14,14,12) / 라바 = 오렌지 (14,8,2) / 비콘 = 시안 (5,14,14) / 흰 횃불 = (15,15,15) 등). 정점단에서는 1개의 float 속성에 r / g / b / sky 의 4 니블로 팩되어 도착한다. light 훅 안에서는 3채널을 따로따로 다루는 것으로 색 있는 국소 조명을 만들 수 있다 — 난색 토치 계열 레시피 (R9.1) 가 기준으로 하는 거동의 실체는 이것이다.
 
@@ -5866,7 +4608,6 @@ v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 
 ---
 
 ## 포그 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](history/v3.md)에 보존되어 있다.)
 
@@ -5893,7 +4634,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 샘플링의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
 
 `bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](api/texture-api.md).
 
@@ -5954,17 +4694,14 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 텍스처 레지스트리 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified
 
 이 문서는 텍스처 이름이 ID로 해석되는 방식과 빌드별 레지스트리 변경을 정리합니다. 셰이더 팩 제작자가 사용할 수 있는 이름 목록은 [텍스처 카탈로그](api/texture-catalog.md)를 참고하세요.
 
 ### 측정 방법
 
-프로덕션 빌드에 포함된 레지스트리 빌더를 실행해 게임에 포함된 블록 텍스처 데이터로 레지스트리를 다시 계산했습니다. 결과 지문 `32451195`는 `bbb6l5`에 포함된 사전 생성 아틀라스와 일치합니다. 별도로 다시 구현해 추정한 값이 아니라 엔진 자체의 계산 결과입니다.
 
 ### 현재 레지스트리
 
-| 항목 | `bbb6l5` | 의미 |
 |---|---:|---|
 | `named` | **1,017** | `bloxdTextureId<Name>` 상수로 사용할 수 있는 이름 |
 | `aliases` | **776** | 기본 이름으로 해석되는 다른 표기 |
@@ -5987,20 +4724,9 @@ WGSL에서는 이름 상수를 사용하세요. 텍스처 이름이 유지되더
 
 | 비교 | 아틀라스 레이어 | 사용 가능한 이름 | 주요 변경 |
 |---|---:|---:|---|
-| `sjr0p7` → `cnty9` | 1,200 → 1,219 | — | 98개 추가, 79개 제거; 회전 텍스처의 이름 규칙 변경 |
-| `cnty9` → `ab90qa` | 1,219 → 1,210 | 905 → 896 | 이름 1개 추가, 10개 제거 |
-| `ab90qa` → `xkg8x` | 1,210 → 1,220 | 896 → 906 | v5 출시 때 제거된 이름 10개가 모두 복구 |
-| `xkg8x` → `bny9u` | 1,220 → 1,232 | 906 → 911 | Trading Terminal 및 Stone Generator의 이름 5개 추가 |
-| `bny9u` → `v98qt8` | 1,232 → 1,227 | 911 → 906 | 이름 1개 추가; 블록이 모델로 바뀌면서 텍스처 6개가 레지스트리에서 제거 |
-| `v98qt8` → `bbb6l5` | 1,227 → 1,650 | 906 → 1,017 | 레이어 423개 추가; 회전·애니메이션 계열 확대; 폴딩 회귀 수정 |
 
 업데이트 때마다 많은 이름의 ID가 재배정되었습니다. 이름 상수를 사용하면 이런 숫자 변경에 팩이 영향을 받지 않습니다.
 
-### v98qt8 폴딩 회귀 (수정됨)
-
-`v98qt8`에서는 엔진의 애니메이션 텍스처 표가 문자열 표기를 키로 사용했지만, 폴딩 로직은 슬롯 인덱스를 기대했습니다. 그 결과 애니메이션 텍스처의 기본 이름은 검증에 실패했고, 각 프레임 이름은 애니메이션 없이 개별 상수로 노출되었습니다.
-
-이 문제는 `bbb6l5`에서 수정되었습니다. 표가 다시 슬롯 인덱스를 사용하고, 애니메이션 기본 이름이 검증되며, 레지스트리 지문도 배포된 아틀라스와 일치합니다. 이 절은 과거 상태를 설명하는 기록이며 현재 빌드의 문제를 뜻하지 않습니다.
 
 ### HEADER_VERSION에 미치는 영향
 
@@ -6015,7 +4741,6 @@ WGSL에서는 이름 상수를 사용하세요. 텍스처 이름이 유지되더
 ---
 
 ## 모델 렌더링의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들에서 복원)
 
 v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](guides/models.md).
 
@@ -6057,7 +4782,6 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 엔진 데이터 대장
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified
 
 이 대장은 현재 빌드에서 셰이더 팩에 공개된 API의 확인된 값을 정리합니다. 모듈 ID나 청크 번호처럼 번들 내부에만 해당하는 정보는 API 사양이 아니므로 싣지 않습니다.
 
@@ -6081,15 +4805,11 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 | 기본 팩 템플릿 | 1,633바이트 |
 | 로더 제한 | WGSL 파일 256개 / 코드 총 256KB / `pack.json` 64KB / ZIP 32MB / 항목 1,024개 |
 
-### bbb6l5 변경 사항
-
-`bbb6l5`는 `apiVersion: 5`를 유지하면서 팩에 공개되는 API를 확장했습니다.
 
 - `bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`이 엔진이 계산한 태양·달 그림자를 제공합니다.
 - uniform의 오프셋 64에 `shadowDirection: vec3f`가 추가되어 크기가 64바이트에서 80바이트로 늘었습니다.
 - `pack.json`에 기존 원형 그림자를 유지하는 선택적 boolean 필드 `keepCircleShadows`가 추가되었습니다.
 - 아틀라스는 1,227에서 1,650 레이어로, 사용 가능한 이름은 906개에서 1,017개로 늘었습니다.
-- `v98qt8`에서 발생한 텍스처 상수 폴딩 회귀가 수정되었습니다.
 
 측정 설명과 근거는 [리서치 로그](internals/research-log.md)와 [텍스처 레지스트리 내부](internals/texture-registry.md)를 참고하세요.
 
@@ -6107,7 +4827,6 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 팩에 보이는 값을 바꾸는 요인
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
 
@@ -6121,11 +4840,9 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 게임별 셰이더 팩 정책
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
 
-- 근거 빌드: `szby6g.main.94a7596c.js` (2026-10-17 시점의 정식 배포). 전체 111 게임 정의를 정적으로 분석한 결과 **allow 26 엔트리 (12 타이틀) / strict 85 엔트리**. 같은 12개의 allow 리터럴이 같은 12개 타이틀에서 v3 프로덕션 번들 (`3ymzdd`, 2026-10-20) 과 v4 번들 (`cnty9`, 2026-10-27) 에서도 변경 없이 재확인되었다 — 아래 목록은 v3·v4에도 그대로 적용된다. 그리고 v5 빌드에서도 다시 불변: `ab90qa` (2026-11-03) 와 `xkg8x` (2026-11-04, allow 리터럴 12개 재계산) 에서 재확인했다. `bny9u` (2026-11-05) 에서는 전체 열거를 다시 실행했다: 게임 정의 수는 111 에서 **115** 로, allow 측은 26 에서 **28 엔트리** 로 늘었다 — 타이틀 12개는 그대로이고 Test Gym 의 새 변형 2종 (Imported Mobs, Interest) 이 합류했다. 아래 목록은 v5 에도 그대로 적용된다. `v98qt8` (2026-11-08)에도 열거를 재실행했습니다 (메인 번들의 게임 모듈 513을 하네스에서 평가): **116 정의 / 28 allow 항목 (12 타이틀) / 88 strict** — allow 측은 불변, strict 정의가 하나 더 늘었습니다.
 - `shaderPackPolicy` 보다 상위의 판정으로서 배포 채널 측의 게이트 (`canUseShaderPacks` 상당) 도 있어, 외부 포털 경유의 배포 (Coolmath Games 판 등) 에서는 `shaderPackPolicy` 의 판정에 이르기 전단에서 셰이더 팩 기구 자체가 무효화될 수 있다. 이하의 allow / strict 의 판별은 bloxd.io 본가 Web판의 해석에 근거한다.
 - allow 는 게임 정의 안의 직접 리터럴 8곳과 기저 변수 (`tb` / `kz` / `cb` / `Fb`) 4곳, 합계 12곳에서 선언되고, 베리언트는 스프레드 상속 (`{...tb,...}`) 으로 받는다. 베리언트 단위의 개별 덮어쓰기 (부모 allow·자식 strict 의 역 패턴) 는 현재 제로.
 
@@ -6150,7 +4867,6 @@ strict 측에서 특히 오해하기 쉬운 점:
 ---
 
 ## 태양과 달
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 `bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
 
@@ -6195,7 +4911,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 디버깅 도구
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](troubleshooting/loading.md) 참조)
 - URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다
@@ -6224,15 +4939,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 | 빌드 | API | 날짜 | 비고 |
 |---|---|---|---|
-| `szby6g` | v3 시대 | 2026-10-17 | 최초의 allow/strict 정적 분석 (게임 정의 111건) |
-| `3ymzdd` | v3 | 2026-10-20 | v3 가이드의 근거 빌드 |
-| `sjr0p7` | v3 시대 | 2026-10-17 | 드리프트 비교 기준선 |
-| `cnty9` | v4 | 2026-10-27 | v4 가이드·905이름 카탈로그의 근거 |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 동결 확인 (할로윈 이벤트 + 스카이블록 개편) |
-| `ab90qa` | **v5** | 2026-11-03 | v5 출시 빌드. 원래 v5 기준선. prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | 레지스트리 드리프트 (+10 이름); preprod `2lcqcl` 은 셰이더 팩의 모든 표면에서 동일하게 실측됨 |
-| `bny9u` | **v5** | 2026-11-05 | ; 이 문서의 베이스라인. prod = preprod (메인 번들 md5 `60eea80ec48253b7ac6cc45604dc8273`, 두 호스트에서 각각 실시간 수신으로 확인) |
-| `v98qt8` | **v5** | 2026-11-08 | **현행**; 이 문서의 베이스라인. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). 레지스트리 드리프트 (순 −5), 게임 115 → 116, 그리고 **텍스처 상수 폴딩 회귀** ([Texture registry](internals/texture-registry.md#the-v98qt8-folding-regression)) |
 
 ### 핵심 방법론
 
@@ -6242,7 +4948,6 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 
 #### 텍스처 레지스트리 재계산
 
-엔진의 레지스트리 구축 모듈 (29812, 청크 52/53/54 적재) 을 텍스처 데이터 (메인 번들의 데이터 모듈 1351) 에 대해 을 미니 webpack 하네스 안에서 출하된 블록 레지스트리의 텍스처 데이터에 대해 실행하고, 출력 (현행 빌드 `bny9u` (2026-11-05) 기준 named 911 / aliases 424 / 아틀라스 1,232 — 모듈 29812 + 데이터 모듈 1351. `xkg8x` 에서는 906 / 416 / 1,220 (모듈 30093 + 1391); v5 출시 때는 896) 을 기록 ([텍스처 레지스트리](internals/texture-registry.md)).
 
 애니메이션 간격은 `animDataPerTex` 식 표 (레이어별 `numAnimStates` / `animationInterval`) 에서 온다 — 간격값은 200 / 250 / 300 ms 세 종류뿐 ([카탈로그](api/texture-catalog.md#애니메이션-계열-43-이름)).
 
@@ -6262,21 +4967,14 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 
 | 비교 | 기간 | 결과 |
 |---|---|---|
-| sjr0p7 → cnty9 | 10일 | 98 추가, 79 삭제. 이름 1121 중 779가 id 변화 (69%) |
-| cnty9 → ab90qa | 7일 | +1 (scorpion_eggs), −10 (더블 체스트 ×8, 스포너 옆면 ×2). 이름 905 중 334가 id 변화 |
-| ab90qa → xkg8x | 1일 | +10 (v5 출시 때의 제거가 전부 복귀: 더블 체스트 ×8, 스포너 옆면 ×2); 896명 중 376명 id 변경; 제거 없음 |
-| xkg8x → bny9u | 1일 | +5 (Trading Terminal ×3, Stone Generator ×2); 906개 중 864개 id 변경 (95%); 제거 없음; 애니메이션 계열 42 → 43 |
-| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
 
 ### 미검증 · 추정
 
 - 픽셀 정밀 섀도맵을 「장래 계획」으로 보는 것은 **해석**이다 (조명 템플릿의 미사용 `var shadow: f32 = 1.;` 에서 추론)
-- allow/strict 구분은 빌드마다 바뀔 수 있다 (12 타이틀 구성은 ab90qa 와 xkg8x 에서 재확인. 미래 게임은 미지)
 - `bloxdFragmentBlockPosition` (v5 헤더 제외): 시그니처 표 항목과 런타임 주입 모두 라이브 확인 — 호출은 검증·컴파일을 통과한다. 엔진 팀이 유지할 생각인지는 미지
 
 ### 재검증 시점
 
-게임 업데이트 (새 main.js 해시) 감지 시: 헤더 (9,125B), apiVersion 상수를 재확인하고, 레지스트리를 재계산하고, allow/strict 목록을 재확인한다. 상세한 모니터링 방법론은 이 문서의 범위 밖이지만, 위의 모듈 위치 (c55 / c116 / c56) 는 당시의 출발점 — `bny9u` 에서는: header/apiVersion 모듈 29815 와 검증 모듈들은 청크 c56, 로더 (zip/manifest/제한) 는 모듈 32942 (청크 c54), 레지스트리 빌더 29812 는 청크 c52/c53/c54, WebGPU 코드젠은 청크 c57, 기본 팩 템플릿은 모듈 33350 (청크 c122), 게임/정책 모듈 517 은 메인 번들
 
 ### 관련 문서
 
@@ -6286,7 +4984,6 @@ c55 헤더 템플릿을 라이브 보간 (`${vC}` = apiVersion, `${Gq.j}` 경유
 ---
 
 ## 버전 히스토리
-> 상태: Historical — 버전별 기록. 각 가이드의 머리에 대상 빌드가 명시되어 있다
 
 v1 부터 v5 까지의 변경 내용·이주 절차·폐지된 API. 구형 팩의 이주와, 시대별 사양의 보존 자료로 쓴다.
 
@@ -6296,9 +4993,6 @@ v1 부터 v5 까지의 변경 내용·이주 절차·폐지된 API. 구형 팩�
 |---|---|---|---|
 | v1 | (최초) | [v1](history/v1.md) | 셰이더 팩 API 의 첫 등장. 6훅 (terrain/liquid × vertex/surface), `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` 어휘 |
 | v2 | — | [v2](history/v2.md) | 식별자 전면 개명, `blockId`, `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](history/v3.md) | `blockId` → `blockFlags` 비트 플래그, `bloxdPi` / `bloxdTau`, 액체 훅의 공식화, 훅 호출 내부의 분석 |
-| v4 | 2026-10-26 | [v4](history/v4.md) | 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict 계약, 엔진 헤더·레지스트리 분석 |
-| **v5** | **2026-11-03** | [v5](history/v5.md) | **현행** — `BloxdFlags` 구조체 (14 bool), Model 훅 (합계 9훅), `bloxdLit()` / `bloxdLitColour()` 라이팅 API, `localPosition`, 인챈트/오버레이 입출력, 6베리언트 |
 
 ### 공통 서두
 
@@ -6353,10 +5047,7 @@ v1 은 최초의 셰이더 팩 API 다. v2 가 식별자를 전면 개명했으�
 ---
 
 ## API v2 마이그레이션 가이드
-> 버전: 2 · 상태: Historical (해당 시기의 마이그레이션 가이드; 대상 빌드는 본문에 명시)
 
-
-대상 빌드: `6qxffk.main.5912a15f.js` (2026-10-16 시점의 정식 배포). 당시 가이드의 입문~내부 각 부는 v2 기준으로 다시 쓴 상태였으며, 본 가이드는 v1에서의 이전 포인트와 v2의 새로운 기능을 모은 것이다. 새 기능의 코드 예제는 v2 컴파일러에 의한 8/8 베리언트 검증과 브라우저 WGSL 컴파일러 (Tint) 검증 (§38)을 통과한 것이며, 기존 레시피의 v2 변환은 기계적인 식별자 교체이므로, 배포 전에는 반드시 실기 컴파일로 확인할 것.
 
 ### 31. v1 팩의 운명 (먼저 결론)
 
@@ -6406,7 +5097,6 @@ v1에서는 `time` / `eyePosition` / `sunDirection` / `originOffset` 이 구조�
 
 **참고**: 필자가 게임 내 엔트리 목록을 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data)에 공개했다 (`entries.json`: id ↔ 블록 이름 대응표. `Furnace|meta|rot2` 같은 회전/meta 변종도 별개 ID로 수록). 대응은 게임 업데이트로 바뀔 수 있으므로 최종 확정은 실기기에서 확인할 것.
 
-자주 쓰는 블록의 예 (entries.json 에서, 2026-10-18 시점. id 가 낮은 지형계만 발췌):
 
 | ID | 블록 이름 | ID | 블록 이름 |
 |---|---|---|---|
@@ -6461,7 +5151,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 #### R-H. 잎만 흔들기 — blockId 에 의한 vertex 훅의 한정
 
-R7 의 바람 레시피 ([레시피](recipes/)) 는 지형 전체를 물결치게 하지만, vertex 훅에서도 `blockId` 를 읽을 수 있으므로, 대상을 잎 블록만으로 한정할 수 있다. id 일람과 WGSL 용 배열은 다음과 같다 (2026-10-18 시점의 실측. Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / 과실 변종 / Autumn Aspen 의 22종):
 
 ```wgsl
 const LEAF_IDS = array<u32, 22>(
@@ -6597,11 +5286,7 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ---
 
 ## API v3 마이그레이션 가이드
-> 버전: 3 · 상태: Historical (해당 시기의 마이그레이션 가이드; 대상 빌드는 본문에 명시)
 
-> **2026-10-26 대체됨: 현행 API는 버전 5** — v3 팩은 여기서 v2에 대해 서술한 것과 똑같이 로드 시 거부된다. 본 가이드를 적용한 뒤 [v4 마이그레이션 가이드](history/v4.md) (v3 → v4: 텍스처 API, `fogAlpha` 개명, `bloxdFragmentBlockPosition`, `hit`) 를 적용할 것. 이어서 [v5 마이그레이션 가이드](history/v5.md) (v4 → v5)도 적용할 것.
-
-대상 빌드: `3ymzdd.main.fae4743f.js` — **2026-10-19부터 정식 프로덕션 빌드**. bloxd.io가 프로덕션에서 제공하는 번들은 이 부를 처음 조사할 때 사용한 프리프로드 배포와 바이트 단위로 동일하다 (md5로 확인했으며, 메인 번들과 셰이더 팩 청크 모두 그러하다). 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 팩 모델은 v2 형태를 유지한다 (`pack.json` 필드, 로더 제한, uniform 레이아웃이 모두 같다).
 
 당시의 입문~내부 각 부는 여전히 v2 기준으로 작성되어 있었다. 본 가이드는 [v2 마이그레이션 가이드](history/v2.md)와 같은 순서로 v2 → v3 이전 포인트와 v3의 새 기능을 모은다. 변환은 대부분 기계적이지만 (§47), 실제 동작을 바꾸는 변경은 하나뿐이다 — 기본 light가 이제 emission을 포그로 감쇠시킨다 (§43) — 그리고 `blockId`가 `blockFlags`로 전면 교체되었으므로 (§42), 배포 전에는 반드시 게임 내 컴파일로 확인할 것.
 
@@ -6609,7 +5294,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 ### 40. v2 팩의 운명 (먼저 결론)
 
-**2026-10-19 업데이트: v3가 프리프로드를 떠나 이제 정식 사이트가 제공하는 버전이 되었다.** v2로 배포된 모든 팩을 포함해, 롤아웃 전에 저장된 모든 v2 팩은 아래 설명대로 프로덕션에서 실패한다. 따라서 오늘 팩을 배포하는 사람에게 §47의 이전은 더 이상 선택이 아니다.
 
 이 빌드는 manifest의 `apiVersion`이 **3과 엄밀히 일치**할 것을 요구하며, **v2/v3 병행 지원은 없다**. v2 팩은 로드 시 「API 버전 불일치」 메시지로 거부된다 (i18n 키와 플레이스홀더 텍스트):
 
@@ -6670,7 +5354,6 @@ vegetation / dirt / sand / rock 플래그는 블록의 등록된 **표시명**�
 
 Yellowstone이 명시된 이유는 `Stone`이 `Yellowstone` 안에서 독립 단어가 아니기 때문이다. Opaque와 emissive는 이름에서 오지 **않는다** — 엔진 자체의 불투명도와 블록 광 방출 데이터에서 오므로, 이 규칙으로는 도출할 수 없다.
 
-출처: 엔진의 이름 분류기 (모듈 28537, 번들 `3ymzdd`); 이름이 있는 7,861개 블록 전체에 대해 검증했다, 2026-10-20.
 
 예 — 머티리얼별로 블록에 색을 입힌다:
 
@@ -6700,7 +5383,6 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
 
-실제 레지스트리로 확인했다 (2026-10-20, 번들 `3ymzdd`):
 `vegetation && !dirt`는 정확히 45개의 나뭇잎 등록 (22개 기본 타입 —
 v2 R-H id 배열이 측정한 것과 같은 22개)과 일치하고, `vegetation && dirt`는 정확히
 8개의 잔디 블록과 일치한다. 어느 방향으로도 예외는 없다 — 레지스트리 집계는 해당 빌드 시점 기준이며, 새 블록이 추가되면 규칙은 그대로인 채 숫자만 늘어난다. `vertex.normal`
@@ -6826,402 +5508,8 @@ v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 �
 - **문구**: 셰이더 팩을 받아들이는 게임에 대한 문장이 이제 「in games that **support** them」으로 표기된다.
 - **적용 범위**: 팩이 동작하는 게임의 범위는 이전 빌드와 같다.
 
-### 49. 엔진 내부: Lite 렌더러가 훅을 호출하는 방식
-
-§40–§48은 로더와 헤더가 알려 주는 내용이다. 이 절과 뒤따르는 절들은 엔진이 실행 시 실제로 하는 일을 프로덕션 번들에서 복원해 기록한다 (Lite 렌더러는 175 KB 청크이며, 통합 소스 파일의 실제 이름 `lite/terrainShaderPack.ts`가 오류 문자열 안에 남아 있다). 이 중 어느 것도 작성하는 코드를 바꾸지는 않지만, 훅이 무엇을 받는지에 대한 추측을 없애고, 다른 커뮤니티 가이드가 아직 미해결로 남겨 둔 여러 질문을 정리한다.
-
-렌더러는 JavaScript에서 훅을 「호출」하지 않는다. 팩이 검증을 통과하면 엔진은 셰이더 텍스트의 고정 앵커 줄을 교체해 **훅 호출을 자체 terrain WGSL에 이어 붙인다**. 앵커는 정확히 한 번만 일치해야 한다 — 0회 또는 여러 회 일치하면 `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`로 중단한다.
-
-| 단계 | 엔진 셰이더의 앵커 줄 | 이어 붙는 내용 |
-|---|---|---|
-| vertex | `let worldPos = vec4f(vertexInputs.position + chunk.xyz, 1.0);`부터 `vertexOutputs.vNormalW = normalize(vertexInputs.normal.xyz);`까지의 네 줄 블록 | `BloxdVertexIn`을 만들고 vertex 훅을 호출한 뒤 `worldPos`를 다시 쓴다 — 이어 붙이기는 `let worldPos`를 `var worldPos`로도 바꾼다 |
-| surface | `baseColor = vec4f(baseColor.rgb * fragmentInputs.vColor, baseColor.a);` | `BloxdSurfaceIn`을 만들고 surface 훅을 호출한 뒤 `baseColor` / `alpha`를 다시 쓴다 |
-| lit colour | `color = vec4f(mix(uniforms.vFogColor, color.rgb, fog), …)` 바로 앞 | `let bloxdSpLitColour = color.rgb;` — 포그 전 색을 캡처한다 |
-| light | fragment 셰이더의 마지막 `return color;` 줄 | `BloxdLightIn`을 만들고 light 훅을 호출한 뒤 `color`를 다시 쓴다 — 포그 블렌드 이후 |
-
-출하된 번들에서 복원한, 훅을 이어 붙이는 코드 (엔진 자체 서식이 길어지는 light-level 샘플 식은 축약):
-
-```wgsl
-// vertex 단계 — vertex 훅을 가진 non-strict 베리언트
-{
-    let bloxdSpVertexIn = BloxdVertexIn(worldPos.xyz, vertexOutputs.vNormalW,
-                                        vertexOutputs.vBlockFlags);
-    let bloxdSpVertex = /* your bloxdTerrainVertex / bloxdLiquidVertex */(bloxdSpVertexIn);
-    worldPos = vec4f(bloxdSpVertex.position, worldPos.w);
-}
-```
-
-```wgsl
-// fragment 단계 — surface
-let bloxdSpSurfaceIn = BloxdSurfaceIn(baseColor.rgb, alpha,
-        normalize(fragmentInputs.vNormalW), fragmentInputs.vPositionW,
-        fragmentInputs.vBlockFlags);
-let bloxdSpSurface = /* your surface hook */(bloxdSpSurfaceIn);
-baseColor = vec4f(bloxdSpSurface.colour, baseColor.a);
-alpha = bloxdSpSurface.alpha;   // 프로그램이 liquid이거나 베리언트가 non-strict일 때만 이어 붙는다
-```
-
-```wgsl
-// fragment 단계 — light
-{
-    let bloxdSpLightIn = BloxdLightIn(
-        bloxdSpLitColour,                        // litColour
-        fragmentInputs.vTerrainLambert,          // directional
-        ambient,                                 // ambient
-        /* light-level varying */.rgb,           // blockLight
-        /* sky channel of the same varying */,   // skyLight
-        uniforms.uAmbientLightColour,            // ambientLightColour
-        uniforms.uSkyLightColour,                // skyLightColour
-        /* held-light term (see below) */,       // heldLight
-        select(vec3f(0.0), uniforms.vFogColor,
-               uniforms.vFogInfos.x != 0.0),     // fogColour — 포그가 전혀 없을 때만 검정
-        fog,                                     // fogVisibility
-        fragmentInputs.vPositionW,               // position
-        normalize(fragmentInputs.vNormalW),      // normal
-        fragmentInputs.vBlockFlags);             // blockFlags
-    let bloxdSpLight = /* your light hook */(bloxdSpSurface, bloxdSpLightIn);
-    color = vec4f(bloxdSpLight.colour, color.a);
-}
-```
-
-이 이어 붙이는 코드에서 곧바로 나오는 네 가지 강제 사실:
-
-- **strict terrain은 surface 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되쓰기는 liquid 프로그램이나 non-strict 베리언트에만 이어 붙는다 — §46 매크로 표의 구현이다. (strict terrain에서는 `#ifdef BLOXD_ALPHA` 코드가 어차피 컴파일 대상에서 빠지며, 이제 가드 없는 alpha 쓰기도 거기서 버려진다는 점이 확인되었다.)
-- **vertex 훅을 선언한 strict 베리언트는 그 훅을 절대 실행하지 않는다** — 엔진은 빌드 시점에 `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`를 보고한다. 공식 템플릿 (§45)이 `bloxdLiquidVertex`를 terrain 쪽과 같은 `#ifndef BLOXD_STRICT`로 감싸는 이유다.
-- `bloxdSp*` 식별자 — **총 14개**: `bloxdSpVertexIn`, `bloxdSpVertex`, `bloxdSpSurfaceIn`, `bloxdSpSurface`, `bloxdSpLightIn`, `bloxdSpLight`, `bloxdSpLitColour`, `bloxdSpSceneDepth`, `bloxdSpPixel`, `bloxdSpPositionW`, `bloxdSpZ`, `bloxdSpEye`, `bloxdSpScale`, `bloxdSpBehind` — 는 엔진 쪽 임시 변수다. 작성하는 코드에는 보이지 않지만 진단과 누군가의 리버스 엔지니어링 출력에 나타나므로, 보는 즉시 알아볼 가치가 있다.
-- **기본 surface 지름길.** 베리언트의 surface 훅이 문자 그대로 `bloxdDefaultSurface`이면, 엔진은 `baseColor` / `alpha` 되쓰기 줄을 아예 이어 붙이지 않는다 — 기본값이 이미 그 값들을 만들어 내므로 대입은 죽은 코드가 된다. 수정하지 않은 훅 체인은 비용이 들지 않는다.
-
-**`BloxdLightIn`에 실제로 들어가는 값** — 이어 붙는 코드 기준, 필드별:
-
-| 필드 | 엔진 쪽 공급원 |
-|---|---|
-| `litColour` | 포그 블렌드 직전에 캡처한 프래그먼트 색 (`bloxdSpLitColour` 앵커) — 헤더가 말하는 「emission과 포그 전」 |
-| `directional` | `vTerrainLambert` — 씬의 방향광에 대한 `max(0, dot(normal, lightDirection)) × intensity` 합을 vertex에서 보간한 값 (식은 §54); 씬에 방향광이 없으면 0 |
-| `ambient` | `material.ambientAndCutoff.xyz × uniforms.sceneAmbient` — 머티리얼별, 프레임별 |
-| `blockLight` | 디코드된 light-level varying의 `.rgb` (디코드는 §54) |
-| `skyLight` | 같은 light-level varying의 스카이 채널 — *「Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING」* (헤더 텍스트) |
-| `ambientLightColour` / `skyLightColour` | `uniforms.uAmbientLightColour` / `uniforms.uSkyLightColour` |
-| `heldLight` | light-level varying의 w 채널과 프레임 uniform `uHeldLightPos` / `uHeldLightColour`로 만든 held-light 항 ([라이팅 내부](internals/lighting-internals.md)이 감쇠와 채널 하한 동작을 기록한다) |
-| `fogColour` | `select(vec3f(0.0), uniforms.vFogColor, uniforms.vFogInfos.x != 0.0)` — **포그가 전혀 없는 씬에서만 검정** (모드 0, §50) |
-| `fogVisibility` | 클램프된 포그 계수 — §50 함수가 반환하는 정확한 값 |
-| `position` / `normal` | `vPositionW` / `vNormalW` varying (normal은 프래그먼트마다 다시 정규화) |
-| `blockFlags` | `vBlockFlags` flat varying — §52의 전체 전달 경로 |
-
-오래된 자료를 읽을 때 방향을 잡기 위해: 동일한 이어 붙이기 구조는 v2 렌더러에도 있었고, v3의 통합 차이는 `vBlockId` → `vBlockFlags`와 액체 베리언트 추가뿐이다. 훅 시스템은 v2 → v3 단절을 거쳐도 구조적으로 안정적이다.
-
-### 50. 포그 함수: 네 가지 모드, 하나의 필드
-
-프로덕션 terrain 셰이더에서 그대로 복원:
-
-```wgsl
-fn calcFogFactor(fogDistance: vec3f) -> f32 {
-    var fogCoeff: f32 = 1.0;
-    let fogStart   = uniforms.vFogInfos.y;
-    let fogEnd     = uniforms.vFogInfos.z;
-    let fogDensity = uniforms.vFogInfos.w;
-    let dist = length(fogDistance);
-    if (uniforms.vFogInfos.x == 3.0) {        // 선형
-        fogCoeff = (fogEnd - dist) / (fogEnd - fogStart);
-    } else if (uniforms.vFogInfos.x == 1.0) { // 지수
-        fogCoeff = 1.0 / pow(2.71828, dist * fogDensity);
-    } else if (uniforms.vFogInfos.x == 2.0) { // 지수 제곱
-        fogCoeff = 1.0 / pow(2.71828, dist * dist * fogDensity * fogDensity);
-    }                                          // 0.0 = 포그 꺼짐 (계수는 1.0 유지)
-    return clamp(fogCoeff, 0.0, 1.0);
-}
-```
-
-- `vFogInfos = vec4f(mode, start, end, density)` — 하나의 vec4가 모든 것을 구동한다.
-- **셰이더에는 네 가지 모드가 있다: 0 = 꺼짐, 1 = 지수, 2 = 지수 제곱, 3 = 선형.** 어느 모드가 실행되든 `fogVisibility`는 클램프된 계수다 — 필드는 정확히 하나뿐이고, 모드 플래그는 팩에 노출되지 않는다.
-- Bloxd 자체 타이틀은 [포그 내부](internals/fog-internals.md)에 설명된 32블록 대역으로 모드 3 (선형)을 구동하므로 (`fogStart = 32 × D`, `fogEnd = 32 × (D + 1)`), 그 관찰의 「항상 선형」이라는 부분은 여전히 출하된 게임플레이를 설명한다. 그러나 지수 모드도 실제로 살아 있는 엔진 코드다 — 타이틀은 클라이언트 업데이트 없이 `vFogInfos.x`를 바꿔 램프를 바꿀 수 있다. 거리 기반 레시피에서 `distance(l.position, bloxdEyePosition())`를 직접 계산하는 방식 (레시피 R-B)은 모드 전환에 영향을 받지 않으므로 거리 기반 외형을 쓰는 견고한 방법이다.
-- 이로써 「엔진이 실제로 어느 포그 램프를 쓰는가」라는 질문이 소스로 정리된다: 네 가지가 모두 구현되어 있고, 출하된 타이틀은 선형을 쓴다. (같은 함수가 헤더의 fogColour 주석도 설명한다 — 모드 0은 `fogColour`가 검정으로 도착하는 유일한 경우이며, Bloxd 게임은 모드 0을 출하하지 않고 대신 포그를 멀리 밀어낸다, [포그 내부](internals/fog-internals.md).)
-
-### 51. bloxdOpaqueBehind(): 정확한 구현
-
-프로덕션 빌드에서 그대로 복원한 함수 전체:
-
-```wgsl
-@group(3) @binding(1) var bloxdSpSceneDepth: texture_2d<f32>;
-var<private> bloxdSpPixel: vec2i;
-var<private> bloxdSpPositionW: vec3f;
-
-fn bloxdOpaqueBehind() -> BloxdOpaqueBehind {
-    let bloxdSpZ = textureLoad(bloxdSpSceneDepth, bloxdSpPixel, 0).r;
-    if (bloxdSpZ <= 0.0) {
-        return BloxdOpaqueBehind(false, vec3f(0.0), 0.0);
-    }
-    let bloxdSpEye = bloxdPackInputs.eyePosition;
-    let bloxdSpScale = max(bloxdSpZ / (scene.view * vec4f(bloxdSpPositionW, 1.0)).z, 1.0);
-    let bloxdSpBehind = bloxdSpEye + (bloxdSpPositionW - bloxdSpEye) * bloxdSpScale;
-    return BloxdOpaqueBehind(true, bloxdSpBehind, distance(bloxdSpBehind, bloxdSpEye));
-}
-```
-
-- **깊이 텍스처는 `@group(3) @binding(1)`에 있다** — group 3은 팩 자신의 그룹이다: binding 0은 64 B `bloxdPackInputs` uniform (§41), binding 1은 이 깊이 텍스처다. 둘 다 엔진이 제공하며 팩 쪽에서는 이름을 붙일 수 없다.
-- **깊이 텍스처는 unfilterable-float, fragment 전용 리소스다.** 바인드 그룹 레이아웃은 이를 `texture: { sampleType: "unfilterable-float" }`로 등록하며 가시성은 `GPUShaderStage.FRAGMENT`뿐이다 — `bloxdOpaqueBehind()`가 `textureSample` 대신 `textureLoad` (명시적 텍셀 좌표, 밉 레벨 0)로 구현된 이유가 바로 이것이다: 이 텍스처에는 하드웨어 필터링이 아예 없다.
-- `z ≤ 0`은 깊이 샘플이 아무것도 맞히지 못했다는 뜻이다 (원거리 평면 / 하늘): `found = false`이며 `position` / `distance`는 의미가 없다 — 항상 `found`를 먼저 확인할 것.
-- 반환되는 위치는 **광선 스케일 교차점**이다: 불투명 표면은 `eye + (fragment − eye) × max(z / viewDepth, 1)`에 놓인다. `distance`는 눈에서 그 점까지의 거리다 — 물 표면 팩에서는 「광선이 단단한 표면에 닿기 전에 물을 얼마나 통과했는가」가 되며, 이것이 두 번째 깊이 버퍼 없이 깊이 틴트 물 레시피를 가능하게 한다.
-
-### 52. blockFlags 전달 경로: 등록에서 훅까지
-
-§42는 비트의 의미를 설명한다. 이 절은 플래그 비트가 블록 등록에서 훅까지 이동하는 완전한 경로다 — 모든 단계는 프로덕션 소스에서 확인했으며, 헤더의 「면 전체에서 같다」가 바이트 수준에서도 성립함을 증명한다.
-
-**1. 등록 (블록 정의 데이터베이스).** 각 블록의 플래그는 등록 시 한 번 계산된다:
-
-```js
-flags[id] = nameFlags                     // 표시명 규칙 (§42): vegetation / dirt / sand / rock
-          | (definition.opaque === true ? 1 : 0)   // 불투명 비트 — 엔진 불투명도 데이터
-          | (anyFaceEmission >= 1       ? 2 : 0);  // 발광 비트 — 블록 광 방출 데이터
-```
-
-표시명 규칙은 네 가지 머티리얼 비트만 담당하고, 두 물리 비트는 별도 엔진 데이터에서 온다 — `opaque`는 블록 정의에서 곧바로, `emissive`는 면별 블록 광 방출 배열에서 온다. 헤더의 「빛나는 광석도 아무리 약해도 포함」은 문자 그대로다: 방출이 1 이상인 면이 있으면 비트가 설정된다.
-
-**2. 블록별 → 머티리얼별 (메셔 초기화).** 지형은 블록 id가 아니라 *머티리얼* 단위로 그려지므로, 플래그는 머티리얼 표로 다시 정리된다 (머티리얼 id로 인덱스하는 `Uint16Array`이며, 각 머티리얼은 소유 블록의 첫 면 플래그를 가진다). 이 표는 메싱 Web Worker로 전달되지만 — **팩 파이프라인이 활성화된 구성에서만** 그렇다. 그 외에는 표가 `null`이고 플래그 바이트가 전혀 기록되지 않는다. 팩이 없는 플레이어는 구조적으로 오버헤드가 0이다.
-
-**3. 정점 바이트로 (메셔 워커).** 플래그는 기존 인터리브 정점 데이터의 여유 바이트 두 개를 탄다:
-
-```js
-addBlockFlagValues(buffer, stride, faceIndex, flags) {
-    for (var base = 4*faceIndex*stride, v = 0; v < 4; v++) {
-        var o = base + v*stride;
-        buffer[o + colorOffset  + 3] = 255 & flags;   // 하위 8비트 → color 속성의 alpha 바이트
-        buffer[o + normalOffset + 3] = flags >> 8;    // 상위 8비트 → normal 속성의 w 바이트
-    }
-}
-```
-
-면의 네 정점 모두 같은 값을 받는다 — 「면 전체에서 같다」의 구현 수준 의미다.
-
-**4. GPU 쪽 디코드 (Lite terrain 셰이더).** 두 바이트는 `blockFlagWords: vec2u` 정점 속성 (location 7, 팩 파이프라인이 켜졌을 때만 존재)으로 이동하고 vertex 단계에서 재조립된다:
-
-```wgsl
-vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
-                          |  (vertexInputs.blockFlagWords.y >> 24u);
-```
-
-`vBlockFlags`는 `@interpolate(flat)`으로 선언된다 — 면마다 일정한 값이 fragment 단계까지 이어지므로, §42의 비트 검사가 면 안에서 안정적이고 면 중간 블렌드가 생길 수 없다.
-
-- 파이프라인은 **16비트** 용량을 예약하지만 (위 디코드는 두 바이트 전체를 재조립한다) v3는 6비트만 정의한다 — 향후 플래그가 정점 형식 변경이나 API 범프 없이 등장할 수 있다.
-- packed-vertex 모드에서는 같은 두 바이트가 전용 속성 대신 `packed.y`와 color 워드의 상위 바이트 안에 들어간다 — 값은 같고 컨테이너만 다르다.
-- 이 플래그에 가장 자주 묻는 나뭇잎 대 잔디 질문은 §42 아래의 [잔디 없는 나뭇잎](#잔디-없는-나뭇잎-모두가-묻는-질문)을 참조.
-
-### 53. 검증 내부: HEADER_VERSION, 서명, 예약 이름
-
-**실측 헤더 해시.** 모든 팩 검증에는 엔진의 `HEADER_VERSION`이 찍힌다. 프로덕션 검증 모듈을 직접 실행하면 (§54 끝의 하네스 주석 참조) 다음과 같이 측정된다:
-
-```
-v2 (sjr0p7):  6.bc5e8338
-v3 (3ymzdd):  6.5bc26a63   ← 라이브 프로덕션 번들에서 측정
-```
-
-FNV-1a-32 해시이며 (`6.` 접두사), 다섯 입력을 해시한다: 베리언트별로 전처리·토큰화한 엔진 헤더 (8개 베리언트 각각 한 항목), 파서의 전체 WGSL 어휘 우주, 네 매크로 이름, 특수 함수 맵, 그리고 `BloxdPackInputs` 선언과 그 `@group(3) @binding(0)` uniform 줄. 작성자에게 중요한 두 가지 결과:
-
-- **엔진 쪽 헤더가 바뀌면 해시도 바뀐다** — 엔진 업데이트 후 저장 팩이 받는 자동 「재확인 필요」 플래그의 메커니즘이다 ([v2 마이그레이션 가이드](history/v2.md) §31).
-- 해시는 *엔진 헤더*를 덮으며 작성하는 코드는 덮지 않는다. 엔진 업데이트를 넘겨 계속 로드되는 팩이 「여전히 유효」한 것은 아니다 — 아직 헤더 변경에 걸리지 않았을 뿐이다. manifest가 참여하는 유일한 버전 검사는 `apiVersion` 게이트다 (§40).
-
-**훅 시그니처 검사: 타입은 토큰 단위로 엄밀, 이름은 자유.** 검증기는 훅 슬롯마다 시그니처 하나를 가진다:
-
-```js
-{
-  vertex:  { params: [{ type: "BloxdVertexIn" }],                      returns: "BloxdVertex"  },
-  surface: { params: [{ type: "BloxdSurfaceIn" }],                     returns: "BloxdSurface" },
-  light:   { params: [{ type: "BloxdSurface" }, { type: "BloxdLightIn" }], returns: "BloxdLight" }
-}
-```
-
-일치는 **토큰 단위**다: 매개변수 타입 이름이 정확히 일치해야 하고, `->`와 반환 타입도 정확히 일치해야 하며, 매개변수 개수와 쉼표 위치도 검사한다. 매개변수 *이름*은 자유다 — 매개변수 자리에 어떤 식별자든 허용되므로, 템플릿이 `(surface, light)`라고 써도 `fn bloxdTerrainLight(s, l)`이 컴파일된다. light 훅은 정확히 매개변수 두 개를 받는다.
-
-**예약 이름.** 규칙은 정규식 하나다: `/^bloxd/i`. `bloxd`로 시작하는 모든 식별자는 예약된다 — `bloxd*`는 모두 엔진 제공이며, 팩은 그 네임스페이스에 선언할 수 없다 (그래서 §44의 `bloxdPi` / `bloxdTau` 재선언이 충돌한다).
-
-**특수 함수.** v3에는 정확히 하나가 등록되어 있다:
-
-```js
-["bloxdOpaqueBehind", { returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }]
-```
-
-「특수」는 *매크로에 묶였다*는 뜻이다 — 가용성이 베리언트 심볼에 달린 엔진 함수다. 올바른 사용을 강제하는 가드 진단은 두 가지다:
-
-> `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — vertex 훅이 surface/light 전용 함수에 닿은 경우.
->
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예를 들어 `#ifdef BLOXD_SCENE_DEPTH`로 감싸지 않은 terrain 쪽 `bloxdOpaqueBehind()`.
-
-**엔진 헤더 (프렐류드), 고정.** v3 헤더는 `// Engine-provided and read-only, prepended to all packs. apiVersion 3.`로 시작하는 5,637바이트 문자열이다. 엔진 자체 WGSL 전처리기가 베리언트별로 평가하는 `#if` / `#ifdef` 지시문을 담는다 — 엔진은 실제로 `#if` 식 평가를 실행하며, 잘못된 식은 `Cannot evaluate #if ...`로 오류를 낸다. 이 가이드의 모든 구조체, 함수 시그니처, 인용 주석은 이 렌더링된 텍스트에서 나왔으므로, 가이드와 출하 헤더가 어긋날 수 없다. 전문은 §54 끝에 그대로 실린다.
-
-**작성자를 위한 파서 주의사항.**
-
-- 팩 쪽 함수는 엔진 셰이더에 병합될 때 `pack_` 접두사로 이름이 바뀐다 (충돌 회피). 진단은 이를 원래 이름으로 되돌린다 — [v2 마이그레이션 가이드](history/v2.md) §38이 설명하는 제2 검증 단계와 같은 메커니즘이다.
-- 미선언 식별자 메시지는 `'${name}' isn't declared. Packs can use their own names, WGSL built-ins and the Bloxd header.`다. `_ can only be the target of a phony assignment, as in _ = f();`와 `'${name}' is a WGSL keyword or reserved word, so it can't be a member name.`가 새로 확인된 메시지 집합을 이룬다.
-- 파서의 어휘 우주에는 **표준 WGSL이 아닌** 식별자도 들어 있다: `bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin`. 엔진은 이를 내장으로 알지만, 특정 브라우저의 WGSL 구현이 이를 제공한다고 보장할 수 없다 — 배포용 팩을 이것들에 기대어 만들지 말 것.
-
-### 54. 확인된 상수, 제한, 레이아웃
-
-프로덕션 Lite 렌더러에서 그대로 가져온 terrain 프로그램의 전체 리소스 레이아웃:
-
-| Binding | 내용 |
-|---|---|
-| `@group(0) @binding(0)` | `scene`: `LiteSceneUniforms` — `viewProjection` mat4x4f, `view` mat4x4f, `vEyePosition` |
-| `@group(1) @binding(0)` | `uniforms`: `TerrainFrameUniforms` — `uHeldLightColour` / `uHeldLightPos`, `uSkyLightColour`, `uAmbientLightColour`, **`vFogInfos`**, `vFogColor`, `outputHeight`, `sceneAmbient`, **`uDirLights: array<vec4f, 4>`** |
-| `@group(1) @binding(1)` | `chunks`: storage `array<vec4f>` — xyz = 렌더 프레임으로의 평행 이동, w = 페이드인 가시성 |
-| `@group(2) @binding(0)` | `material`: `vDiffuseColor`, `ambientAndCutoff`, `emissiveAndLevel`, `anim` |
-| `@group(3) @binding(0)` | `bloxdPackInputs` — 팩 uniform (§41) |
-| `@group(3) @binding(1)` | `bloxdSpSceneDepth` — 깊이 텍스처 (§51) |
-
-- **방향광은 최대 네 개로 하드 캡된다.** 씬이 더 등록하려 하면 렌더러는 `Terrain supports 4 directional lights, not ${n}`으로 오류를 낸다. `l.directional`은 존재하는 만큼 (0–4개, Bloxd 자체 씬은 2개 사용 — [라이팅 내부](internals/lighting-internals.md))의 Lambert 합이다. terrain은 또한 처리할 수 없는 light에 대해 다음과 같이 경고한다, 그대로 옮기면: 늦게 추가된 light — `Light "…" was added to the scene after startup; terrain and block models will ignore it. Add it in _initScene, alongside rendering.dirLights.`; 색이 입혀진 light — `Terrain directional light "…" is tinted (r, g, b); the per-vertex Lambert term carries one scalar per light and will render it as white.`; 메시 필터링 light — `Terrain directional light "…" filters which meshes it affects; the per-vertex Lambert term is written per material and cannot honour that, so terrain ignores it.`
-- **terrain 프로그램 이름**: 파이프라인 캐시 키는 `terrain-{texture}{-anim}{-test}{-lit}-dir{dirLightCount}{-packed}{-sp{packVariant}}{-liquid}`로 읽힌다 — 팩은 `-sp{variant}` 접미사로 나타나며, §46 베리언트마다 프로그램 하나다. 감시자 (`watchPipelineFailures`)는 살아 있는 파이프라인 이름을 `/^terrain-.*?(-lit)?-dir\d+(?:-packed)?-sp(\d+)(?:-liquid)?$/`와 대조해 파이프라인 컴파일이 실패하면 일치하는 팩 베리언트를 다시 검사한다; GPU 장치 손실 (`device.lost`)은 검사를 건너뛴다.
-- **`BLOXD_TERRAIN_DIRECTIONAL`은 엔진 내부 매크로**다 (dirLightCount > 0일 때 정의). 프렐류드의 네 매크로 중 하나가 아니며 팩 코드에 절대 도달하지 않지만, 엔진 자체 셰이더의 WGSL 덤프에는 나타나므로 알아 두면 혼동을 줄일 수 있다.
-- **light-level 디코드**: `aPackedLightLevels` 정점 속성은 니블 네 개를 담은 f32 하나이며, 각각 15로 나뉜다: rgb = 유색 블록 광, a = 스카이 / held 채널. vertex 단계는 이를 `vLightLevels` varying으로 디코드하고, `blockLight`는 `.rgb`를, 스카이 / held 채널은 `.w`를 읽는다. 엔진은 보간 전에 rgb 채널을 가장 밝은 채널의 35%로 바닥 처리한다 — [라이팅 내부](internals/lighting-internals.md)이 게임플레이에서 기록한 리프트의 엔진 쪽 기준점이다.
-- **`vTerrainLambert`** (`directional`의 공급원, §49)는 활성 방향광에 대한 합으로 생성된다: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, `BLOXD_TERRAIN_DIRECTIONAL`로 가드된다.
-- **인덱스 버퍼는 첫 대형 메시에서 32비트가 된다.** Lite 렌더러는 모든 인덱스 값이 65,534 이하로 유지되는 동안만 `Uint16Array` 인덱스를 고른다 — 어떤 인덱스든 65,535에 도달하는 순간 버퍼는 `Uint32Array`가 된다 (버퍼마다 `is32Bits` 플래그로 추적한다). 실제로는: 정점이 최대 65,535개인 청크 메시는 16비트 인덱스에 들어가고, 정확히 65,536개인 메시는 반드시 인덱스 65,535를 내보내 버퍼 전체가 32비트로 전환된다.
-- **manifest 로딩 세부**: `__MACOSX/` 아래 zip 항목, `._` 접두사 파일, `.DS_Store`는 필터링된다 (macOS 아카이브 노이즈). `pack.json`은 소문자 경로 비교로 찾는다 — 0개 일치 → `loadNoManifest`, 2개 이상 → `loadDuplicateManifest`; manifest 읽기는 65,536바이트로 제한된다.
-- **이 모든 것을 어떻게 검증했는가**: 프로덕션 번들의 모듈을 복원하고 (165개 청크; 이 번들의 webpack 레지스트리는 4,951개 모듈을 세지만 — 비동기 자식 의존성을 포함하는지에 따라 모듈 수는 몇 개씩 달라지므로 정확한 숫자는 번들별로 다루는 것이 좋다) Node.js의 webpack 호환 하네스에서 실행했다. 측정된 `HEADER_VERSION` (§53), 렌더링된 5,637바이트 헤더, 베리언트 표의 정규 순서, 특수 함수 맵은 모두 문자열을 읽은 것이 아니라 *출하된 코드를 실행*해 얻은 것이다. 같은 하네스는 커뮤니티 `pack_check` v6의 자연스러운 핵심이다 — 엔진 자체 검증기를 팩에 대해 실행하면 판정을 정확히 재현한다.
-#### v3 엔진 헤더, 그대로
-
-고정된 5,637바이트 (127줄) 텍스트 자체 — 위 §53이 설명한 그 유물이다 — 본 가이드가 대상으로 하는 v3 프로덕션 빌드 `3ymzdd`에서 그대로 복원했다. [v4 마이그레이션 가이드](history/v4.md) §67의 v4 헤더에 대한 v3 대응물이며 (현행 형태는 [텍스처 카탈로그](api/texture-catalog.md)), 같은 이유로 전체를 싣는다: v3 팩을 엔진이 실제로 앞에 붙인 바로 그 텍스트 기준으로 디버깅하고, 모든 v3 → v4 차이 ([v4 마이그레이션 가이드](history/v4.md) §58–§59)를 두 텍스트를 나란히 놓고 직접 읽을 수 있게 하기 위함이다.
-
-```wgsl
-
-// Engine-provided and read-only, prepended to all packs. apiVersion 3.
-
-// Half a turn and a full turn, in radians.
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// Per frame: the same for every vertex and fragment of a frame. The functions read bloxdPackInputs, the engine's
-// uniforms, which packs can't name. Any function can call them, not only a hook.
-
-// Seconds since the page loaded. In f32, so it counts in steps of under 1 ms for the first 4.5 hours, and of about
-// 4 ms from 9 to 18 hours. bloxdSeconds() % period counts from 0 up to period, then starts again.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Whole blocks: a render position plus this is a world position. It changes as the player travels, so render positions
-// stay close to the player, and so precise.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Unit, towards the sun, in world orientation; zero when the sky has no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// A render position's world position. In f32, so it loses fine detail far from the world's origin.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// The world block the face at a fragment's position and normal belongs to, exact anywhere: half a block back inside it.
-fn bloxdFaceBlock(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-// Bits of the hook inputs' blockFlags: what a face's block is and what it's made of. A block made of several materials
-// has each, as sandstone is sand and rock, so leaves are vegetation and not dirt. Test one with
-// (blockFlags & bloxdBlockFlagRock) != 0.
-const bloxdBlockFlagOpaque: u32 = 1;     // Fully opaque, leaves and ice included. Not glass, water, lava, spawners, or ghost and invisible blocks.
-const bloxdBlockFlagEmissive: u32 = 2;   // Gives off block light, as neon, portals, lamps, Lava and Beacon do. Glowing ores count, however faint.
-const bloxdBlockFlagVegetation: u32 = 4; // Leaves, and the grass on grass blocks, which are dirt too. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagDirt: u32 = 8;       // Dirt and soil, grass blocks included. Rocky Dirt is rock too.
-const bloxdBlockFlagSand: u32 = 16;      // Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagRock: u32 = 32;      // Stone and its kinds, andesite, diorite, granite, gravel, ores, sandstone, Rocky Dirt, bedrock, obsidian and magma.
-
-struct BloxdVertexIn {
-    position: vec3f,     // A render position: world minus bloxdRenderOffset().
-    normal: vec3f,
-    blockFlags: u32,     // What kind of block this face is: bloxdBlockFlag* bits, the same across the face.
-}
-
-struct BloxdVertex {
-    position: vec3f,     // A render position.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,       // Texture * vertex colour (tint * AO).
-    alpha: f32,
-    normal: vec3f,
-    position: vec3f,     // A render position; see bloxdWorldPosition and bloxdFaceBlock.
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdSurface {
-    colour: vec3f,
-#ifdef BLOXD_ALPHA
-    alpha: f32,
-#endif
-    emission: vec3f,     // Added after lighting, then fogged.
-}
-
-struct BloxdLightIn {
-    litColour: vec3f,    // The engine's lit result for this fragment, from the surface hook's colour: before emission and fog.
-    directional: f32,    // Summed Lambert from the scene's directional lights (0 when off).
-    ambient: vec3f,      // Ambient light, added to directional.
-    blockLight: vec3f,   // Voxel block light, tone-mapped; 0 without BLOXD_LIGHTING.
-    skyLight: f32,       // Voxel sky light, tone-mapped; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // White without BLOXD_LIGHTING.
-    skyLightColour: vec3f,     // White without BLOXD_LIGHTING.
-    heldLight: vec3f,    // Held light here, tone-mapped like blockLight, before the ambient boost; 0 out of reach
-                         // or without BLOXD_LIGHTING.
-    fogColour: vec3f,    // The game's fog colour. Bloxd's games always have fog, pushed far out when the player
-                         // turns it off; black only in a scene with no fog at all.
-    fogVisibility: f32,  // 1 = no fog, 0 = fully fogged.
-    position: vec3f,     // As in BloxdSurfaceIn.
-    normal: vec3f,
-    blockFlags: u32,     // As in BloxdVertexIn.
-}
-
-struct BloxdLight {
-    colour: vec3f,
-}
-
-// Returned by bloxdOpaqueBehind(), which surface and light hooks may call where BLOXD_SCENE_DEPTH is defined.
-struct BloxdOpaqueBehind {
-    found: bool,         // False where nothing opaque is behind (sky).
-    position: vec3f,     // A render position; meaningless when !found.
-    distance: f32,       // From the eye; meaningless when !found.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Fogs colour as the engine fogs this fragment.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(light.fogColour, colour, light.fogVisibility);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
----
-
-조사: ltf_ahel (glm 을 사용해 조사)
-
-
----
-
 ## API v4 마이그레이션 가이드
-> 버전: 4 · 상태: Historical (해당 시기의 마이그레이션 가이드; 대상 빌드는 본문에 명시)
-> **2026-11-03 대체됨: 현행 API는 버전 5** — v4 팩은 여기서 v3에 대해 서술한 것과 똑같이 로드 시 거부된다. 이 가이드를 적용한 뒤 [v5 마이그레이션 가이드](history/v5.md)를 적용할 것 (v4 → v5: `BloxdFlags` 구조체가 `blockFlags`를 대체, `bloxdLit()`와 공개 조명 레시피, 인챈트/오버레이 입력, 9-훅 기본 팩). 이 가이드의 내부 분석 (§56–§66)은 측정 대상이었던 v4 빌드에 대해서는 정확한 상태로 남는다.
 
-대상 빌드: `cnty9.main.669f8081.js` — **2026-10-26부터 프로덕션과 프리프로드에 동시 적용**. v3 롤아웃 (프리프로드 빌드를 프로덕션으로 승격)과 달리 v4는 한 번의 조치로 양쪽 환경을 같은 새 번들로 전환했고, 두 번들은 바이트 단위로 동일하다 (메인과 모든 셰이더 팩 청크를 md5로 확인), 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. 번들도 이 릴리스를 전후로 재구성되었다 — 메인 번들은 4.73 MB에서 3.03 MB (-36%)로 줄었고, 청크 수는 169에서 193으로 늘었으며, 셰이더 팩 파이프라인 전체 (로더, 검증기, 코드 제너레이터, WebGPU 컴파일러)는 이제 연속된 c49–c54 클러스터에 자리한다. 팩 모델 자체는 형태를 유지한다: 같은 `pack.json` 필드, 같은 로더 제한, 같은 64 B uniform, 같은 6개 훅.
-
-**`tcwczu.main.357faec1.js` (2026-10-30, 프로덕션과 프리프로드가 다시 바이트 동일)로 재검증: v4 API 면 전체는 불변.** 엔진 헤더 (디코딩 6,021 B), 기본 팩 템플릿 (출시 형태 1,122 B), 27개 `bloxdSp*` 심볼, blockFlags 비트, 로더 제한, 12개 allow 타이틀은 모두 이 가이드가 기록한 `cnty9` 기준과 바이트 단위로 동일하다 — v4 동결은 v4 이후 첫 번째 번들 갱신까지 유지됐다. 번들 구성은 계속 움직였다: 메인 번들은 3.28 MB로 커졌고, 청크 맵은 202개 id (195개 출력)가 되었으며, 셰이더 파이프라인 클러스터는 c51–c56 (기본 팩은 c124)로 옮겨갔고, §66의 리프트/콘 상수에 대한 「청크 c8」 참조는 이제 c9이다. 그 어느 것도 팩에는 보이지 않는다. 이 재검증에서 다시 재지 *않은* 것은 텍스처 이름 레지스트리 (§68)뿐이다: `cnty9`의 id는 스냅샷으로 남으며, 이름이 여전히 안정적인 API다.
 
 이 릴리스 전후로 번들 밖에서 바뀐 것이 하나 있다: **엔진이 참조 파일을 이름으로 인용한다.** 엔진 자신의 에러 메시지가 `bloxd-api.wgsl` (주석 달린 엔진 헤더)과 `BLOCK_TEXTURES.md` (텍스처 이름 전체 목록)을 가리킨다 — `...BLOCK_TEXTURES.md lists them.` 이 가이드는 그 두 파일을 다른 곳으로 안내하는 대신 내용을 싣는다: 라이브 빌드에서 그대로 복원한 완전한 헤더는 [엔진 내부와 연구: 엔진 헤더](internals/engine-header.md)에, 사용 가능한 텍스처 이름의 완전한 카탈로그 (v4 빌드에서 905개)는 [텍스처 카탈로그](api/texture-catalog.md)이다. 이 가이드의 팩 대면 사실은 모두 프로덕션 번들에서 복원했다.
 
@@ -7545,7 +5833,6 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 
 ### 60. strict 게임 계약: 버텍스 훅, `discard`, 엑스레이
 
-strict 게임은 예외가 아니라 규칙이다: **모든 것이 기본적으로 strict**이며, [게임별 셰이더 팩 정책](internals/policy.md)에 열거된 12개 allow 타이틀만 빠져나간다 (v4 번들에서 2026-10-27 다시 그대로 확인 — 같은 12 타이틀: Test Gym, Doodle Cube, Rocket Obby, Creative, Bloxd Hop, Fishing, Dress Up, Evil Tower, Plots, Test Mode, Tsunami Steal Brainrots, Work at a Restaurant; 그 외 모든 타이틀 — 서바이벌, 배드워즈, 스카이워즈, 커스텀 게임, ... — 은 strict다). v4는 지금까지 문서 수준의 계약이었던 것을 **강제되는** 계약으로 바꾼다: 번들 내장 검증기가 모든 strict 배리언트를 분석해 전용 진단을 낸다.
 
 #### 60.1 강제되는 두 규칙과 그 정확한 진단
 
@@ -7652,1507 +5939,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **자동 재검사가 이제 텍스처 레지스트리 변화에도 발동한다** (§65.1) — 레지스트리 해시가 HEADER_VERSION에 합류한 결과다. 헤더 텍스트가 변하지 않았더라도, 단지 *텍스처를 추가*하기만 하는 엔진 업데이트로도 저장 팩이 「재확인 필요」로 넘어갈 수 있다. 의도된 동작이다: 당신의 `bloxdTextureId*` 상수는 검증 시점에 굳어진다.
 - **`bloxdSp*` 예약이 27 심볼로 확장됐다** (§63.4) — 생성된 셰이더 안쪽의 엔진 전용 네임스페이스. 팩 수준의 예약 규칙은 불변이고 더 넓다: `/^bloxd/i` (대소문자 무시) 에 맞는 것은 무엇이든 예약이다.
 
-### 63. 엔진 내부: `bloxdTexel`은 실제로 어떻게 샘플링하는가
-
-v3의 §49–§51과 마찬가지로, 이하는 프로덕션 번들 (청크 c54의 코드 제너레이터, 빌드 `cnty9`, 2026-10-26) 에서 그대로 복원했으며, 이 메커니즘에 대해 공개된 가장 깊은 기술이다. §57의 어떤 내용도 이 스니펫들이 증명하는 것을 넘지 않는다.
-
-#### 63.1 생성된 함수, 그대로
-
-아틀라스 텍스처 모드이고 애니메이션이 없는 렌더러 구성에서, 엔진은 정확히 이것을 뿜는다:
-
-```wgsl
-var<private> bloxdSpTextureRotation: u32;
-@group(3) @binding(2) var<storage, read> bloxdSpTextureLayers: array<u32>;
-
-fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
-    return textureDimensions(textureAtlas0,
-        u32(clamp(round(bloxdSpMipLevel), 0.0,
-                  f32(textureNumLevels(textureAtlas0) - 1u))));
-}
-
-fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
-    if (bloxdSpTextureId == 0u) {
-        return vec4f(1.0);
-    }
-    // Each quarter turn clockwise the face shows its texture at reads the
-    // unturned texture at (v, 1 - u)
-    var bloxdSpTurned = bloxdSpUv;
-    if (bloxdSpTextureRotation == 1u) {
-        bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
-    } else if (bloxdSpTextureRotation == 2u) {
-        bloxdSpTurned = 1.0 - bloxdSpUv;
-    } else if (bloxdSpTextureRotation == 3u) {
-        bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
-    }
-    let bloxdSpLayer = bloxdSpTextureId - 1u;
-    return textureSampleLevel(textureAtlas0, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer, round(bloxdSpMipLevel));
-}
-```
-
-아틀라스가 둘 이상이면 꼬리는 레이어 창 사다리가 된다 — 아틀라스 *k*는 레이어 `[k * layersPerAtlas, (k+1) * layersPerAtlas)`를 소유한다:
-
-```wgsl
-    if (bloxdSpLayer < 2u * layersPerAtlas) {
-        return textureSampleLevel(textureAtlas1, atlasSampler, bloxdSpTurned,
-                                  bloxdSpLayer - layersPerAtlas, round(bloxdSpMipLevel));
-    }
-    // ... one rung per atlas, the last one unguarded ...
-    return textureSampleLevel(textureAtlasLast, atlasSampler, bloxdSpTurned,
-                              bloxdSpLayer - N * layersPerAtlas, round(bloxdSpMipLevel));
-```
-
-이것이 증명하는 것: `textureId`는 **모든 아틀라스를 통틀은 전역 1-베이스 레이어 인덱스**이며 (`bloxdSpLayer = textureId - 1u`), `bloxdTextureSize`는 아틀라스 0만 읽는다 — 모든 아틀라스 티어가 치수를 공유하므로 유효하다.
-
-#### 63.2 프래그먼트의 텍스처 4조는 어디서 오는가
-
-버텍스별 속성 `texAtlasIndices` (기하의 텍스처 슬롯 인덱스) 는 **스토리지 버퍼를 통해** 해석되며, 직접 쓰이지 않는다:
-
-```wgsl
-// vertex stage (injected):
-vertexOutputs.vPackTexture = bloxdSpTextureLayers[
-    min(u32(vertexInputs.texAtlasIndices), arrayLength(&bloxdSpTextureLayers) - 1u)];
-```
-
-`bloxdSpTextureLayers`는 JS 쪽에서 채워진다, 슬롯당 `u32` 하나, 정확히 이렇게 패킹된다:
-
-```js
-layers[slot] = (id & 0xffff) | ((rotation & 3) << 16);
-```
-
-프래그먼트 스테이지는 surface 훅이 돌기 전에 두 절반을 풀어낸다:
-
-```wgsl
-// fragment stage (injected, ahead of the surface hook):
-let bloxdSpTexture = fragmentInputs.vPackTexture;
-bloxdSpTextureRotation = bloxdSpTexture >> 16u;      // -> textureRotation field
-// BloxdSurfaceIn constructor tail:
-//   bloxdSpTexture & 0xffffu,        // textureId
-//   bloxdSpTextureRotation,          // textureRotation
-//   fragmentInputs.vMainUV1,         // uv
-//   bloxdSpMipLevel                  // mipLevel (derived below)
-```
-
-그리고 밉은 엔진이 자기 것을 유도하는 방식과 정확히 같이 유도된다:
-
-```wgsl
-let bloxdSpTexelUV = fragmentInputs.vMainUV1 * atlasWidth;
-let bloxdSpDdx = dpdx(bloxdSpTexelUV);
-let bloxdSpDdy = dpdy(bloxdSpTexelUV);
-let bloxdSpLod = 0.5 * log2(max(max(dot(bloxdSpDdx, bloxdSpDdx),
-                                    dot(bloxdSpDdy, bloxdSpDdy)), 1e-10));
-let bloxdSpMipLevel = clamp(bloxdSpLod, 0.0,
-                            f32(textureNumLevels(textureAtlas0) - 1u));
-```
-
-새겨 둘 만한 귀결이 두 가지 있다: 회전은 정말로 **슬롯별 기하 데이터**라는 것 (어디에도 텍스처별 회전 조회는 없다 — 이것이 §57.4의 미묘함이 존재하는 *이유*다), 그리고 (팩 없는) *기본* 지형 셰이더는 아틀라스를 다르게 샘플링한다는 것 — 미리 회전해 둔 레이어 복사본을 날것의 uv로 직접 쓰는 반면, 팩 경로는 회전 안 된 레이어로 정규화해서 `bloxdTexel`이 회전을 다시 적용한다. 같은 픽셀, 두 개의 표현이다.
-
-#### 63.3 애니메이션: 프레임 사다리
-
-애니메이션 텍스처에서는 레이어 할당에 프레임 계산이 하나 자라난다 (이것이 *전부* 다른 점이다 — 샘플링, 회전, 밉 논리는 불변이다):
-
-```wgsl
-    let atlasIdxIn = f32(bloxdSpTextureId - 1u);
-    let animTick = material.anim.x;               // animation clock
-    let animTickStride = material.anim.y;
-    let numAnimTextures = material.anim.z;
-    let animParamIndex = 3.0 * min(numAnimTextures, floor(atlasIdxIn));
-    let animStateMask = animDataPerTex[i32(animParamIndex)];        // frames - 1
-    let animTexIndexStart = animDataPerTex[i32(animParamIndex + 1.0)];
-    let animInterval = max(animTickStride, animDataPerTex[i32(animParamIndex + 2.0)]);
-    let animTickForTex = floor((animTickStride / animInterval) * animTick);
-    let animState = animTickForTex
-        - (animStateMask + 1.0) * floor(animTickForTex / (animStateMask + 1.0));
-    let isAnimTex = min(1.0, animState);
-    let bloxdSpFrame = (1.0 - isAnimTex) * atlasIdxIn
-                     + isAnimTex * (animTexIndexStart + animState - 1.0);
-    let bloxdSpLayer = u32(round(bloxdSpFrame));
-```
-
-`animDataPerTex` (그룹 2, `array<f32>`) 는 애니메이션 텍스처마다 `{mask, startLayer, interval}` 삼중항을 하나씩 나르며, 프레임 수는 **2의 거듭제곱으로 센다** (JS 쪽 빌드 검사가 2의 거듭제곱이 아닌 프레임 수를 `<block> has N animation states, which is not a power of 2`로 거부한다), 정적 센티넬 설계 덕분에 비애니메이션 인덱스도 분기 없이 같은 연산으로 해석된다. 팩 대면 요약, 다시 한 번: *id는 안정적이고, 프레임은 자동이다.* 인터벌은 엔진 콘텐츠이며, `cnty9`에서 실측하면 정확히 세 값을 가진다 — 200 ms (`lava`, `toxic_waste`, `radar_screen`), 250 ms (`smoke`, `homestead_core_mid`, 기계 `*_running` 패밀리들), 300 ms (열일곱 개의 포털, `toxic_waste_barrel_top`) — 패밀리별 칼럼은 §68.4에 있다.
-
-#### 63.4 `bloxdSp*` 네임스페이스 — 27 심볼 전부
-
-제너레이터가 당신의 셰이더에 주입할 수 있는 모든 것, 즉 당신이 다시 선언할 수 없는 모든 것 (팩 수준의 `/^bloxd/i` 예약이 대부분을 무의미하게 만들지만, 엔진 소스를 읽는 사람을 위해 이것이 제너레이터의 템플릿에서 뽑은 완전한 v4 세트다):
-
-`bloxdSpBehind` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpEye` · `bloxdSpFrame` · `bloxdSpLayer` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLitColour` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpPixel` · `bloxdSpPositionW` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpZ`
-
-#### 63.5 완전한 바인드 그룹 레이아웃 (Lite 렌더러, 팩 배리언트)
-
-| 그룹 | 바인딩 | 리소스 | 비고 |
-|---|---|---|---|
-| 0 | 0 | `uniform` 씬 | `LiteSceneUniforms` — viewProjection / view / vEyePosition |
-| 1 | 2–3 | `storage` quads, quadLight | 청크 기하 |
-| 2 | 0 | `uniform` 머티리얼 | `TerrainMaterialUniforms`; `anim`이 §63.3을 구동 |
-| 2 | 1+ | `storage` `animDataPerTex` | 애니메이션 텍스처 삼중항 (애니메이션 구성만) |
-| 2 | next | `textureAtlas0..N-1` | `texture_2d_array<f32>`, 텍스처마다 레이어 하나 |
-| 2 | next | `sampler atlasSampler` | `bloxdTexel`이 쓰는 유일한 샘플러 |
-| 3 | 0 | `uniform bloxdPackInputs` | 팩의 64 B 프레임당 uniform (§56) |
-| 3 | 1 | `texture_2d<f32>` 씬 깊이 | 액체 프로그램; `bloxdOpaqueBehind()`의 기반 (§51) |
-| 3 | 2 | `storage bloxdSpTextureLayers` | id+회전 테이블 (§63.2) |
-
-그룹 3은 팩의 그룹이다: 엔진이 제공하는 슬롯 세 개이며, 어느 것도 팩 코드가 이름을 지을 수 없다.
-
-### 64. 텍스처 이름 레지스트리
-
-엔진은 세션마다 한 번 블록 레지스트리에서 이름 카탈로그를 만든다 — 텍스처 팩 시스템의 `textureNameToIndex`를 만들어 낸 것과 같은 파이프라인이다. 빌더 (번들의 모듈 28833), 의사코드로 복원:
-
-```
-for each (name, index) in textureNameToIndex:           # e.g. ("lava0", 0), ("radar_screen0[rot[2", 19)
-    if name matches /(.*)\[rot\[([1-4])$/ :              # a turned copy slot
-        turnedSlot → { id: rootUnturnedId, rotation: N-1 }   # §63.2's table entry
-        register alias: name  → root,  kind "rotation"
-    else if index is an animation frame (not the base):  # via animDataPerTex
-        register alias: name  → base,  kind "frame"
-    else:
-        canonical name = strip trailing "_?0" if this texture is animated
-        named[canonical] = index + 1                     # the bloxdTextureId* value
-```
-
-작가에게 중요한 규칙, 중복을 제거하면:
-
-1. **사용 가능한 이름은 정규명이다**: 애니메이션 베이스는 프레임 접미사를 떨어뜨리고 (`lava0` → `lava`), 회전 패밀리는 루트로 접히며 (`chest_top[rot[1..4]` → `chest_top`), 두 접기는 합성된다 (`radar_screen0[rot[1..4]` → `radar_screen`, 이 패밀리는 애니메이션이기도 하므로). 그 외의 모든 파일 이름은 그 자체가 이름이다. 상수 표기는 정규명을 CamelCase화한다 (§57.3).
-2. **프레임·회전 별칭은 알려져 있고 에러로 설명된다** — 하나를 쓰면 「이걸 말했나?」 추측이 아니라 전용 프레임/회전 메시지를 받는다 (§57.3). 의도적인 API 설계다: `bloxdTexel`이 애니메이션과 회전을 모두 대신 처리하므로, 프레임이나 회전 복사를 직접 지목하는 것은 언제나 잘못된 선택이다.
-3. **모호함은 이름을 죽인다**: 같은 대소문자/언더스코어 무감각 키로 접히는 두 이름은 둘 다 사용 불가다 (`could name X and Y ... it can't be used`). 드물지만 실재한다 — 기대한 이름이 §68 카탈로그에 없다면 이것이 이유 중 하나다.
-4. **id는 1-베이스이고 「아틀라스 레이어 + 1」과 같다**; 텍스처 없음 id 0은 흰색으로 예약되어 있다.
-
-라이브 레지스트리에서 실측 (빌드 `cnty9`, 2026-10-27, 출하된 데이터에 엔진 자신의 빌더 모듈을 돌려서): **아틀라스 엔트리 1,219개**, **57개 회전 패밀리** (회전 표기 228개) 와 **42개 애니메이션 패밀리** (프레임 표기 188개) 를 접고, **905개 사용 가능한 명명 상수**가 남는다 — 이름별 id와 두 패밀리 표를 갖춘 완전한 목록은 아래 §68로 들어 있다 (그리고 현재형으로는 [텍스처 카탈로그](api/texture-catalog.md)). §65.1의 레지스트리 해시 기구가, 이 숫자들이 흘러가도 굽어진 `bloxdTextureId*` 값이 조용히 낡아버리는 일을 막는다.
-
-### 65. 검증 내부 v4: HEADER_VERSION, 레지스트리 해시, 특수 함수
-
-#### 65.1 HEADER_VERSION이 두 번째 해시를 얻는다
-
-v3 형식은 5개 입력에 대한 `6.<fnv1a32>`였다 (§53). v4는 같은 5개 입력 — 배리언트별 헤더 토큰, 파서의 어휘 우주, 4개 매크로 이름, 특수 함수 맵, `BloxdPackInputs` 선언 — 을 유지하지만 접두사가 `8.`로 옮겨지고, **두 번째 FNV-1a-32가 추가로 붙는다 — 텍스처 레지스트리 전체의 정렬된 `"<name> <id>"` 목록에 대한 해시다**:
-
-```
-v2 (sjr0p7):   6.bc5e8338
-v3 (3ymzdd):   6.5bc26a63
-v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the bundle
-```
-
-(구체적인 v4 해시는 이 가이드를 위해 측정하지 않았다 — 런타임에 계산되는 값이므로 — 하지만 형식은 정확하며, 위의 v2/v3 값은 이전에 공개된 측정값이다. 엔진 업데이트 뒤의 팩 설정 화면이 현재 값을 보여 준다.)
-
-중요한 것은 귀결이다: **저장된 팩의 저장 검증은 이제 텍스처 레지스트리가 변할 때도 무효화된다** — 엔진이 텍스처를 추가하거나, 이름을 바꾸거나, 순서를 바꿀 때 — 당신의 `bloxdTextureId*` 비교가 낡은 레지스트리를 기준으로 해석됐기 때문이다. v3가 헤더 편집에 발동하던 「재확인 필요」 흐름에, 두 번째이자 콘텐츠 구동인 트리거가 생겼다. 작가는 여기에 대해 아무것도 할 필요가 없고 (엔진이 자동으로 재검증한다); 배포자는 그저 이것을 예상하면 된다.
-
-#### 65.2 예약 이름, 다시, 정확하게
-
-규칙은 정규식 `/^bloxd/i` — **대소문자 무시**이므로 `BloxdFoo`도 `bloxdFoo`만큼 예약이며, `bloxdTextureIdAnything`은 아무것도 가리키지 않을 때조차 여기에 든다 (그래서 §57.3의 오기 접두사 진단이 자기만의 메시지 패밀리로 존재한다). §63.4의 27-심볼 `bloxdSp*` 세트는 생성된 코드 안쪽에 있는 엔진 측 짝이다.
-
-#### 65.3 특수 함수: 이제 세 개
-
-검증기의 특수 함수 레지스트리는 v3의 1항목에서 3개로 자랐다 — 텍스처 API의 두 함수가 깊이와 함께 등록된다:
-
-```js
-[
-  ["bloxdOpaqueBehind", { params: "", returns: "BloxdOpaqueBehind", symbol: "BLOXD_SCENE_DEPTH" }],
-  ["bloxdTexel",        { params: "textureId: u32, uv: vec2f, mipLevel: f32", returns: "vec4f", symbol: null }],
-  ["bloxdTextureSize",  { params: "mipLevel: f32", returns: "vec2u", symbol: null }]
-]
-```
-
-`symbol: null`은 「배리언트 게이트 없음」을 뜻한다 — 함수가 존재하는 곳 (surface/light 훅) 이면 어디서든 호출할 수 있다. 두 「reaches」 진단은 그대로 이어지며, 이제 텍스처 오용도 덮는다:
-
-> `${hook} reaches ${name}, which only surface and light hooks can use.` — 예: 버텍스 훅에서의 `bloxdTexel`.
->
-> `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예: 랩 없이 지형 훅에서 호출하는 `bloxdOpaqueBehind()` (v3 §53에서 불변).
-
-#### 65.4 v3 §53에서 그대로 이어지는 것들
-
-훅 서명 검사 (타입은 토큰 정확, 이름은 자유 — 세 서명 항목은 v3와 바이트 동일), 진단 매핑이 딸린 `pack_` 접두사 개명, 미선언 식별자 메시지 패밀리, 파서의 추가 어휘 우주 (`bufferView`, `bufferArrayView`, `bufferLength`, `atomicStoreMax`, `atomicStoreMin` — 여전히 브라우저에서 보장되지 않는다), 그리고 2단계 검증 (내장 파서, 그다음 브라우저의 WGSL 컴파일러 — 여전히 더 엄격하다; §38의 교훈은 유효하다).
-
-### 66. 확인된 상수·제한·레이아웃 (v4)
-
-가이드의 측정 장부에 있는 v4 행 — 날짜가 명시되지 않는 한, 여기 모든 것은 `cnty9` (2026-10-26, prod = preprod, 바이트 동일) 에서 측정했다:
-
-| 항목 | 값 |
-|---|---|
-| `apiVersion` | `4` (엄격 `===`, 숫자) |
-| 엔진 헤더 | 6,021 B / 150 줄; 첫 줄 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.` — 전문은 §67에 내장 |
-| 훅 | 6 (지형/액체 × 버텍스/surface/light); 템플릿은 주석 다듬기뿐 |
-| 배리언트 | 8 (strict × 조명 × 프로그램); 이름 `strict\|allow.lit\|unlit.terrain\|liquid` |
-| 매크로 | `BLOXD_STRICT` (strict) · `BLOXD_LIGHTING` (조명 on) · `BLOXD_ALPHA` (모든 액체 + 비 strict 지형) · `BLOXD_SCENE_DEPTH` (모든 액체) |
-| 팩 uniform | `@group(3) @binding(0)`, 64 B: seconds@0, renderOffset@16, sunDirection@32, eyePosition@48 |
-| 팩 바인딩 | 그룹 3: 0 uniform · 1 씬 깊이 (액체) · 2 `bloxdSpTextureLayers` 스토리지 |
-| blockFlags 비트 | opaque 1 · emissive 2 · vegetation 4 · dirt 8 · sand 16 · rock 32 (불변; §42의 이름 규칙은 그대로 이식됨) |
-| 로더 제한 | 256 `.wgsl` / 256 KB 소스 / 64 KB `pack.json` / 32 MB zip / 1,024 zip 엔트리; UTF-8; 매니페스트 1개; 경로 유일 |
-| 텍스처 레지스트리 | 1,219 엔트리 (2026-10-27 실측, 빌드 `cnty9`) → 905개 사용 가능 이름; 완전한 카탈로그: 아래 §68 (현재형: [텍스처 카탈로그](api/texture-catalog.md)) |
-| 라이트 곡선 | 0–15 레벨 → 이즈아웃 곡선으로 0–1 (`6 → 0.45`, `12 → 0.92`) — 헤더 내, 불변 |
-| 리프트 곡선 | `1 - (1 - x / (3 - 2x))^3` — 불변, 이제 청크 c8 |
-| 방향 콘 | `0.12 / 0.65 / 0.62 / 0.95` — 불변, 이제 청크 c8 |
-| 포그 색 | `vec3f(183/255, 191/255, 195/255)` — 불변; `fogAlpha`가 v4의 이름 (§59.1) |
-| 예약 이름 | `/^bloxd/i` (대소문자 무시) + 27 `bloxdSp*` 엔진 심볼 |
-| HEADER_VERSION | `8.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 타이틀 | [게임별 셰이더 팩 정책](internals/policy.md)의 12개 allow 타이틀 외 전부 (2026-10-27 재확인, 불변) |
-
-
----
-
-### 67. 완전한 v4 엔진 헤더, 그대로
-
-엔진이 모든 팩 앞에 붙이는 6,021바이트·150줄 헤더, `cnty9`에 출시된 그대로 — 첫 줄이 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`로 열리는 바로 그 텍스트다 (§66). 팩 작가가 엔진이 자신을 대신해 무엇을 선언하는지 궁금해할 일이 없도록 여기 전문을 싣는다: 호출해도 되는 모든 자유 함수, 비교할 수 있는 모든 `const`, 모든 필드와 주석을 갖춘 두 입력 구조체가 엔진 순서 그대로 아래에 있다.
-
-이 텍스트에 없고 애초에 없었던 것이 둘 있다 — 팩마다 앞에 붙는 게 아니라 렌더러 구성별로 컴파일 시점에 생성되기 때문이다: `bloxdTexel`/`bloxdTextureSize` 쌍 (§63.1에 생성된 WGSL 전문) 과 27개 `bloxdSp*` 엔진 심볼 (§63.4). `BloxdSurface`와 `bloxdDefaultSurface`에 보이는 `#ifdef BLOXD_ALPHA` 게이트는 엔진 자신의 프리프로세서가 배리언트별로 해석한다 — 정규 텍스트는 게이트를 유지하며, 어느 배리언트가 그것을 정의하는지는 §59.1/§56가 설명한다.
-
-```wgsl
-
-// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.
-
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// These functions return 1 value per frame, the same for every call site.
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Changes as the player travels, so render positions stay close to 0,0,0.
-// Integer distance, in blocks. Render position + this offset = world position.
-// See bloxdWorldPosition for how this can be used.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// This unit vector points towards the sun, in world orientation; 0 when no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// Seconds since the page loaded. As an f32, it has sub-millisecond precision
-// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Each bit of the binary representation of blockFlags is a flag corresponding
-// to a collection of blocks. The collections overlap, so blocks can be in 0-2+.
-// (blockFlags & bloxdBlockFlagRock) != 0 // The block has this flag.
-// (blockFlags & bloxdBlockFlagRock) == 0 // The block doesn't have this flag.
-
-// Opaque blocks, leaves and ice included. Not glass, water, spawners, etc.
-const bloxdBlockFlagOpaque: u32 = 1;
-
-// These blocks emit light, e.g. neon, portals, lamps, lava, and glowing ores.
-const bloxdBlockFlagEmissive: u32 = 2;
-
-// 'Leafy', e.g. leaves, and grass blocks. Not cacti, mushroom blocks or hay.
-const bloxdBlockFlagVegetation: u32 = 4;
-
-// Dirt and soil, grass blocks included. Rocky Dirt is both dirt and rock.
-const bloxdBlockFlagDirt: u32 = 8;
-
-// Sand, Red Sand, and every sandstone, which is rock too.
-const bloxdBlockFlagSand: u32 = 16;
-
-// Stone variants, and more, e.g. gravel, ores, sandstone, magma and obsidian.
-const bloxdBlockFlagRock: u32 = 32;
-
-// Convert a render position to a world position, with possible f32 inaccuracy.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-// Using a fragment's position and normal, identify the block's world position.
-fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i {
-    return vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset();
-}
-
-struct BloxdVertexIn {
-    position: vec3f, // Render position.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-}
-
-struct BloxdVertex {
-    position: vec3f, // The render position output.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,   // RGB colour = texture * tint * ambient occlusion.
-    alpha: f32,      // Opacity.
-    normal: vec3f,   // Unit vector direction pointing away from the face.
-    position: vec3f, // Render position.
-    blockFlags: u32, // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdSurface {
-    colour: vec3f,   // RGB colour output.
-#ifdef BLOXD_ALPHA
-    alpha: f32,      // Opacity output.
-#endif
-    emission: vec3f, // Emissive RGB output, added after lighting, before fog.
-}
-
-// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
-// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
-struct BloxdLightIn {
-    litColour: vec3f,  // RGB surface colour, lit, before emission and fog.
-    directional: f32,  // Summed Lambert from directional lights; 0 when off.
-    ambient: vec3f,    // RGB ambient colour, added to directional light.
-    blockLight: vec3f, // RGB block light; 0 without BLOXD_LIGHTING.
-    skyLight: f32,     // Sky light; 1 without BLOXD_LIGHTING.
-    ambientLightColour: vec3f, // Minimum RGB light; 1 without BLOXD_LIGHTING.
-    skyLightColour: vec3f, // RGB colour of skyLight; 1 without BLOXD_LIGHTING.
-    heldLight: vec3f,  // 0 without BLOXD_LIGHTING. 0 with no light source held.
-    fogColour: vec3f,  // The game's RGB fog colour. 0 when the game has no fog.
-    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
-    position: vec3f,   // Render position.
-    normal: vec3f,     // Unit vector direction pointing away from the face.
-    blockFlags: u32,   // What kind of block. See bloxdBlockFlag*.
-
-    // These are 0 if the face has no texture.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // Texture coordinates in blocks; fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdLight {
-    colour: vec3f, // RGB colour output.
-}
-
-struct BloxdOpaqueBehind {
-    hit: bool,       // False where nothing opaque is behind (sky).
-    position: vec3f, // The render position; 0 when !hit.
-    distance: f32,   // From the camera; 0 when !hit.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-#ifdef BLOXD_ALPHA
-    return BloxdSurface(surface.colour, surface.alpha, vec3f(0.0));
-#else
-    return BloxdSurface(surface.colour, vec3f(0.0));
-#endif
-}
-
-// Applies this fragment's fog to colour, as the engine does.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(colour, light.fogColour, light.fogAlpha);
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    return BloxdLight(bloxdApplyFog(light.litColour + surface.emission, light));
-}
-```
-
-### 68. 텍스처 카탈로그 전체 (905개 이름, 실측)
-
-#### 68.1 읽는 법
-
-**이름** 열은 레지스트리명 — 실제로 코드에 쓰는 핸들이다. 상수 철자는 그 이름을 `_`와 `-` 경계에서 CamelCase화한 것으로, §57.3이 문서화한 규칙을 정확히 따른다: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`, `chest_double_top_1_lo` → `bloxdTextureIdChestDoubleTop1Lo`. 이름이 곧 API다 — 검증기가 로드 시 라이브 레지스트리에 대해 다시 해석하므로, 이름은 레지스트리 드리프트를 견딘다.
-
-**id** 열은 그 상수가 비교되는 값 — 아틀라스 레이어 + 1, `cnty9`에서 실측했다. `surface.textureId` 덤프를 해독하고 디버그 출력을 판독하는 데, 그리고 오작동하는 팩을 오늘의 빌드와 교차 확인하는 데 쓴다. WGSL에 하드코딩하지 마라: 이 값은 한 빌드의 아틀라스 순서 스냅샷이다 (그것이 얼마나 빨리 움직이는지는 §68.5가 보여 준다).
-
-**참고** 열은 접힌 두 패밀리를 표시한다. `animated (N frames)`는 이 이름을 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다는 뜻이다 — 프레임 접미사를 절대 쓰지 마라 (`lava0`, `radar_screen2`는 전용 진단이 딸린 알려진 별칭이다). `turned (4 rotated copies)`는 그 텍스처가 미리 회전된 아틀라스 슬롯으로만 존재한다는 뜻이다 — 이름은 루트를 가리키고 `bloxdTexel`이 회전을 다시 적용한다 (§57.4). 정확히 한 이름 (`radar_screen`) 만이 두 비고를 모두 가진다.
-
-일부러 싣지 *않은* 것: 나머지 416개 레지스트리 철자 — 프레임 별칭 188개와 회전 별칭 228개 — 는 사용 가능한 상수가 아니며, 하나를 쓰려 들면 엔진이 각각을 전용 에러 메시지 패밀리로 설명한다 (§57.3). 모든 것의 기반이 되는 1,219행 레이어 표 (미리 회전된 슬롯 171개 포함) 는 엔진 내부물이며 §63.2/§63.4에서 다룬다.
-
-#### 68.2 카탈로그
-
-사용 가능한 모든 이름, 알파벳순. id 열은 `bloxdTextureId*` 값 — 아틀라스 레이어 + 1, 빌드 `cnty9` (2026-10-27) 에서 실측. **id는 스냅샷, 이름을 API로 다뤄라**: 이 가이드가 실측한 10월의 두 빌드 사이에서 철자를 유지한 1121개 이름 중 779개가 다른 id를 받았다 (§68.5). 엔진은 검증 시점에 이름을 해석하므로, 이름으로 쓴 팩은 레지스트리 드리프트를 견디고 원시 id로 쓴 팩은 그러지 못한다.
-
-| 이름 | id (cnty9) | 참고 |
-|---|---|---|
-| `alloy_kiln_back` | 1091 |  |
-| `alloy_kiln_front` | 1085 |  |
-| `alloy_kiln_side` | 1086 |  |
-| `alloy_kiln_side_running` | 33 | anim (4 프레임) |
-| `alloy_kiln_top` | 1087 | 회전 패밀리 (4 사본) |
-| `andesite_brick` | 465 |  |
-| `apple_block_bottom` | 441 |  |
-| `apple_block_side` | 439 |  |
-| `apple_block_top` | 440 |  |
-| `armour_lucky_block` | 995 |  |
-| `armour_lucky_block_rare` | 997 |  |
-| `armour_lucky_block_super` | 999 |  |
-| `artisan_table_side` | 367 |  |
-| `artisan_table_top` | 368 |  |
-| `ash` | 1031 |  |
-| `auto_bench_back` | 1106 |  |
-| `auto_bench_front` | 1100 |  |
-| `auto_bench_side` | 1101 |  |
-| `auto_bench_side_running` | 35 | anim (4 프레임) |
-| `auto_bench_top` | 1102 | 회전 패밀리 (4 사본) |
-| `autocrafter_bottom` | 962 |  |
-| `autocrafter_lunite_bottom` | 973 |  |
-| `autocrafter_lunite_side` | 972 |  |
-| `autocrafter_side` | 961 |  |
-| `banana_block_side` | 899 |  |
-| `banana_block_top` | 900 |  |
-| `beacon` | 330 |  |
-| `bedrock` | 334 |  |
-| `beetroot_block_bottom` | 925 |  |
-| `beetroot_block_side` | 923 |  |
-| `beetroot_block_top` | 924 |  |
-| `belt_drop_side` | 1185 |  |
-| `belt_drop_top` | 1184 |  |
-| `belt_lift_side` | 1183 |  |
-| `belt_lift_top` | 1182 |  |
-| `belt_loader_slab_front` | 1110 |  |
-| `belt_loader_top` | 1109 |  |
-| `belt_tunnel_back` | 1199 |  |
-| `belt_tunnel_exit_top` | 1200 | 회전 패밀리 (4 사본) |
-| `belt_tunnel_mouth` | 1193 |  |
-| `belt_tunnel_side` | 1194 |  |
-| `belt_tunnel_top` | 1195 | 회전 패밀리 (4 사본) |
-| `black_concrete` | 273 |  |
-| `black_glazed_terracotta` | 429 | 회전 패밀리 (4 사본) |
-| `black_planks` | 366 |  |
-| `black_portal` | 2 | anim (4 프레임) |
-| `black_spawn_block_side` | 760 |  |
-| `black_spawn_block_top` | 756 | 회전 패밀리 (4 사본) |
-| `block_destroyer_tnt_side` | 1017 |  |
-| `block_destroyer_tnt_top` | 1018 |  |
-| `blue_concrete` | 274 |  |
-| `blue_gen_spawn_coal` | 774 |  |
-| `blue_gen_spawn_iron` | 775 |  |
-| `blue_gen_spawn_top` | 773 |  |
-| `blue_glazed_terracotta` | 413 | 회전 패밀리 (4 사본) |
-| `blue_lucky_block` | 994 |  |
-| `blue_lucky_block_rare` | 996 |  |
-| `blue_lucky_block_super` | 998 |  |
-| `blue_planks` | 362 |  |
-| `blue_portal` | 3 | anim (4 프레임) |
-| `blue_spawn_block_side` | 755 |  |
-| `blue_spawn_block_top` | 751 | 회전 패밀리 (4 사본) |
-| `bone_block_side` | 818 |  |
-| `bone_block_top` | 819 |  |
-| `bookshelf` | 564 |  |
-| `bookshelf_1` | 566 |  |
-| `bookshelf_2` | 567 |  |
-| `bookshelf_3` | 568 |  |
-| `bookshelf_4` | 569 |  |
-| `bookshelf_5` | 570 |  |
-| `bookshelf_empty` | 565 |  |
-| `bouncy_bomb_block` | 591 |  |
-| `bowling_alley_floor` | 978 |  |
-| `bread_block_back` | 435 |  |
-| `bread_block_front` | 434 |  |
-| `bread_block_side` | 436 |  |
-| `bread_block_top` | 437 |  |
-| `brick` | 315 |  |
-| `brown_concrete` | 275 |  |
-| `brown_glazed_terracotta` | 417 | 회전 패밀리 (4 사본) |
-| `brown_mushroom_block` | 536 |  |
-| `brown_planks` | 363 |  |
-| `brown_portal` | 4 | anim (4 프레임) |
-| `brown_spawn_block_side` | 750 |  |
-| `brown_spawn_block_top` | 746 | 회전 패밀리 (4 사본) |
-| `building_lucky_block` | 989 |  |
-| `building_lucky_block_rare` | 991 |  |
-| `building_lucky_block_super` | 993 |  |
-| `burner_drill_back` | 1048 |  |
-| `burner_drill_bottom` | 1047 |  |
-| `burner_drill_front` | 1041 |  |
-| `burner_drill_side` | 1042 |  |
-| `burner_drill_side_running` | 27 | anim (4 프레임) |
-| `burner_drill_top` | 1043 | 회전 패밀리 (4 사본) |
-| `cactus_dry` | 350 |  |
-| `cactus_top` | 349 |  |
-| `carrot_block_bottom` | 921 |  |
-| `carrot_block_side` | 919 |  |
-| `carrot_block_top` | 920 |  |
-| `carved_messy_stone` | 827 |  |
-| `carved_pumpkin` | 543 |  |
-| `chalk` | 839 |  |
-| `chalk_black` | 855 |  |
-| `chalk_blue` | 854 |  |
-| `chalk_bricks_black` | 871 |  |
-| `chalk_bricks_blue` | 870 |  |
-| `chalk_bricks_brown` | 869 |  |
-| `chalk_bricks_cyan` | 868 |  |
-| `chalk_bricks_gray` | 867 |  |
-| `chalk_bricks_green` | 866 |  |
-| `chalk_bricks_light_blue` | 865 |  |
-| `chalk_bricks_light_gray` | 864 |  |
-| `chalk_bricks_lime` | 863 |  |
-| `chalk_bricks_magenta` | 862 |  |
-| `chalk_bricks_orange` | 861 |  |
-| `chalk_bricks_pink` | 860 |  |
-| `chalk_bricks_purple` | 859 |  |
-| `chalk_bricks_red` | 858 |  |
-| `chalk_bricks_slab_side_black` | 887 |  |
-| `chalk_bricks_slab_side_blue` | 886 |  |
-| `chalk_bricks_slab_side_brown` | 885 |  |
-| `chalk_bricks_slab_side_cyan` | 884 |  |
-| `chalk_bricks_slab_side_gray` | 883 |  |
-| `chalk_bricks_slab_side_green` | 882 |  |
-| `chalk_bricks_slab_side_light_blue` | 881 |  |
-| `chalk_bricks_slab_side_light_gray` | 880 |  |
-| `chalk_bricks_slab_side_lime` | 879 |  |
-| `chalk_bricks_slab_side_magenta` | 878 |  |
-| `chalk_bricks_slab_side_orange` | 877 |  |
-| `chalk_bricks_slab_side_pink` | 876 |  |
-| `chalk_bricks_slab_side_purple` | 875 |  |
-| `chalk_bricks_slab_side_red` | 874 |  |
-| `chalk_bricks_slab_side_white` | 873 |  |
-| `chalk_bricks_slab_side_yellow` | 872 |  |
-| `chalk_bricks_white` | 857 |  |
-| `chalk_bricks_yellow` | 856 |  |
-| `chalk_brown` | 853 |  |
-| `chalk_cyan` | 852 |  |
-| `chalk_gray` | 851 |  |
-| `chalk_green` | 850 |  |
-| `chalk_light_blue` | 849 |  |
-| `chalk_light_gray` | 848 |  |
-| `chalk_lime` | 847 |  |
-| `chalk_magenta` | 846 |  |
-| `chalk_orange` | 845 |  |
-| `chalk_pink` | 844 |  |
-| `chalk_purple` | 843 |  |
-| `chalk_red` | 842 |  |
-| `chalk_white` | 841 |  |
-| `chalk_yellow` | 840 |  |
-| `charge_vault_side` | 1114 |  |
-| `charge_vault_top` | 1113 |  |
-| `charging_pad_side` | 1159 |  |
-| `charging_pad_top` | 1158 |  |
-| `checkpoint_block` | 761 | 회전 패밀리 (4 사본) |
-| `cherry_block_bottom` | 590 |  |
-| `cherry_block_side` | 588 |  |
-| `cherry_block_top` | 589 |  |
-| `chest_back` | 347 |  |
-| `chest_double_back_hi` | 1219 |  |
-| `chest_double_back_lo` | 1218 |  |
-| `chest_double_front_hi` | 1213 |  |
-| `chest_double_front_lo` | 1212 |  |
-| `chest_double_top_1_hi` | 1215 |  |
-| `chest_double_top_1_lo` | 1214 |  |
-| `chest_double_top_2_hi` | 1217 |  |
-| `chest_double_top_2_lo` | 1216 |  |
-| `chest_front` | 341 |  |
-| `chest_side` | 342 |  |
-| `chest_top` | 343 | 회전 패밀리 (4 사본) |
-| `chili_pepper_block_bottom` | 678 |  |
-| `chili_pepper_block_side` | 676 |  |
-| `chili_pepper_block_top` | 677 |  |
-| `chiseled_red_sandstone` | 456 |  |
-| `chiseled_sandstone` | 325 |  |
-| `clay` | 195 |  |
-| `coal_block` | 233 |  |
-| `coal_deposit` | 1032 |  |
-| `coal_ore` | 227 |  |
-| `coarse_dirt` | 191 |  |
-| `coconut_block_bottom` | 522 |  |
-| `coconut_block_side` | 520 |  |
-| `coconut_block_top` | 521 |  |
-| `code_block` | 679 |  |
-| `comet_heart` | 1170 |  |
-| `comet_ore` | 1169 |  |
-| `compressed_messy_stone` | 530 |  |
-| `conveyor_belt_bottom` | 1081 |  |
-| `conveyor_belt_slab_side` | 1080 |  |
-| `conveyor_belt_top` | 1079 |  |
-| `conveyor_belt_turn_left` | 1171 |  |
-| `conveyor_belt_turn_right` | 1172 |  |
-| `copper_deposit` | 1035 |  |
-| `copper_ore` | 1040 |  |
-| `corn_block_bottom` | 594 |  |
-| `corn_block_side` | 592 |  |
-| `corn_block_top` | 593 |  |
-| `crafting_table_side` | 338 |  |
-| `crafting_table_top` | 339 |  |
-| `crate` | 918 |  |
-| `crop_harvester_back` | 1192 |  |
-| `crop_harvester_back_running` | 45 | anim (4 프레임) |
-| `crop_harvester_front` | 1186 |  |
-| `crop_harvester_side` | 1187 |  |
-| `crop_harvester_side_running` | 44 | anim (4 프레임) |
-| `crop_harvester_top` | 1188 | 회전 패밀리 (4 사본) |
-| `crusher_back` | 1055 |  |
-| `crusher_front` | 1049 |  |
-| `crusher_side` | 1050 |  |
-| `crusher_side_running` | 28 | anim (4 프레임) |
-| `crusher_top` | 1051 | 회전 패밀리 (4 사본) |
-| `crystal_block` | 1029 |  |
-| `crystal_vat_back` | 1166 |  |
-| `crystal_vat_front` | 1160 |  |
-| `crystal_vat_side` | 1161 |  |
-| `crystal_vat_side_running` | 42 | anim (4 프레임) |
-| `crystal_vat_top` | 1162 | 회전 패밀리 (4 사본) |
-| `custom_lobby_block_side` | 769 |  |
-| `custom_lobby_block_top` | 765 | 회전 패밀리 (4 사본) |
-| `cut_red_sandstone` | 457 |  |
-| `cut_sandstone` | 453 |  |
-| `cyan_concrete` | 276 |  |
-| `cyan_gen_spawn_coal` | 783 |  |
-| `cyan_gen_spawn_iron` | 784 |  |
-| `cyan_gen_spawn_top` | 782 |  |
-| `cyan_glazed_terracotta` | 405 | 회전 패밀리 (4 사본) |
-| `cyan_planks` | 360 |  |
-| `cyan_portal` | 5 | anim (4 프레임) |
-| `cyan_spawn_block_side` | 745 |  |
-| `cyan_spawn_block_top` | 741 | 회전 패밀리 (4 사본) |
-| `dark_green_bricks` | 460 |  |
-| `darkstone` | 1206 |  |
-| `darkstone_bricks` | 1207 |  |
-| `darkstone_bricks_cracked` | 1208 |  |
-| `darkstone_bricks_lava` | 1209 |  |
-| `darkstone_engraved` | 1210 |  |
-| `darkstone_smooth` | 1211 |  |
-| `deep_drill_back` | 1140 |  |
-| `deep_drill_bottom` | 1139 |  |
-| `deep_drill_front` | 1133 |  |
-| `deep_drill_side` | 1134 |  |
-| `deep_drill_side_running` | 39 | anim (4 프레임) |
-| `deep_drill_top` | 1135 | 회전 패밀리 (4 사본) |
-| `diamond_block` | 340 |  |
-| `diamond_gen_spawn_side` | 807 |  |
-| `diamond_gen_spawn_top` | 806 |  |
-| `diamond_ore` | 232 |  |
-| `diorite_brick` | 463 |  |
-| `dirt` | 190 |  |
-| `drop_location_block_side` | 814 |  |
-| `drop_location_block_top` | 813 |  |
-| `drop_pad` | 1038 |  |
-| `dry_grass_block` | 980 |  |
-| `dry_grass_block_side` | 979 |  |
-| `electric_drill_back` | 1099 |  |
-| `electric_drill_bottom` | 1098 |  |
-| `electric_drill_front` | 1092 |  |
-| `electric_drill_side` | 1093 |  |
-| `electric_drill_side_running` | 34 | anim (4 프레임) |
-| `electric_drill_top` | 1094 | 회전 패밀리 (4 사본) |
-| `emerald_block` | 237 |  |
-| `emerald_ore` | 231 |  |
-| `end_stone` | 226 |  |
-| `engraved_andesite` | 464 |  |
-| `engraved_diorite` | 462 |  |
-| `engraved_granite` | 466 |  |
-| `evil_lucky_block` | 1022 |  |
-| `evil_lucky_block_face` | 1023 |  |
-| `explosive_paint_black_side` | 626 |  |
-| `explosive_paint_black_top` | 627 |  |
-| `explosive_paint_blue_side` | 624 |  |
-| `explosive_paint_blue_top` | 625 |  |
-| `explosive_paint_brown_side` | 622 |  |
-| `explosive_paint_brown_top` | 623 |  |
-| `explosive_paint_cyan_side` | 620 |  |
-| `explosive_paint_cyan_top` | 621 |  |
-| `explosive_paint_gray_side` | 618 |  |
-| `explosive_paint_gray_top` | 619 |  |
-| `explosive_paint_green_side` | 616 |  |
-| `explosive_paint_green_top` | 617 |  |
-| `explosive_paint_light_blue_side` | 614 |  |
-| `explosive_paint_light_blue_top` | 615 |  |
-| `explosive_paint_light_gray_side` | 612 |  |
-| `explosive_paint_light_gray_top` | 613 |  |
-| `explosive_paint_lime_side` | 610 |  |
-| `explosive_paint_lime_top` | 611 |  |
-| `explosive_paint_magenta_side` | 608 |  |
-| `explosive_paint_magenta_top` | 609 |  |
-| `explosive_paint_orange_side` | 606 |  |
-| `explosive_paint_orange_top` | 607 |  |
-| `explosive_paint_pink_side` | 604 |  |
-| `explosive_paint_pink_top` | 605 |  |
-| `explosive_paint_purple_side` | 602 |  |
-| `explosive_paint_purple_top` | 603 |  |
-| `explosive_paint_quick_black` | 643 |  |
-| `explosive_paint_quick_blue` | 642 |  |
-| `explosive_paint_quick_brown` | 641 |  |
-| `explosive_paint_quick_cyan` | 640 |  |
-| `explosive_paint_quick_gray` | 639 |  |
-| `explosive_paint_quick_green` | 638 |  |
-| `explosive_paint_quick_light_blue` | 637 |  |
-| `explosive_paint_quick_light_gray` | 636 |  |
-| `explosive_paint_quick_lime` | 635 |  |
-| `explosive_paint_quick_magenta` | 634 |  |
-| `explosive_paint_quick_orange` | 633 |  |
-| `explosive_paint_quick_pink` | 632 |  |
-| `explosive_paint_quick_purple` | 631 |  |
-| `explosive_paint_quick_red` | 630 |  |
-| `explosive_paint_quick_white` | 629 |  |
-| `explosive_paint_quick_yellow` | 628 |  |
-| `explosive_paint_red_side` | 600 |  |
-| `explosive_paint_red_top` | 601 |  |
-| `explosive_paint_seeking_black` | 659 |  |
-| `explosive_paint_seeking_blue` | 658 |  |
-| `explosive_paint_seeking_brown` | 657 |  |
-| `explosive_paint_seeking_cyan` | 656 |  |
-| `explosive_paint_seeking_gray` | 655 |  |
-| `explosive_paint_seeking_green` | 654 |  |
-| `explosive_paint_seeking_light_blue` | 653 |  |
-| `explosive_paint_seeking_light_gray` | 652 |  |
-| `explosive_paint_seeking_lime` | 651 |  |
-| `explosive_paint_seeking_magenta` | 650 |  |
-| `explosive_paint_seeking_orange` | 649 |  |
-| `explosive_paint_seeking_pink` | 648 |  |
-| `explosive_paint_seeking_purple` | 647 |  |
-| `explosive_paint_seeking_red` | 646 |  |
-| `explosive_paint_seeking_white` | 645 |  |
-| `explosive_paint_seeking_yellow` | 644 |  |
-| `explosive_paint_sticky_black` | 675 |  |
-| `explosive_paint_sticky_blue` | 674 |  |
-| `explosive_paint_sticky_brown` | 673 |  |
-| `explosive_paint_sticky_cyan` | 672 |  |
-| `explosive_paint_sticky_gray` | 671 |  |
-| `explosive_paint_sticky_green` | 670 |  |
-| `explosive_paint_sticky_light_blue` | 669 |  |
-| `explosive_paint_sticky_light_gray` | 668 |  |
-| `explosive_paint_sticky_lime` | 667 |  |
-| `explosive_paint_sticky_magenta` | 666 |  |
-| `explosive_paint_sticky_orange` | 665 |  |
-| `explosive_paint_sticky_pink` | 664 |  |
-| `explosive_paint_sticky_purple` | 663 |  |
-| `explosive_paint_sticky_red` | 662 |  |
-| `explosive_paint_sticky_white` | 661 |  |
-| `explosive_paint_sticky_yellow` | 660 |  |
-| `explosive_paint_white_side` | 598 |  |
-| `explosive_paint_white_top` | 599 |  |
-| `explosive_paint_yellow_side` | 596 |  |
-| `explosive_paint_yellow_top` | 597 |  |
-| `extra_compressed_messy_stone` | 531 |  |
-| `fallen_cherry_leaves_side` | 586 |  |
-| `fallen_maple_leaves_side` | 478 |  |
-| `farmland` | 433 |  |
-| `fast_belt_slab_side` | 1157 |  |
-| `fast_belt_top` | 1156 |  |
-| `fast_belt_turn_left` | 1173 |  |
-| `fast_belt_turn_right` | 1174 |  |
-| `fertilised_soil` | 926 |  |
-| `finish_block` | 812 |  |
-| `fireball_block` | 539 |  |
-| `food_lucky_block` | 1007 |  |
-| `food_lucky_block_rare` | 1009 |  |
-| `food_lucky_block_super` | 1011 |  |
-| `forge_hopper_top` | 1168 |  |
-| `furnace_front` | 335 |  |
-| `furnace_side` | 336 |  |
-| `furnace_top` | 337 |  |
-| `generator_side` | 1063 |  |
-| `generator_side_running` | 30 | anim (4 프레임) |
-| `generator_top` | 1064 |  |
-| `ghost_chest_back` | 956 |  |
-| `ghost_chest_front` | 953 |  |
-| `ghost_chest_side` | 954 |  |
-| `ghost_chest_top` | 955 |  |
-| `ghost_lucky_block` | 957 |  |
-| `ghost_mystery_block` | 958 |  |
-| `glass` | 294 |  |
-| `glass_black` | 295 |  |
-| `glass_blue` | 296 |  |
-| `glass_brown` | 297 |  |
-| `glass_cyan` | 298 |  |
-| `glass_gray` | 299 |  |
-| `glass_green` | 301 |  |
-| `glass_light_blue` | 302 |  |
-| `glass_light_gray` | 300 |  |
-| `glass_lime` | 303 |  |
-| `glass_magenta` | 304 |  |
-| `glass_orange` | 305 |  |
-| `glass_pink` | 306 |  |
-| `glass_purple` | 307 |  |
-| `glass_red` | 308 |  |
-| `glass_silver` | 311 |  |
-| `glass_white` | 309 |  |
-| `glass_yellow` | 310 |  |
-| `glowstone` | 331 |  |
-| `gold_block` | 235 |  |
-| `gold_deposit` | 1036 |  |
-| `gold_ore` | 229 |  |
-| `granite_brick` | 467 |  |
-| `grass_block_side` | 192 |  |
-| `grass_top` | 193 |  |
-| `gravel` | 196 |  |
-| `gray_concrete` | 271 |  |
-| `gray_gen_spawn_coal` | 792 |  |
-| `gray_gen_spawn_iron` | 793 |  |
-| `gray_gen_spawn_top` | 791 |  |
-| `gray_glazed_terracotta` | 397 | 회전 패밀리 (4 사본) |
-| `gray_planks` | 358 |  |
-| `gray_portal` | 6 | anim (4 프레임) |
-| `gray_spawn_block_side` | 740 |  |
-| `gray_spawn_block_top` | 736 | 회전 패밀리 (4 사본) |
-| `green_bricks` | 459 |  |
-| `green_concrete` | 285 |  |
-| `green_glazed_terracotta` | 421 | 회전 패밀리 (4 사본) |
-| `green_lucky_block` | 1006 |  |
-| `green_lucky_block_rare` | 1008 |  |
-| `green_lucky_block_super` | 1010 |  |
-| `green_planks` | 364 |  |
-| `green_portal` | 7 | anim (4 프레임) |
-| `green_spawn_block_side` | 735 |  |
-| `green_spawn_block_top` | 731 | 회전 패밀리 (4 사본) |
-| `green_stone` | 458 |  |
-| `grenade_block` | 581 |  |
-| `grey_portal` | 8 | anim (4 프레임) |
-| `gun_lucky_block` | 952 |  |
-| `hardened_clay` | 254 |  |
-| `hardened_clay_stained_black` | 270 |  |
-| `hardened_clay_stained_blue` | 266 |  |
-| `hardened_clay_stained_brown` | 267 |  |
-| `hardened_clay_stained_cyan` | 264 |  |
-| `hardened_clay_stained_gray` | 262 |  |
-| `hardened_clay_stained_green` | 268 |  |
-| `hardened_clay_stained_light_blue` | 258 |  |
-| `hardened_clay_stained_lime` | 260 |  |
-| `hardened_clay_stained_magenta` | 257 |  |
-| `hardened_clay_stained_orange` | 256 |  |
-| `hardened_clay_stained_pink` | 261 |  |
-| `hardened_clay_stained_purple` | 265 |  |
-| `hardened_clay_stained_red` | 269 |  |
-| `hardened_clay_stained_silver` | 263 |  |
-| `hardened_clay_stained_white` | 255 |  |
-| `hardened_clay_stained_yellow` | 259 |  |
-| `harvester_bottom` | 969 |  |
-| `harvester_lunite_bottom` | 977 |  |
-| `harvester_lunite_side_0` | 974 |  |
-| `harvester_lunite_side_1` | 975 |  |
-| `harvester_lunite_top` | 976 |  |
-| `harvester_side0` | 966 |  |
-| `harvester_side1` | 967 |  |
-| `harvester_top` | 968 |  |
-| `hay_block_side` | 328 |  |
-| `homestead_core` | 1037 |  |
-| `homestead_core_cap` | 1122 |  |
-| `homestead_core_crown` | 1121 |  |
-| `homestead_core_mid` | 26 | anim (4 프레임) |
-| `hyper_compressed_messy_stone` | 533 |  |
-| `ice` | 326 |  |
-| `ice_brick` | 468 |  |
-| `iceball_block` | 540 |  |
-| `invisible_solid` | 314 |  |
-| `iron_block` | 234 |  |
-| `iron_chest_back` | 917 |  |
-| `iron_chest_front` | 911 |  |
-| `iron_chest_side` | 912 |  |
-| `iron_chest_top` | 913 | 회전 패밀리 (4 사본) |
-| `iron_deposit` | 1033 |  |
-| `iron_ore` | 228 |  |
-| `iron_watermelon_side` | 546 |  |
-| `iron_watermelon_top` | 547 |  |
-| `jungle_grass_block` | 889 |  |
-| `jungle_grass_block_side` | 888 |  |
-| `lapis_block` | 236 |  |
-| `lapis_ore` | 230 |  |
-| `lava` | 1 | anim (8 프레임) |
-| `leather_block_side` | 908 |  |
-| `leather_block_top` | 909 |  |
-| `leaves_aspen` | 288 |  |
-| `leaves_aspen_autumn` | 910 |  |
-| `leaves_cedar` | 470 |  |
-| `leaves_cherry` | 585 |  |
-| `leaves_cherry_fruity` | 906 |  |
-| `leaves_jungle` | 290 |  |
-| `leaves_mango` | 894 |  |
-| `leaves_mango_fruity` | 907 |  |
-| `leaves_maple` | 289 |  |
-| `leaves_maple_autumn` | 477 |  |
-| `leaves_maple_fruity` | 901 |  |
-| `leaves_palm` | 471 |  |
-| `leaves_palm_fruity` | 904 |  |
-| `leaves_pear` | 525 |  |
-| `leaves_pear_fruity` | 905 |  |
-| `leaves_pine` | 287 |  |
-| `leaves_pine_cone` | 902 |  |
-| `leaves_plum` | 469 |  |
-| `leaves_plum_fruity` | 903 |  |
-| `leaves_spectral` | 831 |  |
-| `light_blue_concrete` | 277 |  |
-| `light_blue_glazed_terracotta` | 381 | 회전 패밀리 (4 사본) |
-| `light_blue_lucky_block` | 933 |  |
-| `light_blue_planks` | 354 |  |
-| `light_blue_spawn_block_side` | 730 |  |
-| `light_blue_spawn_block_top` | 726 | 회전 패밀리 (4 사본) |
-| `light_gray_concrete` | 272 |  |
-| `light_gray_glazed_terracotta` | 401 | 회전 패밀리 (4 사본) |
-| `light_gray_planks` | 359 |  |
-| `light_gray_spawn_block_side` | 725 |  |
-| `light_gray_spawn_block_top` | 721 | 회전 패밀리 (4 사본) |
-| `lightblue_portal` | 9 | anim (4 프레임) |
-| `lightgray_portal` | 10 | anim (4 프레임) |
-| `lime_concrete` | 278 |  |
-| `lime_gen_spawn_coal` | 777 |  |
-| `lime_gen_spawn_iron` | 778 |  |
-| `lime_gen_spawn_top` | 776 |  |
-| `lime_glazed_terracotta` | 389 | 회전 패밀리 (4 사본) |
-| `lime_planks` | 356 |  |
-| `lime_portal` | 11 | anim (4 프레임) |
-| `lime_spawn_block_side` | 720 |  |
-| `lime_spawn_block_top` | 716 | 회전 패밀리 (4 사본) |
-| `log_ancient_maple` | 1021 |  |
-| `log_aspen` | 202 |  |
-| `log_cedar` | 201 |  |
-| `log_cherry` | 582 |  |
-| `log_jungle` | 203 |  |
-| `log_mango` | 891 |  |
-| `log_maple` | 198 |  |
-| `log_palm` | 472 |  |
-| `log_pear` | 523 |  |
-| `log_pine` | 199 |  |
-| `log_plum` | 200 |  |
-| `log_spectral` | 828 |  |
-| `lucky_block_pink_question` | 959 |  |
-| `lucky_block_pink_question_rare` | 1013 |  |
-| `lucky_block_pink_question_super` | 1015 |  |
-| `lunite_block` | 971 |  |
-| `lunite_ore` | 970 |  |
-| `machine_bench_side` | 1115 |  |
-| `machine_bench_top` | 1116 |  |
-| `machine_side` | 1039 |  |
-| `magenta_concrete` | 279 |  |
-| `magenta_glazed_terracotta` | 377 | 회전 패밀리 (4 사본) |
-| `magenta_planks` | 353 |  |
-| `magenta_portal` | 12 | anim (4 프레임) |
-| `magenta_spawn_block_side` | 715 |  |
-| `magenta_spawn_block_top` | 711 | 회전 패밀리 (4 사본) |
-| `magma` | 451 |  |
-| `mailbox_front` | 571 |  |
-| `mailbox_front_full` | 573 |  |
-| `mailbox_side` | 572 |  |
-| `mango_block_bottom` | 898 |  |
-| `mango_block_side` | 896 |  |
-| `mango_block_top` | 897 |  |
-| `mega_compressed_messy_stone` | 535 |  |
-| `melon_side` | 544 |  |
-| `melon_top` | 545 |  |
-| `melting_ice` | 595 |  |
-| `messy_stone` | 216 |  |
-| `mob_spawner_block_empty_side` | 823 |  |
-| `mob_spawner_block_top` | 821 |  |
-| `mob_spawner_hostile_block_side` | 822 |  |
-| `mob_spawner_neutral_block_side` | 838 |  |
-| `mob_spawner_passive_block_side` | 820 |  |
-| `moonstone_block` | 450 |  |
-| `moonstone_chest_back` | 449 |  |
-| `moonstone_chest_front` | 443 |  |
-| `moonstone_chest_side` | 444 |  |
-| `moonstone_chest_top` | 445 | 회전 패밀리 (4 사본) |
-| `moonstone_explosive_side` | 332 |  |
-| `moonstone_explosive_top` | 333 |  |
-| `moonstone_gen_spawn_side` | 809 |  |
-| `moonstone_gen_spawn_top` | 808 |  |
-| `moonstone_ore` | 442 |  |
-| `mossy_cobblestone` | 438 |  |
-| `mushroom_stem` | 538 |  |
-| `mystery_block` | 578 |  |
-| `neon_black` | 951 |  |
-| `neon_blue` | 950 |  |
-| `neon_brown` | 949 |  |
-| `neon_cyan` | 948 |  |
-| `neon_gray` | 947 |  |
-| `neon_green` | 946 |  |
-| `neon_light_blue` | 945 |  |
-| `neon_light_gray` | 944 |  |
-| `neon_lime` | 943 |  |
-| `neon_magenta` | 942 |  |
-| `neon_orange` | 941 |  |
-| `neon_pink` | 940 |  |
-| `neon_purple` | 939 |  |
-| `neon_red` | 938 |  |
-| `neon_white` | 937 |  |
-| `neon_yellow` | 936 |  |
-| `nether_brick` | 317 |  |
-| `netherrack` | 318 |  |
-| `obby_absorb_block` | 816 |  |
-| `obby_absorb_death_block` | 817 |  |
-| `obby_death_block` | 815 |  |
-| `obsidian` | 327 |  |
-| `orange_concrete` | 280 |  |
-| `orange_glazed_terracotta` | 373 | 회전 패밀리 (4 사본) |
-| `orange_lucky_block` | 1000 |  |
-| `orange_lucky_block_rare` | 1002 |  |
-| `orange_lucky_block_super` | 1004 |  |
-| `orange_planks` | 352 |  |
-| `orange_portal` | 13 | anim (4 프레임) |
-| `orange_spawn_block_side` | 710 |  |
-| `orange_spawn_block_top` | 706 | 회전 패밀리 (4 사본) |
-| `ore_gen_spawn_side` | 811 |  |
-| `ore_gen_spawn_top` | 810 |  |
-| `packed_snow` | 826 |  |
-| `parts_bench_side` | 1117 |  |
-| `parts_bench_top` | 1118 |  |
-| `patterned_glass_black` | 548 |  |
-| `patterned_glass_blue` | 549 |  |
-| `patterned_glass_brown` | 550 |  |
-| `patterned_glass_cyan` | 551 |  |
-| `patterned_glass_gray` | 552 |  |
-| `patterned_glass_green` | 554 |  |
-| `patterned_glass_light_blue` | 555 |  |
-| `patterned_glass_light_gray` | 553 |  |
-| `patterned_glass_lime` | 556 |  |
-| `patterned_glass_magenta` | 557 |  |
-| `patterned_glass_orange` | 558 |  |
-| `patterned_glass_pink` | 559 |  |
-| `patterned_glass_purple` | 560 |  |
-| `patterned_glass_red` | 561 |  |
-| `patterned_glass_white` | 562 |  |
-| `patterned_glass_yellow` | 563 |  |
-| `pear_block_bottom` | 529 |  |
-| `pear_block_side` | 527 |  |
-| `pear_block_top` | 528 |  |
-| `pet_lucky_block` | 960 |  |
-| `pine_cone_block_side` | 836 |  |
-| `pine_cone_block_top` | 837 |  |
-| `pine_grass_block` | 834 |  |
-| `pine_grass_block_side` | 833 |  |
-| `pink_concrete` | 281 |  |
-| `pink_gen_spawn_coal` | 789 |  |
-| `pink_gen_spawn_iron` | 790 |  |
-| `pink_gen_spawn_top` | 788 |  |
-| `pink_glazed_terracotta` | 393 | 회전 패밀리 (4 사본) |
-| `pink_planks` | 357 |  |
-| `pink_portal` | 14 | anim (4 프레임) |
-| `pink_spawn_block_side` | 705 |  |
-| `pink_spawn_block_top` | 701 | 회전 패밀리 (4 사본) |
-| `planks_aspen` | 205 |  |
-| `planks_cedar` | 209 |  |
-| `planks_cherry` | 584 |  |
-| `planks_jungle` | 207 |  |
-| `planks_mango` | 893 |  |
-| `planks_maple` | 204 |  |
-| `planks_palm` | 473 |  |
-| `planks_pear` | 524 |  |
-| `planks_pine` | 208 |  |
-| `planks_plum` | 206 |  |
-| `planks_spectral` | 830 |  |
-| `plum_block_bottom` | 519 |  |
-| `plum_block_side` | 517 |  |
-| `plum_block_top` | 518 |  |
-| `podzol_top` | 452 |  |
-| `potato_block` | 922 |  |
-| `potion_lucky_block` | 1012 |  |
-| `potion_lucky_block_rare` | 1014 |  |
-| `potion_lucky_block_super` | 1016 |  |
-| `press_back` | 1071 |  |
-| `press_front` | 1065 |  |
-| `press_side` | 1066 |  |
-| `press_side_running` | 31 | anim (4 프레임) |
-| `press_top` | 1067 | 회전 패밀리 (4 사본) |
-| `protector` | 348 |  |
-| `protector_faction` | 575 |  |
-| `protector_tribe` | 574 |  |
-| `pumpkin_face_on` | 291 |  |
-| `pumpkin_side` | 541 |  |
-| `pumpkin_top` | 542 |  |
-| `pure_coal_ore` | 1024 |  |
-| `pure_copper_ore` | 1204 |  |
-| `pure_diamond_ore` | 1027 |  |
-| `pure_gold_ore` | 1026 |  |
-| `pure_iron_ore` | 1025 |  |
-| `pure_moonstone_ore` | 1028 |  |
-| `pure_voltite_ore` | 1205 |  |
-| `purple_concrete` | 282 |  |
-| `purple_glazed_terracotta` | 409 | 회전 패밀리 (4 사본) |
-| `purple_lucky_block` | 988 |  |
-| `purple_lucky_block_rare` | 990 |  |
-| `purple_lucky_block_super` | 992 |  |
-| `purple_planks` | 361 |  |
-| `purple_portal` | 15 | anim (4 프레임) |
-| `purple_spawn_block_side` | 700 |  |
-| `purple_spawn_block_top` | 696 | 회전 패밀리 (4 사본) |
-| `quartz_block_chiseled` | 320 |  |
-| `quartz_block_side` | 319 |  |
-| `radar_bottom` | 929 |  |
-| `radar_screen` | 19 | anim (4 프레임) · 회전 패밀리 (4 사본) |
-| `radar_side_active` | 927 |  |
-| `radar_side_inactive` | 930 |  |
-| `radar_top_active` | 928 |  |
-| `radar_top_inactive` | 931 |  |
-| `recycler_back` | 1181 |  |
-| `recycler_front` | 1175 |  |
-| `recycler_side` | 1176 |  |
-| `recycler_side_running` | 43 | anim (4 프레임) |
-| `recycler_top` | 1177 | 회전 패밀리 (4 사본) |
-| `red_concrete` | 283 |  |
-| `red_gen_spawn_coal` | 771 |  |
-| `red_gen_spawn_iron` | 772 |  |
-| `red_gen_spawn_top` | 770 |  |
-| `red_glazed_terracotta` | 425 | 회전 패밀리 (4 사본) |
-| `red_lucky_block` | 934 |  |
-| `red_lucky_block_rare` | 984 |  |
-| `red_lucky_block_super` | 986 |  |
-| `red_mushroom_block` | 537 |  |
-| `red_planks` | 365 |  |
-| `red_portal` | 16 | anim (4 프레임) |
-| `red_sand` | 474 |  |
-| `red_sandstone` | 454 |  |
-| `red_sandstone_brick` | 475 |  |
-| `red_sandstone_top` | 455 |  |
-| `red_spawn_block_side` | 695 |  |
-| `red_spawn_block_top` | 691 | 회전 패밀리 (4 사본) |
-| `redstone_lamp_off` | 313 |  |
-| `redstone_lamp_on` | 312 |  |
-| `rocket_block` | 579 |  |
-| `rocky_dirt` | 476 |  |
-| `rope_block` | 1030 |  |
-| `sand` | 194 |  |
-| `sandstone_brick` | 461 |  |
-| `sandstone_normal` | 225 |  |
-| `sandstone_top` | 324 |  |
-| `shatter_mill_back` | 1147 |  |
-| `shatter_mill_front` | 1141 |  |
-| `shatter_mill_side` | 1142 |  |
-| `shatter_mill_side_running` | 40 | anim (4 프레임) |
-| `shatter_mill_top` | 1143 | 회전 패밀리 (4 사본) |
-| `shop_trader_spawn_face` | 799 |  |
-| `shop_trader_spawn_side` | 798 |  |
-| `shop_trader_spawn_top` | 794 | 회전 패밀리 (4 사본) |
-| `shop_wizard_spawn_face` | 805 |  |
-| `shop_wizard_spawn_side` | 804 |  |
-| `shop_wizard_spawn_top` | 800 | 회전 패밀리 (4 사본) |
-| `sky_tap_back` | 1155 |  |
-| `sky_tap_bottom` | 1154 |  |
-| `sky_tap_front` | 1148 |  |
-| `sky_tap_side` | 1149 |  |
-| `sky_tap_side_running` | 41 | anim (4 프레임) |
-| `sky_tap_top` | 1150 | 회전 패밀리 (4 사본) |
-| `slab_andesite_brick_side` | 498 |  |
-| `slab_aspen_side` | 483 |  |
-| `slab_brick_side` | 515 |  |
-| `slab_cedar_side` | 482 |  |
-| `slab_cherry_side` | 587 |  |
-| `slab_chiseled_red_sandstone_side` | 512 |  |
-| `slab_chiseled_sandstone_side` | 508 |  |
-| `slab_cobblestone_side` | 488 |  |
-| `slab_cut_red_sandstone_side` | 513 |  |
-| `slab_cut_sandstone_side` | 509 |  |
-| `slab_diorite_brick_side` | 502 |  |
-| `slab_dirt_side` | 486 |  |
-| `slab_dry_grass_top_side` | 981 |  |
-| `slab_engraved_andesite_side` | 497 |  |
-| `slab_engraved_diorite_side` | 501 |  |
-| `slab_engraved_granite_side` | 505 |  |
-| `slab_granite_brick_side` | 506 |  |
-| `slab_grass_top_side` | 487 |  |
-| `slab_ice_brick_side` | 516 |  |
-| `slab_jungle_grass_top_side` | 890 |  |
-| `slab_jungle_side` | 484 |  |
-| `slab_mango_side` | 895 |  |
-| `slab_maple_side` | 479 |  |
-| `slab_mossy_cobblestone_side` | 493 |  |
-| `slab_palm_side` | 485 |  |
-| `slab_pear_side` | 526 |  |
-| `slab_pine_grass_top_side` | 835 |  |
-| `slab_pine_side` | 480 |  |
-| `slab_plum_side` | 481 |  |
-| `slab_red_sandstone_brick_side` | 514 |  |
-| `slab_red_sandstone_side` | 511 |  |
-| `slab_sandstone_brick_side` | 510 |  |
-| `slab_sandstone_normal_side` | 507 |  |
-| `slab_smooth_stone_side` | 490 |  |
-| `slab_spectral_side` | 832 |  |
-| `slab_stone_andesite_side` | 495 |  |
-| `slab_stone_andesite_smooth_side` | 496 |  |
-| `slab_stone_diorite_side` | 499 |  |
-| `slab_stone_diorite_smooth_side` | 500 |  |
-| `slab_stone_granite_side` | 503 |  |
-| `slab_stone_granite_smooth_side` | 504 |  |
-| `slab_stone_side` | 489 |  |
-| `slab_stonebrick_carved_side` | 491 |  |
-| `slab_stonebrick_mossy_side` | 494 |  |
-| `slab_stonebrick_side` | 492 |  |
-| `smelter_back` | 1062 |  |
-| `smelter_front` | 1056 |  |
-| `smelter_side` | 1057 |  |
-| `smelter_side_running` | 29 | anim (4 프레임) |
-| `smelter_top` | 1058 | 회전 패밀리 (4 사본) |
-| `smoke` | 23 | anim (4 프레임) |
-| `smooth_stone` | 218 |  |
-| `snow` | 197 |  |
-| `snowy_messy_stone` | 824 |  |
-| `snowy_messy_stone_side` | 825 |  |
-| `solar_panel_bottom` | 965 |  |
-| `solar_panel_side` | 963 |  |
-| `solar_panel_top` | 964 |  |
-| `sorting_gate_slab_side` | 1108 |  |
-| `sorting_gate_top` | 1107 |  |
-| `splitter_slab_side` | 1083 |  |
-| `splitter_top` | 1082 |  |
-| `sponge` | 329 |  |
-| `starframe` | 1167 |  |
-| `stone` | 217 |  |
-| `stone_andesite` | 221 |  |
-| `stone_andesite_smooth` | 222 |  |
-| `stone_deposit` | 1034 |  |
-| `stone_diorite` | 219 |  |
-| `stone_diorite_smooth` | 220 |  |
-| `stone_granite` | 223 |  |
-| `stone_granite_smooth` | 224 |  |
-| `stonebrick` | 316 |  |
-| `stonebrick_carved` | 321 |  |
-| `stonebrick_cracked` | 323 |  |
-| `stonebrick_mossy` | 322 |  |
-| `storage_silo_side` | 1112 |  |
-| `storage_silo_top` | 1111 |  |
-| `stripped_aspen_log` | 211 |  |
-| `stripped_cedar_log` | 215 |  |
-| `stripped_cherry_log` | 583 |  |
-| `stripped_jungle_log` | 213 |  |
-| `stripped_mango_log` | 892 |  |
-| `stripped_maple_log` | 210 |  |
-| `stripped_palm_log` | 576 |  |
-| `stripped_pear_log` | 577 |  |
-| `stripped_pine_log` | 214 |  |
-| `stripped_plum_log` | 212 |  |
-| `stripped_spectral_log` | 829 |  |
-| `super_compressed_messy_stone` | 532 |  |
-| `super_rocket_block` | 580 |  |
-| `tool_bench_side` | 1119 |  |
-| `tool_bench_top` | 1120 |  |
-| `tools_lucky_block` | 1001 |  |
-| `tools_lucky_block_rare` | 1003 |  |
-| `tools_lucky_block_super` | 1005 |  |
-| `toxic_waste` | 25 | anim (8 프레임) |
-| `toxic_waste_barrel_bottom` | 1020 |  |
-| `toxic_waste_barrel_side` | 1019 |  |
-| `toxic_waste_barrel_top` | 24 | anim (4 프레임) |
-| `toxin_ball_block` | 680 |  |
-| `tree_cutter_back` | 1129 |  |
-| `tree_cutter_back_running` | 37 | anim (4 프레임) |
-| `tree_cutter_front` | 1123 |  |
-| `tree_cutter_side` | 1124 |  |
-| `tree_cutter_side_running` | 36 | anim (4 프레임) |
-| `tree_cutter_top` | 1125 | 회전 패밀리 (4 사본) |
-| `ultra_compressed_messy_stone` | 534 |  |
-| `unloaded` | 189 |  |
-| `volt_engine_side` | 1131 |  |
-| `volt_engine_side_running` | 38 | anim (4 프레임) |
-| `volt_engine_top` | 1132 |  |
-| `voltite_deposit` | 1130 |  |
-| `voltite_ore` | 1084 |  |
-| `watermelon_side` | 292 |  |
-| `watermelon_top` | 293 |  |
-| `weapon_lucky_block` | 935 |  |
-| `weapon_lucky_block_rare` | 985 |  |
-| `weapon_lucky_block_super` | 987 |  |
-| `white_concrete` | 284 |  |
-| `white_gen_spawn_coal` | 786 |  |
-| `white_gen_spawn_iron` | 787 |  |
-| `white_gen_spawn_top` | 785 |  |
-| `white_glazed_terracotta` | 369 | 회전 패밀리 (4 사본) |
-| `white_planks` | 351 |  |
-| `white_portal` | 17 | anim (4 프레임) |
-| `white_spawn_block_side` | 690 |  |
-| `white_spawn_block_top` | 686 | 회전 패밀리 (4 사본) |
-| `wire_mill_back` | 1078 |  |
-| `wire_mill_front` | 1072 |  |
-| `wire_mill_side` | 1073 |  |
-| `wire_mill_side_running` | 32 | anim (4 프레임) |
-| `wire_mill_top` | 1074 | 회전 패밀리 (4 사본) |
-| `wool_colored_black` | 253 |  |
-| `wool_colored_blue` | 249 |  |
-| `wool_colored_brown` | 250 |  |
-| `wool_colored_cyan` | 247 |  |
-| `wool_colored_gray` | 245 |  |
-| `wool_colored_green` | 251 |  |
-| `wool_colored_light_blue` | 241 |  |
-| `wool_colored_light_grey` | 246 |  |
-| `wool_colored_lime` | 243 |  |
-| `wool_colored_magenta` | 240 |  |
-| `wool_colored_orange` | 239 |  |
-| `wool_colored_pink` | 244 |  |
-| `wool_colored_purple` | 248 |  |
-| `wool_colored_red` | 252 |  |
-| `wool_colored_white` | 238 |  |
-| `wool_colored_yellow` | 242 |  |
-| `yellow_concrete` | 286 |  |
-| `yellow_gen_spawn_coal` | 780 |  |
-| `yellow_gen_spawn_iron` | 781 |  |
-| `yellow_gen_spawn_top` | 779 |  |
-| `yellow_glazed_terracotta` | 385 | 회전 패밀리 (4 사본) |
-| `yellow_lucky_block` | 932 |  |
-| `yellow_lucky_block_rare` | 982 |  |
-| `yellow_lucky_block_super` | 983 |  |
-| `yellow_planks` | 355 |  |
-| `yellow_portal` | 18 | anim (4 프레임) |
-| `yellow_spawn_block_side` | 685 |  |
-| `yellow_spawn_block_top` | 681 | 회전 패밀리 (4 사본) |
-
-#### 68.3 회전 계열 (57 루트)
-
-이 텍스처들은 미리 회전된 사본 (`name[rot[1..4`) 으로만 존재한다. 레지스트리는 이들을 아래 루트로 접고, `bloxdTexel`이 샘플 시점에 회전을 다시 적용한다 (§57.4) — 그러므로 참조하는 것은 루트이지 결코 사본이 아니다. `[rot[N` 철자 중 하나를 쓰면 전용 회전 이름 진단이 나온다 (§57.3).
-
-- `alloy_kiln_top` (id 1087)
-- `auto_bench_top` (id 1102)
-- `belt_tunnel_exit_top` (id 1200)
-- `belt_tunnel_top` (id 1195)
-- `black_glazed_terracotta` (id 429)
-- `black_spawn_block_top` (id 756)
-- `blue_glazed_terracotta` (id 413)
-- `blue_spawn_block_top` (id 751)
-- `brown_glazed_terracotta` (id 417)
-- `brown_spawn_block_top` (id 746)
-- `burner_drill_top` (id 1043)
-- `checkpoint_block` (id 761)
-- `chest_top` (id 343)
-- `crop_harvester_top` (id 1188)
-- `crusher_top` (id 1051)
-- `crystal_vat_top` (id 1162)
-- `custom_lobby_block_top` (id 765)
-- `cyan_glazed_terracotta` (id 405)
-- `cyan_spawn_block_top` (id 741)
-- `deep_drill_top` (id 1135)
-- `electric_drill_top` (id 1094)
-- `gray_glazed_terracotta` (id 397)
-- `gray_spawn_block_top` (id 736)
-- `green_glazed_terracotta` (id 421)
-- `green_spawn_block_top` (id 731)
-- `iron_chest_top` (id 913)
-- `light_blue_glazed_terracotta` (id 381)
-- `light_blue_spawn_block_top` (id 726)
-- `light_gray_glazed_terracotta` (id 401)
-- `light_gray_spawn_block_top` (id 721)
-- `lime_glazed_terracotta` (id 389)
-- `lime_spawn_block_top` (id 716)
-- `magenta_glazed_terracotta` (id 377)
-- `magenta_spawn_block_top` (id 711)
-- `moonstone_chest_top` (id 445)
-- `orange_glazed_terracotta` (id 373)
-- `orange_spawn_block_top` (id 706)
-- `pink_glazed_terracotta` (id 393)
-- `pink_spawn_block_top` (id 701)
-- `press_top` (id 1067)
-- `purple_glazed_terracotta` (id 409)
-- `purple_spawn_block_top` (id 696)
-- `radar_screen0` (id 19) · 애니메이션이기도 함
-- `recycler_top` (id 1177)
-- `red_glazed_terracotta` (id 425)
-- `red_spawn_block_top` (id 691)
-- `shatter_mill_top` (id 1143)
-- `shop_trader_spawn_top` (id 794)
-- `shop_wizard_spawn_top` (id 800)
-- `sky_tap_top` (id 1150)
-- `smelter_top` (id 1058)
-- `tree_cutter_top` (id 1125)
-- `white_glazed_terracotta` (id 369)
-- `white_spawn_block_top` (id 686)
-- `wire_mill_top` (id 1074)
-- `yellow_glazed_terracotta` (id 385)
-- `yellow_spawn_block_top` (id 681)
-
-#### 68.4 애니메이션 계열 (42 이름)
-
-이 이름들 중 하나를 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다 (§63.3의 프레임 사다리). 엔진은 텍스처마다 패밀리별 고정 간격으로 프레임을 진행한다 — `cnty9`에서 실측하면 정확히 세 값을 가진다: **200 ms** (`lava`, `toxic_waste`, `radar_screen`), **250 ms** (`smoke`, `homestead_core_mid`, 모든 기계 `*_running` 패밀리), **300 ms** (열일곱 개의 포털과 `toxic_waste_barrel_top`) — 간격 열을 보라 — 그러므로 팩은 프레임 접미사를 절대 쓰지 않는다 (`lava0`은 오류, `lava`가 이름이다).
-
-| 이름 | 프레임 | 간격 | 레지스트리 베이스 |
-|---|---|---|---|
-| `lava` | 8 | 200 ms | `lava0` |
-| `toxic_waste` | 8 | 200 ms | `toxic_waste0` |
-| `alloy_kiln_side_running` | 4 | 250 ms | `alloy_kiln_side_running0` |
-| `auto_bench_side_running` | 4 | 250 ms | `auto_bench_side_running0` |
-| `black_portal` | 4 | 300 ms | `black_portal0` |
-| `blue_portal` | 4 | 300 ms | `blue_portal0` |
-| `brown_portal` | 4 | 300 ms | `brown_portal0` |
-| `burner_drill_side_running` | 4 | 250 ms | `burner_drill_side_running0` |
-| `crop_harvester_back_running` | 4 | 250 ms | `crop_harvester_back_running0` |
-| `crop_harvester_side_running` | 4 | 250 ms | `crop_harvester_side_running0` |
-| `crusher_side_running` | 4 | 250 ms | `crusher_side_running0` |
-| `crystal_vat_side_running` | 4 | 250 ms | `crystal_vat_side_running0` |
-| `cyan_portal` | 4 | 300 ms | `cyan_portal0` |
-| `deep_drill_side_running` | 4 | 250 ms | `deep_drill_side_running0` |
-| `electric_drill_side_running` | 4 | 250 ms | `electric_drill_side_running0` |
-| `generator_side_running` | 4 | 250 ms | `generator_side_running0` |
-| `gray_portal` | 4 | 300 ms | `gray_portal0` |
-| `green_portal` | 4 | 300 ms | `green_portal0` |
-| `grey_portal` | 4 | 300 ms | `grey_portal0` |
-| `homestead_core_mid` | 4 | 250 ms | `homestead_core_mid0` |
-| `lightblue_portal` | 4 | 300 ms | `lightblue_portal0` |
-| `lightgray_portal` | 4 | 300 ms | `lightgray_portal0` |
-| `lime_portal` | 4 | 300 ms | `lime_portal0` |
-| `magenta_portal` | 4 | 300 ms | `magenta_portal0` |
-| `orange_portal` | 4 | 300 ms | `orange_portal0` |
-| `pink_portal` | 4 | 300 ms | `pink_portal0` |
-| `press_side_running` | 4 | 250 ms | `press_side_running0` |
-| `purple_portal` | 4 | 300 ms | `purple_portal0` |
-| `radar_screen` | 4 | 200 ms | `radar_screen0[rot[1` |
-| `recycler_side_running` | 4 | 250 ms | `recycler_side_running0` |
-| `red_portal` | 4 | 300 ms | `red_portal0` |
-| `shatter_mill_side_running` | 4 | 250 ms | `shatter_mill_side_running0` |
-| `sky_tap_side_running` | 4 | 250 ms | `sky_tap_side_running0` |
-| `smelter_side_running` | 4 | 250 ms | `smelter_side_running0` |
-| `smoke` | 4 | 250 ms | `smoke0` |
-| `toxic_waste_barrel_top` | 4 | 300 ms | `toxic_waste_barrel_top0` |
-| `tree_cutter_back_running` | 4 | 250 ms | `tree_cutter_back_running0` |
-| `tree_cutter_side_running` | 4 | 250 ms | `tree_cutter_side_running0` |
-| `volt_engine_side_running` | 4 | 250 ms | `volt_engine_side_running0` |
-| `white_portal` | 4 | 300 ms | `white_portal0` |
-| `wire_mill_side_running` | 4 | 250 ms | `wire_mill_side_running0` |
-| `yellow_portal` | 4 | 300 ms | `yellow_portal0` |
-
-원시 데이터가 드러내는 구조적 비고 하나: 아틀라스는 42가 아니라 45개의 애니메이션 루트를 담는다 — `radar_screen`의 미리 회전된 사본 4개가 저마다 자기만의 4프레임 사다리를 가지며, 이것이 `radar_screen`이 두 패밀리 비고를 함께 지니는 유일한 이름인 이유이기도 하다.
-
-#### 68.5 실측 드리프트 (sjr0p7 → cnty9)
-
-레지스트리는 빌드에 동봉되는 콘텐츠이므로 블록 업데이트와 함께 흘러간다. 이 가이드가 실측한 두 빌드 (2026-10-17과 2026-10-27, 열흘 간격) 가 그 속도를 정확히 보여 준다:
-
-- 엔트리: 1200 → 1219 (98 추가, 79 제거)
-- 철자를 유지한 이름: 1121 — 이 중 **779개가 id를 바꿨다** (69%)
-- 명명 규칙 하나가 달 중간에 이행했다: `_rot1..4` 접미사 이름 68개 (예: `chest_top_rot1`) 가 `[rot[1..4` 슬롯 (예: `chest_top[rot[1`) 이 되었고, 더블 체스트 텍스처 (`chest_double_*`, 8 엔트리) 가 그와 함께 나타났다
-- 사용 가능 이름 수는 900 → 905로 옮겨갔고, `HEADER_VERSION` (§65.1) 의 레지스트리 해시가 id를 구워 넣은 저장 팩 전부를 다시 무효화했다
-
-마지막 항목이 운용상의 교훈이다: **`19`가 아니라 `bloxdTextureIdLava`를 써라** — 이름 상수는 위 항목 전부를 변함없이 견디는데, 검증기가 로드 시 라이브 레지스트리에 대해 다시 해석해 주기 때문이다.
-
-#### 68.6 드리프트 목록 전문 (98 추가, 79 제거)
-
-§68.5의 헤드라인 숫자를 이름 하나하나로 풀어 쓴 것이다 — 10월 팩을 업데이트하는 텍스처 팩 작가는 정확히 어떤 파일 이름이 더는 맞지 않게 됐는지 알아야 하기 때문이다. 목록들이 비교하는 것은 *철자* 층 (텍스처 팩이 쓰는 파일 이름) 이며, 철자를 §68.2의 사용 가능 상수로 바꾸는 것은 §64의 접기 규칙이다.
-
-**회전 접기 이행 — 기계 윗면 17개 (철자 68개 제거, 슬롯 68개 추가).** `alloy_kiln_top`, `auto_bench_top`, `belt_tunnel_exit_top`, `belt_tunnel_top`, `burner_drill_top`, `crop_harvester_top`, `crusher_top`, `crystal_vat_top`, `deep_drill_top`, `electric_drill_top`, `press_top`, `recycler_top`, `shatter_mill_top`, `sky_tap_top`, `smelter_top`, `tree_cutter_top`, `wire_mill_top`은 `_rot1..4` 배리언트 철자에서 `[rot[1..4` 미리 회전된 슬롯으로 옮겨갔다; 접힌 루트가 사용 가능한 이름이므로, 텍스처 팩은 이제 `X_top_rotN.png` 파일 네 개 대신 `X_top.png` 하나를 싣는다.
-
-**체스트 윗면 접기 — 3 패밀리 (철자 6개 제거, 슬롯 12개 추가).** `chest_top_1`/`chest_top_2` → `chest_top`, `iron_chest_top_1`/`_2` → `iron_chest_top`, `moonstone_chest_top_1`/`_2` → `moonstone_chest_top`: 두 배리언트 철자가 루트 아래의 미리 회전된 슬롯이 되었다 — PNG 파일 이름을 그에 맞게 바꿔라.
-
-**새 텍스처 — 17 이름.** 더블 체스트 (`chest_double_back_hi`/`_lo`, `chest_double_front_hi`/`_lo`, `chest_double_top_1_hi`/`_lo`, `chest_double_top_2_hi`/`_lo`), 다크스톤 패밀리 (`darkstone`, `darkstone_bricks`, `darkstone_bricks_cracked`, `darkstone_bricks_lava`, `darkstone_engraved`, `darkstone_smooth`), `pure_copper_ore`, `pure_voltite_ore`, 그리고 `forge_hopper_top`.
-
-**단순 접기 한 건.** `ghost_chest_top_1`/`ghost_chest_top_2`가 단일 `ghost_chest_top`로 합쳐졌다.
-
-**완전 삭제 — 3 이름.** `shaft_hopper_top`, `sun_panel_side`, `sun_panel_top`은 새 레지스트리에 후계 철자가 없다 — 그 콘텐츠는 이 빌드와 함께 게임을 떠났다. `forge_hopper_top`은 검증된 개명이 아니라 정말로 새로운 텍스처이다.
-
-검증용 원시 철자 diff:
-
-```text
-+ 98 added (cnty9):
-alloy_kiln_top[rot[1, alloy_kiln_top[rot[2, alloy_kiln_top[rot[3, alloy_kiln_top[rot[4, auto_bench_top[rot[1, auto_bench_top[rot[2
-auto_bench_top[rot[3, auto_bench_top[rot[4, belt_tunnel_exit_top[rot[1, belt_tunnel_exit_top[rot[2, belt_tunnel_exit_top[rot[3, belt_tunnel_exit_top[rot[4
-belt_tunnel_top[rot[1, belt_tunnel_top[rot[2, belt_tunnel_top[rot[3, belt_tunnel_top[rot[4, burner_drill_top[rot[1, burner_drill_top[rot[2
-burner_drill_top[rot[3, burner_drill_top[rot[4, chest_double_back_hi, chest_double_back_lo, chest_double_front_hi, chest_double_front_lo
-chest_double_top_1_hi, chest_double_top_1_lo, chest_double_top_2_hi, chest_double_top_2_lo, chest_top[rot[1, chest_top[rot[2
-chest_top[rot[3, chest_top[rot[4, crop_harvester_top[rot[1, crop_harvester_top[rot[2, crop_harvester_top[rot[3, crop_harvester_top[rot[4
-crusher_top[rot[1, crusher_top[rot[2, crusher_top[rot[3, crusher_top[rot[4, crystal_vat_top[rot[1, crystal_vat_top[rot[2
-crystal_vat_top[rot[3, crystal_vat_top[rot[4, darkstone, darkstone_bricks, darkstone_bricks_cracked, darkstone_bricks_lava
-darkstone_engraved, darkstone_smooth, deep_drill_top[rot[1, deep_drill_top[rot[2, deep_drill_top[rot[3, deep_drill_top[rot[4
-electric_drill_top[rot[1, electric_drill_top[rot[2, electric_drill_top[rot[3, electric_drill_top[rot[4, forge_hopper_top, ghost_chest_top
-iron_chest_top[rot[1, iron_chest_top[rot[2, iron_chest_top[rot[3, iron_chest_top[rot[4, moonstone_chest_top[rot[1, moonstone_chest_top[rot[2
-moonstone_chest_top[rot[3, moonstone_chest_top[rot[4, press_top[rot[1, press_top[rot[2, press_top[rot[3, press_top[rot[4
-pure_copper_ore, pure_voltite_ore, recycler_top[rot[1, recycler_top[rot[2, recycler_top[rot[3, recycler_top[rot[4
-shatter_mill_top[rot[1, shatter_mill_top[rot[2, shatter_mill_top[rot[3, shatter_mill_top[rot[4, sky_tap_top[rot[1, sky_tap_top[rot[2
-sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smelter_top[rot[3, smelter_top[rot[4
-tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
-wire_mill_top[rot[3, wire_mill_top[rot[4
-
-- 79 removed (sjr0p7):
-alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
-auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
-belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
-burner_drill_top_rot3, burner_drill_top_rot4, chest_top_1, chest_top_2, crop_harvester_top_rot1, crop_harvester_top_rot2
-crop_harvester_top_rot3, crop_harvester_top_rot4, crusher_top_rot1, crusher_top_rot2, crusher_top_rot3, crusher_top_rot4
-crystal_vat_top_rot1, crystal_vat_top_rot2, crystal_vat_top_rot3, crystal_vat_top_rot4, deep_drill_top_rot1, deep_drill_top_rot2
-deep_drill_top_rot3, deep_drill_top_rot4, electric_drill_top_rot1, electric_drill_top_rot2, electric_drill_top_rot3, electric_drill_top_rot4
-ghost_chest_top_1, ghost_chest_top_2, iron_chest_top_1, iron_chest_top_2, moonstone_chest_top_1, moonstone_chest_top_2
-press_top_rot1, press_top_rot2, press_top_rot3, press_top_rot4, recycler_top_rot1, recycler_top_rot2
-recycler_top_rot3, recycler_top_rot4, shaft_hopper_top, shatter_mill_top_rot1, shatter_mill_top_rot2, shatter_mill_top_rot3
-shatter_mill_top_rot4, sky_tap_top_rot1, sky_tap_top_rot2, sky_tap_top_rot3, sky_tap_top_rot4, smelter_top_rot1
-smelter_top_rot2, smelter_top_rot3, smelter_top_rot4, sun_panel_side, sun_panel_top, tree_cutter_top_rot1
-tree_cutter_top_rot2, tree_cutter_top_rot3, tree_cutter_top_rot4, wire_mill_top_rot1, wire_mill_top_rot2, wire_mill_top_rot3
-wire_mill_top_rot4
-```
-
-
----
-
 ## API v5 마이그레이션 가이드
-> 버전: 5 · 상태: Historical (해당 시기의 마이그레이션 가이드; 대상 빌드는 본문에 명시)
-대상 빌드: `ab90qa.main.6188124c.js` — **프로덕션과 프리프로드에 동시 적용 (2026-11-03 실측)**, 그리고 두 번들은 다시 바이트 단위로 동일하다 (두 호스트에서 각각 실시간으로 받아 온 메인 번들의 md5 `fc3322212d15be2445c0e8dfc9733fcc`), 따라서 여기 적힌 내용은 그대로 프로덕션에 적용된다. v3 이후 최대의 API 개정이다: 메인 번들은 3.39 MB로 커졌고 (직전 v4 빌드보다 +115 KB), 청크 맵은 195개 id (c0–c195, 알려진 7개 구멍을 제외하면 188개 출력) 이며, 셰이더 파이프라인은 여전히 c51–c56 클러스터에 있다 (로더 c53, 검증기/헤더/레지스트리 빌더 c55, WebGPU/코드젠 c56, 포그 c9) — 단, 기본 팩 템플릿은 c116으로 옮겨갔다 (`tcwczu`에서는 c124였다). 이 레이아웃 세부는 팩에 하나도 보이지 않는다. 현재 프로덕션 빌드 `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`) 로 재검증했다: 엔진 헤더는 바이트 단위로 동일하고 아래의 로더/변형/훅/예약명 실측값은 모두 불변으로 재확인됐다 — 움직인 표면은 텍스처 레지스트리뿐이다 (896 → 906 사용 가능 이름; §80 추보). preprod (`2lcqcl`) 는 다른 메인 번들을 배포하지만 셰이더 팩의 모든 표면에서 동일하게 실측됐다. 다시 `bny9u.main.02116121.js` (2026-11-05, md5 `60eea80ec48253b7ac6cc45604dc8273`, 프로덕션과 preprod 가 같은 바이트 동일 번들로 배포) 로 재검증했다: 헤더·기본 팩 템플릿·로더 제한·uniform 레이아웃·훅·변형·매크로·예약명·검증 메시지는 모두 재실측 결과 불변. 레지스트리는 다시 움직였고 (906 → 911 사용 가능 이름; §80 추보), 게임 정의 수는 111 → 115 로 늘었으며 셰이더 파이프라인 청크는 재번호되었다 (로더 c54, 검증기/헤더 c56, WebGPU/코드젠 c57, 기본 팩 템플릿 c122).
 
 *보이는* 것: 엔진 헤더는 6,021에서 **디코딩 8,954 바이트**로 커졌고 (151 → 208 줄) — 거의 모든 구조체가 필드를 얻었으며, 4개의 새 함수가 엔진 자신의 조명 레시피를 문서로 만들었고, `blockFlags` 비트마스크는 사라지고 이름 붙은 불리언들로 이루어진 제대로 된 `BloxdFlags` 구조체가 그 자리를 채웠다. 컴파일 시점 게이트 `#ifdef BLOXD_LIGHTING`도 사라졌다: 조명 상태는 프레임당 uniform의 `lit: u32` 멤버로 옮겨가 `bloxdLit()`로 런타임에 조회한다. 기본 팩 템플릿은 6개가 아니라 **9개 훅 전부**를 싣고 나온다. 그리고 엔진 내부의 `bloxdSp*` 네임스페이스는 27에서 46 심볼로 커졌다.
 
@@ -9504,7 +6291,6 @@ strict 게임 계약 자체 (v4 §60) 는 불변이다: 가드 없는 버텍스 
 간결한 v4 팩 — 「초목 틴트 + 헬드라이트 부스트」 — 오늘날이라면 실패하는 그대로의 모습과, 이식된 모습:
 
 ```wgsl
-// ---- v4 (fails validation on ab90qa) ----
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if ((surface.blockFlags & bloxdBlockFlagVegetation) != 0u) {
@@ -9568,308 +6354,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **`HEADER_VERSION`가 `9.<hash>.<hash>`로 이동** — v4와 같은 이중 접미사 구조 (헤더 재료의 fnv1a32, 정렬된 이름-id 레지스트리의 fnv1a32), 선행 정수만 8에서 9로. 저장 팩 재검사 논리 ([v4 마이그레이션 가이드](history/v4.md)의 §55) 는 불변: 헤더/레지스트리가 바뀌면 저장 팩이 「재확인 필요」로 넘어간다.
 - **i18n 면**: 셰이더 팩 키 패밀리는 형태가 불변 (v4 가이드 §62의 `load*`, `status*`, 배리언트 라벨 키가 모두 재측정되어 존재; `loadNoWgsl`/`loadNotZip`도 여전히 그대로).
 - **재조사하는 사람을 위한 번들 레이아웃**: 헤더 c55 (불변), 로더/지속화 c51–c53, 검증기 + 레지스트리 빌더 c55, WebGPU 코드젠 c56, 포그 c9, **기본 팩 템플릿 c116** (c124에서 이동), BLOXD_ALPHA 발생지 c51/c52/c53/c55/c9. 청크 형식 메모: 이제 모든 청크가 ES 모듈이다 (`export const modules = {...}`) — c53에는 c52와 c53 양쪽의 모듈까지 들어 있다 — 번들을 텍스트 검색할 때 중요하다 (`1371` 같은 모듈 id는 어떤 청크도 아닌 *main*의 희소 모듈 배열에 산다).
-
-### 79. 엔진 내부 v5: 텍스처 파이프라인과 46-심볼 `bloxdSp*` 네임스페이스
-
-v4 §63의 3-배리언트 텍스처 코드젠이 같은 형태로 이어진다. 라이브 제너레이터 (c56) 에서 복원:
-
-**배리언트 1 — 텍스처 팩 없음** (생성 블록 전체; `bloxdTextureSize`와 `bloxdTexel`은 스텁):
-
-```wgsl
-fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
-        return vec2u(1u);
-}
-fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
-        return vec4f(1.0);
-}
-```
-
-**배리언트 2 — 아틀라스 경로** (게임에서의 기본): `bloxdTextureSize`는 `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))`를 반환하고, `bloxdTexel`은 로드 전에 면의 4분회전을 적용한다 — v4의 회전 미묘함 (v4 가이드 §57.4), 이제는 생성된 `bloxdSpTurned`에 대한 명시적 if-체인으로 풀어 쓰인다:
-
-```wgsl
-        // Each quarter turn clockwise the face shows its texture at reads the unturned texture at (v, 1 - u)
-        var bloxdSpTurned = bloxdSpUv;
-        if (bloxdSpTextureRotation == 1u) {
-                bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
-        } else if (bloxdSpTextureRotation == 2u) {
-                bloxdSpTurned = 1.0 - bloxdSpUv;
-        } else if (bloxdSpTextureRotation == 3u) {
-                bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
-        }
-```
-
-(그 발췌의 `bloxdSpTextureRotation` 이름은 입력 4조의 회전 멤버에 대한 엔진 자신의 저장소다 — v4 §63.2의 전달 경로, 역할은 불변.) **배리언트 3 — 커스텀 텍스처 팩 텍스처** — 레이어 아틀라스의 텍스처별 셀을 `textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)`로 샘플링하며, 팩 자기 텍셀용 `bloxdSpOwnTexel` 경로가 딸려 있다.
-
-`bloxdSp*` 네임스페이스 — 제너레이터가 주입할 수 있어서 당신이 다시 선언할 수 없는 모든 것 — 은 27에서 **46 심볼**로 커졌다: 새로 20, 은퇴 1 (`bloxdSpLitColour`, 그 일자리는 이제 공개 `bloxdLitColour`), 인계 26:
-
-`bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
-
-새 이름들은 v5 기능에 곧장 흔적이 남는다: `bloxdSpFlags` (flags 구조체 경로), `bloxdSpEnchant` / `bloxdSpItemLocalPosition` (새 입력), `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` (셀 샘플링 텍스처 팩 경로), `bloxdSpQuarterTurns` (위의 회전 체인), `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` (확장된 훅 안의 생성된 지역변수들). 팩 수준의 예약 규칙은 불변이고 목록보다 넓다: 대소문자 무시의 `/^bloxd/i`에 맞는 것이면 무엇이든.
-
-### 80. 텍스처 레지스트리: 896개 사용 가능 이름 (드리프트, 실측)
-
-`ab90qa` (2026-11-03) 에서 v4 카탈로그와 같은 방법론으로 재측정했다 ([v4 마이그레이션 가이드](history/v4.md)의 §68): 출하된 블록 레지스트리의 텍스처 데이터에 엔진 자신의 레지스트리 빌더 모듈 (이 빌드에서는 모듈 29833) 을 돌리고 출력을 기록한다.
-
-| 측정 | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| 아틀라스 엔트리 | 1,219 | **1,210** |
-| 회전 패밀리 (회전 표기) | 57 (228) | **57 (228) — 불변** |
-| 애니메이션 패밀리 (프레임 표기) | 42 (188) | **42 (188) — 불변** |
-| 사용 가능한 명명 상수 | 905 | **896** |
-| 살아남은 이름 중 id 변동 | — | **905개 중 334개가 다른 id를 받았다** |
-
-드리프트, 전부 (이것이 완전한 목록이다 — 11개 이름):
-
-- **추가 (1):** `scorpion_eggs`.
-- **제거 (10):** 더블 체스트 텍스처 여덟 개 `chest_double_front`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_back`, `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo` — 그리고 `chest_double_top_2_hi`, `chest_double_top_2_lo` (더블 체스트가 게임 데이터에서 사라졌다; 싱글 체스트 `chest_*` 패밀리는 온전히 살아 있다) — 여기에 `mob_spawner_hostile_block_side`와 `mob_spawner_neutral_block_side` (스포너는 `mob_spawner_block_top`를 유지; 변형 사이드 텍스처가 사라졌다).
-
-v4 카탈로그의 도그마 ([v4 마이그레이션 가이드](history/v4.md)의 §68) 가 한 글자도 바뀌지 않고 이어진다: **이름이 API이고, id는 스냅샷일 뿐이다.** 살아남은 905개 이름 중 334개가 두 빌드 사이에 id를 바꿨다 — `351`이 아니라 언제나 `bloxdTextureIdStone`을 써라. v4 카탈로그의 알파벳순 목록 ([v4 마이그레이션 가이드](history/v4.md)의 §68.2) 은 위 11개 이름의 드리프트를 감안하면 v5에서도 유효하다; 접기 규칙과 두 패밀리 표는 불변이므로 그 §68.3–§68.4 (회전·애니메이션 패밀리) 도 여전히 정확하다. 현재형 카탈로그는 [텍스처 카탈로그](api/texture-catalog.md)이다.
-
-**추보 (2026-11-04, `xkg8x`):** 레지스트리는 v5 출시 다음 날 다시 움직였다 — 아래의 모든 제거가 뒤집혔다. 아틀라스 엔트리 1,210 → 1,220, 사용 가능 이름 896 → **906** (더블 체스트 텍스처 8개와 스포너 옆면 변형 2개가 복귀; 제거 없음), 생존 896개 중 376개가 id 변경, 계열 불변 (57 / 42). preprod `2lcqcl` 은 셰이더 팽의 모든 표면에서 동일하게 실측. 현행 형태의 카탈로그는 `xkg8x` 로 재실측되었다: [텍스처 카탈로그](api/texture-catalog.md).
-
-**추보 (2026-11-05, `bny9u`):** 레지스트리가 또 움직였다 — 새 블록 2종이 등장. 아틀라스 엔트리 1,220 → 1,232, 사용 가능 이름 906 → **911** (+5: `trading_terminal_front` / `_side` / `_top`, `stone_generator_side` / `_top`. 제거 없음), **생존 906개 중 864개가 id 변경** (95%), 회전 계열 불변 (57), 애니메이션 계열 42 → **43** (`trading_terminal_front`, 8프레임 / 250 ms). 프로덕션과 preprod 는 같은 바이트 동일 번들을 배포한다 (md5 `60eea80ec48253b7ac6cc45604dc8273`). 현행 형태의 카탈로그는 `bny9u` 로 재실측되었다: [텍스처 카탈로그](api/texture-catalog.md).
-
-**부기 (2026-11-08, `v98qt8`):** 레지스트리가 다시 움직였고 이번에는 **폴딩 회귀**도 함께 실립니다. 아틀라스 항목 1,232 → 1,227, 사용 가능 이름 911 → **906** (+1 `hay_block_top`; −6 `artisan_table_side`/`_top`, `crafting_table_side`, `furnace_front`/`_side`/`_top` — Furnace, Workbench, Artisan Bench가 블록 모델화 (Workbench 는 `crafting_table_top` 를 유지 — 윗면은 여전히 지형 텍스처)), **905명 중 716명이 id 변경** (79%), 두 계열 집합 불변 (57 / 43). 프로덕션과 preprod는 동일한 바이트-동일 번들 (md5 `7458fd47ff88331d9f451d1456ff48ac`). 회귀 내용: 엔진의 애니메이션 텍스처 테이블이 폴딩 코드가 기대하는 슬롯 인덱스가 아니라 스펠링 키로 구축되어, 43개 애니메이션 계열 기본 이름(`lava` 등)이 현재 검증에 실패하고 196개 프레임 스펠링이 개별 상수로 풀립니다 — 전체 바이트 수준 분석은 [엔진 내부: 텍스처 레지스트리](internals/texture-registry.md#the-v98qt8-folding-regression)에. 현행 형식 카탈로그는 `v98qt8`에서 재측정됨: [텍스처 카탈로그](api/texture-catalog.md).
-
-
-**추기 (2026-11-20, `bbb6l5`):** 레지스트리가 사상 최대의 변화를 겪었고, 이것이 **v5 시대 첫 API 표면 변화**입니다. 아틀라스 항목 1,227 → **1,650** (+423, −0), 사용 가능 이름 906 → **1,017** (+111 — 아토믹 시대 콘텐츠 팩: 원자로 기계, 우라늄과 재료, 배터리, 폭탄과 특수물), 회전족 57 → **64**, 애니메이션족 43 → **71** (+204개의 새 `frameA~frameB~interval` 전환 스펠링(사전 블렌딩된 크로스페이드 슬롯)), 생존 이름의 **863/906이 id 변경** (95%), 그리고 `v98qt8`의 **폴딩 회귀는 수리됨** (애니메이션 테이블이 다시 슬롯 키로 — `lava` 등이 검증 통과). 이와 함께 `apiVersion` 인상 없이 팩 가시 API가 확장: uniform에 `shadowDirection: vec3f` @ 64 (64 → 80바이트, `minBindingSize` 80), 헤더에 `bloxdShadowDirection()`, 주입 함수 `bloxdShadow()` / `bloxdAirShadow(t)`가 진짜 태양/달 섀도 시스템을 팩에 개방, `pack.json`에 선택 boolean `keepCircleShadows`. 핑거프린트 `13d4e18f` → `32451195` (번들 내장 사전 구축 아틀라스와 일치 검증). 현행 카탈로그는 `bbb6l5`로 재측정: [텍스처 카탈로그](api/texture-catalog.md).
-### 81. 확인된 상수·제한·레이아웃 (v5)
-
-가이드의 측정 장부에 있는 v5 행 — 모든 것을 `ab90qa` (2026-11-03, prod = preprod, 바이트 동일) 에서 측정했다:
-
-| 항목 | 값 |
-|---|---|
-| `apiVersion` | `5` (엄격 `===`, 숫자) |
-| 엔진 헤더 | 디코딩 8,954 B / 208 줄 (출시 형태 9,125 B, 삽입 6곳); 첫 줄 `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — 전문은 §82 |
-| 훅 | 9 (지형/액체/모델 × 버텍스/surface/light); 이름 불변; 기본 템플릿은 9개 전부를 싣는다 (§76) |
-| 배리언트 | 6 (strict × 프로그램); 이름 `strict\|allow.terrain\|liquid\|model` — 조명 축이 사라졌다 (§74) |
-| 매크로 | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (모든 액체 + 비 strict 지형/모델) · `BLOXD_SCENE_DEPTH` (모든 액체) · ~~`BLOXD_LIGHTING`~~ **폐지** |
-| 팩 uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, 신규)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| 팩 바인딩 | 그룹 3: 0 uniform · 1 씬 깊이 (액체) · 2 `bloxdSpTextureLayers` 스토리지 |
-| flags | `BloxdFlags` 구조체, 14 bool (§71); v4 비트값은 은퇴 |
-| 로더 제한 | 256 `.wgsl` / 256 KB 소스 / 64 KB `pack.json` / 32 MB zip / 1,024 zip 엔트리; UTF-8; 매니페스트 1개; 경로 유일 — 모두 불변 |
-| 텍스처 레지스트리 | 1,210 엔트리 → **896개 사용 가능 이름**; cnty9 대비 드리프트 +1/−10 (§80); 카탈로그: v4 가이드 §68 + §80의 드리프트 목록 (현재형: [텍스처 카탈로그](api/texture-catalog.md)); `xkg8x` (2026-11-04) 에서 재실측: 1,220 / **906**, 10건 제거가 모두 뒤집힘, 376건 id 변화 (§80 추보); `bny9u` (2026-11-05) 에서는 1,232 / **911**, +5 (Trading Terminal ×3·Stone Generator ×2), 864건 id 변화 (§80 추보) |
-| 라이트 곡선 | 0–15 레벨 → 이즈아웃 곡선으로 0–1 (`6 → 0.45`, `12 → 0.92`) — 헤더 내, 불변 |
-| 리프트 곡선 | `1 - (1 - x / (3 - 2x))^3` — 불변 (이제 청크 c9) |
-| 방향 콘 | `0.12 / 0.65 / 0.62 / 0.95` — 불변 (청크 c9) |
-| 포그 색 | `vec3f(183/255, 191/255, 195/255)` — 불변 |
-| 예약 이름 | `/^bloxd/i` (대소문자 무시) + 46 `bloxdSp*` 엔진 심볼 (§79) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 타이틀 | [게임별 셰이더 팩 정책](internals/policy.md)의 12개 allow 타이틀 외 전부 (ab90qa에서 재확인, 불변) |
-
-### 82. 완전한 v5 엔진 헤더, 그대로
-
-§67의 성과물을 v5용으로 재측정한 것: 로더가 모든 팩 앞에 붙이는 정확히 그 텍스트, 라이브 프로덕션 번들 (`ab90qa`, 청크 c55, 템플릿을 여섯 개의 라이브 삽입값 — `apiVersion`과 `bloxdPackInputs`를 거치는 다섯 개의 uniform 판독 — 으로 렌더링) 에서 복원했다. 디코딩 8,954 바이트, 208 줄. 바꿔 말한 것은 하나도 없다:
-
-```wgsl
-
-// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
-
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// Blocks along each side of a chunk.
-const bloxdChunkSize: i32 = 32;
-
-// These functions return the same value for the entire frame.
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Integer distance, in blocks: render position + this offset = world position.
-// Changes as the player travels, so render positions stay close to 0,0,0.
-// See bloxdWorldPosition for one way to use it.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// The unit vector towards the sun, in world orientation; 0 when there's no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// Seconds since the page loaded. As an f32, it has sub-millisecond precision
-// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Whether block and sky lighting is on. When it's off, BloxdLightIn's
-// blockLight and heldLight are 0, and its skyLight and light colours are 1.
-fn bloxdLit() -> bool {
-    return bloxdPackInputs.lit != 0u;
-}
-
-// What kind of block, item or lifeform a face is. Any number of flags may be
-// set, possibly even none. For example, sandstone is sand and rock.
-struct BloxdFlags {
-    opaque: bool,     // Opaque blocks, i.e. full cubes with no gaps or holes.
-    emissive: bool,   // Blocks that emit light, e.g. lava and glowing ores.
-    vegetation: bool, // Leaves, grass blocks and leafy plants, e.g. tall grass.
-    dirt: bool,       // Soil, grass blocks included. Rocky Dirt is rock too.
-    sand: bool,       // Sand, Red Sand and every sandstone, which is rock too.
-    rock: bool,       // Stone variants, and more, e.g. gravel, ores and magma.
-
-    // Drawn as block models, so never part of terrain or flagged as opaque.
-    slab: bool,       // Half blocks.
-    stairs: bool,     // Stairs and corner stairs.
-    flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
-
-    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
-    held: bool,       // Items in a hand, in first or third person.
-    dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
-    thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
-
-    lifeform: bool,   // Players, mobs and NPCs. Includes armour and cosmetics.
-}
-
-// Convert a render position to a world position, with possible f32 inaccuracy.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-struct BloxdVertexIn {
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-}
-
-struct BloxdVertex {
-    position: vec3f,      // The render position output.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,        // RGB colour = texture * tint * ambient occlusion.
-    alpha: f32,           // Opacity.
-
-    // Enchanted items and armour only, all 0 for anything else.
-    enchantTier: u32,     // 1-5 for Tier 1-5.
-    enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
-    enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
-
-    // Players and mobs only, 0 for anything else: RGB overlay colour, e.g. the
-    // red flash when hurt, and its alpha. bloxdLitColour mixes it into colour.
-    overlayColour: vec4f,
-
-    // These mean the same as in BloxdVertexIn, after the vertex hook.
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-
-    // These are all 0 if the face has no texture. Most models use textureId 0.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdSurface {
-    colour: vec3f,        // RGB colour output.
-#ifdef BLOXD_ALPHA
-    alpha: f32,           // Opacity output.
-#endif
-    emission: vec3f,      // Emissive RGB, added after lighting, before fog.
-    enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
-    overlayColour: vec4f, // Overlay output, mixed in by bloxdLitColour.
-}
-
-// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
-// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
-// bloxdLitColour lights a surface from these as the engine does.
-struct BloxdLightIn {
-    litColour: vec3f,  // Lit and enchanted RGB colour, before emission and fog.
-    directional: f32,  // Summed Lambert from directional lights; 0 if none.
-    diffuse: vec3f,    // The material's RGB response to directional light.
-    emissive: vec3f,   // The material's RGB glow, added to directional light.
-    ambient: vec3f,    // RGB ambient colour, added to directional light.
-    blockLight: vec3f, // RGB block light; 0 when !bloxdLit().
-    skyLight: f32,     // Sky light; 1 when !bloxdLit().
-    ambientLightColour: vec3f, // Minimum RGB light; 1 when !bloxdLit().
-    skyLightColour: vec3f, // RGB colour of skyLight; 1 when !bloxdLit().
-    heldLight: vec3f,  // RGB held light; 0 when !bloxdLit() or no light held.
-    fogColour: vec3f,  // The game's RGB fog colour; 0 when the game has no fog.
-    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
-
-    // These are the same as in BloxdSurfaceIn.
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdLight {
-    colour: vec3f, // RGB colour output.
-}
-
-struct BloxdOpaqueBehind {
-    hit: bool,       // False where nothing opaque is behind (sky).
-    position: vec3f, // The render position; 0 when !hit.
-    distance: f32,   // From the camera; 0 when !hit.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-    return BloxdSurface(
-        surface.colour,
-#ifdef BLOXD_ALPHA
-        surface.alpha,
-#endif
-        vec3f(0.0),
-        surface.enchantColour,
-        surface.overlayColour,
-    );
-}
-
-// Apply this fragment's fog to colour, as the engine does.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(colour, light.fogColour, light.fogAlpha);
-}
-
-// How the face's material and angle light it: directional light on its
-// diffuse colour, plus its emissive and ambient terms, clamped to 0-1.
-fn bloxdShading(light: BloxdLightIn) -> vec3f {
-    let diffuse = light.directional * light.diffuse;
-    return saturate(diffuse + light.emissive + light.ambient);
-}
-
-// The world's light at this fragment: the brightest of block, sky and held
-// light, none below ambientLightColour.
-fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
-    let ambientLight = light.ambientLightColour;
-    let blockLight = ambientLight + light.blockLight * (1.0 - ambientLight);
-    let skyLight = mix(ambientLight, light.skyLightColour, light.skyLight);
-    let heldLight = ambientLight + light.heldLight * (1.0 - ambientLight);
-    return max(max(blockLight, skyLight), heldLight);
-}
-
-// The surface's colour lit as the engine does, before emission and fog:
-// mixed with overlayColour, then bloxdShading, then mixed with
-// enchantColour, then bloxdWorldLight.
-fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
-    let overlay = surface.overlayColour;
-    let overlaid = mix(surface.colour, overlay.rgb, overlay.a);
-    let shaded = bloxdShading(light) * overlaid;
-    let enchant = surface.enchantColour;
-    let enchanted = mix(shaded, enchant.rgb, enchant.a);
-    return max(enchanted * bloxdWorldLight(light), vec3f(0.0));
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    let lit = bloxdLitColour(surface, light);
-    return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
-}
-```
-
-위의 모든 훅 서명, 구조체, 상수, 주석은 하중을 지는 부재다: 라이브 검증기가 파싱하는 것, 코드 제너레이터가 앞에 붙이는 것, 당신의 팩이 컴파일되는 대상이 바로 이것이다. v4 헤더 ([v4 마이그레이션 가이드](history/v4.md)의 §67) 와 비교해 보면 v5가 한 화면에 드러난다: 상단의 `bloxdChunkSize`와 `bloxdLit()`, 비트 상수를 대체하는 `BloxdFlags` 구조체, 입력 구조체의 `localPosition`과 인챈트/오버레이 필드, 새 출력 둘, 그리고 `bloxdDefaultLight` 앞의 조명 헬퍼 세 개.
-
