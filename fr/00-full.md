@@ -5110,7 +5110,7 @@ Une distribution communautaire « cinematic shader » que nous avons analysée s
 
 ---
 
-## Intérieurs du moteur et recherche
+## Fonctionnement interne du moteur
 Cette catégorie présente le fonctionnement interne du moteur afin de mieux comprendre l'exécution des shader packs. Ces détails d'implémentation peuvent évoluer ; pour les règles d'utilisation stables et les API disponibles, consultez la [Référence de l'API](api/).
 
 ### Plan
