@@ -1,6 +1,6 @@
 # 太陽と月の正体
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20 本番+preprod確認) · 検証状況: Analyzed (本番バンドルの JavaScript から直接復元)
+> 対象API: 5 · 種別: 技術資料
 
 `bloxdSunDirection()` の供給元と、昼夜サイクルの実像。
 
