@@ -184,7 +184,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Garde** : `#ifdef BLOXD_SCENE_DEPTH` (défini dans les variantes liquides)
 - **Signification** : la face opaque derrière ce fragment (terrain vu à travers l'eau) ; `hit == false` pour le ciel
 - **Renommage depuis v2** : `found` → `hit`
-- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Intérieurs du moteur](../internals/rendering-pipeline.md)
+- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Fonctionnement interne du moteur](../internals/rendering-pipeline.md)
 
 ## Voir aussi
 
