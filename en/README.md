@@ -39,11 +39,11 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 
 ## Verification status labels
 
-Each page notes its target API version, build, last-verified date and status.
+Each page notes the API version it covers and the status of its supporting information.
 
 | Label | Meaning |
 |---|---|
-| Verified | Verified on-device / on the target build |
+| Verified | Verified in-game |
 | Analyzed | Confirmed by analyzing the internal implementation |
 | Partially Verified | Only partially confirmed |
 | Experimental | Experimental / unsettled |
