@@ -56,4 +56,4 @@
 
 ## Смотрите также
 
-- [Ошибки валидации](validation.md) · [Внутрянка движка: компиляция WGSL](../internals/wgsl-compilation.md) · [Ограничения](../api/restrictions.md)
+- [Ошибки валидации](validation.md) · [Внутреннее устройство движка: компиляция WGSL](../internals/wgsl-compilation.md) · [Ограничения](../api/restrictions.md)
