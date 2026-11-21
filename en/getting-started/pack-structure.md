@@ -6,7 +6,7 @@
 
 - **Format**: a single `.zip`, or a folder (folder loading is desktop browsers only)
 - **Contents**: one `pack.json` (at the top level of the pack; case-insensitive) + 1–256 `.wgsl` files
-- Multiple `.wgsl` files are concatenated into one module, so splitting and subdirectories are free. No constraints on file names. Concatenation happens in **dictionary order by path name** (module-scope declarations are order-independent, so this only matters for code depending on `var` initialization order). Non-`.wgsl` files (READMEs etc.) are ignored
+- Multiple `.wgsl` files are concatenated into a single module, so you can split code across files and subdirectories. File names are unrestricted. Files are concatenated in **lexicographic order by path** (module-scope declarations are order-independent; this only affects code that depends on the initialization order of `var`). Non-`.wgsl` files (such as README files) are ignored.
 
 ## Size and format limits
 
