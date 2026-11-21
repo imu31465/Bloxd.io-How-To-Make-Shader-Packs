@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **रिटर्न वैल्यू**: `position + vec3f(bloxdRenderOffset())`
 - **टिप्पणी**: f32 परिशुद्धता की सीमाओं के कारण दूर की कोऑर्डिनेट अशुद्ध हो सकती हैं (हेडर: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — अनडॉक्यूमेंटेड, पर अब भी इंजेक्ट होती है
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i

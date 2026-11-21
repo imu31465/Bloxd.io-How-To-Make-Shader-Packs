@@ -36,7 +36,9 @@ Helligkeits-, Schatten- und Fog-Probleme.
 - **Ursache**: beleuchtungsexklusive Eingaben (`blockLight` etc.) ungeschützt benutzt. v5 hat kein `#ifdef BLOXD_LIGHTING` — auf **Laufzeit-`bloxdLit()`** verzweigen
 - **Fix**: früh zurückgeben mit `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Beleuchtung](../api/lighting.md#bloxdlit--das-gate))
 
-## „LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## LightEngine-Warteschlange überlastet
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Ursache**: dichte Leuchtblock-Regionen überlaufen die Licht-Seed-Queue, und die Lichtberechnung des Chunks wird abgeschnitten. **Nicht paket-verursacht**, aber Lichtlücken nahe glühender Cluster gehen darauf zurück
 - **Fix**: Lichtquellen in der Welt verteilen

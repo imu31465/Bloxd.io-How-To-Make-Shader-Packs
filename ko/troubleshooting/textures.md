@@ -4,29 +4,39 @@
 
 `bloxdTextureId*` / `bloxdTexel` 관련 문제. 896 이름 전체는 [텍스처 카탈로그](../api/texture-catalog.md) 에서 검색하라.
 
-## "There's no texture called X. Did you mean bloxdTextureIdY?"
+## 알 수 없는 텍스처 이름
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **원인**: 오철자. 검증기에는 **레벤슈타인 제안** 이 있다 (임계값 `max(2, floor(len/4)) + 1`)
 - **해결**: 제안을 받아들인다. [카탈로그](../api/texture-catalog.md) 와 교차 확인한다
 - **예방**: 이름은 카탈로그에서 복사·붙여넣기 한다
 
-## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+## 애니메이션 텍스처 프레임 이름
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **원인**: 애니메이션 텍스처에 **프레임 번호**를 씀 (`lava0` 등)
 - **해결**: 기본명을 쓴다 — 샘플이 현재 프레임을 자동으로 반환한다
 - **예방**: 42개 애니메이션 계열에는 프레임 접미사를 절대 쓰지 않는다 ([명명 규칙](../api/texture-api.md#철자-규칙과-명명의-자유))
 
-## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+## 회전 텍스처 이름
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **원인**: 회전 계열의 회전 사본 철자 (`[rot[N`) 를 씀
 - **해결**: 루트명을 쓴다 — `bloxdTexel` 이 회전을 다시 적용한다
 
-## "...could name X and Y, which differ only by case or underscores, so it can't be used."
+## 모호한 텍스처 식별자
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **원인**: 대소문자/언더스코어 무관 접기가 이름을 **모호하게** 남겼다
 - **해결**: 철자를 비모호하게 고친다
 
-## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+## 잘못된 텍스처 상수 이름
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **원인**: 접두사 오철자 (예: `bloxdTextureID`, `bloxdtextureid`)
 - **해결**: 이름을 정확히 `bloxdTextureId` 로 시작하게 한다
@@ -44,7 +54,9 @@
 
 - **한계**: 셰이더 팩 API 는 아틀라스를 **읽기만** 한다. 텍스처 추가는 텍스처팩 시스템의 임무다 ([조합](../guides/combinations.md))
 
-## "Packs can't use X: the engine binds every texture and sampler..."
+## 텍스처 접근 제한
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **원인**: `texture_*` / `sampler` 형을 직접 선언함
 - **해결**: `bloxdTexel()` 을 경유한다 ([제한과 예약명](../api/restrictions.md))

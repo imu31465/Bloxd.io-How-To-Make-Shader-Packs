@@ -4,14 +4,17 @@
 
 Erros rejeitados na **etapa do carregador** (a primeira barreira), exibidos na linha de status das configurações com ids `shaderPack:load*`.
 
-## "There's no pack.json at the top of the pack."
+## Manifesto do pacote ausente
+
+> `There's no pack.json at the top of the pack.`
 
 - **Causa**: não há `pack.json` na raiz do zip (ex. a pasta foi zipada com um nível extra de aninhamento)
 - **Verificação**: abra o zip — `pack.json` no nível superior (ou diretamente sob uma única pasta raiz comum)
 - **Correção**: zipe o `pack.json` e os arquivos `.wgsl` diretamente. Uma única pasta raiz comum é removida automaticamente ([Estrutura do pacote](../getting-started/pack-structure.md))
 - **Prevenção**: mantenha um procedimento de zip fixo; o "Comprimir" do macOS funciona como está (o lixo do SO é excluído automaticamente)
 
-## `loadDuplicateManifest` no carregamento do zip
+## Manifesto duplicado
+
 
 - **Causa**: dois arquivos `pack.json` (incluindo diferenças de maiúsculas/minúsculas)
 - **Correção**: mantenha exatamente um
@@ -49,7 +52,9 @@ Zips divididos (split), zip64, entradas criptografadas e compressão não suport
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | caminho duplicado / não-UTF-8 / falha de descompressão / zip danificado |
 | `loadNoManifest` / `loadDuplicateManifest` | posição do manifesto / duplicação |
 
-## "Ready. Reload the page to use it." mas nada muda
+## É necessário recarregar a página
+
+> `Ready. Reload the page to use it." mas nada muda`
 
 - **Causa**: pacotes precisam de um **recarregamento da página** para ativar
 - **Correção**: recarregue depois de selecionar; o status deve se tornar `Ready to use`

@@ -4,7 +4,7 @@
 
 वे समस्याएँ जो 6 में से केवल कुछ वेरिएंट (`strict|allow` × `terrain|liquid|model`) में घटित होती हैं। v5 ने लाइटिंग अक्ष (पुराना `BLOXD_LIGHTING`) हटा दिया और लोडर लोड के समय **सभी 6 वेरिएंट एक साथ** सत्यापित करता है।
 
-## केवल ग़ैर-strict गेमों में लोड होता है / strict में ड्रॉप
+## strict और allow मोड में उपलब्धता
 
 - **कारण**: बिना गार्ड का vertex हुक या पहुँच योग्य `discard`; strict गेम दोनों पर रोक लगाते हैं और उल्लंघन = **पूरे पैक का स्वतः निष्क्रिय होना** (`shaderPack:offInStrict`)
 - **जाँच**: लोडर स्क्रीन पर `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.` दिखता है
@@ -16,7 +16,9 @@
 - **कारण**: `alpha` केवल `#ifdef BLOXD_ALPHA` के पीछे मौजूद है (सभी liquid + ग़ैर-strict terrain/model)
 - **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](../api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## वर्टेक्स हुक के लिए allow मोड आवश्यक
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **कारण**: strict वेरिएंट में vertex हुक होते ही नहीं, इसलिए `BloxdVertex` भी नहीं; vertex कोड strict वेरिएंट से पहुँच योग्य है
 - **समाधान**: vertex हुक पर गार्ड लगाएँ

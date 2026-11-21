@@ -36,7 +36,9 @@ Problèmes de luminosité, d'ombres et de brouillard.
 - **Cause** : entrées propres à l'éclairage (`blockLight` etc.) utilisées sans garde. La v5 n'a pas de `#ifdef BLOXD_LIGHTING` — branchez sur **`bloxdLit()` à l'exécution**
 - **Correction** : retour anticipé `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Éclairage](../api/lighting.md#bloxdlit--la-porte))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## Débordement de la file LightEngine
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Cause** : les régions denses de blocs lumineux font déborder la file de graines de lumière et le calcul de lumière du chunk est écourté. **Non causé par le pack**, mais les trous de lumière près des clusters lumineux remontent à cela
 - **Correction** : espacez les sources de lumière dans le monde

@@ -4,7 +4,7 @@
 
 # Bloxd.io शेडर पैक दस्तावेज़ीकरण
 
-Bloxd.io के WebGPU रेंडरर के लिए शेडर पैक पर एक अनौपचारिक गाइड — निर्माण, कार्यान्वयन, सत्यापन और वितरण से लेकर API विनिर्देश और इंजन-इंटर्नल शोध तक।
+Bloxd.io के WebGPU रेंडरर के लिए shader pack बनाने, लागू करने, जाँचने और साझा करने की अनौपचारिक मार्गदर्शिका। इसमें API विनिर्देश और इंजन की आंतरिक कार्यप्रणाली पर सामग्री भी शामिल है।
 
 ---
 
@@ -40,7 +40,7 @@ Bloxd.io शेडर पैक गेम के **केवल WebGPU रें
 
 ### आप क्या बदल सकते हैं
 
-पैक रेंडरर की **हर फलक वाली 3-चरणीय पाइपलाइन** में जुड़ता है। रेंडर लक्ष्य तीन प्रोग्रामों में बँटते हैं, कुल **9 हुक**:
+शेडर पैक रेंडरर की **हर सतह को रेंडर करने वाली 3-चरणीय पाइपलाइन** में जुड़ता है। रेंडर लक्ष्य तीन प्रोग्रामों में बँटे हैं और कुल **9 हुक** हैं:
 
 | लक्ष्य | हुक (Vertex / Surface / Light) | क्या ड्रॉ होता है |
 |---|---|---|
@@ -48,13 +48,13 @@ Bloxd.io शेडर पैक गेम के **केवल WebGPU रें
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | पानी |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | ब्लॉक मॉडल (स्लैब, सीढ़ियाँ, पौधे), आइटम, प्लेयर, मॉब, NPC, कवच, कॉस्मेटिक्स |
 
-- **कर सकते हैं**: रंग, पारदर्शिता और उत्सर्जन बदलना; लाइटिंग समायोजित करना ([लाइटिंग API](api/lighting.md)); `bloxdTexel` से टेक्सचर सैंपल करना; `flags` के ज़रिए हर मॉडल के लिए अलग इफ़ेक्ट बनाना; vertex एनिमेशन (केवल allow गेम)
+- **कर सकते हैं**: रंग, पारदर्शिता और उत्सर्जन बदलना; लाइटिंग समायोजित करना ([लाइटिंग API](api/lighting.md)); `bloxdTexel` से टेक्सचर सैंपल करना; `flags` के ज़रिए हर मॉडल के लिए अलग इफ़ेक्ट बनाना; vertex एनिमेशन (केवल allow मोड वाले गेम में)
 - **नहीं कर सकते**: अपने टेक्सचर जोड़ना; bloom जैसे post-processing इफ़ेक्ट बनाना; अपना shadow map बनाना या उसका depth data सीधे पढ़ना; वास्तविक reflections (SSR) बनाना; या आकाश, बादलों और सूर्य की डिस्क पर सीधे shader लागू करना
 - **छायाएँ**: `bloxdShadow()` इंजन द्वारा गणना किया गया सूर्य/चंद्रमा का छाया गुणांक देता है, और `bloxdShadowDirection()` छाया डालने वाली रोशनी की गति की दिशा बताता है। `bloxdAirShadow(t)` कैमरे और fragment के बीच किसी बिंदु पर छाया का मूल्यांकन करता है। `skyLight` से मिलने वाली पुरानी voxel sky-occlusion विधि भी उपलब्ध है ([छाया गाइड](guides/shadows.md))
 
 ### strict और allow मोड
 
-हर गेम की एक शेडर-पैक नीति (`shaderPackPolicy`) होती है, और **ज़्यादातर गेम strict मोड में चलते हैं** (कोई vertex एनिमेशन नहीं, कोई `discard` नहीं)। आम वितरण के लिए बने पैकों को strict मोड में काम करना चाहिए। देखें [वेरिएंट](getting-started/variants.md) और [नीति रेफ़रेंस](internals/policy.md)।
+हर गेम की एक शेडर-पैक नीति (`shaderPackPolicy`) होती है, और **ज़्यादातर गेम strict मोड में चलते हैं** (कोई vertex एनिमेशन नहीं, कोई `discard` नहीं)। सामान्य वितरण के लिए बनाए गए पैक strict मोड में काम करने चाहिए। देखें [वेरिएंट](getting-started/variants.md) और [नीति रेफ़रेंस](internals/policy.md)।
 
 ### इस प्रलेखन की मान्यताएँ
 
@@ -1006,7 +1006,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **रिटर्न वैल्यू**: `position + vec3f(bloxdRenderOffset())`
 - **टिप्पणी**: f32 परिशुद्धता की सीमाओं के कारण दूर की कोऑर्डिनेट अशुद्ध हो सकती हैं (हेडर: *"with possible f32 inaccuracy"*)
 
-#### bloxdFragmentBlockPosition — अनडॉक्यूमेंटेड, पर अब भी इंजेक्ट होती है
+#### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -3024,7 +3024,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let glint = pow(max(dot(waveN, halfDir), 0.0), 180.0) * 0.55 * clamp(l.skyLight, 0.0, 1.0);
             out.colour += vec3f(1.0, 0.97, 0.90) * glint;
         }
-}
+    }
     return out;
 }
 ```
@@ -3490,7 +3490,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### पूर्ण-अंधेरी गुफ़ाएँ (आकाशहीन क्षेत्र और भी गहरे करना)
+### अँधेरी गुफ़ाएँ
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -3722,7 +3722,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### ऊँचाई से छद्म गहराई-आधारित पारदर्शिता (वास्तविक छिछलापन-परीक्षण नहीं)
+### ऊँचाई के आधार पर छद्म पारदर्शिता
 
 > सच्ची जल-गहराई के लिए केवल-तरल `bloxdOpaqueBehind()` चाहिए, जो पीछे के अपारदर्शी फलक तक मोटाई मापता है (पूरी रेसिपी: [पानी को प्राकृतिक दिखाना](guides/water.md))। नीचे का उसके बिना एक सरल छद्म स्टाइलिंग है: `s.position.y` स्थानीय निर्देशांक है, इसलिए इसे कच्चा प्रयोग करने पर खंड मूल बदलने के साथ-साथ प्रभाव खिसकता है। विश्व ऊँचाई के लिए `bloxdWorldPosition()` से रूपांतरित करें। नीचे दिया गया केवल विश्व ऊँचाई से अल्फा बदलता है — छद्म प्रभाव है, तटरेखा/तल-जागरूक छिछलापन नहीं। `packWaterReferenceY` को अपनी दुनिया की ऊँचाई के अनुसार समायोजित करें।
 
@@ -3900,7 +3900,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let spec = pow(ndh, 90.0) * 0.38 * lambert * (0.25 + 0.75 * l.skyLight);
             out.colour += spec * vec3f(1.0, 0.97, 0.90);
         }
-}
+    }
     return out;
 }
 ```
@@ -3923,7 +3923,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.4 अर्धगोल परिवेश (ऊपर आकाश / नीचे भूमि प्रतिक्षेप)
+### R9.4 अर्धगोल प्रकाश
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -3958,7 +3958,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.6 वायुमंडलीय परिप्रेक्ष्य (दूरी-विसंतृप्ति से "वायुरूप")
+### R9.6 वायुमंडलीय परिप्रेक्ष्य
 
 > फ़ॉग (रंग प्रतिस्थापन) के विपरीत, "दूरी से विसंतृप्ति" की परत चढ़ाने से दूर के दृश्य कहीं अधिक यथार्थवादी बनते हैं।  
 > सावधानी: केवल संतृप्ति घटाएँ — चमक को कभी न छुएँ।
@@ -3975,7 +3975,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.7 तरंग अभिलंब + सूर्य चमक (जल पर "सूर्य-पथ")
+### R9.7 लहरों के नॉर्मल और सूर्य की चमक
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -4001,12 +4001,12 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let glint = pow(max(dot(n, h), 0.0), 240.0) * 1.1 * (0.25 + 0.75 * l.skyLight);
             out.colour += glint * vec3f(1.0);
         }
-}
+    }
     return out;
 }
 ```
 
-### R9.8 प्रक्रियात्मक सूक्ष्म-उभार (टेक्सचर-प्रतिबंध का विकल्प)
+### R9.8 प्रक्रियात्मक सूक्ष्म उभार
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -4033,12 +4033,12 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let lamFlat = clamp(dot(normalize(l.normal), sunDir), 0.0, 1.0);
             out.colour *= mix(1.0, 0.85 + 0.15 * (lam / max(lamFlat, 0.001)), 0.5);
         }
-}
+    }
     return out;
 }
 ```
 
-### R9.9 अरैखिक गुफ़ा-अंधेरा + दीया रक्षा
+### R9.9 गुफाओं को अँधेरा करना
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -4054,7 +4054,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.10 फ़ॉग दोबारा लगाना (engineColour त्यागने पर आवश्यक)
+### R9.10 फ़ॉग फिर से लगाना
 
 > `min(l.fogAlpha, 0.75)` जैसी निम्नसीमा लगाने से "इससे सघन नहीं" की टोपी बैठती है
 > (0.0 = इंजन-अनुरूप / 0.3–0.5 = साफ़ दूरी)।
@@ -4076,7 +4076,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.11 सिनेमा-ग्रेड (शीत छायाएँ / उष्ण हाइलाइट / रात विसंतृप्ति)
+### R9.11 सिनेमाई रंग-संशोधन
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -4093,7 +4093,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### R9.12 प्रक्षेपित छायाएँ — लिफ्ट व्युत्क्रम + देहली कट (निर्णायक)
+### R9.12 प्रक्षेपित छायाएँ
 
 > **प्राकल्पना पुनः जाँच (अध्याय 10)**: `l.skyLight` कच्चा वॉक्सेल मान (n/15) नहीं, बल्कि इंजन के "लिफ्ट वक्र"  
 > `y = 1-(1-x/(3-2x))³` (अंधेरे क्षेत्रों को उठाने वाला S-वक्र) के बाद का मान है।
@@ -4470,14 +4470,17 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 **लोडर चरण** (पहला द्वार) पर अस्वीकृत होने वाली त्रुटियाँ, जो सेटिंग्स की स्थिति पंक्ति में `shaderPack:load*` ID के साथ दिखती हैं।
 
-### "There's no pack.json at the top of the pack."
+### पैक मेनिफ़ेस्ट नहीं मिला
+
+> `There's no pack.json at the top of the pack.`
 
 - **कारण**: zip के रूट पर `pack.json` नहीं है (जैसे फ़ोल्डर को एक अतिरिक्त नेस्टिंग स्तर के साथ ज़िप कर दिया गया)
 - **जाँच**: zip खोलें — `pack.json` सबसे ऊपरी स्तर पर हो (या एक साझा रूट फ़ोल्डर के ठीक नीचे)
 - **समाधान**: `pack.json` और `.wgsl` फ़ाइलों को सीधे ज़िप करें। एकमात्र साझा रूट फ़ोल्डर अपने आप हटा दिया जाता है ([पैक संरचना](getting-started/pack-structure.md))
 - **रोकथाम**: अपनी ज़िपिंग प्रक्रिया एक जैसी रखें; macOS का "Compress" जैसा है वैसा ही चलता है (OS का कचरा अपने आप बाहर रहता है)
 
-### zip लोड पर `loadDuplicateManifest`
+### डुप्लिकेट मेनिफ़ेस्ट
+
 
 - **कारण**: दो `pack.json` फ़ाइलें (केस के अंतर वाली भी शामिल)
 - **समाधान**: ठीक एक ही रखें
@@ -4515,7 +4518,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | डुप्लिकेट पाथ / नॉन-UTF-8 / डीकंप्रेशन विफलता / ख़राब zip |
 | `loadNoManifest` / `loadDuplicateManifest` | मैनिफ़ेस्ट की स्थिति / दोहराव |
 
-### "Ready. Reload the page to use it." पर कुछ नहीं बदलता
+### लोड करने के बाद पेज रीफ़्रेश करें
+
+> `Ready. Reload the page to use it." पर कुछ नहीं बदलता`
 
 - **कारण**: पैकों के सक्रिय होने के लिए **पेज रीलोड** चाहिए
 - **समाधान**: चुनने के बाद रीलोड करें; स्थिति `Ready to use` हो जानी चाहिए
@@ -4539,7 +4544,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **समाधान**: `"apiVersion": 5` जोड़ें — एक **संख्या** (स्ट्रिंग `"5"` विफल होती है)
 - **रोकथाम**: [pack.json](getting-started/manifest.md) टेम्पलेट से शुरू करें
 
-### "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
+### API संस्करण मेल नहीं खाता
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.`
 
 - **लक्षण**: `loadWrongApiVersion`
 - **कारण**: `apiVersion` मौजूद है पर 5 नहीं है (कोई v1–v4 पैक)
@@ -4584,29 +4591,39 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 वे त्रुटियाँ जो स्थैतिक सत्यापन पास कर लेती हैं पर WGSL के रूप में विफल होती हैं, या केवल ब्राउज़र के WGSL कंपाइलर (चरण 2) में विफल होती हैं।
 
-### "bloxdTerrainVertex must be declared as: fn ..."
+### हुक सिग्नेचर मेल नहीं खाता
+
+> `bloxdTerrainVertex must be declared as: fn ...`
 
 - **कारण**: हुक सिग्नेचर का बेमेल (आर्ग्युमेंट/रिटर्न टाइप)
 - **समाधान**: संदेश में दिखाई गई घोषणा के अनुसार दोबारा लिखें (पैरामीटर के नाम आज़ाद हैं; टाइप बिल्कुल मेल खाने चाहिए)
 - **रोकथाम**: [हुक तुलना तालिका](api/hooks.md) से शुरू करें
 
-### "mixing '*' and '^' requires parenthesis (only in ...)"
+### ऑपरेटर प्राथमिकता
+
+> `mixing '*' and '^' requires parenthesis (only in ...)`
 
 - **कारण**: `^` `&` `|` `<<` `>>` को दूसरे ऑपरेटरों के साथ मिलाने पर WGSL कोष्ठक माँगता है
 - **समाधान**: ऑपरेंड पर कोष्ठक लगाएँ
 
-### "... can only be a function's parameter or return type, ..."
+### आउटपुट वैरिएबल की घोषणा
+
+> `... can only be a function's parameter or return type, ...`
 
 - **कारण**: `var x: BloxdSurface;` — सिर्फ़ टाइप-एनोटेटेत कच्ची घोषणाएँ अस्वीकृत होती हैं, क्योंकि हेडर स्ट्रक्चरों में फ़ील्ड जुड़ते रहते हैं
 - **समाधान**: `var out = bloxdDefaultSurface(s);` (या light हुक में `var out = s;`)
 - **रोकथाम**: आउटपुट हमेशा `bloxdDefault*` से बनाएँ ([लेखन-प्रथाएँ](api/structures.md#लेखन-प्रथाएँ-पुनरावृत्ति))
 
-### "_ can only be the target of a phony assignment, as in _ = f();"
+### अंडरस्कोर असाइनमेंट
+
+> `_ can only be the target of a phony assignment, as in _ = f();`
 
 - **कारण**: `let _ = f();` अमान्य WGSL है
 - **समाधान**: `_ = f();` लिखें
 
-### "Lite: …reads scene depth on a page that didn't turn it on"
+### सीन डेप्थ की उपलब्धता
+
+> `Lite: …reads scene depth on a page that didn't turn it on`
 
 - **कारण**: पेज बनते समय कोई डेप्थ-पढ़ने वाला पैक (`bloxdOpaqueBehind`) सक्रिय था; डेप्थ की उपलब्धता पेज बनने के समय पर तय होती है
 - **समाधान**: पैक सक्रिय रखकर पेज रीलोड करें
@@ -4617,7 +4634,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **समाधान**: कुछ नहीं — `dpdy(h)` को इस मंशा से लिखें कि "h ऊपर जाने पर कैसे बदलता है", और उत्सर्जित कोड वह उलटाव अपने साथ रखता है ([प्रतिबंध](api/restrictions.md#स्वचालित-रीराइट))
 - `dpdx` और `fwidth` अछूते रहते हैं
 
-### गेम जॉइन पर पैक ड्रॉप हो जाता है / ऑन-डिवाइस जाँच कभी पूरी नहीं होती
+### गेम में प्रवेश पर पैक निष्क्रिय
+
+> `गेम जॉइन पर पैक ड्रॉप हो जाता है / ऑन-डिवाइस जाँच कभी पूरी नहीं होती`
 
 - **कारण**: ऑन-डिवाइस जाँच विफल हुई, या 60-सेकंड के ज़बरदस्ती टाइमआउट (`skipped`) में पकड़ी गई — कम-स्पेक डिवाइसों और भारी दुनियाओं पर आम
 - **समाधान**: भारी vertex काम और जटिल लूप घटाएँ; देखें [प्रदर्शन](troubleshooting/performance.md)
@@ -4634,28 +4653,38 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 स्थैतिक सत्यापन (एनालाइज़र, चरण 1) की त्रुटियाँ — ज़्यादातर आरक्षित नाम, strict अनुबंध और हुकों-के-पार कॉल प्रतिबंध।
 
-### "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+### आउटपुट संरचनाएँ सीधे न बनाएँ
+
+> `Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **कारण**: `BloxdSurface(...)` जैसे कंस्ट्रक्टरों को बुलाना
 - **समाधान**: `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` से शुरू करके फ़ील्ड बदलें (`var out = s;` light हुकों में चलता है)
 
-### "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+### आरक्षित पहचानकर्ता
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **कारण**: `bloxd` से शुरू होने वाला पहचानकर्ता (केस-असंवेदनशील)
 - **समाधान**: नाम बदलें (जैसे `packTint`)। केवल 9 हुक नाम अनुमत हैं
 - **रोकथाम**: अपने नामों में `pack` / `my` आदि उपसर्ग लगाएँ
 
-### "bloxdPackInputs isn't part of the bloxd_ header"
+### अज्ञात यूनिफ़ॉर्म इनपुट
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **कारण**: uniform को सीधे संदर्भित करना
 - **समाधान**: हेडर फ़ंक्शनों के ज़रिए उसका उपयोग करें ([पैक फ़ॉर्मैट](api/pack-format.md#प्रति-फ़्रेम-uniform-bloxdpackinputs))
 
-### "... reaches bloxdTexel, which only surface and light hooks can use."
+### वर्टेक्स हुक से टेक्सचर एक्सेस
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **कारण**: किसी vertex हुक (या उससे पहुँच योग्य किसी फ़ंक्शन) से कॉल — "reaches" का मतलब **कॉल पथ** है
 - **समाधान**: कॉल को surface / light हुक में खिसकाएँ
 
-### "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+### सीन डेप्थ से पहले शर्त जाँचें
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **कारण**: `bloxdOpaqueBehind()` को `BLOXD_SCENE_DEPTH` चाहिए, जो केवल सभी-liquid वेरिएंट में परिभाषित होता है; terrain/model-हुक कोड से यह कॉल साझा करना अन-कंपाइलेबल वेरिएंट बना देता है
 - **समाधान**: कॉल को `#ifdef BLOXD_SCENE_DEPTH` में लपेटें
@@ -4695,7 +4724,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 वे समस्याएँ जो 6 में से केवल कुछ वेरिएंट (`strict|allow` × `terrain|liquid|model`) में घटित होती हैं। v5 ने लाइटिंग अक्ष (पुराना `BLOXD_LIGHTING`) हटा दिया और लोडर लोड के समय **सभी 6 वेरिएंट एक साथ** सत्यापित करता है।
 
-### केवल ग़ैर-strict गेमों में लोड होता है / strict में ड्रॉप
+### strict और allow मोड में उपलब्धता
 
 - **कारण**: बिना गार्ड का vertex हुक या पहुँच योग्य `discard`; strict गेम दोनों पर रोक लगाते हैं और उल्लंघन = **पूरे पैक का स्वतः निष्क्रिय होना** (`shaderPack:offInStrict`)
 - **जाँच**: लोडर स्क्रीन पर `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.` दिखता है
@@ -4707,7 +4736,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **कारण**: `alpha` केवल `#ifdef BLOXD_ALPHA` के पीछे मौजूद है (सभी liquid + ग़ैर-strict terrain/model)
 - **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स))
 
-### "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+### वर्टेक्स हुक के लिए allow मोड आवश्यक
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **कारण**: strict वेरिएंट में vertex हुक होते ही नहीं, इसलिए `BloxdVertex` भी नहीं; vertex कोड strict वेरिएंट से पहुँच योग्य है
 - **समाधान**: vertex हुक पर गार्ड लगाएँ
@@ -4811,34 +4842,44 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 `bloxdTextureId*` / `bloxdTexel` के आसपास की समस्याएँ। सभी उपलब्ध नाम [टेक्सचर कैटलॉग](api/texture-catalog.md) में खोजें।
 
-### "There's no texture called X. Did you mean bloxdTextureIdY?"
+### अज्ञात टेक्सचर नाम
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **कारण**: स्पेलिंग की ग़लती; वैलिडेटर में **Levenshtein सुझाव** हैं (देहली `max(2, floor(len/4)) + 1`)
 - **समाधान**: सुझाव स्वीकार करें; [कैटलॉग](api/texture-catalog.md) से मिलाकर देखें
 - **रोकथाम**: नाम कैटलॉग से कॉपी-पेस्ट करें
 
-### "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+### एनिमेटेड टेक्सचर फ़्रेम के नाम
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **कारण**: किसी एनिमेटेड टेक्सचर पर **फ़्रेम नंबर** लिखना (`lava0` आदि)
 - **समाधान**: बेस नाम का उपयोग करें — सैंपलिंग मौजूदा फ़्रेम अपने आप लौटाती है
 - **रोकथाम**: 42 एनीमेशन फ़ैमिलियों के लिए फ़्रेम सफ़िक्स कभी न लिखें ([नामकरण](api/texture-api.md#स्पेलिंग-नियम-और-नामकरण-स्वतंत्रता))
 
-### "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+### घुमाए गए टेक्सचर के नाम
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **कारण**: किसी रोटेशन-फ़ैमिली की घुमाई-हुई-प्रति की स्पेलिंग लिखना (`[rot[N`)
 - **समाधान**: रूट नाम का उपयोग करें — `bloxdTexel` रोटेशन दोबारा लगा देता है
 
-### "...could name X and Y, which differ only by case or underscores, so it can't be used."
+### अस्पष्ट टेक्सचर पहचानकर्ता
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **कारण**: केस/अंडरस्कोर-असंवेदनशील फ़ोल्ड नाम को **अस्पष्ट** छोड़ देता है
 - **समाधान**: स्पेलिंग स्पष्ट करें
 
-### "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+### अमान्य टेक्सचर कॉन्स्टेंट नाम
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **कारण**: उपसर्ग की ग़लत स्पेलिंग (जैसे `bloxdTextureID`, `bloxdtextureid`)
 - **समाधान**: नाम हमेशा ठीक `bloxdTextureId` से शुरू करें
 
-### "Case and underscores are not distinguished" — दोनों नियम साथ कैसे चलते हैं?
+### अक्षरों का केस और अंडरस्कोर
 
 नाम-रिज़ॉल्यूशन केस और `_` को मिला देता है, इसलिए `bloxdTextureId_grass_top` और `bloxdTextureIdGrassTop` **एक ही** कॉन्स्टैंट पर रिज़ॉल्व होते हैं। केवल जब फ़ोल्ड कई उम्मीदवार छोड़ दे, तभी समर्पित अस्पष्टता त्रुटि चलती है ([नामकरण नियम](api/texture-api.md#स्पेलिंग-नियम-और-नामकरण-स्वतंत्रता))।
 
@@ -4851,7 +4892,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **सीमा**: शेडर-पैक API एटलस को केवल **पढ़ता** है; टेक्सचर जोड़ना टेक्सचर-पैक सिस्टम का काम है ([संयोजन](guides/combinations.md))
 
-### "Packs can't use X: the engine binds every texture and sampler..."
+### टेक्सचर एक्सेस की सीमाएँ
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **कारण**: `texture_*` / `sampler` टाइप सीधे घोषित करना
 - **समाधान**: `bloxdTexel()` से होकर जाएँ ([प्रतिबंध](api/restrictions.md))
@@ -4904,7 +4947,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **कारण**: केवल-लाइटिंग इनपुट (`blockLight` आदि) बिना गार्ड उपयोग किए गए। v5 में कोई `#ifdef BLOXD_LIGHTING` नहीं — **रनटाइम `bloxdLit()`** पर शाखा बनाएँ
 - **समाधान**: जल्दी वापसी `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([लाइटिंग](api/lighting.md#bloxdlit--गेट))
 
-### "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+### LightEngine कतार ओवरफ़्लो
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **कारण**: सघन चमकते-ब्लॉक क्षेत्र प्रकाश-सीड क़्यू को उफ़ान दे देते हैं और खंड का प्रकाश-परिकलन बीच में कट जाता है। **पैक-कारित नहीं**, पर चमकते गुच्छों के पास के प्रकाश-अंतराल इसी तक पहुँचते हैं
 - **समाधान**: दुनिया में प्रकाश स्रोत फैलाएँ
@@ -5108,7 +5153,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - लोडिंग के दौरान खंड-सीमाओं पर बारीक चेकर पैटर्न इंजन का स्क्रीन-स्पेस Bayer 4×4 डाइथर खंड-फ़ेड है, पैक की ख़राबी नहीं (ग्राफ़िक्स सेटिंग `chunkFadeIn` से बंद करें)
 - **`mod` एक आरक्षित शब्द है**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` के साथ अस्वीकृत। शेषफल `%` ऑपरेटर से लिखें
 
-### R-C. Bayer डाइथर dissolve — out.alpha, discard चलाता है
+### R-C Bayer डाइथर से विलयन
 
 खंड-फ़ेड के लिए इंजन जिस **उसी Bayer 4×4 तालिका** का उपयोग करता है, उसे दोहराता है — नीचे के ब्लॉकों से ऊपर की ओर कटआउट घोलता है। alphaTest सामग्री (घास, पत्ते) पर discard चलता है; लिक्विड में यह ब्लेंड पारदर्शिता बन जाता है।
 
@@ -5151,7 +5196,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### R-D. कैमरा-निकट पानी-फ़ेड — लिक्विड alpha दृष्टि-रेखाएँ रखता है
+### R-D कैमरे के पास पानी का फ़ेड
 
 Liquid-हुक का `out.alpha` सीधे ब्लेंडिंग को खिलाता है। डाइविंग/पानी-से-ऊपर कैमरा दृष्टि-रेखाएँ बनाए रखने के लिए कैमरा के ठीक नीचे की पानी-सतह को फ़ेड करता है।
 
@@ -5918,20 +5963,20 @@ Pack वितरित करने से पहले उसे लक्ष�
 
 | स्काईबॉक्स | `bloxdSunDirection()` |
 |---|---|
-| `default` (प्रोसीज़रल आकाश) | अशून्य (डिफ़ॉल्ट नीचे) |
-| `gloomy` / `interstellar` / `space_*` (घन टेक्सचर) | **सदा (0,0,0)** |
+| `default` (प्रोसीज़रल आकाश) | शून्य से अलग (डिफ़ॉल्ट मान नीचे दिए गए हैं) |
+| `gloomy` / `interstellar` / `space_*` (क्यूब टेक्सचर) | **सदा (0,0,0)** |
 
-**चंद्रमा सदा `-bloxdSunDirection()` है** (इंजन चंद्रमा की स्थिति सूर्य के ठीक विपरीत गिनता है)। रात सूर्य की ऊँचाई से तय होती है — `bloxdSunDirection().y < 0` (सूर्य क्षितिज से नीचे) पर चंद्रमा ऊपर होता है। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर है, इसलिए चंद्रमा भी स्थिर; उसे चलते हुए केवल दिन-रात चक्र लागू करने वाली दुनियाएँ देखती हैं।
+**चंद्रमा की दिशा हमेशा `-bloxdSunDirection()` होती है** (इंजन चंद्रमा की स्थिति सूर्य के ठीक विपरीत गिनता है)। रात सूर्य की ऊँचाई से तय होती है — `bloxdSunDirection().y < 0` (सूर्य क्षितिज से नीचे) पर चंद्रमा ऊपर होता है। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर है, इसलिए चंद्रमा भी स्थिर; उसे चलते हुए केवल दिन-रात चक्र लागू करने वाली दुनियाएँ देखती हैं।
 
-डिफ़ॉल्ट-दुनिया की सूर्य दिशा लगभग `(-0.56, 0.81, -0.18)` है (inclination = −0.2 / azimuth = 0.55 से गिनी गई इकाई सदिश, स्थिर)। वितरण-पैक परीक्षण के समय हाइलाइट दिशाएँ कागज़ पर भाँपने का व्यावहारिक संदर्भ।
+डिफ़ॉल्ट-दुनिया की सूर्य दिशा लगभग `(-0.56, 0.81, -0.18)` है (inclination = −0.2 / azimuth = 0.55 से गिनी गई इकाई सदिश, स्थिर)। पैक की जाँच करते समय इस मान से हाइलाइट की दिशा का अनुमान लगाया जा सकता है।
 
-दिन-रात चक्र इंजन में अंतर्निहित नहीं है — inclination एक स्थिर संख्या है, और चलता दिन-रात रखने वाली दुनियाएँ उसे गेम-पक्ष से अपडेट करती हैं। `bloxdSunDirection()` हर अपडेट का अनुसरण करता है।
+दिन-रात चक्र इंजन में अंतर्निहित नहीं है — inclination एक स्थिर संख्या है, और चलता दिन-रात रखने वाली दुनियाएँ उसे गेम स्वयं अपडेट करता है। `bloxdSunDirection()` हर अपडेट का अनुसरण करता है।
 
-Terrain के दिशात्मक प्रकाश बस scene-आरंभ पर बने 2 दीप हैं, **दिशा और तीव्रता तय, दिन-रात में अपरिवर्तित**। संक्षेप में, **terrain-चमक का कोई भी घटक समय पर निर्भर नहीं है। दिन-रात के "रूप" केवल स्काईबॉक्स और bloxdSunDirection() से आते हैं**, इसलिए रात में terrain काला करने वाले पैकों को समय-पट्टी bloxdSunDirection() से ख़ुद अनुमान लगानी होगी ([रात के रूप डिज़ाइन करना](guides/night.md) की `sunPresent` तकनीक)।
+Terrain को रोशन करने वाले दो दिशात्मक light sources scene शुरू होते समय बनाए जाते हैं, **दिशा और तीव्रता तय, दिन-रात में अपरिवर्तित**। संक्षेप में, **terrain-चमक का कोई भी घटक समय पर निर्भर नहीं है। दिन-रात के "रूप" केवल स्काईबॉक्स और bloxdSunDirection() से आते हैं**, इसलिए रात में terrain काला करने वाले पैकों को समयावधि bloxdSunDirection() से ख़ुद अनुमान लगानी होगी ([रात के रूप डिज़ाइन करना](guides/night.md) की `sunPresent` तकनीक)।
 
-### R-A. दिशात्मक चांदनी — moonDir = −bloxdSunDirection()
+### R-A. चाँदनी
 
-चंद्रमा ऊपर रहने पर ही नीली-सफ़ेद लैम्बर्ट और मंद स्पेक्युलर जोड़ता है। स्थिर-सूर्य डिफ़ॉल्ट दुनियाओं में `moonUp` 0 है, इसलिए वहाँ कुछ नहीं होता — **केवल दिन-रात-चक्र दुनियाओं में चलने वाली चांदनी, इसलिए सुरक्षित**।
+चंद्रमा ऊपर रहने पर ही नीली-सफ़ेद लैम्बर्ट और मंद स्पेक्युलर जोड़ता है। स्थिर-सूर्य डिफ़ॉल्ट दुनियाओं में `moonUp` 0 है, इसलिए वहाँ कुछ नहीं होता — **केवल दिन-रात-चक्र दुनियाओं में चलने वाली चांदनी, इसलिए यह केवल दिन-रात चक्र वाले वर्ल्ड में सक्रिय होती है**।
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -5948,7 +5993,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
             out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
         }
-}
+    }
     return out;
 }
 ```
@@ -6040,11 +6085,11 @@ v1 पहला शेडर-पैक API था। v2 ने पहचान�
 ## API v2 माइग्रेशन गाइड
 > संस्करण: 2 · स्थिति: ऐतिहासिक (v1 से v2 माइग्रेशन गाइड)
 
-### 31. v1 पैकों का भाग्य (पहले निष्कर्ष)
+### 31. v1 पैक की संगतता
 
 खेल manifest `apiVersion` का **ठीक-ठीक 2 से मेल** माँगता है। v1 पैक लोड `This pack is for shader pack API version 1. Bloxd supports version 2.` (i18n कुंजी `shaderPack:loadWrongApiVersion`) से अस्वीकृत होता है। v1/v2 का **समानांतर समर्थन नहीं** है। इंजन सहेजे गए पैकों का `validation.headerVersion` (हेडर के पूर्ण पाठ का हैश) भी पुनः जाँचता है, अतः इंजन अद्यतन पर सहेजे पैक स्वतः "needs re-check" चिह्नित होने का तंत्र v1 जैसा ही है।
 
-### 32. पहचानकर्ताओं का पूर्ण पुनर्नामकरण (संगति तालिका)
+### 32. पहचानकर्ताओं के नाम बदलना
 
 v2 में अंडरस्कोर नामकरण कैमलकेस में एकीकृत हुआ। **पुराने नाम सर्वथा अप्रयोज्य हैं।**
 
@@ -6082,7 +6127,7 @@ v1 में `time` / `eyePosition` / `sunDirection` / `originOffset` संर�
 | `s.position + vec3f(...)` से विश्व-निर्देशांक रूपांतरण | `bloxdWorldPosition(s.position)` |
 | `vec3i(floor(pos - normal*0.5)) + originOffset` | `bloxdFaceBlock(pos, normal)` |
 
-### 34. नई सुविधा ①: `blockId` (प्रति-खंड शेडिंग)
+### 34. blockId से प्रति-ब्लॉक शेडिंग
 
 तीनों संरचनाओं `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` में `blockId: u32` जोड़ा गया। यह **फलक के स्वामी खंड का ID** (0–65535) है और उसी फलक में स्थिर रहता है (`@interpolate(flat)` से पारित)। इसे टेक्सचर रंग से स्वतंत्र खंड-प्रकार पहचान में प्रयोग करें। पर ID-से-खंड-प्रकार संगति तालिका इंजन के भीतर रहती है और पैक से दिखाई नहीं देती, अतः **कौन ID किस खंड का है, यह दुनिया में मापकर, या नीचे दिए संदर्भ से जाँचा जा सकता है**। भीतर-भीतर यह ID शीर्ष-रंग के α (निचले 8 bit) और अभिलंब के w (ऊपरी 8 bit) — कुल 16 bit — में पकाकर ले जाया जाता है; 65535 की सीमा इसी पथ-चौड़ाई से आती है। blockId तंत्र स्वयं केवल सक्रिय शेडर-पैक होने पर सक्रिय होता है (बिना पैक wire का गंतव्य padding ही रहता है, पर भाग II की संरचना-परिभाषाओं के भीतर से यह अंतर दिखता नहीं)।
 
@@ -6120,7 +6165,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-### 35. नई सुविधा ②: `BLOXD_SCENE_DEPTH` और `bloxdOpaqueBehind()` (मुख्य)
+### 35. सीन डेप्थ तक पहुँच
 
 v1 में संरचनात्मक रूप से असंभव गहराई-पहुँच **केवल तरल (liquid) प्रोग्रामों के लिए** खुल गई। रंग नहीं, पर **ज्यामिति — पीछे पड़े अपारदर्शी फलक की दूरी और स्थिति — उपलब्ध** है। प्ररूपी उपयोग मापी गई जल-मोटाई से अवशोषण-रंग परिकलन है।
 
@@ -6180,7 +6225,7 @@ fn bloxdLiquidSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 9. (वैकल्पिक) `litColour` से फ़ॉग स्वयं प्रबंधित करें / `bloxdOpaqueBehind()` से जल-मोटाई अवशोषण जोड़ें / `blockId` से प्रति-खंड अभिव्यक्ति
 10. **दूसरा चरण (ब्राउज़र Tint) भी सत्यापित करें** — विशेषतः `^` `&` `|` `<<` `>>` वाले व्यंजकों के कोष्ठक। स्थैतिक सत्यापन उत्तीर्ण करने वाला कोड भी ब्राउज़र में अस्वीकृत हो सकता है (§38)
 
-### 38. दूसरा सत्यापन चरण — ब्राउज़र का WGSL कंपाइलर अंतर्निहित पार्सर से कठोर है
+### 38. ब्राउज़र में WGSL सत्यापन
 
 गेम में पैक सत्यापन **2-चरणीय** है। पहला चरण स्थैतिक सत्यापन है (इंजन का अंतर्निहित JS पार्सर — हुक हस्ताक्षर, निषिद्ध वाक्यरचना, sceneDepth उपयोग जैसे पैक-विशिष्ट नियमों की जाँच), और दूसरा चरण ब्राउज़र सत्यापन है (संकलन परिणाम में संलग्न स्टब का वास्तविक WebGPU कार्यान्वयन से संकलन, त्रुटियों को पैक की स्रोत फ़ाइलों की पंक्तियों पर वापस मैप कर प्रदर्शित करना। UI का "Saved, but it won't run until you fix these errors" यही चरण है)। त्रुटि-प्रदर्शन के अंत में आया `(only in terrain)` जैसा प्रत्यय "उस त्रुटि वाले वेरिएंट की program किस्म" बताता है।
 
@@ -6215,17 +6260,17 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 
 इस गाइड के भाग I–VII अभी भी v2 आधार पर लिखे गए हैं। यह भाग [v2 गाइड](history/v2.md) के उसी क्रम में v2 → v3 माइग्रेशन बिंदु और नई v3 सुविधाएँ एकत्र करता है। रूपांतरण अधिकतर यांत्रिक है (§47), पर केवल एक परिवर्तन वास्तव में व्यवहार बदलता है — डिफ़ॉल्ट प्रकाश अब फ़ॉग से emission को क्षीण करता है (§43) — तथा `blockId` को पूरी तरह `blockFlags` से बदल दिया गया है (§42), इसलिए वितरण से पहले हमेशा इन-गेम कंपाइल से सत्यापित करें।
 इस संशोधन में नया: अनुभाग **§49–§54** माइग्रेशन से आगे बढ़कर प्रोडक्शन बिल्ड से पुनर्स्थापित इंजन-आंतरिक विवरण देते हैं — Lite रेंडरर वास्तव में आपके हुक कैसे बुलाता है, असली चार-मोड फ़ॉग फ़ंक्शन, `bloxdOpaqueBehind()` का सटीक कार्यान्वयन, ब्लॉक पंजीकरण से आपके हुक तक blockFlags का पूरा डिलीवरी पथ, और मापे गए हेडर हैश सहित सत्यापन पाइपलाइन। ये पैक सिस्टम के बारे में अब तक के सबसे गहरे सार्वजनिक रूप से प्रलेखित तथ्य हैं, और ये कई ऐसे प्रश्नों को सुलझाते हैं जिन्हें अन्य गाइड अभी भी खुले के रूप में सूचीबद्ध करती हैं।
-### 40. v2 पैकों का भाग्य (पहले निष्कर्ष)
+### 40. v2 पैक की संगतता
 यह बिल्ड मैनिफ़ेस्ट `apiVersion` का **ठीक 3 से मेल खाना** माँगता है, और **समानांतर v2/v3 समर्थन नहीं है**। v2 पैक लोड पर "गलत API संस्करण" संदेशों के साथ अस्वीकृत होता है (i18n कुंजियाँ, प्लेसहोल्डर टेक्स्ट):
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
 सहेजे गए पैक v2 जीवनचक्र बनाए रखते हैं ([v2 गाइड](history/v2.md) §31): हर बिल्ड अपने इंजन हेडर का हैश बनाता है, इंजन अद्यतन सहेजे गए पैक को स्वतः "needs re-check" चिह्नित करते हैं, और जिस सहेजे गए पैक का `apiVersion` वर्तमान के अलावा कोई भी संस्करण हो वह त्रुटि देने के बजाय won't-run चिह्नित होता है (ऊपर का स्टेटस संदेश प्रतिस्थापन की ओर इंगित करता है)।
-### 41. pack.json और uniform बफ़र (क्या अपरिवर्तित रहता है)
+### 41. pack.json और यूनिफ़ॉर्म बफ़र
 - आवश्यक मैनिफ़ेस्ट फ़ील्ड अपरिवर्तित हैं: `{ apiVersion, name, author }`।
 - लोडर सीमाएँ अपरिवर्तित हैं: 32MB zip / 1024 प्रविष्टियाँ / 256 `.wgsl` फ़ाइलें / कुल 256KB कोड / 64KB मैनिफ़ेस्ट।
 - इंजन uniform ब्लॉक का आकार अपरिवर्तित है: `@group(3) @binding(0)`, 64 B, जिसमें घोषणा-क्रम में समय, render offset, सूर्य दिशा और eye position रखे हैं। लेआउट `minBindingSize: 64` के साथ पंजीकृत है, और सटीक फ़ील्ड लेआउट है `seconds: f32` @ byte 0, `renderOffset: vec3i` @ 16, `sunDirection: vec3f` @ 32, `eyePosition: vec3f` @ 48। दो आंतरिक फ़ील्ड नाम बदले: `time` → `seconds`, `originOffset` → `renderOffset`। **बाइट लेआउट v2 जैसा ही है**, और पैक कोड के लिए वैसे भी कुछ नहीं बदलता, क्योंकि पैक uniform को सीधे नाम नहीं दे सकते (इंजन हेडर इसे engine-provided और read-only चिह्नित करता है, "which packs can't name"); हेडर फ़ंक्शन `bloxdSeconds()` / `bloxdRenderOffset()` से ही काम करते रहें।
 - पैक के group 3 में एक प्रलेखित दूसरा स्थान जुड़ा: `@group(3) @binding(1)` वह scene-depth texture है जिसे `bloxdOpaqueBehind()` पढ़ता है (पूरा कार्यान्वयन §51 में)। 64 B का uniform binding 0 पर ही रहता है; पैक अभी भी दोनों binding को नाम नहीं दे सकते।
-### 42. blockId से blockFlags: प्रति-ब्लॉक सामग्री बिट फ़्लैग के रूप में (मुख्य)
+### 42. blockId से blockFlags तक
 तीनों हुक इनपुट संरचनाओं (`BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn`) में v2 फ़ील्ड `blockId: u32` को **बदलकर** `blockFlags: u32` कर दिया गया है। फ़ील्ड पर इंजन टेक्स्ट: *"What kind of block this face is: `bloxdBlockFlag*` bits, the same across the face."* अब इंजन सामग्री डेटा स्वयं भेजता है, इसलिए संख्यात्मक id श्रेणियों से सामग्री अनुमान लगाने या दुनिया में id तालिकाएँ बनाए रखने का v2 तरीका ([v2 गाइड](history/v2.md) §34) अब आवश्यक नहीं है।
 बिट्स नामित स्थिरांकों के रूप में उपलब्ध हैं:
 ```wgsl
@@ -6277,7 +6322,7 @@ let isLeaf = (blockFlags & bloxdBlockFlagVegetation) != 0u
 let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
                  && (blockFlags & bloxdBlockFlagDirt) != 0u;
 ```
-### 43. फ़ंक्शन पुनर्नामकरण और अर्थगत परिवर्तन
+### 43. फ़ंक्शन नाम और व्यवहार में बदलाव
 | v2 | v3 | टिप्पणियाँ |
 |---|---|---|
 | `bloxdTime()` | `bloxdSeconds()` | पेज लोड होने के बाद से सेकंड (नीचे f32 परिशुद्धता नोट) |
@@ -6298,14 +6343,14 @@ let isGrassBlock = (blockFlags & bloxdBlockFlagVegetation) != 0u
   out.colour = bloxdApplyFog(light.litColour + surface.emission, light);
   ```
 - **नाम और अर्थ में अपरिवर्तित**: `bloxdEyePosition()`, `bloxdSunDirection()`, `bloxdFaceBlock()`, `bloxdApplyFog()`, `bloxdWorldPosition()`।
-### 44. नए हेडर स्थिरांक: `bloxdPi` और `bloxdTau`
+### 44. हेडर के नए कॉन्स्टेंट
 ```wgsl
 // आधा घुमाव और पूरा घुमाव, रेडियन में।
 const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;
 ```
 त्रिकोणमिति-जादू के लिए उपयोगी, और इसलिए भी कि पैकों को अब π हार्डकोड नहीं करना पड़ता। नाम के पुनःउपयोग पर ध्यान दें: उसी नाम का पैक-लोकल स्थिरांक अब हेडर की duplicate-identifier जाँच से टकराता है — अपने कोड में कोई भी `bloxdPi` / `bloxdTau` पुनःघोषणा हटाएँ या नाम बदलें।
-### 45. छह-हुक टेम्पलेट (liquid हुक आधिकारिक रूप से दिखाए गए)
+### 45. छह-हुक टेम्पलेट
 बिल्ड के साथ प्रकाशित डिफ़ॉल्ट पैक टेक्स्ट अब **सभी छह हुक** — terrain / liquid × vertex / surface / light — लेकर आता है, और प्रत्येक अपना इंजन डिफ़ॉल्ट लौटाता है। इंजन टिप्पणियाँ इसे इस तरह पेश करती हैं: *"Every hook returns its engine default. Copy a hook and change its output to start a shader pack."*
 ```wgsl
 // Every hook returns its engine default. Copy a hook and change its
@@ -6339,7 +6384,7 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - हुकों की टिप्पणियाँ liquid नियम सीधे बताती हैं: **पानी को तीनों की आवश्यकता है; इसे हटाएँ और पानी आपके terrain हुक का पुनः उपयोग करता है** (v2 से ज्ञात fallback व्यवहार, [v2 गाइड](history/v2.md) §36, अब टेम्पलेट में ही लिखा हुआ)।
 - `bloxdLiquidVertex` वही `#ifndef BLOXD_STRICT` guard में बैठा है जिसमें `bloxdTerrainVertex` — बिना guard के यह strict गेम में पूरा पैक बंद कर देगा, ठीक वैसे ही जैसे terrain-पक्ष के vertex प्रभाव करते हैं।
 - टेम्पलेट की वर्तनी अब पूरे पैरामीटर नाम `vertex` / `surface` / `light` हैं (v2 का टेम्पलेट छोटे `v` / `s` / `l` वाला था)। आपके कोड के पैरामीटर नाम स्वतंत्र हैं — केवल हस्ताक्षर मायने रखते हैं।
-### 46. वेरिएंट मैट्रिक्स: प्रोग्राम अक्ष और मैक्रो परिवर्तन
+### 46. वेरिएंट मैट्रिक्स
 वेरिएंट **strict × lighting × program** के मैट्रिक्स पर बनते हैं — v2 जैसे ही 8 संयोजन, पर अब terrain / liquid मैट्रिक्स का स्पष्ट अक्ष है। वेरिएंट नाम इसे `allow|strict · unlit|lit · terrain|liquid` के रूप में लिखते हैं, और UI में ``terrain`` / `liquid`, `strict` / `non-strict`, `lighting on` / `lighting off` के रूप में दिखते हैं (और त्रुटि प्रदर्शन "(only in {{variants}})" जोड़ सकते हैं)।
 | मैक्रो | कहाँ परिभाषित |
 |---|---|
@@ -6392,7 +6437,7 @@ v4 का बदलाव-सेट एक ही स्क्रीन मे�
 | strict गेम | नीति + प्रलेखित गार्ड | अब **बंडल के वैलिडेटर द्वारा प्रवर्तित**, सटीक डायग्नॉस्टिक के साथ (§60) |
 | बाकी सब | — | जमा हुआ: 6 हुक, `blockFlags` बिट, uniform लेआउट, लोडर सीमाएँ, वेरिएंट मैट्रिक्स, पैक `@group(3)` बाइंडिंग |
 v3 से रूपांतरण यांत्रिक है (§61) — सिवाय एक मौन जाल के: अगर आप सब कुछ पोर्ट कर दें पर `fogAlpha` का उलटाव नज़रअंदाज़ कर दें, तो आपका फ़ॉग-निर्भर कोड उलटे फ़ॉग के साथ चलता है और *बिना त्रुटि के संकलित होता है*। हमेशा की तरह, वितरण से पहले एक इन-गेम कंपाइल से सत्यापित करें।
-### 55. v3 पैकों की अंतिम दशा (निष्कर्ष सबसे पहले)
+### 55. v3 पैक की संगतता
 **हर v3 पैक — v3 के रूप में वितरित किया गया हर पैक सहित — अब प्रोडक्शन पर ठीक लोड के समय विफल होता है।** लोडर `manifest.apiVersion !== 4` की तुलना सख़्त JavaScript `!==` से करता है, इसलिए तुलना टाइप और मान दोनों से सटीक है: JSON को *संख्या* `4` ही ले जानी होगी। स्ट्रिंग `"4"` विफल होती है और अपनी JSON वर्तनी के साथ रिपोर्ट होती है (`{{packVersion}}` से `JSON.stringify` होता है, इसलिए सेटिंग्स स्क्रीन `This pack is for shader pack API version "4"...` को उद्धरण-चिह्नों के साथ दिखाती है — एक उपयोगी संकेत कि आपने स्ट्रिंग लिख दी)।
 लोड-टाइम के दोनों संदेश, लाइव i18n शब्दकोश से शब्दशः:
 > `This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — कुंजी मौजूद है, पर 4 के बराबर नहीं।
@@ -6404,7 +6449,7 @@ v3 से रूपांतरण यांत्रिक है (§61) — �
 - `name` अनिवार्य है, स्ट्रिंग, और trim करने के बाद ग़ैर-रिक्त।
 - `author` वैकल्पिक है, पर मौजूद हो तो स्ट्रिंग होना चाहिए — स्पष्ट `null` अस्वीकृत कर दिया जाता है (`pack.json's "author" must be a string.`)।
 - मैनिफ़ेस्ट की बाकी हर चीज़ लोडर नज़रअंदाज़ कर देता है।
-### 56. pack.json और uniform बफ़र (जो अपरिवर्तित रहता है)
+### 56. pack.json और यूनिफ़ॉर्म बफ़र
 | सीमा | मान | पार होने पर संदेश |
 |---|---|---|
 | प्रति पैक `.wgsl` फ़ाइलें | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6450,9 +6495,11 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return bloxdDefaultLight(surface, light);
 }
 ```
-### 57. टेक्सचर API: `bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` (मुख्य आकर्षण)
+### 57. टेक्सचर API
 v3 पैक किसी फ़ेस का *रंग* पढ़ सकते थे, पर उसका *टेक्सचर* नहीं। v4 ब्लॉक-टेक्सचर एटलस को ख़ुद खोल देता है: तीन नए इंजन फ़ंक्शन, एक नामित-स्थिरांक परिवार, और चार नए इनपुट फ़ील्ड (§58)। मुख्य बदलाव का इंजन हेडर का अपना एक-पंक्ति सारांश: *"This face's texture. Compare with `bloxdTextureId*`."*
-#### 57.1 `bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f`
+#### 57.1 `bloxdTexel`
+
+> `bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f`
 ब्लॉक-टेक्सचर एटलस को **ठीक वैसे ही सैंपल करता है जैसे इंजन का अपना सैंपलर करता है** — वही `texture_2d_array<f32>` एटलस, वही `atlasSampler`, `round(mipLevel)` पर `textureSampleLevel` — इसलिए जो टेक्सल आप पढ़ते हैं और जो टेक्सल इंजन ने रेंडर किया, निर्माण के कारण ही एक-दूसरे से मेल खाते हैं। सिमेंटिक्स, सब जनरेट किए गए WGSL से पुनर्स्थापित (§63 में शब्दशः स्रोत है):
 - **`textureId == 0` होने पर `vec4f(1.0)` लौटता है** — सफ़ेद। यही "कोई टेक्सचर नहीं" का id है, और फ़ेस पर टेक्सचर न होने पर चारों इनपुट फ़ील्ड भी यही ले चलते हैं, इसलिए `bloxdTexel(surface.textureId, ...)` को कॉल करना हमेशा सुरक्षित है।
 - **एनिमेटेड टेक्सचर मौजूदा फ़्रेम लौटाते हैं, अपने आप।** फ़्रेम गेम की एनीमेशन घड़ी के साथ बढ़ता है — आप उसे जमा नहीं सकते, कदम-दर-कदम नहीं चला सकते, और ज़रूरत भी नहीं: एनिमेटेड टेक्सचर के id को सैंपल करना *ही* उसका लाइव फ़्रेम सैंपल करना है (फ़्रेम गणित के लिए §63.3)।
@@ -6617,7 +6664,7 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 एक शुद्ध पुनर्नामकरण — इंजन का अपना डॉक-कमेंट "the world block the face ... belongs to" से बदलकर "identify the block's world position" हुआ, बॉडी बाइट-समान है, और पैरामीटर नाम आज़ाद रहते हैं। रेसिपी R4 और हर `bloxdFaceBlock(l.position, l.normal)` कॉल-साइट सर्च-एंड-रिप्लेस से पोर्ट हो जाती है।
 #### 59.3 `found` → `hit`
 `bloxdOpaqueBehind()` अब भी `BloxdOpaqueBehind` लौटाता है, अब भी केवल वहीं संकलित होता है जहाँ `BLOXD_SCENE_DEPTH` परिभाषित है (लिक्विड प्रोग्राम — §60.4), और उसका कार्यान्वयन फ़ील्ड नाम के अलावा अपरिवर्तित है। `behind.found` → `behind.hit` पोर्ट करें और v4 हेडर कमेंट्स से अर्थ दोबारा पढ़ें: `!hit` होने पर `position` और `distance` `0` होते हैं ("अर्थहीन" नहीं)। R-E (जल-अवशोषण) और साथी यांत्रिक रूप से पोर्ट होते हैं।
-### 60. strict-गेम अनुबंध: वर्टेक्स हुक, `discard`, और X-ray
+### 60. strict गेम की सीमाएँ
 #### 60.1 दो प्रवर्तित नियम और उनके सटीक डायग्नॉस्टिक
 > `bloxdTerrainVertex moves terrain, which strict games prevent.`
 > `discard makes terrain see-through, which strict games prevent.`
@@ -6738,7 +6785,7 @@ Pack uniform 80 bytes का है।
 
 Uniform `@group(3) @binding(0)` पर bind होता है। इसका `minBindingSize` 80 है। Group 3 के अन्य bindings Liquid variants के लिए scene-depth texture और `bloxdSpTextureLayers` storage buffer हैं।
 
-### 71. फ़्लैग-पुनर्लेखन: `blockFlags` → `BloxdFlags` (मुख्य बदलाव)
+### 71. फ़्लैग प्रकार में बदलाव
 
 v4 फलक की पहचान `blockFlags: u32` और छह `bloxdBlockFlag*` कॉन्स्टैंट से करता था (opaque 1, emissive 2, vegetation 4, dirt 8, sand 16, rock 32)। v5 पूरे तंत्र को नाम वाले boolean के स्ट्रक्चर से बदल देता है, लाइव हेडर से शब्दशः उद्धृत:
 
@@ -6801,7 +6848,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ध्यान दें कि क्या *नहीं* बदला: फ़ील्ड तीनों इनपुट स्ट्रक्चरों (`BloxdVertexIn`, `BloxdSurfaceIn`, `BloxdLightIn` — फ़ील्ड नाम `flags`, टाइप `BloxdFlags`) में उसी जगह रहते हैं, बचे हुए छह boolean के अर्थ v4 वाले ही हैं — उन्हीं एज-केस के साथ जिन्हें हेडर अब साफ़ शब्दों में लिखता है ("Rocky Dirt is rock too", "every sandstone is rock too") — और कई फ़्लैग आज़ादी से जुड़ते रहते हैं ("sandstone is sand and rock", "possibly even none")।
 
-### 72. नए इनपुट: `localPosition`, एनचांट चतुष्टय और `overlayColour`
+### 72. नए इनपुट फ़ील्ड
 
 `BloxdVertexIn`, `BloxdSurfaceIn` और `BloxdLightIn` तीनों वही नए मेंबर बढ़ाते हैं। हेडर से, शब्दशः:
 
@@ -6831,7 +6878,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 पुराना चतुष्टय (`textureId`, `textureRotation`, `uv`, `mipLevel`) अछूता आगे आता है, एक कमेंट-पुनर्वाक्यांकन के साथ: v4 कहता था कि `uv` "texture coordinates in blocks" है; v5 कहता है "The texture spans 0-1. fract(uv) is drawn." — वही फ़ील्ड, टेक्सचर के दृष्टिकोण से वर्णित: एक टेक्सचर टाइल uv के `0.0–1.0` पर फैली होती है, और uv के पूर्णांक कदम उसे दोहराई जाने वाली दीवार पर टाइल-दर-टाइल लगा देते हैं। जब तक आपने मल्टी-ब्लॉक स्पैन पर हाथ से अनुमान न गढ़े हों, पोर्ट के लिए कुछ करने की ज़रूरत नहीं।
 
-### 73. नए आउटपुट: `BloxdSurface` को `enchantColour` और `overlayColour` मिलते हैं
+### 73. नए आउटपुट फ़ील्ड
 
 सरफ़ेस **आउटपुट** स्ट्रक्चर दो फ़ील्ड बढ़ाता है, शब्दशः:
 
@@ -6854,7 +6901,7 @@ struct BloxdSurface {
 - **`out.overlayColour.a` बढ़ाना** हर्ट-फ़्लैश को बेस रंग को छुए बिना ज़्यादा चुस्त बना देता है; मिक्स `bloxdLitColour` (§74) में होता है, शेडिंग के बाद, ठीक उसी जगह जहाँ इंजन ने उसे रखा है।
 - उत्सर्जन-क्रम वाली टिप्पणी शब्दशः आगे आती है: उत्सर्जन *लाइटिंग के बाद, कोहरे से पहले जुड़ता है* — और दो नए फ़ील्ड `bloxdLitColour` द्वारा *मिलाए जाते हैं*, जो उत्सर्जन और कोहरे से *पहले* आता है। पूरी आउटपुट श्रृंखला, क्रम में: `colour` → ओवरले मिक्स → शेडिंग → एनचांट मिक्स → वर्ल्ड लाइट → `+ emission` → कोहरा।
 
-### 74. लाइटिंग रेसिपी सार्वजनिक हुई: `bloxdLit()` और तीन हेल्पर
+### 74. लाइटिंग सहायक फ़ंक्शन
 
 v4 लाइटिंग कोड को कंपाइल-टाइम पर गेट करता था: 8 वेरिएंट (`strict|allow` × `lit|unlit` × `terrain|liquid`), जिनमें `#ifdef BLOXD_LIGHTING` तय करता था कि लाइट हुक लिट पथ चलेंगे या अनलिट। v5 संकलन से पूरी लाइटिंग-धुरी हटा देता है:
 
@@ -6937,7 +6984,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### 75. हटाए गए: `bloxdFragmentBlockPosition()`, `bloxdBlockFlag*`, `bloxdSpLitColour`
+### 75. हटाए गए API
 
 तीन चीज़ें गायब हैं, और वैलिडेटर नाम लेकर बताता है:
 
@@ -6947,7 +6994,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 v4-युग के फ़ंक्शन जो अपरिवर्तित बचे: `bloxdEyePosition()`, `bloxdRenderOffset()`, `bloxdSunDirection()`, `bloxdSeconds()`, `bloxdWorldPosition()`, `bloxdApplyFog()`, `bloxdDefaultVertex()`, `bloxdDefaultSurface()`, `bloxdDefaultLight()`, साथ में पूरा टेक्सचर API (`bloxdTexel`, `bloxdTextureSize`, `bloxdTextureId*` — §79 रजिस्ट्री दोबारा मापता है) और `BloxdOpaqueBehind` / `bloxdSceneDepth` अपने liquid-वेरिएंट अर्थों के साथ।
 
-### 76. डिफ़ॉल्ट पैक सभी नौ हुक लेकर आता है
+### 76. डिफ़ॉल्ट पैक के हुक
 
 जिस टेम्पलेट से एक नया पैक शुरू होता है उसमें अब लाइट हुक भी शामिल हैं — v4 के टेम्पलेट में छह थे (प्रति प्रोग्राम vertex+surface) और लाइट हुक दस्तावेज़ों से कॉपी करने के लिए छोड़ दिए जाते थे। v5 का टेम्पलेट, शब्दशः और संपूर्ण (जैसा शिप हुआ, 1,633 बाइट):
 

@@ -4,7 +4,7 @@
 
 Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liquid|model`) auftreten. v5 entfernte die Beleuchtungs-Achse (das alte `BLOXD_LIGHTING`), und der Loader validiert beim Laden **alle 6 Varianten auf einmal**.
 
-## Lädt nur in nicht-strict Spielen / in strict rausgeworfen
+## Verhalten im strict- und allow-Modus
 
 - **Ursache**: ein ungeschützter Vertex-Hook oder ein erreichbares `discard`; strict-Spiele verbieten beides, und ein Verstoß = **Auto-Deaktivierung des ganzen Pakets** (`shaderPack:offInStrict`)
 - **Prüfen**: der Loader-Bildschirm zeigt `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
@@ -16,7 +16,9 @@ Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liqu
 - **Ursache**: `alpha` existiert nur hinter `#ifdef BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model)
 - **Fix**: Alpha-berührenden Code in `#ifdef BLOXD_ALPHA` einpacken ([Präprozessor](../api/preprocessor.md#makro--varianten-matrix))
 
-## „BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## Vertex-Hooks benötigen den allow-Modus
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **Ursache**: strict-Varianten haben überhaupt keine Vertex-Hooks, also auch kein `BloxdVertex`; der Vertex-Code ist aus strict-Varianten erreichbar
 - **Fix**: den Vertex-Hook schützen

@@ -4,14 +4,17 @@
 
 zip・`pack.json` など、**ローダー段階** (最初の門) で弾かれるエラーです。設定画面のステータス行に `shaderPack:load*` の ID つきで表示されます。
 
-## 「There's no pack.json at the top of the pack.」
+## pack.json が見つからない
+
+> `There's no pack.json at the top of the pack.`
 
 - **原因**: zip 直下に `pack.json` が無い (フォルダごと固めてルート階層がずれている等)
 - **確認方法**: zip を開いて `pack.json` が最上位 (または全ファイル共通の1階層ルートの直下) にあるか見る
 - **解決方法**: フォルダの中に入って `pack.json` と `.wgsl` を直接指定して固める。全ファイルが共通する1階層のルートフォルダに収まっている zip はプレフィックスが自動で剥がされる ([パックの構成](../getting-started/pack-structure.md))
 - **再発防止**: zip 化の手順を `pack.json` が直下に来る形で固定する。macOS の「フォルダを圧縮」もそのまま OK (`__MACOSX` 等の OS ゴミは自動除外)
 
-## zip 読み込みで `loadDuplicateManifest`
+## マニフェストの重複
+
 
 - **原因**: `pack.json` が 2 つある (大文字小文字違いも含む)
 - **確認方法**: zip 内を `pack.json` で検索する
@@ -51,7 +54,9 @@ zip・`pack.json` など、**ローダー段階** (最初の門) で弾かれる
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | パス重複 / UTF-8 以外 / 展開失敗 / zip 損傷 |
 | `loadNoManifest` / `loadDuplicateManifest` | `pack.json` の位置・重複 |
 
-## 「Ready. Reload the page to use it.」が表示された後、反映されない
+## 読み込み後にページの再読み込みが必要
+
+> `Ready. Reload the page to use it.」が表示された後、反映されない`
 
 - **原因**: パックは有効化のために**ページ再読み込み**を必要とする
 - **解決方法**: 選択後にページを再読み込みし、ステータスが `Ready to use` になることを確認する

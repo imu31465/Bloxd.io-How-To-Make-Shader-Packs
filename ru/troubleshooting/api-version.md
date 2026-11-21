@@ -11,7 +11,9 @@
 - **Исправление**: добавьте `"apiVersion": 5` — **число** (строка `"5"` не проходит)
 - **Профилактика**: начинайте от шаблона [pack.json](../getting-started/manifest.md)
 
-## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
+## Несовпадение версий API
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.`
 
 - **Симптом**: `loadWrongApiVersion`
 - **Причина**: `apiVersion` есть, но не 5 (пак v1–v4)

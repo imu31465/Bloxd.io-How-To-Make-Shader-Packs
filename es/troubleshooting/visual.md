@@ -25,7 +25,7 @@ Compila bien pero se ve mal.
 - **Causa**: inversión de la niebla por división
 - **Corrección**: suelta la inversión; reconstruye desde `s.colour` y aplica la niebla exactamente una vez al final (o vía `bloxdApplyFog`)
 
-## Los bloques brillantes no brillan (paquetes reconstruidos)
+## Los bloques emisivos no brillan
 
 - **Causa**: falta la re-adición de la emisión — tirar la salida por defecto significa añadir la emisión tú mismo
 - **Corrección**: añade `+ s.emission * (1.0 - l.fogAlpha)`; en v5 la composición `bloxdLitColour()` + emisión + `bloxdApplyFog` es lo más seguro ([Iluminación](../api/lighting.md))
@@ -35,12 +35,12 @@ Compila bien pero se ve mal.
 - **Causa**: usar posiciones de espacio de render directamente — el origen se mueve con el jugador
 - **Corrección**: usa `bloxdWorldPosition(position)` para los efectos dependientes del mundo ([Coordenadas](../recipes/coordinates.md)); nota los límites de precisión de f32 lejos del origen
 
-## Los patrones en la superficie del agua se desalinean en caras giradas
+## Patrones de agua desalineados en caras giradas
 
 - **Causa**: `bloxdTexel` aplica la `textureRotation` propia del fragmento a tu uv ([la sutileza de la rotación](../api/texture-api.md#la-sutileza-de-la-rotación--un-sampler-neutral))
 - **Corrección**: prerrota con el ayudante `texelNeutral`
 
-## El brillo de encantamiento / el destello de daño desaparecieron
+## Faltan los efectos de encantamiento o de daño
 
 - **Causa**: iluminación propia reconstruida sin pasar `enchantColour` / `overlayColour`
 - **Corrección**: pásalos o usa `bloxdLitColour()` ([Efectos de encantamiento](../recipes/enchant-effects.md))

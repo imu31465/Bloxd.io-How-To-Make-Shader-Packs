@@ -10,7 +10,7 @@ Le code du pack est validé et compilé en WGSL. Le WGSL d'un pack ne peut ni ex
 
 ## Ce que vous pouvez changer
 
-Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les cibles de rendu se répartissent en trois programmes comptant **9 hooks** au total :
+Un pack s’intègre au **pipeline de rendu de chaque face, composé de trois étapes**. Les cibles de rendu sont réparties entre trois programmes qui totalisent **9 hooks** :
 
 | Cible | Hooks (Vertex / Surface / Light) | Ce qui est dessiné |
 |---|---|---|
@@ -18,13 +18,13 @@ Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les ci
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | L'eau |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modèles de blocs (dalles, escaliers, plantes), objets, joueurs, mobs, PNJ, armures, cosmétiques |
 
-- **Possible** : modifier les couleurs, la transparence et l’émission ; ajuster l’éclairage (voir l’[API d’éclairage](../api/lighting.md)) ; échantillonner les textures avec `bloxdTexel` ; créer des effets par modèle avec `flags` ; animer les sommets (jeux allow uniquement)
+- **Possible** : modifier les couleurs, la transparence et l’émission ; ajuster l’éclairage (voir l’[API d’éclairage](../api/lighting.md)) ; échantillonner les textures avec `bloxdTexel` ; créer des effets par modèle avec `flags` ; animer les sommets (uniquement dans les jeux en mode allow)
 - **Impossible** : ajouter des textures personnalisées ; créer des effets de post-traitement comme le bloom ; générer une carte d’ombre personnalisée ou accéder à ses données de profondeur ; créer de véritables reflets (SSR) ; ou appliquer des shaders au ciel, aux nuages et au disque solaire lui-même
 - **Ombres** : `bloxdShadow()` fournit le facteur d’ombre solaire/lunaire calculé par le moteur, et `bloxdShadowDirection()` indique la direction de déplacement de la lumière qui projette l’ombre. `bloxdAirShadow(t)` évalue un point entre la caméra et le fragment. L’ancienne méthode d’occlusion voxel du ciel avec `skyLight` reste également disponible ([Guide des ombres](../guides/shadows.md))
 
 ## Modes strict et allow
 
-Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et **la plupart des jeux tournent en mode strict** (pas d'animation de sommets, pas de `discard`). Les packs destinés à la distribution générale doivent fonctionner en mode strict. Voir [Variantes](variants.md) et la [référence de politique](../internals/policy.md).
+Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et **la plupart des jeux fonctionnent en mode strict** (pas d'animation de sommets, pas de `discard`). Les packs destinés à la distribution générale doivent fonctionner en mode strict. Voir [Variantes](variants.md) et la [référence de politique](../internals/policy.md).
 
 ## Hypothèses de cette documentation
 

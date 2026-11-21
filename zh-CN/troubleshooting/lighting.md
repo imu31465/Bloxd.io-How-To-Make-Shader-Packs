@@ -36,7 +36,9 @@
 - **原因**: 光照专属输入 (`blockLight` 等) 未加守卫地使用。v5 没有 `#ifdef BLOXD_LIGHTING` — 请按**运行时 `bloxdLit()`** 分支
 - **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](../api/lighting.md#bloxdlit--门控))
 
-## 「LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk」
+## LightEngine 队列溢出
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **原因**: 密集的发光方块区溢出光照种子队列，该区块的光照计算被截断。**不是包造成的**，但发光簇附近的光照缺口源于此
 - **修复**: 在世界中分散光源

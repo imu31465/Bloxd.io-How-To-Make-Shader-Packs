@@ -30,7 +30,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Aspect de nuée de lucioles (points de lumière dérivant au fil du temps)
+## Effet de lucioles
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

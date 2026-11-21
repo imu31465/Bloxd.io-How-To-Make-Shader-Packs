@@ -11,7 +11,7 @@
 - Los finos dameros en bordes de chunk al cargar son el fundido de chunk por dither Bayer 4×4 en espacio de pantalla del motor, no bugs del paquete (desactivable por el ajuste gráfico `chunkFadeIn`)
 - **`mod` es palabra reservada**: rechazado con `pack.wgsl:3 'mod' is a reserved word in WGSL.` Escribe restos con el operador `%`
 
-## R-C. Disolución por dither Bayer — out.alpha controla discard
+## R-C. Disolución con dither Bayer
 
 Reproduce la **misma tabla Bayer 4×4** que el motor usa en fundidos de chunk, disolviendo cutouts desde bloques bajos hacia arriba. discard se activa en materiales alphaTest (hierba, hojas); en líquidos es transparencia de mezcla.
 
@@ -54,7 +54,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## R-D. Fundido de agua cercana a cámara — el alpha líquido despeja la vista
+## R-D. Fundido de agua cerca de la cámara
 
 El `out.alpha` del hook líquido alimenta la mezcla directamente. Despeja solo la superficie bajo la cámara para asegurar la vista al bucear o con cámara sobre el agua.
 

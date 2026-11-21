@@ -10,7 +10,7 @@ O código do pack é validado e compilado como WGSL. O WGSL do pack não pode ex
 
 ## O que você pode mudar
 
-Um pacote se conecta ao **pipeline de 3 estágios por face** do renderizador. Os alvos de renderização se dividem em três programas com um total de **9 hooks**:
+Um pacote se integra ao **pipeline de renderização de cada face, composto por três etapas**. Os alvos de renderização são divididos em três programas, com **9 hooks** no total:
 
 | Alvo | Hooks (Vertex / Surface / Light) | O que é desenhado |
 |---|---|---|
@@ -18,13 +18,13 @@ Um pacote se conecta ao **pipeline de 3 estágios por face** do renderizador. Os
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Água |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modelos de bloco (lajes, escadas, plantas), itens, jogadores, mobs, NPCs, armaduras, cosméticos |
 
-- **Pode fazer**: alterar cores, transparência e emissão; ajustar a iluminação (a [API de iluminação](../api/lighting.md)); amostrar texturas com `bloxdTexel`; criar efeitos por modelo usando `flags`; animar vértices (apenas jogos allow)
+- **Pode fazer**: alterar cores, transparência e emissão; ajustar a iluminação (a [API de iluminação](../api/lighting.md)); amostrar texturas com `bloxdTexel`; criar efeitos por modelo usando `flags`; animar vértices (apenas em jogos no modo allow)
 - **Não pode fazer**: adicionar texturas próprias; criar efeitos de pós-processamento, como bloom; gerar um mapa de sombras próprio ou acessar seus dados de profundidade; criar reflexos reais (SSR); nem aplicar sombreamento ao céu, às nuvens ou ao disco solar
 - **Sombras**: `bloxdShadow()` fornece o fator de sombra solar/lunar calculado pelo motor, e `bloxdShadowDirection()` indica a direção em que a luz que projeta a sombra se desloca. `bloxdAirShadow(t)` avalia um ponto entre a câmera e o fragmento. O método antigo de oclusão do céu por voxels com `skyLight` também continua disponível ([Guia de sombras](../guides/shadows.md))
 
 ## Modos strict e allow
 
-Cada jogo tem uma política de pacotes de shaders (`shaderPackPolicy`), e **a maioria dos jogos roda em modo strict** (sem animação de vértices, sem `discard`). Pacotes para distribuição geral devem funcionar em modo strict. Veja [Variantes](variants.md) e a [referência de política](../internals/policy.md).
+Cada jogo tem uma política de pacotes de shaders (`shaderPackPolicy`), e **a maioria dos jogos funciona em modo strict** (sem animação de vértices, sem `discard`). Pacotes para distribuição geral devem funcionar em modo strict. Veja [Variantes](variants.md) e a [referência de política](../internals/policy.md).
 
 ## Premissas desta documentação
 

@@ -11,7 +11,9 @@
 - **해결**: `"apiVersion": 5` 를 추가 — **숫자**로 (문자열 `"5"` 는 실패)
 - **예방**: [pack.json](../getting-started/manifest.md) 템플릿에서 시작한다
 
-## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
+## API 버전 불일치
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.`
 
 - **증상**: `loadWrongApiVersion`
 - **원인**: `apiVersion` 은 있지만 5가 아니다 (v1–v4 팩)

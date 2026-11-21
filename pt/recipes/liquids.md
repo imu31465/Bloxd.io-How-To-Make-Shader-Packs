@@ -17,7 +17,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Transparência pseudo por profundidade baseada na altura (não é um teste real de baixio)
+## Transparência aproximada pela altura
 
 > A profundidade real da água precisa do `bloxdOpaqueBehind()` exclusivo de líquidos, que mede a espessura até a face opaca atrás (a receita completa: [Fazendo a água parecer natural](../guides/water.md)). O que segue é um estilizado pseudo mais simples sem ele: `s.position.y` é uma coordenada local, então usá-la crua desloca o efeito conforme a origem do chunk muda. Converta com `bloxdWorldPosition()` para a altura de mundo. O trecho só varia o alpha pela altura de mundo — um pseudo efeito, não um baixio que leve em conta costa/fundo. Ajuste `packWaterReferenceY` à sua altura de mundo.
 

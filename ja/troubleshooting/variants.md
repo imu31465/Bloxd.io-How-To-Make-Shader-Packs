@@ -19,7 +19,9 @@
 - **解決方法**: `alpha` を触るコードを `#ifdef BLOXD_ALPHA` で囲む
 - **再発防止**: 「liquid は常に・terrain/model は allow のみ」の行列を覚える ([プリプロセッサ](../api/preprocessor.md#マクロバリアントの行列))
 
-## `BloxdVertex only exists when BLOXD_STRICT isn't defined`
+## Vertex フックは allow モードが必要
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **原因**: strict バリアントでは vertex フック自体が存在しないため `BloxdVertex` も無い。vertex 関連コードが strict バリアントから到達可能になっている
 - **解決方法**: vertex フックを `#ifndef BLOXD_STRICT` で囲む

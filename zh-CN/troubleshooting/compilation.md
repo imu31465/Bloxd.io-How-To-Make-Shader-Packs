@@ -4,29 +4,39 @@
 
 通过了静态验证却作为 WGSL 失败的错误，或只在浏览器 WGSL 编译器 (第二阶段) 失败的错误。
 
-## 「bloxdTerrainVertex must be declared as: fn ...」
+## 钩子函数签名不匹配
+
+> `bloxdTerrainVertex must be declared as: fn ...`
 
 - **原因**: 钩子签名不符 (参数/返回类型)
 - **修复**: 按消息中展示的声明改写 (参数名自由；类型必须完全匹配)
 - **预防**: 从[钩子对照表](../api/hooks.md)起步
 
-## 「mixing '*' and '^' requires parenthesis (only in ...)」
+## 运算符优先级
+
+> `mixing '*' and '^' requires parenthesis (only in ...)`
 
 - **原因**: WGSL 要求 `^` `&` `|` `<<` `>>` 与其他运算符混用时加括号
 - **修复**: 给操作数加括号
 
-## 「... can only be a function's parameter or return type, ...」
+## 输出变量的声明方式
+
+> `... can only be a function's parameter or return type, ...`
 
 - **原因**: `var x: BloxdSurface;` — 裸的类型标注声明会被拒绝，因为标头结构体会增字段
 - **修复**: `var out = bloxdDefaultSurface(s);` (light 钩子里也可 `var out = s;`)
 - **预防**: 总是从 `bloxdDefault*` 构造输出 ([惯例](../api/structures.md#书写惯例-回顾))
 
-## 「_ can only be the target of a phony assignment, as in _ = f();」
+## 下划线赋值规则
+
+> `_ can only be the target of a phony assignment, as in _ = f();`
 
 - **原因**: `let _ = f();` 不是合法 WGSL
 - **修复**: 写成 `_ = f();`
 
-## 「Lite: …reads scene depth on a page that didn't turn it on」
+## 场景深度的可用条件
+
+> `Lite: …reads scene depth on a page that didn't turn it on`
 
 - **原因**: 读取深度的包 (`bloxdOpaqueBehind`) 在页面生成时处于激活状态；深度可用性在页面生成时就已决定
 - **修复**: 保持包激活并重载页面

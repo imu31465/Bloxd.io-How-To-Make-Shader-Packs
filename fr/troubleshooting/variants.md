@@ -4,7 +4,7 @@
 
 Problèmes qui n'apparaissent que dans certaines des 6 variantes (`strict|allow` × `terrain|liquid|model`). La v5 a supprimé l'axe éclairage (l'ancien `BLOXD_LIGHTING`) et le chargeur valide **les 6 variantes d'un coup** au chargement.
 
-## Ne charge que dans les jeux non stricts / écarté en strict
+## Disponibilité selon le mode strict ou allow
 
 - **Cause** : un hook vertex sans garde ou un `discard` atteignable ; les jeux stricts interdisent les deux et infraction = **désactivation automatique de tout le pack** (`shaderPack:offInStrict`)
 - **Vérification** : l'écran de chargement affiche `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
@@ -16,12 +16,14 @@ Problèmes qui n'apparaissent que dans certaines des 6 variantes (`strict|allow`
 - **Cause** : `alpha` n'existe que derrière `#ifdef BLOXD_ALPHA` (tout liquide + terrain/modèle non strict)
 - **Correction** : encadrez le code qui touche à alpha dans `#ifdef BLOXD_ALPHA` ([Préprocesseur](../api/preprocessor.md#matrice-macros--variantes))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## Les hooks vertex exigent le mode allow
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **Cause** : les variantes strictes n'ont pas de hooks vertex du tout, donc pas de `BloxdVertex` non plus ; le code vertex est atteignable depuis les variantes strictes
 - **Correction** : protégez le hook vertex
 
-## bloxdOpaqueBehind échoue seulement dans certaines variantes
+## Erreur de bloxdOpaqueBehind selon la variante
 
 - **Cause** : `BLOXD_SCENE_DEPTH` n'est définie que dans les variantes tout-liquide
 - **Correction** : `#ifdef BLOXD_SCENE_DEPTH` ([Erreurs de validation](validation.md))
