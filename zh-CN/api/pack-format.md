@@ -17,7 +17,7 @@
 | `apiVersion` | number | 必填 | **必须严格等于 `5`** (`===`)。字符串 `"5"` 会失败，并按其 JSON 写法原样报出 |
 | `name` | string | 必填 | 去除首尾空白后非空；显示在设置中 |
 | `author` | string | 可选 | 若存在则必须是字符串 |
-| `keepCircleShadows` | boolean | 可选 | 当你的着色器同时使用真实太阳阴影 API 时，仍保留玩家/生物脚下旧的圆形团影（[阴影](../guides/shadows.md)）。默认 `false`；其他类型会被专用加载消息拒绝 |
+| `keepCircleShadows` | boolean | 可选 | **`` 新增** — 当你的着色器同时使用真实太阳阴影 API 时，仍保留玩家/生物脚下旧的圆形团影（[阴影](../guides/shadows.md)）。默认 `false`；其他类型会被专用加载消息拒绝 |
 
 manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰好一个 JSON 对象。
 
@@ -47,7 +47,7 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 | 16 | `renderOffset` | `vec3i` | 支撑 `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | 支撑 `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | 支撑 `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | 投影光线的行进方向。`bloxdShadowDirection()` 的来源 |
+| 64 | `shadowDirection` | `vec3f` | **`` 新增** — 投影光线的行进方向。`bloxdShadowDirection()` 的来源 |
 
 `lit` 填进了 v4 在 `seconds` 与 `renderOffset` 之间本就存在的填充区 (偏移 4–15 原为对齐间隙；`vec3i` 需要 16 字节对齐，故 `renderOffset` 保持在 16)。总大小与其余偏移均未变。引擎以单次 `setUint32(4, lit ? 1 : 0)` 写入它 — 它是标志，不是光照等级 (v4 的 JS 侧名称 `terrainLightLevels` / `terrainHeldLight` 已从 bundle 中彻底消失)。
 
