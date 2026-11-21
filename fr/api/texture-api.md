@@ -1,6 +1,6 @@
 # API de textures
 
-> API cible : 5 · Build cible : `bbb6l5` · État : Verified (API inchangée depuis v4, reconfirmée sur le build v5)
+> API cible : 5 · Type : référence technique
 
 L'API de lecture des textures propres du jeu : deux fonctions, une famille de constantes nommées et quatre champs d'entrée. Le résumé en une ligne de l'en-tête lui-même : *« This face's texture. Compare with `bloxdTextureId*`. »*
 
@@ -223,5 +223,5 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## Voir aussi
 
-- **Les 896 noms utilisables** → [Catalogue des textures](texture-catalog.md)
+- **Les noms disponibles utilisables** → [Catalogue des textures](texture-catalog.md)
 - [Intérieurs du moteur : registre des textures](../internals/texture-registry.md) · [Échantillonnage des textures](../internals/texture-sampling.md)

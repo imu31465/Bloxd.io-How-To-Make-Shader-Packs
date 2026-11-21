@@ -1,28 +1,28 @@
 # Historique des versions
 
-> État : Historical — relevés version par version ; chaque guide indique son propre build visé
+> Type : historique · Guides de migration des API v1 à v5
 
-Changements, étapes de migration et API supprimées, de la v1 à la v5. Pour migrer les packs anciens et pour les spécifications conservées de chaque époque.
+Cette section conserve les changements, les étapes de migration et les API supprimées des versions v1 à v5. Elle se concentre sur le comportement des API et les chemins de migration, pas sur les identifiants de build ni les dates de vérification.
 
-## Chronologie
+## Versions
 
-| Version | En production depuis | Guide | L'essentiel |
-|---|---|---|---|
-| v1 | (initiale) | [v1](v1.md) | première API de packs de shaders. 6 hooks (terrain/liquide × vertex/surface) ; le vocabulaire `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
-| v2 | — | [v2](v2.md) | renommage complet des identifiants, `blockId`, `BLOXD_SCENE_DEPTH` et `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` (bits), `bloxdPi` / `bloxdTau`, hooks liquides officiels, internals de l'invocation des hooks |
-| v4 | 2026-10-26 | [v4](v4.md) | API de textures (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), le contrat strict, analyse de l'en-tête du moteur et du registre |
-| **v5** | **2026-11-03** | [v5](v5.md) | **actuelle** — structure `BloxdFlags` (14 booléens), hooks Model (9 au total), l'API d'éclairage `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entrées et sorties d'enchantement/superposition, 6 variantes |
+| Version | Guide de migration | Principaux changements |
+|---|---|---|
+| v1 | [v1](v1.md) | API initiale des shader packs |
+| v2 | [v2](v2.md) | Renommage des identifiants, `blockId` et accès à la profondeur de scène |
+| v3 | [v3](v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau` et hooks Liquid |
+| v4 | [v4](v4.md) | API de textures et restrictions des jeux strict |
+| **v5** | [v5](v5.md) | **Actuelle** — `BloxdFlags`, hooks Model et API d'éclairage et d'ombre |
 
-## La préface commune
+## Traitement des anciennes versions
 
-Le jeu actuel n'accepte que `apiVersion: 5` et **les packs d'anciennes versions échouent à l'instant même du chargement** (les packs enregistrés sont silencieusement désactivés — [Compatibilité](../api/compatibility.md)). Chaque guide couvre « précédent → suivant ». Vous traversez plusieurs versions ? Appliquez-les de la plus ancienne à la plus récente.
+Le jeu actuel n'accepte que les packs avec `apiVersion: 5`. Les anciens packs ne peuvent pas être chargés sans modification. Pour migrer entre plusieurs versions, appliquez les guides dans l'ordre, en commençant par la version la plus ancienne.
 
-## Chemin rapide vers une checklist
+## Parcours de migration
 
-- pack v4 → [guide v5](v5.md) §77 (pour l'essentiel mécanique)
-- pack v3 → [v4](v4.md) §61 → [v5](v5.md) §77
-- pack v2 → [v3](v3.md) §47 → v4 → v5
-- pack v1 → commencez par [v2](v2.md) §37
+- Pack v4 → [guide de migration v5](v5.md)
+- Pack v3 → [v4](v4.md) → [v5](v5.md)
+- Pack v2 → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
+- Pack v1 → [v2](v2.md) → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
 
-> Pour la spécification actuelle elle-même, voir la [Référence API](../api/) ; pour les internals du build actuel, voir les [Internes du moteur](../internals/).
+Pour consulter l'API actuelle, voir la [Référence de l'API](../api/).

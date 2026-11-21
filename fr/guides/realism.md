@@ -1,6 +1,6 @@
 # Réalisme : deux écoles
 
-> API cible : 5 · Build cible : `bbb6l5` (2026-11-20, production et preprod) · État : Verified (porté à l'API actuelle — re-vérification sur appareil recommandée)
+> API cible : 5 · Type : référence technique
 **École A : retouches additives (depuis defaultLight)** — utilisez `engineColour` (couleur terminée) comme base et ajoutez un éclat chaud ou un rim. Facile et sûr, mais le modèle d'éclairage reste celui par défaut.
 
 **École B : rééclairage complet (depuis s.colour)** — écartez `l.engineColour` et reconstruisez l'éclairage depuis `s.colour` (albedo) et les matériaux bruts de LightIn. La vraie voie vers le réalisme. Quatre règles :

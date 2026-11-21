@@ -1,6 +1,6 @@
 # FAQ et notes légales
 
-> API cible : 5 · Build cible : `bbb6l5` (2026-11-20, production et preprod) · État : Verified
+> API cible : 5 · Type : référence technique
 
 ## Questions fréquentes
 
