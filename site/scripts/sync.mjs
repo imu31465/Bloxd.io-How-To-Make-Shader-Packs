@@ -86,7 +86,7 @@ function escapeLine(line) {
     .join('')
 }
 
-const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetivo|build\s+alvo|build\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)\s*[:：]/i
+const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetivo|build\s+alvo|build\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड|last[- ]verified|last verification|last checked|última verificación|última verificação|dernière vérification|zuletzt verifiziert|letzte verifikation|最后验证|最終確認日?|最後確認日|최종 확인일|마지막 확인|последняя проверка|дата последней проверки|अंतिम[- ]सत्यापन(?: तिथि)?)\s*[:：]/i
 
 // ビルドIDと確認日時は配信時刻・公開仕様を示すものではないため、利用者向け表示から除外する。
 // APIバージョンや検証状態など、利用者にも意味のある情報は残す。
