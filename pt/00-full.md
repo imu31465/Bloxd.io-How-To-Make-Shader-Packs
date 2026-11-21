@@ -6255,7 +6255,6 @@ Ao detectar uma atualização do jogo (um novo hash de main.js): reconferir o ca
 ---
 
 ## Histórico de versões
-> Estado: Historical — registros versão por versão; cada guia indica a própria build alvo
 
 Mudanças, etapas de migração e APIs removidas da v1 à v5. Para migrar pacotes antigos e para as especificações preservadas de cada época.
 
@@ -6322,7 +6321,6 @@ Depois aplique v3 → v4 → v5 em ordem ([o caminho rápido](history/index.md#c
 ---
 
 ## Guia de migração para a API v2
-> Versão: 2 · Estado: Historical (guia de migração da época; a build alvo está indicada no texto)
 Build alvo: `6qxffk.main.5912a15f.js` (deploy em produção em 2026-10-16). As Partes I–VII deste guia já estão reescritas para a base v2; este guia reúne os pontos de migração da v1 e as novidades da v2. Os exemplos de código das novidades passam na validação de 8/8 variantes no compilador v2 e na validação do compilador WGSL do navegador (Tint) (§38), mas a conversão v2 de receitas existentes é substituição mecânica de identificadores — verifique sempre com uma compilação em jogo antes de distribuir.
 
 ### 31. Destino dos pacotes v1 (conclusão primeiro)
@@ -6564,7 +6562,6 @@ Pesquisado por ltf_ahel (pesquisado com glm)
 ---
 
 ## Guia de migração para a API v3
-> Versão: 3 · Estado: Historical (guia de migração da era; o build alvo está indicado no texto)
 > **Substituído em 2026-10-26: a API atual é a versão 5** — pacotes v3 são rejeitados ao carregar exatamente como descrito aqui para a v2. Aplique este guia *e depois* [o guia da v4](history/v4.md) (v3 → v4: a API de texturas, a renomeação de `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`). As interioridades deste guia (§49–§54) permanecem exatas para o build v3 em que foram medidas. Aplique também [o guia da v5](history/v5.md) (v4 → v5).
 
 Build alvo: `3ymzdd.main.fae4743f.js` — **a build de produção ativa desde 2026-10-19**. O bundle que o bloxd.io serve em produção é idêntico byte a byte (conferido por md5, tanto o bundle principal quanto os chunks de pacotes de shaders) à implantação de pré-produção contra a qual este guia foi originalmente pesquisado, então tudo aqui se aplica à produção tal qual. O modelo de pacote mantém a forma da v2 (mesmos campos de `pack.json`, mesmos limites do carregador, mesmo layout de uniform).
@@ -7184,7 +7181,6 @@ Pesquisa de ltf_ahel (realizada com glm)
 ---
 
 ## Guia de migração para a API v4
-> Versão: 4 · Estado: Historical (guia de migração da era; o build alvo está indicado no texto)
 > **Substituída em 2026-11-03: a API atual é a versão 5** — pacotes v4 são rejeitados ao carregar exatamente como descrito aqui para a v3. Aplique esta parte *e depois* o [guia v5](history/v5.md) (v4 → v5: a struct `BloxdFlags` substitui `blockFlags`, `bloxdLit()` e a receita de iluminação pública, as entradas de encantamento/sobreposição, o pacote padrão de 9 hooks). As interioridades desta parte (§56–§66) permanecem exatas para os builds v4 em que foram medidas.
 
 Build alvo: `cnty9.main.669f8081.js` — **ativo em produção e preprod simultaneamente desde 2026-10-26**. Ao contrário do rollout da v3 (uma build de preprod promovida a produção), a v4 virou os dois ambientes para o mesmo bundle novo de uma só vez, e os dois bundles são idênticos byte a byte (o principal e cada chunk de pacote de shaders conferidos por md5), então tudo aqui se aplica à produção tal qual. O bundle também foi reorganizado em torno deste lançamento — o bundle principal encolheu de 4,73 MB para 3,03 MB (-36%), o número de chunks cresceu de 169 para 193, e todo o pipeline de pacotes de shaders (carregador, validador, gerador de código, compilador WebGPU) agora vive em um cluster contíguo c49–c54. O modelo de pacote em si mantém sua forma: mesmos campos de `pack.json`, mesmos limites do carregador, mesmo uniform de 64 B, mesmos seis hooks.
@@ -9120,7 +9116,6 @@ wire_mill_top_rot4
 ---
 
 ## Guia de migração para a API v5
-> Versão: 5 · Estado: Historical (guia de migração da época; o build alvo está indicado no texto)
 Build alvo: `ab90qa.main.6188124c.js` — **ativo em produção e preprod simultaneamente (medido em 2026-11-03)**, e os dois bundles voltaram a ser idênticos byte a byte (md5 `fc3322212d15be2445c0e8dfc9733fcc` no bundle principal, baixado ao vivo de ambos os hosts), então tudo aqui se aplica à produção tal qual. Esta é a maior revisão da API desde a v3: o bundle principal cresceu para 3,39 MB (+115 KB sobre o último build v4), o mapa de chunks agora tem 195 ids (c0–c195, 188 emitidos após os 7 buracos conhecidos), o pipeline de shaders continua no cluster c51–c56 (carregador c53, validador/cabeçalho/construtor do registro c55, WebGPU/codegen c56, névoa c9) — mas o template do pack padrão mudou para c116 (estava em c124 em `tcwczu`). Nenhum desses detalhes de layout é visível para um pack. Reverificado no build de produção atual `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`): o cabeçalho do motor é idêntico byte a byte e todas as medições de carregador / variantes / hooks / nomes reservados abaixo foram re-checadas inalteradas — o registro de texturas é a única superfície que se moveu (896 → 906 nomes utilizáveis; adendo §80). Preprod (`2lcqcl`) serve um bundle principal diferente, mas mediu idêntico em todas as superfícies de shader packs. Reverificado de novo em `bny9u.main.02116121.js` (2026-11-05, md5 `60eea80ec48253b7ac6cc45604dc8273`, servido byte a byte idêntico por produção e preprod): cabeçalho, template de pack padrão, limites do carregador, disposição do uniform, hooks, variantes, macros, nomes reservados e mensagens de validação re-medidos inalterados; o registro moveu-se de novo (906 → 911 nomes utilizáveis; adendo §80), o número de definições de jogo cresceu de 111 para 115, e os chunks do pipeline de shaders foram renumerados (carregador c54, validador/cabeçalho c56, WebGPU/codegen c57, template c122).
 
 O que *é* visível: o cabeçalho do motor cresceu de 6.021 para **8.954 bytes decodificados** (151 → 208 linhas) — quase toda struct ganhou campos, quatro funções novas documentam a própria receita de iluminação do motor, e a máscara de bits `blockFlags` sumiu, substituída por uma struct `BloxdFlags` de booleanos de verdade. A chave de compilação `#ifdef BLOXD_LIGHTING` também sumiu: o estado da iluminação passou para o uniform por frame como membro `lit: u32` e é consultado em tempo de execução com `bloxdLit()`. O template do pack padrão agora vem com **todos os nove hooks** em vez de seis. E o namespace interno do motor `bloxdSp*` cresceu de 27 para 46 símbolos.
