@@ -98,7 +98,7 @@ URL 参数或 localStorage 中残留的渲染器覆盖项会让包拒绝启动 �
 ---
 
 ## 快速开始
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 五分钟做出你的第一个包。
 
@@ -157,7 +157,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 包结构
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 ### 分发格式
 
@@ -186,7 +186,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## pack.json (manifest)
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 `pack.json` 是包的 manifest — zip 根部恰好一个 JSON 对象。
 
@@ -225,7 +225,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
 
@@ -354,7 +354,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 变体与守卫
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed
+> 目标API: 5 · 状态: Analyzed
 
 ### 6 种变体
 
@@ -393,7 +393,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 验证
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 ### 三阶段加载检查
 
@@ -471,7 +471,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 包格式
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (在现行加载器上重新实测)
+> 目标API: 5 · 状态: Verified (在现行加载器上重新实测)
 
 整个包模型一页讲完 — manifest、加载器限制、逐帧 uniform。分步版本见[入门指南](getting-started/manifest.md)。
 
@@ -544,7 +544,7 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 包可以定义 **9 个钩子** — 3 个渲染目标 (程序) × 3 个管线阶段，全部可选 (未定义即用引擎默认)。
 
@@ -636,7 +636,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 标志 (BloxdFlags)
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 v5 以具名布尔结构体标识面。v4 的 `blockFlags: u32` 位掩码及其 6 个 `bloxdBlockFlag*` 常量已被移除。
 
@@ -760,7 +760,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 输入与输出结构体
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 包可读写的结构体共七个。每个字段都列在下面 (`#ifdef` 字段为条件存在)。完整标头见[引擎内部](internals/engine-header.md)。
 
@@ -934,7 +934,7 @@ struct BloxdOpaqueBehind {
 ---
 
 ## 函数
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 标头函数一览。纹理 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 连同 `bloxdOpaqueBehind` 在[纹理 API](api/texture-api.md) 中讲述。
 
@@ -1133,7 +1133,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## 光照
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 v5 公开了光照 API。引擎原先在内部做的事 (构建 `litColour`) 现在可从包中调用。本页把光照输入、函数与处理顺序作为一个体系来讲。
 
@@ -1317,7 +1317,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理 API
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
+> 目标API: 5 · 状态: Verified (API 自 v4 起不变，已在 v5 构建上重新确认)
 
 读取游戏自带纹理的 API: 两个函数、一个具名常量族、四个输入字段。标头自己的概句: *「This face's texture. Compare with `bloxdTextureId*`.」*
 
@@ -1423,15 +1423,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 #### 名称解析错误 (逐字取自验证器)
 
 > **前缀拼错 / 大小写:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
->
+> 
 > **动画帧:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
->
+> 
 > **旋转副本:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
->
+> 
 > **折叠后歧义:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
->
+> 
 > **未找到 (带建议):** `There's no texture called X. Did you mean bloxdTextureIdY?` — 建议阈值为莱文斯坦距离 `max(2, floor(len/4)) + 1`
->
+> 
 > **未找到 (无建议):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
 > 消息中的 `BLOCK_TEXTURES.md` 是游戏自身的内部纹理名称清单，被引擎验证器引用 — 并非本站页面。本站的等价物是[纹理目录](api/texture-catalog.md)。
@@ -1547,7 +1547,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 常量
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 标头提供三个常量 (纹理名称常量 `bloxdTextureId*` 见[纹理 API](api/texture-api.md))。
 
@@ -1603,7 +1603,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 预处理器
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行验证器复原)
+> 目标API: 5 · 状态: Analyzed (从现行验证器复原)
 
 条件编译只支持 `#define NAME` (不带值) / `#ifdef` / `#ifndef` / `#else` / `#endif`。`#` 须在行首 (函数体内也可以)。宏名匹配不区分大小写；`#ifdef` 的名称写错时，错误消息会列出官方集合。
 
@@ -1685,7 +1685,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 限制与保留名称
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
+> 目标API: 5 · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
 
 包可以写什么，以及完整的名称保留规则。
 
@@ -1752,7 +1752,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 兼容性
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 当前游戏与旧版本包如何互操作。
 
@@ -1826,7 +1826,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 纹理目录
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标API: 5 · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
 
 可用纹理名称常量 (`bloxdTextureId*`) 的完整目录。**1,017 个名称**，按字母序排列。
 
@@ -3040,13 +3040,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [与纹理包组合](guides/combinations.md) | 与纹理包的搭配 |
 | [调试技巧](guides/debugging.md) | 症状 → 原因诊断 |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
+> 目标API: 5
 
 
 ---
 
 ## 光照的机制
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 引擎默认光照只有「乘法」，不存在高光、菲涅尔、暖冷分离、半球环境光。以下为可重建范围：
 
@@ -3069,7 +3069,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 阴影
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
+> 目标API: 5 · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
 > **`bbb6l5` 起**：新增了真实的太阳阴影 API — `bloxdShadow()`（0–1 的阴影因子；方块、玩家、生物、物品都会投影并跟随太阳）、`bloxdAirShadow(t)`（用于光柱）、`bloxdShadowDirection()`（光线行进方向）。pack.json 的 `keepCircleShadows` 还能选择保留旧圆形团影。详见[函数](api/functions.md)。
 
 
@@ -3140,7 +3140,7 @@ let lit = sunL * sky;
 ---
 
 ## 让水看起来自然
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 本 API 采样不到场景色，因此**是以菲涅尔风颜色混合与太阳高光的拟似表现，而非真实的反射/折射** (深度计算使用液体限定的 `bloxdOpaqueBehind()`——厚度吸收配方在本页后文)。下例保留基色，掠角混入近空色，仅有太阳时加小闪光。
 
@@ -3206,7 +3206,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 夜间表现设计
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 只压暗阴影，太阳缺席时引擎完成色 (`engineColour`) 依然偏亮，面影落差会显得不自然。应对完成色整体施加衰减。
 
@@ -3237,7 +3237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型与纹理
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从标头与验证器复原)
+> 目标API: 5 · 状态: Analyzed (从标头与验证器复原)
 
 v5 新的 Model 钩子绘制与读取什么。
 
@@ -3312,7 +3312,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 写实化的两大流派
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 **流派 A：加算修正 (defaultLight 起点)** —— 以 `engineColour` (完成色) 为底，叠加暖色辉光或轮廓光。轻便安全，但光照模型仍是默认。
 
@@ -3327,7 +3327,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器包能做到什么、做不到什么
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 一页讲清着色器包的写实化天花板：当前 API 能到达哪里、原理上做不到什么、什么是有条件的、限制为何存在、以及最接近的替代手段。动手之前先在这里核对预想。
 
@@ -3410,7 +3410,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 性能
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (基于实测的实践)
+> 目标API: 5 · 状态: Verified (基于实测的实践)
 
 包的钩子在每个片段 (地形 / 液体 / 模型的全部像素) 上运行，因此风格选择会显著左右帧率。
 
@@ -3457,7 +3457,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 实机测试清单
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 编译成功与「好看」是两回事。请按顺序确认：
 
@@ -3481,7 +3481,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 与纹理包的组合
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 着色器包不能添加或采样纹理，材质细微凹凸与天空图像不要只靠着色器解决。Bloxd.io 公开纹理包仓库 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 以另一方式处理纹理、天空盒、模型等。
 
@@ -3495,7 +3495,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 调试技巧
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 - 洞穴过亮 → `skyLight` 非线性曲线不足 (R2 洞穴配方 / R9.9)
 - 白天过曝 → 降低 ACES 前曝光
@@ -3531,13 +3531,13 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [模型着色器](recipes/model-shaders.md) | v5 — 手持物品、皮肤、植物摇摆 |
 | [附魔效果](recipes/enchant-effects.md) | v5 — 移除、增强、重着色闪光 |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
+> 目标API: 5 · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
 
 
 ---
 
 ## 颜色
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 单色 tint (最基础)
 
@@ -3618,7 +3618,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 照明
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 对比 S 曲线
 
@@ -3732,7 +3732,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 发光
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `emission` 在光照计算后叠加，但默认处理会**按雾量 (`fogAlpha`) 衰减它。完全沉雾的远景发光也一并消失。远景也想发光的成分不要加到 emission，在 light 钩子内以 `out.colour += ...` 直接叠加** (默认输出已打雾，远景光落在雾色之上)
 
@@ -3784,7 +3784,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 坐标
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 世界坐标
 
@@ -3839,7 +3839,7 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 时间与动画
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `bloxdSeconds()` 每 3600 秒 (1 小时) 回绕。但这是着色器流逝时间，不保证与游戏内太阳/昼夜同步。视觉周期动画可用，实际夜晚判定优先用 `bloxdSunDirection()` 与光照输入。
 
@@ -3879,7 +3879,7 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 液体
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 水面涟漪 (颜色明灭)
 
@@ -3941,7 +3941,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 顶点（仅 allow）
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
 > 关于确切条件 (allow 标题一览；Custom Games 为 strict) 见[各游戏的着色器适用策略](internals/policy.md)
@@ -4007,7 +4007,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 数学小技巧
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ```wgsl
 // 0..1 平滑分级 (n 级)
@@ -4038,10 +4038,10 @@ let phase = t * 0.15;
 ---
 
 ## 写实化
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (已移植到当前API — 建议实机复核)
+> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 「把原版外观从材质重新组装」的物理系配方集。先读前提：
->
+> 
 > 1. **light 钩子在片元最后阶段调用**。返回的 colour 原样成为最终颜色。**必须自行重打雾** (R9.10)  
 > 2. **引擎默认光照只有乘法**。高光 / 菲涅尔 / 暖冷分离 / 半球环境光都要从零制作  
 > 3. `l.engineColour` 是完成色 (已打雾)。丢弃改从 `s.colour` (反照率) 重建才是正统  
@@ -4279,14 +4279,14 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > **前提复核 (第 10 章)**：`l.skyLight` 不是体素原始值 (n/15)，而是引擎「提升曲线」  
 > `y = 1-(1-x/(3-2x))³` (提亮暗部的 S 曲线) 之后的值。
->
-> | 位置 | 体素原始 | 提升后 (= l.skyLight) | pow(·, 5.0) |  
+> 
+> | 位置 | 体素原始 | 提升后 (= l.skyLight) | pow( · , 5.0) |  
 > |---|---|---|---|  
 > | 开阔天空 | 1.00 | 1.00 | 1.00 |  
 > | 树下 (半径2) | 0.87 | **0.97** | **0.86** ← 几乎无伤 |  
 > | 半径3 | 0.80 | **0.92** | 0.66 |  
 > | 半径5 | 0.67 | 0.78 | 0.29 |
->
+> 
 > **这就是「加伽马也压不黑阴影」的真因** (数值证明)。但曲线单调，可代数严格逆变换：  
 > `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`。恢复原始值后，只需阈值切割 (`smoothstep`) 二值化。  
 > LightEngine 的 BFS 横向扩散为「相邻 1 格 = -1」，阈值 `th = 1 - r/15` 直接成为  
@@ -4343,7 +4343,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型着色器配方
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (依 v5 标头规格撰写)
+> 目标API: 5 · 状态: Analyzed (依 v5 标头规格撰写)
 
 使用 v5 Model 钩子与新标志的配方，实现 **v5 之前不可能做到的「我看的是什么」选取**。基础: [模型与纹理](guides/models.md)。
 
@@ -4495,7 +4495,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 附魔效果
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从现行标头复原)
+> 目标API: 5 · 状态: Analyzed (从现行标头复原)
 
 v5 在输入与输出两端都开放了附魔管线。这些配方在保留引擎数学的前提下控制附魔物品与盔甲的闪光。
 
@@ -4640,7 +4640,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 卡顿 / 被实机检查弃用 | [性能](troubleshooting/performance.md) |
 | 法律、安全、常见问题 | [FAQ](troubleshooting/faq.md) |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
+> 目标API: 5 · 状态: Verified (消息逐字采录自现行验证器与加载器)
 
 ### 错误出现在哪里
 
@@ -4717,7 +4717,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 版本错误
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (逐字取自现行 i18n 字典)
+> 目标API: 5 · 状态: Verified (逐字取自现行 i18n 字典)
 
 围绕 `apiVersion` 的错误。当前游戏**只接受 `5`**。
 
@@ -4996,7 +4996,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理问题
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (消息逐字采录自现行验证器)
+> 目标API: 5 · 状态: Verified (消息逐字采录自现行验证器)
 
 围绕 `bloxdTextureId*` / `bloxdTexel` 的问题。全部 896 个名称可在[纹理目录](api/texture-catalog.md)中搜索。
 
@@ -5112,7 +5112,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型问题
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (v5 新领域)
+> 目标API: 5 · 状态: Analyzed (v5 新领域)
 
 围绕 v5 新 Model 钩子的问题。
 
@@ -5210,7 +5210,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ 与法律事项
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标API: 5 · 状态: Verified
 
 ### 常见问题
 
@@ -5260,7 +5260,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 引擎内部机制与研究
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 通过分析引擎实现复原的内部规格。这里的一切都直接复原自当前生产构建 (`bny9u`) 的 JavaScript。与公开 API 文档 ([API 参考](api/)) 分离，以保存精确的内部行为与分析结果。
 
@@ -5286,7 +5286,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [调试手段](internals/debugging.md) | URL 参数、统计面板 |
 | [研究日志](internals/research-log.md) | 方法论、构建历史、未验证事项 |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
+> 目标API: 5
 
 内部机制不是稳定的 API 契约 — 它们可能随引擎更新而变化，每页都标注其证据构建 ([研究日志](internals/research-log.md))。
 
@@ -5294,7 +5294,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 渲染管线
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 - **surface 钩子在 alphaTest 「之前」跑**：`out.alpha` 直接喂给丢弃判定。镂空材质 (草、叶) 可做溶解式抖动特效 (配方 R-C)。液体 (混合) 中 `out.alpha` 为真实透明度 (配方 R-D)。通常不透明地形无效果——勿误解
 - **`l.ambient` 内容**为 `material.ambient × sceneAmbient`，按材质各异。场景侧直连图形设置「Ambient Lighting Intensity」(默认 0.5)，切勿写死默认值
@@ -5367,7 +5367,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 钩子接入内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
+> 目标API: 5 · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
 
 引擎在运行时如何调用钩子。这不改变你写的代码，但能消除「钩子收到什么」的猜测。
 
@@ -5423,7 +5423,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 引擎标头 (v5, 逐字)
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从现行生产包复原)
+> 目标API: 5 · 状态: Analyzed (从现行生产包复原)
 
 引擎为每个着色器包前置的**准确文本**，从当前线上构建的验证器渲染并应用插值（`apiVersion` 与通过 `bloxdPackInputs` 的 6 个 uniform 读取）。216 行。没有任何改写。此前的线上构建（`bny9u`、`v98qt8`）上再次验证——唯一的变化是阴影相关内容。
 
@@ -5664,7 +5664,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 着色器验证
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行验证器复原)
+> 目标API: 5 · 状态: Analyzed (从现行验证器复原)
 
 静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](troubleshooting/validation.md)。
 
@@ -5739,7 +5739,7 @@ const Jq = new Map([
 ---
 
 ## WGSL 编译
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 状态: Analyzed (从现行 bundle 复原)
 
 第二验证阶段 — 经浏览器 WGSL 编译器的真实编译 — 以及 v5 的验证桩。
 
@@ -5808,7 +5808,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 保留标识符内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行 bundle 的生成器复原)
+> 目标API: 5 · 状态: Analyzed (从现行 bundle 的生成器复原)
 
 `bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](api/restrictions.md)。
 ### 88 个符号
@@ -5851,7 +5851,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 光照内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 `blockLight` 是**三通道 RGB 彩色光**。各发光方块定义有发射色 `[R, G, B]` (各 0–15)，该色原样成为光色 (普通火把 = 暖白 (14,14,12) / 岩浆 = 橙 (14,8,2) / 信标 = 青 (5,14,14) / 白色火把 = (15,15,15) 等)。到顶点阶段时，它以 4 nibble——r / g / b / sky——打包进一个 float 属性到达。在 light 钩子内分通道处理，即可实现彩色局部照明——暖色火把配方 (R9.1) 正是以该行为为基准校准的。
 
@@ -5867,7 +5867,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 雾的内部规格
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 雾计算恒为 LINEAR 模式 (等价于 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogAlpha` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**。它随玩家加载距离而变，因此距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (见下方「加载边界带」一节)。(渲染器的雾函数实际实现了 **四种** 模式——off / exponential / exponential-squared / linear——正式发布的游戏驱动的是 linear；复原源码与稳健性讨论保存于[版本历史：v3 迁移指南](history/v3.md)。)
 
@@ -5894,7 +5894,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 纹理采样内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行生成器 c56 复原)
+> 目标API: 5 · 状态: Analyzed (从现行生成器 c56 复原)
 
 `bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](api/texture-api.md)。
 
@@ -5955,7 +5955,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 纹理注册表内部机制
-> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified
+> 目标 API：5 · 状态：Verified
 
 本页说明纹理名称如何解析为 ID，并汇总不同构建版本之间的注册表变化。供着色器包作者使用的当前名称列表见[纹理目录](api/texture-catalog.md)。
 
@@ -6016,7 +6016,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 模型渲染内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行 bundle 复原)
+> 目标API: 5 · 状态: Analyzed (从现行 bundle 复原)
 
 v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](guides/models.md)。
 
@@ -6058,7 +6058,7 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 ---
 
 ## 引擎数据台账
-> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified
+> 目标 API：5 · 状态：Verified
 
 本台账汇总当前构建中着色器包可见 API 的已确认数值。模块 ID、chunk 编号等 bundle 内部细节不属于 API 规格，因此不在此列出。
 
@@ -6108,7 +6108,7 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 ---
 
 ## 会改变包可见值的因素
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 同一包因**世界与玩家设置**渲染各异。分发前至少在以下 3 环境确认外观：
 
@@ -6122,7 +6122,7 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 ---
 
 ## 各游戏的着色器适用策略
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 本页把 `allow / strict` 在标题层面的语义确定下来。只有游戏定义中显式写着 `shaderPackPolicy: "allow"` 的标题才以完整模式运行 (vertex 钩子、`discard`、地形 `alpha`)；未指定 (或 allow 以外的值) 的标题视为 strict — 定义 `BLOXD_STRICT`，守卫内的代码自动失效。这个判定不在包一侧可控，因此弄清哪些标题跑什么内容是发布的前提。
 
@@ -6151,7 +6151,7 @@ strict 侧特别容易误解的点:
 ---
 
 ## 太阳与月亮
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 `bloxdSunDirection()` 之源是仅在天空盒种类变化时改写的天空方向缓冲，判定基准不是「天空有无太阳」而是**「天空盒是否为 earth 型」**。
 
@@ -6196,7 +6196,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 调试工具
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
 - URL 参数 `?renderer=lite` — 强制 Lite (WebGPU) 渲染器 (`webgl2` / `babylon` 亦可；`babylon` 是 webgl2 的旧名)。优先级：URL 参数 > localStorage `bloxdRenderer` > 设置画面 > 默认 (webgl2)。无效值附带警告忽略。URL 或 localStorage 中残留的覆盖会使需要 WebGPU (lite) 的场景以「needs the new WebGPU renderer, so remove the renderer override...」出错 ([加载错误](troubleshooting/loading.md))
 - URL 参数 `?vconsole` — 屏幕内控制台 (VConsole)。手机实机验证趁手
@@ -6613,9 +6613,9 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 该构建要求 manifest 的 `apiVersion` **精确匹配 3**，且**不并行支持 v2/v3**。v2 包在加载时会被「API 版本不符」消息拒绝 (i18n 键与占位文本):
 
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
->
+> 
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
->
+> 
 
 已保存的包沿用 v2 生命周期 ([v2 迁移指南](history/v2.md) §31): 每个构建都会计算其引擎标头的哈希，引擎更新会自动把已保存包标记为「需要重新检查」，而 `apiVersion` 不是当前版本的已保存包会被标记为不会运行 (并用上述状态消息指向替代包)，而不是报错。
 
@@ -7037,7 +7037,7 @@ v3 (3ymzdd):  6.5bc26a63   ← 从正式生产 bundle 实测
 「特殊」意味着*与宏绑定*——可用性取决于变体符号的引擎函数。两条守卫诊断会强制正确使用:
 
 > `${vertexHook} reaches ${name}, which only surface and light hooks can use.`——vertex 钩子调用了仅 surface / light 钩子可用的函数。
->
+> 
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.`——例如地形侧调用 `bloxdOpaqueBehind()` 却没有 `#ifdef BLOXD_SCENE_DEPTH` 包裹。
 
 **引擎标头 (prelude)，已钉住。** v3 标头是一个 5,637 字节字符串，开头为 `// Engine-provided and read-only, prepended to all packs. apiVersion 3.`。它带有 `#if` / `#ifdef` 指令，由引擎自己的 WGSL 预处理器逐变体求值——引擎确实会执行 `#if` 表达式求值，格式错误的表达式会报 `Cannot evaluate #if ...`。本指南中的每个结构体、函数签名与引用注释都来自这段渲染文本，因此指南与随附标头不会漂移。 全文已在 §54 末尾逐字给出。
@@ -7241,7 +7241,7 @@ v4 的变更集一屏速览:
 
 加载时的两条消息，逐字取自线上 i18n 字典:
 
->
+> 
 > `This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` —— 键存在但不等于 4。
 
 一个已保存的 (此前正常工作的) v3 包不会向玩家抛出任何异常。已保存包的判定结果为 `{kind: "none", reason: "otherApiVersion"}`，包静默失效，着色器包设置标签页用状态行说明情况:
@@ -7356,15 +7356,15 @@ let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 拼写规则，复原自验证器: 在每个非字母数字串处切分名称，各部分首字母大写，再拼到 `bloxdTextureId` 前缀之后。反向查找**对大小写与下划线不敏感** (引擎在匹配前以同样方式折叠你的拼写)，拼写无法解析时有三个专属错误族——全部逐字取自线上验证器:
 
 > **前缀拼错 / 大小写错误:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
->
+> 
 > **动画纹理的一帧:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
->
+> 
 > **旋转副本:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
->
+> 
 > **折叠后歧义:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
->
+> 
 > **未找到，带建议:** `There's no texture called X. Did you mean bloxdTextureIdY?` —— 建议阈值为 Levenshtein 距离 `max(2, floor(len/4)) + 1`。
->
+> 
 > **未找到，无建议:** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
 最后一条消息指向的文件，本指南改为直接内嵌: 完整的实测名录——全部 905 个可用名称及其当时 id，外加旋转族与动画族两张表——就是下文 §68；§64 有注册表测量与背后的折叠规则。该名录的现行版本是[纹理名录](api/texture-catalog.md)。
@@ -7546,7 +7546,7 @@ strict 游戏是规则而非例外: **一切默认 strict**，只有 [各游戏�
 #### 60.1 两条强制规则及其确切诊断
 
 > `bloxdTerrainVertex moves terrain, which strict games prevent.`
->
+> 
 > `discard makes terrain see-through, which strict games prevent.`
 
 机制，复原自验证器:
@@ -7849,7 +7849,7 @@ v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the 
 `symbol: null` 意为「无变体门控」——函数存在处 (surface/light 钩子) 皆可调用。两条 "reaches" 诊断逐字沿用，如今也覆盖纹理误用:
 
 > `${hook} reaches ${name}, which only surface and light hooks can use.` —— 例如 vertex 钩子里的 `bloxdTexel`。
->
+> 
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` —— 例如未包裹的 terrain 钩子里的 `bloxdOpaqueBehind()` (与 v3 §53 一致)。
 
 #### 65.4 其余从 v3 §53 原样沿袭的部分
