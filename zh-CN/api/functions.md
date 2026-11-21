@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 阴影函数
 
-\u0060API v5\u0060 构建把引擎真实的太阳/月亮阴影系统（方块、玩家、生物、物品投下的、随太阳移动的投影阴影）加进了包 API。这两个函数会被**注入每个包编译后的模块**（与 \u0060bloxdFragmentBlockPosition\u0060 一样），并记录在验证器的函数表里，但不属于可读头文本。
+`API v5` 提供引擎的太阳/月亮阴影系统：方块、玩家、生物和物品投下的投影阴影会随太阳移动。这两个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
 
 ### bloxdShadow
 
