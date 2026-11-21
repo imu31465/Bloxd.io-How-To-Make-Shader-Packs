@@ -21,7 +21,7 @@ El modelo completo del paquete en una sola página — manifiesto, límites del 
 
 Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un objeto JSON en la raíz del zip.
 
-## Límites del cargador (remedidos en el c53 en vivo)
+## Límites del cargador
 
 | Límite | Valor | Mensaje al superarlo |
 |---|---|---|
@@ -38,7 +38,7 @@ El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScr
 
 ## Uniform por fotograma: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 80 bytes, pero v5 añadió un miembro (del módulo de diseño de uniform en vivo):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 80 bytes, pero v5 añadió un miembro:
 
 | Desplazamiento | Campo | Tipo | Nota |
 |---|---|---|---|

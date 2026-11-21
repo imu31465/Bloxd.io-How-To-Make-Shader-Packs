@@ -21,7 +21,7 @@ Tout le modèle de pack sur une seule page — manifeste, limites du chargeur, u
 
 Tout le reste du manifeste est ignoré. `pack.json` doit être exactement un objet JSON à la racine du zip.
 
-## Limites du chargeur (remesurées sur le c53 en production)
+## Limites du chargeur
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -38,7 +38,7 @@ Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScri
 
 ## Uniform par frame : bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — toujours 64 octets, mais v5 a ajouté un membre (d'après le module de disposition de l'uniform en production) :
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — toujours 80 octets, mais v5 a ajouté un membre :
 
 | Offset | Champ | Type | Remarque |
 |---|---|---|---|
@@ -57,7 +57,7 @@ Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScri
 
 | binding | Contenu |
 |---|---|
-| 0 | uniform `bloxdPackInputs` (64 o) |
+| 0 | uniform `bloxdPackInputs` (80 o) |
 | 1 | texture de profondeur de scène (variantes liquid) |
 | 2 | buffer de stockage `bloxdSpTextureLayers` |
 

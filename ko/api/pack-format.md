@@ -21,7 +21,7 @@
 
 매니페스트의 나머지는 모두 무시된다. `pack.json` 은 zip 루트에 정확히 하나의 JSON 객체여야 한다.
 
-## 로더 제한 (라이브 c53 에서 재실측)
+## 로더 제한
 
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
@@ -38,7 +38,7 @@
 
 ## 프레임별 uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 80 바이트. 다만 v5 에서 멤버가 하나 늘었다 (라이브 uniform-레이아웃 모듈에서):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 80 바이트. 다만 v5 에서 멤버가 하나 늘었다:
 
 | 오프셋 | 필드 | 형 | 비고 |
 |---|---|---|---|

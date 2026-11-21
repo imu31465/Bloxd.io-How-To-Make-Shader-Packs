@@ -21,7 +21,7 @@ O modelo inteiro de pacote em uma página só — manifesto, limites do carregad
 
 Todo o resto do manifesto é ignorado. `pack.json` deve ser exatamente um objeto JSON na raiz do zip.
 
-## Limites do carregador (remedidos no c53 em produção)
+## Limites do carregador
 
 | Limite | Valor | Mensagem ao exceder |
 |---|---|---|
