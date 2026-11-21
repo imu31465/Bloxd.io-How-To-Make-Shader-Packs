@@ -4596,7 +4596,6 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 特殊関数のシグネチャ表
 
-バリデータは module 29849 に特殊関数の表を持ち、フック間の呼び出し制約を検証します:
 
 ```js
 const Jq = new Map([
@@ -4670,7 +4669,6 @@ const Jq = new Map([
 
 ### バリデーションスタブの生成
 
-静的検証を通したコードに、エンジンは検証用のスタブを合成します (module 29866 から復元):
 
 - 型スタブ表:
 

@@ -4418,7 +4418,6 @@ Die statische Validierung (Analyzer, Stufe 1 der Ladeprüfung). Nutzerseitige Fi
 
 ### Die Signaturentabelle der Spezialfunktionen
 
-Der Validator hält eine Tabelle in Modul 29849 und prüft hook-übergreifende Aufrufbeschränkungen:
 
 ```js
 const Jq = new Map([
@@ -4489,7 +4488,6 @@ Das Typ-Prüfen der statischen Validierung ist unvollständig, deshalb tauchen m
 
 ### Validierungs-Stub-Generierung
 
-Die Engine synthetisiert Stubs für Code, der die statische Validierung bestanden hat (aus Modul 29866 restauriert):
 
 - die Typ-Stub-Tabelle:
 
@@ -4924,7 +4922,6 @@ Die technischen Aussagen hier ruhen nicht auf offizieller Entwickler-Dokumentati
 
 #### Engine-Header-Restaurierung
 
-Rendern der c55-Header-Vorlage mit ihren Live-Interpolationen (`${vC}` = apiVersion, die 5 Uniform-Lesezugriffe über `${Gq.j}`) — 6 Interpolationen auf v5 ([Engine-Header](internals/engine-header.md)).
 
 #### Textur-Registry-Neuberechnung
 
@@ -4941,7 +4938,6 @@ Statische Analyse aller 111 Spieldefinitionen: `shaderPackPolicy`-`"allow"`-Lite
 
 #### Uniform-/Pipeline-Restaurierung
 
-Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Varianten-Textur-Codegen aus dem WebGPU-Generator (c56) ([Textur-Sampling](internals/texture-sampling.md)).
 
 ### Drift-Beobachtungen
 
@@ -5481,7 +5477,6 @@ Die Manifest-Regeln rund um `apiVersion` sind sonst unverändert und verdienen d
 
 ### 56. pack.json und der Uniform-Buffer (was unverändert bleibt)
 
-Das gesamte Nicht-Textur-Paketmodell wird von v3 Byte für Byte übernommen, daher bleibt §41 des [v3-Migrationsleitfadens](history/v3.md) die Referenz. Die v4-Nachmessungen, aus dem Live-Loader-Chunk (c51):
 
 | Limit | Wert | Meldung bei Überschreitung |
 |---|---|---|
@@ -5862,7 +5857,6 @@ Beide Hooks sind reine Surface-/Light-Hooks, dieses Paket braucht also keine `#i
 
 ### 62. Weitere v4-Änderungen und Notizen
 
-- **Die Bundle-Reorg** (Zahlen in der Einleitung) verlegte die Shader-Pipeline in die Chunks c49 (Loader/Persistenz), c50–c51 (Loader-UI + Zip), c53 (Validator + Header + Registry-Builder), c54 (WGSL-Code-Generator + Lite-Renderer). Für jeden, der das Bundle nach einem Leitfaden der v3-Ära neu untersucht: Die Anker sind alle gewandert, der Code nicht.
 - **Der Header-Text wurde für Klarheit neu geschrieben** — jeder Doc-Kommentar neu formuliert (knapper, zweite Person), keine semantische Änderung jenseits von §59. Größe 5.637 → 6.021 Byte, 128 → 150 Zeilen; die erste Zeile ist jetzt `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **Die Emissions-Reihenfolge ist jetzt im Header dokumentiert**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — die Erkenntnis aus v3s §43, jetzt offizielle Formulierung.
 - **Die i18n-Oberfläche** des Shader-Pack-Features umfasst 58 Keys (v4-Build); die Loader-Familie (`load*`) ist über §55–§56 zitiert, die Status-Familie (`status*`) in §55, die Varianten-Labels in §60.1.
@@ -5897,7 +5891,6 @@ Die Umstellung von v4 ist größtenteils mechanisch (§77): Die eine stille Fall
 
 ### 69. Das Schicksal von v4-Paketen (erst das Fazit)
 
-**Jedes v4-Paket — einschließlich jedes als v4 verteilten Pakets — scheitert jetzt in Produktion exakt beim Laden.** Der Loader vergleicht `manifest.apiVersion !== 5` mit strictem JavaScript-`!==` — die Versionskonstante `5` und die Header-Vorlage leben in diesem Build im selben Modul (Modul 29836), daher wandern die Prüfung und der Header-Text, gegen den sie validiert, gemeinsam. Das JSON muss die *Zahl* `5` tragen; ein String `"5"` scheitert und wird mit seiner JSON-Schreibweise gemeldet, exakt wie in v4.
 
 Die beiden Ladezeit-Meldungen sind unverändert aus v4, wortlautgetreu aus dem Live-i18n-Wörterbuch:
 
@@ -5912,7 +5905,6 @@ Die Manifest-Regeln sind sonst nachgemessen und unverändert: `pack.json` muss e
 
 ### 70. pack.json, der Loader und das Uniform (was unverändert bleibt)
 
-Das gesamte Paketmodell wird von v4 Byte für Byte übernommen. Die Loader-Limits, nachgemessen am Live-Loader-Chunk (c53):
 
 | Limit | Wert | Meldung bei Überschreitung |
 |---|---|---|
@@ -6286,4 +6278,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Nur referenzierte Textur-Konstanten werden emittiert.** Der `bloxdTextureId*`-Block des Headers wird pro Paket aus den Namen generiert, die du tatsächlich referenzierst — ein Paket mit drei Konstanten bekommt drei `const`-Zeilen vorangestellt, nicht die vollen ~900.
 - **`HEADER_VERSION` zog auf `9.<hash>.<hash>`** — dieselbe Zwei-Suffix-Struktur wie v4 (fnv1a32 des Header-Materials, fnv1a32 der sortierten Name-id-Registry), mit der führenden Ganzzahl von 8 auf 9 erhöht. Die Stored-Pack-Recheck-Logik (§55 des [v4-Migrationsleitfadens](history/v4.md)) ist unverändert: Eine Header-/Registry-Änderung kippt gespeicherte Pakete auf „muss erneut geprüft werden“.
 - **i18n-Oberfläche**: die Shader-Pack-Key-Familie ist in der Form unverändert (die `load*`-, `status*`- und Varianten-Label-Keys aus §62 des v4-Leitfadens alle nachgemessen vorhanden; `loadNoWgsl`/`loadNotZip` weiterhin exakt).
-- **Bundle-Layout für Nachuntersucher**: Header c55 (unverändert), Loader/Persistenz c51–c53, Validator + Registry-Builder c55, WebGPU-Codegen c56, Fog c9, **Standard-Pack-Vorlage c116** (aus c124 verschoben), die BLOXD_ALPHA-Stellen c51/c52/c53/c55/c9. Chunk-Format-Notiz: Jeder Chunk ist jetzt ein ES-Modul (`export const modules = {...}`) — c53 trägt sogar Module für c52 und c53 —, was zählt, wenn du das Bundle per Textsuche untersuchst (eine Modul-id wie `1371` lebt im Sparse-Module-Array von *main*, in keinem Chunk).

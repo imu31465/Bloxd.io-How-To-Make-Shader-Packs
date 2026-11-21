@@ -4399,7 +4399,6 @@ La validation statique (l'analyseur, étape 1 du contrôle de chargement). Les c
 
 ### La table de signatures des fonctions spéciales
 
-Le validateur tient une table dans le module 29849 et vérifie les restrictions d'appel entre hooks :
 
 ```js
 const Jq = new Map([
@@ -4470,7 +4469,6 @@ Le contrôle de types de la validation statique est incomplet, donc certaines er
 
 ### Génération des stubs de validation
 
-Le moteur synthétise des stubs pour le code qui a passé la validation statique (restauré depuis le module 29866) :
 
 - la table de stubs de types :
 
@@ -4901,7 +4899,6 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 
 #### Restauration de l'en-tête du moteur
 
-Évaluation du template d'en-tête c55 avec ses interpolations réelles (`${vC}` = apiVersion, les 5 lectures d'uniform via `${Gq.j}`) — 6 interpolations en v5 ([En-tête du moteur](internals/engine-header.md)).
 
 #### Recalcul du registre de textures
 
@@ -4918,7 +4915,6 @@ Analyse statique de toutes les 111 définitions de jeu : littéraux `"allow"` de
 
 #### Restauration de l'uniform / du pipeline
 
-L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uniform (29838) ; le codegen des textures à 3 variantes depuis le générateur WebGPU (c56) ([Échantillonnage des textures](internals/texture-sampling.md)).
 
 ### Observations de dérive
 
@@ -5892,7 +5888,6 @@ Les règles de manifeste autour d'`apiVersion` sont inchangées par ailleurs et 
 
 ### 56. pack.json et le buffer d'uniformes (ce qui ne change pas)
 
-Tout le modèle de pack hors textures se transpose de la v3 octet pour octet, donc le §41 du [guide v3](history/v3.md) reste la référence. Les re-mesures de la v4, depuis le chunk du chargeur en production (c51) :
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -6273,7 +6268,6 @@ Les deux hooks ne sont que surface/light, donc ce pack n'a besoin d'aucune envel
 
 ### 62. Autres changements et notes de la v4
 
-- **La réorganisation du bundle** (chiffres dans l'introduction) a déplacé le pipeline de shaders dans les chunks c49 (chargeur/persistance), c50–c51 (interface du chargeur + zip), c53 (validateur + en-tête + constructeur de registre), c54 (générateur de code WGSL + rendu Lite). Pour quiconque ré-étudie le bundle après un guide de l'ère v3 : les ancres ont toutes bougé, pas le code.
 - **Le texte de l'en-tête a été réécrit pour la clarté** — chaque commentaire de documentation reformulé (plus concis, à la seconde personne), sans changement sémantique au-delà du §59. Taille 5 637 → 6 021 octets, 128 → 150 lignes ; la première ligne est désormais `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **L'ordre de l'émission est désormais documenté dans l'en-tête** : `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — le constat du §43 de la v3, désormais formulation officielle.
 - **La surface i18n** de la fonctionnalité packs de shaders est de 58 clés (build v4) ; la famille du chargeur (`load*`) est citée à travers les §55–§56, la famille de statut (`status*`) au §55, les libellés de variantes au §60.1.
@@ -6422,7 +6416,6 @@ Le groupe 3 est le groupe du pack : trois emplacements fournis par le moteur, au
 
 ### 64. Le registre des noms de textures
 
-Le moteur construit le catalogue de noms une fois par session depuis le registre de blocs — le même pipeline qui a produit le `textureNameToIndex` du système de packs de textures. Le constructeur (module 28833 du bundle), restauré en pseudocode :
 
 ```
 for each (name, index) in textureNameToIndex:           # p. ex. ("lava0", 0), ("radar_screen0[rot[2", 19)
@@ -7786,7 +7779,6 @@ La conversion depuis v4 est pour l'essentiel mécanique (§77) : le piège silen
 
 ### 69. Le sort des packs v4 (d'abord la conclusion)
 
-**Tout pack v4 — y compris tout pack distribué comme v4 — échoue désormais en production, exactement au chargement.** Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScript — la constante de version `5` et le gabarit de l'en-tête vivent dans le même module de ce build (module 29836), donc la vérification et le texte d'en-tête auquel elle se rapporte évoluent ensemble. Le JSON doit porter le *nombre* `5` ; une chaîne `"5"` échoue et est signalée avec son orthographe JSON, exactement comme en v4.
 
 Les deux messages au moment du chargement sont inchangés par rapport à v4, verbatim du dictionnaire i18n en production :
 
@@ -7801,7 +7793,6 @@ Les règles du manifeste sont par ailleurs remesurées et inchangées : `pack.js
 
 ### 70. pack.json, le chargeur et l'uniform (ce qui ne change pas)
 
-Tout le modèle de pack passe de v4 octet par octet. Les limites du chargeur, remesurées sur le chunk du chargeur en production (c53) :
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -8175,11 +8166,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Seules les constantes de textures référencées sont émises.** Le bloc `bloxdTextureId*` de l'en-tête est généré par pack à partir des noms que vous référencez réellement — un pack qui utilise trois constantes reçoit trois lignes `const` en préfixe, pas les ~900 complètes.
 - **`HEADER_VERSION` est passé à `9.<hash>.<hash>`** — même structure à deux suffixes qu'en v4 (fnv1a32 du matériau d'en-tête, fnv1a32 du registre trié nom-id), avec l'entier de tête incrémenté de 8 à 9. La logique de revérification des packs sauvegardés (§55 du [guide de migration v4](history/v4.md)) est inchangée : un changement d'en-tête ou de registre bascule les packs sauvegardés en « à revérifier ».
 - **Surface i18n** : la famille de clés des shader packs est inchangée en forme (les clés `load*`, `status*` et d'étiquettes de variante du guide v4 §62 toutes remesurées présentes ; `loadNoWgsl`/`loadNotZip` toujours exactes).
-- **Disposition du bundle pour les re-chercheurs** : en-tête c55 (inchangé), chargeur/persistance c51–c53, validateur + constructeur du registre c55, codegen WebGPU c56, brouillard c9, **gabarit du pack par défaut c116** (déplacé depuis c124), les sites BLOXD_ALPHA c51/c52/c53/c55/c9. Note sur le format des chunks : chaque chunk est désormais un module ES (`export const modules = {...}`) — c53 porte même les modules de c52 comme de c53 — ce qui compte si vous faites une recherche textuelle dans le bundle (un id de module comme `1371` vit dans le tableau épars de modules de *main*, dans aucun chunk).
 
 ### 79. Intérieurs du moteur v5 : le pipeline de textures et l'espace `bloxdSp*` à 46 symboles
 
-Le codegen de textures à trois variantes du v4 §63 est reconduit avec la même forme. Restauré depuis le générateur en production (c56) :
 
 **Variante 1 — aucun texture pack actif** (le bloc généré en entier ; `bloxdTextureSize` et `bloxdTexel` sont des stubs) :
 

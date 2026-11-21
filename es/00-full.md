@@ -4415,7 +4415,6 @@ La validación estática (analizador, etapa 1 de la comprobación de carga). Cor
 
 ### La tabla de firmas de funciones especiales
 
-El validador mantiene una tabla en el módulo 29849 y comprueba las restricciones de llamada entre hooks:
 
 ```js
 const Jq = new Map([
@@ -4486,7 +4485,6 @@ La comprobación de tipos de la validación estática es incompleta, así que al
 
 ### Generación de stubs de validación
 
-El motor sintetiza stubs para el código que pasó la validación estática (restaurado del módulo 29866):
 
 - la tabla de stubs de tipos:
 
@@ -4921,7 +4919,6 @@ Las afirmaciones técnicas de aquí no descansan en documentación oficial de lo
 
 #### Restauración de la cabecera del motor
 
-Renderizando la plantilla de cabecera de c55 con sus interpolaciones en vivo (`${vC}` = apiVersion, las 5 lecturas del uniform vía `${Gq.j}`) — 6 interpolaciones en v5 ([Cabecera del motor](internals/engine-header.md)).
 
 #### Recómputo del registro de texturas
 
@@ -4938,7 +4935,6 @@ Analizando estáticamente las 111 definiciones de juego: literales `"allow"` de 
 
 #### Restauración del uniform / pipeline
 
-El diseño de campos de `BloxdPackInputs` desde el módulo de diseño de uniform (29838); el codegen de texturas de 3 variantes desde el generador WebGPU (c56) ([Muestreo de texturas](internals/texture-sampling.md)).
 
 ### Observaciones de deriva
 
@@ -5911,7 +5907,6 @@ Las reglas de manifiesto en torno a `apiVersion` no cambian en lo demás y convi
 
 ### 56. pack.json y el búfer uniform (lo que no cambia)
 
-Todo el modelo de paquetes sin texturas se traslada de v3 byte a byte, así que §41 de [la guía de migración v3](history/v3.md) sigue siendo la referencia. Las remediciones de v4, del chunk del cargador activo (c51):
 
 | Límite | Valor | Mensaje al superarlo |
 |---|---|---|
@@ -6292,7 +6287,6 @@ Ambos hooks son solo surface/light, así que este paquete no necesita envoltorio
 
 ### 62. Otros cambios y notas de v4
 
-- **La reorganización del bundle** (números en la introducción) movió el pipeline de sombreadores a los chunks c49 (cargador/persistencia), c50–c51 (interfaz del cargador + zip), c53 (validador + cabecera + constructor del registro), c54 (generador de código WGSL + renderizador Lite). Para quien re-investigue el bundle tras una guía de la era v3: los anclajes se movieron todos, el código no.
 - **El texto de la cabecera se reescribió por claridad** — cada comentario de documentación redactado de nuevo (más terso, segunda persona), sin cambio semántico más allá de §59. Tamaño 5.637 → 6.021 bytes, 128 → 150 líneas; la primera línea es ahora `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **El orden de la emisión queda documentado en la cabecera**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — el hallazgo de §43 de v3, ahora redacción oficial.
 - **La superficie i18n** de la función de paquetes de sombreadores es de 58 claves (build v4); la familia del cargador (`load*`) se cita a lo largo de §55–§56, la familia de estado (`status*`) en §55, las etiquetas de variante en §60.1.
@@ -6441,7 +6435,6 @@ El grupo 3 es el grupo del paquete: tres ranuras proporcionadas por el motor, ni
 
 ### 64. El registro de nombres de texturas
 
-El motor construye el catálogo de nombres una vez por sesión a partir del registro de bloques — el mismo pipeline que produjo el `textureNameToIndex` del sistema de paquetes de texturas. El constructor (módulo 28833 del bundle), restaurado como pseudocódigo:
 
 ```
 for each (name, index) in textureNameToIndex:           # p. ej. ("lava0", 0), ("radar_screen0[rot[2", 19)
@@ -7806,7 +7799,6 @@ La conversión desde v4 es en su mayoría mecánica (§77): esta vez la trampa s
 
 ### 69. Destino de los paquetes v4 (conclusión primero)
 
-**Todo paquete v4 — incluido todo paquete distribuido como v4 — falla ahora en producción exactamente al cargar.** El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScript — la constante de versión `5` y la plantilla de cabecera viven en el mismo módulo de este build (módulo 29836), así que la comprobación y el texto de cabecera contra el que valida se mueven juntos. El JSON debe llevar el *número* `5`; una cadena `"5"` falla y se informa con su grafía JSON, exactamente como en v4.
 
 Los dos mensajes de carga no cambian respecto a v4, verbatim del diccionario i18n activo:
 
@@ -7821,7 +7813,6 @@ Las reglas del manifiesto, en lo demás, remedidas y sin cambios: `pack.json` de
 
 ### 70. pack.json, el cargador y el uniform (lo que no cambia)
 
-Todo el modelo de paquetes se traslada de v4 byte a byte. Los límites del cargador, remedidos en el chunk del cargador activo (c53):
 
 | Límite | Valor | Mensaje al superarlo |
 |---|---|---|
@@ -8195,11 +8186,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Solo se emiten las constantes de textura referenciadas.** El bloque `bloxdTextureId*` de la cabecera se genera por paquete a partir de los nombres que realmente referencias — un paquete que usa tres constantes recibe tres líneas `const` anteuestas, no las ~900 completas.
 - **`HEADER_VERSION` pasó a `9.<hash>.<hash>`** — misma estructura de dos sufijos que v4 (fnv1a32 del material de cabecera, fnv1a32 del registro ordenado nombre-id), con el entero inicial subido de 8 a 9. La lógica de recomprobación de paquetes guardados (§55 de [la guía de migración v4](history/v4.md)) no cambia: un cambio de cabecera/registro pasa los paquetes guardados a «necesita revisión».
 - **Superficie i18n**: la familia de claves de paquetes de sombreadores no cambia en forma (las claves `load*`, `status*` y de etiquetas de variante de la guía v4 §62 remedidas todas presentes; `loadNoWgsl`/`loadNotZip` siguen exactas).
-- **Disposición del bundle para re-investigadores**: cabecera c55 (sin cambios), cargador/persistencia c51–c53, validador + constructor del registro c55, codegen WebGPU c56, niebla c9, **plantilla del pack por defecto c116** (movida desde c124), los sitios de BLOXD_ALPHA c51/c52/c53/c55/c9. Nota de formato de chunks: cada chunk es ahora un módulo ES (`export const modules = {...}`) — c53 incluso lleva módulos tanto de c52 como de c53 — lo que importa si buscas texto en el bundle (un id de módulo como `1371` vive en el array disperso de módulos de *main*, no en ningún chunk).
 
 ### 79. Interioridades del motor v5: el pipeline de texturas y el espacio `bloxdSp*` de 46 símbolos
 
-El codegen de texturas de tres variantes de v4 §63 se traslada con la misma forma. Restaurado del generador activo (c56):
 
 **Variante 1 — sin paquete de texturas activo** (el bloque generado completo; `bloxdTextureSize` y `bloxdTexel` son stubs):
 

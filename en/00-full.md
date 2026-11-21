@@ -3616,7 +3616,6 @@ Errors that pass static validation but fail as WGSL, or fail only in the browser
 ---
 
 ## Validation errors
-> Target API: 5 · Status: Verified (messages recorded verbatim from the live validator)
 
 Static-validation (analyzer, stage 1) errors — mostly reserved names, the strict contract, and cross-hook call restrictions.
 
@@ -5604,7 +5603,6 @@ Every usable texture name becomes a `const` you can compare against — spelled 
 | `black_portal0.png` (frames 0–3) | `bloxdTextureIdBlackPortal` | same rule |
 | `radar_screen0` (turned copies `[rot[1`–`[rot[4`) | `bloxdTextureIdRadarScreen0` | turned family: folds to the root name |
 
-The spelling rule, restored from the validator: split the name on every non-alphanumeric run, capitalise each part, concatenate after the `bloxdTextureId` prefix. Lookup is **case- and underscore-insensitive** in the other direction (the engine folds your spelling the same way before matching), with three dedicated error families when a spelling doesn't resolve — all verbatim from the live validator:
 
 > **Misspelt prefix / wrong case:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >
@@ -6084,7 +6082,6 @@ fn bloxdLit() -> bool {
 }
 ```
 
-If your v4 pack wrapped its light hooks in `#ifdef BLOXD_LIGHTING ... #else ... #endif`, the v5 port is an early return: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }`. The analyzer even tells you this — using `BLOXD_LIGHTING` now produces the validation message *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* (measured verbatim from the live validator).
 
 Three more functions join the header, and they are the ones v4 authors kept re-deriving by hand — the engine's own lighting, documented as callable WGSL:
 
