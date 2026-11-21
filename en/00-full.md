@@ -456,7 +456,7 @@ See the [testing guide](guides/testing.md) for the full checklist and the comple
 | [Preprocessor](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](api/restrictions.md) | language limits, reserved identifiers |
 | [Compatibility](api/compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](api/texture-catalog.md) | all 1,017 usable names (searchable) |
+| [Texture catalog](api/texture-catalog.md) | all 896 usable names (searchable) |
 
 
 Migrating from v4? See [Version History: v5](history/v5.md).
@@ -5007,6 +5007,7 @@ Changes, migration steps and removed APIs for v1 through v5. For migrating legac
 
 ### Timeline
 
+| Version | Live since | Guide | Highlights |
 |---|---|---|---|
 | v1 | (initial) | [v1](history/v1.md) | first shader-pack API. 6 hooks (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` vocabulary |
 | v2 | — | [v2](history/v2.md) | full identifier rename, `blockId`, `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` |
@@ -5519,7 +5520,6 @@ Two things change for authors versus the v2 rules ([the v2 guide](history/v2.md)
 - **Validation stays two-stage** ([the v2 guide](history/v2.md) §38): static validation first, then the browser's real WebGPU compilation through generated stub snippets that call your hooks, with errors mapped back to source files / lines, and diagnostics restore the original names of engine-side identifiers through a mapping.
 - **Strict diagnostics name the reason**: a vertex hook moving terrain reports "… moves terrain, which strict games prevent." and `discard` in surface / light hooks reports "discard makes terrain see-through, which strict games prevent."; the settings UI keeps the "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." guidance (`offInStrict`).
 - **Loader messages**: error kinds and limits are unchanged; "Zip64 archives aren't supported." is surfaced as a UI message (`loadZip64`). The pack-UI string inventory totals 57 `shaderPack:*` keys; among load-stage errors, `loadNoWgsl` (a zip containing zero `.wgsl` files) and `loadNotZip` (a file without a zip end-of-archive signature) round out the set.
-- **No in-game WGSL editor ships with the pack UI.** The settings screen offers no shader code editor — packs are authored as zip files outside the game. (A CodeMirror editor does exist in the bundle, but it is the JavaScript editor of the custom-game scripting UI; it has no WGSL support and no connection to the pack system.)
 - **Hardware gate**: Lite requires a driver supporting the `shader-f16` WebGPU feature; too-old drivers are rejected with a message like "Intel driver too old for Lite (no shader-f16)".
 - **Lighting changes re-validate saved packs**: when the lighting setting changes at run time, the engine re-runs the pack check (`changed → recheck`); replay viewing calls the same hook with `changed: false` and skips the re-check.
 - **Wording**: text about games that accept shader packs now reads "in games that **support** them".
@@ -5538,14 +5538,12 @@ The v4 change set in one screen:
 | `fogVisibility` | `1 = no fog` | renamed **`fogAlpha`**, meaning **inverted**: `0 = no fog, 1 = only fogColour` |
 | `bloxdFaceBlock()` | — | renamed **`bloxdFragmentBlockPosition()`** (same math) |
 | `BloxdOpaqueBehind.found` | `found` | renamed **`hit`** |
-| Strict games | policy + guards documented | now **enforced by the bundled validator** with exact diagnostics (§60) |
 | Everything else | — | frozen: 6 hooks, `blockFlags` bits, uniform layout, loader limits, variant matrix, pack `@group(3)` bindings |
 
 Conversion from v3 is mechanical (§61) except for one silent trap: if you port everything but ignore the `fogAlpha` inversion, your fog-dependent code runs with inverted fog and *compiles fine*. As always, verify with an in-game compile before distributing.
 
 ### 55. Fate of v3 packs (conclusion first)
 
-**Every v3 pack — including every pack distributed as v3 — now fails on production exactly at load.** The loader compares `manifest.apiVersion !== 4` with strict JavaScript `!==`, so the comparison is type- and value-exact: the JSON must carry the *number* `4`. A string `"4"` fails and is reported with its JSON spelling (`{{packVersion}}` is `JSON.stringify`-ed, so the settings screen shows `This pack is for shader pack API version "4"...` with quotes — a useful tell that you wrote a string).
 
 The two load-time messages, verbatim from the live i18n dictionary:
 
@@ -5566,7 +5564,6 @@ The manifest rules around `apiVersion` are otherwise unchanged and worth re-stat
 
 ### 56. pack.json and the uniform buffer (what stays unchanged)
 
-The whole non-texture pack model carries over from v3 byte-for-byte, so §41 of the [v3 guide](history/v3.md) remains the reference. The v4 re-measurements, from the live loader chunk (c51):
 
 | Limit | Value | Message when exceeded |
 |---|---|---|
@@ -5875,7 +5872,6 @@ Both rules exist for the same reason — in competitive games, a shader that mov
 
 #### 60.3 What's *not* in v4: the shadow API
 
-The same community channel records the engine author as having a shadow-API draft (a `bloxd-api` companion file) that did **not** ship in this release, with block/grass shadows expected to arrive together with a future shader-pack API update. Nothing shadow-related exists in the v4 bundle (no shadow symbols, no reserved names beyond §63.4's list) — treat shadows as announced-but-unshipped, and don't build distribution packs against them yet. The `skyLight`-based projected-shadow recipes of R9.12 remain the only shadow look available in v4.
 
 #### 60.4 Strict recap for liquid authors
 
@@ -5947,7 +5943,6 @@ Both hooks are surface/light-only, so this pack needs no `#ifndef BLOXD_STRICT` 
 
 ### 62. Other v4 changes and notes
 
-- **The bundle reorg** (numbers in the intro) moved the shader pipeline into chunks c49 (loader/persistence), c50–c51 (loader UI + zip), c53 (validator + header + registry builder), c54 (WGSL code generator + Lite renderer). For anyone re-researching the bundle after a v3-era guide: the anchors all moved, the code didn't.
 - **The header text was rewritten for clarity** — every doc comment re-worded (terser, second person), no semantic change beyond §59. Size 5,637 → 6,021 bytes, 128 → 150 lines; the first line is now `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **Emission ordering is now documented in-header**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3's §43 finding, now official wording.
 - **i18n surface** for the shader-pack feature is 58 keys (v4 build); the loader family (`load*`) is quoted across §55–§56, the status family (`status*`) in §55, the variant labels in §60.1.
@@ -5971,7 +5966,6 @@ The v5 change set in one screen:
 | Lighting helpers | engine-private `litColour` | **public**: `bloxdShading()`, `bloxdWorldLight()`, `bloxdLitColour()` (§74) |
 | `bloxdFragmentBlockPosition()` | documented in the header | **out of the documented header** — but still injected and still accepted by the validator (§75) |
 | Default pack | 6 hooks (vertex+surface) | **9 hooks** — light hooks included (§76) |
-| `bloxdChunkSize` | not in header | **new const `bloxdChunkSize: i32 = 32`** (§78) |
 | `bloxdSp*` namespace | 27 symbols | **46 symbols** (+20, −1) (§79) |
 | Texture registry | 905 usable names | **896 usable names** — +1, −10 (§80) |
 | Loader limits, zip rules, `pack.json` shape, hooks names, strict contract | — | **frozen, byte-identical limits** (§70) |
@@ -5994,7 +5988,6 @@ The manifest rules are otherwise re-measured and unchanged: `pack.json` must be 
 
 ### 70. pack.json, the loader, and the uniform (what stays unchanged)
 
-The whole pack model carries over from v4 byte-for-byte. The loader limits, re-measured on the live loader chunk (c53):
 
 | Limit | Value | Message when exceeded |
 |---|---|---|
@@ -6005,7 +5998,6 @@ The whole pack model carries over from v4 byte-for-byte. The loader limits, re-m
 | Zip entries | 1,024 | `The zip has more than 1024 entries.` |
 | Zip shape | — | split zips, Zip64, encrypted entries, unsupported compression methods each rejected with a dedicated message; every file must be valid UTF-8; exactly one `pack.json`; no duplicate paths |
 
-The per-frame uniform is still `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`, still 64 bytes — but it gained a member. The layout table, from the live uniform-layout module:
 
 | Offset | Field | Type | Note |
 |---|---|---|---|
@@ -6015,7 +6007,6 @@ The per-frame uniform is still `@group(3) @binding(0) var<uniform> bloxdPackInpu
 | 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
 
-`lit` slots into the padding that v4 already had between `seconds` and `renderOffset` (offsets 4–15 were alignment slack in v4; `renderOffset` stays at 16 because a `vec3i` needs 16-byte alignment), so the struct's total size and every other member's offset are unchanged. The engine writes it as a single `setUint32(4, lit ? 1 : 0)` — it is a flag, not a light level: the v4 JS-side names `terrainLightLevels` / `terrainHeldLight` are gone from the bundle entirely.
 
 The pack bind-group layout is otherwise unchanged: group 3 is still `0` uniform · `1` scene-depth texture (liquid variants) · `2` the `bloxdSpTextureLayers` storage buffer. `minBindingSize` is still 64.
 
@@ -6039,7 +6030,6 @@ struct BloxdFlags {
     stairs: bool,     // Stairs and corner stairs.
     flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
 
-    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
     held: bool,       // Items in a hand, in first or third person.
     dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
     thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
@@ -6062,7 +6052,6 @@ The six v4 bit tests map one-to-one onto fields — the migration is a rename, n
 The eight **new** fields are the real story. v4 had no way to tell a slab from a full block, a held item from terrain, or a player from a pumpkin — every non-terrain face was just "not opaque" with a texture id. v5 answers "what am I looking at" directly:
 
 - **`slab` / `stairs` / `flat`** — the three block-model shapes. `flat` covers the cross-plane plants (tall grass, flowers, crops, cobwebs). These are *drawn as block models*, so the header notes they are never part of terrain and never `opaque`.
-- **`placed`** — chunk geometry as placed in the world; explicitly *not* items or vehicles.
 - **`held`** — items in a hand, first or third person. This is the field first-person-shader authors wanted since v1: you can finally detect the held item and treat it differently from the world.
 - **`dropped`** / **`thrown`** — items on the ground / on belts / in pipes, versus items in flight (snowballs, arrows, rockets).
 - **`lifeform`** — players, mobs and NPCs, *including armour and cosmetics*.
@@ -6222,7 +6211,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 Three things are gone, and the validator says so by name:
 
-- **`bloxdFragmentBlockPosition(position, normal) -> vec3i`** — dropped from the documented header, but **not actually dead**: the validator's signature table kept its entry (so calls still pass validation in every hook, vertex included), and the code generator still injects a definition into the terrain/liquid module and both model programs (`vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()` for terrain/liquid; a 1/64-offset, cell-snapping variant for models). v4 packs calling it keep working. Treat it as deprecated: it is undocumented now, so prefer `bloxdWorldPosition()` for continuous positions and `flags` for "which block am I on", and expect it may vanish in a future version.
 - **The six `bloxdBlockFlag*` constants** — replaced by `BloxdFlags` (§71). Any surviving reference fails validation with the analyzer's reserved-name diagnostic.
 - **`bloxdSpLitColour`** — the engine-internal symbol whose job became the public `bloxdLitColour()` (§74). It leaves the `bloxdSp*` namespace, which otherwise only grows (§79).
 
@@ -6287,7 +6275,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 The comments are new wording and worth reading as documentation of the deletion model: *"Modify the return values to start building a shader pack. If you delete a hook, the default is used instead."* The liquid note changed too — v4 said "If deleted, water uses your terrain hooks instead", v5 says "To share code with another hook, define a function and call it from both places" — and the strict note now explains the `#ifndef` in one sentence: *"Strict games keep terrain where it is. Without the #ifndef, this hook would turn the whole shader pack off there."*
 
-The strict-games contract itself (v4 §60) is unchanged: an unguarded vertex hook reports `<hook> moves terrain, which strict games prevent.`, a reachable `discard` reports `discard makes terrain see-through, which strict games prevent.`, and either disables *all* hooks in strict games. The 12 allow titles were re-measured on the live bundle — still 12, unchanged.
 
 ### 77. v4 → v5 migration checklist
 
@@ -6361,11 +6348,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 78. Other v5 changes and notes
 
-- **`bloxdChunkSize` joins the header** — `const bloxdChunkSize: i32 = 32;` ("Blocks along each side of a chunk"). Previously an engine-side magic number; now a named constant you can branch on. `bloxdPi`/`bloxdTau` unchanged.
 - **The header's frame-function section got a shared comment** — "These functions return the same value for the entire frame" (v4: "return 1 value per frame, the same for every call site") — pure wording.
 - **Y-derivatives are auto-negated in pack code.** The analyzer rewrites every call to `dpdy`, `dpdyCoarse` or `dpdyFine` into `(-dpdy(...))` — the screen-space y axis points down, so the negation makes "derivative with respect to up" match intuition. You write `dpdy(h)` expecting "how does h change going up"; the emitted code negates it for you. `dpdx` and the `fwidth` family are untouched. (Measured in the validator's token-rewrite pass; the dpdy family is specifically listed as the negation set.)
 - **Texture-name diagnostics got a spelling engine.** A name that starts with `bloxdTextureId` but doesn't resolve now gets a Levenshtein-powered suggestion: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?`"* — plus dedicated messages for frame spellings (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) and turned spellings (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*). The general reservation rule is restated in the diagnostics: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*, and *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 - **Only referenced texture constants are emitted.** The header's `bloxdTextureId*` block is generated per pack from the names you actually reference — a pack that uses three constants gets three `const` lines prepended, not the full ~900.
 - **`HEADER_VERSION` moved to `9.<hash>.<hash>`** — same two-suffix structure as v4 (fnv1a32 of the header material, fnv1a32 of the sorted name-id registry), with the leading integer bumped from 8 to 9. The stored-pack recheck logic (§55 of the [v4 guide](history/v4.md)) is unchanged: a header/registry change flips stored packs to "needs re-check".
 - **i18n surface**: the shader-pack key family is unchanged in shape (the `load*`, `status*`, and variant-label keys of the v4 guide §62 all re-measured present; `loadNoWgsl`/`loadNotZip` still exact).
-- **Bundle layout for re-researchers**: header c55 (unchanged), loader/persistence c51–c53, validator + registry builder c55, WebGPU codegen c56, fog c9, **default pack template c116** (moved from c124), the BLOXD_ALPHA sites c51/c52/c53/c55/c9. Chunk format note: every chunk is now an ES module (`export const modules = {...}`) — c53 even carries modules for both c52 and c53 — which matters if you text-search the bundle (a module id like `1371` lives in *main*'s sparse module array, not in any chunk).

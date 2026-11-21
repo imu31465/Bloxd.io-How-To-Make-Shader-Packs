@@ -426,7 +426,7 @@ v4 以前の「照明 on/off」軸は廃止されました (v4 は8バリアン�
 | [プリプロセッサ](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [制限と予約名](api/restrictions.md) | 言語機能の制限、予約識別子 |
 | [互換性](api/compatibility.md) | 旧バージョンパックの挙動、保存パックの再検証 |
-| [テクスチャカタログ](api/texture-catalog.md) | 利用可能1,017名のname catalog (検索可能) |
+| [テクスチャカタログ](api/texture-catalog.md) | 利用可能896名の実測カタログ (検索可能) |
 
 
 v4からの移行が必要な場合は [バージョン履歴: v5](history/v5.md) を参照してください。
@@ -5220,6 +5220,7 @@ API v1 から v5 までの変更内容・移行手順・廃止されたAPIの保
 
 ### 年表
 
+| バージョン | 稼働開始 | 移行ガイド | 主な変更 |
 |---|---|---|---|
 | v1 | (初期) | [v1](history/v1.md) | シェーダーパック機構の初出。6フック (terrain/liquid × vertex/surface)、`bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` の語彙 |
 | v2 | — | [v2](history/v2.md) | 識別子の全面改名、`blockId`、`BLOXD_SCENE_DEPTH` と `bloxdOpaqueBehind()` |
@@ -5728,7 +5729,6 @@ v2 の規則 ([v2 移行ガイド](history/v2.md) §36) と比べて、作者向
 - **検証は2段階のまま** ([v2 移行ガイド](history/v2.md) §38): まず静的検証、次に、フックを呼ぶ生成スタブスニペットを通じたブラウザの実際の WebGPU コンパイル。エラーは元のソースファイル/行にマップされ、診断はマッピングを通じてエンジン側識別子の元の名前を復元する。
 - **strict の診断は理由を名指しする**: テレインを動かす vertex フックは "… moves terrain, which strict games prevent." を報告し、surface / light フック内の `discard` は "discard makes terrain see-through, which strict games prevent." を報告する。設定 UI は "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." の案内 (`offInStrict`) を保ち続ける。
 - **ローダーメッセージ**: エラーの種類と制限は不変。"Zip64 archives aren't supported." は UI メッセージ (`loadZip64`) として表示される。パック UI の文字列一覧は合計 57 個の `shaderPack:*` キーからなり、読み込み段階のエラーとしては、`loadNoWgsl` (`.wgsl` ファイルを1つも含まない zip) と `loadNotZip` (zip の end-of-archive シグネチャを持たないファイル) が残りを埋める。
-- **パック UI にゲーム内 WGSL エディタは同梱されていない。** 設定画面にシェーダーコードエディタはなく、パックはゲームの外で zip ファイルとして作成する。(バンドルには CodeMirror エディタが実在するが、それはカスタムゲームスクリプト UI の JavaScript エディタであり、WGSL サポートもパックシステムとの接続もない。)
 - **ハードウェアゲート**: Lite は `shader-f16` WebGPU 機能をサポートするドライバを要求する。古すぎるドライバは "Intel driver too old for Lite (no shader-f16)" のようなメッセージで拒否される。
 - **ライティング変更は保存パックを再検証する**: 実行中にライティング設定が変わると、エンジンはパックチェックを再実行する (`changed → recheck`)。リプレイ視聴は同じフックを `changed: false` で呼び、再チェックをスキップする。
 - **文言**: シェーダーパックを受け入れるゲームについての文は、現在 "in games that **support** them" となっている。
@@ -5747,7 +5747,6 @@ v4 の変更点を一目で:
 | `fogVisibility` | `1 = フォグなし` | 改名 **`fogAlpha`**、意味は**反転**: `0 = フォグなし、1 = fogColour のみ` |
 | `bloxdFaceBlock()` | — | 改名 **`bloxdFragmentBlockPosition()`** (中身は同一) |
 | `BloxdOpaqueBehind.found` | `found` | 改名 **`hit`** |
-| strict ゲーム | ポリシーとガードを文書化 | バンドル内バリデータによる**強制**に (診断メッセージ付き、§60) |
 | その他 | — | 凍結維持: 6 フック / `blockFlags` ビット / uniform レイアウト / ローダ制限 / バリアント行列 / group 3 の binding |
 
 v3 からの変換は機械的 (§61) だが、静かな罠が1つある: `fogAlpha` の反転を無視して他を全部移植すると、フォグ依存コードは**反転したフォグで問題なくコンパイル通過**する。いつも通り、配布前に実機コンパイルで確認すること。
@@ -5775,7 +5774,6 @@ v3 からの変換は機械的 (§61) だが、静かな罠が1つある: `fogAl
 
 ### 56. pack.json と uniform バッファ (変わらないもの)
 
-テクスチャ以外のパックモデルは v3 からバイト単位で引き継がれるため、[v3 移行ガイド](history/v3.md) §41 が引き続き参照先になる。v4 での再実測値を稼働中のローダチャンク (c51) から示す:
 
 | 制限 | 値 | 超過時のメッセージ |
 |---|---|---|
@@ -5884,7 +5882,6 @@ let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 >
 > **未発見 (提案なし):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
-最後のメッセージが指す先の中身を本ガイドは自ら掲載している: 実測 id 付きの利用可能 905 名全一覧と回転族・アニメーション族の表が §68 にあり、その背後のレジストリ測定と畳み込み規則は §64 にある。
 
 #### 57.4 回転の繊細さ — そして中立サンプリングヘルパー
 
@@ -6084,7 +6081,6 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 
 #### 60.3 v4 に*入っていない*もの: シャドウ API
 
-同じコミュニティチャンネルには、エンジン作者がシャドウ API の草案 (`bloxd-api` の仲間ファイル) を持っているが今回のリリースには**入れていない**、という記録がある。ブロック/草のシャドウは将来のシェーダーパック API 更新とともに届く見込み。v4 バンドルにはシャドウ関連が何も存在しない (シャドウシンボルなし、§63.4 のリスト以外の予約名なし) — シャドウは「発表済み・未搭載」と扱い、まだこれに依存する配布パックを作らないこと。`skyLight` ベースの投影シャドウ レシピ (R9.12) は v4 で唯一入手可能なシャドウ表現のままである。
 
 #### 60.4 リキッド作者向け strict のまとめ
 
@@ -6156,11 +6152,9 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 62. その他の v4 変更と注意
 
-- **バンドル再編** (導入部の数値) により、シェーダーパイプラインは c49 (ローダ/永続化)、c50〜c51 (ローダ UI + zip)、c53 (バリデータ + ヘッダ + レジストリ構築)、c54 (WGSL コード生成器 + Lite レンダラ) へ移動した。v3 時代のガイドの後にバンドルを再調査する人へ: アンカーは全部移動したが、コードは移動していない。
 - **ヘッダテキストは明確さのために書き直された** — すべてのドキュメントコメントが言い換えられ (より簡潔に)、§59 以外の意味変化はない。サイズ 5,637 → 6,021 バイト、128 → 150 行。1 行目は `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission の順序がヘッダ内で公式文書化された**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3 の §43 の発見が公式の文言になった。
 - シェーダーパック機能の **i18n 表面は 58 キー** (v4 ビルド)。ローダ系 (`load*`) は §55〜§56、ステータス系 (`status*`) は §55、バリアントラベルは §60.1 で引用済み。
-- **リファレンス資材の内蔵** (導入部): エンジンのエラーメッセージは `bloxd-api.wgsl` と `BLOCK_TEXTURES.md` を引用する。本ガイドは引用ではなく中身を同梱する — 完全復元ヘッダ (§67) と完全実測カタログ (§68) — ので、パックの作成・デバッグに外部ファイルは不要である。
 - **テクスチャレジストリ変化でも自動再チェックが発動する** (§65.1) — レジストリハッシュが HEADER_VERSION に加わった結果。ヘッダテキストが変わらなくても、テクスチャを*追加しただけ*のエンジン更新後に保存パックが「要再チェック」に切り替わりうる。これは意図的な設計である: `bloxdTextureId*` 定数は検証時に焼き固められるから。
 - **`bloxdSp*` 予約は 27 シンボルに拡大** (§63.4) — 生成シェーダ内のエンジン私有名前空間。パックレベルの予約規則は不変かつより広い: `/^bloxd/i` (大小文字非感受) に一致するすべて。
 
@@ -6180,7 +6174,6 @@ v5 の変更点を一目で:
 | ライティングヘルパー | エンジン内部の `litColour` | **公開**: `bloxdShading()`、`bloxdWorldLight()`、`bloxdLitColour()` (§74) |
 | `bloxdFragmentBlockPosition()` | ヘッダーに記載 | **ヘッダーからは外れた** — ただし注入とバリデータ受け入れは継続 (§75) |
 | デフォルトパック | 6 フック (vertex+surface) | **9 フック** — light フックも同梱 (§76) |
-| `bloxdChunkSize` | ヘッダーに無し | **新定数 `bloxdChunkSize: i32 = 32`** (§78) |
 | `bloxdSp*` 名前空間 | 27 シンボル | **46 シンボル** (+20、−1) (§79) |
 | テクスチャレジストリ | 利用可能 905 名 | **利用可能 896 名** — +1、−10 (§80) |
 | ローダ制限、zip 規則、`pack.json` の形、フック名、strict 契約 | — | **凍結、バイト同一の制限値** (§70) |
@@ -6200,11 +6193,9 @@ v4 からの変換はほぼ機械的である (§77)。今回の静かな罠は�
 
 > `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
 
-マニフェストの規則は再計測の上、不変である: `pack.json` は zip ルートの JSON オブジェクトでなければならず、`apiVersion` は存在して `=== 5`、`name` は必須・文字列・トリミング後非空、`author` は任意だが存在するなら文字列、それ以外のマニフェスト内容はローダに無視される。
 
 ### 70. pack.json、ローダ、そして uniform (不変のもの)
 
-パックモデル全体が v4 からバイト単位で引き継がれる。ローダ制限、ライブローダチャンク (c53) で再計測:
 
 | 制限 | 値 | 超過時のメッセージ |
 |---|---|---|
@@ -6215,7 +6206,6 @@ v4 からの変換はほぼ機械的である (§77)。今回の静かな罠は�
 | zip エントリ数 | 1,024 | `The zip has more than 1024 entries.` |
 | zip の形 | — | 分割 zip・Zip64・暗号化エントリ・未対応圧縮はそれぞれ専用メッセージで拒否。全ファイルは有効な UTF-8、`pack.json` は厳密に 1 つ、パスの重複なし |
 
-per-frame uniform は相変わらず `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`、引き続き 64 バイト — ただしメンバが 1 個増えた。レイアウト表、ライブの uniform レイアウトモジュールから:
 
 | オフセット | フィールド | 型 | 備考 |
 |---|---|---|---|
@@ -6225,7 +6215,6 @@ per-frame uniform は相変わらず `@group(3) @binding(0) var<uniform> bloxdPa
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` の裏 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` の裏 |
 
-`lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まった (オフセット 4〜15 は v4 ではアラインメントの隙間だった。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。よって構造体の合計サイズも他の全メンバのオフセットも不変である。エンジンはこれを `setUint32(4, lit ? 1 : 0)` の 1 命令で書き込む — これは光量ではなくフラグである: v4 の JS 側名 `terrainLightLevels` / `terrainHeldLight` はバンドルから完全に消えた。
 
 パックの bind-group レイアウトは他の点で不変: group 3 は `0` uniform・`1` シーン深度テクスチャ (liquid バリアント)・`2` `bloxdSpTextureLayers` ストレージバッファのまま。`minBindingSize` も 64 のままである。
 
@@ -6249,7 +6238,6 @@ struct BloxdFlags {
     stairs: bool,     // Stairs and corner stairs.
     flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
 
-    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
     held: bool,       // Items in a hand, in first or third person.
     dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
     thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
@@ -6272,7 +6260,6 @@ struct BloxdFlags {
 本当の主役は 8 個の**新フィールド**である。v4 にはハーフブロックとフルブロックを区別する方法も、保持アイテムと地形を区別する方法も、プレイヤーとカボチャを区別する方法もなかった — 地形でない面はすべて「不透明でなく、テクスチャ id を持つ」だけだった。v5 は「何を見ているのか」に直接答える:
 
 - **`slab` / `stairs` / `flat`** — 3 種のブロックモデル形状。`flat` は交差平面の植物 (背の高い草、花、作物、クモの巣) を含む。これらは*ブロックモデルとして描画される*ため、ヘッダーは地形の一部には決してならず `opaque` にも決してならないと注記する。
-- **`placed`** — チャンクの一部として設置されたジオメトリ。アイテムや乗り物は明示的に含まない。
 - **`held`** — 手に持ったアイテム、一人称・三人称の両方。v1 から一人称シェーダー作者が欲しがり続けたフィールドである: 保持アイテムを検出して世界と違う扱いにすることがついに可能になった。
 - **`dropped` / `thrown`** — 地面/ベルト/パイプ上のアイテムと、飛行中のアイテム (雪玉、矢、ロケット)。
 - **`lifeform`** — プレイヤー、モブ、NPC。*防具とコスメティックを含む*。
@@ -6361,7 +6348,6 @@ fn bloxdLit() -> bool {
 }
 ```
 
-v4 パックが light フックを `#ifdef BLOXD_LIGHTING ... #else ... #endif` で括っていたなら、v5 移植は早期 return である: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }`。アナライザはこれ自体を教えてくれる — `BLOXD_LIGHTING` を使うと検証メッセージ *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* が出る (ライブバリデータから逐語計測)。
 
 さらに 3 個の関数がヘッダーに加わり、これが v4 作者が手で再導出し続けてきたもの — エンジン自身のライティング、呼び出し可能な WGSL として文書化された:
 
@@ -6432,11 +6418,9 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 3 つが消え、バリデータは名指しでその旨を告げる:
 
-- **`bloxdFragmentBlockPosition(position, normal) -> vec3i`** — ドキュメントされたヘッダーからは外れたが、**実際には死んでいない**: バリデータのシグネチャ表にエントリが残っており (呼び出しは Vertex フックを含む全フックで名前検証を通る)、コードジェネレーターも地形/液体モジュールとモデル両プログラムに定義を注入し続けている (地形/液体は `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`、モデルは 1/64 オフセットで設置済みモデルはセルにスナップする変種)。v4 パックの呼び出しはそのまま動く。ただし非公開となったため非推奨: 連続値には `bloxdWorldPosition()`、「どのブロックの上か」には `flags` を使い、将来のバージョンで消える可能性を前提にすること。
 - **6 個の `bloxdBlockFlag*` 定数** — `BloxdFlags` (§71) に置換。残存参照はアナライザの予約名診断で検証に失敗する。
 - **`bloxdSpLitColour`** — その役割が公開の `bloxdLitColour()` (§74) になったエンジン内部シンボル。`bloxdSp*` 名前空間から去るが、名前空間自体は増える一方である (§79)。
 
-v4 時代から無傷で生き残る関数: `bloxdEyePosition()`、`bloxdRenderOffset()`、`bloxdSunDirection()`、`bloxdSeconds()`、`bloxdWorldPosition()`、`bloxdApplyFog()`、`bloxdDefaultVertex()`、`bloxdDefaultSurface()`、`bloxdDefaultLight()` に加え、テクスチャ API の全体 (`bloxdTexel`、`bloxdTextureSize`、`bloxdTextureId*` — §79 がレジストリを再計測) と、liquid バリアントでの `BloxdOpaqueBehind` / `bloxdSceneDepth`。
 
 ### 76. デフォルトパックは 9 フックすべてを同梱
 
@@ -6497,7 +6481,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 コメントは新しい文言で、削除モデルの文書として読む価値がある: *«Modify the return values to start building a shader pack. If you delete a hook, the default is used instead.»* liquid の注記も変わった — v4 は «If deleted, water uses your terrain hooks instead» と言い、v5 は «To share code with another hook, define a function and call it from both places» と言う — そして strict の注記は `#ifndef` を 1 文で説明するようになった: *«Strict games keep terrain where it is. Without the #ifndef, this hook would turn the whole shader pack off there.»*
 
-strict ゲーム契約そのもの (v4 §60) は不変である: 無防備な vertex フックは `<hook> moves terrain, which strict games prevent.` を報告し、到達可能な `discard` は `discard makes terrain see-through, which strict games prevent.` を報告し、いずれも strict ゲームで*全*フックを無効化する。allow 12 タイトルはライブバンドルで再計測した — 引き続き 12、不変。
 
 ### 77. v4 → v5 移行チェックリスト
 
@@ -6571,11 +6554,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 78. その他の v5 変更と注記
 
-- **`bloxdChunkSize` がヘッダーに参加** — `const bloxdChunkSize: i32 = 32;` («Blocks along each side of a chunk») 。以前はエンジン側のマジックナンバーだったのが、分岐に使える名前付き定数になった。`bloxdPi`/`bloxdTau` は不変。
 - **ヘッダーのフレーム関数節に共有コメント** — «These functions return the same value for the entire frame» (v4: «return 1 value per frame, the same for every call site») — 純粋に文言。
-- **パックコード内の Y 導関数が自動符号反転される。** アナライザは `dpdy`、`dpdyCoarse`、`dpdyFine` のすべての呼び出しを `(-dpdy(...))` に書き換える — スクリーン空間の y 軸は下向きなので、この反転によって «上方向への変化率» が直観と一致する。`dpdy(h)` は «h は上へ行くとどう変わるか» という意図で書けばよく、出力コードが反転を引き受ける。`dpdx` と `fwidth` 系は手つかずである (バリデータのトークン書き換えパスで計測。dpdy 系が反転セットとして明示列挙されている)。
 - **テクスチャ名診断にスペル補正エンジン。** `bloxdTextureId` で始まるが解決できない名前には Levenshtein 距離による提案が付く: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?"* — さらにフレーム綴り (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) と回転綴り (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*) の専用メッセージがある。予約の一般則も診断で言い直された: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*、そして *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 - **参照されたテクスチャ定数だけが出力される。** ヘッダーの `bloxdTextureId*` ブロックは、パックが実際に参照した名前からパック毎に生成される — 3 個の定数を使うパックには 3 行の `const` が先頭に付くのであって、約 900 行ではない。
 - **`HEADER_VERSION` は `9.<hash>.<hash>` へ** — v4 と同じ 2 接尾辞構造 (ヘッダー素材の fnv1a32、ソート済み名前-id レジストリの fnv1a32) で、先頭整数が 8 から 9 へ上がった。保存パックの再検証ロジック ([v4 移行ガイド](history/v4.md) §55) は不変: ヘッダー/レジストリの変化は保存パッチを «要再チェック» にする。
-- **i18n 面**: シェーダーパックのキー群は形が不変 (v4 移行ガイド §62 の `load*`、`status*`、バリアントラベル群はすべて再計測で存在、`loadNoWgsl`/`loadNotZip` もそのまま)。
-- **バンドル再調査者向けレイアウト**: ヘッダー c55 (不変)、ローダ/永続化 c51〜c53、バリデータ + レジストリ構築器 c55、WebGPU コード生成 c56、フォグ c9、**デフォルトパックテンプレート c116** (c124 から移動)、BLOXD_ALPHA 箇所 c51/c52/c53/c55/c9。チャンク形式の注記: 各チャンクは ES モジュール (`export const modules = {...}`) になった — c53 は c52 と c53 の両方のモジュールを運ぶ — なのでバンドルをテキスト検索するなら意味がある (モジュール id `1371` は*main* の疎モジュール配列にあり、どのチャンクにも無い)。
