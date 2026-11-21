@@ -1,8 +1,8 @@
 # Cabeçalho do motor (verbatim)
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (restaurado do bundle de produção em execução)
+> API alvo: 5 · Tipo: referência técnica
 
-O texto exato que o engine anexa a cada pack, renderizado do validador da build ao vivo com suas interpolações aplicadas (`apiVersion` e as 6 leituras de uniform via `bloxdPackInputs`). 216 linhas. Nenhuma paráfrase. Re-verificado nas builds anteriores (`bny9u`, `v98qt8`) — o único acréscimo é o conteúdo de sombras.
+Texto de referência do cabeçalho WGSL que o motor acrescenta aos shader packs. Consulte a [Referência da API](../api/) para entender cada campo e função.
 
 Guia de leitura:
 - Explicações campo por campo → [Estruturas](../api/structures.md)

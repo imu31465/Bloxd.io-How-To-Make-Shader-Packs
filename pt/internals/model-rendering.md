@@ -1,6 +1,6 @@
 # Interioridades da renderização de modelos
 
-> API alvo: 5 · Build alvo: `bbb6l5` · Estado: Analyzed (restaurado do bundle em produção)
+> API alvo: 5 · Tipo: referência técnica
 
 As interioridades do programa Model da v5. O guia voltado ao usuário: [Modelos e texturas](../guides/models.md).
 

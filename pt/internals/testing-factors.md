@@ -1,7 +1,6 @@
 # O que muda os valores visíveis do pacote — lista de provas
 
 
-
 O mesmo pacote renderiza distinto segundo **mundo e ajustes de jogador**. Revise ao menos estes 3 ambientes antes de distribuir:
 
 1. **Mundo normal** (skybox default, sem overrides) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`, cores padrão
