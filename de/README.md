@@ -24,7 +24,7 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 | API-Funktionen & Felder nachschlagen | [API-Referenz](api/) | Autoren mitten in der Umsetzung |
 | Einen Effekt umsetzen (Licht, Wasser, Modelle…) | [Leitfäden](guides/) · [Rezepte](recipes/) | alle, die einen bestimmten visuellen Stil umsetzen möchten |
 | Einen Fehler beheben | [Fehlerbehebung](troubleshooting/) | alle mit nicht funktionierenden Pack |
-| Engine-Interna erforschen | [Engine-Interna & Forschung](internals/) | Engine-Analytiker |
+| Engine-Interna erforschen | [Engine-Interna](internals/) | Engine-Analytiker |
 | Ältere Versionen nachschlagen (v1–v5) | [Versionsgeschichte](history/) | Migratoren alter Packs |
 
 ## Dokumentationsstruktur
@@ -34,7 +34,7 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 - **[Leitfäden](guides/)** — wie Beleuchtung funktioniert, Schatten, Wasser, Nacht, Modell-Rendering, Performance, Realismus-Konzepte.
 - **[Rezepte](recipes/)** — zielgerichtete Codebeispiele: Farben, Beleuchtung, Emission, Koordinaten, Animation, Flüssigkeiten, Vertices, Mathematik, Realismus, Modell-Shader, Enchant-Effekte.
 - **[Fehlerbehebung](troubleshooting/)** — symptomgetriebene Fehlerlösung: Laden, API-Version, Kompilierung, Validierung, Varianten, visuell, Texturen, Beleuchtung, Modelle, Performance.
-- **[Engine-Interna & Forschung](internals/)** — Rendering-Pipeline, Hook-Aufruf, Engine-Header, Validierungs- & Kompilierungs-Interna, reservierte Bezeichner, Beleuchtungs-/Fog-Interna, Textur-Sampling & Registry, Modell-Rendering, Messdaten.
+- **[Engine-Interna](internals/)** — Rendering-Pipeline, Hook-Aufruf, Engine-Header, Validierungs- & Kompilierungs-Interna, reservierte Bezeichner, Beleuchtungs-/Fog-Interna, Textur-Sampling & Registry, Modell-Rendering, Messdaten.
 - **[Versionsgeschichte](history/)** — v1 bis v5: Änderungen je Version, Migrationsschritte, entfernte APIs.
 
 ## Verifikationsstatus
