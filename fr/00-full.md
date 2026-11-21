@@ -4891,7 +4891,6 @@ Les énoncés techniques d'ici ne reposent pas sur la documentation officielle d
 
 ### Principes fondamentaux
 
-1. **Récupération directe du bundle de production** — main.js et chunks bruts rapatriés depuis la production et la preprod, identité vérifiée par md5
 2. **Respect du verbatim** — en-têtes, messages d'erreur et chaînes i18n **cités tels quels**, jamais paraphrasés
 3. **Mesure reproduite** — les valeurs dérivées comme le registre sont recalculées en exécutant les propres modules du moteur dans un harnais (sortie réelle, pas une réimplémentation approximative)
 4. **Builds nommés** — chaque mesure porte un id de build et une date
@@ -4945,7 +4944,6 @@ L'agencement des champs de `BloxdPackInputs` depuis le module d'agencement d'uni
 ---
 
 ## Historique des versions
-> État : Historical — relevés version par version ; chaque guide indique son propre build visé
 
 Changements, étapes de migration et API supprimées, de la v1 à la v5. Pour migrer les packs anciens et pour les spécifications conservées de chaque époque.
 
@@ -5009,7 +5007,6 @@ Appliquez ensuite v3 → v4 → v5 dans l'ordre ([le chemin rapide](history/inde
 ---
 
 ## Guide de migration vers l'API v2
-> Version : 2 · État : Historical (guide de migration de l'époque ; le build visé est indiqué dans le texte)
 
 ### 31. Le sort des packs v1 (d'abord la conclusion)
 
@@ -5071,9 +5068,7 @@ Les trois structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gagnent to
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
-entries.json liste aussi des entrées non-bloc (outils etc.), mais seuls les IDs des familles de blocs atteignent les hooks terrain / liquide.
 
 #### R-F. Teinte par type de bloc avec blockId
 
@@ -5109,7 +5104,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-La couleur de la face encode directement 3 bits de blockId en RVB (noir = 0 / rouge = 1 / vert = 2 / jaune = 3 / bleu = 4 / magenta = 5 / cyan = 6 / blanc = 7). Une observation lit un chiffre octal. Si p0 → p3 lisent successivement 3, 2, 7, 2, l'octal 2723 = 1491 lu sur le chiffre du haut est l'ID (Lava). Les familles de terrain à ID bas se contentent de 2 observations (p0, p1). N'utilise que le hook surface, donc tourne aussi en titres stricts.
 
 #### R-H. Ne balancer que les feuilles — limiter le hook vertex par blockId
 
@@ -5248,7 +5242,6 @@ Recherché par ltf_ahel (recherché avec glm)
 ---
 
 ## Guide de migration vers l'API v3
-> Version : 3 · État : Historical (guide de migration de l'époque ; le build visé est indiqué dans le texte)
 
 
 Les parties I à VII de ce guide restent écrites sur la base v2. Cette partie rassemble, dans le même ordre que le [guide v2](history/v2.md), les points de migration v2 → v3 et les nouveautés v3. La conversion est surtout mécanique (§47), mais un seul changement modifie réellement le comportement — la lumière par défaut atténue désormais l'émission avec le brouillard (§43) — et `blockId` est entièrement remplacé par `blockFlags` (§42) : vérifiez donc toujours par une compilation en jeu avant distribution.
@@ -5656,7 +5649,6 @@ vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
 **Le hash d'en-tête mesuré.** Chaque validation de pack est estampillée avec le `HEADER_VERSION` du moteur. Exécuter directement le module de validation de production (voir la note sur le harness à la fin du §54) le mesure :
 
 ```
-v2 (sjr0p7):  6.bc5e8338
 ```
 
 C'est un hash FNV-1a-32 (préfixé par `6.`) sur cinq entrées : l'en-tête du moteur préprocessé et tokenisé **par variante** (une entrée pour chacune des 8 variantes), l'univers lexical WGSL complet de l'analyseur, les quatre noms de macros, la table des fonctions spéciales, et la déclaration `BloxdPackInputs` avec sa ligne d'uniform `@group(3) @binding(0)`. Deux conséquences pour les auteurs :
@@ -6462,7 +6454,6 @@ Les règles qui comptent pour un auteur, dédupliquées :
 Le format v3 était `6.<fnv1a32>` sur cinq entrées (§53). La v4 garde les mêmes cinq entrées — les tokens d'en-tête par variante, l'univers lexical de l'analyseur, les quatre noms de macros, la table des fonctions spéciales et la déclaration `BloxdPackInputs` — mais le préfixe passe à `8.` **et un second FNV-1a-32 est ajouté, haché sur la liste triée `"<name> <id>"` de tout le registre de textures** :
 
 ```
-v2 (sjr0p7):   6.bc5e8338
 ```
 
 (Les hashes v4 concrets n'ont pas été mesurés pour ce guide — ils sont calculés à l'exécution — mais le format est exact, et les valeurs v2/v3 ci-dessus sont les mesures déjà publiées. Tout écran de réglages de pack après une mise à jour du moteur affiche le courant.)
@@ -7753,7 +7744,6 @@ sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smel
 tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
 wire_mill_top[rot[3, wire_mill_top[rot[4
 
-- 79 removed (sjr0p7):
 alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
 auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
 belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2

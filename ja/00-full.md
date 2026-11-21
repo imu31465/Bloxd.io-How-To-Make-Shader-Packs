@@ -5121,11 +5121,9 @@ URL パラメータ・コンソール・drawcalls 統計など、解析と診断
 ## リサーチログ
 > 検証状況: Verified — このドキュメントは計測方法と根拠を記録します。
 
-ここに記載する数値は、ゲームの本番・preprod環境から取得したデータと、エンジン自身の処理を使った再計測に基づきます。現行APIの使い方は[APIリファレンス](api/)を参照してください。
 
 ### 調査方針
 
-1. **実際の配信データを取得する** — 本番とpreprodのビルドを取得し、両環境の内容が一致するか確認します。
 2. **エンジンの出力をそのまま使う** — ヘッダー、エラーメッセージ、i18nの文言は、必要に応じて原文を引用します。
 3. **計測を再現する** — テクスチャレジストリなどの派生値は、近似実装ではなくエンジン自身の処理を実行して求めます。
 
@@ -5182,7 +5180,6 @@ URL パラメータ・コンソール・drawcalls 統計など、解析と診断
 
 ### 再検証のタイミング
 
-ゲームの新しいビルドを確認したら、APIバージョン、エンジンヘッダー、ローダー制限、テクスチャレジストリ、allow / strict の対象を再確認します。本番とpreprodの一致も改めて検証してください。
 
 ### 関連
 
@@ -5319,7 +5316,6 @@ v1 では `time` / `eyePosition` / `sunDirection` / `originOffset` は構造体�
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json には道具などの非ブロック項目も収録されているが、地形・液体のフックに届くのはブロック系の id である。
 
@@ -5357,48 +5353,10 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-面の色は blockId の 3 ビットをそのまま RGB で表す (黒 = 0 / 赤 = 1 / 緑 = 2 / 黄 = 3 / 青 = 4 / マゼンタ = 5 / シアン = 6 / 白 = 7)。1 回の観察で 8 進数 1 桁が読める。p0 → p3 の順に 3, 2, 7, 2 と読めた場合は、上の桁から並べた 8 進 2723 = 1491 が id となる (Lava)。id の低い地形系は p0 と p1 の 2 回で足りる。surface フックのみで構成されているため、strict タイトルでも動作する。
 
-#### R-H. 葉だけをそよがせる — blockId による vertex フックの絞り込み
+#### R-H. `blockId` を使う場合の注意
 
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// vertex フックは strict タイトルで自動無効 (§36 参照)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // 変位はワールド位置の滑らかな関数にする。ワールド上の同一地点を指す
-        // 共有頂点が同じ値に動くため、面が剥がれない ([レシピ](recipes/) R7 も同じ原則)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- id 一覧はエンジンの更新で増える (実測でも新ビルドで 50 種のブロックが追加された)。使い続ける場合は [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) か R-G のビット平面表示で追加分を調べて配列に足すこと
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) は地面に敷く非固体の敷き葉である。揺らすと地面から浮いて見えるため、配列から外して除外するのも一つの選択
-- strict タイトルでは vertex フックが丸ごと無効になるが、上のガードがあれば「揺れが止まるだけ」で、フラグメント側の効果は生き続ける
-
+数値IDはエンジン側のデータで、更新により変わる可能性があります。過去の測定値を固定配列として流用しないでください。必要な場合は R-G の表示方法で利用中の環境を確認し、現行APIでは可能な限り `BloxdFlags` の名前付きフィールドを利用してください。
 ### 35. 新機能 ②: `BLOXD_SCENE_DEPTH` と `bloxdOpaqueBehind()` (本命)
 
 v1 では構造上不可能とされていた深度アクセスが、**液体 (liquid) プログラムに限り**解禁された。色は取得できないが、**奥の不透明面までの距離と位置という幾何情報が取得できる**。典型的な用途は、水の厚みを測定して吸収色を計算することである。
@@ -5483,17 +5441,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
 本書の掲載コードはこのパターンを含まない (`pack_hash3` の `+`/`*` 混在と `h ^ (h >> 16u)` は括弧済みのため仕様適合)。パックを書いたら第1段階と第2段階の両方を通すこと。
-
-### 39. 独立した類似資料について
-
-本書とほぼ同じ内容の社区資料として [GlitchHunterCoder/Bloxd-Essay の Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader) が存在する。こちらは本書より先に公開されているが、**本書の内容は glm が Bloxd の本体バンドルファイル (webpack チャンク群) を実際に解析して得た情報であり、コピペなどではない**。両者が一致するのは、同じ実装を独立に調べれば同じ結論に至るためである。
-
----
-
-調査: ltf_ahel (glm を用いて調査)
-
-
----
 
 ## API v3 移行ガイド
 

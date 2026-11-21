@@ -4911,7 +4911,6 @@ Las afirmaciones técnicas de aquí no descansan en documentación oficial de lo
 
 ### Principios básicos
 
-1. **Recuperación directa del bundle de producción** — el main.js y los chunks crudos descargados tanto de producción como de preprod, identidad verificada por md5
 2. **Respeto literal** — cabeceras, mensajes de error y cadenas i18n se **citan tal cual**, nunca parafraseadas
 3. **Medición reproducida** — los valores derivados, como el registro, se recalculan ejecutando los módulos del propio motor en un arnés (salida real, no una reimplementación parecida)
 4. **Builds con nombre** — cada medición lleva un id de build y fecha
@@ -5090,7 +5089,6 @@ Los tres structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganan `bloc
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json también lista ítems que no son bloques (herramientas etc.), pero solo los ids de familia de bloque llegan a los hooks de terreno / líquido.
 
@@ -5128,7 +5126,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-El color de la cara codifica 3 bits de blockId directamente como RGB (negro = 0 / rojo = 1 / verde = 2 / amarillo = 3 / azul = 4 / magenta = 5 / cian = 6 / blanco = 7). Una observación lee un dígito octal. Si p0 → p3 leen 3, 2, 7, 2, el octal 2723 = 1491 leído desde el dígito superior es el id (Lava). Las familias de terreno de id bajo se completan con dos observaciones (p0, p1). Usa solo el hook surface, así que corre también en títulos strict.
 
 #### R-H. Hacer ondear solo las hojas — acotar el hook vertex por blockId
 
@@ -5672,7 +5669,6 @@ vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
 **El hash de cabecera medido.** Toda validación de paquete se sella con el `HEADER_VERSION` del motor. Ejecutar directamente el módulo de validación de producción (ver la nota del arnés al final de §54) lo mide:
 
 ```
-v2 (sjr0p7):  6.bc5e8338
 ```
 
 Es un hash FNV-1a-32 (prefijado `6.`) sobre cinco entradas: la cabecera del motor preprocesada y tokenizada **por variante** (una entrada por cada una de las 8 variantes), el universo léxico WGSL completo del analizador, los cuatro nombres de macro, el mapa de funciones especiales, y la declaración `BloxdPackInputs` junto con su línea uniform `@group(3) @binding(0)`. Dos consecuencias para los autores:
@@ -6477,7 +6473,6 @@ Las reglas que importan a un autor, deduplicadas:
 El formato v3 era `6.<fnv1a32>` sobre cinco entradas (§53). v4 mantiene las mismas cinco entradas — tokens de cabecera por variante, el universo léxico del analizador, los cuatro nombres de macro, el mapa de funciones especiales y la declaración `BloxdPackInputs` — pero el prefijo pasa a `8.` **y se añade un segundo FNV-1a-32, hasheado sobre la lista ordenada `"<nombre> <id>"` de todo el registro de texturas**:
 
 ```
-v2 (sjr0p7):   6.bc5e8338
 ```
 
 (Los hashes v4 concretos no se midieron para esta guía — se calculan en tiempo de ejecución — pero el formato es exacto, y los valores v2/v3 de arriba son las mediciones publicadas anteriormente. Cualquier pantalla de ajustes de paquete tras una actualización del motor muestra el actual.)
@@ -7768,7 +7763,6 @@ sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smel
 tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
 wire_mill_top[rot[3, wire_mill_top[rot[4
 
-- 79 removed (sjr0p7):
 alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
 auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
 belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2

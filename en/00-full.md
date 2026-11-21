@@ -4947,7 +4947,6 @@ The technical statements here rest not on official developer documentation but o
 
 ### Core principles
 
-1. **Direct production-build retrieval** — raw main.js and chunks fetched from both production and preprod, identity verified by hash
 2. **Verbatim respect** — headers, error messages and i18n strings are **quoted as-is**, never paraphrased
 3. **Reproduced measurement** — derived values like the registry are recomputed by running the engine's own modules in a harness (real output, not a lookalike re-implementation)
 4. **Named builds** — every measurement carries a build id and date
@@ -5125,7 +5124,6 @@ All three structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` gained `bl
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json also lists non-block items (tools etc.), but only block-family ids reach the terrain / liquid hooks.
 
@@ -5163,48 +5161,10 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-The face color encodes 3 bits of blockId directly as RGB (black = 0 / red = 1 / green = 2 / yellow = 3 / blue = 4 / magenta = 5 / cyan = 6 / white = 7). One observation reads one octal digit. If p0 → p3 read 3, 2, 7, 2, then octal 2723 = 1491 read from the top digit is the id (Lava). Low-id terrain families finish with two observations (p0, p1). Uses only the surface hook, so it also runs in strict titles.
 
-#### R-H. Making only leaves sway — narrowing the vertex hook by blockId
+#### R-H. Caution when using `blockId`
 
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// vertex hooks are auto-disabled in strict titles (see §36)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // displacement is a smooth function of world position. Shared vertices pointing
-        // at the same world point move identically, so faces never tear ([Recipes](recipes/) R7 - same principle)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- The id list grows with engine updates (during measurement alone, 50 block kinds were added in a new build). To keep using it, look up additions via [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) or by measuring with R-G's bit-plane display, and extend the array
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) are non-solid ground leaf mats. Swaying makes them look like they lift off the ground, so excluding them from the array is one option
-- In strict titles the vertex hook is disabled wholesale, but with the guard above the pack just "stops swaying" — fragment-side effects keep working
-
+Numeric IDs are engine-managed data and may change with updates. Do not reuse a previously measured list as a permanent mapping. When needed, inspect the environment you are using with the R-G display method; in the current API, prefer named `BloxdFlags` fields whenever possible.
 ### 35. New feature 2: `BLOXD_SCENE_DEPTH` and `bloxdOpaqueBehind()` (the headline)
 
 Depth access, structurally impossible in v1, is unlocked **for liquid programs only**. No color, but **geometry — distance and position of the opaque face behind — is available**. The typical use is absorption-color computation from measured water thickness.
@@ -5289,17 +5249,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
 The code printed in this guide contains none of this pattern (the `+`/`*` mixing in `pack_hash3` and `h ^ (h >> 16u)` are already parenthesised, hence spec-compliant). When you write a pack, pass both the first and the second stage.
-
-### 39. On independently similar materials
-
-A community material with nearly the same content exists: [GlitchHunterCoder/Bloxd-Essay's Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). It was published before this guide, but **this guide's content comes from glm's own analysis of Bloxd's actual bundle files (webpack chunk set) — not copy-paste**. Both match because independently investigating the same implementation leads to the same conclusions.
-
----
-
-Researched by ltf_ahel (researched with glm)
-
-
----
 
 ## API v3 migration guide
 
@@ -5837,7 +5786,6 @@ The fog-*distance* behaviour is unchanged — same curve, same colours; only the
 
 #### 59.2 `bloxdFaceBlock` → `bloxdFragmentBlockPosition`
 
-A pure rename — the engine's own doc comment changed from "the world block the face ... belongs to" to "identify the block's world position", the body is byte-identical, and parameter names remain free. Recipe R4 and every `bloxdFaceBlock(l.position, l.normal)` call site ports by search-and-replace.
 
 #### 59.3 `found` → `hit`
 
@@ -5967,7 +5915,6 @@ The v5 change set in one screen:
 | Default pack | 6 hooks (vertex+surface) | **9 hooks** — light hooks included (§76) |
 | `bloxdSp*` namespace | 27 symbols | **46 symbols** (+20, −1) (§79) |
 | Texture registry | 905 usable names | **896 usable names** — +1, −10 (§80) |
-| Loader limits, zip rules, `pack.json` shape, hooks names, strict contract | — | **frozen, byte-identical limits** (§70) |
 
 Conversion from v4 is mostly mechanical (§77): the one silent trap is different this time — a pack that still reads `blockFlags` or guards light hooks with `#ifdef BLOXD_LIGHTING` **fails validation with a specific message** (the analyzer now explains both), so nothing silently misbehaves; but a pack that only *reads the old bit constants* by name will refuse to load until ported. As always, verify with an in-game compile before distributing.
 
