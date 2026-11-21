@@ -2,7 +2,7 @@
 
 Esta página documenta la API v5 actual. La fuente principal de sus definiciones es la cabecera que el motor añade automáticamente al inicio de cada pack (consulta [Interior del motor](../internals/engine-header.md) para ver la cabecera completa).
 
-## Mapa
+## Contenido
 
 | Página | Contenido |
 |---|---|
@@ -12,7 +12,7 @@ Esta página documenta la API v5 actual. La fuente principal de sus definiciones
 | [Estructuras](structures.md) | cada campo de cada estructura (incl. campos condicionales) |
 | [Funciones](functions.md) | todas las firmas de funciones de fotograma/por defecto/especiales |
 | [Iluminación](lighting.md) | la API de iluminación y el orden de procesamiento |
-| [API de texturas](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` y el nombrado |
+| [API de texturas](texture-api.md) | `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*` y la nomenclatura |
 | [Constantes](constants.md) | `bloxdPi` / `bloxdTau` / `bloxdChunkSize` |
 | [Preprocesador](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restricciones](restrictions.md) | límites del lenguaje, identificadores reservados |
