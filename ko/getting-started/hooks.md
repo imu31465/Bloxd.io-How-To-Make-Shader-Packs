@@ -1,8 +1,8 @@
 # 셰이더 훅
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
-팩은 **9개의 훅**에 끼어들 수 있다: 3개 렌더 대상 (Terrain / Liquid / Model) × 3개 파이프라인 단계 (Vertex / Surface / Light). 모두 선택 사항이다 — 정의하지 않은 훅은 엔진 기본값으로 폴백한다.
+셰이더 팩은 최대 **9개의 훅**을 정의할 수 있다. 렌더 대상 3개 (Terrain / Liquid / Model)와 파이프라인 단계 3개 (Vertex / Surface / Light)의 조합이다. 모든 훅은 선택 사항이며, 정의하지 않은 단계에는 엔진의 기본 구현이 적용된다.
 
 ## 훅 일람
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## 렌더 대상 분할
+## 렌더 대상
 
 - **Terrain** — 물과 블록 모델을 제외한 모든 블록
 - **Liquid** — 물
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **중요**: 팩이 Liquid 훅을 하나도 정의하지 않으면, **물 위에서는 Terrain 훅도 돌지 않는다** (물은 Liquid 훅이 단독 처리). 액체가 terrain 훅으로 폴백하던 v4 이전 동작과 다르다.
 
-## 폴백과 코드 공유
+## 기본 동작과 코드 재사용
 
 - 정의하지 않은 훅은 그 단계가 엔진 기본값을 쓴다는 뜻이다 (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` 와 같은 동작)
 - **훅 간 코드 공유**는 모듈 스코프 함수를 정의해 양쪽에서 호출한다:
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 기본 팩 (공식 9훅 템플릿)
+## 기본 팩 템플릿
 
 시작 템플릿이 이제 light 훅을 포함한다. 출하 상태 그대로 1,683 바이트:
 
