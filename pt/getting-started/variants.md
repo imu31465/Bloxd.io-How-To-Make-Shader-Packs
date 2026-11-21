@@ -33,4 +33,4 @@ Somente `#define NAME` (sem valor) / `#ifdef` / `#ifndef` / `#else` / `#endif` e
 
 A maioria dos jogos é strict (sem animação de vértices, sem `discard`). Um hook de vértice sem guarda reporta `<hook> moves terrain, which strict games prevent.` e um `discard` alcançável reporta `discard makes terrain see-through, which strict games prevent.` — ambos desativam **todos os hooks** naquele jogo strict. Sempre envolva os hooks de vértice em `#ifndef BLOXD_STRICT`.
 
-Para as interioridades da política por jogo, veja [Interioridades do motor: política](../internals/policy.md).
+Para conhecer a política de cada jogo, consulte [Funcionamento interno do motor: política](../internals/policy.md).
