@@ -81,7 +81,7 @@ const CATS = ['getting-started', 'api', 'guides', 'recipes', 'troubleshooting', 
 // ビルドID・確認日は配信日時ではないため、利用者向け総合マニュアルには掲載しない。
 const BUILD_METADATA_LINE = /^>.*(?:target build|対象ビルド|Ziel-Build|build objetivo|build cible|लक्ष्य बिल्ड|대상 빌드|build alvo|целевой билд|目标构建)/i
 function stripBuildMetadata(src) {
-  return src.split('\\n').filter(line => !BUILD_METADATA_LINE.test(line)).join('\\n')
+  return src.split('\n').filter(line => !BUILD_METADATA_LINE.test(line)).join('\n')
 }
 
 for (const code of langs) {
