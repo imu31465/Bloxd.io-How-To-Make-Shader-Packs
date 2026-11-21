@@ -1,6 +1,6 @@
 # Guides
 
-"Mechanism and mindset" material. What is possible in the first place is on [What shader packs can and cannot do](constraints.md); goal-oriented code examples live in [Recipes](../recipes/).
+This section explains how shader packs work and the ideas behind them. For a quick overview of what packs can and cannot do, see [What shader packs can and cannot do](constraints.md). Goal-based code examples are collected in [Recipes](../recipes/).
 
 ## Map
 
