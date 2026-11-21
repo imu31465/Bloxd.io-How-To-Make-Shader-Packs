@@ -1,22 +1,11 @@
 # Catálogo de texturas
 
-Este catálogo recoge los nombres de textura y las constantes disponibles para los shader packs. En WGSL, referencia las texturas por su nombre.
-
 ## Cómo leerlo
 
-La columna **nombre** es el nombre del registro — el identificador que escribes de verdad. La grafía de la constante pasa el nombre de archivo a CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **No se distinguen mayúsculas ni guiones bajos** (`bloxdTextureId_grass_top` se resuelve idéntico a `bloxdTextureIdGrassTop`). Los nombres son la API — el cargador los re-resuelve contra el registro en vivo al cargar, así que los nombres sobreviven a la deriva del registro ([API de texturas](texture-api.md)).
+La columna **Nombre** contiene el nombre de textura que debes usar. Por ejemplo, `grass_top` se referencia como `bloxdTextureIdGrassTop`. No se distinguen mayúsculas, minúsculas ni guiones bajos.
 
-
-### Cómo se relacionan los números
-
-Las cifras cuentan conjuntos distintos, así que no suman a lo tonto:
-
-| Cantidad | Qué cuenta |
-|---|---|
 
 ## El catálogo
-
-Este catálogo recoge los nombres de textura y las constantes disponibles para los shader packs. En WGSL, referencia las texturas por su nombre.
 
 | Nombre | Notas |
 | --- | --- |
@@ -1107,6 +1096,9 @@ Estas texturas existen solo como copias prerrotadas (`name[rot[1..4`). El regist
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## Relacionado
 
-- [API de texturas](texture-api.md) · [Interior del motor: registro de texturas](../internals/texture-registry.md) · [Historial de versiones: v4](../history/v4.md)
+- [API de texturas](texture-api.md) — resolución de nombres y muestreo
+- [Cómo funciona el registro de texturas](../internals/texture-registry.md) — constantes con nombre
+- [Internas del muestreo de texturas](../internals/texture-sampling.md) — funcionamiento del muestreo

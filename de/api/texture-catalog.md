@@ -1,22 +1,11 @@
 # Texturkatalog
 
-Dieser Katalog enthält die für Shader-Packs verfügbaren Texturnamen und benannten Konstanten. Referenziere Texturen in WGSL über ihren Namen.
-
 ## Wie zu lesen
 
-Die Spalte **name** ist der Registry-Name — das Handle, das du tatsächlich schreibst. Die Schreibweise der Konstante CamelCaset den Dateinamen: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Groß/Klein und Unterstriche werden nicht unterschieden** (`bloxdTextureId_grass_top` löst identisch zu `bloxdTextureIdGrassTop` auf). Namen sind die API — der Loader löst sie beim Laden gegen die Live-Registry neu auf, daher überstehen Namen Registry-Drift ([Textur-API](texture-api.md)).
+Die Spalte **Name** enthält den zu verwendenden Texturnamen. Beispielsweise wird `grass_top` als `bloxdTextureIdGrassTop` referenziert. Groß-/Kleinschreibung und Unterstriche werden nicht unterschieden.
 
-
-### Wie die Zahlen zusammenhängen
-
-Die Zählungen benennen verschiedene Mengen, sie summieren sich also nicht naiv:
-
-| Zählung | Was sie zählt |
-|---|---|
 
 ## Der Katalog
-
-Dieser Katalog enthält die für Shader-Packs verfügbaren Texturnamen und benannten Konstanten. Referenziere Texturen in WGSL über ihren Namen.
 
 | Name | Anmerkungen |
 | --- | --- |
@@ -1038,7 +1027,6 @@ Dieser Katalog enthält die für Shader-Packs verfügbaren Texturnamen und benan
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-
 ### Rotationsfamilien
 
 
@@ -1108,6 +1096,9 @@ Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Reg
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## Verwandte Seiten
 
-- [Textur-API](texture-api.md) · [Engine-Interna: Textur-Registry](../internals/texture-registry.md) · [Versionsgeschichte: v4](../history/v4.md)
+- [Textur-API](texture-api.md) — Namensauflösung und Sampling
+- [Funktionsweise der Textur-Registry](../internals/texture-registry.md) — benannte Konstanten
+- [Textur-Sampling-Interna](../internals/texture-sampling.md) — Sampling-Verhalten

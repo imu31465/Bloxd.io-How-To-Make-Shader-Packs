@@ -1,22 +1,11 @@
 # Catalogue de textures
 
-Ce catalogue répertorie les noms de texture et les constantes accessibles aux shader packs. Dans le WGSL, référencez les textures par leur nom.
-
 ## Comment lire
 
-La colonne **nom** est le nom du registre — l'identifiant que vous écrivez réellement. L'orthographe de la constante passe le nom de fichier en CamelCase : `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Casse et tirets bas ne sont pas distingués** (`bloxdTextureId_grass_top` se résout de façon identique à `bloxdTextureIdGrassTop`). Les noms sont l'API — le chargeur les résout de nouveau contre le registre en production au chargement, donc les noms survivent à la dérive du registre ([API de textures](texture-api.md)).
+La colonne **Nom** contient le nom de texture à utiliser. Par exemple, `grass_top` est référencé comme `bloxdTextureIdGrassTop`. La casse et les tirets bas ne sont pas distingués.
 
-
-### Comment les chiffres s'articulent
-
-Ces chiffres désignent des ensembles différents, donc ils ne s'additionnent pas naïvement :
-
-| Chiffre | Ce qu'il compte |
-|---|---|
 
 ## Le catalogue
-
-Ce catalogue répertorie les noms de texture et les constantes accessibles aux shader packs. Dans le WGSL, référencez les textures par leur nom.
 
 | Nom | Notes |
 | --- | --- |
@@ -1107,6 +1096,9 @@ Ces textures n'existent que comme copies pré-rotées (`name[rot[1..4`). Le regi
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## Voir aussi
 
-- [API de textures](texture-api.md) · [Intérieurs du moteur : Registre de textures](../internals/texture-registry.md) · [Historique des versions : v4](../history/v4.md)
+- [API de textures](texture-api.md) — résolution des noms et échantillonnage
+- [Fonctionnement du registre de textures](../internals/texture-registry.md) — constantes nommées
+- [Internes de l'échantillonnage des textures](../internals/texture-sampling.md) — fonctionnement de l'échantillonnage

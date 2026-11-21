@@ -1,20 +1,11 @@
 # 纹理目录
 
-本目录列出了着色器包可用的纹理名称和具名常量。在 WGSL 中请通过名称引用纹理。
-
 ## 如何阅读
 
+**名称**列给出了要使用的纹理名称。例如，`grass_top` 应通过 `bloxdTextureIdGrassTop` 引用。大小写和下划线不作区分。
 
-### 数字之间如何对上
-
-这些数字统计的是不同的集合，因此不能直接相加：
-
-| 数量 | 统计对象 |
-|---|---|
 
 ## 目录
-
-本目录列出了着色器包可用的纹理名称和具名常量。在 WGSL 中请通过名称引用纹理。
 
 | 名称 | 备注 |
 | --- | --- |
@@ -1036,7 +1027,6 @@
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-
 ### 旋转族
 
 
@@ -1106,6 +1096,9 @@
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## 相关
 
-- [纹理 API](texture-api.md) · [引擎内部: 纹理注册表](../internals/texture-registry.md) · [版本历史: v4](../history/v4.md)
+- [纹理 API](texture-api.md) — 名称解析与采样
+- [纹理注册表的工作方式](../internals/texture-registry.md) — 具名常量的行为
+- [纹理采样内部机制](../internals/texture-sampling.md) — 采样过程

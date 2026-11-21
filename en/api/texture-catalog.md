@@ -1,23 +1,12 @@
 # Texture catalog
 
-This catalog lists the texture names and named constants available to shader packs. Refer to textures by name in WGSL.
-
 ## How to read
 
+The **name** column contains the texture name to use. For example, `grass_top` is referenced as `bloxdTextureIdGrassTop`. Case and underscores are not distinguished.
 
 The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
 
-
-### How the numbers relate
-
-The counts name different sets, so they do not sum naively:
-
-| Count | What it counts |
-|---|---|
-
 ## The catalog
-
-This catalog lists the texture names and named constants available to shader packs. Refer to textures by name in WGSL.
 
 | Name | Notes |
 | --- | --- |
@@ -1110,4 +1099,6 @@ These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry 
 
 ## Related
 
-- [Texture API](texture-api.md) · [Engine Internals: Texture Registry](../internals/texture-registry.md) · [Version History: v4](../history/v4.md)
+- [Texture API](texture-api.md) — name lookup and sampling
+- [How the texture registry works](../internals/texture-registry.md) — named-constant behavior
+- [Texture sampling internals](../internals/texture-sampling.md) — sampling behavior

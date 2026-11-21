@@ -1,22 +1,11 @@
 # Catálogo de texturas
 
-Este catálogo lista os nomes de textura e as constantes disponíveis para shader packs. No WGSL, faça referência às texturas pelo nome.
-
 ## Como ler
 
-A coluna **nome** é o nome do registro — o identificador que você realmente escreve. A grafia da constante converte o nome do arquivo para CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Maiúsculas e sublinhados não são distinguidos** (`bloxdTextureId_grass_top` resolve de forma idêntica a `bloxdTextureIdGrassTop`). Os nomes são a API — o carregador os resolve novamente contra o registro vivo ao carregar, então os nomes sobrevivem à deriva do registro ([API de texturas](texture-api.md)).
+A coluna **Nome** contém o nome da textura a ser usado. Por exemplo, `grass_top` é referenciado como `bloxdTextureIdGrassTop`. Maiúsculas, minúsculas e sublinhados não são diferenciados.
 
-
-### Como os números se relacionam
-
-As contagens nomeiam conjuntos distintos, então elas não se somam de forma ingênua:
-
-| Contagem | O que conta |
-|---|---|
 
 ## O catálogo
-
-Este catálogo lista os nomes de textura e as constantes disponíveis para shader packs. No WGSL, faça referência às texturas pelo nome.
 
 | Nome | Notas |
 | --- | --- |
@@ -1038,7 +1027,7 @@ Este catálogo lista os nomes de textura e as constantes disponíveis para shade
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-### Famílias de rotação (64 raízes)
+### Famílias de rotação
 
 
 Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). O registro as dobra para a raiz listada abaixo, e `bloxdTexel` reaplica a rotação no momento da amostragem — referencie a raiz, nunca as cópias. Escrever uma grafia `[rot[N` dispara o diagnóstico dedicado de rotação.
@@ -1107,6 +1096,9 @@ Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). 
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## Relacionados
 
-- [API de texturas](texture-api.md) · [Interior do motor: registro de texturas](../internals/texture-registry.md) · [Histórico de versões: v4](../history/v4.md)
+- [API de texturas](texture-api.md) — resolução de nomes e amostragem
+- [Como funciona o registro de texturas](../internals/texture-registry.md) — constantes nomeadas
+- [Interior da amostragem de texturas](../internals/texture-sampling.md) — funcionamento da amostragem

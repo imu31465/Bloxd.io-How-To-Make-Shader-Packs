@@ -1,25 +1,12 @@
 # 텍스처 카탈로그
 
-이 카탈로그에는 셰이더 팩에서 사용할 수 있는 텍스처 이름과 이름 상수가 정리되어 있습니다. WGSL에서는 이름으로 텍스처를 참조하세요.
-
 ## 읽는 법
 
-**이름** 열이 레지스트리명 — 실제로 코드에 쓰는 핸들이다. 상수 철자는 파일명의 CamelCase 다: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **대소문자와 언더스코어는 구별되지 않는다** (`bloxdTextureId_grass_top` 은 `bloxdTextureIdGrassTop` 과 똑같이 해석된다). 이름이 API 다 — 로더가 로드 시 라이브 레지스트리에 대해 다시 해석하므로, 이름은 레지스트리 드리프트를 견딘다 ([텍스처 API](texture-api.md)).
-
+**이름** 열에는 사용할 텍스처 이름이 표시됩니다. 예를 들어 `grass_top`은 `bloxdTextureIdGrassTop`으로 참조합니다. 대소문자와 밑줄은 구별하지 않습니다.
 
 **비고** 열은 두 접기 계열을 표시한다. 「애니메이션(4프레임)」은 이 이름을 샘플하면 현재 애니메이션 프레임이 자동으로 반환된다는 뜻이다 — **프레임 접미사를 절대 쓰지 마라** (`lava0` 은 전용 진단이 붙은 알려진 별명이다). 「회전 계열(4사본)」은 그 텍스처가 미리 회전된 슬롯으로만 존재한다는 뜻이다 — 이름은 루트를 가리키고 `bloxdTexel` 이 회전을 다시 적용한다. 정확히 한 이름 (`radar_screen`) 만이 두 비고를 모두 가진다.
 
-
-### 수치의 관계
-
-이 숫자들은 서로 다른 집합을 세므로, 단순 합산되지 않는다:
-
-| 개수 | 세는 것 |
-|---|---|
-
 ## 카탈로그
-
-이 카탈로그에는 셰이더 팩에서 사용할 수 있는 텍스처 이름과 이름 상수가 정리되어 있습니다. WGSL에서는 이름으로 텍스처를 참조하세요.
 
 | 이름 | 비고 |
 | --- | --- |
@@ -1110,6 +1097,9 @@
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
 
+
 ## 관련 문서
 
-- [텍스처 API](texture-api.md) · [엔진 내부와 연구: 텍스처 레지스트리](../internals/texture-registry.md) · [버전 히스토리: v4](../history/v4.md)
+- [텍스처 API](texture-api.md) — 이름 해석과 샘플링
+- [텍스처 레지스트리 작동 방식](../internals/texture-registry.md) — 이름 상수의 동작
+- [텍스처 샘플링 내부](../internals/texture-sampling.md) — 샘플링 방식
