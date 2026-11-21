@@ -11,7 +11,9 @@ Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liqu
 - **Fix**: Vertex-Hooks und `discard` in `#ifndef BLOXD_STRICT` einpacken
 - **Vorbeugen**: Vertex-Hooks immer von der geschützten Vorlage ausgehend starten ([Varianten](../getting-started/variants.md))
 
-## „.alpha is undefined"
+## Das Feld `alpha` ist in dieser Variante nicht verfügbar
+
+> `.alpha is undefined`
 
 - **Ursache**: `alpha` existiert nur hinter `#ifdef BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model)
 - **Fix**: Alpha-berührenden Code in `#ifdef BLOXD_ALPHA` einpacken ([Präprozessor](../api/preprocessor.md#makro--varianten-matrix))
