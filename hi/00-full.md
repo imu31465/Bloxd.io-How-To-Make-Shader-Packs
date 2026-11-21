@@ -3354,7 +3354,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## रेसिपी
 लक्ष्य-उन्मुख कोड उदाहरण। "यह कैसे काम करता है" वाला पक्ष [गाइड](guides/) में है। यहाँ की हर चीज़ v5 शब्दावली (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) पर पोर्ट की गई है और 6 वेरिएंट (strict × terrain / liquid / model) पास करने के लिए गार्ड की गई है।
 
-### नक्शा
+### विषय-सूची
 
 | पृष्ठ | विषय-सामग्री |
 |---|---|
@@ -5114,19 +5114,19 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ## इंजन की आंतरिक संरचना
 यह श्रेणी shader packs के निष्पादन को समझने में मदद करने वाले इंजन के आंतरिक व्यवहार का वर्णन करती है। कार्यान्वयन के ये विवरण गेम अपडेट के साथ बदल सकते हैं। स्थिर उपयोग नियमों और उपलब्ध APIs के लिए [API संदर्भ](api/) देखें।
 
-### नक्शा
+### विषय-सूची
 
 | पेज | विषय-वस्तु |
 |---|---|
-| [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) | alphaTest की स्थिति, 2-प्रकाश सेटअप, uniform की हक़ीक़त, greedy meshing |
-| [हुक इनवोकेशन](internals/hook-invocation.md) | हुक इंजन के WGSL में कैसे जोड़े जाते हैं |
+| [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) | alphaTest की स्थिति, दो प्रकाश स्रोतों की व्यवस्था और uniform का वास्तविक डेटा, greedy meshing |
+| [हुक इनवोकेशन](internals/hook-invocation.md) | हुक इंजन के WGSL कोड में कैसे जोड़े जाते हैं |
 | [इंजन हेडर](internals/engine-header.md) | Shader packs के आगे जोड़ी जाने वाली WGSL घोषणाएँ |
 | [शेडर सत्यापन](internals/shader-validation.md) | एनालाइज़र की आंतरिक बनावट, सिग्नेचर तालिका, HEADER_VERSION |
 | [WGSL कंपाइलेशन](internals/wgsl-compilation.md) | चरण-2 का असली कंपाइलेशन और सत्यापन स्टब |
 | [आरक्षित पहचानकर्ता](internals/reserved-identifiers.md) | 46 `bloxdSp*` प्रतीक |
 | [प्रकाश इंटर्नल्स](internals/lighting-internals.md) | blockLight / heldLight की संरचना |
-| [फ़ॉग इंटर्नल्स](internals/fog-internals.md) | केवल-रैखिक, 32-ब्लॉक प्रवणता पट्टी |
-| [टेक्सचर सैंपलिंग](internals/texture-sampling.md) | 3-वेरिएंट टेक्सचर कोडजेन |
+| [फ़ॉग इंटर्नल्स](internals/fog-internals.md) | केवल रैखिक कमी, 32 ब्लॉक में फैला संक्रमण क्षेत्र |
+| [टेक्सचर सैंपलिंग](internals/texture-sampling.md) | तीन वेरिएंट के लिए टेक्सचर कोड जनरेशन |
 | [टेक्सचर रजिस्ट्री](internals/texture-registry.md) | नाम lookup, animation और rotation नाम |
 | [मॉडल रेंडरिंग](internals/model-rendering.md) | v5 का Model प्रोग्राम |
 | [इंजन डेटा](internals/engine-data.md) | API v5 सुविधाएँ और pack सीमाएँ |
@@ -5741,7 +5741,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## टेक्सचर सैंपलिंग इंटर्नल्स
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
-`bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — 3-वेरिएंट टेक्सचर कोडजेन। उपयोगकर्ता-पक्ष: [टेक्सचर API](api/texture-api.md)।
+`bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — तीन वेरिएंट के लिए टेक्सचर कोड जनरेशन। उपयोगकर्ता-पक्ष: [टेक्सचर API](api/texture-api.md)।
 
 ### तीन वेरिएंट
 
