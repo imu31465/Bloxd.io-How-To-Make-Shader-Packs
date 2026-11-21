@@ -6339,7 +6339,6 @@ On detecting a game update (a new build id): re-check the header, the `apiVersio
 ---
 
 ## Version History
-> Status: Historical — version-by-version records; each guide names its own target build
 
 Changes, migration steps and removed APIs for v1 through v5. For migrating legacy packs and for the preserved per-era specifications.
 
@@ -6406,7 +6405,6 @@ Then apply v3 → v4 → v5 in order ([the fast path](history/index.md#fast-path
 ---
 
 ## API v2 migration guide
-> Version: 2 · Status: Historical (migration guide of the era; the target build is noted in the text)
 Target build: `6qxffk.main.5912a15f.js` (production deploy as of 2026-10-16). Parts I–VII of this guide are already rewritten to the v2 baseline; this guide collects the migration points from v1 and the new v2 features. New-feature code examples pass 8/8 variant validation on the v2 compiler and browser WGSL compiler (Tint) validation (§38), but v2 conversion of existing recipes is mechanical identifier substitution — always verify with an in-game compile before distribution.
 
 ### 31. Fate of v1 packs (conclusion first)
@@ -6648,7 +6646,6 @@ Researched by ltf_ahel (researched with glm)
 ---
 
 ## API v3 migration guide
-> Version: 3 · Status: Historical (migration guide of the era; the target build is noted in the text)
 > **Superseded 2026-10-26: the live API is now version 5** — v3 packs are rejected at load exactly as described here for v2. Apply this part *and then* [the v4 guide](history/v4.md) (v3 → v4: the texture API, the `fogAlpha` rename, `bloxdFragmentBlockPosition`, `hit`). This part's internals (§49–§54) remain accurate for the v3 build they were measured on. Then apply [the v5 guide](history/v5.md) as well (v4 → v5).
 
 Target build: `3ymzdd.main.fae4743f.js` — **the live production build since 2026-10-19**. The bundle bloxd.io serves in production is byte-identical (md5-checked, main bundle and shader-pack chunks alike) to the preprod deploy this part was originally researched against, so everything here applies to production as-is. The pack model keeps its v2 shape (same `pack.json` fields, same loader limits, same uniform layout).
@@ -7268,7 +7265,6 @@ Researched by ltf_ahel (researched with glm)
 ---
 
 ## API v4 migration guide
-> Version: 4 · Status: Historical (migration guide of the era; the target build is noted in the text)
 > **Superseded 2026-11-03: the live API is now version 5** — v4 packs are rejected at load exactly as described here for v3. Apply this part *and then* the [v5 guide](history/v5.md) (v4 → v5: the `BloxdFlags` struct replaces `blockFlags`, `bloxdLit()` and the public lighting recipe, the enchant/overlay inputs, the 9-hook default pack). This part's internals (§56–§66) remain accurate for the v4 builds they were measured on.
 
 Target build: `cnty9.main.669f8081.js` — **live on production and preprod simultaneously since 2026-10-26**. Unlike the v3 rollout (a preprod build promoted to production), v4 flipped both environments to the same new bundle in one move, and the two bundles are byte-identical (main and every shader-pack chunk md5-checked), so everything here applies to production as-is. The bundle was also reorganised around this release — the main bundle shrank from 4.73 MB to 3.03 MB (-36%), the chunk count grew from 169 to 193, and the whole shader-pack pipeline (loader, validator, code generator, WebGPU compiler) now lives in a contiguous c49–c54 cluster. The pack model itself keeps its shape: same `pack.json` fields, same loader limits, same 64 B uniform, same six hooks.
@@ -9205,7 +9201,6 @@ wire_mill_top_rot4
 ---
 
 ## API v5 migration guide
-> Version: 5 · Status: Historical (migration guide of the era; the target build is noted in the text)
 Target build: `ab90qa.main.6188124c.js` — **live on production and preprod simultaneously (measured 2026-11-03)**, so everything here applies to production as-is. This is the biggest API revision since v3. What *is* visible: the engine header grew from 6,021 to **8,954 decoded bytes** (151 → 208 lines) — almost every struct gained fields, four new functions document the engine's own lighting recipe, and the `blockFlags` bitmask is gone, replaced by a proper `BloxdFlags` struct of booleans. The `#ifdef BLOXD_LIGHTING` compile-time gate is gone too: lighting state moved into the per-frame uniform as a `lit: u32` member and is queried at runtime with `bloxdLit()`. The default pack template now ships **all nine hooks** instead of six. And the `bloxdSp*` engine-internal namespace grew from 27 to 46 symbols.
 
 Re-verified, in order, on every production build since: `xkg8x` (2026-11-04 — the header byte-identical, every loader / variant / hook / reserved-name measurement unchanged, the registry moved 896 → 906 usable names; §80); `2lcqcl` preprod (different main bundle, identical on every shader-pack surface); `bny9u` (2026-11-05 — header, default pack template, loader limits, uniform layout, hooks, variants, macros, reserved names and validation messages all unchanged; registry 906 → 911; game definitions 111 → 115); `v98qt8` (2026-11-08 — same frozen API surface, registry 911 → 906, game definitions 115 → 116, plus the texture-constant folding regression); and `bbb6l5` (2026-11-20 — **the first v5-era surface change**: the uniform grew to 80 bytes with `shadowDirection`, the real sun/moon shadow functions `bloxdShadow()` / `bloxdAirShadow()` joined the API, `pack.json` gained `keepCircleShadows`, the folding regression was fixed, and the registry grew to 1,650 layers / 1,017 usable names; §80 addendum). The `apiVersion` stays `5` through all of it — v5 packs written for the launch build still load unchanged.
