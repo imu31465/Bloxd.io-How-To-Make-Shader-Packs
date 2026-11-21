@@ -58,7 +58,6 @@ Jedes Spiel hat eine Shader-Pack-Policy (`shaderPackPolicy`), und **die meisten 
 
 - Das aktuelle Spiel akzeptiert nur `apiVersion: 5`-Pakete; v1–v4-Pakete werden beim Laden abgelehnt (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](api/compatibility.md))
 - Du migrierst ein Paket, das für eine ältere Version geschrieben wurde? Siehe [Versionsgeschichte](history/)
-- Engine-Interna können sich mit Updates ändern, daher nennt jede Seite ihren Ziel-Build
 
 ---
 
@@ -3991,7 +3990,6 @@ Das aktuelle Spiel akzeptiert nur `apiVersion: 5`; ältere Pakete werden still d
 
 #### F. Ändert sich die API nochmal?
 
-Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](api/compatibility.md#re-validierung-gespeicherter-pakete-muss-erneut-geprüft-werden)).
 
 #### F. Was ist mit „Cinematic-Shader“-Distributionen?
 

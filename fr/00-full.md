@@ -58,7 +58,6 @@ Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et *
 
 - Le jeu actuel n'accepte que les packs `apiVersion: 5` ; les packs v1–v4 sont rejetés au chargement (les packs enregistrés deviennent silencieusement inactifs — [Compatibilité](api/compatibility.md))
 - Vous migrez un pack écrit pour une ancienne version ? Voir l'[Historique des versions](history/)
-- Les internals du moteur peuvent changer avec les mises à jour ; chaque page indique donc son build cible
 
 ---
 
@@ -3973,7 +3972,6 @@ Le jeu actuel n'accepte que `apiVersion: 5` ; les packs plus anciens sont désac
 
 #### Q. L'API changera-t-elle encore ?
 
-Les internals du moteur peuvent changer avec les mises à jour — chaque page nomme son build cible. Les packs sauvegardés se revalident automatiquement quand l'en-tête ou le registre change ([Compatibilité](api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
 
 #### Q. Qu'en est-il des distributions « cinematic shader » ?
 

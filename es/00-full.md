@@ -58,7 +58,6 @@ Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayo
 
 - El juego actual solo acepta paquetes `apiVersion: 5`; los paquetes v1–v4 se rechazan al cargar (los guardados quedan inactivos en silencio — [Compatibilidad](api/compatibility.md))
 - ¿Migras un paquete escrito para una versión antigua? Ver [Historial de versiones](history/)
-- Las interioridades del motor pueden cambiar con las actualizaciones, así que cada página nombra su build objetivo
 
 ---
 
@@ -3989,7 +3988,6 @@ El juego actual solo acepta `apiVersion: 5`; los paquetes antiguos se desactivan
 
 #### P. ¿Cambiará la API de nuevo?
 
-Las interioridades del motor pueden cambiar con las actualizaciones — cada página nombra su build objetivo. Los paquetes guardados se revalidan automáticamente cuando cambian la cabecera o el registro ([Compatibilidad](api/compatibility.md#revalidación-de-paquetes-guardados-necesita-revisión)).
 
 #### P. ¿Y las distribuciones de «shader cinematográfico»?
 
