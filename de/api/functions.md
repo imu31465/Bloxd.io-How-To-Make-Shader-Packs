@@ -1,6 +1,6 @@
 # Funktionen
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Jede Header-Funktion. Die Textur-API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) steht zusammen mit `bloxdOpaqueBehind` in der [Textur-API](texture-api.md).
 
@@ -142,7 +142,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ## Schattenfunktionen
 
-Der Build `bbb6l5` hat der Pack-API das echte Sonnen-/Mondschattensystem der Engine hinzugefügt — projizierte, sonnenfolgende Schatten, geworfen von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+Der Build API v5 hat der Pack-API das echte Sonnen-/Mondschattensystem der Engine hinzugefügt — projizierte, sonnenfolgende Schatten, geworfen von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 ### bloxdShadow
 
@@ -150,7 +150,7 @@ Der Build `bbb6l5` hat der Pack-API das echte Sonnen-/Mondschattensystem der Eng
 fn bloxdShadow() -> f32
 ```
 
-- **Liefert**: das Sonnen- oder Mondlicht, das dieses Fragment erreicht — **0 im Schatten, 1 beleuchtet** — *neu in `bbb6l5`*
+- **Liefert**: das Sonnen- oder Mondlicht, das dieses Fragment erreicht — **0 im Schatten, 1 beleuchtet** — *neu in API v5*
 - Wer sie wirft: **Blöcke, Spieler, Mobs und Items** (der in der Ego-Perspektive gehaltene Gegenstand ist absichtlich ausgenommen)
 - Verhalten (wörtlich aus der Validatoren-Beschreibung): blendet auf 0 ab, wenn Sonne oder Mond sinken oder sich die Fläche abwendet; **1 auf `flags.emissive`-Flächen**; das Licht läuft entlang `bloxdShadowDirection()`, also gibt es Schatten selbst unter einem sonnenlosen Himmel
 - **Aufrufbar von**: surface-/light-Hooks
@@ -162,7 +162,7 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 ```
 
-- **Liefert**: wie `bloxdShadow()`, aber an einem Punkt **zwischen Kamera (t = 0) und diesem Fragment (t = 1)** — *neu in `bbb6l5`* — für Lichtsäulen
+- **Liefert**: wie `bloxdShadow()`, aber an einem Punkt **zwischen Kamera (t = 0) und diesem Fragment (t = 1)** — *neu in API v5* — für Lichtsäulen
 - Nur Blöcke werfen sie (Spieler und Mobs nicht), auf ganze Blöcke weichgezeichnet; `t` ist auf 0–1 geklemmt
 - Rezept: mehrere `t` entlang des Sichtstrahls abtasten und akkumulieren — [Schatten](../guides/shadows.md)
 

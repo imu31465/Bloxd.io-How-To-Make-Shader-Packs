@@ -1,6 +1,6 @@
 # Beleuchtung
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
+> Ziel-API: 5 · Typ: technische Referenz
 
 v5 hat die Beleuchtungs-API veröffentlicht. Was die Engine intern tat (den Aufbau von `litColour`) ist jetzt aus Paketen aufrufbar. Diese Seite behandelt die Beleuchtungs-Eingaben, Funktionen und die Verarbeitungsreihenfolge als System.
 

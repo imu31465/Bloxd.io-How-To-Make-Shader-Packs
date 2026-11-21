@@ -1,28 +1,28 @@
 # Versionsgeschichte
 
-> Status: Historical — Aufzeichnungen je Version; jeder Leitfaden nennt seinen eigenen Ziel-Build
+> Typ: Historisch · Migrationsleitfäden für API v1–v5
 
-Änderungen, Migrationsschritte und entfernte APIs für v1 bis v5. Für die Migration alter Pakete und für die bewahrten Spezifikationen der jeweiligen Ära.
+Dieser Abschnitt bewahrt Änderungen, Migrationsschritte und entfernte APIs der Versionen v1 bis v5. Der Schwerpunkt liegt auf API-Verhalten und Migrationspfaden, nicht auf Build-IDs oder Prüfzeitpunkten.
 
-## Zeitstrahl
+## Versionen
 
-| Version | Live seit | Leitfaden | Highlights |
-|---|---|---|---|
-| v1 | (anfänglich) | [v1](v1.md) | erste Shader-Pack-API. 6 Hooks (Terrain/Liquid × Vertex/Surface); Vokabular `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
-| v2 | — | [v2](v2.md) | vollständige Bezeichner-Umbenennung, `blockId`, `BLOXD_SCENE_DEPTH` und `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags`-Bitflags, `bloxdPi` / `bloxdTau`, offizielle Liquid-Hooks, Hook-Aufruf-Interna |
-| v4 | 2026-10-26 | [v4](v4.md) | Textur-API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), der strict-Vertrag, Engine-Header- & Registry-Analyse |
-| **v5** | **2026-11-03** | [v5](v5.md) | **aktuell** — `BloxdFlags`-Struktur (14 Bools), Model-Hooks (9 gesamt), die Beleuchtungs-API `bloxdLit()` / `bloxdLitColour()`, `localPosition`, Enchant-/Overlay-Ein- & -Ausgaben, 6 Varianten |
+| Version | Migrationsleitfaden | Wichtigste Änderungen |
+|---|---|---|
+| v1 | [v1](v1.md) | Erste Shader-Pack-API |
+| v2 | [v2](v2.md) | Umbenennung von Bezeichnern, `blockId` und Scene-Depth-Zugriff |
+| v3 | [v3](v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau` und Liquid-Hooks |
+| v4 | [v4](v4.md) | Textur-API und Einschränkungen in Strict-Spielen |
+| **v5** | [v5](v5.md) | **Aktuell** — `BloxdFlags`, Model-Hooks sowie Lighting- und Shadow-API |
 
-## Das gemeinsame Vorwort
+## Umgang mit älteren Versionen
 
-Das aktuelle Spiel akzeptiert nur `apiVersion: 5`, und **Pakete alter Versionen scheitern im Augenblick des Ladens** (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](../api/compatibility.md)). Jeder Leitfaden deckt „vorherige → nächste“ ab. Mehrere Versionen überspringen? Älteste zuerst anwenden.
+Das aktuelle Spiel akzeptiert nur Packs mit `apiVersion: 5`. Ältere Packs können nicht unverändert geladen werden. Bei einer Migration über mehrere Versionen wendest du die Leitfäden der Reihe nach an, beginnend mit der ältesten Version.
 
-## Schnellweg zu einer Checkliste
+## Migrationspfade
 
-- v4-Paket → [v5-Leitfaden](v5.md) §77 (größtenteils mechanisch)
-- v3-Paket → [v4](v4.md) §61 → [v5](v5.md) §77
-- v2-Paket → [v3](v3.md) §47 → v4 → v5
-- v1-Paket → bei [v2](v2.md) §37 beginnen
+- v4-Pack → [v5-Migrationsleitfaden](v5.md)
+- v3-Pack → [v4](v4.md) → [v5](v5.md)
+- v2-Pack → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
+- v1-Pack → [v2](v2.md) → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
 
-> Für die aktuelle Spezifikation selbst siehe [API-Referenz](../api/); für Interna des aktuellen Builds siehe [Engine-Interna](../internals/).
+Die aktuelle API steht in der [API-Referenz](../api/).

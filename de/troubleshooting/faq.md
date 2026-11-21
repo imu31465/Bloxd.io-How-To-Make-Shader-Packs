@@ -1,6 +1,6 @@
 # FAQ & rechtliche Hinweise
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> Ziel-API: 5 · Typ: technische Referenz
 
 ## Häufig gestellte Fragen
 

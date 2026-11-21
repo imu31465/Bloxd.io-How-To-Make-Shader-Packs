@@ -1,72 +1,43 @@
 # Kompatibilität
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> Ziel-API: 5 · Typ: API-Referenz
 
-Wie das aktuelle Spiel und Pakete alter Versionen zusammenwirken.
+Diese Seite erklärt, welche Shader-Pack-API-Versionen das aktuelle Spiel akzeptiert und wie gespeicherte Packs älterer Versionen behandelt werden.
 
-## Akzeptierte Versionen
+## Akzeptierte API-Version
 
-**Nur `apiVersion: 5`.** Der Loader vergleicht `manifest.apiVersion !== 5` strikt, und v1/v2/v3/v4-Pakete **scheitern im Augenblick des Ladens**. Eine Multi-Version-Akzeptanz existiert nicht.
+Das aktuelle Spiel akzeptiert nur Packs, deren Manifest den numerischen Wert `5` in `apiVersion` enthält. Die Zeichenkette `"5"` wird nicht akzeptiert. Packs für API v1–v4 müssen vor dem Laden migriert werden.
 
-## Meldungen zur Ladezeit (wortwörtlich aus dem Live-i18n-Wörterbuch)
+## Meldungen beim Laden
 
 - `pack.json needs "apiVersion": {{version}}.` — der Schlüssel `apiVersion` fehlt
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — der Schlüssel existiert, ist aber nicht 5
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — die angegebene Version stimmt nicht mit der aktuellen Version überein
 
-## Gespeicherte alte Pakete (keine Ausnahmen — stille Deaktivierung)
+## Gespeicherte Packs älterer Versionen
 
-Zuvor gespeicherte v1–v4-Pakete werfen keine Exception. Das Saved-Pack-Ergebnis wird zu:
+Ein Pack, das für eine ältere API-Version gespeichert wurde, wird im aktuellen Spiel nicht ausgeführt. Die Shader-Pack-Einstellungen zeigen an, dass das Pack eine nicht unterstützte Version verwendet. Aktualisiere es anhand des passenden Migrationsleitfadens.
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+## Erneute Validierung gespeicherter Packs
 
-und das Paket wird **still deaktiviert**. Nur der Shader-Pack-Einstellungen-Tab erklärt den Grund:
+Gespeicherte Packs werden erneut validiert, wenn sich von der Engine bereitgestellte Header oder Texturnamen-Definitionen ändern. Die erneute Validierung erfolgt automatisch beim Laden des Spiels. Referenziere Texturen im Pack-Code über benannte Konstanten und nicht über numerische IDs, die sich ändern können.
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+## Laufzeitkompatibilität
 
-## Der Charakter der v4→v5-Konvertierung
+- **WebGPU:** Shader-Packs benötigen einen WebGPU-fähigen Renderer.
+- **Mobilgeräte:** In Umgebungen ohne WebGPU-Unterstützung sind Shader-Packs nicht verfügbar ([Voraussetzungen](../getting-started/requirements.md)).
+- **Texturzugriff:** In Renderer-Konfigurationen ohne Textur-Atlas bieten `bloxdTexel` und `bloxdTextureSize` keinen normalen Zugriff auf Atlas-Texturen ([Textur-API](texture-api.md)).
 
-Die Konvertierung ist größtenteils mechanisch (vollständige Checkliste im [v5-Migrationsleitfaden](../history/v5.md)):
+## Unterstützung der API-Versionen
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (eine 1:1-Umbenennung)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition`-Aufrufstellen kompilieren weiterhin (die Engine injiziert die Funktion), sind aber jetzt undokumentiert — davon wegzumigrieren ist der sichere Weg ([Funktionen](functions.md#bloxdfragmentblockposition--undokumentiert-aber-weiterhin-injiziert))
-- `pack.json` auf `"apiVersion": 5` anheben
-
-Die stille Falle ist diesmal eine andere: Pakete, die weiterhin `blockFlags` lesen oder Light-Hooks in `#ifdef BLOXD_LIGHTING` verpacken, **scheitern mit eigenen Meldungen an der Validierung** (der Analyzer erklärt inzwischen beide Fälle) — nichts verhält sich also still falsch; sie bleiben bis zur Migration schlicht abgelehnt.
-
-## Re-Validierung gespeicherter Pakete („muss erneut geprüft werden“)
-
-`HEADER_VERSION` ist `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (die führende Ganzzahl stieg von der 8 in v4 auf 9). Wenn sich der Engine-Header oder die Textur-Registry ändert (bei Spiel-Updates üblich), werden gespeicherte Pakete als „muss erneut geprüft werden“ markiert und beim Seitenladen automatisch neu validiert.
-
-**v98qt8-Vorbehalt:** die Faltungs-Regression des aktuellen Builds ([Engine-Interna: Textur-Registry](../internals/texture-registry.md#the-v98qt8-folding-regression)) ändert, was die Engine hasht — das berechnete Registry-Suffix ist die *ungefaltete* 1.047-Zeilen-Tabelle (`694df62c`), nicht die beabsichtigte gefaltete 906-Zeilen-Tabelle (`df6c1915`, auf `bny9u` `e735ebdc`). Jedes gespeicherte Paket validiert daher auf diesem Build neu, und Pakete, die einen der 43 Animationsfamilien-Basisnamen (`lava`, …) referenzieren, **scheitern** anschließend an der Neuprüfung, bis die Engine-Seite behoben ist — schreibe trotzdem die gefalteten Namen; sie sind die API.
-
-
-
-Ein gemessenes Beispiel für Registry-Bewegung (zwei Builds, 10 Tage auseinander): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt), und von den Namen, die ihre Schreibweise behielten, **änderten 779 von 1121 die id**. Mit anderen Worten:
-
-- **Pakete, die mit Namen geschrieben sind (`bloxdTextureIdLava`), überstehen den Drift** (der Loader löst sie gegen die Live-Registry neu auf)
-- **Pakete, die mit rohen ids (`19`) geschrieben sind, brechen bei der Re-Validierung**
-
-Details: [Engine-Interna: Textur-Registry](../internals/texture-registry.md).
-
-## Laufzeitumgebungen
-
-- **Nur WebGPU-Renderer**: Das Installieren eines Pakets erzwingt den WebGPU-Renderer
-- **Mobil**: In WebGPU-beschränkten Umgebungen laufen Pakete gar nicht ([Voraussetzungen](../getting-started/requirements.md))
-- **Nicht-Atlas-Renderer-Konfigurationen**: `bloxdTexel` / `bloxdTextureSize` fallen auf Stubs zurück (weiße Texel, 1×1); der Code kompiliert und läuft weiterhin ([Textur-API](texture-api.md#wohin-die-textur-api-nicht-gehen-kann))
-
-## Zusammenfassung der Versionsunterstützung
-
-| API-Version | Live seit | Behandlung durch das aktuelle Spiel |
-|---|---|---|
-| v1 | — | beim Laden abgelehnt (Migration via [v2](../history/v2.md)) |
-| v2 | — | beim Laden abgelehnt |
-| v3 | 2026-10-19 | beim Laden abgelehnt |
-| v4 | 2026-10-26 | beim Laden abgelehnt |
-| **v5** | **2026-11-03** | **aktuell** |
+| API-Version | Unterstützung im aktuellen Spiel |
+|---|---|
+| v1 | Wird beim Laden abgelehnt |
+| v2 | Wird beim Laden abgelehnt |
+| v3 | Wird beim Laden abgelehnt |
+| v4 | Wird beim Laden abgelehnt |
+| **v5** | **Aktuell** |
 
 ## Verwandte Seiten
 
-- [v5-Migrationscheckliste](../history/v5.md) · [Versionsgeschichte](../history/)
+- [Migration von v4 zu v5](../history/v5.md)
+- [Versionsgeschichte](../history/)

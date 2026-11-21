@@ -1,72 +1,58 @@
-# Packformat
+# Pack-Format
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (am Live-Loader nachgemessen)
+> Ziel-API: 5 · Typ: API-Referenz
 
-Das ganze Paketmodell auf einer Seite — Manifest, Loader-Limits, Per-Frame-Uniform. Für die Schritt-für-Schritt-Version siehe [Erste Schritte](../getting-started/manifest.md).
+Diese Seite fasst Manifest, ZIP-Archivgrenzen und Pack-Uniform zusammen. Einrichtungsschritte stehen unter [Erste Schritte](../getting-started/manifest.md).
 
 ## pack.json
+
+Lege `pack.json` im Stammverzeichnis des ZIP-Archivs ab. Es muss ein JSON-Objekt sein.
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
-| Feld | Typ | Pflicht | Beschreibung |
+| Feld | Typ | Erforderlich | Beschreibung |
 |---|---|---|---|
-| `apiVersion` | Zahl | Pflicht | **muss strikt `5` entsprechen** (`===`). Ein String `"5"` scheitert und wird mit seiner JSON-Schreibweise gemeldet |
-| `name` | String | Pflicht | nach dem Trimmen nicht leer; wird in den Einstellungen angezeigt |
-| `author` | String | optional | muss, falls vorhanden, ein String sein |
-| `keepCircleShadows` | boolean | optional | **neu in `bbb6l5`** — behält die alten kreisförmigen Schatten unter Spielern und Mobs, wenn deine Shader auch die echte Sonnenschatten-API nutzen ([Schatten](../guides/shadows.md)). Standard `false`; jeder andere Typ wird mit eigener Meldung abgelehnt |
+| `apiVersion` | number | Ja | Den numerischen Wert `5` angeben. Eine Zeichenkette wird nicht akzeptiert |
+| `name` | string | Ja | Nicht leerer Name nach Entfernen äußerer Leerzeichen |
+| `author` | string | Nein | Name des Autors |
+| `keepCircleShadows` | boolean | Nein | Auf `true` setzen, um bei Verwendung der Shadow-API die traditionellen runden Schatten beizubehalten |
 
-Alles andere im Manifest wird ignoriert. `pack.json` muss exakt ein JSON-Objekt im Zip-Root sein.
+## Loader-Grenzen
 
-## Loader-Limits (am Live-c53 nachgemessen)
+| Element | Grenze |
+|---|---:|
+| `.wgsl`-Dateien pro Pack | 256 |
+| WGSL-Quelltext insgesamt | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP-Archiv | 32 MB |
+| ZIP-Einträge | 1.024 |
 
-| Limit | Wert | Meldung bei Überschreitung |
+Aufgeteilte ZIP-Archive, Zip64, verschlüsselte Einträge und nicht unterstützte Kompressionsverfahren werden nicht unterstützt. Speichere alle Dateien als UTF-8 und verwende keine doppelten Pfade im Archiv.
+
+## Pack-Uniform
+
+Das Pack-Uniform ist 80 Byte groß und an `@group(3) @binding(0)` gebunden.
+
+| Offset | Feld | Typ |
 |---|---|---|
-| `.wgsl`-Dateien pro Paket | 256 | `The pack has more than 256 .wgsl files.` |
-| `.wgsl`-Quelltext gesamt | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json`-Größe | 64 KB | `pack.json is over 64 KB.` |
-| Zip-Größe | 32 MB | `The zip is over 32 MB.` |
-| Zip-Einträge | 1.024 | `The zip has more than 1024 entries.` |
-| Zip-Form | — | Split-Zip / zip64 / verschlüsselt / nicht unterstützte Kompression werden je mit eigener Meldung abgelehnt; alle Dateien valides UTF-8; exakt eine `pack.json`; keine doppelten Pfade |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-## API-Versionsprüfung
+Die minimale Uniform-Binding-Größe beträgt 80 Byte. Die übrigen Bindings in Gruppe 3 sind die Scene-Depth-Textur für Liquid-Varianten und der Storage-Puffer `bloxdSpTextureLayers`.
 
-Der Loader vergleicht `manifest.apiVersion !== 5` mit JavaScript-strikt `!==`. Die Versionskonstante `5` und die Header-Vorlage leben im selben Modul (c55 / Modul 29836), daher bewegen sich Validierung und der Header, den sie voraussetzt, gemeinsam. Meldungen bei Nichtübereinstimmung: siehe [Kompatibilität](compatibility.md).
+## Verwandte Seiten
 
-## Per-Frame-Uniform: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — weiterhin 64 Byte, aber v5 hat ein Member hinzugefügt (aus dem Live-Uniform-Layout-Modul):
-
-| Offset | Feld | Typ | Hinweis |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | unterlegt `bloxdSeconds()` |
-| 4 | `lit` | `u32` | 1, wenn Block-/Himmels-Beleuchtung an ist; unterlegt `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | unterlegt `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | unterlegt `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | unterlegt `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **neu in `bbb6l5`** — die Richtung, in die das schattenwerfende Licht läuft; stützt `bloxdShadowDirection()` |
-
-`shadowDirection` füllt die Lücke nach `eyePosition` (ein `vec3f` belegt 12 Byte, also waren Offsets 60–63 Spielraum; `shadowDirection` landet bei 64, einer 16-Byte-Grenze — der Struct bleibt exakt 80 Byte). Die Engine schreibt ihn mit drei `setFloat32` — es ist ein Einheitsvektor (tagsüber von der Sonne, nachts vom Mond, bei sonnenlosen Worlds von der Sonne des Standardhimmels), nie über dem Horizont. Damit wuchs das Uniform von 64 auf 80 Byte und das `minBindingSize` stieg auf 80.
-
-`lit` passte in den Spielraum, den v4 bereits zwischen `seconds` und `renderOffset` hatte.
-
-**Das Uniform nie direkt aus einem Paket referenzieren.** Es über die Header-Funktionen benutzen (`bloxdSeconds()` usw.). Die Stage-Sichtbarkeit ist VERTEX|FRAGMENT, deshalb funktionieren Header-Funktionen auch aus Modul-Funktionen und Vertex-Hooks.
-
-## Bind-Group-Layout
-
-| Binding | Inhalt |
-|---|---|
-| 0 | `bloxdPackInputs`-Uniform (64 B) |
-| 1 | Szenentiefe-Textur (Liquid-Varianten) |
-| 2 | `bloxdSpTextureLayers`-Storage-Buffer |
-
-`minBindingSize` bleibt 64. Die Tiefentextur (Binding 1) ist FRAGMENT-only — deshalb ist `bloxdOpaqueBehind()` nur aus Surface-/Light-Hooks aufrufbar.
-
-## WGSL-Konkatenation
-
-Mehrere `.wgsl`-Dateien werden in **Wörterbuch-Reihenfolge des Pfadnamens** zu einem Modul konkateniert. Modul-Ebene-Deklarationen sind reihenfolgeunabhängig; nur die `var`-Initialisierungsreihenfolge kann relevant werden. Nicht-`.wgsl`-Dateien werden ignoriert.
+- [Manifest erstellen](../getting-started/manifest.md)
+- [API-Referenz](./)
+- [API-v5-Migrationsleitfaden](../history/v5.md)
