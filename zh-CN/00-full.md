@@ -23,14 +23,12 @@
 8. [验证](getting-started/validation.md) — 三阶段加载检查与实机测试
 9. [分发](getting-started/distribution.md) — 打 zip 与发布卫生
 
-> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](api/)；要现成效果请看[实战配方](recipes/)。
-
 ---
 
 ## 概览与前置条件
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> API: 5 · 状态: Verified
 
 ### 着色器包是什么
 
@@ -48,9 +46,9 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 水 |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 方块模型 (台阶、楼梯、植物)、物品、玩家、生物、NPC、盔甲、外观装饰 |
 
-- **能做到**: 改颜色、透明度与自发光；重建光照 ([光照 API](api/lighting.md))；投影式阴影 (经 `skyLight`)；采样纹理 (`bloxdTexel` — 读取既有方块纹理图集)；逐模型效果 (`flags` 会告诉你「这是手持物品」「这是玩家」)；顶点动画 (仅 allow 游戏)
-- **做不到**: 添加自己的纹理 (那是纹理包系统的职责)；后处理 (泛光等)；随太阳旋转的阴影贴图式阴影；真实反射 (SSR)；影响天空、云或太阳盘本身
-- **容易忽视但很强**: **利用 `skyLight` (体素天空遮蔽) 的投影式阴影** — 让树下与屋檐下明确压暗。破坏方块会让 LightEngine 立即重算，阴影实时跟随
+- **可以实现**：修改颜色、透明度和自发光；调整光照（见[光照 API](api/lighting.md)）；使用 `bloxdTexel` 采样纹理；通过 `flags` 创建逐模型效果；移动顶点（仅限 allow 游戏）
+- **无法实现**：添加自定义纹理；创建泛光等后期处理效果；生成自定义阴影贴图或直接读取其深度数据；实现真实反射（SSR）；直接对天空、云或太阳圆盘本身应用着色器
+- **阴影**：`bloxdShadow()` 提供引擎计算的太阳/月亮阴影系数，`bloxdShadowDirection()` 返回投射阴影的光线行进方向。`bloxdAirShadow(t)` 可评估摄像机与当前片元之间某一点的阴影。旧的 `skyLight` 体素天空遮蔽方法也仍可使用（见[阴影指南](guides/shadows.md)）
 
 ### strict 与 allow 模式
 
@@ -60,8 +58,7 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 
 - 当前游戏只接受 `apiVersion: 5` 的包；v1–v4 包加载即被拒绝 (已保存的包会静默失效 — [兼容性](api/compatibility.md))
 - 要迁移为旧版本编写的包？见[版本历史](history/)
-- 引擎内部可能随更新变化，因此每页都标注目标构建
-
+- 引擎内部机制的说明仅作参考；受支持的 API 以 API 参考为准
 ---
 
 ## 环境要求
@@ -449,7 +446,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## API 参考
-当前 API v5 的系统性规格。这里的一切都实测自目标构建 `bny9u` (2026-11-05；生产与预发环境一致)。拼在每个包前的引擎标头 (复现于[引擎内部](internals/engine-header.md)) 是首要资料来源。
+本页介绍当前 API v5。API 定义的主要依据是引擎自动添加到每个着色器包开头的引擎标头（完整内容见[引擎内部](internals/engine-header.md)）。
 
 ### 导航
 
@@ -466,13 +463,11 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 | [预处理器](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [限制](api/restrictions.md) | 语言限制、保留标识符 |
 | [兼容性](api/compatibility.md) | 旧版本包、已保存包重验 |
-| [纹理目录](api/texture-catalog.md) | 全部 896 个可用名称 (可搜索) |
+| [纹理目录](api/texture-catalog.md) | 1,017 个可用的具名常量（可搜索） |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
+> API: 5 · 状态: Analyzed（根据引擎标头和验证器还原）
 
 从 v4 迁移？请看[版本历史: v5](history/v5.md)。
-
-
 ---
 
 ## 包格式
