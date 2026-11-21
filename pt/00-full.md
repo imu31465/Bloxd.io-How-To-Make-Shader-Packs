@@ -132,7 +132,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> O cabeçalho do motor (constantes, estruturas, funções) é prefixado automaticamente a cada pacote no carregamento — você nunca o escreve por conta própria. O cabeçalho completo está reproduzido em [Interioridades do motor](internals/engine-header.md).
+> O cabeçalho do motor (constantes, estruturas, funções) é prefixado automaticamente a cada pacote no carregamento — você nunca o escreve por conta própria. O cabeçalho completo está reproduzido em [Funcionamento interno do motor](internals/engine-header.md).
 
 ### 2. Carregue-o no jogo
 
@@ -386,7 +386,7 @@ Somente `#define NAME` (sem valor) / `#ifdef` / `#ifndef` / `#else` / `#endif` e
 
 A maioria dos jogos é strict (sem animação de vértices, sem `discard`). Um hook de vértice sem guarda reporta `<hook> moves terrain, which strict games prevent.` e um `discard` alcançável reporta `discard makes terrain see-through, which strict games prevent.` — ambos desativam **todos os hooks** naquele jogo strict. Sempre envolva os hooks de vértice em `#ifndef BLOXD_STRICT`.
 
-Para as interioridades da política por jogo, veja [Interioridades do motor: política](internals/policy.md).
+Para as interioridades da política por jogo, veja [Funcionamento interno do motor: política](internals/policy.md).
 
 
 ---
@@ -617,7 +617,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - Template oficial de 9 hooks → [Primeiros passos: hooks de shader](getting-started/hooks.md)
 - Cada campo de cada struct → [Estruturas](api/structures.md)
-- Interioridades da invocação de hooks → [Interior do motor](internals/hook-invocation.md)
+- Como os hooks são invocados → [Interior do motor](internals/hook-invocation.md)
 
 
 ---
@@ -740,14 +740,14 @@ Referências restantes às constantes `bloxdBlockFlag*` falham no diagnóstico d
 ### Relacionados
 
 - Migração completa da v4 → [Histórico de versões: v5](history/v5.md)
-- Interioridades da entrega de flags → [Interior do motor](internals/rendering-pipeline.md)
+- Detalhes internos da entrega de flags → [Interior do motor](internals/rendering-pipeline.md)
 
 
 ---
 
 ## Estruturas de entrada e saída
 
-Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Interioridades do motor](internals/engine-header.md).
+Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Funcionamento interno do motor](internals/engine-header.md).
 
 ### BloxdVertexIn (entrada do hook de vértice)
 
@@ -1103,7 +1103,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guarda**: `#ifdef BLOXD_SCENE_DEPTH` (definida em variantes de líquido)
 - **Significado**: a face opaca atrás deste fragmento (terreno visto através da água); `hit == false` para o céu
 - **Renomeação da v2**: `found` → `hit`
-- **A fundo**: [Histórico de versões: v3](history/v3.md) e [Interioridades do motor](internals/rendering-pipeline.md)
+- **A fundo**: [Histórico de versões: v3](history/v3.md) e [Funcionamento interno do motor](internals/rendering-pipeline.md)
 
 ### Relacionado
 
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` chegam já mapeados a 0–1**: os níveis 0–15 passam por uma curva ease-out (p. ex. `6 → 0.45`, `12 → 0.92`). Todos excluem `ambientLightColour`
 - **Curva de lift**: `skyLight` é na verdade "esta posição consegue ver o céu" — dados de oclusão por voxel, ou seja, um shadow map. A separação sol/sombra por limiar pode precisar da transformada inversa (veja o [guia de realismo](guides/realism.md))
-- **Funcionamento interno da névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Interioridades do motor: interioridades da névoa](internals/fog-internals.md))
+- **Funcionamento interno da névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Funcionamento interno do motor: névoa](internals/fog-internals.md))
 
 ### Receitas
 
@@ -1291,7 +1291,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Relacionado
 
-- [Funções](api/functions.md) · [Guias: iluminação](guides/lighting.md) · [Interioridades do motor: interioridades da iluminação](internals/lighting-internals.md)
+- [Funções](api/functions.md) · [Guias: iluminação](guides/lighting.md) · [Funcionamento interno do motor: iluminação](internals/lighting-internals.md)
 
 
 ---
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### Relacionado
 
 - **Todos os nomes disponíveis utilizáveis** → [Catálogo de texturas](api/texture-catalog.md)
-- [Interioridades do motor: registro de texturas](internals/texture-registry.md) · [Amostragem de texturas](internals/texture-sampling.md)
+- [Funcionamento interno do motor: registro de texturas](internals/texture-registry.md) · [Amostragem de texturas](internals/texture-sampling.md)
 
 
 ---
@@ -2985,7 +2985,7 @@ Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 
 ### Relacionado
 
-- [receitas de realismo](recipes/realism.md) (a receita completa de sombra projetada) · [Interioridades de iluminação](internals/lighting-internals.md) · [Dicas de depuração](guides/debugging.md)
+- [receitas de realismo](recipes/realism.md) (a receita completa de sombra projetada) · [Funcionamento interno da iluminação](internals/lighting-internals.md) · [Dicas de depuração](guides/debugging.md)
 
 
 ---
@@ -3151,9 +3151,9 @@ Exemplos completos: [receitas de shaders de modelo](recipes/model-shaders.md) e 
 
 `bloxdModelLight` recebe os mesmos `BloxdSurface` / `BloxdLightIn` e trabalha com `bloxdDefaultLight` / `bloxdLitColour()`. O brilho de encantamento (`enchantColour`) e o clarão de dano (`overlayColour`) se misturam dentro de `bloxdLitColour`, então **os padrões preservam ambos os looks automaticamente**; para controlá-los, veja [efeitos de encantamento](recipes/enchant-effects.md).
 
-### Interioridades
+### Detalhes internos
 
-Como os modelos são renderizados e como as entradas de flags/encantamento fluem: [Interioridades do motor: renderização de modelos](internals/model-rendering.md); símbolos gerados como `bloxdSpItemLocalPosition` e `bloxdSpEnchant` estão listados em [restrições](api/restrictions.md).
+Como os modelos são renderizados e como as entradas de flags/encantamento fluem: [Funcionamento interno do motor: renderização de modelos](internals/model-rendering.md); símbolos gerados como `bloxdSpItemLocalPosition` e `bloxdSpEnchant` estão listados em [restrições](api/restrictions.md).
 
 
 ---
@@ -4646,7 +4646,7 @@ Erros que passam pela validação estática mas falham como WGSL, ou falham apen
 
 ### Relacionado
 
-- [Erros de validação](troubleshooting/validation.md) · [Interioridades do motor: compilação de WGSL](internals/wgsl-compilation.md) · [Restrições](api/restrictions.md)
+- [Erros de validação](troubleshooting/validation.md) · [Funcionamento interno do motor: compilação de WGSL](internals/wgsl-compilation.md) · [Restrições](api/restrictions.md)
 
 
 ---
@@ -4717,7 +4717,7 @@ Erros de resolução de nomes de textura (sugestões de grafia, grafias de quadr
 
 ### Relacionado
 
-- [Restrições e nomes reservados](api/restrictions.md) · [Interioridades do motor: validação de shaders](internals/shader-validation.md) · [Problemas específicos de variantes](troubleshooting/variants.md)
+- [Restrições e nomes reservados](api/restrictions.md) · [Funcionamento interno do motor: validação de shaders](internals/shader-validation.md) · [Problemas específicos de variantes](troubleshooting/variants.md)
 
 
 ---
@@ -4908,7 +4908,7 @@ A resolução de nomes faz folding de maiúsculas e `_`, então `bloxdTextureId_
 
 ### Relacionado
 
-- [API de texturas](api/texture-api.md) · [Catálogo de texturas](api/texture-catalog.md) · [Interioridades do registro de texturas](internals/texture-registry.md)
+- [API de texturas](api/texture-api.md) · [Catálogo de texturas](api/texture-catalog.md) · [Detalhes internos do registro de texturas](internals/texture-registry.md)
 
 
 ---
@@ -4960,7 +4960,7 @@ Problemas de brilho, sombra e névoa.
 ### Quer a teoria?
 
 - Sombras: [Sombras](guides/shadows.md) (skyLight = mapa de sombras por voxel)
-- Névoa: [Interioridades do motor: névoa](internals/fog-internals.md)
+- Névoa: [Funcionamento interno do motor: névoa](internals/fog-internals.md)
 
 ### Relacionado
 
@@ -5081,7 +5081,7 @@ Pacotes são WGSL puro — **execução de JS e acesso à rede são impossíveis
 
 #### P. Em quais jogos os pacotes funcionam?
 
-A maioria dos jogos roda em modo strict (sem animação de vértices, sem `discard`). Animação de vértices funciona apenas em jogos da lista allow. A lista por título está em [Interioridades do motor: política](internals/policy.md).
+A maioria dos jogos roda em modo strict (sem animação de vértices, sem `discard`). Animação de vértices funciona apenas em jogos da lista allow. A lista por título está em [Funcionamento interno do motor: política](internals/policy.md).
 
 #### P. Pacotes funcionam no celular?
 
@@ -5216,7 +5216,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ---
 
-## Interioridades da invocação de hooks
+## Como os hooks são invocados
 > API alvo: 5 · Tipo: referência técnica
 
 Como o motor chama os hooks em tempo de execução. Isto não muda nada no código que você escreve, mas elimina as suposições sobre o que os hooks recebem.
@@ -5258,9 +5258,9 @@ A arquitetura de injeção existia no renderizador da v2 e permaneceu estável n
 | `directional` | a soma interpolada por vértice do Lambert de cada luz direcional (o rig de 2 luzes em [Pipeline de renderização](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | a resposta RGB direcional do material / o brilho RGB |
 | `ambient` | `material.ambient × sceneAmbient` — por material, por frame |
-| `blockLight` / `skyLight` | os varyings de níveis de luz decodificados ([Interioridades de iluminação](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | os varyings de níveis de luz decodificados ([Funcionamento interno da iluminação](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | os uniforms correspondentes |
-| `heldLight` | construída a partir do varying de nível de luz e dos uniforms de luz na mão (a queda do cone em [Interioridades de iluminação](internals/lighting-internals.md)) |
+| `heldLight` | construída a partir do varying de nível de luz e dos uniforms de luz na mão (a queda do cone em [Funcionamento interno da iluminação](internals/lighting-internals.md)) |
 | `fogColour` | preta só em cenas inteiramente sem névoa (modo 0) |
 | `fogAlpha` | o fator de névoa limitado ([Funcionamento interno da névoa](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings e valores de interpolação flat (os mesmos de `BloxdSurfaceIn` — valores posteriores ao hook de vertex) |
@@ -5655,7 +5655,7 @@ Ao injetar as chamadas de hooks, o motor mantém um mapeamento de identificadore
 
 ---
 
-## Interioridades dos identificadores reservados
+## Identificadores reservados: detalhes internos
 > API alvo: 5 · Tipo: referência técnica
 
 O namespace `bloxdSp*` — símbolos que os geradores podem injetar e que os pacotes, portanto, não podem redeclarar. O resumo para autores de pacotes: [Restrições](api/restrictions.md).
@@ -5697,7 +5697,7 @@ Identificadores com prefixo `bloxdTextureId` resolvem como nomes de textura com 
 
 ---
 
-## Interioridades de iluminação
+## Funcionamento interno da iluminação
 > API alvo: 5 · Tipo: referência técnica
 `blockLight` é **luz colorida** com três canais RGB. Cada bloco emissor de luz define uma cor de emissão `[R, G, B]` (0–15 cada) que se torna a cor da luz tal qual (tocha comum = branco quente (14,14,12) / lava = laranja (14,8,2) / beacon = ciano (5,14,14) / tocha branca = (15,15,15), etc.). No estágio de vértice ela chega empacotada como 4 nibbles — r / g / b / sky — em um único atributo float. Tratar os três canais separadamente dentro do hook light permite a iluminação local colorida — a receita de tocha quente (R9.1) é calibrada contra esse comportamento.
 
@@ -5738,7 +5738,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## Interioridades da amostragem de texturas
+## Como o motor amostra texturas
 > API alvo: 5 · Tipo: referência técnica
 
 Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — a geração de código das texturas de 3 variantes. O lado do usuário: [API de texturas](api/texture-api.md).
@@ -5825,7 +5825,7 @@ Ao carregar um pack, o carregador resolve cada constante nomeada usando os nomes
 
 ---
 
-## Interioridades da renderização de modelos
+## Funcionamento interno da renderização de modelos
 > API alvo: 5 · Tipo: referência técnica
 
 As interioridades do programa Model da v5. O guia voltado ao usuário: [Modelos e texturas](guides/models.md).
@@ -6427,7 +6427,7 @@ Duas coisas mudam para autores em relação às regras da v2 ([o guia da v2](his
 
 Esta página é um guia histórico para migrar packs da API v3 para a v4. Para passar da v4 para a versão atual, aplique o [guia de migração da API v5](history/v5.md). Para criar novos packs, consulte a [Referência da API](api/).
 
-Uma coisa mudou em torno deste lançamento que *não* está no bundle: **o motor agora cita arquivos de referência pelo nome.** Suas próprias mensagens de erro apontam para `bloxd-api.wgsl` (o cabeçalho do motor anotado) e `BLOCK_TEXTURES.md` (a lista completa de nomes de textura) — `...BLOCK_TEXTURES.md lists them.` Este guia carrega o conteúdo de ambos em vez de remeter você a outro lugar: o cabeçalho completo, restaurado verbatim da build ativa, está embutido em [Interioridades do motor: Cabeçalho do motor](internals/engine-header.md), e o catálogo completo de nomes de textura utilizáveis (905 na build v4) é o [Catálogo de texturas](api/texture-catalog.md). Todo fato voltado ao pacote desta parte foi restaurado do bundle de produção.
+Uma coisa mudou em torno deste lançamento que *não* está no bundle: **o motor agora cita arquivos de referência pelo nome.** Suas próprias mensagens de erro apontam para `bloxd-api.wgsl` (o cabeçalho do motor anotado) e `BLOCK_TEXTURES.md` (a lista completa de nomes de textura) — `...BLOCK_TEXTURES.md lists them.` Este guia carrega o conteúdo de ambos em vez de remeter você a outro lugar: o cabeçalho completo, restaurado verbatim da build ativa, está embutido em [Funcionamento interno do motor: cabeçalho](internals/engine-header.md), e o catálogo completo de nomes de textura utilizáveis (905 na build v4) é o [Catálogo de texturas](api/texture-catalog.md). Todo fato voltado ao pacote desta parte foi restaurado do bundle de produção.
 O conjunto de mudanças da v4 em uma tela:
 | Área | v3 | v4 |
 |---|---|---|
