@@ -4542,7 +4542,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 Ошибки, связанные с `apiVersion`. Текущая игра принимает **только `5`**.
 
-### "pack.json needs "apiVersion": {{version}}."
+### Отсутствует apiVersion
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **Симптом**: это сообщение сразу после загрузки (`loadNoApiVersion`)
 - **Причина**: ключ `apiVersion` отсутствует целиком
@@ -4736,7 +4738,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **Исправление**: оберните вершинные хуки и `discard` в `#ifndef BLOXD_STRICT`
 - **Профилактика**: всегда начинайте вершинные хуки от защищённого шаблона ([Варианты](getting-started/variants.md))
 
-### ".alpha is undefined"
+### Поле `alpha` недоступно в этом варианте
+
+> `.alpha is undefined`
 
 - **Причина**: `alpha` существует только за `#ifdef BLOXD_ALPHA` (все жидкостные + не-strict террейн/модели)
 - **Исправление**: оберните код, трогающий alpha, в `#ifdef BLOXD_ALPHA` ([Препроцессор](api/preprocessor.md#матрица-макрос--вариант))
