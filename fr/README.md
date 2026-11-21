@@ -24,7 +24,7 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 | Chercher fonctions et champs de l'API | [Référence API](api/) | auteurs en pleine implémentation |
 | Réaliser un effet (lumière, eau, modèles…) | [Guides](guides/) · [Recettes](recipes/) | toute personne construisant un rendu |
 | Corriger une erreur | [Dépannage](troubleshooting/) | toute personne avec un pack cassé |
-| Explorer les fonctionnement interne du moteur | [Intérieurs du moteur et recherche](internals/) | analystes du moteur |
+| Explorer les fonctionnement interne du moteur | [Fonctionnement interne du moteur](internals/) | analystes du moteur |
 | Consulter les anciennes versions (v1–v5) | [Historique des versions](history/) | migrations d'anciens packs |
 
 ## Carte de la documentation
@@ -34,7 +34,7 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 - **[Guides](guides/)** — comment fonctionne l'éclairage, les ombres, l'eau, la nuit, le rendu des modèles, les performances, les concepts de réalisme.
 - **[Recettes](recipes/)** — exemples de code orientés objectif : couleurs, éclairage, émission, coordonnées, animation, liquides, sommets, maths, réalisme, shaders de modèle, effets d'enchantement.
 - **[Dépannage](troubleshooting/)** — résolution d'erreurs par symptôme : chargement, version d'API, compilation, validation, variantes, visuel, textures, éclairage, modèles, performances.
-- **[Intérieurs du moteur et recherche](internals/)** — pipeline de rendu, invocation des hooks, en-tête du moteur, intérieurs de validation et de compilation, identifiants réservés, intérieurs d'éclairage/brouillard, échantillonnage et registre des textures, rendu des modèles, données mesurées.
+- **[Fonctionnement interne du moteur](internals/)** — pipeline de rendu, invocation des hooks, en-tête du moteur, intérieurs de validation et de compilation, identifiants réservés, intérieurs d'éclairage/brouillard, échantillonnage et registre des textures, rendu des modèles, données mesurées.
 - **[Historique des versions](history/)** — de v1 à v5 : changements par version, étapes de migration, API retirées.
 
 ## Libellés de statut de vérification
