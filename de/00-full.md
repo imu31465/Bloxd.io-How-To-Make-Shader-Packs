@@ -1061,7 +1061,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ### Schattenfunktionen
 
-API v5 stellt das Sonnen-/Mondschattensystem der Engine bereit: projizierte, sonnenfolgende Schatten von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+Diese drei Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 #### bloxdShadow
 
@@ -5126,7 +5126,7 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 
 ---
 
-## Engine-Interna
+## Funktionsweise der Engine
 Diese Kategorie erläutert das interne Verhalten der Engine, damit sich die Ausführung von Shader-Packs besser verstehen lässt. Diese Implementierungsdetails können sich ändern; stabile Nutzungsregeln und verfügbare APIs stehen in der [API-Referenz](api/).
 
 ### Übersicht
