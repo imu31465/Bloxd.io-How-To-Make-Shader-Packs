@@ -1,8 +1,8 @@
 # Shader-Hooks
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> API-Version: 5 · Status: Verified
 
-Ein Paket kann **9 Hooks** einhängen: 3 Render-Ziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle sind optional — ein undefinierter Hook fällt auf den Engine-Standard zurück.
+Ein Shader-Pack kann bis zu **9 Hooks** definieren: 3 Renderziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle Hooks sind optional. Ist ein Hook nicht definiert, verwendet die Engine ihre Standardimplementierung.
 
 ## Die Hooks
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## Aufteilung der Render-Ziele
+## Renderziele
 
 - **Terrain** — jeder Block außer Wasser und Block-Modellen
 - **Liquid** — Wasser
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **Wichtig**: Definiert ein Paket keinen Liquid-Hook, **läuft auf Wasser auch kein Terrain-Hook** (Wasser wird ausschließlich von Liquid-Hooks behandelt). Das unterscheidet sich vom Verhalten vor v4, wo Liquid auf Terrain-Hooks zurückfiel.
 
-## Fallbacks und Code-Sharing
+## Standardverhalten und gemeinsame Code-Nutzung
 
 - Ein undefinierter Hook bedeutet: Diese Stufe benutzt den Engine-Standard (dasselbe Verhalten wie `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
 - **Um Code über Hooks zu teilen**, eine Funktion auf Modul-Ebene definieren und aus beiden aufrufen:
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Das Standardpaket (offizielle 9-Hook-Vorlage)
+## Vorlage des Standard-Packs
 
 Die Startvorlage enthält inzwischen die Light-Hooks. 1.683 Byte wie ausgeliefert, wortwörtlich:
 
