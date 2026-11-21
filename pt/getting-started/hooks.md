@@ -1,8 +1,8 @@
 # Hooks de shader
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção em 2026-11-20) · Estado: Verified
+> API: 5 · Estado: Verified
 
-Um pacote pode se conectar a **9 hooks**: 3 alvos de renderização (Terrain / Liquid / Model) × 3 estágios de pipeline (Vertex / Surface / Light). Todos são opcionais — um hook indefinido cai no padrão do motor.
+Um shader pack pode definir até **9 hooks**: 3 alvos de renderização (Terrain / Liquid / Model) × 3 etapas do pipeline (Vertex / Surface / Light). Todos são opcionais. Quando um hook não é definido, o motor usa a implementação padrão.
 
 ## Os hooks
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* recebem os mesmos tipos
 ```
 
-## Divisão de alvos de renderização
+## Alvos de renderização
 
 - **Terrain** — todo bloco, exceto água e modelos de bloco
 - **Liquid** — água
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **Importante**: se um pacote não define nenhum hook de Liquid, **nenhum hook de Terrain roda na água** (a água é tratada somente pelos hooks de Liquid). Isso difere do comportamento anterior à v4, em que o líquido caía nos hooks de terreno.
 
-## Fallbacks e compartilhamento de código
+## Comportamento padrão e reutilização de código
 
 - Um hook indefinido significa que esse estágio usa o padrão do motor (mesmo comportamento que `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
 - **Para compartilhar código entre hooks**, defina uma função de escopo de módulo e chame-a a partir de ambos:
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## O pacote padrão (template oficial de 9 hooks)
+## Template do pacote padrão
 
 O template de partida agora inclui os hooks de luz. 1.683 bytes como distribuído, verbatim:
 
