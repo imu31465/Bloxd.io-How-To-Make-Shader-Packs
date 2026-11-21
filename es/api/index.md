@@ -1,6 +1,6 @@
 # Referencia de la API
 
-Esta página documenta la API v5 actual. La fuente principal de sus definiciones es la cabecera que el motor añade automáticamente al inicio de cada pack (consulta [Interior del motor](../internals/engine-header.md) para ver la cabecera completa).
+Esta página documenta la API v5 actual. La fuente principal de sus definiciones es la cabecera que el motor añade automáticamente al inicio de cada pack (consulta [Funcionamiento interno del motor](../internals/engine-header.md) para ver la cabecera completa).
 
 ## Contenido
 
