@@ -17,7 +17,7 @@
 | `apiVersion` | number | 필수 | **`5` 와 엄밀히 같아야 한다** (`===`). 문자열 `"5"` 는 실패하며, JSON 철자 그대로 보고된다 |
 | `name` | string | 필수 | 트림 후 비어 있지 않을 것. 설정 화면에 표시된다 |
 | `author` | string | 선택 | 있으면 string 이어야 한다 |
-| `keepCircleShadows` | boolean | 선택 | **`` 신규** — 팩 셰이더가 실제 태양 섀도 API를 쓸 때도 플레이어/몹 아래의 옛 원형 섀도를 유지 ([섀도](../guides/shadows.md)). 기본 `false`. 다른 타입은 전용 로드 메시지로 거부 |
+| `keepCircleShadows` | boolean | 선택 | 팩 셰이더가 실제 태양 섀도 API를 쓸 때도 플레이어/몹 아래의 옛 원형 섀도를 유지 ([섀도](../guides/shadows.md)). 기본 `false`. 다른 타입은 전용 로드 메시지로 거부 |
 
 매니페스트의 나머지는 모두 무시된다. `pack.json` 은 zip 루트에 정확히 하나의 JSON 객체여야 한다.
 
@@ -34,11 +34,11 @@
 
 ## API 버전 검사
 
-로더는 `manifest.apiVersion !== 5` 를 JavaScript 엄격 `!==` 로 비교한다. 버전 상수 `5` 와 헤더 템플릿은 같은 모듈 (c55 / 모듈 29836) 에 있으므로, 검증과 검증이 전제하는 헤더는 함께 움직인다. 불일치 메시지: [호환성](compatibility.md) 참조.
+로더는 `manifest.apiVersion !== 5` 를 JavaScript 엄격 `!==` 로 비교한다. 불일치 메시지: [호환성](compatibility.md) 참조.
 
 ## 프레임별 uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 64 바이트. 다만 v5 에서 멤버가 하나 늘었다 (라이브 uniform-레이아웃 모듈에서):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 80 바이트. 다만 v5 에서 멤버가 하나 늘었다 (라이브 uniform-레이아웃 모듈에서):
 
 | 오프셋 | 필드 | 형 | 비고 |
 |---|---|---|---|
@@ -47,7 +47,7 @@
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` 의 기반 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` 의 기반 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` 의 기반 |
-| 64 | `shadowDirection` | `vec3f` | **`` 신규** — 그림자를 만드는 빛의 진행 방향. `bloxdShadowDirection()`의 뒷받침 |
+| 64 | `shadowDirection` | `vec3f` | 그림자를 만드는 빛의 진행 방향. `bloxdShadowDirection()`의 뒷받침 |
 
 `lit` 은 v4 부터 있던 `seconds` 와 `renderOffset` 사이의 패딩에 들어갔다 (오프셋 4–15 는 정렬 틈이었고, `vec3i` 는 16바이트 정렬이 필요해 `renderOffset` 은 16 그대로다). 총 크기와 다른 모든 오프셋은 불변. 엔진은 `setUint32(4, lit ? 1 : 0)` 한 번으로 쓴다 — 라이트 레벨이 아니라 플래그다 (v4 의 JS 측 이름 `terrainLightLevels` / `terrainHeldLight` 는 번들에서 완전히 사라졌다).
 
@@ -61,7 +61,7 @@
 | 1 | 씬 깊이 텍스처 (액체 베리언트) |
 | 2 | `bloxdSpTextureLayers` 스토리지 버퍼 |
 
-`minBindingSize` 는 64 그대로다. 깊이 텍스처 (binding 1) 는 FRAGMENT 전용이며, 이것이 `bloxdOpaqueBehind()` 가 서피스/light 훅 전용인 이유다.
+`minBindingSize` 는 80 그대로다. 깊이 텍스처 (binding 1) 는 FRAGMENT 전용이며, 이것이 `bloxdOpaqueBehind()` 가 서피스/light 훅 전용인 이유다.
 
 ## wgsl 연결
 

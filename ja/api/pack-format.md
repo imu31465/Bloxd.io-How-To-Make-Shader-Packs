@@ -17,7 +17,7 @@
 | `apiVersion` | 数値 | 必須 | **`5` と厳密に (`===`) 一致**。文字列 `"5"` は失敗し JSON 上の表記つきで報告 |
 | `name` | 文字列 | 必須 | トリミング後非空。設定画面に表示 |
 | `author` | 文字列 | 任意 | 存在するなら文字列 |
-| `keepCircleShadows` | boolean | 任意 | **`` の新設** — パックのシェーダーがリアル太陽シャドウ API を使う場合も、プレイヤー/モブの下の従来の円形影を残す ([影の表現](../guides/shadows.md))。既定 `false`。他の型は専用のロードメッセージで拒否 |
+| `keepCircleShadows` | boolean | 任意 | パックのシェーダーがリアル太陽シャドウ API を使う場合も、プレイヤー/モブの下の従来の円形影を残す ([影の表現](../guides/shadows.md))。既定 `false`。他の型は専用のロードメッセージで拒否 |
 
 それ以外のマニフェスト内容はローダに無視されます。`pack.json` は zip ルートに厳密に1つ、JSON オブジェクトでなければなりません。
 
@@ -47,9 +47,9 @@
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` の裏 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` の裏 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` の裏 |
-| 64 | `shadowDirection` | `vec3f` | **`` の新設** — 影を落とす光の進行方向。`bloxdShadowDirection()` の裏 |
+| 64 | `shadowDirection` | `vec3f` | 影を落とす光の進行方向。`bloxdShadowDirection()` の裏 |
 
-`shadowDirection` は `eyePosition` の後のパディングに収まりました (`vec3f` は 12 バイトを占めるためオフセット 60〜63 が隙間。64 の位置は 16 バイト境界で、構造体はちょうど 80 バイト)。エンジンは 3 回の `setFloat32` で書き込みます — 単位ベクトル (昼は太陽、夜は月、太陽がない worlds では既定空の太陽) で、決して水平線より上にはなりません。uniform 全体は 80 バイトで、`minBindingSize` も 80 です。
+`shadowDirection` は `eyePosition` の後のパディングに収まりました (`vec3f` は 12 バイトを占めるためオフセット 60〜63 が隙間。80 の位置は 16 バイト境界で、構造体はちょうど 80 バイト)。エンジンは 3 回の `setFloat32` で書き込みます — 単位ベクトル (昼は太陽、夜は月、太陽がない worlds では既定空の太陽) で、決して水平線より上にはなりません。uniform 全体は 80 バイトで、`minBindingSize` も 80 です。
 
 `lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まりました (オフセット 4〜15 は v4 ではアラインメントの隙間。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。
 

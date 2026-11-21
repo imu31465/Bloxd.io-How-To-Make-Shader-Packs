@@ -17,11 +17,11 @@ The whole pack model on one page — manifest, loader limits, per-frame uniform.
 | `apiVersion` | number | required | **must strictly equal `5`** (`===`). A string `"5"` fails and is reported with its JSON spelling |
 | `name` | string | required | non-empty after trimming; shown in settings |
 | `author` | string | optional | must be a string if present |
-| `keepCircleShadows` | boolean | optional | **new in the `` build** — keep the old circular blob shadows under players and mobs when your pack's shaders also use the real sun-shadow API ([Shadows](../guides/shadows.md)). Default `false`; any other type is rejected with a dedicated load message |
+| `keepCircleShadows` | boolean | optional | keep the old circular blob shadows under players and mobs when your pack's shaders also use the real sun-shadow API ([Shadows](../guides/shadows.md)). Default `false`; any other type is rejected with a dedicated load message |
 
 Everything else in the manifest is ignored. `pack.json` must be exactly one JSON object at the zip root.
 
-## Loader limits (re-measured on the live loader)
+## Loader limits
 
 | Limit | Value | Message when exceeded |
 |---|---|---|
@@ -34,7 +34,7 @@ Everything else in the manifest is ignored. `pack.json` must be exactly one JSON
 
 ## API-version check
 
-The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. The version constant `5` and the header it validates against ship together in the game's validator, so the check and the header move together. Mismatch messages: see [Compatibility](compatibility.md).
+The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Mismatch messages: see [Compatibility](compatibility.md).
 
 ## Per-frame uniform: bloxdPackInputs
 
@@ -47,9 +47,9 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Th
 | 16 | `renderOffset` | `vec3i` | backs `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | backs `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **new in ``** — the direction the shadow-casting light travels; backs `bloxdShadowDirection()` |
+| 64 | `shadowDirection` | `vec3f` | the direction the shadow-casting light travels; backs `bloxdShadowDirection()` |
 
-`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 64, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. The uniform is 80 bytes, and the pack bind-group's `minBindingSize` is 80.
+`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 80, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. The uniform is 80 bytes, and the pack bind-group's `minBindingSize` is 80.
 
 `lit` still fits into the padding v4 had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16).
 
