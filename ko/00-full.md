@@ -98,7 +98,7 @@ URL 파라미터나 localStorage 에 남은 렌더러 오버라이드는 팩의 
 ---
 
 ## 퀵 스타트
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 5분 만에 첫 팩을 만든다.
 
@@ -129,7 +129,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> 엔진 헤더 (상수·구조체·함수) 는 로드 시 모든 팩 앞에 자동으로 붙는다 — 직접 쓸 일은 없다. 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 재현되어 있다.
+> 엔진 헤더 (상수 · 구조체 · 함수) 는 로드 시 모든 팩 앞에 자동으로 붙는다 — 직접 쓸 일은 없다. 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 재현되어 있다.
 
 ### 2. 게임에서 로드
 
@@ -157,7 +157,7 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## 팩 구조
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
 ### 배포 형식
 
@@ -186,7 +186,7 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## pack.json (매니페스트)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 `pack.json` 은 팩의 매니페스트다 — zip 루트에 정확히 하나의 JSON 객체.
 
@@ -225,7 +225,7 @@ v1–v4 에서의 이주는 [버전 히스토리](history/) 를 보라.
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 팩은 **9개의 훅**에 끼어들 수 있다: 3개 렌더 대상 (Terrain / Liquid / Model) × 3개 파이프라인 단계 (Vertex / Surface / Light). 모두 선택 사항이다 — 정의하지 않은 훅은 엔진 기본값으로 폴백한다.
 
@@ -354,7 +354,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 베리언트와 가드
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed
 
 ### 6개 베리언트
 
@@ -393,7 +393,7 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## 검증
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 ### 3단계 로드 검사
 
@@ -471,7 +471,7 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 ---
 
 ## 팩 형식
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (라이브 로더에서 재실측)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (라이브 로더에서 재실측)
 
 매니페스트, 로더 제한, 프레임별 uniform — 팩 모델 전체를 한 페이지에 담는다. 단계별 버전은 [시작하기](getting-started/manifest.md) 에 있다.
 
@@ -544,7 +544,7 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
 팩은 **9개의 훅** — 3개의 렌더 대상 (프로그램) × 3개의 파이프라인 단계 — 을 정의할 수 있다. 모두 선택 사항이다 (정의하지 않으면 엔진 기본값).
 
@@ -636,7 +636,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 플래그 (BloxdFlags)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 면을 이름 붙은 bool 구조체로 식별한다. v4 의 `blockFlags: u32` 비트마스크와 그 6개 `bloxdBlockFlag*` 상수는 사라졌다.
 
@@ -760,7 +760,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 입출력 구조체
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 7개의 구조체를 팩이 읽고 쓸 수 있다. 모든 필드를 아래에 실었다 (`#ifdef` 필드는 조건부). 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 있다.
 
@@ -934,7 +934,7 @@ struct BloxdOpaqueBehind {
 ---
 
 ## 함수
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더의 모든 함수이다. 텍스처 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 와 `bloxdOpaqueBehind` 는 [텍스처 API](api/texture-api.md) 에서 다룬다.
 
@@ -1133,7 +1133,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 ---
 
 ## 라이팅
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 라이팅 API 를 공개했다. 엔진이 내부에서 하던 일 (`litColour` 를 만드는 것) 을 이제 팩에서 호출할 수 있다. 이 페이지는 라이팅의 입력·함수·처리 순서를 하나의 체계로 다룬다.
 
@@ -1317,7 +1317,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 API
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
+> 대상 API: 5 · 상태: Verified (API 는 v4 이후 불변, v5 빌드에서 재확인)
 
 게임 자신의 텍스처를 읽는 API: 함수 2개, 이름 상수 계열, 입력 필드 4개. 헤더 자신의 한 줄 요약: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1423,15 +1423,15 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 #### 이름 해석 오류 (검증기에서 그대로)
 
 > **접두사 오철자 / 대소문자:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
->
+> 
 > **애니메이션 프레임:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
->
+> 
 > **회전 사본:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
->
+> 
 > **접은 뒤 모호:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
->
+> 
 > **미발견 (제안 있음):** `There's no texture called X. Did you mean bloxdTextureIdY?` — 제안 임계값은 레벤슈타인 거리 `max(2, floor(len/4)) + 1`
->
+> 
 > **미발견 (제안 없음):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
 > 이 메시지의 `BLOCK_TEXTURES.md` 는 게임 자신의 내부 텍스처명 목록으로, 엔진 검증기가 참조하는 것이다 — 이 사이트의 페이지가 아니다. 여기서의 대응물은 [텍스처 카탈로그](api/texture-catalog.md) 다.
@@ -1547,7 +1547,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 상수
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 헤더에서 그대로 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더는 세 개의 상수를 제공한다 (텍스처 이름 상수 `bloxdTextureId*` 는 [텍스처 API](api/texture-api.md) 에서 다룬다).
 
@@ -1603,7 +1603,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 전처리기
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 검증기에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 검증기에서 복원)
 
 조건부 컴파일이 지원하는 것은 `#define NAME` (값 없음) / `#ifdef` / `#ifndef` / `#else` / `#endif` 뿐이다. `#` 은 행 머리에 붙인다 (함수 안도 상관없다). 플래그명 대조는 대소문자를 구별하지 않으며, 틀린 `#ifdef` 이름을 쓰면 오류 메시지가 공식 목록을 보여준다.
 
@@ -1685,7 +1685,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 제한과 예약명
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (v4 제한을 v5 에서 바이트 동일로 재확인)
+> 대상 API: 5 · 상태: Verified (v4 제한을 v5 에서 바이트 동일로 재확인)
 
 팩이 쓸 수 있는 것과, 이름 예약 규칙의 전모.
 
@@ -1752,7 +1752,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 호환성
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 현행 게임과 구버전 팩이 서로 어떻게 맞물리는지에 대한 설명이다.
 
@@ -1826,7 +1826,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 텍스처 카탈로그
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (엔진 자신의 레지스트리 빌더를 재실행해 추출)
 
 사용 가능한 텍스처 이름 상수 (`bloxdTextureId*`) 의 완전한 카탈로그. **1,017 이름**, 알파벳순.
 
@@ -3039,13 +3039,13 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [텍스처팩과의 조합](guides/combinations.md) | 텍스처팩과의 역할 분담 |
 | [디버깅 팁](guides/debugging.md) | 증상 → 원인의 진단 가이드 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인)
+> 대상 API: 5 · preprod 확인)
 
 
 ---
 
 ## 조명이 작동하는 방식
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 엔진 기존의 조명은 곱셈뿐이며, 스페큘러·프레넬·난색-냉색 분리·반구 환경광은 존재하지 않는다. 아래가 재구축 가능한 범위이다:
 
@@ -3068,8 +3068,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 그림자
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
-> **`bbb6l5`부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록·플레이어·몹·아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](api/functions.md)를 보세요.
+> 대상 API: 5 · 상태: Verified (LightEngine 동작은 v4 실측 이후 불변)
+> **`bbb6l5`부터**: 실제 태양 섀도 API가 추가되었습니다 — `bloxdShadow()` (0~1 섀도 계수. 블록 · 플레이어 · 몹 · 아이템이 섀도를 드리우고 태양을 따라감), `bloxdAirShadow(t)` (빛 기둥용), `bloxdShadowDirection()` (빛의 진행 방향). pack.json의 `keepCircleShadows`로 옛 원형 섀도 병존도 선택할 수 있습니다. 자세히는 [함수](api/functions.md)를 보세요.
 
 
 셰이더 팩에서 「그림자」를 만드는 세 방법과 그 한계.
@@ -3139,7 +3139,7 @@ let lit = sunL * sky;
 ---
 
 ## 물을 자연스럽게 보이게 하기
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 이 API는 씬색을 샘플링할 수 없으므로, 이것은 **진짜 반사·굴절이 아니라 프레넬풍 색 블렌드와 태양 하이라이트에 의한 유사 스타일링**이다 (깊이 계산에는 액체 한정의 `bloxdOpaqueBehind()`를 쓴다 — 두께 흡수 레시피는 이 페이지의 뒷부분에). 아래 샘플은 베이스 색을 남기면서 얕은 시선 각도에서 하늘빛에 가까운 색을 조금 섞고, 태양이 있을 때만 작은 글린트를 더한다.
 
@@ -3205,7 +3205,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 야간 표현 설계
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 그림자만 어둡게 하면, 태양 없을 때 엔진 완성색 (`engineColour`) 이 밝은 채 남아, 면과 그림자의 차이가 부자연스러워질 수 있다. 그림자의 색조가 아니라 완성색 전체에 감쇠를 걸 필요가 있다.
 
@@ -3236,7 +3236,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델과 텍스처
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (헤더·검증기에서 복원)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (헤더 · 검증기에서 복원)
 
 v5 의 새 Model 훅이 그리는 것과 읽는 것.
 
@@ -3311,7 +3311,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 리얼화의 두 유파
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 **유파 A: 가산 수정 (defaultLight 기점)** — `engineColour` (완성색) 를 바탕으로, 난색 글로우나 림을 더한다. 간편하고 안전하지만 조명 모델 자체는 기존 그대로.
 
@@ -3326,7 +3326,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 셰이더 팩으로 가능한 것과 불가능한 것
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩의 리얼화 「천장」을 한 페이지에 정리한다: 현재 API가 어디까지 닿는지, 원리적으로 불가능한 것은 무엇인지, 조건부인 것은 무엇인지, 제한이 존재하는 이유, 그리고 가장 가까운 대체 수단. 만들기 시작하기 전에 여기서 구상한 표현이 실현 가능한지 확인한다.
 
@@ -3409,7 +3409,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 퍼포먼스
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (실측 기반 실천)
+> 대상 API: 5 · 상태: Verified (실측 기반 실천)
 
 팩의 훅은 모든 프래그먼트 (지형 / 액체 / 모델의 모든 픽셀) 에서 돌므로, 스타일 선택이 프레임 레이트를 크게 움직인다.
 
@@ -3456,7 +3456,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 게임 내 테스트 체크리스트
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 컴파일 성공과 「보기 좋다」는 별개다. 다음 순서로 확인한다.
 
@@ -3480,7 +3480,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 텍스처 팩과의 조합
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩측에서 텍스처를 추가·샘플링할 수 없다는 제약이 있으므로, 소재 그 자체의 미세한 요철이나 하늘의 화상을 바꾸고 싶으면 셰이더만으로 해결하려 하지 않는다. Bloxd.io용 공개 텍스처팩 리포지토리 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 에는 텍스처, skybox, 모델 등을 다루는 별도 방식이 있다.
 
@@ -3494,7 +3494,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 디버깅 요령
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 - 동굴이 너무 밝다 → `skyLight` 의 비선형 커브가 부족하다 (R2 동굴 레시피 / R9.9)
 - 낮이 하얗게 날린다 → ACES 앞의 노출을 낮춘다
@@ -3530,13 +3530,13 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [모델 셰이더](recipes/model-shaders.md) | v5 — 손에 든 아이템, 스킨, 식물 흔들림 |
 | [인챈트 효과](recipes/enchant-effects.md) | v5 — 글린트 제거·증폭·재색 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (원본 레시피의 v5 이식 — 배포 전에는 게임 내 컴파일로 재확인할 것)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (원본 레시피의 v5 이식 — 배포 전에는 게임 내 컴파일로 재확인할 것)
 
 
 ---
 
 ## 색
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 단색 틴트 (가장 기본)
 
@@ -3617,7 +3617,7 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 조명
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 콘트라스트 S자 커브
 
@@ -3731,7 +3731,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 발광
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > `emission` 은 조명 계산 후에 가산되지만, 기존 처리에서는 **포그량 (`fogAlpha`) 이 곱해져 감쇠한다. 즉 완전히 안개에 잠긴 원경에서는 emission 도 사라진다. 원경에서도 빛나게 하고 싶은 성분은 emission 에 더하지 말고, light 훅 안에서 `out.colour += ...` 로 직접 가산한다** (기본 출력은 이미 포그된 상태이므로, 원경에서는 안개색 위에 빛이 얹힌다)
 
 ### 등불의 맥동 (횃불이 숨쉰다)
@@ -3782,7 +3782,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 좌표
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 월드 좌표
 
@@ -3837,8 +3837,8 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 시간과 애니메이션
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
-> `bloxdSeconds()` 은 3600초 (1시간) 마다 감긴다. 셰이더 경과 시간이며 게임 안의 태양·낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `bloxdSunDirection()` 이나 조명 입력을 우선한다.
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> `bloxdSeconds()` 은 3600초 (1시간) 마다 감긴다. 셰이더 경과 시간이며 게임 안의 태양 · 낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `bloxdSunDirection()` 이나 조명 입력을 우선한다.
 
 ### 낮밤 사이클 (1시간에 1일)
 
@@ -3876,7 +3876,7 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 액체
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 수면의 잔물결 (색의 명멸)
 
@@ -3938,7 +3938,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 버텍스 (allow 전용)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
 > 정확한 조건 (allow 타이틀 일람; Custom Games 는 strict) 은 [게임별 셰이더 팩 정책](internals/policy.md) 참조
 
@@ -4003,7 +4003,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 수식 도구 상자
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 
 ```wgsl
@@ -4035,9 +4035,9 @@ let phase = t * 0.15;
 ---
 
 ## 리얼화
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 「바닐라의 겉모습을 소재에서 다시 짜는」 물리계 레시피집. 먼저 이 전제들을 읽을 것:
->
+> 
 > 1. **light 훅은 프래그먼트의 최종단에서 불린다**. 반환한 colour 가 그대로 최종색. **직접 포그를 다시 걸 필요가 있다** (R9.10)  
 > 2. **엔진 기존의 조명은 곱셈뿐**. 스페큘러 / 프레넬 / 난색-냉색 분리 / 반구 환경광은 제로에서 만든다  
 > 3. `l.engineColour` 는 완성색 (포그 완료). 버리고 `s.colour` (알베도) 에서 다시 짜는 것이 본격파  
@@ -4275,14 +4275,14 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > **전제 재확인 (10장)**: `l.skyLight` 는 생 voxel 값 (n/15) 이 아니라 엔진이 「리프트 곡선」  
 > `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 통과시킨 후의 값.
->
-> | 장소 | voxel 생값 | 리프트 후 (= l.skyLight) | pow(·, 5.0) |  
+> 
+> | 장소 | voxel 생값 | 리프트 후 (= l.skyLight) | pow( · , 5.0) |  
 > |---|---|---|---|  
 > | 열린 하늘 | 1.00 | 1.00 | 1.00 |  
 > | 나무 밑 (반경2) | 0.87 | **0.97** | **0.86** ← 거의 무손상 |  
 > | 반경3 | 0.80 | **0.92** | 0.66 |  
 > | 반경5 | 0.67 | 0.78 | 0.29 |
->
+> 
 > **이것이 「감마를 올려도 그림자가 짙어지지 않는다」 의 원인** (수치로 증명). 그러나 곡선은 단조이므로 대수적으로 엄밀히 역변환할 수 있다:  
 > `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. 생값을 복원하면, 후는**임계값 커트** (`smoothstep`) 로 이값화할 뿐.  
 > LightEngine 의 BFS 옆확산은 「인접 1 블록 = -1」 이므로, 임계값 `th = 1 - r/15` 는 그대로  
@@ -4339,7 +4339,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 셰이더
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (v5 헤더 사양에 맞춰 작성)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (v5 헤더 사양에 맞춰 작성)
 
 v5 Model 훅과 새 플래그로, **v5 이전에는 불가능했던 「지금 무엇을 보고 있는가」 선택**을 하는 레시피. 기초: [모델과 텍스처](guides/models.md).
 
@@ -4491,7 +4491,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 인챈트 효과
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (라이브 헤더에서 복원)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (라이브 헤더에서 복원)
 
 v5 는 인챈트 파이프라인을 입력과 출력 양쪽으로 열었다. 엔진의 수식을 보존하면서 인챈트 아이템과 방어구의 글린트를 제어하는 레시피.
 
@@ -4636,7 +4636,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 느림 / 실기기 검사에서 탈락 | [퍼포먼스](troubleshooting/performance.md) |
 | 법적·안전·자주 묻는 질문 | [FAQ](troubleshooting/faq.md) |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (메시지는 라이브 검증기·로더에서 그대로 기록)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (메시지는 라이브 검증기 · 로더에서 그대로 기록)
 
 ### 오류가 나타나는 곳
 
@@ -4713,7 +4713,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 버전 오류
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified (라이브 i18n 사전에서 그대로)
+> 대상 API: 5 · preprod 확인) · 상태: Verified (라이브 i18n 사전에서 그대로)
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
@@ -4992,7 +4992,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 문제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
+> 대상 API: 5 · 상태: Verified (메시지는 라이브 검증기에서 그대로 기록)
 
 `bloxdTextureId*` / `bloxdTexel` 관련 문제. 896 이름 전체는 [텍스처 카탈로그](api/texture-catalog.md) 에서 검색하라.
 
@@ -5108,7 +5108,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 문제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (v5 의 새 영역)
+> 대상 API: 5 · 상태: Analyzed (v5 의 새 영역)
 
 새로운 v5 Model 훅 관련 문제.
 
@@ -5206,7 +5206,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## FAQ와 법적 주석
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 ### 자주 묻는 질문
 
@@ -5280,7 +5280,7 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 | [디버깅](internals/debugging.md) | URL 파라미터, 통계 패널 |
 | [리서치 로그](internals/research-log.md) | 방법론, 빌드 이력, 미검증 항목 |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인)
+> 대상 API: 5 · preprod 확인)
 
 내부 사양은 안정된 API 계약이 아니다 — 엔진 업데이트로 바뀔 수 있으며, 각 페이지는 근거 빌드를 명시한다 ([리서치 로그](internals/research-log.md)).
 
@@ -5288,7 +5288,7 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 ---
 
 ## 렌더링 파이프라인
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - **surface 훅은 alphaTest 의 「앞」 에서 돈다**: `out.alpha` 가 그대로 discard 판정에 쓰인다. 컷아웃 소재 (풀·잎) 에서는 디더 패턴으로 녹는 듯한 이펙트를 만들 수 있다 (레시피 R-C). 액체 (블렌딩) 에서는 `out.alpha` 가 실제 투명도가 된다 (레시피 R-D). 통상 불투명 지형에서는 alpha 가 끝내 무시된다
 - **`l.ambient` 의 내용**은 `material.ambient × sceneAmbient` 로 소재마다 다른 값이다. 씬측은 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5) 에 직결되어 있으므로, 기본값 때려박기를 하지 않는다
@@ -5361,7 +5361,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 훅 호출의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
+> 대상 API: 5 · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
 
 엔진이 런타임에 훅을 부르는 방식. 쓰는 코드에는 아무것도 바뀌지 않지만, 훅이 무엇을 받는지에 대한 추측이 사라진다.
 
@@ -5417,7 +5417,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 엔진 헤더 (그대로)
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
 
 엔진이 모든 팩 앞에 붙이는**정확한 텍스트**입니다. 라이브 빌드의 검증기에서 보간을 적용해 렌더링했습니다 (`apiVersion`과 `bloxdPackInputs`를 통한 6개 uniform 읽기). 216행. 바꿔 쓴 곳은 없습니다. 이전 프로덕션 빌드(`bny9u`, `v98qt8`)에서도 재검증했습니다 — 추가된 것은 섀도 관련 뿐입니다.
 
@@ -5658,7 +5658,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 셰이더 검증의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 검증기에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 검증기에서 복원)
 
 정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](troubleshooting/validation.md).
 
@@ -5733,7 +5733,7 @@ const Jq = new Map([
 ---
 
 ## WGSL 컴파일의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 번들에서 복원)
 
 두 번째 검증 단계 — 브라우저의 WGSL 컴파일러를 통한 진짜 컴파일 — 과 v5 의 검증 스텁.
 
@@ -5802,7 +5802,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 ---
 
 ## 예약 식별자의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들의 생성기에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 번들의 생성기에서 복원)
 
 `bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](api/restrictions.md).
 ### 88 심볼
@@ -5845,7 +5845,7 @@ v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 
 ---
 
 ## 라이팅 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - `blockLight` 는 RGB 3채널의 **색 있는 빛**이다. 광원 블록마다 발광색 `[R, G, B]` (각 0-15) 가 정의되어 있고, 그것이 그대로 빛의 색이 된다 (통상 횃불 = 온백 (14,14,12) / 라바 = 오렌지 (14,8,2) / 비콘 = 시안 (5,14,14) / 흰 횃불 = (15,15,15) 등). 정점단에서는 1개의 float 속성에 r / g / b / sky 의 4 니블로 팩되어 도착한다. light 훅 안에서는 3채널을 따로따로 다루는 것으로 색 있는 국소 조명을 만들 수 있다 — 난색 토치 계열 레시피 (R9.1) 가 기준으로 하는 거동의 실체는 이것이다.
 
@@ -5861,7 +5861,7 @@ v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 
 ---
 
 ## 포그 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](history/v3.md)에 보존되어 있다.)
 
@@ -5888,7 +5888,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 텍스처 샘플링의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 생성기 c56 에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 생성기 c56 에서 복원)
 
 `bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](api/texture-api.md).
 
@@ -5949,7 +5949,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 텍스처 레지스트리 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
 이 문서는 텍스처 이름이 ID로 해석되는 방식과 빌드별 레지스트리 변경을 정리합니다. 셰이더 팩 제작자가 사용할 수 있는 이름 목록은 [텍스처 카탈로그](api/texture-catalog.md)를 참고하세요.
 
@@ -6010,7 +6010,7 @@ WGSL에서는 이름 상수를 사용하세요. 텍스처 이름이 유지되더
 ---
 
 ## 모델 렌더링의 내부
-> 대상 API: 5 · 대상 빌드: `bbb6l5` · 상태: Analyzed (라이브 번들에서 복원)
+> 대상 API: 5 · 상태: Analyzed (라이브 번들에서 복원)
 
 v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](guides/models.md).
 
@@ -6052,7 +6052,7 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 엔진 데이터 대장
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
 이 대장은 현재 빌드에서 셰이더 팩에 공개된 API의 확인된 값을 정리합니다. 모듈 ID나 청크 번호처럼 번들 내부에만 해당하는 정보는 API 사양이 아니므로 싣지 않습니다.
 
@@ -6102,7 +6102,7 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 팩에 보이는 값을 바꾸는 요인
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
 
@@ -6116,7 +6116,7 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 게임별 셰이더 팩 정책
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
 
@@ -6145,7 +6145,7 @@ strict 측에서 특히 오해하기 쉬운 점:
 ---
 
 ## 태양과 달
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 `bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
 
@@ -6190,7 +6190,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 디버깅 도구
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
 - URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](troubleshooting/loading.md) 참조)
 - URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다
@@ -6609,9 +6609,9 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 이 빌드는 manifest의 `apiVersion`이 **3과 엄밀히 일치**할 것을 요구하며, **v2/v3 병행 지원은 없다**. v2 팩은 로드 시 「API 버전 불일치」 메시지로 거부된다 (i18n 키와 플레이스홀더 텍스트):
 
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
->
+> 
 > `statusWrongApiVersion`: "This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it."
->
+> 
 
 저장된 팩은 v2 라이프사이클을 그대로 따른다 ([v2 마이그레이션 가이드](history/v2.md) §31): 모든 빌드는 엔진 헤더의 해시를 계산하고, 엔진 업데이트는 저장된 팩을 자동으로 「재확인 필요」로 표시하며, `apiVersion`이 현재 버전이 아닌 저장 팩은 오류를 내는 대신 실행되지 않음으로 표시된다 (위 상태 메시지가 대체 팩을 가리킨다).
 
@@ -7037,7 +7037,7 @@ FNV-1a-32 해시이며 (`6.` 접두사), 다섯 입력을 해시한다: 베리�
 「특수」는 *매크로에 묶였다*는 뜻이다 — 가용성이 베리언트 심볼에 달린 엔진 함수다. 올바른 사용을 강제하는 가드 진단은 두 가지다:
 
 > `${vertexHook} reaches ${name}, which only surface and light hooks can use.` — vertex 훅이 surface/light 전용 함수에 닿은 경우.
->
+> 
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예를 들어 `#ifdef BLOXD_SCENE_DEPTH`로 감싸지 않은 terrain 쪽 `bloxdOpaqueBehind()`.
 
 **엔진 헤더 (프렐류드), 고정.** v3 헤더는 `// Engine-provided and read-only, prepended to all packs. apiVersion 3.`로 시작하는 5,637바이트 문자열이다. 엔진 자체 WGSL 전처리기가 베리언트별로 평가하는 `#if` / `#ifdef` 지시문을 담는다 — 엔진은 실제로 `#if` 식 평가를 실행하며, 잘못된 식은 `Cannot evaluate #if ...`로 오류를 낸다. 이 가이드의 모든 구조체, 함수 시그니처, 인용 주석은 이 렌더링된 텍스트에서 나왔으므로, 가이드와 출하 헤더가 어긋날 수 없다. 전문은 §54 끝에 그대로 실린다.
@@ -7355,15 +7355,15 @@ let texel = bloxdTexel(surface.textureId, uv, surface.mipLevel);
 표기 규칙, 검증기에서 복원: 이름을 비영숫자 연속 부분마다 쪼개 각 부분의 첫 글자를 대문자로 바꾸고 `bloxdTextureId` 접두사 뒤에 이어 붙인다. 반대 방향의 조회는 **대소문자·언더스코어 무감각**이다 (엔진이 매칭 전에 당신의 표기를 같은 방식으로 접는다). 표기가 해석되지 않을 때는 3개의 전용 에러 패밀리가 나온다 — 라이브 검증기에서 그대로:
 
 > **접두사 오기 / 대소문자 오류:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
->
+> 
 > **애니메이션 텍스처의 프레임:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
->
+> 
 > **회전 복사:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
->
+> 
 > **접은 뒤 모호:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
->
+> 
 > **미발견, 제안 있음:** `There's no texture called X. Did you mean bloxdTextureIdY?` — 제안 임계값은 레벤슈타인 거리 `max(2, floor(len/4)) + 1`.
->
+> 
 > **미발견, 제안 없음:** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
 마지막 메시지가 가리키는 파일을 이 가이드는 대신 싣는다: 완전한 실측 카탈로그 — 905개 사용 가능 이름 각각과 당시의 id, 회전·애니메이션 패밀리 표 — 는 아래 §68이고; §64에는 레지스트리 측정과 그 배후의 접기 규칙이 있다. 그 카탈로그의 라이브 후속판이 [텍스처 카탈로그](api/texture-catalog.md)이다.
@@ -7545,7 +7545,7 @@ strict 게임은 예외가 아니라 규칙이다: **모든 것이 기본적으�
 #### 60.1 강제되는 두 규칙과 그 정확한 진단
 
 > `bloxdTerrainVertex moves terrain, which strict games prevent.`
->
+> 
 > `discard makes terrain see-through, which strict games prevent.`
 
 메커니즘, 검증기에서 복원:
@@ -7848,7 +7848,7 @@ v4 (cnty9):    8.<header-hash>.<registry-hash>     ← format restored from the 
 `symbol: null`은 「배리언트 게이트 없음」을 뜻한다 — 함수가 존재하는 곳 (surface/light 훅) 이면 어디서든 호출할 수 있다. 두 「reaches」 진단은 그대로 이어지며, 이제 텍스처 오용도 덮는다:
 
 > `${hook} reaches ${name}, which only surface and light hooks can use.` — 예: 버텍스 훅에서의 `bloxdTexel`.
->
+> 
 > `${hook} reaches ${name}, which needs ${symbol}, but this hook also runs on ${program}, which doesn't define it; guard the call with #ifdef ${symbol}.` — 예: 랩 없이 지형 훅에서 호출하는 `bloxdOpaqueBehind()` (v3 §53에서 불변).
 
 #### 65.4 v3 §53에서 그대로 이어지는 것들
