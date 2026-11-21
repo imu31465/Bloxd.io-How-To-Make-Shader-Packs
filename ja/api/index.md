@@ -17,6 +17,6 @@
 | [プリプロセッサ](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [制限と予約名](restrictions.md) | 言語機能の制限、予約識別子 |
 | [互換性](compatibility.md) | 旧バージョンパックの挙動、保存パックの再検証 |
-| [テクスチャカタログ](texture-catalog.md) | 利用可能1,017名の実測カタログ (検索可能) |
+| [テクスチャカタログ](texture-catalog.md) | 利用可能な1,017名のテクスチャ名カタログ (検索可能) |
 
 v4からの移行が必要な場合は [バージョン履歴: v5](../history/v5.md) を参照してください。

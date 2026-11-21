@@ -17,6 +17,6 @@
 | [전처리기](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [제한과 예약명](restrictions.md) | 언어 기능 제한, 예약 식별자 |
 | [호환성](compatibility.md) | 구버전 팩의 취급, 저장 팩 재검증 |
-| [텍스처 카탈로그](texture-catalog.md) | 사용 가능 1,017 이름의 실측 카탈로그 (검색 가능) |
+| [텍스처 카탈로그](texture-catalog.md) | 사용 가능한 텍스처 이름 1,017개의 카탈로그 (검색 가능) |
 
 v4 에서 이주해야 한다면 [버전 히스토리: v5](../history/v5.md) 를 보라.

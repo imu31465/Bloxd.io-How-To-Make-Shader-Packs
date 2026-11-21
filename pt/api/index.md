@@ -19,6 +19,4 @@ Esta seção documenta a API v5 atual de shader packs. Cada página explica os t
 | [Compatibilidade](compatibility.md) | pacotes de versões antigas, revalidação de pacotes salvos |
 | [Catálogo de texturas](texture-catalog.md) | todos os 1,017 nomes utilizáveis (com busca) |
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
-
 Migrando da v4? Veja [Histórico de versões: v5](../history/v5.md).
