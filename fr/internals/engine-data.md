@@ -1,48 +1,46 @@
 # Relevé des données du moteur
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20) · État : Verified
+> API cible : 5 · Build cible : `bbb6l5` (2026-11-20 ; production et preprod servent le même bundle identique octet par octet) · État : Verified
 
-Ce relevé rassemble les valeurs confirmées de l'API visible par les shader packs sur le build actuel. Les détails internes du bundle, tels que les ID de modules et de chunks, ne font pas partie de la spécification et sont donc omis.
+Le relevé de mesures de la documentation — chaque valeur confirmée, toutes mesurées sur le build cible actuel `bny9u`.
 
-## Spécification actuelle
+## Le relevé
 
 | Élément | Valeur |
 |---|---|
-| `apiVersion` | `5` (comparaison stricte avec un nombre) |
-| En-tête du moteur | 216 lignes ; texte intégral dans [En-tête du moteur](engine-header.md) |
-| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` ; `BLOXD_LIGHTING` a été supprimée en v5 |
-| Uniform du pack | 80 octets : `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Binding du pack | `@group(3) @binding(0)` ; `minBindingSize` 80 |
-| Flags | structure `BloxdFlags` avec 14 champs booléens |
-| Atlas de textures | 1 650 couches ; 1 017 noms ; 776 alias |
-| Familles de textures | 64 familles de rotation et 71 d'animation |
-| Identifiants réservés | noms correspondant à `/^bloxd/i` et 88 symboles internes `bloxdSp*` |
-| Définitions de jeux | 119 |
-| Politique des shader packs | 12 titres autorisés, 28 entrées ; voir la [Politique par jeu](policy.md) |
-| Modèle de pack par défaut | 1 633 octets |
-| Limites du chargeur | 256 fichiers WGSL / 256 Ko de code / 64 Ko pour `pack.json` / ZIP de 32 Mo / 1 024 entrées |
+| `apiVersion` | `5` (strict `===`, nombre) |
+| en-tête du moteur | 8 954 o décodés / 208 lignes (9 125 o en l'état livré, 6 interpolations). Première ligne `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — texte intégral dans [En-tête du moteur](engine-header.md) |
+| hooks | 9 (terrain/liquide/modèle × vertex/surface/light). Noms inchangés ; le gabarit par défaut embarque les 9 |
+| variantes | 6 (strict × programme). Noms `strict\|allow.terrain\|liquid\|model` — l'axe d'éclairage a disparu |
+| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (tout liquide + terrain/modèle non stricts) · `BLOXD_SCENE_DEPTH` (tout liquide) · ~~`BLOXD_LIGHTING`~~ **retirée** |
+| uniform du pack | `@group(3) @binding(0)`, 64 o : seconds@0, **lit@4 (u32, nouveau)**, renderOffset@16, sunDirection@32, eyePosition@48 |
+| bindings du pack | groupe 3 : 0 uniform · 1 profondeur de scène (liquide) · 2 storage `bloxdSpTextureLayers` |
+| flags | la struct `BloxdFlags`, 14 booléens ; les valeurs de bits de la v4 retirées |
+| limites du chargeur | 256 `.wgsl` / 256 Ko de source / 64 Ko `pack.json` / 32 Mo de zip / 1 024 entrées ; UTF-8 ; un seul manifeste ; chemins uniques — tout inchangé |
+| registre de textures | 1 210 entrées → **896 noms utilisables** ; dérive vs cnty9 +1/−10 ([Registre des textures](texture-registry.md)) → `xkg8x` (2026-11-04) : 1 220 / **906** → `bny9u` (2026-11-05) : 1 232 / **911 noms utilisables** — +5 (Terminal d'Échange ×3, Générateur de Pierre ×2), 864 changements d'id  → `v98qt8` (2026-11-08): 1,227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
+| courbe de lumière | niveaux 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — dans l'en-tête, inchangée |
+| courbe de lift | `1 - (1 - x / (3 - 2x))^3` — inchangée (actuellement chunk c9) |
+| cône directionnel | `0.12 / 0.65 / 0.62 / 0.95` — inchangé (chunk c9) |
+| couleur de brouillard | `vec3f(183/255, 191/255, 195/255)` — inchangée |
+| noms réservés | `/^bloxd/i` (insensible à la casse) + les 46 symboles `bloxdSp*` du moteur ([Identifiants réservés](reserved-identifiers.md)) |
+| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
+| titres stricts | tout sauf les 12 titres allow de [Politique](policy.md) (réénumérés sur v98qt8 : 116 définitions de jeu, 28 entrées allow — les mêmes 12 titres) |
+| constructeurs en-tête/registre | module d'en-tête 29815 dans le chunk c56 (renuméroté depuis c55) ; sur `bny9u` le constructeur du registre est le module 29812 (chunks c52/c53/c54, module de données 1351 ; sur `xkg8x` c'était 30093 + 1391) |
+| gabarit de pack par défaut | chunk c122 (c116 sur `xkg8x`, c124 en v4), 1 633 o |
 
-## Changements de bbb6l5
+## Agencement du bundle (pour refaire le relevé)
 
-`bbb6l5` conserve `apiVersion: 5`, mais étend l'API visible par les packs :
+Le cluster du pipeline de shaders : chargeur (zip/manifeste/limites, module 32942) et constructeur du registre c52–c54, validateur/en-tête c56, WebGPU/codegen c57, brouillard c9. **Le gabarit de pack par défaut est c122** (c116 sur `xkg8x`, c124 en v4).
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` et `bloxdShadowDirection()` exposent le système d'ombres du soleil et de la lune calculé par le moteur.
-- L'uniform reçoit `shadowDirection: vec3f` à l'offset 64 et passe de 64 à 80 octets.
-- `pack.json` accepte le booléen facultatif `keepCircleShadows` pour conserver les anciennes ombres circulaires.
-- L'atlas passe de 1 227 à 1 650 couches et de 906 à 1 017 noms disponibles.
-- La régression de pliage des constantes de texture introduite dans `v98qt8` est corrigée.
+Note sur le format des chunks : chaque chunk est un module ES (`export const modules = {...}`) — c53 transporte à la fois les modules de c52 et ceux de c53 — donc la recherche en texte brut dans le bundle reste pertinente (l'id de module `1371` vit dans le tableau de modules épars de *main*, dans aucun chunk).
 
-Les détails et les preuves de ces mesures figurent dans le [Journal de recherche](research-log.md) et les [Intérieurs du registre des textures](texture-registry.md).
+Le bundle principal fait 3,39 Mo (+115 Ko vs le build v4) ; la carte des chunks compte 195 ids (188 émis, 7 lacunes connues).
 
-## Versions antérieures
+## Anciens relevés
 
-- [Historique des versions](../history/) — changements et migrations des anciennes API
-- [Journal de recherche](research-log.md) — méthode et références des mesures
+- v4 (cnty9, 2026-10-27) → [Historique des versions : v4](../history/v4.md)
+- v3 (3ymzdd, 2026-10-19) → [Historique des versions : v3](../history/v3.md)
 
 ## Voir aussi
 
-- [En-tête du moteur](engine-header.md) — texte intégral de l'en-tête
-- [Politique par jeu](policy.md) — titres soumis aux politiques allow / strict
-- [Registre des textures](texture-registry.md) — noms et attribution des ID
+- [Journal de recherche](research-log.md) · [En-tête du moteur](engine-header.md) · [Politique](policy.md)
