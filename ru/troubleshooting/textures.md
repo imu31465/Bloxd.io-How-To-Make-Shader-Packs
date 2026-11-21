@@ -68,4 +68,4 @@
 
 ## Смотрите также
 
-- [API текстур](../api/texture-api.md) · [Каталог текстур](../api/texture-catalog.md) · [Внутрянка реестра текстур](../internals/texture-registry.md)
+- [API текстур](../api/texture-api.md) · [Каталог текстур](../api/texture-catalog.md) · [Внутреннее устройство реестра текстур](../internals/texture-registry.md)
