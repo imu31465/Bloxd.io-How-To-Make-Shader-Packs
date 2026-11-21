@@ -5126,7 +5126,7 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 
 ---
 
-## Engine-Interna & Forschung
+## Engine-Interna
 Diese Kategorie erläutert das interne Verhalten der Engine, damit sich die Ausführung von Shader-Packs besser verstehen lässt. Diese Implementierungsdetails können sich ändern; stabile Nutzungsregeln und verfügbare APIs stehen in der [API-Referenz](api/).
 
 ### Map
