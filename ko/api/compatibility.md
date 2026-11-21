@@ -1,72 +1,43 @@
 # 호환성
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · 유형: API 참조
 
-현행 게임과 구버전 팩이 서로 어떻게 맞물리는지에 대한 설명이다.
+현재 게임에서 허용하는 셰이더 팩 API 버전과 이전 버전으로 저장한 팩의 처리 방식을 설명합니다.
 
-## 받아들이는 버전
+## 허용되는 API 버전
 
-**`apiVersion: 5` 뿐이다.** 로더는 `manifest.apiVersion !== 5` 를 엄격히 비교하며, v1/v2/v3/v4 팩은 **로드하는 그 순간 실패한다**. 다중 버전 병행 수용은 존재하지 않는다.
+현재 게임은 매니페스트의 `apiVersion`이 숫자 `5`인 팩만 허용합니다. 문자열 `"5"`는 허용되지 않습니다. API v1~v4용으로 만든 팩은 마이그레이션해야 로드할 수 있습니다.
 
-## 로드 시점 메시지 (라이브 i18n 사전에서 그대로 인용)
+## 로드 시 메시지
 
-- `pack.json needs "apiVersion": {{version}}.` — `apiVersion` 키가 빠져 있다
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 키는 있지만 5가 아니다
+- `pack.json needs "apiVersion": {{version}}.` — `apiVersion` 키가 없는 경우
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 지정한 버전이 현재 버전과 다른 경우
 
-## 저장된 구버전 팩 (예외 없음 — 조용한 비활성화)
+## 이전 버전으로 저장한 팩
 
-과거에 저장한 v1–v4 팩은 예외를 던지지 않는다. 저장 팩의 결과는:
+이전 API 버전으로 저장한 팩은 현재 게임에서 실행되지 않습니다. 셰이더 팩 설정 화면에 지원되지 않는 버전이라는 안내가 표시됩니다. 해당 마이그레이션 가이드에 따라 팩을 업데이트하세요.
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+## 저장된 팩 재검증
 
-로 귀결되며, 팩은 **조용히 비활성**이 된다. 이유를 설명해 주는 곳은 셰이더 팩 설정 탭뿐이다:
+엔진이 제공하는 헤더나 텍스처 이름 정의가 바뀌면 저장된 팩을 다시 검증합니다. 재검증은 게임을 불러올 때 자동으로 수행됩니다. 팩 코드에서는 변경될 수 있는 숫자 ID 대신 이름 상수로 텍스처를 참조하세요.
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+## 실행 환경 호환성
 
-## v4 → v5 변환의 성격
+- **WebGPU:** 셰이더 팩에는 WebGPU를 지원하는 렌더러가 필요합니다.
+- **모바일:** WebGPU를 지원하지 않는 환경에서는 셰이더 팩을 사용할 수 없습니다 ([요구 사항](../getting-started/requirements.md)).
+- **텍스처 접근:** 텍스처 아틀라스를 사용하지 않는 렌더러 구성에서는 `bloxdTexel`과 `bloxdTextureSize`가 일반적인 아틀라스 텍스처 접근을 제공하지 않습니다 ([텍스처 API](texture-api.md)).
 
-변환은 대부분 기계적이다 (전체 체크리스트는 [v5 마이그레이션 가이드](../history/v5.md) 에 있다):
+## API 버전 지원
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 개명)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 호출 지점은 여전히 컴파일된다 (엔진이 주입한다). 다만 이제는 문서화되지 않았으므로, 여기서 벗어나 이주하는 것이 안전한 선택이다 ([함수](functions.md#bloxdfragmentblockposition--문서화되지-않았지만-여전히-주입된다))
-- `pack.json` 을 `"apiVersion": 5` 로 올린다
-
-이번 판의 조용한 함정: `blockFlags` 를 계속 읽거나 light 훅을 `#ifdef BLOXD_LIGHTING` 으로 감싼 채인 팩은 **전용 메시지와 함께 검증에 실패한다** (분석기가 이제 이 두 경우를 모두 설명한다). 즉 조용히 오동작하는 일은 없고, 이주할 때까지 계속 거부될 뿐이다.
-
-## 저장 팩 재검증 (「재확인 필요」)
-
-`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` 이다 (선두 정수는 v4 의 8 에서 9 로 올라갔다). 엔진의 헤더나 텍스처 레지스트리가 바뀌면 (게임 업데이트 때 흔하다) 저장 팩은 「재확인 필요」 로 표시되고, 페이지 로드 시 자동으로 재검증된다.
-
-**v98qt8 유의사항:** 현행 빌드의 폴딩 회귀([엔진 내부: 텍스처 레지스트리](../internals/texture-registry.md#the-v98qt8-folding-regression))가 엔진이 해시하는 대상을 바꿉니다 — 계산되는 레지스트리 접미사는 *폴딩되지 않은* 1,047행 표(`694df62c`)이지 의도된 폴디드 906행 표(`df6c1915`, `bny9u`에서는 `e735ebdc`)가 아닙니다. 그래서 저장된 모든 팩이 이 빌드에서 재검증되며, 43개 애니메이션 계열 기본 이름(`lava` 등) 중 하나를 참조하는 팩은 엔진 측이 고쳐질 때까지 재검증에 **실패**합니다 — 그래도 폴디드 이름으로 쓰십시오. 그것이 API입니다.
-
-
-
-레지스트리 이동의 실측 예 (10일 간격의 두 빌드): 엔트리 1200 → 1219 (98개 추가, 79개 삭제). 그리고 철자를 유지한 이름 중에서 **1121개 가운데 779개가 id 가 바뀌었다**. 다시 말해:
-
-- **이름 (`bloxdTextureIdLava`) 으로 쓴 팩은 드리프트를 견딘다** (로더가 라이브 레지스트리에 대해 다시 해석한다)
-- **원시 id (`19`) 로 쓴 팩은 재검증에서 깨진다**
-
-상세는 [엔진 내부와 연구: 텍스처 레지스트리](../internals/texture-registry.md).
-
-## 실행 환경
-
-- **WebGPU 렌더러 전용**: 팩을 설치하면 WebGPU 렌더러가 강제로 켜진다
-- **모바일**: WebGPU가 제한된 환경에서는 팩을 아예 실행할 수 없다 ([요구 사항](../getting-started/requirements.md))
-- **비아틀라스 렌더러 구성**: `bloxdTexel` / `bloxdTextureSize` 는 스텁으로 퇴화한다 (흰 텍셀, 1×1). 코드 자체는 여전히 컴파일되고 실행된다 ([텍스처 API](texture-api.md#텍스처-api-가-갈-수-없는-곳))
-
-## 버전 지원 요약
-
-| API 버전 | 가동 개시 | 현행 게임에서의 취급 |
-|---|---|---|
-| v1 | — | 로드 시 거부 ([v2](../history/v2.md) 경유로 이주) |
-| v2 | — | 로드 시 거부 |
-| v3 | 2026-10-19 | 로드 시 거부 |
-| v4 | 2026-10-26 | 로드 시 거부 |
-| **v5** | **2026-11-03** | **현행** |
+| API 버전 | 현재 게임 지원 |
+|---|---|
+| v1 | 로드 시 거부 |
+| v2 | 로드 시 거부 |
+| v3 | 로드 시 거부 |
+| v4 | 로드 시 거부 |
+| **v5** | **현재 버전** |
 
 ## 관련 문서
 
-- [v5 마이그레이션 체크리스트](../history/v5.md) · [버전 히스토리](../history/)
+- [v4에서 v5로 마이그레이션](../history/v5.md)
+- [버전 히스토리](../history/)
