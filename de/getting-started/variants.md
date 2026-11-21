@@ -6,7 +6,7 @@
 
 Du schreibst einen Codekörper, aber er muss in allen **6 Varianten** kompilieren: `{strict, allow} × {terrain, liquid, model}`. Der Loader validiert beim Laden alle sechs.
 
-Die Achse „Beleuchtung an/aus“ aus v4 und früher ist weg (v4 hatte 8 Varianten). Der Beleuchtungszustand ist jetzt eine Laufzeitfrage für [`bloxdLit()`](../api/lighting.md), kein Compile-Zeit-Zweig.
+Die Achse „Beleuchtung an/aus“ aus v4 und früher entfällt (v4 hatte 8 Varianten). Ob Beleuchtung aktiv ist, wird jetzt zur Laufzeit mit [`bloxdLit()`](../api/lighting.md) abgefragt und nicht mehr zur Compile-Zeit entschieden.
 
 | Variante | Beispiel | Definierte Makros |
 |---|---|---|
@@ -29,7 +29,7 @@ Verfügbar sind nur `#define NAME` (ohne Wert) / `#ifdef` / `#ifndef` / `#else` 
 
 `BLOXD_LIGHTING` wurde **in v5 entfernt**. Die Verwendung scheitert an der Validierung mit: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## Der strict-Spiele-Vertrag
+## Einschränkungen in strict-Spielen
 
 Die meisten Spiele sind strict (keine Vertex-Animation, kein `discard`). Ein ungeschützter Vertex-Hook meldet `<hook> moves terrain, which strict games prevent.`, und ein erreichbares `discard` meldet `discard makes terrain see-through, which strict games prevent.` — beides schaltet **alle Hooks** in diesem strict-Spiel ab. Vertex-Hooks immer in `#ifndef BLOXD_STRICT` einpacken.
 
