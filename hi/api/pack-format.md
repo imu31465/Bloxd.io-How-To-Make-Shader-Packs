@@ -1,70 +1,58 @@
-# पैक फ़ॉर्मैट
+# Pack format
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bbb6l5` (2026-11-20 को प्रोडक्शन और preprod में सत्यापित) · स्थिति: Verified (लाइव लोडर पर पुनः मापा गया)
+> लक्ष्य API: 5 · प्रकार: API संदर्भ
 
-पूरा पैक मॉडल एक ही पेज पर — मैनिफ़ेस्ट, लोडर सीमाएँ, प्रति-फ़्रेम uniform। कदम-दर-कदम संस्करण के लिए देखें [शुरुआत करें](../getting-started/manifest.md)।
+इस पृष्ठ में manifest, ZIP archive सीमाएँ और pack uniform का सार दिया गया है। सेटअप के निर्देशों के लिए [शुरुआत](../getting-started/manifest.md) देखें।
 
 ## pack.json
+
+`pack.json` को ZIP archive के root में रखें। यह JSON object होना चाहिए।
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
 | फ़ील्ड | प्रकार | आवश्यक | विवरण |
 |---|---|---|---|
-| `apiVersion` | number | आवश्यक | **कड़ाई से ठीक `5` होना चाहिए** (`===`)। स्ट्रिंग `"5"` असफल होती है और उसकी JSON वर्तनी सहित रिपोर्ट होती है |
-| `name` | string | आवश्यक | ट्रिम करने के बाद ग़ैर-खाली; सेटिंग्स में दिखता है |
-| `author` | string | वैकल्पिक | मौजूद हो तो स्ट्रिंग होना चाहिए |
-| `keepCircleShadows` | boolean | वैकल्पिक | **`bbb6l5` में नया** — जब आपके शेडर असली सूर्य-छाया API का भी उपयोग करें, तब भी खिलाड़ियों/मॉब के नीचे पुरानी गोल छायाएँ रखें ([छायाएँ](../guides/shadows.md))। डिफ़ॉल्ट `false`; अन्य प्रकार专 लोड संदेश से अस्वीकृत |
+| `apiVersion` | number | हाँ | संख्यात्मक मान `5` सेट करें। String स्वीकार नहीं है |
+| `name` | string | हाँ | आगे-पीछे के whitespace हटाने के बाद non-empty नाम |
+| `author` | string | नहीं | लेखक का नाम |
+| `keepCircleShadows` | boolean | नहीं | Shadow API का उपयोग करते हुए पारंपरिक गोल छायाएँ बनाए रखने के लिए `true` करें |
 
-मैनिफ़ेस्ट की बाकी सब चीज़ें नज़रअंदाज़ कर दी जाती हैं। `pack.json` zip के रूट में ठीक एक JSON ऑब्जेक्ट होना चाहिए।
+## Loader सीमाएँ
 
-## लोडर सीमाएँ (लाइव c53 पर पुनः मापी गई)
+| मद | सीमा |
+|---|---:|
+| प्रति pack `.wgsl` फ़ाइलें | 256 |
+| कुल `.wgsl` source | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP archive | 32 MB |
+| ZIP entries | 1,024 |
 
-| सीमा | मान | पार होने पर संदेश |
+Split ZIP archives, Zip64, encrypted entries और unsupported compression methods समर्थित नहीं हैं। सभी फ़ाइलें UTF-8 में सहेजें और archive में duplicate paths न रखें।
+
+## Pack uniform
+
+Pack uniform 80 bytes का है और `@group(3) @binding(0)` पर bind होता है।
+
+| Offset | Field | Type |
 |---|---|---|
-| प्रति पैक `.wgsl` फ़ाइलें | 256 | `The pack has more than 256 .wgsl files.` |
-| कुल `.wgsl` स्रोत | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` आकार | 64 KB | `pack.json is over 64 KB.` |
-| zip आकार | 32 MB | `The zip is over 32 MB.` |
-| zip प्रविष्टियाँ | 1,024 | `The zip has more than 1024 entries.` |
-| zip आकृति | — | split zip / zip64 / एन्क्रिप्टेड / असमर्थित कंप्रेशन — हर एक अपने अलग संदेश के साथ अस्वीकृत; सभी फ़ाइलें वैध UTF-8; ठीक एक `pack.json`; कोई डुप्लिकेट पाथ नहीं |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-## API-संस्करण जाँच
+Uniform का न्यूनतम binding size 80 bytes है। Group 3 के अन्य bindings Liquid variants के लिए scene-depth texture और `bloxdSpTextureLayers` storage buffer हैं।
 
-लोडर `manifest.apiVersion !== 5` की तुलना JavaScript के strict `!==` से करता है। संस्करण कॉन्स्टैंट `5` और हेडर टेम्पलेट एक ही मॉड्यूल में रहते हैं (c55 / मॉड्यूल 29836), इसलिए सत्यापन और वह हेडर जिसे वह मान लेता है, साथ-साथ चलते हैं। बेमेल के संदेश: देखें [कम्पैटिबिलिटी](compatibility.md)।
+## संबंधित
 
-## प्रति-फ़्रेम uniform: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — अब भी 64 बाइट, पर v5 ने एक सदस्य जोड़ा है (लाइव uniform-लेआउट मॉड्यूल से):
-
-| ऑफ़सेट | फ़ील्ड | प्रकार | टिप्पणी |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | `bloxdSeconds()` का आधार |
-| 4 | `lit` | `u32` | ब्लॉक/आकाश लाइटिंग चालू होने पर 1; `bloxdLit()` का आधार |
-| 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` का आधार |
-| 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` का आधार |
-| 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` का आधार |
-| 64 | `shadowDirection` | `vec3f` | **`bbb6l5` में नया** — छाया डालने वाली रोशनी की यात्रा दिशा; `bloxdShadowDirection()` का आधार |
-
-`lit` को v4 की `seconds` और `renderOffset` के बीच पहले से मौजूद पैडिंग में फिट करा गया (ऑफ़सेट 4–15 अलाइनमेंट के अंतराल थे; `vec3i` को 16-बाइट अलाइनमेंट चाहिए, इसलिए `renderOffset` 16 पर ही रहा)। कुल आकार और बाकी सभी ऑफ़सेट अपरिवर्तित हैं। इंजन इसे एक ही `setUint32(4, lit ? 1 : 0)` से लिखता है — यह एक फ़्लैग है, लाइट लेवल नहीं (v4 के JS-पक्ष के नाम `terrainLightLevels` / `terrainHeldLight` बंडल से पूरी तरह ग़ायब हैं)।
-
-**uniform को पैक से कभी सीधे संदर्भित न करें।** इसे हेडर फ़ंक्शनों (`bloxdSeconds()` आदि) के ज़रिए इस्तेमाल करें। स्टेज विज़िबिलिटी VERTEX|FRAGMENT है, इसलिए हेडर फ़ंक्शन मॉड्यूल-स्तरीय फ़ंक्शनों और vertex हुकों से भी चलते हैं।
-
-## बाइंड-ग्रुप लेआउट
-
-| binding | सामग्री |
-|---|---|
-| 0 | `bloxdPackInputs` uniform (80 B) |
-| 1 | scene-depth टेक्सचर (liquid वेरिएंट) |
-| 2 | `bloxdSpTextureLayers` स्टोरेज बफ़र |
-
-`minBindingSize` 80 है (uniform के साथ बढ़ा)। डेप्थ टेक्सचर (binding 1) केवल FRAGMENT के लिए है, इसीलिए `bloxdOpaqueBehind()` केवल surface/light हुकों तक सीमित है।
-
-## wgsl संयोजन
-
-कई `.wgsl` फ़ाइलें **पाथ नाम के शब्दकोश क्रम में** एक मॉड्यूल में जुड़ जाती हैं। मॉड्यूल-स्तरीय घोषणाएँ क्रम-से-स्वतंत्र होती हैं; केवल `var` इनिशियलाइज़ेशन का क्रम मायने रख सकता है। ग़ैर-`.wgsl` फ़ाइलें नज़रअंदाज़ कर दी जाती हैं।
+- [Manifest बनाना](../getting-started/manifest.md)
+- [API संदर्भ](./)
+- [API v5 माइग्रेशन गाइड](../history/v5.md)

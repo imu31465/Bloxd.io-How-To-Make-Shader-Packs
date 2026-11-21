@@ -1,8 +1,8 @@
 # टेक्सचर समस्याएँ
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bbb6l5` · स्थिति: Verified (संदेश लाइव वैलिडेटर से अक्षरशः दर्ज किए गए)
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
-`bloxdTextureId*` / `bloxdTexel` के आसपास की समस्याएँ। सभी 896 नाम [टेक्सचर कैटलॉग](../api/texture-catalog.md) में खोजें।
+`bloxdTextureId*` / `bloxdTexel` के आसपास की समस्याएँ। सभी उपलब्ध नाम [टेक्सचर कैटलॉग](../api/texture-catalog.md) में खोजें।
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 
