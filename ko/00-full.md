@@ -1006,7 +1006,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **반환값**: `position + vec3f(bloxdRenderOffset())`
 - **주의**: f32 정밀도 한계로 먼 좌표는 부정확할 수 있다 (헤더: *"with possible f32 inaccuracy"*)
 
-#### bloxdFragmentBlockPosition — 문서화되지 않았지만 여전히 주입된다
+#### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -1061,7 +1061,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ### 섀도 함수
 
-`API v5`는 엔진의 태양/달 그림자 시스템을 제공합니다. 블록·플레이어·몹·아이템이 드리우는 투영 그림자는 태양을 따라 움직입니다. 이 두 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+이 세 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 각 팩의 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 포함되지 않는다.
 
 #### bloxdShadow
 
