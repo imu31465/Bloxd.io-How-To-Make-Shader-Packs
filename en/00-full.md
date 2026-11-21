@@ -4818,36 +4818,35 @@ The Model program forms one axis of the variant matrix: `strict.model` / `allow.
 ---
 
 ## Engine data ledger
+> Target API: 5 · Status: Analyzed
 
+This page summarizes the API surface available to shader packs. See the [API reference](api/) for usage details.
 
-### The ledger
+### API surface
 
-| Item | Value |
+| Item | Specification |
 |---|---|
-| `apiVersion` | `5` (strict `===`, number) — unchanged through the whole v5 era |
-| engine header | 216 lines decoded (208 at the v5 launch). First line `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — full text in [Engine header](internals/engine-header.md) |
-| hooks | 9 (terrain/liquid/model × vertex/surface/light). Names unchanged; the default template bundles all 9 |
-| variants | 6 (strict × program). Names `strict\|allow.terrain\|liquid\|model` — the lighting axis is gone |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (all liquid + non-strict terrain/model) · `BLOXD_SCENE_DEPTH` (all liquid) · ~~`BLOXD_LIGHTING`~~ **removed** |
-| pack bindings | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` storage; `minBindingSize` 80 |
-| flags | the `BloxdFlags` struct, 14 bools; v4's bit values retired |
-| loader limits | 256 `.wgsl` / 256 KB source / 64 KB `pack.json` / 32 MB zip / 1,024 entries; UTF-8; one manifest; unique paths — all unchanged. `pack.json` gains the optional `keepCircleShadows` boolean |
-| light curve | 0–15 levels → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — in the header, unchanged |
-| lift curve | `1 - (1 - x / (3 - 2x))^3` — unchanged |
-| directional cone | `0.12 / 0.65 / 0.62 / 0.95` — unchanged |
-| fog color | `vec3f(183/255, 191/255, 195/255)` — unchanged |
-| header/registry builders | engine-internal (bundle internals are not part of the documented API) |
+| API version | `5` |
+| Engine header | 216 lines; see the [engine header](internals/engine-header.md) |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Variants | 6 (strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Pack uniform | 80 bytes; see [Pack format](api/pack-format.md) |
+| Uniform fields | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Texture names | Usable named constants are listed in the [texture catalog](api/texture-catalog.md) |
 
-### Past ledgers
+### Shadow API
 
+- `bloxdShadow()` returns the engine-computed sun/moon shadow factor.
+- `bloxdAirShadow(t)` evaluates shadow at a point between the camera and the fragment.
+- `bloxdShadowDirection()` returns the direction of the light that casts the shadow.
+- `keepCircleShadows` is an optional `pack.json` field that preserves the legacy circular shadows.
 
 ### Related
 
-- [Research log](internals/research-log.md) · [Engine header](internals/engine-header.md) · [Policy](internals/policy.md)
-
-
----
-
+- [API reference](api/) — APIs available to packs
+- [Pack format](api/pack-format.md) — manifest, uniform, and loader limits
+- [Game policies](internals/policy.md) — per-game restrictions
 ## What changes pack-visible values
 The same pack renders differently across **world and player settings**. Check at least these 3 environments before distribution:
 
