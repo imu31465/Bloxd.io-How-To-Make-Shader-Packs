@@ -4908,7 +4908,6 @@ As afirmações técnicas daqui não se apoiam em documentação oficial de dese
 
 ### Princípios básicos
 
-1. **Recuperação direta do bundle de produção** — o main.js e os chunks brutos baixados tanto da produção quanto do preprod, identidade verificada por md5
 2. **Respeito verbatim** — cabeçalhos, mensagens de erro e strings de i18n são **citadas tal como são**, nunca parafraseadas
 3. **Medição reproduzida** — valores derivados, como o registro, são recalculados executando os próprios módulos do motor em um harness (saída real, não uma reimplementação parecida)
 4. **Builds nomeados** — cada medição carrega um id de build e data
@@ -5072,8 +5071,6 @@ Na v1, `time` / `eyePosition` / `sunDirection` / `originOffset` eram campos de s
 
 Os três structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganharam `blockId: u32`. É o **ID do bloco dono** (0–65535), uniforme em toda a face (passado com `@interpolate(flat)`). Use-o para identificação do tipo de bloco independente da cor da textura. Mas a tabela de ID para tipo de bloco vive dentro do motor e é invisível aos pacotes, então **qual ID é qual bloco pode ser medido no mundo, ou consultado na referência abaixo**. Internamente, esse ID é carregado embutido no alpha da cor do vértice (8 bits baixos) e no w da normal (8 bits altos) — 16 bits no total, daí vem o teto de 65535. O próprio sistema blockId só é ativado enquanto existir um pacote de shaders ativo (sem um pacote, a fiação mantém seus alvos de preenchimento, mas dentro das definições de structs da Parte II essa diferença é inobservável).
 
-**Referência**: o autor publica uma listagem de entradas do jogo em [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json`: uma tabela id ↔ nome de bloco; variantes de rotação/meta como `Furnace|meta|rot2` são listadas como IDs separados). As correspondências podem mudar com as atualizações do jogo — para algo definitivo, confirme no jogo real.
-
 
 | ID | Nome do bloco | ID | Nome do bloco |
 |---|---|---|---|
@@ -5086,7 +5083,6 @@ Os três structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganharam `b
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json também lista itens que não são blocos (ferramentas etc.), mas só os ids de famílias de blocos chegam aos hooks de terreno / líquido.
 
@@ -5124,7 +5120,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-A cor da face codifica 3 bits do blockId diretamente como RGB (preto = 0 / vermelho = 1 / verde = 2 / amarelo = 3 / azul = 4 / magenta = 5 / ciano = 6 / branco = 7). Uma observação lê um dígito octal. Se p0 → p3 lerem 3, 2, 7, 2, então o octal 2723 = 1491, lido a partir do dígito de cima, é o id (Lava). As famílias de terreno de id baixo terminam com duas observações (p0, p1). Usa só o hook surface, então roda também em títulos estritos.
 
 #### R-H. Balançar só as folhas — limitar o hook vertex por blockId
 

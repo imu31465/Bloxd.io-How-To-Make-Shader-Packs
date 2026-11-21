@@ -4928,7 +4928,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 핵심 원칙
 
-1. **프로덕션 번들의 직접 회수** — 프로덕션과 preprod 양쪽에서 원시 main.js 와 청크를 받아, md5 로 동일성 확인
 2. **원문 존중** — 헤더, 오류 메시지, i18n 문자열은 **그대로 인용**하며 절대 바꿔 쓰지 않는다
 3. **재현된 측정** — 레지스트리 같은 파생값은 엔진 자신의 모듈을 하네스에서 돌려 재계산한다 (비슷하게 만든 재구현이 아니라 실제 출력)
 4. **이름 붙은 빌드** — 모든 측정에는 빌드 id 와 날짜가 붙는다
@@ -5106,7 +5105,6 @@ v1에서는 `time` / `eyePosition` / `sunDirection` / `originOffset` 이 구조�
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json 에는 도구 등의 비블록 항목도 수록되어 있지만, 지형·액체의 훅에 닿는 것은 블록계 id 이다.
 
@@ -5144,48 +5142,10 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-면의 색은 blockId 의 3비트를 그대로 RGB 로 나타낸다 (흑 = 0 / 적 = 1 / 녹 = 2 / 황 = 3 / 청 = 4 / 마젠타 = 5 / 시안 = 6 / 백 = 7). 1회의 관찰로 8진수 1자리를 읽을 수 있다. p0 → p3 순으로 3, 2, 7, 2 로 읽혔다면, 위 자리부터 나열한 8진 2723 = 1491 이 id 가 된다 (Lava). id 가 낮은 지형계는 p0 과 p1 의 2회로 족하다. surface 훅만으로 구성되어 있으므로, strict 타이틀에서도 움직인다.
 
-#### R-H. 잎만 흔들기 — blockId 에 의한 vertex 훅의 한정
+#### R-H. `blockId` 사용 시 주의
 
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// vertex 훅은 strict 타이틀에서 자동 무효 (§36 참조)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // 변위는 월드 위치의 매끄러운 함수로 한다. 월드 위의 같은 지점을 가리키는
-        // 공유 정점이 같은 값으로 움직이므로, 면이 뜯기지 않는다 ([레시피](recipes/) R7 도 같은 원리)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- id 일람은 엔진의 갱신으로 늘어난다 (실측에서도 새 빌드로 50종의 블록이 추가됐다). 계속 쓰는 경우는 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 나 R-G 의 비트 평면 표시로 추가분을 조사해 배열에 더할 것
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) 는 지면에 까는 비고체의 깔개 잎이다. 흔들면 지면에서 뜨는 것처럼 보이므로, 배열에서 빼서 제외하는 것도 하나의 선택
-- strict 타이틀에서는 vertex 훅이 통째로 무효가 되지만, 위의 가드가 있으면 「흔들림이 멎을 뿐」 이고, 프래그먼트 측의 효과는 계속 산다
-
+숫자 ID는 엔진이 관리하는 데이터이며 업데이트에 따라 바뀔 수 있다. 과거에 측정한 목록을 영구 매핑으로 재사용하지 말 것. 필요하면 R-G 표시 방법으로 사용 중인 환경을 확인하고, 현재 API에서는 가능한 한 `BloxdFlags`의 이름 있는 필드를 우선한다.
 ### 35. 새 기능 ②: `BLOXD_SCENE_DEPTH` 와 `bloxdOpaqueBehind()` (본명)
 
 v1에서 구조적으로 불가능했던 깊이 액세스가 **액체 (liquid) 프로그램에 한해** 풀렸다. 색은 얻을 수 없지만, **안쪽 불투명면까지의 거리와 위치라는 기하 정보를 얻을 수 있다**. 전형적인 용법은 물의 두께를 잰 흡수색 계산이다.
@@ -5270,17 +5230,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
 이 책의 게재 코드는 이 패턴을 포함하지 않는다 (`pack_hash3` 의 `+`/`*` 혼재와 `h ^ (h >> 16u)` 는 괄호 처리되어 있어 사양 적합). 팩을 쓰면 제1단계와 제2단계를 둘 다 통과시킬 것.
-
-### 39. 독립적인 유사 자료에 대하여
-
-내용이 거의 같은 커뮤니티 자료가 존재한다: [GlitchHunterCoder/Bloxd-Essay 의 Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). 이 가이드보다 먼저 공개되었지만, **이 가이드 내용은 glm 이 Bloxd 의 실제 번들 파일 (webpack 청크 묶음) 을 독자 해석한 것으로 — 베끼기가 아니다**. 둘이 일치하는 것은, 같은 구현을 독자 조사하면 같은 결론에 이르기 때문이다.
-
----
-
-조사: ltf_ahel (glm 을 사용해 조사)
-
-
----
 
 ## API v3 마이그레이션 가이드
 

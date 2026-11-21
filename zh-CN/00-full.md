@@ -4932,7 +4932,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 核心原则
 
-1. **直接抓取生产包** — 从生产与预发两侧抓取原始 main.js 与 chunk，以 md5 核验同一性
 2. **逐字尊重** — 标头、错误消息与 i18n 字符串**原样引用**，绝不转述
 3. **复现式测量** — 注册表等派生值通过在 harness 中运行引擎自身模块重算 (真实输出，而非形似的重实现)
 4. **具名构建** — 每项测量都带构建 id 与日期
@@ -5110,7 +5109,6 @@ v1 中 `time` / `eyePosition` / `sunDirection` / `originOffset` 为结构体字�
 | 6 | Clay | 139 | Ice |
 | 7 | Gravel | 147 | Bedrock |
 | 8 | Snow | 149 | Cactus |
-| 9 | Maple Log | 1491 | Lava |
 
 entries.json 也收录非方块条目 (工具等)，但只有方块家族的 ID 能到达地形 / 液体钩子。
 
@@ -5148,48 +5146,10 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-面的颜色直接以 RGB 编码 blockId 的 3 位 (黑 = 0 / 红 = 1 / 绿 = 2 / 黄 = 3 / 蓝 = 4 / 品红 = 5 / 青 = 6 / 白 = 7)。一次观测读取一个八进制位。若 p0 → p3 依次读到 3, 2, 7, 2，则从最高位起读出的八进制 2723 = 1491 即该 ID (Lava)。低 ID 的地形家族用 2 次观测 (p0, p1) 就够了。本包只用 surface 钩子，因此在 strict 游戏中也运行。
 
-#### R-H. 只摇摆树叶——按 blockId 限定 vertex 钩子
+#### R-H. 使用 `blockId` 时的注意事项
 
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// vertex 钩子在 strict 游戏中自动禁用 (见 §36)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // 位移是随世界坐标变化的平滑函数。指向同一世界点的共享顶点
-        // 移动相同，因此面永远不会撕裂 ([实战配方](recipes/) R7 遵循同一原理)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- ID 列表随引擎更新增长 (仅在实测期间就有 50 种方块新增于新构建)。要继续使用，请经由 [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) 或 R-G 的位平面显示找出新增项，再扩展数组
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) 是地上的非固体落叶层。摆动它们会像从地面剥离；把它们从数组中排除也是一个选择
-- 在 strict 游戏中 vertex 钩子会被整体禁用，但有上面的守卫，包只是「停止摇摆」——片元侧效果继续工作
-
+数字 ID 由引擎管理，可能随更新变化。不要把过去测得的列表当作永久映射重复使用。必要时可通过 R-G 的显示方法检查当前环境；在当前 API 中，尽可能优先使用 `BloxdFlags` 的命名字段。
 ### 35. 新功能 ②: `BLOXD_SCENE_DEPTH` 与 `bloxdOpaqueBehind()` (核心)
 
 v1 中结构上不可能的深度访问，**仅限液体 (liquid) 程序解禁**。取不到颜色，但**可取得后方不透明面的距离与位置等几何信息**。典型用法是以测得的水体厚度计算吸收色。
@@ -5274,17 +5234,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
 本指南刊载代码不含此写法 (`pack_hash3` 的 `+`/`*` 混用与 `h ^ (h >> 16u)` 已加括号，故符合规范)。写完包后，第 1 阶段与第 2 阶段都要通过。
-
-### 39. 关于独立相似资料
-
-存在内容几乎相同的社区资料：[GlitchHunterCoder/Bloxd-Essay 的 Shader](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader)。它比本指南先公开，但**本指南内容出自 glm 对 Bloxd 实际包文件 (webpack chunk 集) 的独立解析——并非复制粘贴**。两者一致是因为独立调查同一实现必得同一结论。
-
----
-
-调查：ltf_ahel (使用 glm 调查)
-
-
----
 
 ## API v3 迁移指南
 
