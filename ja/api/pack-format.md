@@ -49,7 +49,7 @@
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` の裏 |
 | 64 | `shadowDirection` | `vec3f` | 影を落とす光の進行方向。`bloxdShadowDirection()` の裏 |
 
-`shadowDirection` は `eyePosition` の後のパディングに収まりました (`vec3f` は 12 バイトを占めるためオフセット 60〜63 が隙間。80 の位置は 16 バイト境界で、構造体はちょうど 80 バイト)。エンジンは 3 回の `setFloat32` で書き込みます — 単位ベクトル (昼は太陽、夜は月、太陽がない worlds では既定空の太陽) で、決して水平線より上にはなりません。uniform 全体は 80 バイトで、`minBindingSize` も 80 です。
+`shadowDirection` は `eyePosition` の後のパディングに収まりました (`vec3f` は 12 バイトを占めるためオフセット 60〜63 が隙間。64 の位置は 16 バイト境界で、構造体はちょうど 80 バイト)。エンジンは 3 回の `setFloat32` で書き込みます — 単位ベクトル (昼は太陽、夜は月、太陽がない worlds では既定空の太陽) で、決して水平線より上にはなりません。uniform 全体は 80 バイトで、`minBindingSize` も 80 です。
 
 `lit` は v4 が `seconds` と `renderOffset` の間に既に持っていたパディングに収まりました (オフセット 4〜15 は v4 ではアラインメントの隙間。`vec3i` が 16 バイトアラインを必要とするため `renderOffset` は 16 のまま)。
 

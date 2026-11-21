@@ -49,7 +49,7 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Mi
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
 | 64 | `shadowDirection` | `vec3f` | the direction the shadow-casting light travels; backs `bloxdShadowDirection()` |
 
-`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 80, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. The uniform is 80 bytes, and the pack bind-group's `minBindingSize` is 80.
+`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 64, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. The uniform is 80 bytes, and the pack bind-group's `minBindingSize` is 80.
 
 `lit` still fits into the padding v4 had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16).
 

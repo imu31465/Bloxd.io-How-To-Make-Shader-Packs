@@ -49,7 +49,7 @@ Der Loader vergleicht `manifest.apiVersion !== 5` mit JavaScript-strikt `!==`. M
 | 48 | `eyePosition` | `vec3f` | unterlegt `bloxdEyePosition()` |
 | 64 | `shadowDirection` | `vec3f` | die Richtung, in die das schattenwerfende Licht läuft; stützt `bloxdShadowDirection()` |
 
-`shadowDirection` füllt die Lücke nach `eyePosition` (ein `vec3f` belegt 12 Byte, also waren Offsets 60–63 Spielraum; `shadowDirection` landet bei 80, einer 16-Byte-Grenze — der Struct bleibt exakt 80 Byte). Die Engine schreibt ihn mit drei `setFloat32` — es ist ein Einheitsvektor (tagsüber von der Sonne, nachts vom Mond, bei sonnenlosen Worlds von der Sonne des Standardhimmels), nie über dem Horizont. Das Uniform ist 80 Byte groß; `minBindingSize` beträgt ebenfalls 80.
+`shadowDirection` füllt die Lücke nach `eyePosition` (ein `vec3f` belegt 12 Byte, also waren Offsets 60–63 Spielraum; `shadowDirection` landet bei 64, einer 16-Byte-Grenze — der Struct bleibt exakt 80 Byte). Die Engine schreibt ihn mit drei `setFloat32` — es ist ein Einheitsvektor (tagsüber von der Sonne, nachts vom Mond, bei sonnenlosen Worlds von der Sonne des Standardhimmels), nie über dem Horizont. Das Uniform ist 80 Byte groß; `minBindingSize` beträgt ebenfalls 80.
 
 `lit` passte in den Spielraum, den v4 bereits zwischen `seconds` und `renderOffset` hatte.
 
