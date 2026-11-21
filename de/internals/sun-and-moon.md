@@ -1,6 +1,6 @@
 # Sonne und Mond
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Die `bloxdSunDirection()`-Quelle ist ein Sonnenrichtungs-Buffer, der nur bei Skybox-Typwechsel neu geschrieben wird — Kriterium ist nicht „ob der Himmel eine Sonne hat", sondern **„ob die Skybox vom Erdtyp ist"**.
 

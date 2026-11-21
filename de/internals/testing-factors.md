@@ -1,6 +1,6 @@
 # Was paket-sichtbare Werte verändert
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (Analyse des Produktions-Bundles auf JavaScript-Ebene)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Dasselbe Paket rendert je nach **Welt und Spieler-Einstellungen** anders. Vor Verteilung mindestens diese 3 Umgebungen prüfen:
 

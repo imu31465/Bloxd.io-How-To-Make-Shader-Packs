@@ -1,6 +1,6 @@
 # Model-Rendering-Interna
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (aus dem Live-Bundle restauriert)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Die Interna des v5-Model-Programms. Der nutzerseitige Leitfaden: [Modelle und Texturen](../guides/models.md).
 

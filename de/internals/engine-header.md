@@ -1,8 +1,8 @@
 # Engine-Header (wortwörtlich)
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (aus dem Live-Produktions-Bundle restauriert)
+> Ziel-API: 5 · Typ: technische Referenz
 
-Der exakte Text, den die Engine jedem Pack voranstellt — aus dem Validator des Live-Builds mit angewandten Interpolationen gerendert (`apiVersion` und die 6 Uniform-Leses via `bloxdPackInputs`). 216 Zeilen. Keine Paraphrase. Auf den früheren Builds (`bny9u`, `v98qt8`) erneut verifiziert — der einzige Zuwachs ist der Schatten-Inhalt.
+Referenztext des WGSL-Headers, den die Engine jedem Shader-Pack voranstellt. Erläuterungen zu den einzelnen Feldern und Funktionen stehen in der [API-Referenz](../api/).
 
 Lese-Anleitung:
 - Feld-für-Feld-Erklärungen → [Strukturen](../api/structures.md)

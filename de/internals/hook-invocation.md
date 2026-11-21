@@ -1,6 +1,6 @@
 # Hook-Aufruf-Interna
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (aus dem Produktions-Bundle restauriert — der Lite-Renderer; die integrierte Quelldatei `lite/terrainShaderPack.ts` überlebt in Fehlerstrings)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Wie die Engine Hooks zur Laufzeit aufruft. Das ändert nichts an dem Code, den du schreibst, nimmt aber das Rätselraten darüber, was Hooks empfangen.
 

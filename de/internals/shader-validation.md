@@ -1,6 +1,6 @@
 # Shader-Validierung
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (aus dem Live-Validator restauriert)
+> Ziel-API: 5 · Typ: technische Referenz
 
 Die statische Validierung (Analyzer, Stufe 1 der Ladeprüfung). Nutzerseitige Fixes: [Validierungsfehler](../troubleshooting/validation.md).
 
