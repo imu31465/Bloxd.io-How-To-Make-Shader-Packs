@@ -92,6 +92,7 @@ const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetiv
 // APIバージョンや検証状態など、利用者にも意味のある情報は残す。
 function stripBuildMetadataLine(line) {
   if (!line.startsWith('>')) return line
+  if (/historical/i.test(line) && /(?:target\\s*build|対象ビルド|build\\s+objetivo|build\\s+alvo|build\\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)/i.test(line)) return null
   const parts = line.replace(/^>\s*/, '').split(/\s*[·•]\s*/)
   const kept = parts.filter(part => !BUILD_METADATA_FIELD.test(part))
   if (kept.length === 0) return null
