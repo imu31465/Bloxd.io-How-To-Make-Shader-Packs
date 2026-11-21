@@ -456,7 +456,7 @@ v4 以前の「照明 on/off」軸は廃止されました (v4 は8バリアン�
 ## APIリファレンス
 現行API v5の仕様書です。各パックの先頭にエンジンが自動付与するヘッダーがAPI定義の一次ソースです (全文は [エンジン内部](internals/engine-header.md) を参照)。
 
-### このカテゴリーの構成
+### ページ一覧
 
 | ページ | 内容 |
 |---|---|
@@ -2948,7 +2948,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ## ガイド
 「仕組みと考え方」を説明する資料です。そもそも何が可能かは[シェーダーパックにできること・できないこと](guides/constraints.md)にまとまっています。目的別のコード例は[レシピ](recipes/)に分かれています。
 
-### このカテゴリーの構成
+### ページ一覧
 
 | ページ | 内容 |
 |---|---|
@@ -3472,7 +3472,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## レシピ
 目的別のコード例集です。仕組みや考え方の解説は[ガイド](guides/)に分かれています。すべて API v5 の語彙 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) に移植済みで、6バリアント (strict × terrain / liquid / model) を通す前提のガード付きです。
 
-### このカテゴリーの構成
+### ページ一覧
 
 | ページ | 内容 |
 |---|---|
@@ -5344,11 +5344,11 @@ WebGPU 対応が限定される環境では動きません ([動作環境](getti
 ## エンジン内部
 エンジン内部の動作を説明する技術資料です。シェーダーパックがどのように処理されるかを詳しく知りたい場合に参照してください。安定した利用方法と公開仕様は[APIリファレンス](api/)を参照してください。
 
-### このカテゴリーの構成
+### ページ一覧
 
 | ページ | 内容 |
 |---|---|
-| [レンダリングパイプライン](internals/rendering-pipeline.md) | alphaTest の位置、方位光 2 灯、uniform の実体、greedy meshing |
+| [レンダリングパイプライン](internals/rendering-pipeline.md) | alphaTest の位置、方向光2灯、uniform の実体、greedy meshing |
 | [フック呼び出しの内部](internals/hook-invocation.md) | フックがどう呼び出されるか |
 | [エンジンヘッダー](internals/engine-header.md) | パックに付加されるWGSLヘッダー |
 | [シェーダー検証の内部](internals/shader-validation.md) | 静的検証の内部、シグネチャ表、HEADER_VERSION |
@@ -5479,7 +5479,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | フィールド | エンジン側の供給元 |
 |---|---|
 | `litColour` | フォグ混合の直前に捕捉されたフラグメント色 — ヘッダーの表現では「emission とフォグの前」 |
-| `directional` | シーンの方向ライトごとの Lambert 和を頂点補間したもの (方位光 2 灯構成は [レンダリングパイプライン](internals/rendering-pipeline.md)) |
+| `directional` | シーンの方向ライトごとの Lambert 和を頂点補間したもの (方向光2灯構成は [レンダリングパイプライン](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | マテリアルの方向光 RGB 応答 / RGB グロー (v5 新設) |
 | `ambient` | `material.ambient × sceneAmbient` — マテリアルごと、フレームごと |
 | `blockLight` / `skyLight` | デコードされたライトレベルの varying ([ライティングの内部](internals/lighting-internals.md)) |
