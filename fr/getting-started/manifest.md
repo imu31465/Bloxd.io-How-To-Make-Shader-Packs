@@ -16,7 +16,7 @@
 
 | Champ | Type | Requis | Description |
 |---|---|---|---|
-| `apiVersion` | nombre | requis | Doit être **exactement égal à `5`** (`===` strict). Une chaîne `"5"` ou tout autre type échoue, signalé avec l'orthographe JSON |
+| `apiVersion` | nombre | requis | Doit être **exactement égal à `5`** (`===` strict). Une chaîne `"5"` ou tout autre type échoue, et le message affiche sa représentation JSON |
 | `name` | chaîne | requis | Non vide après suppression des espaces en début et fin. Affiché dans l'interface des réglages |
 | `author` | chaîne | optionnel | Peut être omis ; doit être une chaîne s'il est présent |
 
