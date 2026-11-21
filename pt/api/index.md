@@ -1,6 +1,6 @@
 # Referência da API
 
-A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o build alvo `bny9u` (2026-11-05; produção e preprod idênticos). O cabeçalho do motor anteposto a cada pacote (reproduzido em [Interior do motor](../internals/engine-header.md)) é a fonte primária.
+Esta seção documenta a API v5 atual de shader packs. Cada página explica os tipos, as funções e os limites necessários para criar e implementar shader packs.
 
 ## Mapa
 
@@ -17,7 +17,7 @@ A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o bui
 | [Pré-processador](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrições](restrictions.md) | limites da linguagem, identificadores reservados |
 | [Compatibilidade](compatibility.md) | pacotes de versões antigas, revalidação de pacotes salvos |
-| [Catálogo de texturas](texture-catalog.md) | todos os 896 nomes utilizáveis (com busca) |
+| [Catálogo de texturas](texture-catalog.md) | todos os 1,017 nomes utilizáveis (com busca) |
 
 > API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
 
