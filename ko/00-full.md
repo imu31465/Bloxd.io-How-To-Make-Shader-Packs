@@ -132,7 +132,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> 엔진 헤더 (상수 · 구조체 · 함수) 는 로드 시 모든 팩 앞에 자동으로 붙는다 — 직접 쓸 일은 없다. 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 재현되어 있다.
+> 엔진 헤더 (상수 · 구조체 · 함수) 는 로드 시 모든 팩 앞에 자동으로 붙는다 — 직접 쓸 일은 없다. 헤더 전문은 [엔진 내부](internals/engine-header.md) 에 재현되어 있다.
 
 ### 2. 게임에서 로드
 
@@ -386,7 +386,7 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 
 대부분의 게임은 strict 다 (정점 애니메이션 없음, `discard` 없음). 가드 없는 버텍스 훅은 `<hook> moves terrain, which strict games prevent.` 를, 도달 가능한 `discard` 는 `discard makes terrain see-through, which strict games prevent.` 를 낸다 — 둘 다 그 strict 게임에서 **모든 훅**을 비활성화한다. 버텍스 훅은 항상 `#ifndef BLOXD_STRICT` 로 감싸라.
 
-게임별 정책의 내부는 [엔진 내부와 연구: 정책](internals/policy.md) 을 보라.
+게임별 정책의 내부는 [엔진 내부: 정책](internals/policy.md) 을 보라.
 
 
 ---
@@ -444,7 +444,7 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## API 레퍼런스
-이 페이지는 현행 API v5 사양을 설명한다. API 정의의 기본 자료는 엔진이 모든 팩의 앞에 자동으로 추가하는 엔진 헤더다 (전체 내용은 [엔진 내부와 연구](internals/engine-header.md) 참조).
+이 페이지는 현행 API v5 사양을 설명한다. API 정의의 기본 자료는 엔진이 모든 팩의 앞에 자동으로 추가하는 엔진 헤더다 (전체 내용은 [엔진 내부](internals/engine-header.md) 참조).
 
 ### 구성
 
@@ -617,7 +617,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - 공식 9훅 템플릿 → [시작하기: 셰이더 훅](getting-started/hooks.md)
 - 모든 구조체 필드 → [구조체](api/structures.md)
-- 훅 호출의 내부 → [엔진 내부와 연구](internals/hook-invocation.md)
+- 훅 호출의 내부 → [엔진 내부](internals/hook-invocation.md)
 
 
 ---
@@ -740,14 +740,14 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### 관련 문서
 
 - v4 전체 이주 → [버전 히스토리: v5](history/v5.md)
-- 플래그 전달의 내부 → [엔진 내부와 연구](internals/rendering-pipeline.md)
+- 플래그 전달의 내부 → [엔진 내부](internals/rendering-pipeline.md)
 
 
 ---
 
 ## 입출력 구조체
 
-7개의 구조체를 팩이 읽고 쓸 수 있다. 모든 필드를 아래에 실었다 (`#ifdef` 필드는 조건부). 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 있다.
+7개의 구조체를 팩이 읽고 쓸 수 있다. 모든 필드를 아래에 실었다 (`#ifdef` 필드는 조건부). 헤더 전문은 [엔진 내부](internals/engine-header.md) 에 있다.
 
 ### BloxdVertexIn (버텍스 훅 입력)
 
@@ -1108,7 +1108,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **가드**: `#ifdef BLOXD_SCENE_DEPTH` (액체 베리언트에서 정의)
 - **의미**: 이 프래그먼트 뒤의 불투명 면 (물 너머로 보이는 지형). 하늘일 때는 `hit == false`
 - **v2 에서의 개명**: `found` → `hit`
-- **심층 해설**: [버전 히스토리: v3](history/v3.md) 및 [엔진 내부와 연구](internals/rendering-pipeline.md)
+- **심층 해설**: [버전 히스토리: v3](history/v3.md) 및 [엔진 내부](internals/rendering-pipeline.md)
 
 ### 관련 문서
 
@@ -1255,7 +1255,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` 는 0–1 로 매핑되어 도착한다**: 0–15 레벨을 이즈아웃 곡선에 통과시킨 것 (예: `6 → 0.45`, `12 → 0.92`). 셋 모두 `ambientLightColour` 를 제외한 값이다
 - **리프트 곡선**: `skyLight` 의 실체는 「이 장소에서 하늘이 보이는가」 — 복셀 가림 데이터, 즉 섀도맵이다. 임계값 기반의 양지/음지 분리에는 역변환이 필요할 수 있다 ([리얼화 가이드](guides/realism.md) 참조)
-- **포그 내부**: 선형 모드에서 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (0..1 클램프), 뷰 공간에서 정점별로 계산된다. 현행 빌드는 선형뿐이다 (상세는 [엔진 내부와 연구: 포그의 내부](internals/fog-internals.md))
+- **포그 내부**: 선형 모드에서 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (0..1 클램프), 뷰 공간에서 정점별로 계산된다. 현행 빌드는 선형뿐이다 (상세는 [엔진 내부: 포그의 내부](internals/fog-internals.md))
 
 ### 레시피
 
@@ -1296,7 +1296,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 관련 문서
 
-- [함수](api/functions.md) · [가이드: 라이팅](guides/lighting.md) · [엔진 내부와 연구: 라이팅의 내부](internals/lighting-internals.md)
+- [함수](api/functions.md) · [가이드: 라이팅](guides/lighting.md) · [엔진 내부: 라이팅의 내부](internals/lighting-internals.md)
 
 
 ---
@@ -1521,7 +1521,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### 관련 문서
 
 - **사용 가능 896 이름 전체** → [텍스처 카탈로그](api/texture-catalog.md)
-- [엔진 내부와 연구: 텍스처 레지스트리](internals/texture-registry.md) · [텍스처 샘플링](internals/texture-sampling.md)
+- [엔진 내부: 텍스처 레지스트리](internals/texture-registry.md) · [텍스처 샘플링](internals/texture-sampling.md)
 
 
 ---
@@ -1657,7 +1657,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 ### 관련 문서
 
-- [시작하기: 베리언트](getting-started/variants.md) · [엔진 내부와 연구: 셰이더 검증](internals/shader-validation.md)
+- [시작하기: 베리언트](getting-started/variants.md) · [엔진 내부: 셰이더 검증](internals/shader-validation.md)
 
 
 ---
@@ -1723,7 +1723,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 ### 관련 문서
 
-- [문제 해결: 컴파일](troubleshooting/compilation.md) · [엔진 내부와 연구: 셰이더 검증](internals/shader-validation.md)
+- [문제 해결: 컴파일](troubleshooting/compilation.md) · [엔진 내부: 셰이더 검증](internals/shader-validation.md)
 
 
 ---
@@ -3162,7 +3162,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 내부
 
-모델이 어떻게 렌더되고 플래그/인챈트 입력이 어떻게 흐르는가: [엔진 내부와 연구: 모델 렌더링](internals/model-rendering.md). `bloxdSpItemLocalPosition` 이나 `bloxdSpEnchant` 같은 생성 심볼은 [제한과 예약명](api/restrictions.md) 에 실려 있다.
+모델이 어떻게 렌더되고 플래그/인챈트 입력이 어떻게 흐르는가: [엔진 내부: 모델 렌더링](internals/model-rendering.md). `bloxdSpItemLocalPosition` 이나 `bloxdSpEnchant` 같은 생성 심볼은 [제한과 예약명](api/restrictions.md) 에 실려 있다.
 
 
 ---
@@ -4661,7 +4661,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 관련 문서
 
-- [검증 오류](troubleshooting/validation.md) · [엔진 내부와 연구: WGSL 컴파일](internals/wgsl-compilation.md) · [제한과 예약명](api/restrictions.md)
+- [검증 오류](troubleshooting/validation.md) · [엔진 내부: WGSL 컴파일](internals/wgsl-compilation.md) · [제한과 예약명](api/restrictions.md)
 
 
 ---
@@ -4732,7 +4732,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 관련 문서
 
-- [제한과 예약명](api/restrictions.md) · [엔진 내부와 연구: 셰이더 검증](internals/shader-validation.md) · [베리언트 고유 문제](troubleshooting/variants.md)
+- [제한과 예약명](api/restrictions.md) · [엔진 내부: 셰이더 검증](internals/shader-validation.md) · [베리언트 고유 문제](troubleshooting/variants.md)
 
 
 ---
@@ -4975,7 +4975,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 이론이 궁금하다면
 
 - 그림자: [그림자](guides/shadows.md) (skyLight = 복셀 섀도맵)
-- 포그: [엔진 내부와 연구: 포그의 내부](internals/fog-internals.md)
+- 포그: [엔진 내부: 포그의 내부](internals/fog-internals.md)
 
 ### 관련 문서
 
@@ -5096,7 +5096,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### Q. 어떤 게임에서 동작하나?
 
-대부분의 게임은 strict 모드로 돈다 (정점 애니메이션 없음, `discard` 없음). 정점 애니메이션은 allow 목록 게임에서만 동작한다. 타이틀별 목록은 [엔진 내부와 연구: 정책](internals/policy.md) 에 있다.
+대부분의 게임은 strict 모드로 돈다 (정점 애니메이션 없음, `discard` 없음). 정점 애니메이션은 allow 목록 게임에서만 동작한다. 타이틀별 목록은 [엔진 내부: 정책](internals/policy.md) 에 있다.
 
 #### Q. 모바일에서 동작하나?
 
@@ -5129,7 +5129,7 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 ---
 
-## 엔진 내부와 연구
+## 엔진 내부
 이 분류는 셰이더 팩의 실행을 이해하는 데 도움이 되는 엔진 내부 동작을 설명합니다. 구현 세부 사항은 게임 업데이트에 따라 바뀔 수 있습니다. 안정적인 사용 규칙과 지원 API는 [API 참조](api/)를 확인하세요.
 
 ### 구성
@@ -6451,7 +6451,7 @@ v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 �
 
 이 페이지는 API v3 팩을 v4로 마이그레이션하기 위한 역사적 안내서입니다. 현재 버전으로 옮기려면 [API v5 마이그레이션 가이드](history/v5.md)를 적용하세요. 새 팩을 만들 때는 [API 참조](api/)를 확인하세요.
 
-이 릴리스 전후로 번들 밖에서 바뀐 것이 하나 있다: **엔진이 참조 파일을 이름으로 인용한다.** 엔진 자신의 에러 메시지가 `bloxd-api.wgsl` (주석 달린 엔진 헤더)과 `BLOCK_TEXTURES.md` (텍스처 이름 전체 목록)을 가리킨다 — `...BLOCK_TEXTURES.md lists them.` 이 가이드는 그 두 파일을 다른 곳으로 안내하는 대신 내용을 싣는다: 라이브 빌드에서 그대로 복원한 완전한 헤더는 [엔진 내부와 연구: 엔진 헤더](internals/engine-header.md)에, 사용 가능한 텍스처 이름의 완전한 카탈로그 (v4 빌드에서 905개)는 [텍스처 카탈로그](api/texture-catalog.md)이다. 이 가이드의 팩 대면 사실은 모두 프로덕션 번들에서 복원했다.
+이 릴리스 전후로 번들 밖에서 바뀐 것이 하나 있다: **엔진이 참조 파일을 이름으로 인용한다.** 엔진 자신의 에러 메시지가 `bloxd-api.wgsl` (주석 달린 엔진 헤더)과 `BLOCK_TEXTURES.md` (텍스처 이름 전체 목록)을 가리킨다 — `...BLOCK_TEXTURES.md lists them.` 이 가이드는 그 두 파일을 다른 곳으로 안내하는 대신 내용을 싣는다: 라이브 빌드에서 그대로 복원한 완전한 헤더는 [엔진 내부: 엔진 헤더](internals/engine-header.md)에, 사용 가능한 텍스처 이름의 완전한 카탈로그 (v4 빌드에서 905개)는 [텍스처 카탈로그](api/texture-catalog.md)이다. 이 가이드의 팩 대면 사실은 모두 프로덕션 번들에서 복원했다.
 v4 변경 세트를 한 화면에:
 | 영역 | v3 | v4 |
 |---|---|---|
