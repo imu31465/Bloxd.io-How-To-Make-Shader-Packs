@@ -46,9 +46,9 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 水 |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 方块模型 (台阶、楼梯、植物)、物品、玩家、生物、NPC、盔甲、外观装饰 |
 
-- **能做到**: 改颜色、透明度与自发光；重建光照 ([光照 API](api/lighting.md))；投影式阴影 (经 `skyLight`)；采样纹理 (`bloxdTexel` — 读取既有方块纹理图集)；逐模型效果 (`flags` 会告诉你「这是手持物品」「这是玩家」)；顶点动画 (仅 allow 游戏)
-- **做不到**: 添加自己的纹理 (那是纹理包系统的职责)；后处理 (泛光等)；随太阳旋转的阴影贴图式阴影；真实反射 (SSR)；影响天空、云或太阳盘本身
-- **容易忽视但很强**: **利用 `skyLight` (体素天空遮蔽) 的投影式阴影** — 让树下与屋檐下明确压暗。破坏方块会让 LightEngine 立即重算，阴影实时跟随
+- **可以实现**：修改颜色、透明度与自发光；重建光照（[光照 API](api/lighting.md)）；使用引擎计算的日月阴影（`bloxdShadow()`、`bloxdAirShadow(t)`、`bloxdShadowDirection()`）；使用体素天空遮蔽（`skyLight`）；通过 `bloxdTexel` 采样纹理；通过 `flags` 实现逐模型效果；在 allow 游戏中进行顶点动画
+- **无法实现**：添加自定义纹理（应使用纹理包系统）；对最终画面进行后处理（泛光等）；读取阴影贴图深度数据或生成自定义阴影贴图；添加真正的反射（SSR）；修改天空、云或太阳圆盘本身
+- **选择阴影方案**：需要跟随太阳和月亮的阴影时，使用 `bloxdShadow()`。`skyLight` 是一种较旧的方案，可用于压暗树下和屋檐下的区域，但不会跟随太阳或月亮移动。参见[阴影](guides/shadows.md)。
 
 ### strict 与 allow 模式
 
@@ -58,7 +58,6 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 
 - 当前游戏只接受 `apiVersion: 5` 的包；v1–v4 包加载即被拒绝 (已保存的包会静默失效 — [兼容性](api/compatibility.md))
 - 要迁移为旧版本编写的包？见[版本历史](history/)
-- 引擎内部可能随更新变化，因此每页都标注目标构建
 
 ---
 
@@ -3999,7 +3998,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### 问: API 还会再变吗？
 
-引擎内部可能随更新变化 — 每页都标注目标构建。标头或注册表变化时，已保存的包会自动重验 ([兼容性](api/compatibility.md#已保存包的重验-需要重新检查))。
 
 #### 问: 那些「电影级着色器」分发物是怎么回事？
 
@@ -4786,35 +4784,50 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 ---
 
 ## 引擎数据台账
-> 目标 API：5 · 状态：Analyzed
 
-本页汇总着色器包可使用的 API。具体用法请参阅 [API 参考](api/)。
+本台账汇总当前构建中着色器包可见 API 的已确认数值。模块 ID、chunk 编号等 bundle 内部细节不属于 API 规格，因此不在此列出。
 
-### API 范围
+### 当前规格
 
-| 项目 | 规格 |
+| 项目 | 当前值 |
 |---|---|
-| API 版本 | `5` |
-| 引擎标头 | 216 行；参见[引擎标头](internals/engine-header.md) |
+| `apiVersion` | `5`（与数值进行严格比较） |
+| 引擎标头 | 216 行；全文见[引擎标头](internals/engine-header.md) |
 | 钩子 | 9 个（Terrain / Liquid / Model × Vertex / Surface / Light） |
 | 变体 | 6 个（strict × terrain / liquid / model） |
-| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH` |
-| 包 uniform | 80 字节；参见[包格式](api/pack-format.md) |
-| uniform 字段 | `seconds` @0、`lit` @4、`renderOffset` @16、`sunDirection` @32、`eyePosition` @48、`shadowDirection` @64 |
-| 纹理名称 | 可用的命名常量列于[纹理目录](api/texture-catalog.md) |
+| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH`；`BLOXD_LIGHTING` 已在 v5 移除 |
+| 包 uniform | 80 字节：`seconds` @0、`lit` @4、`renderOffset` @16、`sunDirection` @32、`eyePosition` @48、`shadowDirection` @64 |
+| 包 binding | `@group(3) @binding(0)`；`minBindingSize` 为 80 |
+| 标志 | `BloxdFlags` 结构体，包含 14 个布尔字段 |
+| 纹理图集 | 1,650 层；1,017 个名称；776 个别名 |
+| 纹理族 | 64 个旋转族、71 个动画族 |
+| 保留标识符 | 匹配 `/^bloxd/i` 的名称，以及 88 个内部 `bloxdSp*` 符号 |
+| 游戏定义 | 119 个 |
+| 着色器包策略 | 12 个允许的游戏标题、28 条目；见[按游戏划分的策略](internals/policy.md) |
+| 默认包模板 | 1,633 字节 |
+| 加载器限制 | 256 个 WGSL 文件 / 源码总计 256 KB / `pack.json` 64 KB / ZIP 32 MB / 1,024 个条目 |
 
-### 阴影 API
 
-- `bloxdShadow()` 返回引擎计算的日光/月光阴影系数。
-- `bloxdAirShadow(t)` 在摄像机与片段之间的指定位置评估阴影。
-- `bloxdShadowDirection()` 返回产生阴影的光照方向。
-- `keepCircleShadows` 是 `pack.json` 的可选布尔字段，可保留旧式圆形阴影。
+- 新增 `bloxdShadow()`、`bloxdAirShadow(t)` 和 `bloxdShadowDirection()`，用于访问引擎计算的太阳与月亮阴影。
+- uniform 在偏移 64 处增加 `shadowDirection: vec3f`，大小从 64 字节增加到 80 字节。
+- `pack.json` 新增可选布尔字段 `keepCircleShadows`，用于保留旧版圆形影子。
+- 图集从 1,227 层增至 1,650 层，可用名称从 906 个增至 1,017 个。
 
-### 相关页面
+测量说明与证据见[研究日志](internals/research-log.md)和[纹理注册表内部机制](internals/texture-registry.md)。
 
-- [API 参考](api/) — 着色器包可用的 API
-- [包格式](api/pack-format.md) — manifest、uniform 和加载器限制
-- [游戏策略](internals/policy.md) — 各游戏的限制
+### 过往版本
+
+- [版本历史](history/) — 旧 API 的变化与迁移
+- [研究日志](internals/research-log.md) — 测量方法与依据
+
+### 相关
+
+- [引擎标头](internals/engine-header.md) — 完整标头文本
+- [按游戏划分的策略](internals/policy.md) — allow / strict 策略列表
+- [纹理注册表](internals/texture-registry.md) — 名称与 ID 的对应关系
+
+---
+
 ## 会改变包可见值的因素
 
 同一包因**世界与玩家设置**渲染各异。分发前至少在以下 3 环境确认外观：
@@ -4978,7 +4991,6 @@ v1 到 v5 的变更、迁移步骤与被移除的 API。用于迁移旧包，也
 
 ### 时间线
 
-| 版本 | 上线时间 | 指南 | 要点 |
 |---|---|---|---|
 | v1 | (最初) | [v1](history/v1.md) | 第一个着色器包 API。6 个钩子 (terrain/liquid × vertex/surface)；`bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` 词汇 |
 | v2 | — | [v2](history/v2.md) | 全面标识符改名、`blockId`、`BLOXD_SCENE_DEPTH` 与 `bloxdOpaqueBehind()` |
@@ -5487,7 +5499,6 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **验证仍为两阶段** ([v2 迁移指南](history/v2.md) §38): 先静态验证，再通过生成的桩片段调用你的钩子，交给浏览器真实 WebGPU 编译；错误会映射回源文件 / 行，诊断还会通过映射还原引擎侧标识符的原始名称。
 - **严格诊断会说明原因**: 移动地形的 vertex 钩子会报告 "… moves terrain, which strict games prevent."，surface / light 钩子中的 `discard` 会报告 "discard makes terrain see-through, which strict games prevent."；设置 UI 保留 "wrap each one listed below in `#ifndef BLOXD_STRICT ... #endif`." 的说明 (`offInStrict`)。
 - **加载器消息**: 错误类型与限制不变；"Zip64 archives aren't supported." 会作为 UI 消息显示 (`loadZip64`)。包 UI 的字符串清单共 57 个 `shaderPack:*` 键；在加载阶段错误中，`loadNoWgsl` (zip 中没有任何 `.wgsl` 文件) 与 `loadNotZip` (文件缺少 zip 归档结束签名) 补全了这一集合。
-- **包 UI 不附带游戏内 WGSL 编辑器。** 设置画面不提供着色器代码编辑器——包在游戏外以 zip 文件编写。(bundle 中确实存在 CodeMirror 编辑器，但那是 Custom Game 脚本 UI 的 JavaScript 编辑器；它不支持 WGSL，也与包系统毫无关联。)
 - **硬件门槛**: Lite 要求驱动支持 `shader-f16` WebGPU 功能；过旧的驱动会被拒绝，消息类似 "Intel driver too old for Lite (no shader-f16)"。
 - **光照变更会重新验证已保存的包**: 运行时光照设置改变时，引擎会重新运行包检查 (`changed → recheck`)；回放观看以 `changed: false` 调用同一钩子，并跳过重新检查。
 - **措辞**: 关于接受着色器包的游戏，文本现在写作 "in games that **support** them"。
@@ -5513,7 +5524,6 @@ v4 的变更集一屏速览:
 
 ### 55. v3 包的命运 (先说结论)
 
-**每个 v3 包——包括所有以 v3 分发的包——现在都会在生产环境于加载时立即失败。** 加载器以 JavaScript 严格不等号 `!==` 比较 `manifest.apiVersion !== 4`，因此该比较对类型与值双重严格: JSON 必须携带*数字* `4`。字符串 `"4"` 会失败并按其 JSON 拼写上报 (`{{packVersion}}` 经过了 `JSON.stringify`，所以设置画面会显示带引号的 `This pack is for shader pack API version "4"...` —— 一个提示你写了字符串的实用线索)。
 
 加载时的两条消息，逐字取自线上 i18n 字典:
 
@@ -5843,7 +5853,6 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 
 #### 60.3 v4 中没有的: 阴影 API
 
-同一社区频道记录到引擎作者有一份阴影 API 草稿 (`bloxd-api` 的伴生文件)，但**未**随本发布出货，方块/草阴影预计将与未来的着色器包 API 更新一同到来。v4 bundle 中不存在任何阴影相关内容 (没有阴影符号，保留名也没超出 §63.4 的清单)——把阴影当作「已宣布未出货」，暂时不要基于它构建分发包。基于 `skyLight` 的 R9.12 投影风阴影配方仍是 v4 中唯一的阴影表现。
 
 #### 60.4 给液体作者的 strict 小结
 
@@ -5915,7 +5924,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 62. 其他 v4 变更与注意
 
-- **bundle 再编成** (数字见引言) 把着色器管线挪进了 c49 (加载器/持久化)、c50–c51 (加载器 UI + zip)、c53 (验证器 + 头文件 + 注册表构建器)、c54 (WGSL 代码生成器 + Lite 渲染器)。对想在 v3 时代指南之后再研究 bundle 的人: 锚点全动了，代码没动。
 - **头文件文本为清晰性重写**——每条文档注释重新措辞 (更简练、第二人称)，除 §59 外无语义变化。大小 5,637 → 6,021 字节，128 → 150 行；首行现在是 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission 的顺序现在写进了头文件**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` —— v3 §43 的发现，如今是官方措辞。
 - 着色器包功能的 **i18n 面**为 58 个键 (v4 构建)；加载器族 (`load*`) 引散见 §55–§56，状态族 (`status*`) 在 §55，变体标签在 §60.1。
@@ -5949,7 +5957,6 @@ v5 的变更集一屏速览:
 
 ### 69. v4 包的命运 (先说结论)
 
-**每个 v4 包——包括所有以 v4 分发的包——现在都会在生产环境于加载时立即失败。** 加载器以 JavaScript 严格不等号 `!==` 比较 `manifest.apiVersion !== 5`——本构建中版本常量 `5` 与头文件模板位于同一模块 (模块 29836)，所以检查与它所校验的头文件文本一起移动。JSON 必须携带*数字* `5`；字符串 `"5"` 会失败并按其 JSON 拼写上报，与 v4 完全一样。
 
 加载时的两条消息与 v4 相比不变，逐字取自线上 i18n 字典:
 
@@ -5985,7 +5992,6 @@ manifest 规则经重新测量、其余不变: `pack.json` 必须是位于 zip �
 | 32 | `sunDirection` | `vec3f` | 支撑 `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | 支撑 `bloxdEyePosition()` |
 
-`lit` 填进了 v4 本就留在 `seconds` 与 `renderOffset` 之间的填充 (v4 中偏移 4–15 是对齐空隙；`renderOffset` 保持在 16，因为 `vec3i` 需要 16 字节对齐)，所以结构体总尺寸与所有其他成员的偏移都不变。引擎以单条 `setUint32(4, lit ? 1 : 0)` 写入——它是标志位，不是光照等级: v4 的 JS 侧名字 `terrainLightLevels` / `terrainHeldLight` 已从 bundle 中彻底消失。
 
 包的绑定组布局其余不变: 组 3 仍是 `0` uniform · `1` 场景深度纹理 (液体变体) · `2` `bloxdSpTextureLayers` 存储缓冲。`minBindingSize` 仍是 64。
 
@@ -6257,7 +6263,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 注释是新措辞，值得当作「删除模型」的文档读一读: *"Modify the return values to start building a shader pack. If you delete a hook, the default is used instead."* 液体注记也变了——v4 说 "If deleted, water uses your terrain hooks instead"，v5 说 "To share code with another hook, define a function and call it from both places"——而 strict 注记现在用一句话解释 `#ifndef`: *"Strict games keep terrain where it is. Without the #ifndef, this hook would turn the whole shader pack off there."*
 
-strict 游戏契约本身 (v4 §60) 不变: 未守卫的 vertex 钩子报 `<hook> moves terrain, which strict games prevent.`，可达的 `discard` 报 `discard makes terrain see-through, which strict games prevent.`，任一者在 strict 游戏中禁用*全部*钩子。12 个 allow 标题在真实 bundle 上重新测量过——仍是 12 个，不变。
 
 ### 77. v4 → v5 迁移清单
 
@@ -6338,4 +6343,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **只生成被引用的纹理常量。** 头文件的 `bloxdTextureId*` 块按包生成，只含你实际引用的名字——用到三个常量的包前置三行 `const`，而不是全部约 900 行。
 - **`HEADER_VERSION` 移至 `9.<hash>.<hash>`** —— 与 v4 相同的双后缀结构 (头文件材料的 fnv1a32、排序后名称-id 注册表的 fnv1a32)，前导整数从 8 升到 9。已保存包的重检逻辑 ([v4 迁移指南](history/v4.md) §55) 不变: 头文件/注册表变化会把已保存包翻成「需要重检」。
 - **i18n 面**: 着色器包的键族形态不变 (v4 指南 §62 的 `load*`、`status*`、变体标签键全部重新测量在位；`loadNoWgsl`/`loadNotZip` 仍逐字一致)。
-- **给再研究者的 bundle 布局**: 头文件 c55 (不变)、加载器/持久化 c51–c53、验证器 + 注册表构建器 c55、WebGPU 代码生成 c56、雾 c9、**默认包模板 c116** (自 c124 移来)、BLOXD_ALPHA 位置 c51/c52/c53/c55/c9。chunk 格式注意: 每个 chunk 现在是 ES 模块 (`export const modules = {...}`)——c53 甚至同时携带 c52 与 c53 两边的模块——这对文本搜索 bundle 的人有影响 (形如 `1371` 的模块 id 位于 *main* 的稀疏模块数组里，不在任何 chunk 中)。

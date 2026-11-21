@@ -46,8 +46,8 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 물 |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 블록 모델 (반 블록, 계단, 식물), 아이템, 플레이어, 몹, NPC, 방어구, 화장품 |
 
-- **할 수 있다**: 색·투명도·발광 변경, 라이팅 재구축 ([라이팅 API](api/lighting.md)), 엔진이 계산한 태양·달 그림자 사용 (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`), 복셀 하늘 가림 (`skyLight`) 사용, `bloxdTexel`로 텍스처 샘플링, `flags`를 이용한 모델별 효과, allow 게임에서 정점 애니메이션
-- **할 수 없다**: 자체 텍스처 추가 (텍스처팩 시스템의 역할), 최종 프레임 후처리 (블룸 등), 섀도맵 깊이 데이터 접근 또는 자체 섀도맵 생성, 실제 반사 (SSR) 추가, 하늘·구름·태양 원반 자체 변경
+- **할 수 있다**: 색·투명도·발광 변경, 라이팅 재구축 ([라이팅 API](api/lighting.md)), 엔진이 계산한 태양·달 그림자 (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`), 복셀 하늘 가림 (`skyLight`), `bloxdTexel`을 이용한 텍스처 샘플링, `flags`를 이용한 모델별 효과, allow 게임에서의 정점 애니메이션
+- **할 수 없다**: 사용자 텍스처 추가 (텍스처팩 시스템의 역할), 후처리 (블룸 등), 섀도맵 깊이 데이터 접근 또는 자체 섀도맵 생성, 실제 반사 (SSR) 추가, 하늘·구름·태양 원반 자체 변경
 - **그림자 방식 선택**: 태양과 달을 따라가는 엔진 그림자에는 `bloxdShadow()`를 사용한다. `skyLight`는 나무 밑과 지붕 밑을 어둡게 하는 이전 방식이며 태양이나 달의 움직임을 따라가지 않는다. [그림자](guides/shadows.md)를 참조한다.
 
 ### strict 와 allow 모드
@@ -58,7 +58,6 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 
 - 현행 게임은 `apiVersion: 5` 팩만 받는다. v1–v4 팩은 로드 시 거부된다 (저장 팩은 조용히 비활성 — [호환성](api/compatibility.md))
 - 구버전용으로 쓴 팩을 이주하고 있는가? [버전 히스토리](history/) 를 보라
-- 엔진 내부는 업데이트로 바뀔 수 있으므로, 모든 페이지가 대상 빌드를 명시한다
 
 ---
 
@@ -3996,7 +3995,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 #### Q. API 는 또 바뀌나?
 
-엔진 내부는 업데이트로 바뀔 수 있다 — 모든 페이지가 대상 빌드를 명시한다. 헤더나 레지스트리가 바뀌면 저장 팩은 자동 재검증된다 ([호환성](api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 #### Q. 「시네마틱 셰이더」 배포물은 뭔가?
 
@@ -4782,35 +4780,50 @@ Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict
 ---
 
 ## 엔진 데이터 대장
-> 대상 API: 5 · 상태: Analyzed
 
-이 페이지는 셰이더 팩에서 사용할 수 있는 API 구성을 요약한다. 사용 방법은 [API 레퍼런스](api/)를 참조한다.
+이 대장은 현재 빌드에서 셰이더 팩에 공개된 API의 확인된 값을 정리합니다. 모듈 ID나 청크 번호처럼 번들 내부에만 해당하는 정보는 API 사양이 아니므로 싣지 않습니다.
 
-### API 구성
+### 현재 사양
 
-| 항목 | 사양 |
+| 항목 | 현재 값 |
 |---|---|
-| API 버전 | `5` |
-| 엔진 헤더 | 216줄; [엔진 헤더](internals/engine-header.md) 참조 |
+| `apiVersion` | `5` (숫자와 엄격 비교) |
+| 엔진 헤더 | 216행; 전체 내용은 [엔진 헤더](internals/engine-header.md) 참조 |
 | 훅 | 9개 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | 베리언트 | 6개 (strict × terrain / liquid / model) |
-| 매크로 | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
-| 팩 uniform | 80바이트; [팩 형식](api/pack-format.md) 참조 |
-| uniform 필드 | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| 텍스처 이름 | 사용 가능한 이름 상수는 [텍스처 카탈로그](api/texture-catalog.md)에 수록 |
+| 매크로 | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING`은 v5에서 제거됨 |
+| 팩 uniform | 80바이트: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| 팩 binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| 플래그 | 14개 boolean 필드를 가진 `BloxdFlags` 구조체 |
+| 텍스처 아틀라스 | 1,650 레이어; 이름 1,017개; 별칭 776개 |
+| 텍스처 계열 | 회전 64개, 애니메이션 71개 |
+| 예약 식별자 | `/^bloxd/i`와 일치하는 이름 및 내부 `bloxdSp*` 심볼 88개 |
+| 게임 정의 | 119개 |
+| 셰이더 팩 정책 | 허용된 게임 12개, 항목 28개; [게임별 정책](internals/policy.md) 참조 |
+| 기본 팩 템플릿 | 1,633바이트 |
+| 로더 제한 | WGSL 파일 256개 / 코드 총 256KB / `pack.json` 64KB / ZIP 32MB / 항목 1,024개 |
 
-### 그림자 API
 
-- `bloxdShadow()`는 엔진이 계산한 태양·달 그림자 계수를 반환한다.
-- `bloxdAirShadow(t)`는 카메라와 프래그먼트 사이의 한 지점에서 그림자를 평가한다.
-- `bloxdShadowDirection()`은 그림자를 만드는 빛의 방향을 반환한다.
-- `keepCircleShadows`는 기존 원형 그림자를 유지하는 `pack.json` 선택 필드다.
+- `bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`이 엔진이 계산한 태양·달 그림자를 제공합니다.
+- uniform의 오프셋 64에 `shadowDirection: vec3f`가 추가되어 크기가 64바이트에서 80바이트로 늘었습니다.
+- `pack.json`에 기존 원형 그림자를 유지하는 선택적 boolean 필드 `keepCircleShadows`가 추가되었습니다.
+- 아틀라스는 1,227에서 1,650 레이어로, 사용 가능한 이름은 906개에서 1,017개로 늘었습니다.
 
-### 관련 페이지
+측정 설명과 근거는 [리서치 로그](internals/research-log.md)와 [텍스처 레지스트리 내부](internals/texture-registry.md)를 참고하세요.
 
-- [API 레퍼런스](api/) — 팩에서 사용할 수 있는 API
-- [팩 형식](api/pack-format.md) — manifest, uniform, 로더 제한
-- [게임별 정책](internals/policy.md) — 게임별 제한
+### 이전 버전
+
+- [버전 히스토리](history/) — 이전 API의 변경 및 마이그레이션
+- [리서치 로그](internals/research-log.md) — 측정 방법과 근거
+
+### 관련 문서
+
+- [엔진 헤더](internals/engine-header.md) — 헤더 전체 내용
+- [게임별 정책](internals/policy.md) — allow / strict 정책 대상
+- [텍스처 레지스트리](internals/texture-registry.md) — 이름과 ID의 연결
+
+---
+
 ## 팩에 보이는 값을 바꾸는 요인
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
@@ -4998,7 +5011,6 @@ v1 부터 v5 까지의 변경 내용·이주 절차·폐지된 API. 구형 팩�
 ## API v1
 > 상태: **Historical** — 셰이더 팩 기구의 첫 시대. 모든 v1 팩은 현행 게임이 거부한다.
 
-v1 은 최초의 셰이더 팩 API 다. v2 가 식별자를 전면 개명했으므로 ([v2 가이드](history/v2.md) §32 의 표), v1 어휘를 아는 주된 가치는 **옛 배포물과 옛 커뮤니티 가이드를 읽는 것** 이다.
 
 ### v1 어휘 (v2 에서 개명)
 
@@ -5273,10 +5285,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ## API v3 마이그레이션 가이드
 
 
-당시의 입문~내부 각 부는 여전히 v2 기준으로 작성되어 있었다. 본 가이드는 [v2 마이그레이션 가이드](history/v2.md)와 같은 순서로 v2 → v3 이전 포인트와 v3의 새 기능을 모은다. 변환은 대부분 기계적이지만 (§47), 실제 동작을 바꾸는 변경은 하나뿐이다 — 기본 light가 이제 emission을 포그로 감쇠시킨다 (§43) — 그리고 `blockId`가 `blockFlags`로 전면 교체되었으므로 (§42), 배포 전에는 반드시 게임 내 컴파일로 확인할 것.
-
-이번 개정에서 새로 추가된 **§49–§54**는 이전 자체를 넘어 프로덕션 빌드에서 복원한 엔진 내부로 들어간다 — Lite 렌더러가 실제로 훅을 호출하는 방식, 실제 4모드 포그 함수, `bloxdOpaqueBehind()`의 정확한 구현, 블록 등록에서 훅까지 이어지는 blockFlags의 완전한 전달 경로, 그리고 실측 헤더 해시가 포함된 검증 파이프라인이다. 이는 현재까지 팩 시스템에 관해 공개된 가장 깊은 사실이며, 다른 가이드가 아직 미해결로 남겨 둔 여러 질문에 답한다.
-
 ### 40. v2 팩의 운명 (먼저 결론)
 
 
@@ -5496,8 +5504,6 @@ v2 규칙 ([v2 마이그레이션 가이드](history/v2.md) §36)과 비교해 �
 ## API v4 마이그레이션 가이드
 
 
-이 릴리스 전후로 번들 밖에서 바뀐 것이 하나 있다: **엔진이 참조 파일을 이름으로 인용한다.** 엔진 자신의 에러 메시지가 `bloxd-api.wgsl` (주석 달린 엔진 헤더)과 `BLOCK_TEXTURES.md` (텍스처 이름 전체 목록)을 가리킨다 — `...BLOCK_TEXTURES.md lists them.` 이 가이드는 그 두 파일을 다른 곳으로 안내하는 대신 내용을 싣는다: 라이브 빌드에서 그대로 복원한 완전한 헤더는 [엔진 내부와 연구: 엔진 헤더](internals/engine-header.md)에, 사용 가능한 텍스처 이름의 완전한 카탈로그 (v4 빌드에서 905개)는 [텍스처 카탈로그](api/texture-catalog.md)이다. 이 가이드의 팩 대면 사실은 모두 프로덕션 번들에서 복원했다.
-
 v4 변경 세트를 한 화면에:
 
 | 영역 | v3 | v4 |
@@ -5511,11 +5517,9 @@ v4 변경 세트를 한 화면에:
 | strict 게임 | 정책 + 가드를 문서화 | 번들 내장 **검증기가 강제**, 정확한 진단 (§60) |
 | 그 외 전부 | — | 동결: 6 훅, `blockFlags` 비트, uniform 레이아웃, 로더 제한, 배리언트 행렬, 팩 `@group(3)` 바인딩 |
 
-v3에서의 변환은 기계적이다 (§61). 단 하나의 조용한 함정이 있을 뿐: `fogAlpha` 반전을 무시한 채 나머지를 전부 이식하면, 포그 의존 코드는 포그가 반전된 채 동작하고 *컴파일은 깨끗이 통과*한다. 언제나처럼 배포 전에는 게임 내 컴파일로 확인할 것.
 
 ### 55. v3 팩의 운명 (먼저 결론)
 
-**v3 팩 전부 — v3로 배포된 팩도 포함 — 는 이제 프로덕션에서 로드 시점에 정확히 실패한다.** 로더는 `manifest.apiVersion !== 4`를 JavaScript 엄격 비교 `!==`로 판정하므로, 비교는 타입·값이 완전히 일치해야 한다: JSON은 *숫자* `4`를 담아야 한다. 문자열 `"4"`는 실패하며 JSON 상의 표기 그대로 보고된다 (`{{packVersion}}`는 `JSON.stringify`되므로, 설정 화면에는 `This pack is for shader pack API version "4"...`처럼 따옴표가 붙어 나온다 — 문자열을 썼다는 유용한 신호).
 
 로드 시점의 두 메시지, 라이브 i18n 사전에서 그대로:
 
@@ -5676,7 +5680,6 @@ fn texelNeutral(id: u32, uv: vec2f, mip: f32, r: u32) -> vec4f {
 //                        surface.mipLevel, surface.textureRotation);
 ```
 
-(`textureRotation == 0`이면 보정이 필요 없다. 실제로는 대부분의 면이 0을 담는다; 회전된 면은 소수다 — 하지만 배포 팩은 그렇다고 가정해서는 안 된다.)
 
 #### 57.5 작동 예시
 
@@ -5844,7 +5847,6 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
 
 #### 60.3 v4에 *없는* 것: 섀도 API
 
-같은 커뮤니티 채널은 엔진 작가가 섀도 API 초안 (`bloxd-api` 동반 파일)을 가지고 있었지만 이 릴리스에 **싣지 않았다**고 기록한다 — 블록/풀 그림자는 장래의 셰이더 팩 API 갱신과 함께 도착할 것으로 보인다. v4 번들에는 섀도 관련이 아무것도 없다 (섀도 심볼도 없고, §63.4의 목록을 넘는 예약 이름도 없다) — 섀도는 「발표는 되었으나 미출시」로 다루고, 그것에 기대고 배포 팩을 만들지 말라. `skyLight` 기반 투영 그림자 레시피 (R9.12) 가 v4에서 이용 가능한 유일한 그림자 표현으로 남는다.
 
 #### 60.4 액체 작가를 위한 strict 요약
 
@@ -5860,9 +5862,7 @@ fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
    - 바닥/상한 관용구는 필드와 함께 반전된다: `max(VIS, 0.15)` → `min(ALPHA, 0.85)`
 4. **깊이 레시피 이식**: `behind.found` → `behind.hit`; `!hit`일 때 `position`/`distance`는 `0`.
 5. *(임의)* **텍스처 API 채택**: `bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`와 새 필드 4개 (§57–§58). 회전의 미묘함 (57.4)과, 텍셀 코드는 `textureId == 0`을 견뎌야 한다는 점을 기억할 것.
-6. **strict 감사** (배포에는 필수): 모든 버텍스 훅을 `#ifndef BLOXD_STRICT ... #endif`로 감쌀 것; `discard`를 쓴다면 그것 (또는 그것을 담은 훅) 도 같은 방식으로 감싸거나, strict 게임이 팩의 훅 전부를 비활성화한다는 사실을 받아들일 것.
 7. **8개 배리언트에 걸친 게임 내 컴파일 확인**: 로더 화면의 "Checking the pack..."은 모든 배리언트를 한 번에 검증한다 — strict/비 strict × 조명 on/off × 지형/액체 — 한 패스로 전부 덮는다. 그런 다음 allow 게임 하나 (Test Mode가 가장 빠르다)와 strict 게임 하나를 눈으로 확인한다.
-8. **자신의 버전 메타데이터를 올리고 재배포**: 플레이어 기계에 저장된 v3 사본은 조용히 비활성이며 (§55), 이유를 말해 주는 것은 설정 탭뿐이다.
 
 #### 61.1 완전한 v3 → v4 이식, 전과 후
 
@@ -5946,11 +5946,9 @@ v5 변경 세트를 한 화면에:
 | 텍스처 레지스트리 | 905개 사용 가능 이름 | **896개 사용 가능 이름** — +1, −10 (§80) |
 | 로더 제한, zip 규칙, `pack.json` 형태, 훅 이름, strict 계약 | — | **동결, 제한값은 바이트 동일** (§70) |
 
-v4에서의 변환은 대부분 기계적이다 (§77): 이번의 조용한 함정은 모습이 다르다 — `blockFlags`를 여전히 읽거나 light 훅을 `#ifdef BLOXD_LIGHTING`로 가드하는 팩은 **전용 메시지와 함께 검증에 실패**한다 (분석기가 이제 둘 다 설명해 준다), 그래서 조용히 잘못 동작하는 일은 없다; 하지만 옛 비트 상수를 *이름으로만* 읽는 팩은 이식될 때까지 로드를 계속 거부한다. 언제나처럼 배포 전에는 게임 내 컴파일로 확인할 것.
 
 ### 69. v4 팩의 운명 (먼저 결론)
 
-**v4 팩 전부 — v4로 배포된 팩도 포함 — 는 이제 프로덕션에서 로드 시점에 정확히 실패한다.** 로더는 `manifest.apiVersion !== 5`를 JavaScript 엄격 비교 `!==`로 판정한다 — 이 빌드에서는 버전 상수 `5`와 헤더 템플릿이 같은 모듈 (모듈 29836) 에 있으므로, 검사와 그 검사가 기준 삼는 헤더 텍스트가 함께 움직인다. JSON은 *숫자* `5`를 담아야 한다; 문자열 `"5"`는 실패하며 v4와 똑같이 JSON 상의 표기 그대로 보고된다.
 
 로드 시점의 두 메시지는 v4에서 불변이며, 라이브 i18n 사전에서 그대로:
 
@@ -6269,7 +6267,6 @@ strict 게임 계약 자체 (v4 §60) 는 불변이다: 가드 없는 버텍스 
 6. **엔진 레시피 헬퍼 채택** *(임시이지만 권장)*: 손으로 굴린 라이트 색을 `bloxdLitColour(surface, light)`로 대체 — 또는 `bloxdShading` / `bloxdWorldLight`와 섞어 맞추고 (§74) — 그다음 `bloxdDefaultLight`가 하듯 `surface.emission`과 `bloxdApplyFog`를 더한다.
 7. **strict 감사** (v4에서 불변): 버텍스 훅과 도달 가능한 모든 `discard`에 `#ifndef BLOXD_STRICT`.
 8. **게임 내 컴파일 확인**: 로더는 **6** 배리언트 전부를 한 번에 검증한다 (strict × terrain/liquid/model — 조명 축은 더 이상 따로 컴파일되지 않는다, §74). 그리고 allow 게임 하나와 strict 게임 하나를 눈으로 확인한다.
-9. **자신의 버전 메타데이터를 올리고 재배포**: 플레이어 기계에 저장된 v4 사본은 조용히 비활성이며 (§69), 이유를 말해 주는 것은 설정 탭뿐이다.
 
 #### 77.1 완전한 v4 → v5 이식, 전과 후
 

@@ -46,9 +46,9 @@ Um pacote se conecta ao **pipeline de 3 estágios por face** do renderizador. Os
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Água |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modelos de bloco (lajes, escadas, plantas), itens, jogadores, mobs, NPCs, armaduras, cosméticos |
 
-- **Pode fazer**: mudar cores, transparência e emissão; reconstruir a iluminação ([API de iluminação](api/lighting.md)); usar as sombras do sol e da lua calculadas pelo motor (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`); usar a oclusão do céu por voxels (`skyLight`); amostrar texturas com `bloxdTexel`; criar efeitos por modelo com `flags`; animar vértices em jogos allow
+- **Pode fazer**: mudar cores, transparência e emissão; reconstruir a iluminação ([API de iluminação](api/lighting.md)); usar sombras do sol e da lua calculadas pelo motor (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`); usar a oclusão do céu por voxels (`skyLight`); amostrar texturas com `bloxdTexel`; criar efeitos por modelo com `flags`; animar vértices em jogos allow
 - **Não pode fazer**: adicionar texturas próprias (isso cabe ao sistema de pacotes de texturas); aplicar pós-processamento ao quadro final (bloom etc.); acessar dados de profundidade do shadow map ou gerar um shadow map próprio; adicionar reflexos reais (SSR); alterar o céu, as nuvens ou o próprio disco solar
-- **Fácil de deixar passar, mas poderoso**: **sombras de estilo projetado usando `skyLight` (oclusão de céu por voxels)** — escurecem nitidamente as áreas sob árvores e telhados. Quebrar blocos faz a LightEngine recalcular imediatamente, então as sombras acompanham em tempo real
+- **Escolha do método de sombra**: use `bloxdShadow()` para as sombras do motor que acompanham o sol e a lua. `skyLight` é um método antigo para escurecer áreas sob árvores e telhados; não acompanha o sol nem a lua. Consulte [Sombras](guides/shadows.md).
 
 ### Modos strict e allow
 
@@ -58,7 +58,6 @@ Cada jogo tem uma política de pacotes de shaders (`shaderPackPolicy`), e **a ma
 
 - O jogo atual aceita apenas pacotes `apiVersion: 5`; pacotes v1–v4 são rejeitados no carregamento (pacotes salvos ficam silenciosamente inativos — [Compatibilidade](api/compatibility.md))
 - Está migrando um pacote escrito para uma versão mais antiga? Veja o [Histórico de versões](history/)
-- As interioridades do motor podem mudar com as atualizações, então cada página indica sua build alvo
 
 ---
 
@@ -3982,7 +3981,6 @@ O jogo atual aceita apenas `apiVersion: 5`; pacotes antigos são desativados em 
 
 #### P. A API mudará de novo?
 
-As interioridades do motor podem mudar com as atualizações — cada página nomeia a sua build alvo. Pacotes salvos são revalidados automaticamente quando o cabeçalho ou o registro muda ([Compatibilidade](api/compatibility.md#revalidação-de-pacotes-salvos-precisa-de-nova-verificação)).
 
 #### P. E as distribuições de "cinematic shader"?
 
@@ -4766,35 +4764,50 @@ O programa Model forma um eixo da matriz de variantes: `strict.model` / `allow.m
 ---
 
 ## Ledger de dados do motor
-> API alvo: 5 · Estado: Analyzed
 
-Esta página resume a API disponível para os shader packs. Consulte a [Referência da API](api/) para obter detalhes de uso.
+Este ledger reúne os valores confirmados da API visível aos shader packs no build atual. Detalhes internos do bundle, como IDs de módulos e chunks, não fazem parte da especificação e não são listados aqui.
 
-### Superfície da API
+### Especificação atual
 
-| Item | Especificação |
+| Item | Valor |
 |---|---|
-| Versão da API | `5` |
-| Cabeçalho do motor | 216 linhas; consulte o [cabeçalho do motor](internals/engine-header.md) |
+| `apiVersion` | `5` (comparação estrita com número) |
+| Cabeçalho do motor | 216 linhas; texto completo em [Cabeçalho do motor](internals/engine-header.md) |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
-| Uniform do pack | 80 bytes; consulte o [formato do pack](api/pack-format.md) |
-| Campos do uniform | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Nomes de texturas | As constantes utilizáveis estão no [catálogo de texturas](api/texture-catalog.md) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` foi removida no v5 |
+| Uniform do pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Binding do pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| Flags | estrutura `BloxdFlags` com 14 campos booleanos |
+| Atlas de texturas | 1.650 camadas; 1.017 nomes; 776 aliases |
+| Famílias de textura | 64 de rotação e 71 de animação |
+| Identificadores reservados | nomes que correspondem a `/^bloxd/i` e 88 símbolos internos `bloxdSp*` |
+| Definições de jogos | 119 |
+| Política de shader packs | 12 títulos permitidos, 28 entradas; veja [Política por jogo](internals/policy.md) |
+| Template padrão do pack | 1.633 bytes |
+| Limites do loader | 256 arquivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
 
-### API de sombras
 
-- `bloxdShadow()` retorna o fator de sombra do sol/lua calculado pelo motor.
-- `bloxdAirShadow(t)` avalia a sombra em um ponto entre a câmera e o fragmento.
-- `bloxdShadowDirection()` retorna a direção da luz que projeta a sombra.
-- `keepCircleShadows` é um campo booleano opcional de `pack.json` que mantém as sombras circulares antigas.
+- `bloxdShadow()`, `bloxdAirShadow(t)` e `bloxdShadowDirection()` expõem o sistema de sombras do sol e da lua calculado pelo motor.
+- O uniform recebe `shadowDirection: vec3f` no deslocamento 64 e aumenta de 64 para 80 bytes.
+- `pack.json` aceita o booleano opcional `keepCircleShadows` para manter as antigas sombras circulares.
+- O atlas cresce de 1.227 para 1.650 camadas e passa de 906 para 1.017 nomes disponíveis.
+
+A explicação e as evidências dessas medições estão no [Registro de pesquisa](internals/research-log.md) e nas [Interioridades do registro de texturas](internals/texture-registry.md).
+
+### Versões anteriores
+
+- [Histórico de versões](history/) — mudanças e migrações das APIs anteriores
+- [Registro de pesquisa](internals/research-log.md) — método e referências das medições
 
 ### Relacionado
 
-- [Referência da API](api/) — APIs disponíveis para os packs
-- [Formato do pack](api/pack-format.md) — manifesto, uniform e limites do carregador
-- [Política por jogo](internals/policy.md) — restrições de cada jogo
+- [Cabeçalho do motor](internals/engine-header.md) — texto completo do cabeçalho
+- [Política por jogo](internals/policy.md) — títulos com política allow / strict
+- [Registro de texturas](internals/texture-registry.md) — nomes e atribuição de IDs
+
+---
+
 ## O que muda os valores visíveis do pacote — lista de provas
 O mesmo pacote renderiza distinto segundo **mundo e ajustes de jogador**. Revise ao menos estes 3 ambientes antes de distribuir:
 
@@ -5658,7 +5671,6 @@ vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
 **O hash de cabeçalho medido.** Toda validação de pacote é marcada com o `HEADER_VERSION` do motor. Executar diretamente o módulo de validação de produção (ver a nota do harness no fim da §54) o mede:
 
 ```
-v2 (sjr0p7):  6.bc5e8338
 ```
 
 É um hash FNV-1a-32 (prefixado com `6.`) sobre cinco entradas: o cabeçalho do motor pré-processado e tokenizado **por variante** (uma entrada para cada uma das 8 variantes), o universo lexical WGSL completo do analisador, os quatro nomes de macro, o mapa de funções especiais, e a declaração `BloxdPackInputs` junto com sua linha de uniform `@group(3) @binding(0)`. Duas consequências para autores:
@@ -5863,8 +5875,6 @@ Pesquisa de ltf_ahel (realizada com glm)
 
 ## Guia de migração para a API v4
 
-
-Uma coisa mudou em torno deste lançamento que *não* está no bundle: **o motor agora cita arquivos de referência pelo nome.** Suas próprias mensagens de erro apontam para `bloxd-api.wgsl` (o cabeçalho do motor anotado) e `BLOCK_TEXTURES.md` (a lista completa de nomes de textura) — `...BLOCK_TEXTURES.md lists them.` Este guia carrega o conteúdo de ambos em vez de remeter você a outro lugar: o cabeçalho completo, restaurado verbatim da build ativa, está embutido em [Interioridades do motor: Cabeçalho do motor](internals/engine-header.md), e o catálogo completo de nomes de textura utilizáveis (905 na build v4) é o [Catálogo de texturas](api/texture-catalog.md). Todo fato voltado ao pacote desta parte foi restaurado do bundle de produção.
 
 O conjunto de mudanças da v4 em uma tela:
 
@@ -6213,7 +6223,6 @@ Ambas as regras existem pela mesma razão — em jogos competitivos, um shader q
 
 #### 60.3 O que *não* está na v4: a API de sombras
 
-O mesmo canal comunitário registra que o autor do motor tem um rascunho de API de sombras (um arquivo companheiro do `bloxd-api`) que **não** foi distribuído neste lançamento, com sombras de bloco/grama esperadas para chegar junto com uma futura atualização da API de pacotes de shaders. Nada relacionado a sombras existe no bundle v4 (sem símbolos de sombra, sem nomes reservados além da lista da §63.4) — trate as sombras como anunciadas mas não distribuídas, e não construa ainda pacotes de distribuição contra elas. As receitas de sombra projetada baseadas em `skyLight` da R9.12 continuam sendo o único visual de sombra disponível na v4.
 
 #### 60.4 Recapitulação estrita para autores de líquidos
 
@@ -6463,7 +6472,6 @@ As regras que importam a um autor, deduplicadas:
 O formato da v3 era `6.<fnv1a32>` sobre cinco entradas (§53). A v4 mantém as mesmas cinco entradas — tokens de cabeçalho por variante, o universo léxico do parser, os quatro nomes de macro, o mapa de funções especiais e a declaração `BloxdPackInputs` —, mas o prefixo muda para `8.` **e um segundo FNV-1a-32 é anexado, hasheado sobre a lista ordenada `"<nome> <id>"` do registro de texturas inteiro**:
 
 ```
-v2 (sjr0p7):   6.bc5e8338
 ```
 
 (Os hashes v4 concretos não foram medidos para este guia — eles são computados em tempo de execução —, mas o formato é exato, e os valores de v2/v3 acima são as medições publicadas anteriormente. Qualquer tela de configurações de pacote após uma atualização do motor mostra o atual.)
@@ -7754,7 +7762,6 @@ sky_tap_top[rot[3, sky_tap_top[rot[4, smelter_top[rot[1, smelter_top[rot[2, smel
 tree_cutter_top[rot[1, tree_cutter_top[rot[2, tree_cutter_top[rot[3, tree_cutter_top[rot[4, wire_mill_top[rot[1, wire_mill_top[rot[2
 wire_mill_top[rot[3, wire_mill_top[rot[4
 
-- 79 removed (sjr0p7):
 alloy_kiln_top_rot1, alloy_kiln_top_rot2, alloy_kiln_top_rot3, alloy_kiln_top_rot4, auto_bench_top_rot1, auto_bench_top_rot2
 auto_bench_top_rot3, auto_bench_top_rot4, belt_tunnel_exit_top_rot1, belt_tunnel_exit_top_rot2, belt_tunnel_exit_top_rot3, belt_tunnel_exit_top_rot4
 belt_tunnel_top_rot1, belt_tunnel_top_rot2, belt_tunnel_top_rot3, belt_tunnel_top_rot4, burner_drill_top_rot1, burner_drill_top_rot2
