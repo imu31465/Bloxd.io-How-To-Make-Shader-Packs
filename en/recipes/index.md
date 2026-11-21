@@ -1,6 +1,6 @@
 # Recipes
 
-Goal-oriented code examples. The "how it works" side lives in [Guides](../guides/). Everything here is ported to v5 vocabulary (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) and guarded to pass the 6 variants (strict × terrain / liquid / model).
+Code examples organized by goal. For explanations of the underlying mechanisms, see [Guides](../guides/). Examples use API v5 terminology (`flags`, `bloxdLit()`, `fogAlpha`, `bloxdSeconds()`) and include guards for all six variants (strict × terrain / liquid / model).
 
 ## Map
 
