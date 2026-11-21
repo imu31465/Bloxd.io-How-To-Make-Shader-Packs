@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 섀도 함수
 
-\u0060API v5\u0060 빌드는 엔진의 실제 태양/달 섀도 시스템(블록·플레이어·몹·아이템이 드리우는, 태양을 따라가는 투영 섀도)을 팩 API에 추가했습니다. 이 두 함수는 (\u0060bloxdFragmentBlockPosition\u0060처럼) **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+`API v5`는 엔진의 태양/달 그림자 시스템을 제공합니다. 블록·플레이어·몹·아이템이 드리우는 투영 그림자는 태양을 따라 움직입니다. 이 두 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
 
 ### bloxdShadow
 
