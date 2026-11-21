@@ -14,6 +14,5 @@ Build your first shader pack by following the guide from the basics through test
 8. [Validation](validation.md) — the 3-stage load check and on-device testing
 9. [Distribution](distribution.md) — zipping and release hygiene
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod on 2026-11-20) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](../api/); for ready-made effects see [Recipes](../recipes/).
