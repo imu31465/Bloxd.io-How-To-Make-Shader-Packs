@@ -14,6 +14,5 @@ Esta guía te acompaña desde los conceptos básicos hasta las pruebas y la publ
 8. [Validación](validation.md) — la comprobación de carga de 3 etapas y las pruebas en el dispositivo
 9. [Distribución](distribution.md) — comprimido en zip e higiene de publicación
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (verificado en producción y preprod el 2026-11-20) · Estado: Verified/Analyzed
 
 Cuando necesites la especificación completa, sigue a [Referencia de la API](../api/); para efectos listos para usar ver [Recetas](../recipes/).
