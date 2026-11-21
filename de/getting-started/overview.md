@@ -1,6 +1,6 @@
 # Überblick & Voraussetzungen
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> API: 5 · Status: Verified
 
 ## Was ein Shader Pack ist
 
@@ -18,9 +18,9 @@ Ein Paket dockt an die **3-stufige Flächen-Pipeline** des Renderers an. Die Ren
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Wasser |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block-Modelle (Stufen, Treppen, Pflanzen), Items, Spieler, Mobs, NPCs, Rüstung, Kosmetik |
 
-- **Möglich**: Farben, Transparenz und Emission ändern; Beleuchtung neu aufbauen (die [Beleuchtungs-API](../api/lighting.md)); projektionsartige Schatten (über `skyLight`); Texturen sampeln (`bloxdTexel` — Lesen des bestehenden Block-Textur-Atlas); Effekte pro Modell (`flags` sagen dir „das ist ein gehaltenes Item“, „das ist ein Spieler“); Vertex-Animation (nur allow-Spiele)
-- **Nicht möglich**: eigene Texturen hinzufügen (das ist Aufgabe des Texturpack-Systems); Post-Processing (Bloom etc.); Shadow-Map-Schatten, die mit der Sonne rotieren; echte Reflexionen (SSR); Himmel, Wolken oder die Sonnenscheibe selbst anfassen
-- **Leicht zu übersehen, aber stark**: **projektionsartige Schatten über `skyLight` (Voxel-Himmels-Okklusion)** — Flächen unter Bäumen und Dächern klar abdunkeln. Blöcke abzubauen lässt die LightEngine sofort neu rechnen, Schatten folgen also in Echtzeit
+- **Möglich**: Farben, Transparenz und Emission ändern; Beleuchtung anpassen (siehe [Beleuchtungs-API](../api/lighting.md)); Texturen mit `bloxdTexel` sampeln; mit `flags` Effekte je Modell erstellen; Vertices animieren (nur allow-Spiele)
+- **Nicht möglich**: eigene Texturen hinzufügen; Post-Processing-Effekte wie Bloom erstellen; eine eigene Shadowmap erzeugen oder auf deren Tiefendaten zugreifen; echte Reflexionen (SSR) erzeugen; oder Himmel, Wolken und Sonnenscheibe selbst schattieren
+- **Schatten**: `bloxdShadow()` liefert den von der Engine berechneten Sonnen-/Mondschatten-Faktor. `bloxdShadowDirection()` gibt die Bewegungsrichtung des schattenwerfenden Lichts an. `bloxdAirShadow(t)` wertet einen Punkt zwischen Kamera und Fragment aus. Die ältere voxelbasierte Himmelsabschattung mit `skyLight` bleibt ebenfalls verfügbar ([Schatten-Anleitung](../guides/shadows.md))
 
 ## strict- und allow-Modi
 
@@ -30,4 +30,4 @@ Jedes Spiel hat eine Shader-Pack-Policy (`shaderPackPolicy`), und **die meisten 
 
 - Das aktuelle Spiel akzeptiert nur `apiVersion: 5`-Pakete; v1–v4-Pakete werden beim Laden abgelehnt (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](../api/compatibility.md))
 - Du migrierst ein Paket, das für eine ältere Version geschrieben wurde? Siehe [Versionsgeschichte](../history/)
-- Engine-Interna können sich mit Updates ändern, daher nennt jede Seite ihren Ziel-Build
+- Erklärungen zu Engine-Interna dienen als Hintergrundinformation. Für den unterstützten API-Vertrag ist die API-Referenz maßgeblich
