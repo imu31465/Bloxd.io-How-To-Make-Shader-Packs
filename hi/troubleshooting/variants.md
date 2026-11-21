@@ -11,7 +11,9 @@
 - **समाधान**: vertex हुकों और `discard` को `#ifndef BLOXD_STRICT` में लपेटें
 - **रोकथाम**: vertex हुक हमेशा गार्डेड टेम्पलेट से शुरू करें ([वेरिएंट](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## इस वेरिएंट में `alpha` फ़ील्ड उपलब्ध नहीं है
+
+> `.alpha is undefined`
 
 - **कारण**: `alpha` केवल `#ifdef BLOXD_ALPHA` के पीछे मौजूद है (सभी liquid + ग़ैर-strict terrain/model)
 - **समाधान**: alpha छूने वाले कोड को `#ifdef BLOXD_ALPHA` में लपेटें ([प्रीप्रोसेसर](../api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स))
