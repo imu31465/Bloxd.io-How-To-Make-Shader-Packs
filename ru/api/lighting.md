@@ -137,7 +137,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` приходят уже отображёнными в 0–1**: уровни 0–15 через ease-out-кривую (напр. `6 → 0.45`, `12 → 0.92`). Все исключают `ambientLightColour`
 - **Кривая лифта**: `skyLight` — на самом деле «видит ли эта позиция небо»: воксельные данные перекрытия, т.е. карта теней. Пороговому разделению солнца/тени может понадобиться обратное преобразование (см. [руководство по реализму](../guides/realism.md))
-- **Внутрянка тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутрянка движка: внутрянка тумана](../internals/fog-internals.md))
+- **Как работает туман**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутреннее устройство движка: туман](../internals/fog-internals.md))
 
 ## Рецепты
 
@@ -178,4 +178,4 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ## См. также
 
-- [Функции](functions.md) · [Руководства: освещение](../guides/lighting.md) · [Внутрянка движка: внутрянка освещения](../internals/lighting-internals.md)
+- [Функции](functions.md) · [Руководства: освещение](../guides/lighting.md) · [Внутреннее устройство движка: освещение](../internals/lighting-internals.md)
