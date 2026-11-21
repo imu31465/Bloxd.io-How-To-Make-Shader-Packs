@@ -1006,7 +1006,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Devuelve**: `position + vec3f(bloxdRenderOffset())`
 - **Nota**: los límites de precisión de f32 hacen que las coordenadas lejanas puedan ser inexactas (cabecera: *"with possible f32 inaccuracy"*)
 
-#### bloxdFragmentBlockPosition
+#### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -1061,7 +1061,7 @@ La receta de iluminación del propio motor, documentada como WGSL llamable — c
 
 ### Funciones de sombras
 
-La API v5 añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
+Estas tres funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
 
 #### bloxdShadow
 
