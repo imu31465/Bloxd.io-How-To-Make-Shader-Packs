@@ -2,11 +2,11 @@
 
 > Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
 
-## Vertriebsformat
+## Bereitstellungsformat
 
 - **Format**: eine einzelne `.zip` oder ein Ordner (Ordner-Laden geht nur in Desktop-Browsern)
 - **Inhalt**: eine `pack.json` (auf der obersten Ebene des Pakets; case-insensitive) + 1–256 `.wgsl`-Dateien
-- Mehrere `.wgsl`-Dateien werden zu einem Modul konkateniert, Aufteilen und Unterverzeichnisse sind also gratis. Keine Beschränkungen für Dateinamen. Die Konkatenation erfolgt in **Wörterbuch-Reihenfolge des Pfadnamens** (Modul-Ebene-Deklarationen sind reihenfolgeunabhängig, das spielt also nur für Code eine Rolle, der von der `var`-Initialisierungsreihenfolge abhängt). Nicht-`.wgsl`-Dateien (READMEs etc.) werden ignoriert
+- Mehrere `.wgsl`-Dateien werden zu einem Modul zusammengefügt. Du kannst den Code also auf mehrere Dateien und Unterordner verteilen; Dateinamen sind frei wählbar. Die Dateien werden in **lexikografischer Reihenfolge des Pfads** zusammengefügt (Deklarationen auf Modulebene sind reihenfolgeunabhängig; relevant ist das nur für Code, der von der Initialisierungsreihenfolge von `var` abhängt). Dateien ohne `.wgsl`-Endung (z. B. README-Dateien) werden ignoriert.
 
 ## Größen- und Formatlimits
 
