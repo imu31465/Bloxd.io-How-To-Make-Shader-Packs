@@ -1,6 +1,6 @@
 # Referencia de la API
 
-La especificación sistemática de la API v5 actual. Todo lo que hay aquí está medido sobre el build objetivo `bny9u` (2026-11-05; producción y preprod idénticos). La cabecera del motor antepuesta a cada paquete (reproducida en [Interior del motor](../internals/engine-header.md)) es la fuente primaria.
+Esta página documenta la API v5 actual. La fuente principal de sus definiciones es la cabecera que el motor añade automáticamente al inicio de cada pack (consulta [Interior del motor](../internals/engine-header.md) para ver la cabecera completa).
 
 ## Mapa
 
@@ -17,8 +17,8 @@ La especificación sistemática de la API v5 actual. Todo lo que hay aquí está
 | [Preprocesador](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restricciones](restrictions.md) | límites del lenguaje, identificadores reservados |
 | [Compatibilidad](compatibility.md) | paquetes de versiones antiguas, revalidación de paquetes guardados |
-| [Catálogo de texturas](texture-catalog.md) | los 896 nombres utilizables (con búsqueda) |
+| [Catálogo de texturas](texture-catalog.md) | 1.017 constantes con nombre disponibles (con búsqueda) |
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Analyzed (restaurado literalmente de la cabecera y el validador)
+> API: 5 · Estado: Analyzed (reconstruido a partir de la cabecera del motor y el validador)
 
 ¿Migras desde v4? Ver [Historial de versiones: v5](../history/v5.md).
