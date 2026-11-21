@@ -1,8 +1,8 @@
 # Hooks de shader
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified
+> API : 5 · État : Verified
 
-Un pack peut se brancher sur **9 hooks** : 3 cibles de rendu (Terrain / Liquid / Model) × 3 étapes de pipeline (Vertex / Surface / Light). Tous sont optionnels — un hook non défini retombe sur le comportement par défaut du moteur.
+Un shader pack peut définir jusqu’à **9 hooks** : 3 cibles de rendu (Terrain / Liquid / Model) × 3 étapes du pipeline (Vertex / Surface / Light). Tous sont facultatifs. Lorsqu’un hook n’est pas défini, le moteur utilise son implémentation par défaut.
 
 ## Les hooks
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* prennent les mêmes types
 ```
 
-## Répartition des cibles de rendu
+## Cibles de rendu
 
 - **Terrain** — tous les blocs sauf l'eau et les modèles de blocs
 - **Liquid** — l'eau
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **Important** : si un pack ne définit aucun hook Liquid, **aucun hook Terrain ne tourne non plus sur l'eau** (l'eau est gérée par les seuls hooks Liquid). Cela diffère du comportement d'avant la v4, où le liquide retombait sur les hooks de terrain.
 
-## Comportements de repli et partage de code
+## Comportement par défaut et partage de code
 
 - Un hook non défini signifie que cette étape utilise le comportement par défaut du moteur (même comportement que `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
 - **Pour partager du code entre hooks**, définissez une fonction à portée de module et appelez-la depuis les deux :
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Le pack par défaut (gabarit officiel à 9 hooks)
+## Modèle de pack par défaut
 
 Le gabarit de départ inclut désormais les hooks de lumière. 1 683 octets tel que livré, mot à mot :
 
