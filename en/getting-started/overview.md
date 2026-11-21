@@ -1,7 +1,5 @@
 # Overview & prerequisites
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified
-
 ## What a shader pack is
 
 A Bloxd.io shader pack changes the look of the game's **WebGPU renderer only**. Packs are written in a **restricted subset of WGSL** and loaded from the in-game settings → Shader Pack screen as a zip or folder. While a pack is installed, the WebGPU renderer is force-enabled in settings.
@@ -18,9 +16,9 @@ A pack plugs into the renderer's **3-stage per-face pipeline**. The render targe
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Water |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block models (slabs, stairs, plants), items, players, mobs, NPCs, armour, cosmetics |
 
-- **Can do**: change colors, transparency and emission; rebuild lighting (the [Lighting API](../api/lighting.md)); projected-style shadows (via `skyLight`); sample textures (`bloxdTexel` — reading the existing block-texture atlas); per-model effects (`flags` tell you "this is a held item", "this is a player"); vertex animation (allow games only)
-- **Cannot do**: add your own textures (that is the texture-pack system's job); post-processing (bloom etc.); shadow-map shadows that rotate with the sun; true reflections (SSR); affect the sky, clouds or the sun disc itself
-- **Easy to miss but powerful**: **projected-style shadows using `skyLight` (voxel sky occlusion)** — clearly darken areas under trees and roofs. Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
+- **Can do**: change colors, transparency and emission; rebuild lighting ([Lighting API](../api/lighting.md)); use engine-provided sun/moon shadows (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`); use voxel sky occlusion (`skyLight`); sample textures (`bloxdTexel`); create per-model effects (`flags`); animate vertices in allow games
+- **Cannot do**: add custom textures (use the texture-pack system); post-process the finished frame (bloom, etc.); access shadow-map depth data or generate a custom shadow map; add true reflections (SSR); affect the sky, clouds, or sun disc themselves
+- **Choosing a shadow method**: use `bloxdShadow()` for engine-provided shadows that follow the sun and moon. `skyLight` is an older way to darken areas under trees and roofs; it does not follow the sun or moon. See [Shadows](../guides/shadows.md).
 
 ## strict and allow modes
 
@@ -30,4 +28,3 @@ Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run i
 
 - The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](../api/compatibility.md))
 - Migrating a pack written for an older version? See [Version History](../history/)
-- Engine internals may change with updates, so every page names its target build

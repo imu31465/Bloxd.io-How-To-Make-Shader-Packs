@@ -1,7 +1,5 @@
 # Vue d'ensemble et prérequis
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified
-
 ## Ce qu'est un pack de shaders
 
 Un pack de shaders Bloxd.io change l'apparence du jeu **pour le seul renderer WebGPU**. Les packs s'écrivent dans un **sous-ensemble restreint de WGSL** et se chargent depuis l'écran Réglages → Shader Pack du jeu, sous forme de zip ou de dossier. Tant qu'un pack est installé, le renderer WebGPU est activé de force dans les réglages.
@@ -18,9 +16,9 @@ Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les ci
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | L'eau |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modèles de blocs (dalles, escaliers, plantes), objets, joueurs, mobs, PNJ, armures, cosmétiques |
 
-- **Possible** : changer les couleurs, la transparence et l'émission ; reconstruire l'éclairage (l'[API d'éclairage](../api/lighting.md)) ; les ombres de style projection (via `skyLight`) ; échantillonner des textures (`bloxdTexel` — lire l'atlas de textures de blocs existant) ; les effets par modèle (`flags` vous dit « c'est un objet tenu », « c'est un joueur ») ; l'animation de sommets (jeux allow uniquement)
-- **Impossible** : ajouter vos propres textures (c'est le travail du système de packs de textures) ; le post-traitement (bloom etc.) ; les ombres par shadow map qui tournent avec le soleil ; les vrais reflets (SSR) ; agir sur le ciel, les nuages ou le disque solaire lui-même
-- **Facile à manquer mais puissant** : **les ombres de style projection via `skyLight` (occlusion voxel du ciel)** — assombrissent nettement les zones sous les arbres et les toits. Casser des blocs fait recalculer LightEngine immédiatement, de sorte que les ombres suivent en temps réel
+- **Possible** : modifier les couleurs, la transparence et l'émission ; reconstruire l'éclairage ([API d'éclairage](../api/lighting.md)) ; utiliser les ombres du soleil et de la lune calculées par le moteur (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`) ; utiliser l'occlusion voxel du ciel (`skyLight`) ; échantillonner les textures avec `bloxdTexel` ; créer des effets par modèle avec `flags` ; animer les sommets dans les jeux allow
+- **Impossible** : ajouter des textures personnalisées (c'est le rôle du système de packs de textures) ; appliquer un post-traitement à l'image finale (bloom, etc.) ; accéder aux données de profondeur de la shadow map ou générer sa propre shadow map ; ajouter de véritables reflets (SSR) ; modifier le ciel, les nuages ou le disque solaire lui-même
+- **Choisir une méthode d'ombre** : utilisez `bloxdShadow()` pour les ombres du moteur qui suivent le soleil et la lune. `skyLight` est une ancienne méthode pour assombrir les zones sous les arbres et les toits ; elle ne suit pas le soleil ni la lune. Voir [Ombres](../guides/shadows.md).
 
 ## Modes strict et allow
 
@@ -30,4 +28,3 @@ Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et *
 
 - Le jeu actuel n'accepte que les packs `apiVersion: 5` ; les packs v1–v4 sont rejetés au chargement (les packs enregistrés deviennent silencieusement inactifs — [Compatibilité](../api/compatibility.md))
 - Vous migrez un pack écrit pour une ancienne version ? Voir l'[Historique des versions](../history/)
-- Les internals du moteur peuvent changer avec les mises à jour ; chaque page indique donc son build cible
