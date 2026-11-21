@@ -224,4 +224,4 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## Voir aussi
 
 - **Les noms disponibles utilisables** → [Catalogue des textures](texture-catalog.md)
-- [Intérieurs du moteur : registre des textures](../internals/texture-registry.md) · [Échantillonnage des textures](../internals/texture-sampling.md)
+- [Fonctionnement interne du moteur : registre des textures](../internals/texture-registry.md) · [Échantillonnage des textures](../internals/texture-sampling.md)
