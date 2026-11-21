@@ -11,7 +11,9 @@ Problems that occur in only some of the 6 variants (`strict|allow` × `terrain|l
 - **Fix**: wrap vertex hooks and `discard` in `#ifndef BLOXD_STRICT`
 - **Prevention**: always start vertex hooks from the guarded template ([Variants](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## `alpha` is unavailable in this variant
+
+> `.alpha is undefined`
 
 - **Cause**: `alpha` exists only behind `#ifdef BLOXD_ALPHA` (all liquid + non-strict terrain/model)
 - **Fix**: wrap alpha-touching code in `#ifdef BLOXD_ALPHA` ([Preprocessor](../api/preprocessor.md#macro--variant-matrix))
