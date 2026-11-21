@@ -24,7 +24,7 @@ Guía no oficial sobre los shader packs del renderizador WebGPU de Bloxd.io. Cub
 | Consultar funciones y campos de la API | [Referencia de la API](api/) | autores en plena implementación |
 | Implementar un efecto (luz, agua, modelos…) | [Guías](guides/) · [Recetas](recipes/) | quienes quieran implementar un estilo visual |
 | Corregir un error | [Solución de problemas](troubleshooting/) | cualquiera con un pack roto |
-| Investigar las funcionamiento interno del motor | [Interior del motor e investigación](internals/) | analistas del motor |
+| Investigar las funcionamiento interno del motor | [Funcionamiento interno del motor](internals/) | analistas del motor |
 | Consultar versiones antiguas (v1–v5) | [Historial de versiones](history/) | quien migra packs antiguos |
 
 ## Mapa de la documentación
@@ -34,7 +34,7 @@ Guía no oficial sobre los shader packs del renderizador WebGPU de Bloxd.io. Cub
 - **[Guías](guides/)** — cómo funciona la iluminación, sombras, agua, noche, renderizado de modelos, rendimiento, conceptos de realismo.
 - **[Recetas](recipes/)** — ejemplos de código orientados a objetivo: colores, iluminación, emisión, coordenadas, animación, líquidos, vértices, matemáticas, realismo, sombreadores de modelo, efectos de encantamiento.
 - **[Solución de problemas](troubleshooting/)** — resolución de errores por síntoma: carga, versión de API, compilación, validación, variantes, visual, texturas, iluminación, modelos, rendimiento.
-- **[Interior del motor e investigación](internals/)** — canalización de renderizado, invocación de hooks, cabecera del motor, interioridades de validación y compilación, identificadores reservados, interioridades de iluminación/niebla, muestreo y registro de texturas, renderizado de modelos, datos medidos.
+- **[Funcionamiento interno del motor](internals/)** — canalización de renderizado, invocación de hooks, cabecera del motor, interioridades de validación y compilación, identificadores reservados, interioridades de iluminación/niebla, muestreo y registro de texturas, renderizado de modelos, datos medidos.
 - **[Historial de versiones](history/)** — de v1 a v5: cambios por versión, pasos de migración, API eliminadas.
 
 ## Estados de verificación
@@ -49,4 +49,4 @@ Cada página indica la versión de API que cubre y el estado de verificación de
 | Experimental | experimental / sin consolidar |
 | Historical | material de una versión pasada |
 
-Los datos crudos extraídos del motor (cabecera, registro, mediciones) viven en [Interior del motor e investigación](internals/); la metodología y los registros que hay detrás se siguen en el [registro de investigación](internals/research-log.md).
+Los datos crudos extraídos del motor (cabecera, registro, mediciones) viven en [Funcionamiento interno del motor](internals/); la metodología y los registros que hay detrás se siguen en el [registro de investigación](internals/research-log.md).
