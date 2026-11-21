@@ -23,14 +23,12 @@ Bloxd.io의 WebGPU 렌더러를 위한 셰이더 팩에 대한 비공식 가이�
 8. [검증](getting-started/validation.md) — 3단계 로드 검사와 실기기 테스트
 9. [배포](getting-started/distribution.md) — zipping 과 릴리스 위생
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20 프로덕션 및 preprod에서 확인) · 상태: Verified/Analyzed
 
 전체 사양이 필요하면 [API 레퍼런스](api/) 로, 완성품 효과는 [레시피](recipes/) 로 계속하라.
-
 ---
 
 ## 개요와 전제
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
 ### 셰이더 팩이란
 
@@ -48,9 +46,9 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 물 |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 블록 모델 (반 블록, 계단, 식물), 아이템, 플레이어, 몹, NPC, 방어구, 화장품 |
 
-- **할 수 있다**: 색·투명도·발광 변경, 라이팅 재구축 ([라이팅 API](api/lighting.md)), 투영형 그림자 (`skyLight` 경유), 텍스처 샘플 (`bloxdTexel` — 기존 블록 텍스처 아틀라스 읽기), 모델별 효과 (`flags` 가 「손에 든 아이템이다」「플레이어다」를 알려준다), 정점 애니메이션 (allow 게임만)
-- **할 수 없다**: 자신의 텍스처 추가 (그것은 텍스처팩 시스템의 임무), 후처리 (블룸 등), 태양과 함께 도는 섀도맵 그림자, 진짜 반사 (SSR), 하늘·구름·태양 원반 자체에 영향
-- **놓치기 쉽지만 강력**: **`skyLight` (복셀 하늘 가림) 을 쓴 투영형 그림자** — 나무 밑과 지붕 밑을 뚜렷하게 어둡게 한다. 블록을 부수면 LightEngine 이 즉시 재계산하므로, 그림자는 실시간으로 따라간다
+- **할 수 있는 것**: 색상·투명도·발광 변경, 라이팅 조정 ([라이팅 API](api/lighting.md)), `bloxdTexel`을 이용한 텍스처 샘플링, `flags`를 이용한 모델별 효과, 정점 애니메이션 (allow 게임만)
+- **할 수 없는 것**: 사용자 텍스처 추가, 블룸 등의 후처리 효과 생성, 사용자 섀도맵 생성 또는 깊이 데이터 직접 접근, 실제 반사 (SSR), 하늘·구름·태양 원반 자체에 셰이더 적용
+- **그림자**: `bloxdShadow()`는 엔진이 계산한 태양·달 그림자 계수를 제공하고, `bloxdShadowDirection()`은 그림자를 만드는 빛의 진행 방향을 반환한다. `bloxdAirShadow(t)`는 카메라와 프래그먼트 사이의 한 지점에서 그림자를 평가한다. 기존 `skyLight` 복셀 하늘 가림 방식도 계속 사용할 수 있다 ([그림자 가이드](guides/shadows.md))
 
 ### strict 와 allow 모드
 
@@ -60,8 +58,7 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 
 - 현행 게임은 `apiVersion: 5` 팩만 받는다. v1–v4 팩은 로드 시 거부된다 (저장 팩은 조용히 비활성 — [호환성](api/compatibility.md))
 - 구버전용으로 쓴 팩을 이주하고 있는가? [버전 히스토리](history/) 를 보라
-- 엔진 내부는 업데이트로 바뀔 수 있으므로, 모든 페이지가 대상 빌드를 명시한다
-
+- 엔진 내부 설명은 참고 자료다. 지원되는 API 사양은 API 레퍼런스를 확인한다
 ---
 
 ## 요구 사항
@@ -449,7 +446,7 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## API 레퍼런스
-현행 API v5 의 체계적인 사양서이다. 모두 대상 빌드 `bny9u` (2026-11-05; 프로덕션과 preprod 가 동일 번들) 에서의 실측에 기반한다. 모든 팩 앞에 엔진이 자동으로 붙이는 헤더 (전문은 [엔진 내부와 연구](internals/engine-header.md)) 가 이 절의 1차 자료다.
+이 페이지는 현행 API v5 사양을 설명한다. API 정의의 기본 자료는 엔진이 모든 팩의 앞에 자동으로 추가하는 엔진 헤더다 (전체 내용은 [엔진 내부와 연구](internals/engine-header.md) 참조).
 
 ### 구성
 
@@ -466,13 +463,11 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 | [전처리기](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [제한과 예약명](api/restrictions.md) | 언어 기능 제한, 예약 식별자 |
 | [호환성](api/compatibility.md) | 구버전 팩의 취급, 저장 팩 재검증 |
-| [텍스처 카탈로그](api/texture-catalog.md) | 사용 가능 896 이름의 실측 카탈로그 (검색 가능) |
+| [텍스처 카탈로그](api/texture-catalog.md) | 사용 가능한 이름 지정 상수 1,017개 (검색 가능) |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (헤더·검증기에서 그대로 복원)
+> 대상 API: 5 · 검증 상태: Analyzed (엔진 헤더와 검증기에서 복원)
 
 v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 보라.
-
-
 ---
 
 ## 팩 형식
