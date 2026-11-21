@@ -5146,46 +5146,43 @@ Une distribution communautaire « cinematic shader » que nous avons analysée s
 
 ---
 
-## Intérieurs du moteur et recherche
-Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`bny9u`). Séparé de la documentation d'API publique ([Référence API](api/)) pour préserver le comportement interne exact et les résultats d'analyse.
+## Internes du moteur
+
+Cette catégorie présente le fonctionnement interne du moteur afin de mieux comprendre l'exécution des shader packs. Ces détails d'implémentation peuvent évoluer ; pour les règles d'utilisation stables et les API disponibles, consultez la [Référence de l'API](internals/api).
 
 ### Plan
 
 | Page | Contenu |
 |---|---|
-| [Pipeline de rendu](internals/rendering-pipeline.md) | position d'alphaTest, setup à 2 lumières, réalité de l'uniform, greedy meshing |
-| [Invocation des hooks](internals/hook-invocation.md) | comment les hooks sont greffés dans le WGSL du moteur |
-| [En-tête du moteur](internals/engine-header.md) | l'en-tête v5 complet (verbatim, 8,954B) |
-| [Validation des shaders](internals/shader-validation.md) | les intérieurs de l'analyseur, la table des signatures, HEADER_VERSION |
-| [Compilation WGSL](internals/wgsl-compilation.md) | la vraie compilation de l'étape 2 et les stubs de validation |
-| [Identifiants réservés](internals/reserved-identifiers.md) | les 46 symboles `bloxdSp*` |
-| [Intérieurs de l'éclairage](internals/lighting-internals.md) | structure de blockLight / heldLight |
-| [Intérieurs du brouillard](internals/fog-internals.md) | linéaire uniquement, la bande de dégradé de 32 blocs |
-| [Échantillonnage des textures](internals/texture-sampling.md) | le codegen de textures à 3 variantes |
-| [Registre des textures](internals/texture-registry.md) | résolution nom→id, 896 noms, dérive mesurée |
-| [Rendu des modèles](internals/model-rendering.md) | le programme Model v5 |
-| [Données du moteur](internals/engine-data.md) | le relevé v5 des constantes/limites/layouts |
-| [Facteurs de test](internals/testing-factors.md) | quels réglages monde/joueur changent les valeurs visibles des packs |
-| [Politique](internals/policy.md) | shaderPackPolicy — les 12 titres allow |
-| [Soleil et lune](internals/sun-and-moon.md) | ce qui alimente bloxdSunDirection |
-| [Débogage](internals/debugging.md) | paramètres URL, panneaux de statistiques |
-| [Journal de recherche](internals/research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
-
-> API cible : 5
-
-Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](internals/research-log.md)).
+| [Pipeline de rendu](internals/index.md/rendering-pipeline.md) | position d'alphaTest, setup à 2 lumières, réalité de l'uniform, greedy meshing |
+| [Invocation des hooks](internals/index.md/hook-invocation.md) | comment les hooks sont greffés dans le WGSL du moteur |
+| [En-tête du moteur](internals/index.md/engine-header.md) | Déclarations WGSL ajoutées aux shader packs |
+| [Validation des shaders](internals/index.md/shader-validation.md) | les intérieurs de l'analyseur, la table des signatures, HEADER_VERSION |
+| [Compilation WGSL](internals/index.md/wgsl-compilation.md) | la vraie compilation de l'étape 2 et les stubs de validation |
+| [Identifiants réservés](internals/index.md/reserved-identifiers.md) | les 46 symboles `bloxdSp*` |
+| [Intérieurs de l'éclairage](internals/index.md/lighting-internals.md) | structure de blockLight / heldLight |
+| [Intérieurs du brouillard](internals/index.md/fog-internals.md) | linéaire uniquement, la bande de dégradé de 32 blocs |
+| [Échantillonnage des textures](internals/index.md/texture-sampling.md) | le codegen de textures à 3 variantes |
+| [Registre de textures](internals/index.md/texture-registry.md) | Résolution des noms et noms d'animation et de rotation |
+| [Rendu des modèles](internals/index.md/model-rendering.md) | le programme Model v5 |
+| [Données du moteur](internals/index.md/engine-data.md) | Fonctions de l'API v5 et limites des packs |
+| [Facteurs de test](internals/index.md/testing-factors.md) | quels réglages monde/joueur changent les valeurs visibles des packs |
+| [Politique](internals/index.md/policy.md) | shaderPackPolicy — les 12 titres allow |
+| [Soleil et lune](internals/index.md/sun-and-moon.md) | ce qui alimente bloxdSunDirection |
+| [Débogage](internals/index.md/debugging.md) | paramètres URL, panneaux de statistiques |
 
 
----
+Les détails internes ne constituent pas un contrat d'API stable. Lors de la création de packs, privilégiez la [Référence de l'API](internals/api).
 
 ## Pipeline de rendu
-> API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
+
+> API cible : 5 · Type : référence technique
 - **Les hooks surface tournent « avant » alphaTest** : `out.alpha` alimente directement le test discard. Les matériaux cutout (herbe, feuilles) permettent des effets de dither façon dissolution (recette R-C). Pour les liquides (rendus en blend) `out.alpha` est la vraie transparence (recette R-D). Aucun effet sur le terrain opaque normal — ne pas s'y méprendre
 - **Le contenu de `l.ambient`** est `material.ambient × sceneAmbient`, distinct selon le matériau. Le côté scène est lié au réglage graphique « Ambient Lighting Intensity » (défaut 0.5) — ne codez jamais les valeurs par défaut en dur
 - **Les lumières directionnelles de la scène forment un setup à 2 lumières** : la somme Lambert de la lumière principale (direction issue de la position du soleil du réglage de ciel, intensité 1.0) et de la lumière de remplissage (direction `[-0.5, -1, -1]`, intensité 0.35) parvient dans `l.directional`. La lumière de remplissage pointe vers le bas : elle n'apporte rien aux faces du haut et rattrape les surfaces tournées vers le bas (plafonds de grottes etc.). Le terrain ne considère que les lumières ajoutées dans `_initScene` ; les lumières ajoutées à la scène après le démarrage sont ignorées du terrain et des modèles de blocs (un message d'avertissement officiel le dit)
 - **`bloxdSeconds()` est en réalité `performance.now()`** : l'uptime du navigateur, bouclé à 1 heure. Sans rapport avec le jour/nuit du jeu ni le temps de monde écoulé. Pour animer en synchronisation avec une horloge de jeu, estimez le temps depuis l'azimut de `bloxdSunDirection()` dans les mondes à cycle jour/nuit
-- **Les fonctions d'en-tête lisent un seul uniform** : le moteur place l'uniform `bloxdPackInputs` de 64 octets à `@group(3) @binding(0)` (5 slots — seconds / lit / renderOffset / sunDirection / eyePosition, petit-boutiste), et `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` correspondent à la lecture de ces slots ([Format du pack : uniform par frame](api/pack-format.md#uniform-par-frame--bloxdpackinputs)). Les packs ne peuvent pas écrire cet uniform, et comme le WGSL du pack et celui du moteur fusionnent en un seul module, déclarer soi-même le même group/binding est tout aussi impossible. `@group(3) @binding(1)` porte la texture de profondeur de scène des liquides, et `@binding(2)` le buffer de stockage `bloxdSpTextureLayers`
-- **Les données vertex sont construites par le mesher (Web Worker)** : le terrain de blocs est entrelacé à 28 octets par vertex (32 octets quand l'atlas est actif) — position = float32×3 / normale = entier signé 8 bits×4 / couleur = entier normalisé 8 bits×4 (la substance de `s.colour` — la teinte × AO y est cuite en 8 bits à l'étape du mesher, la séparer ou la restaurer côté pack est donc impossible par principe) / UV = float32×2 / atlasIndex = float32. Seuls les niveaux de lumière voyagent dans un buffer vertex séparé de 4 octets (valeurs mesurées : [Relevé de données du moteur](internals/engine-data.md)). Les vertices sont dessinés avec instanciation par chunk
+- **Les fonctions d'en-tête lisent un seul uniform** : le moteur place l'uniform `bloxdPackInputs` de 64 octets à `@group(3) @binding(0)` (5 slots — seconds / lit / renderOffset / sunDirection / eyePosition, petit-boutiste), et `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` correspondent à la lecture de ces slots ([Format du pack : uniform par frame](internals/api/pack-format.md#uniform-par-frame--bloxdpackinputs)). Les packs ne peuvent pas écrire cet uniform, et comme le WGSL du pack et celui du moteur fusionnent en un seul module, déclarer soi-même le même group/binding est tout aussi impossible. `@group(3) @binding(1)` porte la texture de profondeur de scène des liquides, et `@binding(2)` le buffer de stockage `bloxdSpTextureLayers`
+- **Les données vertex sont construites par le mesher (Web Worker)** : le terrain de blocs est entrelacé à 28 octets par vertex (32 octets quand l'atlas est actif) — position = float32×3 / normale = entier signé 8 bits×4 / couleur = entier normalisé 8 bits×4 (la substance de `s.colour` — la teinte × AO y est cuite en 8 bits à l'étape du mesher, la séparer ou la restaurer côté pack est donc impossible par principe) / UV = float32×2 / atlasIndex = float32. Seuls les niveaux de lumière voyagent dans un buffer vertex séparé de 4 octets (valeurs mesurées : [Relevé de données du moteur](internals/rendering-pipeline.md/engine-data.md)). Les vertices sont dessinés avec instanciation par chunk
 - Les fins damiers aux bords de chunk pendant le chargement sont le fondu de chunk par dither Bayer 4×4 en espace écran du moteur, pas des bugs du pack (désactivable via le réglage graphique `chunkFadeIn`)
 - **`mod` est un mot réservé** : rejeté avec `pack.wgsl:3 'mod' is a reserved word in WGSL.` Écrivez les restes avec l'opérateur `%`
 
@@ -5247,11 +5244,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-
----
-
 ## Intérieurs de l'invocation des hooks
-> API cible : 5 · État : Analyzed (restauré depuis le bundle de production — le renderer Lite ; le fichier source intégré `lite/terrainShaderPack.ts` survit dans les messages d'erreur)
+
+> API cible : 5 · Type : référence technique
 
 Comment le moteur appelle les hooks à l'exécution. Cela ne change rien au code que vous écrivez, mais supprime les conjectures sur ce que les hooks reçoivent.
 
@@ -5268,9 +5263,9 @@ Le renderer n'« appelle » pas les hooks depuis JavaScript. Une fois qu'un pack
 
 ### Ce que la greffe impose
 
-- **le terrain strict ignore les changements d'alpha des hooks de surface.** La réécriture `alpha = bloxdSpSurface.alpha` n'est greffée que pour le programme liquide ou les variantes non strictes — l'implémentation derrière la table de macros ([Préprocesseur](api/preprocessor.md))
+- **le terrain strict ignore les changements d'alpha des hooks de surface.** La réécriture `alpha = bloxdSpSurface.alpha` n'est greffée que pour le programme liquide ou les variantes non strictes — l'implémentation derrière la table de macros ([Préprocesseur](internals/api/preprocessor.md))
 - **Une variante stricte qui déclare un hook de vertex ne l'exécute jamais.** Le moteur le signale au moment du build : `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. D'où le `#ifndef BLOXD_STRICT` du gabarit
-- **Les identifiants `bloxdSp*`** sont des temporaires du moteur — invisibles pour votre code mais présents dans les diagnostics et la sortie de rétro-ingénierie ([Identifiants réservés](internals/reserved-identifiers.md) — 46 en v5)
+- **Les identifiants `bloxdSp*`** sont des temporaires du moteur — invisibles pour votre code mais présents dans les diagnostics et la sortie de rétro-ingénierie ([Identifiants réservés](internals/hook-invocation.md/reserved-identifiers.md) — 46 en v5)
 - **Le raccourci de surface par défaut.** Si le hook de surface d'une variante est littéralement `bloxdDefaultSurface`, le moteur omet entièrement la greffe de réécriture `baseColor` / `alpha` — le défaut produit déjà ces valeurs, donc les affectations sont du code mort. **Les chaînes de hooks non modifiées ne coûtent rien**
 
 ### Ce qui a changé en v5
@@ -5279,8 +5274,8 @@ L'architecture de greffe existait dans le renderer v2 et est restée stable de v
 
 - `vBlockFlags` (bits) → la **struct `BloxdFlags`** (délivrée via `bloxdSpFlags`)
 - la capture de `litColour` est passée d'interne au moteur à **API publique** (`bloxdLitColour()` — le `bloxdSpLitColour` de la v4 promu)
-- `BloxdLightIn` a gagné `diffuse` / `emissive`, et `bloxdShading()` reconstruit la réponse matériau ([Éclairage](api/lighting.md))
-- livraison de `localPosition` (`bloxdSpItemLocalPosition`), des entrées d'enchant (`bloxdSpEnchant`) et d'`overlayColour` ([Rendu des modèles](internals/model-rendering.md))
+- `BloxdLightIn` a gagné `diffuse` / `emissive`, et `bloxdShading()` reconstruit la réponse matériau ([Éclairage](internals/api/lighting.md))
+- livraison de `localPosition` (`bloxdSpItemLocalPosition`), des entrées d'enchant (`bloxdSpEnchant`) et d'`overlayColour` ([Rendu des modèles](internals/hook-invocation.md/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (inversé)
 - le programme Model a rejoint la matrice de variantes (3 programmes × 2 modes = 6 variantes)
 
@@ -5289,36 +5284,34 @@ L'architecture de greffe existait dans le renderer v2 et est restée stable de v
 | Champ | Source côté moteur |
 |---|---|
 | `litColour` | la couleur de fragment capturée juste avant le mix de brouillard — « avant émission et brouillard » en termes d'en-tête |
-| `directional` | la somme des Lambert par lumière directionnelle, interpolée par vertex (setup à 2 lumières dans [Pipeline de rendu](internals/rendering-pipeline.md)) |
+| `directional` | la somme des Lambert par lumière directionnelle, interpolée par vertex (setup à 2 lumières dans [Pipeline de rendu](internals/hook-invocation.md/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | la réponse RVB directionnelle du matériau / la lueur RVB |
 | `ambient` | `material.ambient × sceneAmbient` — par matériau, par frame |
-| `blockLight` / `skyLight` | les varyings de niveaux de lumière décodés ([Intérieurs de l'éclairage](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | les varyings de niveaux de lumière décodés ([Intérieurs de l'éclairage](internals/hook-invocation.md/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | les uniforms correspondants |
-| `heldLight` | construit depuis le varying de niveau de lumière et les uniforms de lumière tenue (atténuation de cône dans [Intérieurs de l'éclairage](internals/lighting-internals.md)) |
+| `heldLight` | construit depuis le varying de niveau de lumière et les uniforms de lumière tenue (atténuation de cône dans [Intérieurs de l'éclairage](internals/hook-invocation.md/lighting-internals.md)) |
 | `fogColour` | noir uniquement dans les scènes entièrement sans brouillard (mode 0) |
-| `fogAlpha` | le facteur de brouillard clampé ([Intérieurs du brouillard](internals/fog-internals.md)) |
+| `fogAlpha` | le facteur de brouillard clampé ([Intérieurs du brouillard](internals/hook-invocation.md/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings et valeurs à interpolation flat (comme `BloxdSurfaceIn` — valeurs post-hook de vertex) |
 
 ### Voir aussi
 
-- [Hooks de shader](api/hooks.md) · [Pipeline de rendu](internals/rendering-pipeline.md) · [Identifiants réservés](internals/reserved-identifiers.md) · [Historique des versions : v3](history/v3.md)
-
-
----
+- [Hooks de shader](internals/api/hooks.md) · [Pipeline de rendu](internals/hook-invocation.md/rendering-pipeline.md) · [Identifiants réservés](internals/hook-invocation.md/reserved-identifiers.md) · [Historique des versions : v3](internals/history/v3.md)
 
 ## En-tête du moteur (verbatim)
-> API cible : 5 · État : Analyzed (restauré depuis le bundle de production en direct)
 
-Le texte exact que le moteur préfixe à chaque pack, rendu depuis le validateur de la build en direct avec ses interpolations appliquées (`apiVersion` et les 6 lectures d\'uniform via `bloxdPackInputs`). 216 lignes. Aucune paraphrase. Revérifié sur les builds précédentes (`bny9u`, `v98qt8`) — le seul ajout est le contenu des ombres.
+> API cible : 5 · Type : référence technique
+
+Texte de référence de l'en-tête WGSL ajouté par le moteur à chaque shader pack. Consultez la [Référence de l'API](internals/api) pour comprendre chaque champ et chaque fonction.
 
 Guide de lecture :
-- Explications champ par champ → [Structures](api/structures.md)
-- Fonction par fonction → [Fonctions](api/functions.md) / [Éclairage](api/lighting.md)
-- Flags (BloxdFlags) → [Flags](api/flags.md)
-- Le bloc `bloxdTextureId*` n'est **pas** dans cet en-tête — il est généré par pack à partir des noms référencés ([API de textures](api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` marque les champs conditionnels ([Préprocesseur](api/preprocessor.md))
-- Différences avec l'en-tête de la v4 (6 021 o) → [Historique des versions : v5](history/v5.md)
-- Comment l'en-tête est validé (HEADER_VERSION) → [Validation des shaders](internals/shader-validation.md)
+- Explications champ par champ → [Structures](internals/api/structures.md)
+- Fonction par fonction → [Fonctions](internals/api/functions.md) / [Éclairage](internals/api/lighting.md)
+- Flags (BloxdFlags) → [Flags](internals/api/flags.md)
+- Le bloc `bloxdTextureId*` n'est **pas** dans cet en-tête — il est généré par pack à partir des noms référencés ([API de textures](internals/api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` marque les champs conditionnels ([Préprocesseur](internals/api/preprocessor.md))
+- Différences avec l'en-tête de la v4 (6 021 o) → [Historique des versions : v5](internals/history/v5.md)
+- Comment l'en-tête est validé (HEADER_VERSION) → [Validation des shaders](internals/engine-header.md/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5540,23 +5533,21 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Voir aussi
 
-- [Référence API](api/) — la version annotée de cet en-tête
-- [Validation des shaders](internals/shader-validation.md) — HEADER_VERSION et la revalidation des packs sauvegardés
-- [Relevé des données du moteur](internals/engine-data.md) — le relevé de mesures
-
-
----
+- [Référence API](internals/api) — la version annotée de cet en-tête
+- [Validation des shaders](internals/engine-header.md/shader-validation.md) — HEADER_VERSION et la revalidation des packs sauvegardés
+- [Relevé des données du moteur](internals/engine-header.md/engine-data.md) — le relevé de mesures
 
 ## Validation des shaders
-> API cible : 5 · État : Analyzed (restauré depuis le validateur en production)
 
-La validation statique (l'analyseur, étape 1 du contrôle de chargement). Les correctifs côté utilisateur : [Erreurs de validation](troubleshooting/validation.md).
+> API cible : 5 · Type : référence technique
+
+La validation statique (l'analyseur, étape 1 du contrôle de chargement). Les correctifs côté utilisateur : [Erreurs de validation](internals/troubleshooting/validation.md).
 
 ### Les étapes
 
-1. **Limites du chargeur** (zip / forme du pack.json) → [Format du pack](api/pack-format.md)
+1. **Limites du chargeur** (zip / forme du pack.json) → [Format du pack](internals/api/pack-format.md)
 2. **Validation statique (analyseur)** — cette page ; syntaxe, types, noms réservés, contrats de hooks à travers les 6 variantes
-3. **Compilation réelle dans le navigateur** → [Compilation WGSL](internals/wgsl-compilation.md)
+3. **Compilation réelle dans le navigateur** → [Compilation WGSL](internals/shader-validation.md/wgsl-compilation.md)
 4. **Revalidation à l'exécution à l'entrée en jeu** — compile réellement chaque matériau de terrain existant (plus stricte que le contrôle de l'écran de réglages) ; son échec exclut le pack de ce jeu
 
 ### La table de signatures des fonctions spéciales
@@ -5586,7 +5577,7 @@ Note : `bloxdFragmentBlockPosition` a disparu de la génération de l'en-tête, 
 
 ### Résolution des noms de textures & diagnostics
 
-La résolution `bloxdTextureId*` possède un chemin dédié ([les messages](api/texture-api.md#erreurs-de-résolution-de-noms-verbatim-depuis-le-validateur)) :
+La résolution `bloxdTextureId*` possède un chemin dédié ([les messages](internals/api/texture-api.md#erreurs-de-résolution-de-noms-verbatim-depuis-le-validateur)) :
 
 - **pliage** : découpage sur les non-alphanumériques, CamelCase, préfixe `bloxdTextureId` ; la correspondance inverse est insensible à la casse et aux underscores
 - **suggestions d'orthographe** (nouveau en v5) : les noms sans correspondance reçoivent des propositions Levenshtein au seuil `max(2, floor(len/4)) + 1`
@@ -5600,36 +5591,34 @@ La résolution `bloxdTextureId*` possède un chemin dédié ([les messages](api/
 
 ### La réécriture des dérivées en Y
 
-La passe de réécriture de jetons de l'analyseur réécrit chaque appel `dpdy` / `dpdyCoarse` / `dpdyFine` en `(-dpdy(...))` (la famille dpdy est explicitement énumérée comme l'ensemble d'inversion). `dpdx` et `fwidth` restent intouchés ([Restrictions](api/restrictions.md#réécritures-automatiques)).
+La passe de réécriture de jetons de l'analyseur réécrit chaque appel `dpdy` / `dpdyCoarse` / `dpdyFine` en `(-dpdy(...))` (la famille dpdy est explicitement énumérée comme l'ensemble d'inversion). `dpdx` et `fwidth` restent intouchés ([Restrictions](internals/api/restrictions.md#réécritures-automatiques)).
 
 ### Génération de l'en-tête & des constantes de textures
 
-- l'en-tête est préfixé en lecture seule ([En-tête du moteur](internals/engine-header.md))
+- l'en-tête est préfixé en lecture seule ([En-tête du moteur](internals/shader-validation.md/engine-header.md))
 - le bloc `bloxdTextureId*` est généré **par pack** à partir des noms référencés
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` vaut `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (entier de tête passé de 8 à 9 depuis la v4). Les deux suffixes fnv1a32 prennent l'empreinte du matériau d'en-tête et du registre nom-id trié. La revalidation des packs sauvegardés utilise cette empreinte pour décider « à revérifier » ([Compatibilité](api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
+`HEADER_VERSION` vaut `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (entier de tête passé de 8 à 9 depuis la v4). Les deux suffixes fnv1a32 prennent l'empreinte du matériau d'en-tête et du registre nom-id trié. La revalidation des packs sauvegardés utilise cette empreinte pour décider « à revérifier » ([Compatibilité](internals/api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
 
 ### Stubs de validation
 
-Le code qui passe la validation statique reçoit du code stub synthétisé avant le vrai contrôle WGSL du navigateur : `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — la table de stubs de types (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) construit les structs d'entrée et invoque les hooks. Détails : [Compilation WGSL](internals/wgsl-compilation.md).
+Le code qui passe la validation statique reçoit du code stub synthétisé avant le vrai contrôle WGSL du navigateur : `var<private> bloxdValidationP: vec4f` plus `bloxdValidateVertex` / `bloxdValidateFragment` — la table de stubs de types (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) construit les structs d'entrée et invoque les hooks. Détails : [Compilation WGSL](internals/shader-validation.md/wgsl-compilation.md).
 
 ### Voir aussi
 
-- [Erreurs de validation](troubleshooting/validation.md) · [Compilation WGSL](internals/wgsl-compilation.md) · [Registre des textures](internals/texture-registry.md) · [Relevé des données du moteur](internals/engine-data.md)
-
-
----
+- [Erreurs de validation](internals/troubleshooting/validation.md) · [Compilation WGSL](internals/shader-validation.md/wgsl-compilation.md) · [Registre des textures](internals/shader-validation.md/texture-registry.md) · [Relevé des données du moteur](internals/shader-validation.md/engine-data.md)
 
 ## Compilation WGSL
-> API cible : 5 · État : Analyzed (restauré depuis le bundle en production)
+
+> API cible : 5 · Type : référence technique
 
 La deuxième étape de validation — la compilation réelle via le compilateur WGSL du navigateur — et les stubs de validation de la v5.
 
 ### Pourquoi deux étapes
 
-Le contrôle de types de la validation statique est incomplet, donc certaines erreurs n'apparaissent qu'ici (p. ex. les exigences de précédence d'opérateurs de WGSL comme `mixing '*' and '^' requires parenthesis`). Les erreurs apparaissent en jeu avec le nom de la variante ([Erreurs de compilation](troubleshooting/compilation.md)).
+Le contrôle de types de la validation statique est incomplet, donc certaines erreurs n'apparaissent qu'ici (p. ex. les exigences de précédence d'opérateurs de WGSL comme `mixing '*' and '^' requires parenthesis`). Les erreurs apparaissent en jeu avec le nom de la variante ([Erreurs de compilation](internals/troubleshooting/compilation.md)).
 
 ### Génération des stubs de validation
 
@@ -5682,27 +5671,23 @@ En greffant les appels de hooks, le moteur garde une table de correspondance d'i
 
 ### Revalidation à l'exécution à l'entrée en jeu
 
-`checkCompilation` s'exécute à chaque entrée en jeu et compile réellement chaque matériau de terrain existant (plus stricte que le contrôle de l'écran de réglages). L'échec exclut le pack de ce jeu. Le contrôle a un délai d'expiration forcé de 60 secondes ([Performance](troubleshooting/performance.md)).
+`checkCompilation` s'exécute à chaque entrée en jeu et compile réellement chaque matériau de terrain existant (plus stricte que le contrôle de l'écran de réglages). L'échec exclut le pack de ce jeu. Le contrôle a un délai d'expiration forcé de 60 secondes ([Performance](internals/troubleshooting/performance.md)).
 
 ### Voir aussi
 
-- [Erreurs de compilation](troubleshooting/compilation.md) · [Validation des shaders](internals/shader-validation.md) · [Premiers pas : Validation](getting-started/validation.md)
-
-
----
+- [Erreurs de compilation](internals/troubleshooting/compilation.md) · [Validation des shaders](internals/wgsl-compilation.md/shader-validation.md) · [Premiers pas : Validation](internals/getting-started/validation.md)
 
 ## Intérieurs des identifiants réservés
-> API cible : 5 · État : Analyzed (restauré depuis les générateurs du bundle en production)
 
-L'espace de noms `bloxdSp*` — des symboles que les générateurs peuvent injecter et que les packs ne peuvent donc pas redéclarer. Le résumé pour les auteurs de packs : [Restrictions](api/restrictions.md).
+> API cible : 5 · Type : référence technique
+
+L'espace de noms `bloxdSp*` — des symboles que les générateurs peuvent injecter et que les packs ne peuvent donc pas redéclarer. Le résumé pour les auteurs de packs : [Restrictions](internals/api/restrictions.md).
 
 ### Les 88 symboles
 
-De 27 en v4 à 46 au lancement v5, puis **88** sur `bbb6l5` (+42, 0 retiré ; le seul retrait historique fut `bloxdSpLitColour`, promu au public `bloxdLitColour()`) :
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### Nouveaux noms ↔ le système d'ombres de `bbb6l5`
 
 Les 42 nouveaux symboles proviennent de l'implémentation des ombres soleil/lune du moteur, qui soutient `bloxdShadow()` / `bloxdAirShadow()` :
 
@@ -5719,41 +5704,37 @@ Les 42 nouveaux symboles proviennent de l'implémentation des ombres soleil/lune
 - `bloxdSpFlags` — la livraison de la struct `BloxdFlags`
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — les nouvelles entrées (enchant, position locale au modèle)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — le chemin d'échantillonnage par cellules des texture packs
-- `bloxdSpQuarterTurns` — la chaîne de rotation ([Échantillonnage des textures](internals/texture-sampling.md))
+- `bloxdSpQuarterTurns` — la chaîne de rotation ([Échantillonnage des textures](internals/reserved-identifiers.md/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — les variables locales des hooks étendus
 
 ### La règle au niveau pack
 
-Plus large que cet espace de noms : **tout ce qui correspond à `/^bloxd/i` (insensible à la casse)**. Seuls les 9 noms de fonctions hook peuvent être déclarés ([Erreurs de validation](troubleshooting/validation.md)).
+Plus large que cet espace de noms : **tout ce qui correspond à `/^bloxd/i` (insensible à la casse)**. Seuls les 9 noms de fonctions hook peuvent être déclarés ([Erreurs de validation](internals/troubleshooting/validation.md)).
 
-Les identifiants préfixés par `bloxdTextureId` se résolvent en noms de textures avec leur famille d'erreurs dédiée ([Problèmes de textures](troubleshooting/textures.md)).
+Les identifiants préfixés par `bloxdTextureId` se résolvent en noms de textures avec leur famille d'erreurs dédiée ([Problèmes de textures](internals/troubleshooting/textures.md)).
 
 ### Voir aussi
 
-- [Restrictions](api/restrictions.md) · [Échantillonnage des textures](internals/texture-sampling.md) · [Historique des versions : v5](history/v5.md)
-
-
----
+- [Restrictions](internals/api/restrictions.md) · [Échantillonnage des textures](internals/reserved-identifiers.md/texture-sampling.md) · [Historique des versions : v5](internals/history/v5.md)
 
 ## Intérieurs de l'éclairage
-> API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
+
+> API cible : 5 · Type : référence technique
 
 `blockLight` est une **lumière colorée** à trois canaux RVB. Chaque bloc émetteur définit une couleur d'émission `[R, G, B]` (0–15 chacun) reprise telle quelle comme couleur de lumière (torche normale = blanc chaud (14,14,12) / lave = orange (14,8,2) / beacon = cyan (5,14,14) / torche blanche = (15,15,15), etc.). À l'étage vertex elle arrive empaquetée en 4 nibbles — r / g / b / sky — dans un seul attribut flottant. Traiter les trois canaux séparément dans le hook light permet l'éclairage local coloré — la recette de torche chaude (R9.1) est calibrée sur ce comportement.
 
 En décodant `aPackedLightLevels`, le moteur applique à chaque canal un **plancher à 35 % du canal RVB le plus brillant**. P. ex. une « lumière rouge pure » est relevée à (1,00, 0,35, 0) aux sommets avant interpolation et lift. L'orange de torche paraissant « rose blanchâtre plutôt que rouge » en jeu vient de là — réglez la saturation de la recette de torche chaude (R9.1) contre ce comportement par défaut.
 
-La composition de lumière n'est pas additive. En interne le moteur prend le **max** entre la lumière de bloc (après le plancher de 35 %) et la lumière de ciel construite en `mix(couleur ambiante, couleur de ciel, skyLight)`, puis prend encore le max avec la lumière tenue (après boost d'ambiant). Les valeurs de canaux dans cette composition sont les valeurs **post-lift** — le moteur compose à partir des mêmes niveaux de lumière relevés que ceux qui parviennent aux entrées des hooks (`terrainLightLevels` après la courbe de lift). Donc `blockLight` et `skyLight` ne s'annulent jamais l'un l'autre — la contribution du côté le plus sombre est simplement jetée — si bien qu'affaiblir la lumière de ciel n'assombrit guère les zones dominées par la lumière de bloc. Concevez les recettes d'exposition / d'atténuation autour de cette structure (la protection de lumière locale de [Concevoir des looks nocturnes](guides/night.md) existe pour compenser cela).
+La composition de lumière n'est pas additive. En interne le moteur prend le **max** entre la lumière de bloc (après le plancher de 35 %) et la lumière de ciel construite en `mix(couleur ambiante, couleur de ciel, skyLight)`, puis prend encore le max avec la lumière tenue (après boost d'ambiant). Les valeurs de canaux dans cette composition sont les valeurs **post-lift** — le moteur compose à partir des mêmes niveaux de lumière relevés que ceux qui parviennent aux entrées des hooks (`terrainLightLevels` après la courbe de lift). Donc `blockLight` et `skyLight` ne s'annulent jamais l'un l'autre — la contribution du côté le plus sombre est simplement jetée — si bien qu'affaiblir la lumière de ciel n'assombrit guère les zones dominées par la lumière de bloc. Concevez les recettes d'exposition / d'atténuation autour de cette structure (la protection de lumière locale de [Concevoir des looks nocturnes](internals/guides/night.md) existe pour compenser cela).
 
 La portée de la lumière tenue en main (`heldLight`) suit le canal le plus brillant de la couleur de lumière (max 15 blocs), avec le prétraitement `dist^0.75`, le même plancher de canal à 35 %, et `l.heldLight` est la valeur pré-boost d'ambiant. L'atténuation du cône, restaurée depuis le module de lumière du moteur : l'atténuation angulaire du faisceau vaut `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))`, où `t` est l'angle normalisé par rapport à l'axe du cône (0 = centre, 1 = bord) ; la portée vaut `(rangeOverride > 0 ? rangeOverride : canal le plus brillant) × atténuation du cône`, avec `rangeOverride` lu dans l'alpha de la couleur de lumière tenue ; dans la portée, un override atténue par `(range − dist) / range` tandis que le défaut soustrait la distance (prétraitée) canal par canal ; viennent ensuite le plancher de 35 %, la division par 15, la courbe de lift, et enfin le boost d'ambiant. Les objets personnalisés peuvent fixer `spotlightRange` et l'angle du cône — un mode « faisceau tenu en main » dont le cône suit la caméra. Les packs ne peuvent pas connaître la direction du faisceau.
 
 Les blocs personnalisés peuvent porter `skyLightEmission` (0–15), qui **s'injecte dans le canal skyLight lui-même, à part du BFS de blockLight**. Les packs style R9.12 jugeant soleil/ombre par seuil de skyLight peuvent se méprendre dans les mondes où des lumières artificielles relèvent skyLight. Les packs de distribution doivent juger en combinaison avec blockLight pour rester robustes.
 
-
----
-
 ## Intérieurs du brouillard
-> API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
-Le calcul du brouillard est toujours en mode LINEAR (équivalent à `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), avec `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = réglage de distance de brouillard ; seul D = 0 est spécial avec fogEnd = 5). **La bande de dégradé du brouillard ne fait que 32 blocs de large**, et `l.fogAlpha` est moins une « brume de distance » qu'une **distance normalisée au bord du monde chargé**. Elle varie par joueur selon la distance de chargement : les effets fondés sur la distance doivent donc calculer `distance(l.position, bloxdEyePosition())` eux-mêmes (la section « Bande de bord de chargement » ci-dessous). (la fonction de brouillard du renderer implémente en réalité **quatre** modes — désactivé / exponentiel / exponentiel au carré / linéaire — et les titres livrés pilotent le linéaire ; la source restaurée et l'argument de robustesse sont préservés dans [Historique des versions : v3](history/v3.md).)
+
+> API cible : 5 · Type : référence technique
+Le calcul du brouillard est toujours en mode LINEAR (équivalent à `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), avec `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = réglage de distance de brouillard ; seul D = 0 est spécial avec fogEnd = 5). **La bande de dégradé du brouillard ne fait que 32 blocs de large**, et `l.fogAlpha` est moins une « brume de distance » qu'une **distance normalisée au bord du monde chargé**. Elle varie par joueur selon la distance de chargement : les effets fondés sur la distance doivent donc calculer `distance(l.position, bloxdEyePosition())` eux-mêmes (la section « Bande de bord de chargement » ci-dessous). (la fonction de brouillard du renderer implémente en réalité **quatre** modes — désactivé / exponentiel / exponentiel au carré / linéaire — et les titres livrés pilotent le linéaire ; la source restaurée et l'argument de robustesse sont préservés dans [Historique des versions : v3](internals/history/v3.md).)
 
 La couleur de brouillard par défaut est `rgb(183, 191, 195)` (gris-bleu pâle). Les créateurs de mondes peuvent la changer via `fogColourOverride` (hex). Avec le mode brouillard 0 (NONE), **fogColour arrive noir**. La forme standard `bloxdApplyFog(col, l)` est sûre puisque la couleur de brouillard n'est pas utilisée quand fogAlpha vaut 0. L'API script a deux options de plus, `fogChunkDistanceOverride` et `fogOnSkybox` : les jeux personnalisés peuvent régler indépendamment la distance de brouillard (la valeur D) et l'application du brouillard à la skybox. Par défaut la skybox n'est pas affectée par le brouillard (seuls les jeux activant `fogOnSkybox` teintent aussi la skybox avec la couleur de brouillard).
 
@@ -5774,13 +5755,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-
----
-
 ## Intérieurs de l'échantillonnage des textures
-> API cible : 5 · État : Analyzed (restauré depuis le générateur en production, c56)
 
-Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — le codegen de textures à 3 variantes. Le côté utilisateur : [API de textures](api/texture-api.md).
+> API cible : 5 · Type : référence technique
+
+Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — le codegen de textures à 3 variantes. Le côté utilisateur : [API de textures](internals/api/texture-api.md).
 
 ### Les trois variantes
 
@@ -5821,7 +5800,7 @@ Le code écrit pour le vrai atlas se compile et s'exécute toujours ici — il v
 
 ### L'échelle d'images d'animation
 
-Les textures animées (43 familles) avancent à intervalles fixes par famille (200 / 250 / 300 ms — la colonne intervalle du [catalogue de textures](api/texture-catalog.md#familles-danimation-43-noms)). Passer un id de famille d'animation à `bloxdTexel` échantillonne l'image courante.
+Les textures animées (43 familles) avancent à intervalles fixes par famille (200 / 250 / 300 ms — la colonne intervalle du [catalogue de textures](internals/api/texture-catalog.md#familles-danimation-43-noms)). Passer un id de famille d'animation à `bloxdTexel` échantillonne l'image courante.
 
 ### Réglages du sampler
 
@@ -5833,39 +5812,13 @@ Le mesher fusionne les faces au matériau/AO/lumière identiques en rectangles u
 
 ### Voir aussi
 
-- [API de textures](api/texture-api.md) · [Registre des textures](internals/texture-registry.md) · [Pipeline de rendu](internals/rendering-pipeline.md)
-
-
----
-
-## Fonctionnement du registre de textures
-
-> API cible : 5 · Usage : références aux textures par nom
-
-Les shader packs référencent les textures à l'aide de constantes nommées, et non d'ID numériques. Les constantes utilisent le format `bloxdTextureId<Name>`. Consultez le [Catalogue de textures](internals/api/texture-catalog.md) pour connaître les noms disponibles.
-
-### Résolution des noms
-
-Lors du chargement d'un pack, le chargeur résout chaque constante nommée à partir des noms de texture disponibles. Si l'organisation interne change mais que le nom reste disponible, le pack peut continuer à référencer cette texture par son nom.
-
-**N'inscrivez pas directement d'ID numériques de texture dans le WGSL.** Les ID internes et les positions dans l'atlas peuvent changer lorsque le contenu du jeu est mis à jour. Les constantes nommées rendent le code du pack indépendant de ces positions internes.
-
-### Animation et rotation
-
-- **Animation :** utilisez le nom de base, comme `lava`, plutôt que les noms d'image tels que `lava0`–`lava7`. L'échantillonnage sélectionne l'image courante.
-- **Rotation :** utilisez le nom de base indiqué dans le catalogue plutôt que les emplacements de rotation internes. L'échantillonnage applique la rotation de la face.
-- **Transitions entre images :** le moteur possède des emplacements internes pour interpoler entre deux images d'animation adjacentes. Les packs doivent continuer à utiliser les constantes nommées habituelles.
-
-### Voir aussi
-
-- [Catalogue de textures](internals/api/texture-catalog.md) — noms et constantes disponibles
-- [API de textures](internals/api/texture-api.md) — recherche et échantillonnage des textures
-- [Internes de l'échantillonnage des textures](internals/texture-registry.md/texture-sampling.md) — fonctionnement de l'échantillonnage
+- [API de textures](internals/api/texture-api.md) · [Registre des textures](internals/texture-sampling.md/texture-registry.md) · [Pipeline de rendu](internals/texture-sampling.md/rendering-pipeline.md)
 
 ## Intérieurs du rendu des modèles
-> API cible : 5 · État : Analyzed (restauré depuis le bundle en production)
 
-Les intérieurs du programme Model v5. Le guide côté utilisateur : [Modèles et textures](guides/models.md).
+> API cible : 5 · Type : référence technique
+
+Les intérieurs du programme Model v5. Le guide côté utilisateur : [Modèles et textures](internals/guides/models.md).
 
 ### Ce qu'est le programme Model
 
@@ -5883,7 +5836,7 @@ Avant la v5, les packs ne pouvaient se brancher que sur terrain / liquide ; les 
 
 ### Calcul de l'enchant
 
-Le moteur anime le balayage du scintillement et le livre en tant que `enchantColour.a` aux hooks surface/light ([Effets d'enchantement](recipes/enchant-effects.md)). Le mélange se produit à l'intérieur de `bloxdLitColour()` — juste après l'ombrage, avant la lumière du monde ([Éclairage](api/lighting.md#le-pipeline-complet)).
+Le moteur anime le balayage du scintillement et le livre en tant que `enchantColour.a` aux hooks surface/light ([Effets d'enchantement](internals/recipes/enchant-effects.md)). Le mélange se produit à l'intérieur de `bloxdLitColour()` — juste après l'ombrage, avant la lumière du monde ([Éclairage](internals/api/lighting.md#le-pipeline-complet)).
 
 ### L'overlay (flash de dégâts etc.)
 
@@ -5891,66 +5844,19 @@ Le moteur anime le balayage du scintillement et le livre en tant que `enchantCol
 
 ### Le chemin des textures
 
-La plupart des faces de modèle utilisent `textureId: 0` (pas de texture) — les skins de joueurs et les textures de mobs ne sont pas dans l'espace de noms de l'atlas de textures de blocs. `surface.colour` arrive avec skin × teinte cuits dedans, donc le traitement des faces de modèle part de `colour` ([textures possédées par le modèle](api/texture-api.md#textures-possédées-par-le-modèle-textureid-0)).
+La plupart des faces de modèle utilisent `textureId: 0` (pas de texture) — les skins de joueurs et les textures de mobs ne sont pas dans l'espace de noms de l'atlas de textures de blocs. `surface.colour` arrive avec skin × teinte cuits dedans, donc le traitement des faces de modèle part de `colour` ([textures possédées par le modèle](internals/api/texture-api.md#textures-possédées-par-le-modèle-textureid-0)).
 
 ### Variantes
 
-Le programme Model forme un axe de la matrice de variantes : `strict.model` / `allow.model`. `BLOXD_ALPHA` n'est défini que dans allow.model ([Préprocesseur](api/preprocessor.md#matrice-macros--variantes)) ; strict.model n'a pas de hooks de vertex.
+Le programme Model forme un axe de la matrice de variantes : `strict.model` / `allow.model`. `BLOXD_ALPHA` n'est défini que dans allow.model ([Préprocesseur](internals/api/preprocessor.md#matrice-macros--variantes)) ; strict.model n'a pas de hooks de vertex.
 
 ### Voir aussi
 
-- [Modèles et textures](guides/models.md) · [Recettes de shaders pour modèles](recipes/model-shaders.md) · [Flags](api/flags.md) · [Pipeline de rendu](internals/rendering-pipeline.md)
-
-
----
-
-## Données du moteur
-
-> API cible : 5 · Usage : résumé des spécifications
-
-Cette page résume l'API accessible aux shader packs et les limites importantes lors de la création d'un pack. Consultez les références correspondantes pour les définitions et les exemples.
-
-### Vue d'ensemble de l'API
-
-| Élément | Spécification |
-|---|---|
-| Version de l'API | `5` |
-| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| Variantes | 6 (allow / strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA` et `BLOXD_SCENE_DEPTH`. `BLOXD_LIGHTING` n'est pas disponible |
-| Uniform du pack | 80 octets. Voir [Format du pack](internals/api/pack-format.md) pour les offsets |
-| Textures | Utilisez les constantes nommées au format `bloxdTextureId<Name>`. Ne figez jamais les ID numériques |
-| Noms réservés | Les identifiants commençant par `bloxd` sont réservés au moteur |
-
-### Limites du pack
-
-| Élément | Limite |
-|---|---:|
-| Fichiers WGSL | 256 |
-| Total des sources WGSL | 256 KB |
-| `pack.json` | 64 KB |
-| Archive ZIP | 32 MB |
-| Entrées ZIP | 1 024 |
-
-Placez un seul manifeste à la racine du ZIP et enregistrez les fichiers en UTF-8. Les chemins dupliqués et les formats ZIP non pris en charge sont refusés. Voir [Format du pack](internals/api/pack-format.md) pour plus de détails.
-
-### Principales fonctions de l'API v5
-
-- `bloxdShadow()` et `bloxdAirShadow(t)` exposent les informations d'ombre du soleil et de la lune.
-- `bloxdShadowDirection()` renvoie la direction de la lumière qui projette l'ombre.
-- Définissez le champ facultatif `keepCircleShadows` de `pack.json` sur `true` pour conserver les ombres circulaires traditionnelles tout en utilisant l'API d'ombre.
-- Vérifiez l'éclairage à l'exécution avec `bloxdLit()` ; la macro `BLOXD_LIGHTING` n'est pas prise en charge.
-
-### Voir aussi
-
-- [Référence de l'API](internals/api) — fonctions, structures et constantes
-- [Format du pack](internals/api/pack-format.md) — manifeste, uniform et limites du chargeur
-- [Catalogue de textures](internals/api/texture-catalog.md) — noms de textures disponibles
-- [Politique par jeu](internals/engine-data.md/policy.md) — couverture allow / strict
-- [Guide de migration de l'API v4](internals/history/v4.md) — migration depuis la version précédente
+- [Modèles et textures](internals/guides/models.md) · [Recettes de shaders pour modèles](internals/recipes/model-shaders.md) · [Flags](internals/api/flags.md) · [Pipeline de rendu](internals/model-rendering.md/rendering-pipeline.md)
 
 ## Ce qui change les valeurs visibles des packs
-> API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
+
+> API cible : 5 · Type : référence technique
 
 Le même pack rend différemment selon **les réglages de monde et de joueur**. Vérifiez au moins ces 3 environnements avant de distribuer :
 
@@ -5960,18 +5866,15 @@ Le même pack rend différemment selon **les réglages de monde et de joueur**. 
 
 Sources principales de variation : `lightingOverride` (éclairage forcé) / `skyLightColourOverride`, `ambientLightColourOverride` (permutations hex) / `visionMinLightColour` (« couleur la plus sombre visible ». Implémenté comme un max par composante contre `uSkyLightColour` et `uAmbientLightColour` à la fois ; Night Vision l'utilise — les packs « grotte bien noire » n'iront pas aussi sombre que prévu, et la couleur de ciel elle-même est relevée) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (présence de bloxdSunDirection()). `uSkyLightColour` par défaut = (1,1,1) blanc, `uAmbientLightColour` par défaut = (0.25,0.25,0.30). `l.ambient` côté scène = réglage graphique « Ambient Lighting Intensity » (défaut 0.5). `(1.0 - l.fogAlpha)` suit les réglages de brouillard / distance de chunks du joueur. S'y ajoutent comme facteurs de variation des réglages de monde : `cameraTint` (teinte RGBA sur tout l'écran) et `proximityFadeDistance` / `proximityFadeMinOpacity` (fondu de proximité caméra pour les entités) — `cameraTint` en particulier est une passe finale composée **par-dessus** la sortie du pack. Beaucoup d'entre eux peuvent aussi être fixés via l'API script (`serverOption`) et mis à jour pendant que le jeu tourne.
 
-
----
-
 ## Politique de shader pack par jeu
-> API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
+
+> API cible : 5 · Type : référence technique
 Cette page fixe ce que `allow / strict` signifie au niveau du titre. Seuls les titres dont la définition de jeu porte explicitement `shaderPackPolicy: "allow"` fonctionnent en mode complet (hooks de vertex, `discard`, `alpha` de terrain) ; les titres sans réglage (ou avec une valeur autre qu'allow) sont stricts — `BLOXD_STRICT` est défini et le code entouré de gardes est désactivé automatiquement. Le côté pack ne peut pas choisir cela : savoir quels titres exécutent quoi est un prérequis pour la distribution.
 
-- Build de référence : `szby6g.main.94a7596c.js` (déploiement en production au 2026-10-17). L'énumération statique des 111 définitions de jeu donne **26 entrées allow (12 titres) / 85 entrées strictes**. Les mêmes 12 littéraux allow sur les mêmes 12 titres ont été reconfirmés inchangés sur le bundle de production v3 (`3ymzdd`, 2026-10-20) puis de nouveau sur le bundle v4 (`cnty9`, 2026-10-27) — la liste ci-dessous se transpose telle quelle en v3 et v4. Et sur les builds v5, à nouveau inchangé : reconfirmé sur `ab90qa` (2026-11-03) et `xkg8x` (2026-11-04, 12 littéraux allow recomptés). Sur `bny9u` (2026-11-05), l'énumération complète a été relancée : le nombre de définitions de jeu est passé de 111 à **115** et le côté allow de 26 à **28 entrées** — toujours les mêmes 12 titres, rejoints par deux nouvelles variantes de Test Gym (Imported Mobs, Interest). La liste ci-dessous s'applique telle quelle aussi à v5. Sur `v98qt8` (2026-11-08), l'énumération a été relancée (module jeux 513 du bundle principal, évalué dans un harnais) : **116 définitions / 28 entrées allow (12 titres) / 88 strict** — le côté allow est inchangé, une définition strict de plus.
 - Au-dessus de `shaderPackPolicy` existe un verrou de canal de distribution (en gros `canUseShaderPacks`) : via des portails externes (p. ex. les builds Coolmath Games), le système de shader packs lui-même peut être désactivé avant même que `shaderPackPolicy` soit consulté. L'analyse allow/strict ci-dessous repose sur le build web principal de bloxd.io.
-- allow est déclaré en 12 endroits : 8 littéraux directs dans les définitions de jeu et 4 variables de base (`tb` / `kz` / `cb` / `Fb`) ; les variantes l'héritent par spread (`{...tb,...}`). Il n'existe actuellement aucune surcharge par variante (pas non plus de motif parent-allow / enfant-strict).
 
-Les 12 titres allow (26 entrées au total) :
+
+### Titres allow
 
 - **Test Gym** — base + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (13 entrées)
 - **Doodle Cube** — base + Solos / Duos (3)
@@ -5986,10 +5889,61 @@ Les cas les plus trompeurs côté strict :
 
 Notez qu'en titres stricts le pack reste chargé et compilé, et que les recettes côté fragment comme surface / light fonctionnent comme d'habitude. Ce qui est contraint : les hooks de vertex (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard`, et l'`alpha` de terrain (les liquides l'ont toujours).
 
-Cette liste reflète l'analyse statique du build ci-dessus ; des mises à jour du moteur peuvent modifier la répartition allow/strict. À revérifier à chaque nouvelle version.
 
+Avant de distribuer un pack, testez-le dans le jeu cible et vérifiez que les hooks dont vous avez besoin y fonctionnent.
 
----
+## Le soleil et la lune
+
+> API cible : 5 · Type : référence technique
+La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit uniquement quand le type de skybox change — le critère n'est pas « si le ciel a un soleil » mais **« si la skybox est de type terre »**.
+
+| Skybox | `bloxdSunDirection()` |
+|---|---|
+| `default` (ciel procédural) | Non nul (défauts ci-dessous) |
+| `gloomy` / `interstellar` / `space_*` (textures cubiques) | **Toujours (0,0,0)** |
+
+**La lune est toujours en `-bloxdSunDirection()`** (le moteur calcule la position de la lune comme l'opposé exact du soleil). La nuit se juge par la hauteur du soleil — la lune est levée quand `bloxdSunDirection().y < 0` (soleil sous l'horizon). Mais dans les mondes par défaut le soleil est statique, donc la lune l'est aussi ; seuls les mondes implémentant un cycle jour/nuit la voient bouger.
+
+La direction du soleil des mondes par défaut vaut environ `(-0.56, 0.81, -0.18)` (vecteur unitaire calculé depuis inclination = −0.2 / azimuth = 0.55, statique). Une référence pratique pour prédire sur papier les directions de reflet en testant des packs de distribution.
+
+Les cycles jour/nuit ne sont pas intégrés au moteur — l'inclination est un nombre statique, et les mondes à jour/nuit mobile l'actualisent côté jeu. `bloxdSunDirection()` suit chaque mise à jour.
+
+Les lumières directionnelles du terrain ne sont que 2 lampes créées au démarrage de la scène, à **direction et intensité fixes, inchangées jour et nuit**. En bref : **aucun facteur de luminosité du terrain ne dépend du temps. Les « looks » jour/nuit viennent uniquement de la skybox et de bloxdSunDirection()** — les packs assombrissant le terrain la nuit doivent donc estimer eux-mêmes la tranche horaire depuis bloxdSunDirection() (la technique `sunPresent` de [Conception des looks nocturnes](internals/guides/night.md)).
+
+### R-A. Clair de lune directionnel — moonDir = −bloxdSunDirection()
+
+Ajoute du Lambert blanc bleuté et un faible specular uniquement pendant que la lune est levée. `moonUp` vaut 0 dans les mondes par défaut à soleil statique, donc rien ne s'y passe — **clair de lune qui ne se déclenche que dans les mondes à cycle jour/nuit, donc sûr**.
+
+```wgsl
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    if (bloxdLit()) {
+        // la lune est toujours exactement à l'opposé du soleil ; auto-extinction en journée via moonDir.y < 0
+        let moonDir = -bloxdSunDirection();
+        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+        if (moonUp > 0.0) {
+            let n     = normalize(l.normal);
+            let diff  = max(0.0, dot(n, moonDir));
+            let view  = normalize(bloxdEyePosition() - l.position);
+            let halfV = normalize(moonDir + view);
+            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+        }
+}
+    return out;
+}
+```
+
+## Outils de débogage
+
+> API cible : 5 · Type : référence technique
+- Paramètre URL `?renderer=lite` — force le renderer Lite (WebGPU) (`webgl2` / `babylon` fonctionnent aussi ; `babylon` est l'ancien nom de webgl2). Priorité : paramètre URL > localStorage `bloxdRenderer` > écran de réglages > défaut (webgl2). Les valeurs invalides sont ignorées avec un avertissement. Des overrides laissés dans l'URL ou le localStorage peuvent casser des scènes nécessitant WebGPU (lite) avec « needs the new WebGPU renderer, so remove the renderer override... » ([Erreurs de chargement](internals/troubleshooting/loading.md))
+- Paramètre URL `?vconsole` — console à l'écran (VConsole). Pratique pour la vérification sur appareil mobile
+- Paramètre URL `?drawcalls=1` — ajoute un panneau de debug de statistiques de draw. Choisissez des objets de jeu depuis la console de debug, ou utilisez `drawCalls()` / `why()` / `configureDrawCallWatching()`, pour inspecter le surdessin des gros mécanismes (pack ou autres) et les approches de la limite de ~65,000 vertices par draw call — utile pour isoler les goulots d'étranglement de performance
+- La console affiche `noa-engine v0.33.0` et `Renderer: lite from <source>` — vérifiez-les d'abord pour éviter un mauvais diagnostic de la voie de rendu
+- Le renderer WebGPU se verrouille « forcé ON » pendant qu'un pack s'applique. Le réglage « Disable Block Texture Atlas » se verrouille aussi (l'atlas reste ON), et les packs ne peuvent pas du tout s'appliquer sur les appareils sans WebGPU. La base pour écrire « navigateur WebGPU requis » sur les pages de distribution
+- Les textures de blocs sont une texture tableau 2D (`texture_2d_array`), et le sampler du terrain est nearest + repeat. Le mesher fusionne aussi les faces au matériau / AO / lumière identiques en un rectangle (**greedy meshing**), si bien que l'UV d'une face fusionnée peut dépasser la largeur d'une tuile (bords rentrés de 0.0015). L'adressage repeat matériel gère le carrelage, donc les faces fusionnées paraissent sans couture. Notez qu'un détail procédural indexé sur `vUV` peut casser aux frontières des faces fusionnées — indexez-le plutôt sur la position monde (`s.position` + `bloxdRenderOffset()`)
+- La revalidation d'exécution à chaque entrée en jeu (`checkCompilation`) compile de vrais matériaux de terrain dans le WebGPU du navigateur (plus stricte que la validation statique de l'écran de réglages). Les packs qui échouent ici sont exclus de ce jeu
 
 ## Le soleil et la lune
 > API cible : 5 · État : Analyzed (analyse JavaScript du bundle de production)
