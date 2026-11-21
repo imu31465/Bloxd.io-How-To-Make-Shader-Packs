@@ -80,8 +80,9 @@ const CATS = ['getting-started', 'api', 'guides', 'recipes', 'troubleshooting', 
 
 // ビルドID・確認日は配信日時ではないため、利用者向け総合マニュアルには掲載しない。
 const BUILD_METADATA_LINE = /(?:target build|build target|last verified|last verification|対象ビルド|Ziel-Build|Zuletzt verifiziert|Letzte Prüfung|build objetivo|build cible|dernière vérification|última verificación|लक्ष्य बिल्ड|अंतिम सत्यापन|대상 빌드|최종 확인|최종 검증|build alvo|última verificação|целевой билд|последняя проверка|目标构建|最后验证)/i
+const INTERNAL_BUILD_DETAIL_LINE = /(?:\\b(?:c49|c50|c51|c52|c53|c54|c55|c56|c116|c124)\\b|\\b(?:module|modul|modulo|módulo|модуль|模块|모듈)\\s+(?:ID\\s+)?\\d{3,5}\\b|webpack[- ]chunk|chunk layout|bundle reorg|bundle layout|byte-identical|md5|live loader chunk|live validator|production bundle|preprod|re-measured on the live|remesurad[oa]s? en (?:el|la) c\\d+|remesuré(?:es)? sur le c\\d+|re-mesurad[oa] no c\\d+|auf dem live-c\\d+|na live c\\d+|по-новому измерен.*c\\d+|在现行 c\\d+ 上重新实测)/i
 function stripBuildMetadata(src) {
-  return src.split('\n').filter(line => !BUILD_METADATA_LINE.test(line)).join('\n')
+  return src.split('\n').filter(line => !BUILD_METADATA_LINE.test(line) && !INTERNAL_BUILD_DETAIL_LINE.test(line)).join('\n')
 }
 
 for (const code of langs) {
