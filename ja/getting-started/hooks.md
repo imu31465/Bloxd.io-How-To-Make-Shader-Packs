@@ -1,8 +1,8 @@
 # シェーダーフック
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20 本番+preprod確認) · 検証状況: Verified
+> 対象API: 5 · 検証状況: Verified
 
-シェーダーパックがレンダラーに差し込めるのは **9つのフック** です。3つの描画対象 (Terrain / Liquid / Model) × 3つのパイプライン段階 (Vertex / Surface / Light) の組み合わせで、すべて任意定義です (定義しなければエンジンのデフォルト挙動が使われます)。
+シェーダーパックでは、最大 **9つのフック**を定義できます。3つの描画対象 (Terrain / Liquid / Model) と3つの処理段階 (Vertex / Surface / Light) の組み合わせです。すべて任意定義で、定義しなかった段階にはエンジンの標準処理が使われます。
 
 ## フックの一覧
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* も同じ型
 ```
 
-## 描画対象の分担
+## 描画対象
 
 v5 では3系統のフックの分担が明確です:
 
@@ -37,7 +37,7 @@ v5 では3系統のフックの分担が明確です:
 
 **重要**: パックに Liquid Hook がない場合、**水には Terrain Hook は実行されません** (水は Liquid Hook だけで処理される)。Terrain Hook だけで水も変わるとした旧バージョンの説明とは異なります。
 
-## フォールバックの規則
+## 未定義フックの動作とコード共有
 
 - フックが未定義なら、その段階は**エンジンのデフォルト** (`bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` と同じ挙動) になる
 - **同じ処理を複数フックで共有したい**場合は、モジュールスコープの関数を定義して両方から呼ぶ:
@@ -58,7 +58,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## デフォルトパック (9フック同梱の公式テンプレート)
+## デフォルトパックのテンプレート
 
 新しいパックの出発点となるテンプレートに、v5 では light フックも入りました。出荷形態で 1,683 バイト、全文逐語:
 
