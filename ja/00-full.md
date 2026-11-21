@@ -548,7 +548,7 @@ group 3 のバインディングは次のとおりです:
 | **Liquid** | 水 | **Terrain Hook は実行されない** (水はデフォルト描画のまま) |
 | **Model** | ブロックモデル (ハーフブロック・階段・草花・作物・クモの巣)、手に持った/ドロップ/投げられたアイテム、プレイヤー、モブ、NPC、防具、コスメティック | — |
 
-パックに Liquid Hook がない場合、水には** Terrain Hook も Liquid Hook も実行されません** (v4 以前の「liquid がなければ terrain が代行」する挙動は廃止)。
+パックに Liquid Hook がない場合、水には **Terrain Hook も Liquid Hook も実行されません** (v4 以前の「liquid がなければ terrain が代行」する挙動は廃止)。
 
 ### 段階ごとの役割
 
