@@ -4552,7 +4552,9 @@ Split-Zips, zip64, verschlüsselte Einträge und nicht unterstützte Kompression
 
 Fehler rund um `apiVersion`. Das aktuelle Spiel akzeptiert **nur `5`**.
 
-### „pack.json needs "apiVersion": {{version}}."
+### apiVersion fehlt
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **Symptom**: diese Meldung direkt nach dem Laden (`loadNoApiVersion`)
 - **Ursache**: der Schlüssel `apiVersion` fehlt vollständig
@@ -4746,7 +4748,9 @@ Probleme, die nur in einem Teil der 6 Varianten (`strict|allow` × `terrain|liqu
 - **Fix**: Vertex-Hooks und `discard` in `#ifndef BLOXD_STRICT` einpacken
 - **Vorbeugen**: Vertex-Hooks immer von der geschützten Vorlage ausgehend starten ([Varianten](getting-started/variants.md))
 
-### „.alpha is undefined"
+### Das Feld `alpha` ist in dieser Variante nicht verfügbar
+
+> `.alpha is undefined`
 
 - **Ursache**: `alpha` existiert nur hinter `#ifdef BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model)
 - **Fix**: Alpha-berührenden Code in `#ifdef BLOXD_ALPHA` einpacken ([Präprozessor](api/preprocessor.md#makro--varianten-matrix))
