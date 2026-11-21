@@ -470,78 +470,64 @@ Esta página documenta la API v5 actual. La fuente principal de sus definiciones
 ¿Migras desde v4? Ver [Historial de versiones: v5](history/v5.md).
 ---
 
-## Formato del paquete
-> API objetivo: 5 · Estado: Verified (remedido en el cargador en vivo)
+## Formato del pack
 
-El modelo completo del paquete en una sola página — manifiesto, límites del cargador, uniform por fotograma. Para la versión paso a paso ver [Primeros pasos](getting-started/manifest.md).
+> API objetivo: 5 · Tipo: referencia de API
+
+Esta página resume el manifiesto, los límites del archivo ZIP y el uniform del pack. Para ver los pasos de configuración, consulta [Primeros pasos](api/getting-started/manifest.md).
 
 ### pack.json
+
+Coloca `pack.json` en la raíz del archivo ZIP. Debe ser un objeto JSON.
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
-| `apiVersion` | número | obligatorio | **debe ser exactamente `5`** (`===`). Un string `"5"` falla y se informa con su grafía JSON |
-| `name` | string | obligatorio | no vacío tras recortar espacios; se muestra en los ajustes |
-| `author` | string | opcional | debe ser un string si está presente |
-| `keepCircleShadows` | boolean | opcional | **nuevo en `bbb6l5`** — conserva las antiguas sombras circulares bajo jugadores y mobs cuando tus shaders también usan la API real de sombras sol ([Sombras](guides/shadows.md)). Por defecto `false`; cualquier otro tipo se rechaza con un mensaje dedicado |
+| `apiVersion` | number | Sí | Usa el valor numérico `5`. No se acepta una cadena |
+| `name` | string | Sí | Nombre no vacío después de quitar los espacios exteriores |
+| `author` | string | No | Nombre del autor |
+| `keepCircleShadows` | boolean | No | Establécelo en `true` para conservar las sombras circulares tradicionales al usar la API de sombras |
 
-Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un objeto JSON en la raíz del zip.
+### Límites del cargador
 
-### Límites del cargador (remedidos en el c53 en vivo)
+| Elemento | Límite |
+|---|---:|
+| Archivos `.wgsl` por pack | 256 |
+| Fuente `.wgsl` total | 256 KB |
+| `pack.json` | 64 KB |
+| Archivo ZIP | 32 MB |
+| Entradas ZIP | 1.024 |
 
-| Límite | Valor | Mensaje al superarlo |
+No se admiten archivos ZIP divididos, Zip64, entradas cifradas ni métodos de compresión no compatibles. Guarda todos los archivos en UTF-8 y evita las rutas duplicadas dentro del archivo.
+
+### Uniform del pack
+
+El uniform del pack ocupa 80 bytes y se enlaza en `@group(3) @binding(0)`.
+
+| Offset | Campo | Tipo |
 |---|---|---|
-| archivos `.wgsl` por paquete | 256 | `The pack has more than 256 .wgsl files.` |
-| fuente `.wgsl` total | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| tamaño de `pack.json` | 64 KB | `pack.json is over 64 KB.` |
-| tamaño del zip | 32 MB | `The zip is over 32 MB.` |
-| entradas del zip | 1.024 | `The zip has more than 1024 entries.` |
-| forma del zip | — | zip dividido / zip64 / cifrado / compresión no soportada: cada uno rechazado con su propio mensaje; todos los archivos UTF-8 válidos; exactamente un `pack.json`; sin rutas duplicadas |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-### Comprobación de versión de API
+El tamaño mínimo del enlace del uniform es de 80 bytes. Los demás enlaces del grupo 3 son la textura de profundidad de escena para las variantes Liquid y el búfer `bloxdSpTextureLayers`.
 
-El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScript. La constante de versión `5` y la plantilla de cabecera viven en el mismo módulo (c55 / módulo 29836), así que la validación y la cabecera que asume se mueven juntas. Mensajes de desajuste: ver [Compatibilidad](api/compatibility.md).
+### Relacionado
 
-### Uniform por fotograma: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 64 bytes, pero v5 añadió un miembro (del módulo de diseño de uniform en vivo):
-
-| Desplazamiento | Campo | Tipo | Nota |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | respalda `bloxdSeconds()` |
-| 4 | `lit` | `u32` | 1 cuando la iluminación de bloque/cielo está activada; respalda `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | respalda `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | respalda `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | respalda `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **nuevo en `bbb6l5`** — la dirección en que viaja la luz que proyecta sombras; respalda `bloxdShadowDirection()` |
-
-`lit` cupo en el relleno que v4 ya tenía entre `seconds` y `renderOffset` (los desplazamientos 4–15 eran huecos de alineación; `vec3i` necesita alineación de 16 bytes, así que `renderOffset` se queda en 16). El tamaño total y todos los demás desplazamientos no cambian. El motor lo escribe con un único `setUint32(4, lit ? 1 : 0)` — es un flag, no un nivel de luz (los nombres del lado JS de v4 `terrainLightLevels` / `terrainHeldLight` han desaparecido por completo del bundle).
-
-**Nunca referencies el uniform directamente desde un paquete.** Úsalo a través de las funciones de cabecera (`bloxdSeconds()` etc.). La visibilidad de etapa es VERTEX|FRAGMENT, así que las funciones de cabecera funcionan también desde funciones de ámbito de módulo y hooks de vértice.
-
-### Diseño del grupo de bindings
-
-| binding | Contenido |
-|---|---|
-| 0 | uniform `bloxdPackInputs` (64 B) |
-| 1 | textura de profundidad de escena (variantes de líquido) |
-| 2 | buffer de almacenamiento `bloxdSpTextureLayers` |
-
-`minBindingSize` sigue siendo 64. La textura de profundidad (binding 1) es exclusiva de FRAGMENT, razón por la que `bloxdOpaqueBehind()` solo existe en hooks surface/light.
-
-### Concatenación de wgsl
-
-Los múltiples archivos `.wgsl` se concatenan en un solo módulo en **orden de diccionario por nombre de ruta**. Las declaraciones de ámbito de módulo son independientes del orden; solo el orden de inicialización de `var` puede importar. Los archivos que no son `.wgsl` se ignoran.
-
-
----
+- [Crear el manifiesto](api/getting-started/manifest.md)
+- [Referencia de API](api/pack-format.md)
+- [Guía de migración a API v5](api/history/v5.md)
 
 ## Hooks de sombreado
 > API objetivo: 5 · Estado: Verified
@@ -934,9 +920,10 @@ Valor de retorno de `bloxdOpaqueBehind()`. Úsalo en variantes de líquido tras 
 ---
 
 ## Funciones
-> API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
-Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](api/texture-api.md), junto con `bloxdOpaqueBehind`.
+> API objetivo: 5 · Tipo: referencia técnica
+
+Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](api/functions.md/texture-api.md), junto con `bloxdOpaqueBehind`.
 
 ### Funciones de fotograma (mismo valor durante todo el fotograma)
 
@@ -1031,7 +1018,7 @@ Esta función **ya no forma parte de la cabecera documentada** (sí lo estaba en
 
 - **Validador**: sigue listada en la tabla de firmas en vivo, así que las llamadas pasan la validación de nombres en todos los hooks (incluidos los hooks de vértice)
 - **Ejecución**: el generador de código sigue inyectando una definición en el módulo de terreno/líquido y en ambos programas de modelo — terreno/líquido usan `vec3i(floor(position - normal * 0.5)) + bloxdRenderOffset()`; los pipelines de modelo usan un desplazamiento de 1/64 de bloque, ajustando a la celda del modelo para los modelos de bloque colocados
-- **Advertencia**: al ser una interna indocumentada puede desaparecer en una versión futura sin aviso — prefiere `bloxdWorldPosition()` para posiciones continuas y `flags` para «qué bloque es este» (ver [Historial de versiones: v5](history/v5.md) para su salida de la cabecera)
+- **Advertencia**: al ser una interna indocumentada puede desaparecer en una versión futura sin aviso — prefiere `bloxdWorldPosition()` para posiciones continuas y `flags` para «qué bloque es este» (ver [Historial de versiones: v5](api/history/v5.md) para su salida de la cabecera)
 
 Los paquetes escritos para v4 que la llaman siguen funcionando; los paquetes nuevos no deberían adoptarla.
 
@@ -1065,7 +1052,7 @@ Literalmente, «aplica la receta del motor y luego aplica niebla al resultado co
 
 ### Funciones de receta de iluminación
 
-La receta de iluminación del propio motor, documentada como WGSL llamable — compón o sustituye las etapas individualmente. Explicaciones y el diagrama de flujo: [Iluminación](api/lighting.md).
+La receta de iluminación del propio motor, documentada como WGSL llamable — compón o sustituye las etapas individualmente. Explicaciones y el diagrama de flujo: [Iluminación](api/functions.md/lighting.md).
 
 | Función | Firma | Papel |
 |---|---|---|
@@ -1076,7 +1063,7 @@ La receta de iluminación del propio motor, documentada como WGSL llamable — c
 
 ### Funciones de sombras
 
-La build `bbb6l5` añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
+La API v5 añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
 
 #### bloxdShadow
 
@@ -1084,11 +1071,11 @@ La build `bbb6l5` añadió a la API de packs el sistema real de sombras sol/luna
 fn bloxdShadow() -> f32
 ```
 
-- **Devuelve**: la luz de sol o de luna que llega a este fragmento — **0 en sombra, 1 iluminado** — *nuevo en `bbb6l5`*
+- **Devuelve**: la luz de sol o de luna que llega a este fragmento — **0 en sombra, 1 iluminado** — *nuevo en API v5*
 - Qué las proyecta: **bloques, jugadores, mobs y objetos** (el objeto sostenido en primera persona queda excluido a propósito)
 - Comportamiento (literal de la descripción del validador): se desvanece a 0 al ponerse el sol o la luna o al volverse la cara; **1 en caras `flags.emissive`**; la luz viaja a lo largo de `bloxdShadowDirection()`, así que hay sombras incluso bajo un cielo sin sol
 - **Llamable desde**: hooks surface / light
-- Receta: `let sun = mix(shadowColour, litColour, bloxdShadow());` — ver [Sombras](guides/shadows.md)
+- Receta: `let sun = mix(shadowColour, litColour, bloxdShadow());` — ver [Sombras](api/guides/shadows.md)
 
 #### bloxdAirShadow
 
@@ -1096,9 +1083,9 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 ```
 
-- **Devuelve**: como `bloxdShadow()`, pero en un punto **entre la cámara (t = 0) y este fragmento (t = 1)** — *nuevo en `bbb6l5`* — para haces de luz
+- **Devuelve**: como `bloxdShadow()`, pero en un punto **entre la cámara (t = 0) y este fragmento (t = 1)** — *nuevo en API v5* — para haces de luz
 - Sólo los bloques las proyectan (jugadores y mobs no), difuminadas a bloques enteros; `t` se recorta a 0–1
-- Receta: muestrear varios `t` a lo largo del rayo de vista y acumular — [Sombras](guides/shadows.md)
+- Receta: muestrear varios `t` a lo largo del rayo de vista y acumular — [Sombras](api/guides/shadows.md)
 
 #### bloxdShadowDirection
 
@@ -1118,17 +1105,15 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guarda**: `#ifdef BLOXD_SCENE_DEPTH` (definida en variantes de líquido)
 - **Significado**: la cara opaca tras este fragmento (terreno visto a través del agua); `hit == false` para el cielo
 - **Renombrado respecto a v2**: `found` → `hit`
-- **A fondo**: [Historial de versiones: v3](history/v3.md) y [Interior del motor](internals/rendering-pipeline.md)
+- **A fondo**: [Historial de versiones: v3](api/history/v3.md) y [Interior del motor](api/internals/rendering-pipeline.md)
 
 ### Relacionado
 
-- [Iluminación](api/lighting.md) · [API de texturas](api/texture-api.md) · [Formato del paquete](api/pack-format.md)
-
-
----
+- [Iluminación](api/functions.md/lighting.md) · [API de texturas](api/functions.md/texture-api.md) · [Formato del paquete](api/functions.md/pack-format.md)
 
 ## Iluminación
-> API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
+
+> API objetivo: 5 · Tipo: referencia técnica
 
 v5 publicó la API de iluminación. Lo que el motor hacía internamente (construir `litColour`) ahora es llamable desde los paquetes. Esta página cubre las entradas, las funciones y el orden de procesamiento de la iluminación como un sistema.
 
@@ -1264,8 +1249,8 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### Física de los niveles de luz (trasfondo, saltable)
 
 - **`blockLight` / `skyLight` / `heldLight` llegan ya mapeados a 0–1**: los niveles 0–15 a través de una curva ease-out (p. ej. `6 → 0.45`, `12 → 0.92`). Todos excluyen `ambientLightColour`
-- **Curva de realce**: `skyLight` es en realidad «¿puede esta posición ver el cielo?» — datos de oclusión por vóxeles, es decir, un mapa de sombras. La separación sol/sombra por umbral puede necesitar la transformación inversa (ver la [guía de realismo](guides/realism.md))
-- **Interioridades de la niebla**: en modo lineal `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (acotado 0..1), calculado por vértice en espacio de vista. El build actual es solo lineal (detalles en [Interior del motor: interioridades de la niebla](internals/fog-internals.md))
+- **Curva de realce**: `skyLight` es en realidad «¿puede esta posición ver el cielo?» — datos de oclusión por vóxeles, es decir, un mapa de sombras. La separación sol/sombra por umbral puede necesitar la transformación inversa (ver la [guía de realismo](api/guides/realism.md))
+- **Interioridades de la niebla**: en modo lineal `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (acotado 0..1), calculado por vértice en espacio de vista. El build actual es solo lineal (detalles en [Interior del motor: interioridades de la niebla](api/internals/fog-internals.md))
 
 ### Recetas
 
@@ -1306,13 +1291,11 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Relacionado
 
-- [Funciones](api/functions.md) · [Guías: iluminación](guides/lighting.md) · [Interior del motor: interioridades de la iluminación](internals/lighting-internals.md)
-
-
----
+- [Funciones](api/lighting.md/functions.md) · [Guías: iluminación](api/guides/lighting.md) · [Interior del motor: interioridades de la iluminación](api/internals/lighting-internals.md)
 
 ## API de texturas
-> API objetivo: 5 · Estado: Verified (API sin cambios desde v4, reconfirmada en el build de v5)
+
+> API objetivo: 5 · Tipo: referencia técnica
 
 La API para leer las texturas propias del juego: dos funciones, una familia de constantes con nombre y cuatro campos de entrada. La frase de una línea de la propia cabecera: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -1418,18 +1401,18 @@ Cada nombre de textura utilizable se convierte en una `const` comparable. **La g
 #### Errores de resolución de nombres (literales del validador)
 
 > **Grafía del prefijo / mayúsculas:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
-> 
+>
 > **Fotograma de animación:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
-> 
+>
 > **Copia girada:** `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, which bloxdTexel turns as each face shows it.`
-> 
+>
 > **Ambigua tras el plegado:** `...could name X and Y, which differ only by case or underscores, so it can't be used.`
-> 
+>
 > **No encontrada (con sugerencia):** `There's no texture called X. Did you mean bloxdTextureIdY?` — el umbral de sugerencia es distancia de Levenshtein `max(2, floor(len/4)) + 1`
-> 
+>
 > **No encontrada (sin sugerencia):** `There's no texture called X. Texture names are the file names texture packs use, as in bloxdTextureIdGrassTop for grass_top.png; BLOCK_TEXTURES.md lists them.`
 
-> El `BLOCK_TEXTURES.md` de ese mensaje es la lista interna de nombres de textura del propio juego, referenciada por el validador del motor — no es una página de este sitio. El equivalente aquí es el [Catálogo de texturas](api/texture-catalog.md).
+> El `BLOCK_TEXTURES.md` de ese mensaje es la lista interna de nombres de textura del propio juego, referenciada por el validador del motor — no es una página de este sitio. El equivalente aquí es el [Catálogo de texturas](api/texture-api.md/texture-catalog.md).
 
 #### Solo se emiten las constantes referenciadas
 
@@ -1535,11 +1518,8 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Relacionado
 
-- **Los 896 nombres utilizables** → [Catálogo de texturas](api/texture-catalog.md)
-- [Interior del motor: registro de texturas](internals/texture-registry.md) · [Muestreo de texturas](internals/texture-sampling.md)
-
-
----
+- **Los nombres disponibles utilizables** → [Catálogo de texturas](api/texture-api.md/texture-catalog.md)
+- [Interior del motor: registro de texturas](api/internals/texture-registry.md) · [Muestreo de texturas](api/internals/texture-sampling.md)
 
 ## Constantes
 > API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
@@ -1747,78 +1727,48 @@ Los identificadores que empiezan por `bloxdTextureId` se resuelven como constant
 ---
 
 ## Compatibilidad
-> API objetivo: 5 · Estado: Verified
 
-Cómo interoperan el juego actual y los paquetes de versiones antiguas.
+> API objetivo: 5 · Tipo: referencia de API
 
-### Versiones aceptadas
+Esta página explica qué versiones de la API de shader packs acepta el juego actual y cómo se tratan los packs guardados para versiones anteriores.
 
-**Solo `apiVersion: 5`.** El cargador compara `manifest.apiVersion !== 5` estrictamente y los paquetes v1/v2/v3/v4 **fallan en el instante mismo de la carga**. No existe aceptación de varias versiones a la vez.
+### Versión de API aceptada
 
-### Mensajes en el momento de la carga (literales del diccionario i18n en vivo)
+El juego actual solo acepta packs cuyo manifiesto contiene el valor numérico `5` en `apiVersion`. No se acepta la cadena `"5"`. Los packs creados para API v1–v4 deben migrarse antes de poder cargarse.
+
+### Mensajes al cargar
 
 - `pack.json needs "apiVersion": {{version}}.` — falta la clave `apiVersion`
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — la clave existe pero no es 5
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — la versión indicada no coincide con la actual
 
-### Paquetes antiguos guardados (sin excepciones — desactivación silenciosa)
+### Packs guardados de versiones anteriores
 
-Los paquetes v1–v4 guardados previamente no lanzan errores. El resultado del paquete guardado se resuelve a:
+Un pack guardado para una versión anterior de la API no se ejecutará en el juego actual. La pantalla de ajustes de shader packs indica que el pack pertenece a una versión no compatible. Actualízalo siguiendo la guía de migración correspondiente.
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+### Revalidación de packs guardados
 
-y el paquete queda **inactivo en silencio**. Solo la pestaña de ajustes de shader packs explica el porqué:
+Los packs guardados se vuelven a validar cuando cambian los encabezados del motor o las definiciones de nombres de textura. La revalidación se realiza automáticamente al cargar el juego. En el código del pack, referencia las texturas mediante constantes con nombre, no mediante IDs numéricos que pueden cambiar.
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+### Compatibilidad del entorno
 
-### La naturaleza de la conversión v4 → v5
+- **WebGPU:** los shader packs requieren un renderizador compatible con WebGPU.
+- **Móviles:** los shader packs no están disponibles en entornos sin compatibilidad con WebGPU ([Requisitos](api/getting-started/requirements.md)).
+- **Acceso a texturas:** en las configuraciones del renderizador que no utilizan el atlas, `bloxdTexel` y `bloxdTextureSize` no ofrecen acceso normal a las texturas del atlas ([API de texturas](api/compatibility.md/texture-api.md)).
 
-La conversión es en su mayoría mecánica (lista completa en [la guía de migración a v5](history/v5.md)):
+### Compatibilidad de versiones de API
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (un renombrado 1:1)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- los puntos de llamada a `bloxdFragmentBlockPosition` siguen compilando (el motor lo sigue inyectando), pero ya no está documentado — migrar fuera de él es la jugada segura ([Funciones](api/functions.md#bloxdfragmentblockposition--indocumentado-pero-sigue-inyectado))
-- sube `pack.json` a `"apiVersion": 5`
-
-La trampa silenciosa de esta vez: los paquetes que sigan leyendo `blockFlags` o envolviendo hooks de luz en `#ifdef BLOXD_LIGHTING` **fallan la validación con mensajes dedicados** (el analizador ya explica ambos casos), así que nada se comporta mal en silencio — simplemente siguen rechazados hasta que se migren.
-
-### Revalidación de paquetes guardados («necesita revisión»)
-
-`HEADER_VERSION` es `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (el entero inicial pasó del 8 de v4 al 9). Cuando la cabecera del motor o el registro de texturas cambian (habitual con las actualizaciones del juego), los paquetes guardados se marcan como «necesita revisión» y se revalidan automáticamente al cargar la página.
-
-**Advertencia de v98qt8:** la regresión de plegado del build actual ([Interior del motor: registro de texturas](internals/texture-registry.md#the-v98qt8-folding-regression)) cambia lo que hashea el motor — el sufijo de registro que calcula es la tabla *sin plegar* de 1.047 filas (`694df62c`), no la plegada de 906 filas prevista (`df6c1915`, era `e735ebdc` en `bny9u`). Cada paquete guardado se revalida por tanto en este build, y los paquetes que referencien alguno de los 43 nombres base de familias de animación (`lava`, …) **fallan** la revalidación hasta que se arregle el lado del motor — escribe los nombres plegados de todos modos; son la API.
-
-
-Un ejemplo medido del movimiento del registro (dos builds, 10 días de diferencia): entradas 1200 → 1219 (98 añadidas, 79 eliminadas), y de los nombres que conservaron su grafía, **779 de 1121 cambiaron de id**. Dicho de otro modo:
-
-- **los paquetes escritos con nombres (`bloxdTextureIdLava`) sobreviven a la deriva** (el cargador los re-resuelve contra el registro en vivo)
-- **los paquetes escritos con ids crudos (`19`) se rompen en la revalidación**
-
-Detalles: [Interior del motor: registro de texturas](internals/texture-registry.md).
-
-### Entornos de ejecución
-
-- **Solo renderizador WebGPU**: instalar un paquete activa por la fuerza el renderizador WebGPU
-- **Móvil**: los entornos con WebGPU limitado no pueden ejecutar paquetes en absoluto ([Requisitos](getting-started/requirements.md))
-- **Configuraciones de renderizador sin atlas**: `bloxdTexel` / `bloxdTextureSize` se degradan a stubs (texels blancos, 1×1); el código sigue compilando y ejecutándose ([API de texturas](api/texture-api.md#adónde-no-llega-la-api-de-texturas))
-
-### Resumen de soporte de versiones
-
-| Versión de API | En producción desde | Trato del juego actual |
-|---|---|---|
-| v1 | — | rechazado al cargar (migra vía [v2](history/v2.md)) |
-| v2 | — | rechazado al cargar |
-| v3 | 2026-10-19 | rechazado al cargar |
-| v4 | 2026-10-26 | rechazado al cargar |
-| **v5** | **2026-11-03** | **actual** |
+| Versión de API | Compatibilidad con el juego actual |
+|---|---|
+| v1 | Rechazada al cargar |
+| v2 | Rechazada al cargar |
+| v3 | Rechazada al cargar |
+| v4 | Rechazada al cargar |
+| **v5** | **Actual** |
 
 ### Relacionado
 
-- [Lista de comprobación de migración a v5](history/v5.md) · [Historial de versiones](history/)
-
-
----
+- [Migración de v4 a v5](api/history/v5.md)
+- [Historial de versiones](api/history)
 
 ## Catálogo de texturas
 
@@ -2973,8 +2923,9 @@ La iluminación por defecto del motor es "solo multiplicación" — no existen e
 ---
 
 ## Sombras
-> API objetivo: 5 · Estado: Verified (comportamiento de LightEngine sin cambios desde la medición de v4)
-> **Desde `bbb6l5`**: se añadió la API real de sombras solares — `bloxdShadow()` (factor de sombra 0–1; proyectan bloques, jugadores, mobs y objetos, siguiendo al sol), `bloxdAirShadow(t)` (para haces de luz) y `bloxdShadowDirection()` (dirección de la luz). `keepCircleShadows` en pack.json permite conservar también las antiguas sombras circulares. Detalles en [Funciones](api/functions.md).
+
+> API objetivo: 5 · Tipo: referencia técnica
+> **Desde API v5**: se añadió la API real de sombras solares — `bloxdShadow()` (factor de sombra 0–1; proyectan bloques, jugadores, mobs y objetos, siguiendo al sol), `bloxdAirShadow(t)` (para haces de luz) y `bloxdShadowDirection()` (dirección de la luz). `keepCircleShadows` en pack.json permite conservar también las antiguas sombras circulares. Detalles en [Funciones](guides/api/functions.md).
 
 Las tres formas de hacer «sombras» en un shader pack, y sus límites.
 
@@ -3017,7 +2968,7 @@ Bajo árboles, techos y dentro de edificios el valor ya es bajo e interpola suav
 
 La curva es monótona y se invierte exacta: `c=(1-y)^(1/3); x=3(1-c)/(3-2c)`. Restaura el valor crudo y luego binariza con un **umbral `smoothstep`**. La propagación BFS del LightEngine es «−1 por bloque adyacente», así que `th = 1 - r/15` es directamente el mando de «radio de oclusión contado como sombra».
 
-La implementación completa (puerta solar + separación cálida/fría + passthrough de blockLight) está en [recetas de realismo](recipes/realism.md). Pasos clave:
+La implementación completa (puerta solar + separación cálida/fría + passthrough de blockLight) está en [recetas de realismo](guides/recipes/realism.md). Pasos clave:
 
 ```wgsl
 // 1. restore the raw value (skipping this means shadows never appear)
@@ -3034,13 +2985,11 @@ Mandos: **área** = `shTh` (0.93→radio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 
 - Las sombras referencian el **cielo hacia arriba**, así que **no giran con el sol** (resolución de vóxeles; los bordes suaves vienen de la propagación BFS)
 
-- Las sombras rotatorias precisas al píxel quedan fuera de la API actual ([Looks inalcanzables](guides/constraints.md))
+- Las sombras rotatorias precisas al píxel quedan fuera de la API actual ([Looks inalcanzables](guides/shadows.md/constraints.md))
 
 ### Relacionado
 
-- [recetas de realismo](recipes/realism.md) (la receta completa de sombra proyectada) · [Interioridades de la iluminación](internals/lighting-internals.md) · [Consejos de depuración](guides/debugging.md)
-
----
+- [recetas de realismo](guides/recipes/realism.md) (la receta completa de sombra proyectada) · [Interioridades de la iluminación](guides/internals/lighting-internals.md) · [Consejos de depuración](guides/shadows.md/debugging.md)
 
 ## Hacer que el agua parezca natural
 > API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
@@ -3215,7 +3164,8 @@ Cómo se renderizan los modelos y cómo fluyen las entradas de flags/encantamien
 ---
 
 ## Realismo: dos escuelas
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+
+> API objetivo: 5 · Tipo: referencia técnica
 
 **Escuela A: retoques aditivos (desde defaultLight)** — usa `engineColour` (color terminado) como base y suma brillo cálido o rim. Fácil y seguro, pero el modelo de iluminación sigue siendo el por defecto.
 
@@ -3224,10 +3174,7 @@ Cómo se renderizan los modelos y cómo fluyen las entradas de flags/encantamien
 1. **Reaplica la niebla**: el hook light se ejecuta tras la niebla; aplica `mix(l.fogColour, col, (1.0 - l.fogAlpha))` tú mismo (R9.10). Con niebla densa, pon suelo con `min(l.fogAlpha, 0.70)`. Y al revés: mezclar más color de niebla en paquetes basados en engineColour produce doble niebla blanca
 2. **Fallback unlit**: pasa a `defaultLight` fuera de `#ifdef BLOXD_LIGHTING`
 3. **Protege funciones compartidas enteras**: envuelve en `#ifdef BLOXD_LIGHTING` como funciones completas las funciones compartidas que toman `BloxdLightIn` (proteger solo llamadas no basta)
-4. **Sin dirección solar**: si `bloxdSunDirection()` es cero, no calcules especular direccional. `l.directional` es un escalar de cantidad de luz, no un vector de dirección: no restaura la dirección del brillo. Cambia a ambiente débil sin dirección si hace falta. La dirección lunar está disponible vía `-bloxdSunDirection()` (solo se mueve en mundos con ciclo día/noche — [El sol y la luna](internals/sun-and-moon.md))
-
-
----
+4. **Sin dirección solar**: si `bloxdSunDirection()` es cero, no calcules especular direccional. `l.directional` es un escalar de cantidad de luz, no un vector de dirección: no restaura la dirección del brillo. Cambia a ambiente débil sin dirección si hace falta. La dirección lunar está disponible vía `-bloxdSunDirection()` (solo se mueve en mundos con ciclo día/noche — [El sol y la luna](guides/internals/sun-and-moon.md))
 
 ## Qué pueden y qué no pueden hacer los paquetes de sombreadores
 > API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
@@ -4899,21 +4846,22 @@ Compila bien pero se ve mal.
 ---
 
 ## Problemas de texturas
-> API objetivo: 5 · Estado: Verified (mensajes registrados literalmente del validador en vivo)
 
-Problemas en torno a `bloxdTextureId*` / `bloxdTexel`. Busca los 896 nombres en el [catálogo de texturas](api/texture-catalog.md).
+> API objetivo: 5 · Tipo: referencia técnica
+
+Problemas en torno a `bloxdTextureId*` / `bloxdTexel`. Busca los nombres disponibles en el [catálogo de texturas](troubleshooting/api/texture-catalog.md).
 
 ### "There's no texture called X. Did you mean bloxdTextureIdY?"
 
 - **Causa**: una errata; el validador tiene **sugerencias Levenshtein** (umbral `max(2, floor(len/4)) + 1`)
-- **Corrección**: acepta la sugerencia; contrasta con el [catálogo](api/texture-catalog.md)
+- **Corrección**: acepta la sugerencia; contrasta con el [catálogo](troubleshooting/api/texture-catalog.md)
 - **Prevención**: copia y pega los nombres del catálogo
 
 ### "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
 
 - **Causa**: escribir un **número de fotograma** en una textura animada (`lava0` etc.)
 - **Corrección**: usa el nombre base — el muestreo devuelve automáticamente el fotograma actual
-- **Prevención**: nunca escribas sufijos de fotograma para las 43 familias de animación ([nombrado](api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado))
+- **Prevención**: nunca escribas sufijos de fotograma para las 43 familias de animación ([nombrado](troubleshooting/api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado))
 
 ### "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
 
@@ -4932,33 +4880,30 @@ Problemas en torno a `bloxdTextureId*` / `bloxdTexel`. Busca los 896 nombres en 
 
 ### "Case and underscores are not distinguished" — ¿cómo conviven ambas reglas?
 
-La resolución de nombres pliega mayúsculas y `_`, así que `bloxdTextureId_grass_top` y `bloxdTextureIdGrassTop` se resuelven a **la misma** constante. Solo cuando el plegado deja múltiples candidatos se dispara el error dedicado de ambigüedad ([reglas de nombrado](api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado)).
+La resolución de nombres pliega mayúsculas y `_`, así que `bloxdTextureId_grass_top` y `bloxdTextureIdGrassTop` se resuelven a **la misma** constante. Solo cuando el plegado deja múltiples candidatos se dispara el error dedicado de ambigüedad ([reglas de nombrado](troubleshooting/api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado)).
 
 ### bloxdTexel siempre devuelve blanco en los modelos
 
 - **Es de diseño**: la mayoría de los modelos usan `textureId: 0` (sin textura — pieles de jugador etc.); `bloxdTexel(0, ...)` devuelve `vec4f(1.0)`
-- **Corrección**: selecciona con `surface.textureId != 0u` ([texturas propias del modelo](api/texture-api.md#texturas-propias-del-modelo-textureid-0))
+- **Corrección**: selecciona con `surface.textureId != 0u` ([texturas propias del modelo](troubleshooting/api/texture-api.md#texturas-propias-del-modelo-textureid-0))
 
 ### Querer añadir texturas
 
-- **Límite**: la API de shader packs solo **lee** el atlas; añadir texturas es tarea del sistema de paquetes de texturas ([combinaciones](guides/combinations.md))
+- **Límite**: la API de shader packs solo **lee** el atlas; añadir texturas es tarea del sistema de paquetes de texturas ([combinaciones](troubleshooting/guides/combinations.md))
 
 ### "Packs can't use X: the engine binds every texture and sampler..."
 
 - **Causa**: declarar tipos `texture_*` / `sampler` directamente
-- **Corrección**: pasa por `bloxdTexel()` ([Restricciones](api/restrictions.md))
+- **Corrección**: pasa por `bloxdTexel()` ([Restricciones](troubleshooting/api/restrictions.md))
 
 ### Los ids crudos se rompieron tras una actualización del juego
 
 - **Causa**: **los ids son instantáneas** — medido, 334 de 905 nombres supervivientes cambiaron de id entre dos builds
-- **Corrección**: escribe `bloxdTextureIdLava`, no `19` ([los nombres son la API](api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
+- **Corrección**: escribe `bloxdTextureIdLava`, no `19` ([los nombres son la API](troubleshooting/api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
 
 ### Relacionado
 
-- [API de texturas](api/texture-api.md) · [Catálogo de texturas](api/texture-catalog.md) · [Internas del registro de texturas](internals/texture-registry.md)
-
-
----
+- [API de texturas](troubleshooting/api/texture-api.md) · [Catálogo de texturas](troubleshooting/api/texture-catalog.md) · [Internas del registro de texturas](troubleshooting/internals/texture-registry.md)
 
 ## Problemas de iluminación
 > API objetivo: 5 · Estado: Verified
@@ -5113,7 +5058,8 @@ Problemas de velocidad y sus soluciones.
 ---
 
 ## FAQ y notas legales
-> API objetivo: 5 · Estado: Verified
+
+> API objetivo: 5 · Tipo: referencia técnica
 
 ### Preguntas frecuentes
 
@@ -5123,44 +5069,41 @@ La función de shader packs es accesible desde la interfaz del juego y crear paq
 
 #### P. ¿Pueden los paquetes hacer algo peligroso?
 
-Los paquetes son WGSL puro — **la ejecución de JS y el acceso a red son imposibles por diseño**. Solo corre el código que pasa la validación y la compilación ([Restricciones](api/restrictions.md)).
+Los paquetes son WGSL puro — **la ejecución de JS y el acceso a red son imposibles por diseño**. Solo corre el código que pasa la validación y la compilación ([Restricciones](troubleshooting/api/restrictions.md)).
 
 #### P. ¿En qué juegos funcionan los paquetes?
 
-La mayoría de los juegos corre en modo strict (sin animación de vértices, sin `discard`). La animación de vértices funciona solo en juegos de la lista allow. La lista por título está en [Interior del motor: política](internals/policy.md).
+La mayoría de los juegos corre en modo strict (sin animación de vértices, sin `discard`). La animación de vértices funciona solo en juegos de la lista allow. La lista por título está en [Interior del motor: política](troubleshooting/internals/policy.md).
 
 #### P. ¿Funcionan los paquetes en el móvil?
 
-Solo en entornos con WebGPU ([Requisitos](getting-started/requirements.md)).
+Solo en entornos con WebGPU ([Requisitos](troubleshooting/getting-started/requirements.md)).
 
 #### P. ¿Puedo distribuir mis propias texturas?
 
-No en un shader pack (el atlas es de solo lectura). Eso es tarea del sistema de paquetes de texturas ([combinaciones](guides/combinations.md)).
+No en un shader pack (el atlas es de solo lectura). Eso es tarea del sistema de paquetes de texturas ([combinaciones](troubleshooting/guides/combinations.md)).
 
 #### P. ¿Puedo seguir usando un paquete de una versión antigua?
 
-El juego actual solo acepta `apiVersion: 5`; los paquetes antiguos se desactivan en silencio ([Compatibilidad](api/compatibility.md)). Migra vía el [Historial de versiones](history/).
+El juego actual solo acepta `apiVersion: 5`; los paquetes antiguos se desactivan en silencio ([Compatibilidad](troubleshooting/api/compatibility.md)). Migra vía el [Historial de versiones](troubleshooting/history).
 
 #### P. ¿Cambiará la API de nuevo?
 
-Las interioridades del motor pueden cambiar con las actualizaciones — cada página nombra su build objetivo. Los paquetes guardados se revalidan automáticamente cuando cambian la cabecera o el registro ([Compatibilidad](api/compatibility.md#revalidación-de-paquetes-guardados-necesita-revisión)).
+Las interioridades del motor pueden cambiar con las actualizaciones — cada página nombra su build objetivo. Los paquetes guardados se revalidan automáticamente cuando cambian la cabecera o el registro ([Compatibilidad](troubleshooting/api/compatibility.md#revalidación-de-paquetes-guardados-necesita-revisión)).
 
 #### P. ¿Y las distribuciones de «shader cinematográfico»?
 
-Una distribución comunitaria de «cinematic shader» que analizamos resultó ser un paquete de texturas (texturas 128×128, sin `pack.json` / `.wgsl`). La mayoría de los looks «sombrío tipo shader» son artesanía del lado de las texturas ([combinaciones](guides/combinations.md)).
+Una distribución comunitaria de «cinematic shader» que analizamos resultó ser un paquete de texturas (texturas 128×128, sin `pack.json` / `.wgsl`). La mayoría de los looks «sombrío tipo shader» son artesanía del lado de las texturas ([combinaciones](troubleshooting/guides/combinations.md)).
 
 ### Legal y notas
 
 - Esta es una guía no oficial y no representa las opiniones de los desarrolladores. La API puede cambiar sin previo aviso
 - Creada con asistencia de IA; la exactitud no está garantizada. Verifícala contra el comportamiento real del juego
-- Los valores medidos (ids de textura etc.) son instantáneas de builds concretos y cambian entre builds ([los nombres son la API](api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
+- Los valores medidos (ids de textura etc.) son instantáneas de builds concretos y cambian entre builds ([los nombres son la API](troubleshooting/api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
 
 ### Relacionado
 
-- [Entrada de la documentación](./) · [Historial de versiones](history/)
-
-
----
+- [Entrada de la documentación](troubleshooting) · [Historial de versiones](troubleshooting/history)
 
 ## Internas del motor
 
@@ -6026,33 +5969,32 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ## Historial de versiones
 
-Cambios, pasos de migración y API eliminadas de v1 a v5. Para migrar paquetes antiguos y para las especificaciones conservadas de cada época.
+> Tipo: histórico · Guías de migración de API v1–v5
 
-### Cronología
+Esta sección conserva los cambios, los pasos de migración y las API retiradas de las versiones v1 a v5. Se centra en el comportamiento de la API y las rutas de migración, no en identificadores de builds ni fechas de verificación.
 
-| Versión | En producción desde | Guía | Lo esencial |
-|---|---|---|---|
-| v1 | (inicial) | [v1](history/v1.md) | primera API de shader packs. 6 hooks (terrain/liquid × vertex/surface); vocabulario `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
-| v2 | — | [v2](history/v2.md) | renombrado total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](history/v3.md) | `blockId` → `blockFlags` (bits), `bloxdPi` / `bloxdTau`, hooks de líquido oficiales, interioridades de la invocación de hooks |
-| v4 | 2026-10-26 | [v4](history/v4.md) | API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), el contrato strict, análisis de cabecera y registro del motor |
-| **v5** | **2026-11-03** | [v5](history/v5.md) | **actual** — estructura `BloxdFlags` (14 bools), hooks de Model (9 en total), la API de iluminación `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entradas y salidas de encantamiento/superposición, 6 variantes |
+### Versiones
 
-### El prefacio común
+| Versión | Guía de migración | Cambios principales |
+|---|---|---|
+| v1 | [v1](history/index.md/v1.md) | API inicial de shader packs |
+| v2 | [v2](history/index.md/v2.md) | Renombrado de identificadores, `blockId` y acceso a la profundidad de escena |
+| v3 | [v3](history/index.md/v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau` y hooks Liquid |
+| v4 | [v4](history/index.md/v4.md) | API de texturas y restricciones de juegos strict |
+| **v5** | [v5](history/index.md/v5.md) | **Actual** — `BloxdFlags`, hooks Model y API de iluminación y sombras |
 
-El juego actual solo acepta `apiVersion: 5` y **los paquetes de versiones antiguas fallan en el instante mismo de la carga** (los guardados quedan inactivos en silencio — [Compatibilidad](api/compatibility.md)). Cada guía cubre «anterior → siguiente». ¿Cruzas varias versiones? Aplícalas de la más antigua a la más nueva.
+### Cómo se tratan las versiones anteriores
 
-### Camino rápido a una lista de comprobación
+El juego actual solo acepta packs con `apiVersion: 5`. Los packs antiguos no se pueden cargar sin cambios. Para migrar entre varias versiones, aplica las guías en orden, empezando por la versión más antigua.
 
-- paquete v4 → [guía de v5](history/v5.md) §77 (casi todo mecánico)
-- paquete v3 → [v4](history/v4.md) §61 → [v5](history/v5.md) §77
-- paquete v2 → [v3](history/v3.md) §47 → v4 → v5
-- paquete v1 → empieza por [v2](history/v2.md) §37
+### Rutas de migración
 
-> Para la especificación vigente en sí ver [Referencia de la API](api/); para las interioridades del build vigente ver [Interior del motor](internals/).
+- Pack v4 → [guía de migración a v5](history/index.md/v5.md)
+- Pack v3 → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
+- Pack v2 → [v3](history/index.md/v3.md) → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
+- Pack v1 → [v2](history/index.md/v2.md) → [v3](history/index.md/v3.md) → [v4](history/index.md/v4.md) → [v5](history/index.md/v5.md)
 
-
----
+Para consultar la API actual, visita la [Referencia de API](history/api).
 
 ## API v1
 > Estado: **Historical** — la primera era del mecanismo de shader packs. Todo paquete v1 es rechazado por el juego actual.
@@ -6092,7 +6034,8 @@ Después aplica v3 → v4 → v5 en orden ([el camino rápido](history/index.md#
 
 ## Guía de migración a API v2
 
-Build objetivo: `6qxffk.main.5912a15f.js` (despliegue en producción a 2026-10-16). Las Partes I–VII de esta guía ya están reescritas a la base v2; esta guía recoge los puntos de migración desde v1 y las novedades de v2. Los ejemplos de código de novedades pasan la validación de 8/8 variantes en el compilador v2 y la validación del compilador WGSL del navegador (Tint) (§38), pero la conversión v2 de recetas existentes es sustitución mecánica de identificadores — verifica siempre con compilación en juego antes de distribuir.
+> Versión: 2 · Estado: histórico (guía de migración de v1 a v2)
+
 
 ### 31. Destino de los paquetes v1 (conclusión primero)
 
@@ -6142,7 +6085,6 @@ Los tres structs `BloxdVertexIn` / `BloxdSurfaceIn` / `BloxdLightIn` ganan `bloc
 
 **Referencia**: el autor publica una lista de entradas del juego en [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) (`entries.json`: tabla id ↔ nombre de bloque; las variantes de rotación/meta como `Furnace|meta|rot2` figuran como IDs separados). Las correspondencias pueden cambiar con las actualizaciones del juego; lo definitivo se confirma en el juego real.
 
-Ejemplos de bloques comunes (de entries.json a fecha de 2026-10-18; solo las familias de terreno de id bajo):
 
 | ID | Nombre de bloque | ID | Nombre de bloque |
 |---|---|---|---|
@@ -6174,67 +6116,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     return result;
 }
 ```
-
-#### R-G. Medir blockId en el mundo — el pack de plano de bits
-
-Receta de debug para consultar en el mundo los ids de bloques ausentes de la tabla de correspondencias. Cambia la constante `plane` inicial por `0, 1, 2, …` mientras lees el color de la cara del bloque que quieres identificar.
-
-```wgsl
-const plane: u32 = 0u;
-
-fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
-    var out = bloxdDefaultSurface(s);
-    let d = (s.blockId >> (plane * 3u)) & 7u;
-    var palette = array<vec3f, 8>(
-        vec3f(0.0, 0.0, 0.0), vec3f(1.0, 0.0, 0.0), vec3f(0.0, 1.0, 0.0), vec3f(1.0, 1.0, 0.0),
-        vec3f(0.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(0.0, 1.0, 1.0), vec3f(1.0, 1.0, 1.0));
-    out.colour = palette[d];
-    return out;
-}
-```
-
-El color de la cara codifica 3 bits de blockId directamente como RGB (negro = 0 / rojo = 1 / verde = 2 / amarillo = 3 / azul = 4 / magenta = 5 / cian = 6 / blanco = 7). Una observación lee un dígito octal. Si p0 → p3 leen 3, 2, 7, 2, el octal 2723 = 1491 leído desde el dígito superior es el id (Lava). Las familias de terreno de id bajo se completan con dos observaciones (p0, p1). Usa solo el hook surface, así que corre también en títulos strict.
-
-#### R-H. Hacer ondear solo las hojas — acotar el hook vertex por blockId
-
-La receta de viento R7 ([Recetas](recipes/)) ondea todo el terreno, pero el hook vertex también puede leer `blockId`, así que se puede acotar el objetivo a bloques de hoja. La lista de ids y el array WGSL (medidos a fecha de 2026-10-18; 22 variedades — Pine / Aspen / Maple / Jungle / Plum / Cedar / Palm / Autumn Maple / Fallen Maple / Pear / Cherry / Fallen Cherry / Spectral / Mango / variantes con fruta / Autumn Aspen):
-
-```wgsl
-const LEAF_IDS = array<u32, 22>(
-    100u, 101u, 102u, 103u, 491u, 492u, 493u, 653u, 655u, 911u,
-    1226u, 1227u, 1636u, 1969u, 2019u, 2020u, 2021u, 2022u, 2023u,
-    2024u, 2025u, 2085u);
-
-// los hooks vertex se auto-desactivan en títulos strict (ver sección 36)
-#ifndef BLOXD_STRICT
-
-fn sp_isLeaf(id: u32) -> bool {
-    for (var i = 0u; i < 22u; i++) {
-        if (LEAF_IDS[i] == id) { return true; }
-    }
-    return false;
-}
-
-fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
-    var out = bloxdDefaultVertex(v);
-    if (sp_isLeaf(v.blockId)) {
-        let wp   = bloxdWorldPosition(v.position);
-        let t    = bloxdTime();
-        // el desplazamiento es una función suave de la posición en el mundo. Los vértices compartidos que apuntan
-        // al mismo punto del mundo se mueven igual, así que las caras nunca se desgarran ([Recetas](recipes/) R7 - mismo principio)
-        let sway = sin(wp.x * 0.9 + t * 1.7) * cos(wp.z * 0.7 + t * 1.1);
-        out.position.x += sway * 0.045;
-        out.position.z += sway * 0.030;
-    }
-    return out;
-}
-
-#endif
-```
-
-- La lista de ids crece con las actualizaciones del motor (solo durante la medición, un build nuevo añadió 50 clases de bloque). Para seguir usándola, consulta los añadidos vía [Bloxd-Entries-Data](https://github.com/imu31465/Bloxd-Entries-Data) o mídelos con el display de plano de bits de R-G, y extiende el array
-- `Fallen Maple Leaves` (655) / `Fallen Cherry Leaves` (1227) son esterillas de hoja no sólidas sobre el suelo. El ondeo las hace parecer que se despegan del suelo, con lo que excluirlas del array es una opción
-- En títulos strict el hook vertex se desactiva en bloque, pero con la guardia de arriba el paquete simplemente "deja de ondear" — los efectos del lado fragment siguen funcionando
 
 ### 35. Novedad ②: `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` (la principal)
 
@@ -6320,17 +6201,6 @@ let h = (a * 73856093u) ^ (b * 19349663u) ^ (c * 83492791u);
 ```
 
 El código publicado en esta guía no contiene este patrón (la mezcla `+`/`*` de `pack_hash3` y `h ^ (h >> 16u)` ya van entre paréntesis, luego conformes). Cuando escribas un paquete, pasa la primera y la segunda etapa.
-
-### 39. Sobre materiales independientemente similares
-
-Existe un material comunitario de contenido casi igual: [Shader de GlitchHunterCoder/Bloxd-Essay](https://github.com/GlitchHunterCoder/Bloxd-Essay/tree/main/Shader). Se publicó antes que esta guía, pero **el contenido de esta guía viene del análisis propio de glm sobre los archivos bundle reales de Bloxd (conjunto de chunks webpack) — no es copiar-pegar**. Ambos coinciden porque investigar independientemente la misma implementación lleva a las mismas conclusiones.
-
----
-
-Investigado por ltf_ahel (investigado con glm)
-
-
----
 
 ## Guía de migración a API v3
 
