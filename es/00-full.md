@@ -386,7 +386,7 @@ Solo están disponibles `#define NAME` (sin valor) / `#ifdef` / `#ifndef` / `#el
 
 La mayoría de los juegos son strict (sin animación de vértices, sin `discard`). Un hook de vértice sin guarda informa `<hook> moves terrain, which strict games prevent.` y un `discard` alcanzable informa `discard makes terrain see-through, which strict games prevent.` — ambos desactivan **todos los hooks** en ese juego strict. Envuelve siempre los hooks de vértice en `#ifndef BLOXD_STRICT`.
 
-Para las interioridades de la política por juego, ver [Interior del motor: política](internals/policy.md).
+Para las funcionamiento interno de la política por juego, ver [Interior del motor: política](internals/policy.md).
 
 
 ---
@@ -446,7 +446,7 @@ Ver la [guía de pruebas](guides/testing.md) para la lista completa y la lista �
 ## Referencia de la API
 Esta página documenta la API v5 actual. La fuente principal de sus definiciones es la cabecera que el motor añade automáticamente al inicio de cada pack (consulta [Interior del motor](internals/engine-header.md) para ver la cabecera completa).
 
-### Mapa
+### Contenido
 
 | Página | Contenido |
 |---|---|
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` llegan ya mapeados a 0–1**: los niveles 0–15 a través de una curva ease-out (p. ej. `6 → 0.45`, `12 → 0.92`). Todos excluyen `ambientLightColour`
 - **Curva de realce**: `skyLight` es en realidad «¿puede esta posición ver el cielo?» — datos de oclusión por vóxeles, es decir, un mapa de sombras. La separación sol/sombra por umbral puede necesitar la transformación inversa (ver la [guía de realismo](guides/realism.md))
-- **Interioridades de la niebla**: en modo lineal `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (acotado 0..1), calculado por vértice en espacio de vista. El build actual es solo lineal (detalles en [Interior del motor: interioridades de la niebla](internals/fog-internals.md))
+- **Interioridades de la niebla**: en modo lineal `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (acotado 0..1), calculado por vértice en espacio de vista. El build actual es solo lineal (detalles en [Interior del motor: funcionamiento interno de la niebla](internals/fog-internals.md))
 
 ### Recetas
 
@@ -1291,7 +1291,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Relacionado
 
-- [Funciones](api/functions.md) · [Guías: iluminación](guides/lighting.md) · [Interior del motor: interioridades de la iluminación](internals/lighting-internals.md)
+- [Funciones](api/functions.md) · [Guías: iluminación](guides/lighting.md) · [Interior del motor: funcionamiento interno de la iluminación](internals/lighting-internals.md)
 
 
 ---
@@ -2879,7 +2879,7 @@ Estas texturas existen solo como copias prerrotadas (`name[rot[1..4`). El regist
 ## Guías
 Material de «mecanismo y mentalidad». Qué es posible en primer lugar está en [Qué pueden y no pueden hacer los shader packs](guides/constraints.md); los ejemplos de código orientados a objetivo viven en [Recetas](recipes/).
 
-### Mapa
+### Contenido
 
 | Página | Contenido |
 |---|---|
@@ -3360,7 +3360,7 @@ Los paquetes de texturas tienen su propia especificación (a título de referenc
 ## Recetas
 Ejemplos de código orientados a objetivo. El lado del «cómo funciona» vive en [Guías](guides/). Todo lo que hay aquí está portado al vocabulario de v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) y protegido para pasar las 6 variantes (strict × terreno / líquido / modelo).
 
-### Mapa
+### Contenido
 
 | Página | Contenido |
 |---|---|
@@ -4972,7 +4972,7 @@ Problemas de brillo, sombra y niebla.
 ### ¿Quieres la teoría?
 
 - Sombras: [Sombras](guides/shadows.md) (skyLight = mapa de sombras por vóxeles)
-- Niebla: [Interior del motor: internas de niebla](internals/fog-internals.md)
+- Niebla: [Interior del motor: estructura interna de la niebla](internals/fog-internals.md)
 
 ### Relacionado
 
@@ -5129,20 +5129,20 @@ Una distribución comunitaria de «cinematic shader» que analizamos resultó se
 ## Funcionamiento interno del motor
 Esta categoría explica el funcionamiento interno del motor y puede ayudar a comprender cómo se ejecutan los shader packs. Estos detalles de implementación pueden cambiar; para las reglas de uso estables y las API disponibles, consulta la [Referencia de API](api/).
 
-### Mapa
+### Contenido
 
 | Página | Contenido |
 |---|---|
 | [Canalización de renderizado](internals/rendering-pipeline.md) | posición del alphaTest, montaje de 2 luces, realidad del uniform, greedy meshing |
 | [Invocación de hooks](internals/hook-invocation.md) | cómo se empalman los hooks en el WGSL del motor |
 | [Encabezado del motor](internals/engine-header.md) | Declaraciones WGSL que se añaden a los shader packs |
-| [Validación de sombreadores](internals/shader-validation.md) | internas del analizador, la tabla de firmas, HEADER_VERSION |
+| [Validación de sombreadores](internals/shader-validation.md) | funcionamiento interno del analizador, la tabla de firmas, HEADER_VERSION |
 | [Compilación de WGSL](internals/wgsl-compilation.md) | la compilación real de etapa 2 y los stubs de validación |
 | [Identificadores reservados](internals/reserved-identifiers.md) | los 46 símbolos `bloxdSp*` |
 | [Internas de iluminación](internals/lighting-internals.md) | estructura de blockLight / heldLight |
-| [Internas de niebla](internals/fog-internals.md) | solo lineal, la banda de gradiente de 32 bloques |
-| [Muestreo de texturas](internals/texture-sampling.md) | el codegen de texturas de 3 variantes |
-| [Registro de texturas](internals/texture-registry.md) | Resolución de nombres y nombres de animación y rotación |
+| [Internas de niebla](internals/fog-internals.md) | solo lineal, la franja de atenuación de 32 bloques |
+| [Muestreo de texturas](internals/texture-sampling.md) | la generación de código de texturas de 3 variantes |
+| [Registro de texturas](internals/texture-registry.md) | Resolución de nombres y nombres de animación y orientación |
 | [Renderizado de modelos](internals/model-rendering.md) | el programa Model de v5 |
 | [Datos del motor](internals/engine-data.md) | Funciones de API v5 y límites de los packs |
 | [Factores de prueba](internals/testing-factors.md) | qué ajustes de mundo/jugador cambian los valores visibles para los paquetes |
@@ -5755,7 +5755,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Internas del muestreo de texturas
 > API objetivo: 5 · Tipo: referencia técnica
 
-Cómo compilan de verdad `bloxdTexel` / `bloxdTextureSize` — el codegen de texturas de 3 variantes. El lado de usuario: [API de texturas](api/texture-api.md).
+Cómo compilan de verdad `bloxdTexel` / `bloxdTextureSize` — la generación de código de texturas de 3 variantes. El lado de usuario: [API de texturas](api/texture-api.md).
 
 ### Las tres variantes
 
@@ -6275,7 +6275,7 @@ El código publicado en esta guía no contiene este patrón (la mezcla `+`/`*` d
 Esta página es una guía histórica para migrar packs de API v2 a v3. Para pasar de v3 a v4, aplica la [guía de migración de API v4](history/v4.md) y después la [guía de migración de API v5](history/v5.md) para llegar a la versión actual. Para crear packs nuevos, consulta la [Referencia de API](api/).
 
 Las Partes I–VII de esta guía siguen escritas sobre la base v2. Esta guía reúne, en el mismo orden que [la guía de migración v2](history/v2.md), los puntos de migración de v2 → v3 y las nuevas funciones de v3. La conversión es en su mayoría mecánica (§47), pero solo un cambio altera realmente el comportamiento — la luz predeterminada ahora atenúa la emisión con la niebla (§43) — y `blockId` se sustituye por completo por `blockFlags` (§42), así que verifica siempre con una compilación en el juego antes de distribuir.
-Novedad en esta revisión: las secciones **§49–§54** van más allá de la migración y entran en interioridades del motor restauradas del build de producción — cómo invoca realmente el renderizador Lite tus hooks, la función de niebla real de cuatro modos, la implementación exacta de `bloxdOpaqueBehind()`, la ruta completa de entrega de blockFlags desde el registro del bloque hasta tu hook, y el pipeline de validación con su hash de cabecera medido. Son los hechos documentados públicamente más profundos sobre el sistema de paquetes hasta la fecha, y resuelven varias preguntas que otras guías todavía listan como abiertas.
+Novedad en esta revisión: las secciones **§49–§54** van más allá de la migración y entran en funcionamiento interno del motor restauradas del build de producción — cómo invoca realmente el renderizador Lite tus hooks, la función de niebla real de cuatro modos, la implementación exacta de `bloxdOpaqueBehind()`, la ruta completa de entrega de blockFlags desde el registro del bloque hasta tu hook, y el pipeline de validación con su hash de cabecera medido. Son los hechos documentados públicamente más profundos sobre el sistema de paquetes hasta la fecha, y resuelven varias preguntas que otras guías todavía listan como abiertas.
 ### 40. Compatibilidad con paquetes v2
 El build exige que el `apiVersion` del manifiesto **coincida exactamente con 3**, y **no hay soporte paralelo de v2/v3**. Un paquete v2 se rechaza al cargar con los mensajes de «versión de API incorrecta» (claves i18n, texto de marcador):
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
