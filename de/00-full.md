@@ -6282,7 +6282,6 @@ Beim Erkennen eines Spiel-Updates (ein neuer main.js-Hash): den Header (9.125 B)
 ---
 
 ## Versionsgeschichte
-> Status: Historical — Aufzeichnungen je Version; jeder Leitfaden nennt seinen eigenen Ziel-Build
 
 Änderungen, Migrationsschritte und entfernte APIs für v1 bis v5. Für die Migration alter Pakete und für die bewahrten Spezifikationen der jeweiligen Ära.
 
@@ -6349,7 +6348,6 @@ Danach v3 → v4 → v5 der Reihe nach anwenden ([der Schnellweg](history/index.
 ---
 
 ## API v2 Migrationsleitfaden
-> Version: 2 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 
 Ziel-Build: `6qxffk.main.5912a15f.js` (Produktions-Deployment mit Stand 2026-10-16). Teile I bis VII dieses Leitfadens sind bereits auf v2-Standard umgeschrieben; dieser Leitfaden fasst die Migrationspunkte von v1 und die v2-Neuerungen zusammen. Die Code-Beispiele der Neuerungen haben die 8/8-Variantenprüfung des v2-Compilers und die Browser-WGSL-Compiler-Prüfung (Tint) (§38) bestanden, und die v2-Konvertierung bestehender Rezepte ist rein mechanischer Bezeichnerersatz: vor Verteilung unbedingt per In-Game-Kompilierung prüfen.
 
@@ -6592,7 +6590,6 @@ Recherchiert von ltf_ahel (recherchiert mit glm)
 ---
 
 ## API v3 Migrationsleitfaden
-> Version: 3 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 > **Seit 2026-10-26 ersetzt: die aktuelle API ist Version 5** — v3-Pakete werden beim Laden genau so abgelehnt, wie es hier für v2 beschrieben ist. Diesen Leitfaden *und danach* den [v4-Migrationsleitfaden](history/v4.md) anwenden (v3 → v4: Textur-API, `fogAlpha`-Umbenennung, `bloxdFragmentBlockPosition`, `hit`). Die Interna dieses Leitfadens (§49–§54) bleiben für die v3-Builds, auf denen sie gemessen wurden, korrekt. Danach auch den [v5-Migrationsleitfaden](history/v5.md) anwenden (v4 → v5).
 
 Ziel-Build: `3ymzdd.main.fae4743f.js` — **der seit 2026-10-19 live ausgelieferte Produktions-Build**. Das Bundle, das bloxd.io in Produktion ausliefert, ist byte-identisch (per md5 geprüft, Haupt-Bundle und Shader-Pack-Chunks gleichermaßen) mit dem Preprod-Deploy, gegen den dieser Leitfaden ursprünglich untersucht wurde; alles hier gilt also unverändert für die Produktion. Das Paketmodell behält seine v2-Form (gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches Uniform-Layout).
@@ -7211,7 +7208,6 @@ Recherchiert von ltf_ahel (recherchiert mit glm)
 ---
 
 ## API v4 Migrationsleitfaden
-> Version: 4 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 > **Seit 2026-11-03 ersetzt: die aktuelle API ist Version 5** — v4-Pakete werden beim Laden genau so abgelehnt, wie es hier für v3 beschrieben ist. Diesen Leitfaden *und danach* den [v5-Migrationsleitfaden](history/v5.md) anwenden (v4 → v5: die Struktur `BloxdFlags` ersetzt `blockFlags`, `bloxdLit()` und das öffentliche Beleuchtungsrezept, die Enchant-/Overlay-Eingaben, das 9-Hook-Standardpaket). Die Interna dieses Leitfadens (§56–§66) bleiben für die v4-Builds, auf denen sie gemessen wurden, korrekt.
 
 Ziel-Build: `cnty9.main.669f8081.js` — **seit 2026-10-26 gleichzeitig in Produktion und Preprod live**. Anders als beim v3-Rollout (ein Preprod-Build, der zum Produktions-Build befördert wurde) hat v4 beide Umgebungen in einem Schritt auf dasselbe neue Bundle umgeschaltet, und die beiden Bundles sind byte-identisch (Haupt-Bundle und jeder Shader-Pack-Chunk per md5 geprüft), daher gilt alles hier unverändert für die Produktion. Das Bundle wurde um dieses Release herum außerdem neu organisiert — das Haupt-Bundle schrumpfte von 4,73 MB auf 3,03 MB (−36 %), die Chunk-Anzahl wuchs von 169 auf 193, und die gesamte Shader-Pack-Pipeline (Loader, Validator, Code-Generator, WebGPU-Compiler) sitzt jetzt in einem zusammenhängenden c49–c54-Cluster. Das Paketmodell selbst behält seine Form: gleiche `pack.json`-Felder, gleiche Loader-Limits, gleiches 64-B-Uniform, dieselben sechs Hooks.
@@ -9147,7 +9143,6 @@ wire_mill_top_rot4
 ---
 
 ## API v5 Migrationsleitfaden
-> Version: 5 · Status: Historical (Migrationsleitfaden der jeweiligen Ära; der Ziel-Build steht im Text)
 
 Ziel-Build: `ab90qa.main.6188124c.js` — **seit der Messung am 2026-11-03 gleichzeitig in Produktion und Preprod live**, und die beiden Bundles sind wieder byte-identisch (md5 `fc3322212d15be2445c0e8df9733fcc` auf dem Haupt-Bundle, live von beiden Hosts geladen), daher gilt alles hier unverändert für die Produktion. Dies ist die größte API-Revision seit v3: das Haupt-Bundle wuchs auf 3,39 MB (+115 KB über den letzten v4-Build), die Chunk-Map hat jetzt 195 ids (c0–c195, 188 emittiert nach den 7 bekannten Löchern), die Shader-Pipeline sitzt weiterhin im c51–c56-Cluster (Loader c53, Validator/Header/Registry-Builder c55, WebGPU/Codegen c56, Fog c9) — aber die Standard-Pack-Vorlage zog nach c116 (in `tcwczu` war sie c124). Keins dieser Layout-Details ist für ein Paket sichtbar. Nachverifiziert auf dem aktuellen Produktions-Build `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`): der Engine-Header ist byte-identisch, und sämtliche Loader-/Varianten-/Hook-/reservierte-Namen-Messungen unten wurden unverändert nachgeprüft — die einzige bewegte Oberfläche ist die Textur-Registry (896 → 906 nutzbare Namen; §80-Nachtrag). Preprod (`2lcqcl`) liefert ein anderes Haupt-Bundle, misst aber auf jeder Shader-Pack-Oberfläche identisch. Erneut nachverifiziert auf `bny9u.main.02116121.js` (2026-11-05, md5 `60eea80ec48253b7ac6cc45604dc8273`, von Produktion und Preprod byte-identisch geliefert): Header, Standard-Pack-Vorlage, Loader-Limits, Uniform-Layout, Hooks, Varianten, Makros, reservierte Namen und Validierungsmeldungen alle unverändert nachgemessen; die Registry bewegte sich erneut (906 → 911 nutzbare Namen; §80-Nachtrag), die Zahl der Spieldefinitionen wuchs 111 → 115, und die Shader-Pipeline-Chunks wurden neu nummeriert (Loader c54, Validator/Header c56, WebGPU/Codegen c57, Standard-Pack-Vorlage c122).
 
