@@ -446,7 +446,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ## Справочник по API
 На этой странице описана актуальная спецификация API v5. Основной источник определений API — заголовок движка, который автоматически добавляется в начало каждого пака (полный текст см. в разделе [Внутреннее устройство движка](internals/engine-header.md)).
 
-### Карта
+### Содержание
 
 | Страница | Содержимое |
 |---|---|
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` приходят уже отображёнными в 0–1**: уровни 0–15 через ease-out-кривую (напр. `6 → 0.45`, `12 → 0.92`). Все исключают `ambientLightColour`
 - **Кривая лифта**: `skyLight` — на самом деле «видит ли эта позиция небо»: воксельные данные перекрытия, т.е. карта теней. Пороговому разделению солнца/тени может понадобиться обратное преобразование (см. [руководство по реализму](guides/realism.md))
-- **Внутрянка тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутрянка движка: внутрянка тумана](internals/fog-internals.md))
+- **Внутреннее устройство тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутрянка движка: внутрянка тумана](internals/fog-internals.md))
 
 ### Рецепты
 
@@ -2880,7 +2880,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ## Руководства
 Материал категории «механизм и образ мышления». Что вообще возможно — описано в [Что умеют и не умеют шейдер-паки](guides/constraints.md); примеры кода под конкретные цели живут в [Рецептах](recipes/).
 
-### Карта
+### Содержание
 
 | Страница | Содержание |
 |---|---|
@@ -3358,7 +3358,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## Рецепты
 Примеры кода, ориентированные на конкретные цели. Сторона «как это устроено» живёт в [Руководствах](guides/). Всё здесь портировано на словарь v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) и защищено guard'ами, чтобы проходить 6 вариантов (strict × террейн / жидкость / модель).
 
-### Карта
+### Содержание
 
 | Страница | Содержание |
 |---|---|
@@ -4837,7 +4837,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Смотрите также
 
-- [Проблемы освещения](troubleshooting/lighting.md) · [Советы по отладке](guides/debugging.md) · [Внутрянка тумана](internals/fog-internals.md)
+- [Проблемы освещения](troubleshooting/lighting.md) · [Советы по отладке](guides/debugging.md) · [Внутреннее устройство тумана](internals/fog-internals.md)
 
 
 ---
@@ -4966,7 +4966,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Смотрите также
 
-- [Освещение](api/lighting.md) · [Визуальные проблемы](troubleshooting/visual.md) · [Внутрянка освещения](internals/lighting-internals.md)
+- [Освещение](api/lighting.md) · [Визуальные проблемы](troubleshooting/visual.md) · [Внутреннее устройство освещения](internals/lighting-internals.md)
 
 
 ---
@@ -5119,18 +5119,18 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ## Внутреннее устройство движка
 В этом разделе описано внутреннее поведение движка, помогающее понять выполнение шейдер-паков. Детали реализации могут меняться при обновлениях игры. Стабильные правила использования и поддерживаемые API приведены в [Справочнике API](api/).
 
-### Карта
+### Содержание
 
 | Страница | Содержимое |
 |---|---|
 | [Пайплайн рендеринга](internals/rendering-pipeline.md) | позиция alphaTest, схема с 2 источниками света, что на самом деле лежит в uniform, greedy meshing |
-| [Вызов хуков](internals/hook-invocation.md) | как хуки врезаются в WGSL движка |
+| [Вызов хуков](internals/hook-invocation.md) | как хуки вставляются в WGSL-код движка |
 | [Заголовок движка](internals/engine-header.md) | Объявления WGSL, добавляемые перед кодом шейдер-паков |
 | [Валидация шейдеров](internals/shader-validation.md) | внутренности анализатора, таблица сигнатур, HEADER_VERSION |
 | [Компиляция WGSL](internals/wgsl-compilation.md) | настоящая компиляция этапа 2 и заглушки валидации |
 | [Зарезервированные идентификаторы](internals/reserved-identifiers.md) | 46 символов `bloxdSp*` |
-| [Внутрянка освещения](internals/lighting-internals.md) | структура blockLight / heldLight |
-| [Внутрянка тумана](internals/fog-internals.md) | только линейный, 32-блочная полоса градиента |
+| [Внутреннее устройство освещения](internals/lighting-internals.md) | структура blockLight / heldLight |
+| [Внутреннее устройство тумана](internals/fog-internals.md) | только линейное затухание с переходной зоной шириной 32 блока |
 | [Сэмплинг текстур](internals/texture-sampling.md) | кодогенерация текстур в 3 вариантах |
 | [Реестр текстур](internals/texture-registry.md) | Разрешение имён, имена анимаций и поворотов |
 | [Рендеринг моделей](internals/model-rendering.md) | программа Model в v5 |
@@ -5260,11 +5260,11 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | `directional` | интерполированная по вершинам сумма ламбертов по каждому направленному свету (сетап из двух источников в [Пайплайне рендеринга](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | направленный RGB-отклик материала / RGB-свечение |
 | `ambient` | `material.ambient × sceneAmbient` — по материалу, на кадр |
-| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутрянка освещения](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутреннее устройство освещения](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | соответствующие uniform |
 | `heldLight` | собирается из varying уровня света и uniform ручного света (затухание конуса — в [Внутрянке освещения](internals/lighting-internals.md)) |
 | `fogColour` | чёрный только в сценах, полностью лишённых тумана (режим 0) |
-| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутрянка тумана](internals/fog-internals.md)) |
+| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутреннее устройство тумана](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying и flat-интерполированные значения (как в `BloxdSurfaceIn` — значения после vertex-хука) |
 
 ### См. также
@@ -5701,7 +5701,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## Внутрянка освещения
+## Внутреннее устройство освещения
 > Целевая версия API: 5 · Тип: техническая справка
 `blockLight` — **цветной свет** с тремя RGB-каналами. Каждый светящийся блок задаёт цвет свечения `[R, G, B]` (0–15 на канал), который как есть становится цветом света (обычный факел = тёплый белый (14,14,12) / лава = оранжевый (14,8,2) / маяк = циан (5,14,14) / белый факел = (15,15,15) и т.д.). На вершинной стадии он приходит упакованным в 4 ниббла — r / g / b / sky — в одном float-атрибуте. Обработка трёх каналов по отдельности внутри light-хука включает цветной локальный свет — рецепт тёплых факелов (R9.1) откалиброван именно под это поведение.
 
@@ -5716,7 +5716,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## Внутрянка тумана
+## Внутреннее устройство тумана
 > Целевая версия API: 5 · Тип: техническая справка
 Расчёт тумана всегда идёт в режиме LINEAR (эквивалент: `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), при `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = настройка дистанции тумана; лишь D = 0 особенный с fogEnd = 5). **Градиентная полоса тумана имеет ширину всего 32 блока**, а `l.fogAlpha` — не столько «дымка по дистанции», сколько **нормированная дистанция до края загруженного мира**. Она меняется от игрока к игроку вместе с дистанцией загрузки, поэтому дистанционные эффекты должны сами вычислять `distance(l.position, bloxdEyePosition())` (раздел «Полоса края загрузки» ниже). (функция тумана рендерера на самом деле реализует **четыре** режима — выключен / экспоненциальный / экспоненциальный в квадрате / линейный — и поставляемые титулы управляют линейным; восстановленный исходный код и обоснование устойчивости сохранены в [Истории версий: v3](history/v3.md).)
 
