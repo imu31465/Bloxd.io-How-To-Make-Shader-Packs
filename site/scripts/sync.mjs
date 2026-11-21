@@ -90,7 +90,7 @@ const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetiv
 
 // 公開ページから、調査時点のビルド情報と内部バンドル構成を除外する。
 const BUILD_METADATA_LINE = /(?:target build|build target|last verified|last verification|対象ビルド|Ziel-Build|Zuletzt verifiziert|Letzte Prüfung|build objetivo|build cible|dernière vérification|última verificación|लक्ष्य बिल्ड|अंतिम सत्यापन|대상 빌드|최종 확인|최종 검증|build alvo|última verificação|целевой билд|последняя проверка|目标构建|最后验证)/i
-const INTERNAL_BUILD_DETAIL_LINE = /(?:\b(?:c49|c50|c51|c52|c53|c54|c55|c56|c116|c124)\b|\b(?:module|modul|modulo|módulo|модуль|模块|모듈)\s+(?:ID\s+)?\d{3,5}\b|webpack[- ]chunk|chunk layout|bundle reorg|bundle layout|byte-identical|\bmd5\b|live loader chunk|live validator|production bundle|preprod|re-measured on the live|remesurad[oa]s? en (?:el|la) c\d+|remesuré(?:es)? sur le c\d+|re-mesurad[oa] no c\d+|auf dem live-c\d+|na live c\d+|по-новому измерен.*c\d+|在现行 c\d+ 上重新实测|本番ビルド|本番バンドル|ライブローダーチャンク|バンドル再編|\b(?:bbb6l5|bny9u|v98qt8|cnty9|ab90qa|xkg8x|3ymzdd|tcwczu|sjr0p7|6qxffk)\b)/i
+const INTERNAL_BUILD_DETAIL_LINE = /(?:\b(?:c49|c50|c51|c52|c53|c54|c55|c56|c116|c124)\b|\b(?:module|modul|modulo|módulo|модуль|模块|모듈)\s+(?:ID\s+)?\d{3,5}\b|webpack[- ]chunk|chunk layout|bundle reorg|bundle layout|byte-identical|\bmd5\b|live loader chunk|live validator|production bundle|production build|preprod|re-measured on the live|remesurad[oa]s? en (?:el|la) c\d+|remesuré(?:es)? sur le c\d+|re-mesurad[oa] no c\d+|auf dem live-c\d+|na live c\d+|по-новому измерен.*c\d+|在现行 c\d+ 上重新实测|本番ビルド|本番バンドル|ライブローダーチャンク|バンドル再編|\b(?:bbb6l5|bny9u|v98qt8|cnty9|ab90qa|xkg8x|3ymzdd|tcwczu|sjr0p7|6qxffk)\b)/i
 
 // ビルドIDと確認日時は配信時刻・公開仕様を示すものではないため、利用者向け表示から除外する。
 // APIバージョンや検証状態など、利用者にも意味のある情報は残す。

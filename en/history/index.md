@@ -2,7 +2,7 @@
 
 > Type: Historical · API v1–v5 migration guides
 
-This section preserves the changes, migration steps, and removed APIs from versions v1 through v5. It focuses on API behavior and migration paths rather than build identifiers or verification dates.
+This section preserves the changes, migration steps, and removed APIs from versions v1 through v5, with an emphasis on API behavior and migration paths.
 
 ## Versions
 
