@@ -6,13 +6,10 @@ Un guide non officiel sur les shader packs du renderer WebGPU de Bloxd.io — de
 
 - API actuelle : **5** (`pack.json` doit déclarer `apiVersion: 5`)
 - Cible : renderer WebGPU
-- Dernière vérification : 2026-11-20
-- Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20)
 - Hooks de shader : 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). Cherchez-vous une fonction de l'API ? Voir la [Référence API](api/).
 
-> Cette documentation n'est pas une ressource officielle des développeurs du jeu. Les intérieurs du moteur peuvent changer avec les mises à jour — vérifiez le build cible et le statut de vérification indiqués sur chaque page.
 >
 > Ce guide a été créé avec l'assistance d'une IA ; l'exactitude n'est pas garantie. Vérifiez par rapport au comportement réel en jeu. Continuez à vérifier les recettes face à l'écran du chargeur et à la compilation en jeu.
 >
@@ -38,17 +35,3 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 - **[Dépannage](troubleshooting/)** — résolution d'erreurs par symptôme : chargement, version d'API, compilation, validation, variantes, visuel, textures, éclairage, modèles, performances.
 - **[Intérieurs du moteur et recherche](internals/)** — pipeline de rendu, invocation des hooks, en-tête du moteur, intérieurs de validation et de compilation, identifiants réservés, intérieurs d'éclairage/brouillard, échantillonnage et registre des textures, rendu des modèles, données mesurées.
 - **[Historique des versions](history/)** — de v1 à v5 : changements par version, étapes de migration, API retirées.
-
-## Libellés de statut de vérification
-
-Chaque page indique sa version d'API cible, son build, sa date de dernière vérification et son statut.
-
-| Libellé | Signification |
-|---|---|
-| Verified | vérifié sur appareil / sur le build cible |
-| Analyzed | confirmé en analysant l'implémentation interne |
-| Partially Verified | confirmé seulement partiellement |
-| Experimental | expérimental / non consolidé |
-| Historical | matériel d'une version passée |
-
-Les données brutes extraites du moteur (en-tête, registre, mesures) vivent dans les [Intérieurs du moteur](internals/) ; la méthodologie et les journaux qui les sous-tendent se suivent dans le [journal de recherche](internals/research-log.md).

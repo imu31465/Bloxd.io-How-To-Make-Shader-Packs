@@ -6,13 +6,10 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 
 - API actual: **5** (`pack.json` debe declarar `apiVersion: 5`)
 - Objetivo: renderizador WebGPU
-- Última verificación: 2026-11-20
-- Build objetivo: `bbb6l5` (verificado en producción y preprod el 2026-11-20)
 - Hooks de sombreado: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 ¿Nuevo con los shader packs? Empieza por [Primeros pasos](getting-started/). ¿Consultas de la API? Mira [Referencia de la API](api/).
 
-> Esta documentación no es un recurso oficial de los desarrolladores del juego. Las interioridades del motor pueden cambiar con las actualizaciones — comprueba el build objetivo y el estado de verificación anotados en cada página.
 >
 > Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifícala contra el comportamiento real del juego. Sigue verificando las recetas contra la pantalla del cargador y la compilación en el juego.
 >
@@ -38,17 +35,3 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 - **[Solución de problemas](troubleshooting/)** — resolución de errores por síntoma: carga, versión de API, compilación, validación, variantes, visual, texturas, iluminación, modelos, rendimiento.
 - **[Interior del motor e investigación](internals/)** — canalización de renderizado, invocación de hooks, cabecera del motor, interioridades de validación y compilación, identificadores reservados, interioridades de iluminación/niebla, muestreo y registro de texturas, renderizado de modelos, datos medidos.
 - **[Historial de versiones](history/)** — de v1 a v5: cambios por versión, pasos de migración, API eliminadas.
-
-## Estados de verificación
-
-Cada página anota su versión de API objetivo, build, fecha de última verificación y estado.
-
-| Etiqueta | Significado |
-|---|---|
-| Verified | verificado en el dispositivo / en el build objetivo |
-| Analyzed | confirmado analizando la implementación interna |
-| Partially Verified | confirmado solo parcialmente |
-| Experimental | experimental / sin consolidar |
-| Historical | material de una versión pasada |
-
-Los datos crudos extraídos del motor (cabecera, registro, mediciones) viven en [Interior del motor e investigación](internals/); la metodología y los registros que hay detrás se siguen en el [registro de investigación](internals/research-log.md).

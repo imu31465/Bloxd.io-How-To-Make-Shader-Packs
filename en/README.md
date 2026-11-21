@@ -6,13 +6,10 @@ An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from cr
 
 - Current API: **5** (`pack.json` must declare `apiVersion: 5`)
 - Target: WebGPU renderer
-- Last verified: 2026-11-20
-- Target build: `bbb6l5` (verified in production and preprod on 2026-11-20)
 - Shader hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 New to shader packs? Start with [Getting Started](getting-started/). Looking up the API? Start with [API Reference](api/).
 
-> This documentation is not an official resource from the game's developers. Engine internals may change with updates — check the target build and verification status noted on each page.
 >
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior. Keep verifying recipes against the loader screen and in-game compilation.
 >
@@ -38,17 +35,3 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 - **[Troubleshooting](troubleshooting/)** — symptom-driven error resolution: loading, API version, compilation, validation, variants, visual, texture, lighting, model, performance.
 - **[Engine Internals & Research](internals/)** — rendering pipeline, hook invocation, engine header, validation & compilation internals, reserved identifiers, lighting/fog internals, texture sampling & registry, model rendering, measured data.
 - **[Version History](history/)** — v1 through v5: changes per version, migration steps, removed APIs.
-
-## Verification status labels
-
-Each page notes its target API version, build, last-verified date and status.
-
-| Label | Meaning |
-|---|---|
-| Verified | Verified on-device / on the target build |
-| Analyzed | Confirmed by analyzing the internal implementation |
-| Partially Verified | Only partially confirmed |
-| Experimental | Experimental / unsettled |
-| Historical | Material for a past version |
-
-Raw engine-extracted data (header, registry, measurements) lives in [Engine Internals](internals/); the methodology and logs behind it are tracked in the [research log](internals/research-log.md).
