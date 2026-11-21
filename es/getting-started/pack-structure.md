@@ -6,7 +6,7 @@
 
 - **Formato**: un único `.zip`, o una carpeta (la carga por carpeta es solo para navegadores de escritorio)
 - **Contenido**: un `pack.json` (en el nivel superior del paquete; sin distinguir mayúsculas) + 1–256 archivos `.wgsl`
-- Los múltiples archivos `.wgsl` se concatenan en un solo módulo, así que dividir y usar subdirectorios es gratis. Sin restricciones en los nombres de archivo. La concatenación ocurre en **orden de diccionario por nombre de ruta** (las declaraciones de ámbito de módulo son independientes del orden, así que esto solo importa para código que dependa del orden de inicialización de `var`). Los archivos que no son `.wgsl` (READMEs etc.) se ignoran
+- Los archivos `.wgsl` se concatenan en un único módulo, así que puedes repartir el código entre varios archivos y subdirectorios. No hay restricciones para los nombres. La concatenación sigue el **orden lexicográfico de las rutas** (las declaraciones a nivel de módulo no dependen del orden; esto solo importa si el código depende del orden de inicialización de `var`). Los archivos que no sean `.wgsl` (como los README) se ignoran.
 
 ## Límites de tamaño y formato
 
@@ -21,6 +21,6 @@
 
 Todos los archivos deben ser UTF-8 válidos.
 
-## Consejos de comprimido
+## Consejos para crear el ZIP
 
 Un zip que guarda todo bajo una carpeta raíz común ve ese prefijo eliminado automáticamente (el «Comprimir» de macOS funciona tal cual; los archivos con prefijo `__MACOSX`, `._` y `.DS_Store` se excluyen automáticamente). Los archivos sueltos en el nivel raíz rompen la detección del nivel superior, así que el método más seguro es comprimir `pack.json` y los archivos `.wgsl` directamente (verifica que `pack.json` quede en la raíz del zip).
