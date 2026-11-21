@@ -14,6 +14,5 @@ Dieser Leitfaden führt dich Schritt für Schritt durch die Erstellung deines er
 8. [Validierung](validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](../api/); für fertige Effekte siehe [Rezepte](../recipes/).
