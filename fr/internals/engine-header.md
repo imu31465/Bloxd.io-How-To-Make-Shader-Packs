@@ -1,8 +1,8 @@
 # En-tête du moteur (verbatim)
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Analyzed (restauré depuis le bundle de production en direct)
+> API cible : 5 · Type : référence technique
 
-Le texte exact que le moteur préfixe à chaque pack, rendu depuis le validateur de la build en direct avec ses interpolations appliquées (`apiVersion` et les 6 lectures d\'uniform via `bloxdPackInputs`). 216 lignes. Aucune paraphrase. Revérifié sur les builds précédentes (`bny9u`, `v98qt8`) — le seul ajout est le contenu des ombres.
+Texte de référence de l'en-tête WGSL ajouté par le moteur à chaque shader pack. Consultez la [Référence de l'API](../api/) pour comprendre chaque champ et chaque fonction.
 
 Guide de lecture :
 - Explications champ par champ → [Structures](../api/structures.md)

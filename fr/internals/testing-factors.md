@@ -1,6 +1,6 @@
 # Ce qui change les valeurs visibles des packs
 
-> API cible : 5 · Build cible : `bbb6l5` (2026-11-20, production et preprod) · État : Analyzed (analyse JavaScript du bundle de production)
+> API cible : 5 · Type : référence technique
 
 Le même pack rend différemment selon **les réglages de monde et de joueur**. Vérifiez au moins ces 3 environnements avant de distribuer :
 

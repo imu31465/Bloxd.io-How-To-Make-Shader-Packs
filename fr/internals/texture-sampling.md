@@ -1,6 +1,6 @@
 # Intérieurs de l'échantillonnage des textures
 
-> API cible : 5 · Build cible : `bbb6l5` · État : Analyzed (restauré depuis le générateur en production, c56)
+> API cible : 5 · Type : référence technique
 
 Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — le codegen de textures à 3 variantes. Le côté utilisateur : [API de textures](../api/texture-api.md).
 

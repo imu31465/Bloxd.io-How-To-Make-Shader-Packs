@@ -1,6 +1,6 @@
 # Intérieurs du rendu des modèles
 
-> API cible : 5 · Build cible : `bbb6l5` · État : Analyzed (restauré depuis le bundle en production)
+> API cible : 5 · Type : référence technique
 
 Les intérieurs du programme Model v5. Le guide côté utilisateur : [Modèles et textures](../guides/models.md).
 

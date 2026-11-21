@@ -1,6 +1,6 @@
-# Intérieurs du moteur et recherche
+# Internes du moteur
 
-Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`bny9u`). Séparé de la documentation d'API publique ([Référence API](../api/)) pour préserver le comportement interne exact et les résultats d'analyse.
+Cette catégorie présente le fonctionnement interne du moteur afin de mieux comprendre l'exécution des shader packs. Ces détails d'implémentation peuvent évoluer ; pour les règles d'utilisation stables et les API disponibles, consultez la [Référence de l'API](../api/).
 
 ## Plan
 
@@ -8,22 +8,20 @@ Spécifications internes restaurées en analysant l'implémentation du moteur. T
 |---|---|
 | [Pipeline de rendu](rendering-pipeline.md) | position d'alphaTest, setup à 2 lumières, réalité de l'uniform, greedy meshing |
 | [Invocation des hooks](hook-invocation.md) | comment les hooks sont greffés dans le WGSL du moteur |
-| [En-tête du moteur](engine-header.md) | l'en-tête v5 complet (verbatim, 8,954B) |
+| [En-tête du moteur](engine-header.md) | Déclarations WGSL ajoutées aux shader packs |
 | [Validation des shaders](shader-validation.md) | les intérieurs de l'analyseur, la table des signatures, HEADER_VERSION |
 | [Compilation WGSL](wgsl-compilation.md) | la vraie compilation de l'étape 2 et les stubs de validation |
 | [Identifiants réservés](reserved-identifiers.md) | les 46 symboles `bloxdSp*` |
 | [Intérieurs de l'éclairage](lighting-internals.md) | structure de blockLight / heldLight |
 | [Intérieurs du brouillard](fog-internals.md) | linéaire uniquement, la bande de dégradé de 32 blocs |
 | [Échantillonnage des textures](texture-sampling.md) | le codegen de textures à 3 variantes |
-| [Registre des textures](texture-registry.md) | résolution nom→id, 896 noms, dérive mesurée |
+| [Registre de textures](texture-registry.md) | Résolution des noms et noms d'animation et de rotation |
 | [Rendu des modèles](model-rendering.md) | le programme Model v5 |
-| [Données du moteur](engine-data.md) | le relevé v5 des constantes/limites/layouts |
+| [Données du moteur](engine-data.md) | Fonctions de l'API v5 et limites des packs |
 | [Facteurs de test](testing-factors.md) | quels réglages monde/joueur changent les valeurs visibles des packs |
 | [Politique](policy.md) | shaderPackPolicy — les 12 titres allow |
 | [Soleil et lune](sun-and-moon.md) | ce qui alimente bloxdSunDirection |
 | [Débogage](debugging.md) | paramètres URL, panneaux de statistiques |
-| [Journal de recherche](research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20)
 
-Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](research-log.md)).
+Les détails internes ne constituent pas un contrat d'API stable. Lors de la création de packs, privilégiez la [Référence de l'API](../api/).

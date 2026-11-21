@@ -1,6 +1,6 @@
 # Compilation WGSL
 
-> API cible : 5 · Build cible : `bbb6l5` · État : Analyzed (restauré depuis le bundle en production)
+> API cible : 5 · Type : référence technique
 
 La deuxième étape de validation — la compilation réelle via le compilateur WGSL du navigateur — et les stubs de validation de la v5.
 
