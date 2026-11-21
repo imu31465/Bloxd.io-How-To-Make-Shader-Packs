@@ -1103,7 +1103,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (определён в жидкостных вариантах)
 - **Смысл**: непрозрачная грань позади этого фрагмента (террейн, видимый сквозь воду); `hit == false` для неба
 - **Переименование из v2**: `found` → `hit`
-- **Подробный разбор**: [История версий: v3](history/v3.md) и [Внутрянка движка](internals/rendering-pipeline.md)
+- **Подробный разбор**: [История версий: v3](history/v3.md) и [Внутреннее устройство движка](internals/rendering-pipeline.md)
 
 ### См. также
 
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` приходят уже отображёнными в 0–1**: уровни 0–15 через ease-out-кривую (напр. `6 → 0.45`, `12 → 0.92`). Все исключают `ambientLightColour`
 - **Кривая лифта**: `skyLight` — на самом деле «видит ли эта позиция небо»: воксельные данные перекрытия, т.е. карта теней. Пороговому разделению солнца/тени может понадобиться обратное преобразование (см. [руководство по реализму](guides/realism.md))
-- **Внутреннее устройство тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутрянка движка: внутрянка тумана](internals/fog-internals.md))
+- **Внутреннее устройство тумана**: в линейном режиме `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clamp 0..1), вычисляется повершинно в пространстве вида. Текущий билд — только линейный (подробности в [Внутреннее устройство движка: туман](internals/fog-internals.md))
 
 ### Рецепты
 
@@ -1291,7 +1291,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### См. также
 
-- [Функции](api/functions.md) · [Руководства: освещение](guides/lighting.md) · [Внутрянка движка: внутрянка освещения](internals/lighting-internals.md)
+- [Функции](api/functions.md) · [Руководства: освещение](guides/lighting.md) · [Внутреннее устройство движка: освещение](internals/lighting-internals.md)
 
 
 ---
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### См. также
 
 - **Все 896 пригодных имён** → [Каталог текстур](api/texture-catalog.md)
-- [Внутрянка движка: реестр текстур](internals/texture-registry.md) · [Сэмплинг текстур](internals/texture-sampling.md)
+- [Внутреннее устройство движка: реестр текстур](internals/texture-registry.md) · [Сэмплинг текстур](internals/texture-sampling.md)
 
 
 ---
@@ -4648,7 +4648,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Смотрите также
 
-- [Ошибки валидации](troubleshooting/validation.md) · [Внутрянка движка: компиляция WGSL](internals/wgsl-compilation.md) · [Ограничения](api/restrictions.md)
+- [Ошибки валидации](troubleshooting/validation.md) · [Внутреннее устройство движка: компиляция WGSL](internals/wgsl-compilation.md) · [Ограничения](api/restrictions.md)
 
 
 ---
@@ -4719,7 +4719,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Смотрите также
 
-- [Ограничения и зарезервированные имена](api/restrictions.md) · [Внутрянка движка: валидация шейдеров](internals/shader-validation.md) · [Проблемы отдельных вариантов](troubleshooting/variants.md)
+- [Ограничения и зарезервированные имена](api/restrictions.md) · [Внутреннее устройство движка: проверка шейдеров](internals/shader-validation.md) · [Проблемы отдельных вариантов](troubleshooting/variants.md)
 
 
 ---
@@ -4910,7 +4910,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Смотрите также
 
-- [API текстур](api/texture-api.md) · [Каталог текстур](api/texture-catalog.md) · [Внутрянка реестра текстур](internals/texture-registry.md)
+- [API текстур](api/texture-api.md) · [Каталог текстур](api/texture-catalog.md) · [Внутреннее устройство реестра текстур](internals/texture-registry.md)
 
 
 ---
@@ -4962,7 +4962,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### Хотите теорию?
 
 - Тени: [Тени](guides/shadows.md) (skyLight = воксельная карта теней)
-- Туман: [Внутрянка движка: туман](internals/fog-internals.md)
+- Туман: [Внутреннее устройство движка: туман](internals/fog-internals.md)
 
 ### Смотрите также
 
@@ -5083,7 +5083,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### В. В каких играх работают паки?
 
-Большинство игр работает в strict-режиме (без вершинной анимации, без `discard`). Вершинная анимация работает только в allow-играх. Перечень по играм — в [Внутрянка движка: режимы применения по играм](internals/policy.md).
+Большинство игр работает в strict-режиме (без вершинной анимации, без `discard`). Вершинная анимация работает только в allow-играх. Перечень по играм — в [Внутреннее устройство движка: применение в разных играх](internals/policy.md).
 
 #### В. Работают ли паки на мобильных?
 
@@ -5218,7 +5218,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ---
 
-## Внутрянка вызова хуков
+## Как движок вызывает хуки
 > Целевая версия API: 5 · Тип: техническая справка
 
 Как движок вызывает хуки во время выполнения. Это ничего не меняет в коде, который вы пишете, но убирает догадки о том, что получают хуки.
@@ -5659,7 +5659,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## Внутрянка зарезервированных идентификаторов
+## Как устроены зарезервированные идентификаторы
 > Целевая версия API: 5 · Тип: техническая справка
 
 Пространство имён `bloxdSp*` — символы, которые генераторы могут внедрять, и поэтому паки не могут их переобъявлять. Сводка для авторов паков: [Ограничения](api/restrictions.md).
@@ -5742,7 +5742,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## Внутрянка сэмплинга текстур
+## Как движок выбирает тексели из текстур
 > Целевая версия API: 5 · Тип: техническая справка
 
 Как `bloxdTexel` / `bloxdTextureSize` компилируются на самом деле — кодогенерация текстур в 3 вариантах. Со стороны пользователя: [API текстур](api/texture-api.md).
@@ -5829,10 +5829,10 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ---
 
-## Внутрянка рендеринга моделей
+## Внутреннее устройство рендеринга моделей
 > Целевая версия API: 5 · Тип: техническая справка
 
-Внутрянка программы Model в v5. Пользовательское руководство: [Модели и текстуры](guides/models.md).
+Внутреннее устройство программы Model в API v5. Пользовательское руководство: [Модели и текстуры](guides/models.md).
 
 ### Что такое программа Model
 
@@ -6426,7 +6426,7 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 Эта страница — историческое руководство по переносу паков API v3 на v4. Для перехода с v4 на текущую версию используйте [руководство по миграции на API v5](history/v5.md). При создании новых паков обращайтесь к [Справочнику API](api/).
 
-Одна вещь изменилась вокруг этого релиза и при этом *не* в бандле: **движок теперь цитирует справочные файлы по имени.** Его собственные сообщения об ошибках указывают на `bloxd-api.wgsl` (аннотированный заголовок движка) и `BLOCK_TEXTURES.md` (полный список имён текстур) — `...BLOCK_TEXTURES.md lists them.` Это руководство несёт содержимое обоих файлов вместо отсылки куда-то ещё: полный заголовок, восстановленный дословно из живого билда, встроен в [Внутрянка движка: заголовок движка](internals/engine-header.md), а полный каталог пригодных имён текстур (905 в билде v4) — это [Каталог текстур](api/texture-catalog.md). Каждый факт этой части, касающийся паков, восстановлен из продакшн-бандла.
+Одна вещь изменилась вокруг этого релиза и при этом *не* в бандле: **движок теперь цитирует справочные файлы по имени.** Его собственные сообщения об ошибках указывают на `bloxd-api.wgsl` (аннотированный заголовок движка) и `BLOCK_TEXTURES.md` (полный список имён текстур) — `...BLOCK_TEXTURES.md lists them.` Это руководство несёт содержимое обоих файлов вместо отсылки куда-то ещё: полный заголовок, восстановленный дословно из живого билда, встроен в [Внутреннее устройство движка: заголовок движка](internals/engine-header.md), а полный каталог пригодных имён текстур (905 в билде v4) — это [Каталог текстур](api/texture-catalog.md). Каждый факт этой части, касающийся паков, восстановлен из продакшн-бандла.
 Набор изменений v4 на одном экране:
 | Область | v3 | v4 |
 |---|---|---|
