@@ -12,6 +12,8 @@ Die Spalte **notes** markiert die beiden Faltungs-Familien. „anim (N Frames)�
 
 ## Der Katalog
 
+Alle 1.017 nutzbaren Namen sind alphabetisch aufgeführt. Die Tabelle enthält nur Textur-Namen und Hinweise.
+
 | Name | Anmerkungen |
 |---|---|
 | `alloy_kiln_back` |  |

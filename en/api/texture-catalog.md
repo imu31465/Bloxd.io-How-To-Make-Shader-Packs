@@ -12,6 +12,8 @@ The **notes** column marks the two folding families. "anim (N frames)" means sam
 
 ## The catalog
 
+All 1,017 usable names are listed alphabetically. The table shows texture names and notes only.
+
 | Name | Notes |
 |---|---|
 | `alloy_kiln_back` |  |

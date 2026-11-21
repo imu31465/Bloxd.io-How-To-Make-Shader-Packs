@@ -10,16 +10,9 @@ Les ID numériques des textures sont des valeurs internes propres à chaque buil
 
 La colonne **notes** marque les deux familles de pliage. « anim (N images) » signifie que l'échantillonnage de ce nom renvoie automatiquement l'image d'animation courante — **n'écrivez jamais le suffixe d'image** (`lava0` est un alias connu avec un diagnostic dédié). « famille de rotation (4 copies) » signifie que la texture n'existe que sous forme d'emplacements pré-rotés — le nom désigne la racine et `bloxdTexel` réapplique la rotation. Exactement un nom (`radar_screen`) porte les deux notes.
 
-### Comment les chiffres s'articulent
-
-Ces chiffres désignent des ensembles différents, donc ils ne s'additionnent pas naïvement :
-
-| Chiffre | Ce qu'il compte |
-|---|---|
-| **1,017** | constantes nommées utilisables — des noms de texture que vous pouvez écrire comme `bloxdTextureId*` |
-| **776** | noms d'alias (520 d'image + 256 de rotation) — des orthographes reconnues qui sont *rejetées* avec une orientation vers le nom de base ; ce sont des noms, pas des constantes, et ils n'ajoutent aucun id |
-
 ## Le catalogue
+
+Les 1 017 noms utilisables sont présentés par ordre alphabétique. Le tableau affiche uniquement les noms de texture et les notes.
 
 | Nom | Notes |
 |---|---|

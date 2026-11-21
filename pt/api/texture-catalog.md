@@ -10,16 +10,9 @@ Os IDs numéricos das texturas são valores internos específicos de cada build 
 
 A coluna **notas** marca as duas famílias de dobramento. «anim (N quadros)» significa que amostrar este nome retorna automaticamente o quadro de animação atual — **nunca escreva o sufixo de quadro** (`lava0` é um alias conhecido com um diagnóstico dedicado). «família de rotação (4 cópias)» significa que a textura existe apenas como slots pré-rotacionados — o nome refere-se à raiz e `bloxdTexel` reaplica a rotação. Exatamente um nome (`radar_screen`) carrega ambas as notas.
 
-### Como os números se relacionam
-
-As contagens nomeiam conjuntos distintos, então elas não se somam de forma ingênua:
-
-| Contagem | O que conta |
-|---|---|
-| **1,017** | constantes nomeadas utilizáveis — nomes de textura que você pode escrever como `bloxdTextureId*` |
-| **776** | nomes de alias (520 de quadro + 256 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
-
 ## O catálogo
+
+Todos os 1.017 nomes utilizáveis são listados em ordem alfabética. A tabela mostra apenas os nomes das texturas e as notas.
 
 | Nome | Notas |
 |---|---|
@@ -1041,7 +1034,7 @@ As contagens nomeiam conjuntos distintos, então elas não se somam de forma ing
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-### Famílias de rotação (64 raízes)
+### Famílias de rotação
 
 Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). O registro as dobra para a raiz listada abaixo, e `bloxdTexel` reaplica a rotação no momento da amostragem — referencie a raiz, nunca as cópias. Escrever uma grafia `[rot[N` dispara o diagnóstico dedicado de rotação.
 - `alloy_kiln_top`

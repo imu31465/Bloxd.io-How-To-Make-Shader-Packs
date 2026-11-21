@@ -12,6 +12,8 @@ La columna **notas** marca las dos familias de plegado. «anim (N fotogramas)» 
 
 ## El catálogo
 
+Los 1.017 nombres utilizables se enumeran en orden alfabético. La tabla solo muestra los nombres de textura y las notas.
+
 | Nombre | Notas |
 |---|---|
 | `alloy_kiln_back` |  |
