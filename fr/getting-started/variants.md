@@ -4,9 +4,9 @@
 
 ## 6 variantes
 
-Vous écrivez un seul corps de code, mais il doit compiler dans les **6 variantes** : `{strict, allow} × {terrain, liquid, model}`. Le chargeur valide les six au moment du chargement.
+Vous conservez une seule base de code, qui doit compiler dans les **6 variantes** : `{strict, allow} × {terrain, liquid, model}`. Le chargeur valide les six au moment du chargement.
 
-L'axe « éclairage activé/désactivé » de la v4 et des versions antérieures a disparu (la v4 comptait 8 variantes). L'état d'éclairage est désormais une question d'exécution pour [`bloxdLit()`](../api/lighting.md), et non plus une branche à la compilation.
+L'axe « éclairage activé/désactivé » de la v4 et des versions antérieures a disparu (la v4 comptait 8 variantes). L'état de l'éclairage est désormais évalué à l'exécution par [`bloxdLit()`](../api/lighting.md), et non plus une branche à la compilation.
 
 | Variante | Exemple | Macros définies |
 |---|---|---|
@@ -29,7 +29,7 @@ Seuls `#define NAME` (sans valeur) / `#ifdef` / `#ifndef` / `#else` / `#endif` s
 
 `BLOXD_LIGHTING` a été **supprimé en v5**. L'utiliser fait échouer la validation avec : *« BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead. »*
 
-## Le contrat des jeux stricts
+## Restrictions des jeux stricts
 
 La plupart des jeux sont stricts (pas d'animation de sommets, pas de `discard`). Un hook vertex sans garde signale `<hook> moves terrain, which strict games prevent.` et un `discard` atteignable signale `discard makes terrain see-through, which strict games prevent.` — les deux désactivent **tous les hooks** dans ce jeu strict. Englobez toujours les hooks vertex dans `#ifndef BLOXD_STRICT`.
 
