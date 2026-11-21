@@ -39,11 +39,11 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 
 ## Libellés de statut de vérification
 
-Chaque page indique sa version d'API cible, son build, sa date de dernière vérification et son statut.
+Chaque page indique la version de l’API qu’elle couvre et l’état de vérification de son contenu.
 
 | Libellé | Signification |
 |---|---|
-| Verified | vérifié sur appareil / sur le build cible |
+| Verified | vérifié dans le jeu |
 | Analyzed | confirmé en analysant l'implémentation interne |
 | Partially Verified | confirmé seulement partiellement |
 | Experimental | expérimental / non consolidé |
