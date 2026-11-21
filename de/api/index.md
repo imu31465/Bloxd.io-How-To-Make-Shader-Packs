@@ -1,6 +1,6 @@
 # API-Referenz
 
-Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `bny9u` gemessen (2026-11-05; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](../internals/engine-header.md)), ist die Primärquelle.
+Diese Seite dokumentiert die aktuelle API v5. Die maßgebliche Quelle für die API-Definitionen ist der Engine-Header, den die Engine jedem Pack automatisch voranstellt (den vollständigen Header findest du unter [Engine-Interna](../internals/engine-header.md)).
 
 ## Map
 
@@ -17,8 +17,8 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Präprozessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Einschränkungen](restrictions.md) | Sprachgrenzen, reservierte Bezeichner |
 | [Kompatibilität](compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
-| [Texturkatalog](texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
+| [Texturkatalog](texture-catalog.md) | 1.017 verfügbare benannte Konstanten (durchsuchbar) |
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+> API: 5 · Status: Analyzed (aus Engine-Header und Validator rekonstruiert)
 
 Migration von v4? Siehe [Versionsgeschichte: v5](../history/v5.md).
