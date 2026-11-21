@@ -1,8 +1,8 @@
 # Texture issues
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (messages recorded verbatim from the live validator)
+> Target API: 5 · Type: technical reference
 
-Problems around `bloxdTextureId*` / `bloxdTexel`. Search all 896 names in the [texture catalog](../api/texture-catalog.md).
+Problems around `bloxdTextureId*` / `bloxdTexel`. Search all available names in the [texture catalog](../api/texture-catalog.md).
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 

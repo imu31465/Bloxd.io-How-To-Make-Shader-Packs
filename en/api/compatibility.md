@@ -1,70 +1,43 @@
 # Compatibility
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified
+> Target API: 5 · Type: API reference
 
-How the current game and old-version packs interoperate.
+This page explains which shader-pack API versions the current game accepts and how older saved packs are handled.
 
-## Accepted versions
+## Accepted API version
 
-**Only `apiVersion: 5`.** The loader compares `manifest.apiVersion !== 5` strictly and v1/v2/v3/v4 packs **fail at the instant of load**. No multi-version acceptance exists.
+The current game accepts packs whose manifest contains the numeric value `5` in `apiVersion`. The string `"5"` is not accepted. Packs created for API v1–v4 must be migrated before they can load.
 
-## Load-time messages (verbatim from the live i18n dictionary)
+## Load-time messages
 
 - `pack.json needs "apiVersion": {{version}}.` — the `apiVersion` key is missing
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the key exists but isn't 5
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — the specified version does not match the current version
 
-## Saved old packs (no exceptions — silent inactivation)
+## Previously saved packs
 
-Previously-saved v1–v4 packs don't throw. The saved-pack result resolves to:
+A pack saved for an older API version will not run in the current game. The shader-pack settings screen reports that the pack is for an unsupported version. Update the pack using the relevant migration guide.
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+## Saved-pack revalidation
 
-and the pack becomes **silently inactive**. Only the shader-pack settings tab explains why:
+Saved packs are revalidated when engine-provided headers or texture-name definitions change. Revalidation runs automatically when the game loads. In pack code, refer to textures by named constants rather than numeric IDs that may change.
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+## Runtime compatibility
 
-## The nature of the v4 → v5 conversion
+- **WebGPU:** Shader packs require a WebGPU renderer.
+- **Mobile:** Shader packs are unavailable in environments without WebGPU support ([Requirements](../getting-started/requirements.md)).
+- **Texture access:** In renderer configurations that do not use the texture atlas, `bloxdTexel` and `bloxdTextureSize` do not provide normal atlas-texture access ([Texture API](texture-api.md)).
 
-The conversion is mostly mechanical (full checklist in [the v5 migration guide](../history/v5.md)):
+## API version support
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (a 1:1 rename)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` call sites still compile (the engine injects it), but it is undocumented now — migrating off it is the safe move ([Functions](functions.md#bloxdfragmentblockposition--undocumented-but-still-injected))
-- bump `pack.json` to `"apiVersion": 5`
-
-The quiet trap this time: packs that keep reading `blockFlags` or wrapping light hooks in `#ifdef BLOXD_LIGHTING` **fail validation with dedicated messages** (the analyzer now explains both cases), so nothing misbehaves silently — they just stay refused until migrated.
-
-## Saved-pack re-validation ("needs re-check")
-
-`HEADER_VERSION` is `9.<hash>` from the engine's validator, with the texture-registry fingerprint folded into the page-level validation version (the leading integer went from v4's 8 to 9). When the engine's header or texture registry changes (common with game updates), saved packs are marked "needs re-check" and re-validate automatically on page load.
-
-**The `v98qt8` folding regression is fixed on `bbb6l5`**: the animated-texture table is slot-keyed again, so the registry fingerprint is computed over the intended folded table, the 43 animation-family base names validate again, and saved packs that reference them no longer fail re-validation. The `bbb6l5` header change (the shadow additions) does force one re-validation pass of every stored pack — a one-time automatic event, not a rejection.
-
-A measured example of registry movement (two builds, 10 days apart): entries 1200 → 1219 (98 added, 79 removed), and of the names that kept their spelling, **779 of 1121 changed id**. In other words:
-
-- **packs written with names (`bloxdTextureIdLava`) survive drift** (the loader re-resolves against the live registry)
-- **packs written with raw ids (`19`) break on re-validation**
-
-Details: [Engine Internals: Texture Registry](../internals/texture-registry.md).
-
-## Runtime environments
-
-- **WebGPU-renderer only**: installing a pack force-enables the WebGPU renderer
-- **Mobile**: WebGPU-limited environments can't run packs at all ([Requirements](../getting-started/requirements.md))
-- **Non-atlas renderer configurations**: `bloxdTexel` / `bloxdTextureSize` degrade to stubs (white texels, 1×1); code still compiles and runs ([Texture API](texture-api.md#where-the-texture-api-cant-go))
-
-## Version support summary
-
-| API version | Live since | Treatment by the current game |
-|---|---|---|
-| v1 | — | rejected at load (migrate via [v2](../history/v2.md)) |
-| v2 | — | rejected at load |
-| v3 | 2026-10-19 | rejected at load |
-| v4 | 2026-10-26 | rejected at load |
-| **v5** | **2026-11-03** | **current** |
+| API version | Current-game support |
+|---|---|
+| v1 | Rejected at load |
+| v2 | Rejected at load |
+| v3 | Rejected at load |
+| v4 | Rejected at load |
+| **v5** | **Current** |
 
 ## Related
 
-- [v5 migration checklist](../history/v5.md) · [Version History](../history/)
+- [Migrating from v4 to v5](../history/v5.md)
+- [Version history](../history/)

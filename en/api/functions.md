@@ -1,6 +1,6 @@
 # Functions
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored verbatim from the live header; shadow functions restored from the live validator's function table)
+> Target API: 5 · Type: technical reference
 
 Every header function. The texture API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) is covered in [Texture API](texture-api.md), along with `bloxdOpaqueBehind`.
 
@@ -53,7 +53,7 @@ fn bloxdSunDirection() -> vec3f
 fn bloxdShadowDirection() -> vec3f
 ```
 
-- **Returns**: the travel direction of the light that casts `bloxdShadow()`'s shadows — **new in the `bbb6l5` build** (the uniform's sixth member, `shadowDirection` @ 64)
+- **Returns**: the travel direction of the light that casts `bloxdShadow()`'s shadows — **new in the API v5** (the uniform's sixth member, `shadowDirection` @ 64)
 - **Facts**:
   - **not the same as `bloxdSunDirection()`**: the shadow light falls back to the moon at night and to the default sky's sun when the world has no sun, so shadows exist under a sunless sky too
   - its `y` is never above 0 (0 when the sun is on the horizon) — the light always comes down
@@ -160,7 +160,7 @@ The engine's own lighting recipe, documented as callable WGSL — compose or ove
 
 ## Shadow functions
 
-The `bbb6l5` build added the engine's real sun/moon shadow system to the pack API — projected, sun-following shadows cast by blocks, players, mobs and items. These three functions are **injected into every pack's compiled module** (like `bloxdFragmentBlockPosition`) and documented in the validator's function table, but are not part of the readable header text.
+The API v5 added the engine's real sun/moon shadow system to the pack API — projected, sun-following shadows cast by blocks, players, mobs and items. These three functions are **injected into every pack's compiled module** (like `bloxdFragmentBlockPosition`) and documented in the validator's function table, but are not part of the readable header text.
 
 ### bloxdShadow
 
@@ -168,7 +168,7 @@ The `bbb6l5` build added the engine's real sun/moon shadow system to the pack AP
 fn bloxdShadow() -> f32
 ```
 
-- **Returns**: sunlight or moonlight reaching this fragment — **0 in shadow, 1 lit** — *new in `bbb6l5`*
+- **Returns**: sunlight or moonlight reaching this fragment — **0 in shadow, 1 lit** — *new in API v5*
 - What casts them: **blocks, players, mobs and items** (the engine also excludes the first-person held item — the body you're in would shade it as you turn)
 - Behavior (verbatim from the validator's description):
   - fades to 0 as the sun or moon sets, or as the face turns away from the light
@@ -183,7 +183,7 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 ```
 
-- **Returns**: like `bloxdShadow()`, but at a point **between the camera (t = 0) and this fragment (t = 1)** — *new in `bbb6l5`* — for light shafts and volumetric rays
+- **Returns**: like `bloxdShadow()`, but at a point **between the camera (t = 0) and this fragment (t = 1)** — *new in API v5* — for light shafts and volumetric rays
 - **Facts** (verbatim from the validator's description):
   - **only blocks cast these shadows** (players and mobs do not), **blurred to whole blocks**
   - `t` is clamped to 0–1

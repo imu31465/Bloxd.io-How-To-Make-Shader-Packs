@@ -1,14 +1,14 @@
 # Shadows
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (bloxdShadow API re-measured on the live build)
+> Target API: 5 · Type: technical reference
 
-Two eras of shadow-making: the classic `skyLight` recipe (works on every build since v4), and the **real sun/moon shadows** the `bbb6l5` build added to the API (`bloxdShadow()`). For a new pack on a current build, prefer the real thing.
+Two eras of shadow-making: the classic `skyLight` recipe (works on every build since v4), and the **real sun/moon shadows** the API v5 added to the API (`bloxdShadow()`). For a new pack on a current build, prefer the real thing.
 
-## Can / cannot (on `bbb6l5`)
+## Can / cannot (on API v5)
 
 | Effect | Possible? | How |
 |---|---|---|
-| Real sun-following shadows (blocks, players, mobs, items) | ◎ | `bloxdShadow()` — [the real shadow API](#the-real-shadow-api-bbb6l5) |
+| Real sun-following shadows (blocks, players, mobs, items) | ◎ | `bloxdShadow()` — [the real shadow API](#the-real-shadow-api-API v5) |
 | Light shafts / god rays through the air | ◎ | `bloxdAirShadow(t)` sampled along the view ray |
 | Sun-accurate shading direction for your own math | ◎ | `bloxdShadowDirection()` |
 | The old blob shadows under players kept alongside real shadows | ◎ | `pack.json` → `"keepCircleShadows": true` |
@@ -18,7 +18,7 @@ Two eras of shadow-making: the classic `skyLight` recipe (works on every build s
 | Shadow-map depth access / custom shadow casting | ✕ | the engine's shadow volume is not a pack input; only the final 0-1 factor is |
 | Physical penumbra | △ | block-shadow blur is whole-block; the sky-voxel route is BFS-capped |
 
-## The real shadow API (`bbb6l5`)
+## The real shadow API (API v5)
 
 Three additions turned "shadows" from a lighting trick into a first-class input:
 
