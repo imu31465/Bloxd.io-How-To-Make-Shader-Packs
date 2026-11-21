@@ -11,7 +11,9 @@ Problemas que ocurren solo en algunas de las 6 variantes (`strict|allow` × `ter
 - **Corrección**: envuelve los hooks de vértice y el `discard` en `#ifndef BLOXD_STRICT`
 - **Prevención**: parte siempre de la plantilla con guarda para los hooks de vértice ([Variantes](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## El campo `alpha` no está disponible en esta variante
+
+> `.alpha is undefined`
 
 - **Causa**: `alpha` existe solo tras `#ifdef BLOXD_ALPHA` (todo líquido + terreno/modelo no strict)
 - **Corrección**: envuelve el código que toca alpha en `#ifdef BLOXD_ALPHA` ([Preprocesador](../api/preprocessor.md#matriz-de-macros--variantes))
