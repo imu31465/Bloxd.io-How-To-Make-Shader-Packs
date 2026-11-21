@@ -6,8 +6,6 @@
 
 - 当前 API：**5**（`pack.json` 必须声明 `apiVersion: 5`）
 - 目标：WebGPU 渲染器
-- 最后验证：2026-11-20
-- 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）
 - 着色器钩子：9 个（Terrain / Liquid / Model × Vertex / Surface / Light）
 
 初次制作着色器包请从[入门指南](getting-started/)开始；查询 API 请看 [API 参考](api/)。
@@ -41,11 +39,11 @@
 
 ## 验证状态标签
 
-每页标注其目标 API 版本、构建、最后验证日期与状态。
+每页标注其涵盖的 API 版本和内容核验状态。
 
 | 标签 | 含义 |
 |---|---|
-| Verified | 已在目标构建上实测验证 |
+| Verified | 已在游戏中验证 |
 | Analyzed | 通过分析内部实现确认 |
 | Partially Verified | 仅部分确认 |
 | Experimental | 实验性、未定 |
