@@ -1,6 +1,6 @@
 # Internas de la validación de sombreadores
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Analyzed (restaurado del validador en vivo)
+> API objetivo: 5 · Tipo: referencia técnica
 
 La validación estática (analizador, etapa 1 de la comprobación de carga). Correcciones orientadas al usuario: [Errores de validación](../troubleshooting/validation.md).
 

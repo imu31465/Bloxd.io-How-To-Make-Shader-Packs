@@ -1,6 +1,6 @@
 # Internas del muestreo de texturas
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Analyzed (restaurado del generador en vivo, c56)
+> API objetivo: 5 · Tipo: referencia técnica
 
 Cómo compilan de verdad `bloxdTexel` / `bloxdTextureSize` — el codegen de texturas de 3 variantes. El lado de usuario: [API de texturas](../api/texture-api.md).
 

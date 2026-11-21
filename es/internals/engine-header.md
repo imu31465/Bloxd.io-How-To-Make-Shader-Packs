@@ -1,8 +1,8 @@
 # Cabecera del motor (literal)
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Analyzed (restaurado del bundle de producción en vivo)
+> API objetivo: 5 · Tipo: referencia técnica
 
-El texto exacto que el engine antepone a cada pack, renderizado desde el validador de la build en vivo con sus interpolaciones aplicadas (`apiVersion` y las 6 lecturas de uniform vía `bloxdPackInputs`). 216 líneas. Sin paráfrasis. Re-verificado en las builds previas (`bny9u`, `v98qt8`) — lo único añadido es el contenido de sombras.
+Texto de referencia del encabezado WGSL que el motor añade a los shader packs. Consulta la [Referencia de API](../api/) para conocer el significado y el uso de cada campo y función.
 
 Guía de lectura:
 - Explicaciones campo por campo → [Estructuras](../api/structures.md)

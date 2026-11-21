@@ -1,6 +1,6 @@
 # Internas del renderizado de modelos
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Analyzed (restaurado del bundle en vivo)
+> API objetivo: 5 · Tipo: referencia técnica
 
 Las internas del programa Model de v5. La guía orientada al usuario: [Modelos y texturas](../guides/models.md).
 

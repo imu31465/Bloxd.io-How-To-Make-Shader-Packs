@@ -1,14 +1,13 @@
 # Política de shader packs por juego
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Analyzed (análisis del paquete de producción a nivel de JavaScript)
+> API objetivo: 5 · Tipo: referencia técnica
 
 Esta página precisa lo que significan `allow / strict` a nivel de título. Solo los títulos cuya definición de juego lleva de forma explícita `shaderPackPolicy: "allow"` funcionan en modo completo (hooks vertex, `discard`, `alpha` de terreno); los títulos sin valor (o con un valor distinto de allow) son estrictos: se define `BLOXD_STRICT` y el código dentro de guardas se desactiva automáticamente. El lado del paquete no puede elegir esto, así que saber qué títulos ejecutan qué es un prerrequisito de la distribución.
 
-- Build de referencia: `szby6g.main.94a7596c.js` (despliegue en producción a fecha de 2026-10-17). Enumerando estáticamente las 111 definiciones de juego: **26 entradas allow (12 títulos) / 85 entradas estrictas**. Los mismos 12 literales allow en los mismos 12 títulos se reconfirmaron sin cambios en el bundle de producción v3 (`3ymzdd`, 2026-10-20) y de nuevo en el bundle v4 (`cnty9`, 2026-10-27) — la lista de abajo se traslada tal cual a v3 y v4. Y en los builds v5, de nuevo sin cambios: reconfirmado en `ab90qa` (2026-11-03) y `xkg8x` (2026-11-04, 12 literales allow recontados). En `bny9u` (2026-11-05) se volvió a ejecutar la enumeración completa: el número de definiciones de juego creció de 111 a **115** y el lado allow de 26 a **28 entradas** — siguen siendo los mismos 12 títulos, sumándose dos variantes nuevas de Test Gym (Imported Mobs, Interest). La lista de abajo se traslada literalmente también a v5. En `v98qt8` (2026-11-08) la enumeración se reejecutó (módulo de juegos 513 en el bundle principal, evaluado en un arnés): **116 definiciones / 28 entradas allow (12 títulos) / 88 strict** — el lado allow no cambia y se sumó una definición strict más.
 - Encima de `shaderPackPolicy` hay una compuerta por canal de distribución (aprox. `canUseShaderPacks`): en builds de portales externos (Coolmath Games etc.) el sistema de shader packs se puede desactivar antes de llegar siquiera a leer `shaderPackPolicy`. El análisis allow/strict de abajo parte del build web principal de bloxd.io.
-- allow se declara en 12 lugares: 8 literales directos en definiciones de juego y 4 variables base (`tb` / `kz` / `cb` / `Fb`); las variantes lo heredan por spread (`{...tb,...}`). Hoy no existe ninguna sobreescritura por variante (tampoco el patrón inverso padre-allow / hijo-estricto).
 
-Los 12 títulos allow (26 entradas en total):
+
+## Títulos allow
 
 - **Test Gym** — base + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (13 entradas)
 - **Doodle Cube** — base + Solos / Duos (3)
@@ -23,4 +22,5 @@ En el lado estricto, los casos que más confunden:
 
 En los títulos estrictos el paquete sí se carga y compila, y las recetas del lado fragment como surface / light funcionan con normalidad. Lo restringido: los hooks vertex (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard` y la `alpha` de terreno (en líquidos existe siempre).
 
-Esta lista refleja el análisis estático del build indicado; las actualizaciones del motor pueden cambiar el reparto allow/strict. Vuelve a comprobarlo al salir versiones nuevas.
+
+Antes de distribuir un pack, pruébalo en el juego de destino y confirma que funcionan los hooks que necesitas.
