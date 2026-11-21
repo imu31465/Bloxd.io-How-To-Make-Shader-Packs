@@ -5166,47 +5166,44 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 ---
 
-## 엔진 내부와 연구
-엔진 구현을 분석해 복원한 내부 사양. 여기의 모든 것은 현행 프로덕션 빌드 (`bny9u`) 의 JavaScript 에서 직접 회수했다. 정확한 내부 동작과 분석 결과를 보존하기 위해 공개 API 문서 ([API 레퍼런스](api/)) 와 분리해 두었다.
+## 엔진 내부
+
+이 분류는 셰이더 팩의 실행을 이해하는 데 도움이 되는 엔진 내부 동작을 설명합니다. 구현 세부 사항은 게임 업데이트에 따라 바뀔 수 있습니다. 안정적인 사용 규칙과 지원 API는 [API 참조](internals/api)를 확인하세요.
 
 ### 구성
 
 | 페이지 | 내용 |
 |---|---|
-| [렌더링 파이프라인](internals/rendering-pipeline.md) | alphaTest 위치, 2광원 구성, uniform 의 실상, greedy 메싱 |
-| [훅 호출](internals/hook-invocation.md) | 훅이 엔진의 WGSL 에 어떻게 이어지는가 |
-| [엔진 헤더](internals/engine-header.md) | v5 헤더 전문 (그대로, 8,954B) |
-| [셰이더 검증](internals/shader-validation.md) | 분석기 내부, 시그니처 표, HEADER_VERSION |
-| [WGSL 컴파일](internals/wgsl-compilation.md) | 2단계 진짜 컴파일과 검증 스텁 |
-| [예약 식별자](internals/reserved-identifiers.md) | 46개 `bloxdSp*` 심볼 |
-| [라이팅의 내부](internals/lighting-internals.md) | blockLight / heldLight 의 구조 |
-| [포그의 내부](internals/fog-internals.md) | 선형뿐, 32블록 기울기대 |
-| [텍스처 샘플링](internals/texture-sampling.md) | 3변형 텍스처 코드젠 |
-| [텍스처 레지스트리](internals/texture-registry.md) | 이름→id 해석, 896 이름, 실측 드리프트 |
-| [모델 렌더링](internals/model-rendering.md) | v5 의 Model 프로그램 |
-| [엔진 데이터](internals/engine-data.md) | v5 상수·제한·레이아웃 대장 |
-| [테스트 요인](internals/testing-factors.md) | 월드·플레이어 설정 중 팩 가시값을 바꾸는 것 |
-| [정책](internals/policy.md) | shaderPackPolicy — allow 12 타이틀 |
-| [태양과 달](internals/sun-and-moon.md) | bloxdSunDirection 에 무엇이 흐르는가 |
-| [디버깅](internals/debugging.md) | URL 파라미터, 통계 패널 |
-| [리서치 로그](internals/research-log.md) | 방법론, 빌드 이력, 미검증 항목 |
-
-> 대상 API: 5 · preprod 확인)
-
-내부 사양은 안정된 API 계약이 아니다 — 엔진 업데이트로 바뀔 수 있으며, 각 페이지는 근거 빌드를 명시한다 ([리서치 로그](internals/research-log.md)).
+| [렌더링 파이프라인](internals/index.md/rendering-pipeline.md) | alphaTest 위치, 2광원 구성, uniform 의 실상, greedy 메싱 |
+| [훅 호출](internals/index.md/hook-invocation.md) | 훅이 엔진의 WGSL 에 어떻게 이어지는가 |
+| [엔진 헤더](internals/index.md/engine-header.md) | 셰이더 팩 앞에 추가되는 WGSL 선언 |
+| [셰이더 검증](internals/index.md/shader-validation.md) | 분석기 내부, 시그니처 표, HEADER_VERSION |
+| [WGSL 컴파일](internals/index.md/wgsl-compilation.md) | 2단계 진짜 컴파일과 검증 스텁 |
+| [예약 식별자](internals/index.md/reserved-identifiers.md) | 46개 `bloxdSp*` 심볼 |
+| [라이팅의 내부](internals/index.md/lighting-internals.md) | blockLight / heldLight 의 구조 |
+| [포그의 내부](internals/index.md/fog-internals.md) | 선형뿐, 32블록 기울기대 |
+| [텍스처 샘플링](internals/index.md/texture-sampling.md) | 3변형 텍스처 코드젠 |
+| [텍스처 레지스트리](internals/index.md/texture-registry.md) | 이름 해석, 애니메이션 및 회전 이름 |
+| [모델 렌더링](internals/index.md/model-rendering.md) | v5 의 Model 프로그램 |
+| [엔진 데이터](internals/index.md/engine-data.md) | API v5 기능 및 팩 제한 |
+| [테스트 요인](internals/index.md/testing-factors.md) | 월드·플레이어 설정 중 팩 가시값을 바꾸는 것 |
+| [정책](internals/index.md/policy.md) | shaderPackPolicy — allow 12 타이틀 |
+| [태양과 달](internals/index.md/sun-and-moon.md) | bloxdSunDirection 에 무엇이 흐르는가 |
+| [디버깅](internals/index.md/debugging.md) | URL 파라미터, 통계 패널 |
 
 
----
+엔진 내부 구현은 안정적인 API 계약이 아닙니다. 팩을 작성할 때는 [API 참조](internals/api)의 공개 사양을 우선하세요.
 
 ## 렌더링 파이프라인
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 - **surface 훅은 alphaTest 의 「앞」 에서 돈다**: `out.alpha` 가 그대로 discard 판정에 쓰인다. 컷아웃 소재 (풀·잎) 에서는 디더 패턴으로 녹는 듯한 이펙트를 만들 수 있다 (레시피 R-C). 액체 (블렌딩) 에서는 `out.alpha` 가 실제 투명도가 된다 (레시피 R-D). 통상 불투명 지형에서는 alpha 가 끝내 무시된다
 - **`l.ambient` 의 내용**은 `material.ambient × sceneAmbient` 로 소재마다 다른 값이다. 씬측은 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5) 에 직결되어 있으므로, 기본값 때려박기를 하지 않는다
 - **씬의 방위광은 2등 구성**: 주광 (방향은 스카이 설정의 태양 위치에 유래·강도 1.0) 과 필광 (방향 `[-0.5, -1, -1]`·강도 0.35) 의 Lambert 합이 `l.directional` 로 도착한다. 필광은 방향이 아래를 향하므로 윗면에는 기여하지 않고, 아래를 향한 면 (동굴 천장 등) 을 집는다. 지형이 고려하는 것은 `_initScene` 으로 추가된 등뿐이며, 기동 후에 씬에 추가한 등은 지형·블록 모델에서 무시된다 (공식 경고 문구가 있다)
 - **`bloxdSeconds()` 의 정체는 `performance.now()`** 이다: 브라우저의 기동 경과 시간을 1시간으로 감은 값. 게임 안 낮밤이나 월드 경과 시간과 무관하다. 게임 안 시계와 동기된 애니메이션을 만들고 싶으면, 낮밤 사이클 구현 월드의 `bloxdSunDirection()` 방위각에서 추정하는 것이 현실적이다
-- **헤더 함수는 uniform 하나를 읽는다**: 엔진은 `@group(3) @binding(0)` 에 64바이트 `bloxdPackInputs` uniform (seconds / lit / renderOffset / sunDirection / eyePosition 의 5슬롯·little-endian) 을 두고 있으며, `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 이 각 슬롯의 읽기에 해당한다 ([팩 형식: 프레임당 uniform](api/pack-format.md#프레임별-uniform-bloxdpackinputs)). 팩에서 이 uniform 을 고쳐 쓸 수는 없고, 팩과 엔진의 WGSL은 같은 모듈로 합성되므로, 같은 group/binding 을 자신이 선언할 수도 없다. `@group(3) @binding(1)` 에는 액체의 씬 깊이 텍스처가, `@binding(2)` 에는 `bloxdSpTextureLayers` 스토리지 버퍼가 실린다.
-- **정점 데이터는 메셔 (Web Worker) 가 만든다**: 블록의 지형을 1정점 28바이트 (아틀라스 있음은 32바이트) 의 인터리브로 정리하고, 위치 = float32×3 / 법선 = 8bit 신호 정수×4 / 색 = 8bit 준정수×4 (`s.colour` 의 실체 — tint × AO 가 메셔 시점에 8bit 로 구워져, 팩에서 분리·복원은 원리적으로 불가) / UV = float32×2 / atlasIndex = float32. 라이트 레벨만은 독립된 4바이트 정점 버퍼로 운반된다 (실측값: [엔진 데이터 장부](internals/engine-data.md)). 정점은 청크 단위의 instancing 으로 그려진다
+- **헤더 함수는 uniform 하나를 읽는다**: 엔진은 `@group(3) @binding(0)` 에 64바이트 `bloxdPackInputs` uniform (seconds / lit / renderOffset / sunDirection / eyePosition 의 5슬롯·little-endian) 을 두고 있으며, `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 이 각 슬롯의 읽기에 해당한다 ([팩 형식: 프레임당 uniform](internals/api/pack-format.md#프레임별-uniform-bloxdpackinputs)). 팩에서 이 uniform 을 고쳐 쓸 수는 없고, 팩과 엔진의 WGSL은 같은 모듈로 합성되므로, 같은 group/binding 을 자신이 선언할 수도 없다. `@group(3) @binding(1)` 에는 액체의 씬 깊이 텍스처가, `@binding(2)` 에는 `bloxdSpTextureLayers` 스토리지 버퍼가 실린다.
+- **정점 데이터는 메셔 (Web Worker) 가 만든다**: 블록의 지형을 1정점 28바이트 (아틀라스 있음은 32바이트) 의 인터리브로 정리하고, 위치 = float32×3 / 법선 = 8bit 신호 정수×4 / 색 = 8bit 준정수×4 (`s.colour` 의 실체 — tint × AO 가 메셔 시점에 8bit 로 구워져, 팩에서 분리·복원은 원리적으로 불가) / UV = float32×2 / atlasIndex = float32. 라이트 레벨만은 독립된 4바이트 정점 버퍼로 운반된다 (실측값: [엔진 데이터 장부](internals/rendering-pipeline.md/engine-data.md)). 정점은 청크 단위의 instancing 으로 그려진다
 - 로딩 때 청크 경계의 미세 체크무늬는 엔진의 화면 공간 Bayer 4×4 디더 청크 페이드이며, 팩 유래 버그가 아니다 (그래픽 설정의 `chunkFadeIn` 을 끄면 무효화할 수 있다)
 - **`mod` 는 예약어**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` 로 거부된다. 나머지는 `%` 연산자로 쓴다
 
@@ -5268,11 +5265,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-
----
-
 ## 훅 호출의 내부
-> 대상 API: 5 · 상태: Analyzed (프로덕션 번들에서 복원 — Lite 렌더러. 통합 소스 파일 `lite/terrainShaderPack.ts` 가 오류 문자열에 살아 있다)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 엔진이 런타임에 훅을 부르는 방식. 쓰는 코드에는 아무것도 바뀌지 않지만, 훅이 무엇을 받는지에 대한 추측이 사라진다.
 
@@ -5289,9 +5284,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 접합이 강제하는 것
 
-- **strict 지형은 서피스 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되돌리기 쓰기는 액체 프로그램이나 비strict 베리언트에만 이식된다 — 매크로 표 뒤의 구현이다 ([전처리기](api/preprocessor.md))
+- **strict 지형은 서피스 훅의 alpha 변경을 무시한다.** `alpha = bloxdSpSurface.alpha` 되돌리기 쓰기는 액체 프로그램이나 비strict 베리언트에만 이식된다 — 매크로 표 뒤의 구현이다 ([전처리기](internals/api/preprocessor.md))
 - **버텍스 훅을 선언한 strict 베리언트는 그것을 결코 실행하지 않는다.** 엔진이 빌드 시점에 보고한다: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. 템플릿의 `#ifndef BLOXD_STRICT` 이 이 때문이다
-- **`bloxdSp*` 식별자**는 엔진 임시변수다 — 당신의 코드에는 보이지 않지만 진단과 리버스 엔지니어링 출력에는 나타난다 ([예약 식별자](internals/reserved-identifiers.md) — v5 에서 46개)
+- **`bloxdSp*` 식별자**는 엔진 임시변수다 — 당신의 코드에는 보이지 않지만 진단과 리버스 엔지니어링 출력에는 나타난다 ([예약 식별자](internals/hook-invocation.md/reserved-identifiers.md) — v5 에서 46개)
 - **기본 서피스 지름길.** 어떤 베리언트의 서피스 훅이 문자 그대로 `bloxdDefaultSurface` 면, 엔진은 `baseColor` / `alpha` 되돌리기 이식을 통째로 생략한다 — 기본값이 이미 그 값을 만들므로 대입은 죽은 코드다. **손대지 않은 훅 체인은 비용이 없다**
 
 ### v5 에서 바뀐 것
@@ -5300,8 +5295,8 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - `vBlockFlags` (비트) → **`BloxdFlags` 구조체** (`bloxdSpFlags` 경유 전달)
 - `litColour` 캡처가 엔진 내부물에서 **공개 API** 로 (`bloxdLitColour()` — v4 의 `bloxdSpLitColour` 승격)
-- `BloxdLightIn` 이 `diffuse` / `emissive` 를 얻었고, `bloxdShading()` 이 머티리얼 응답을 재구축한다 ([라이팅](api/lighting.md))
-- `localPosition` (`bloxdSpItemLocalPosition`), 인챈트 입력 (`bloxdSpEnchant`), `overlayColour` 의 전달 ([모델 렌더링](internals/model-rendering.md))
+- `BloxdLightIn` 이 `diffuse` / `emissive` 를 얻었고, `bloxdShading()` 이 머티리얼 응답을 재구축한다 ([라이팅](internals/api/lighting.md))
+- `localPosition` (`bloxdSpItemLocalPosition`), 인챈트 입력 (`bloxdSpEnchant`), `overlayColour` 의 전달 ([모델 렌더링](internals/hook-invocation.md/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (반전)
 - Model 프로그램이 베리언트 매트릭스에 합류 (3 프로그램 × 2 모드 = 6베리언트)
 
@@ -5310,36 +5305,34 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | 필드 | 엔진 측 출처 |
 |---|---|
 | `litColour` | 포그 믹스 직전에 캡처된 프래그먼트색 — 헤더 표현으로 「emission 과 포그 이전」 |
-| `directional` | 방향광별 Lambert 의 버텍스 보간 합 ([렌더링 파이프라인](internals/rendering-pipeline.md) 의 2광원 구성) |
+| `directional` | 방향광별 Lambert 의 버텍스 보간 합 ([렌더링 파이프라인](internals/hook-invocation.md/rendering-pipeline.md) 의 2광원 구성) |
 | `diffuse` / `emissive` | 머티리얼의 방향광 RGB 응답 / RGB 발광 |
 | `ambient` | `material.ambient × sceneAmbient` — 머티리얼별, 프레임별 |
-| `blockLight` / `skyLight` | 디코딩된 라이트 레벨 베리링 ([라이팅의 내부](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | 디코딩된 라이트 레벨 베리링 ([라이팅의 내부](internals/hook-invocation.md/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | 대응하는 uniform |
-| `heldLight` | 라이트 레벨 베리링과 held-light uniform 으로 구축 (원뿔 감쇠는 [라이팅의 내부](internals/lighting-internals.md)) |
+| `heldLight` | 라이트 레벨 베리링과 held-light uniform 으로 구축 (원뿔 감쇠는 [라이팅의 내부](internals/hook-invocation.md/lighting-internals.md)) |
 | `fogColour` | 완전히 포그 없는 장면 (모드 0) 에서만 검정 |
-| `fogAlpha` | 클램프된 포그 계수 ([포그의 내부](internals/fog-internals.md)) |
+| `fogAlpha` | 클램프된 포그 계수 ([포그의 내부](internals/hook-invocation.md/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | 베리링과 플랫 보간값 (`BloxdSurfaceIn` 과 동일 — 버텍스 훅 적용 후의 값) |
 
 ### 관련 문서
 
-- [셰이더 훅](api/hooks.md) · [렌더링 파이프라인](internals/rendering-pipeline.md) · [예약 식별자](internals/reserved-identifiers.md) · [버전 히스토리: v3](history/v3.md)
-
-
----
+- [셰이더 훅](internals/api/hooks.md) · [렌더링 파이프라인](internals/hook-invocation.md/rendering-pipeline.md) · [예약 식별자](internals/hook-invocation.md/reserved-identifiers.md) · [버전 히스토리: v3](internals/history/v3.md)
 
 ## 엔진 헤더 (그대로)
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (라이브 프로덕션 번들에서 복원)
 
-엔진이 모든 팩 앞에 붙이는**정확한 텍스트**입니다. 라이브 빌드의 검증기에서 보간을 적용해 렌더링했습니다 (`apiVersion`과 `bloxdPackInputs`를 통한 6개 uniform 읽기). 216행. 바꿔 쓴 곳은 없습니다. 이전 프로덕션 빌드(`bny9u`, `v98qt8`)에서도 재검증했습니다 — 추가된 것은 섀도 관련 뿐입니다.
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+엔진이 셰이더 팩 앞에 추가하는 WGSL 헤더의 참조 텍스트입니다. 각 필드와 함수의 의미는 [API 참조](internals/api)를 확인하세요.
 
 읽기용 가이드:
-- 필드별 해설 → [구조체](api/structures.md)
-- 함수별 해설 → [함수](api/functions.md) / [라이팅](api/lighting.md)
-- 플래그 (BloxdFlags) → [플래그](api/flags.md)
-- `bloxdTextureId*` 블록은 이 헤더에 **없다** — 참조된 이름에서 팩마다 생성된다 ([텍스처 API](api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` 는 조건부 필드를 표시한다 ([전처리기](api/preprocessor.md))
-- v4 헤더 (6,021B) 와의 차분 → [버전 히스토리: v5](history/v5.md)
-- 헤더가 검증에 쓰이는 구조 (HEADER_VERSION) → [셰이더 검증](internals/shader-validation.md)
+- 필드별 해설 → [구조체](internals/api/structures.md)
+- 함수별 해설 → [함수](internals/api/functions.md) / [라이팅](internals/api/lighting.md)
+- 플래그 (BloxdFlags) → [플래그](internals/api/flags.md)
+- `bloxdTextureId*` 블록은 이 헤더에 **없다** — 참조된 이름에서 팩마다 생성된다 ([텍스처 API](internals/api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` 는 조건부 필드를 표시한다 ([전처리기](internals/api/preprocessor.md))
+- v4 헤더 (6,021B) 와의 차분 → [버전 히스토리: v5](internals/history/v5.md)
+- 헤더가 검증에 쓰이는 구조 (HEADER_VERSION) → [셰이더 검증](internals/engine-header.md/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5561,23 +5554,21 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 관련 문서
 
-- [API 레퍼런스](api/) — 이 헤더의 주석 달린 버전
-- [셰이더 검증](internals/shader-validation.md) — HEADER_VERSION 과 저장 팩 재검증
-- [엔진 데이터](internals/engine-data.md) — 실측 대장
-
-
----
+- [API 레퍼런스](internals/api) — 이 헤더의 주석 달린 버전
+- [셰이더 검증](internals/engine-header.md/shader-validation.md) — HEADER_VERSION 과 저장 팩 재검증
+- [엔진 데이터](internals/engine-header.md/engine-data.md) — 실측 대장
 
 ## 셰이더 검증의 내부
-> 대상 API: 5 · 상태: Analyzed (라이브 검증기에서 복원)
 
-정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](troubleshooting/validation.md).
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+정적 검증 (분석기, 로드 검사의 1단계). 사용자용 해결책: [검증 오류](internals/troubleshooting/validation.md).
 
 ### 단계들
 
-1. **로더 제한** (zip / pack.json 형태) → [팩 형식](api/pack-format.md)
+1. **로더 제한** (zip / pack.json 형태) → [팩 형식](internals/api/pack-format.md)
 2. **정적 검증 (분석기)** — 이 페이지. 구문, 형, 예약명, 6베리언트 전체의 훅 계약
-3. **브라우저의 진짜 컴파일** → [WGSL 컴파일](internals/wgsl-compilation.md)
+3. **브라우저의 진짜 컴파일** → [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md)
 4. **게임 참가 시점의 런타임 재검증** — 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다
 
 ### 특수 함수 시그니처 표
@@ -5607,7 +5598,7 @@ const Jq = new Map([
 
 ### 텍스처명 해석과 진단
 
-`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](api/texture-api.md#이름-해석-오류-검증기에서-그대로)):
+`bloxdTextureId*` 해석에는 전용 경로가 있다 ([메시지 목록](internals/api/texture-api.md#이름-해석-오류-검증기에서-그대로)):
 
 - **접기**: 비영숫자로 분할, CamelCase, `bloxdTextureId` 접두. 역방향 대조는 대소문자/언더스코어 무관
 - **철자 제안** (v5 신규): 일치하지 않는 이름에 임계값 `max(2, floor(len/4)) + 1` 의 레벤슈타인 제안
@@ -5621,36 +5612,34 @@ const Jq = new Map([
 
 ### Y 도함수 재작성
 
-분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](api/restrictions.md#자동-재작성)).
+분석기의 토큰 재작성 패스는 `dpdy` / `dpdyCoarse` / `dpdyFine` 호출 전부를 `(-dpdy(...))` 로 재작성한다 (dpdy 계열이 반전 집합으로 명시 열거되어 있다). `dpdx` 와 `fwidth` 는 손대지 않는다 ([제한과 예약명](internals/api/restrictions.md#자동-재작성)).
 
 ### 헤더·텍스처 상수 생성
 
-- 헤더는 읽기 전용으로 앞에 붙는다 ([엔진 헤더](internals/engine-header.md))
+- 헤더는 읽기 전용으로 앞에 붙는다 ([엔진 헤더](internals/shader-validation.md/engine-header.md))
 - `bloxdTextureId*` 블록은 참조된 이름에서 **팩마다** 생성된다
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](api/compatibility.md#저장-팩-재검증-재확인-필요)).
+`HEADER_VERSION` 은 `9.<fnv1a32(header)>.<fnv1a32(텍스처 레지스트리)>` (선두 정수는 v4 에서 8 → 9). 두 fnv1a32 접미사가 헤더 소재와 정렬된 이름-id 레지스트리를 지문화한다. 저장 팩 재검증은 이 지문으로 「재확인 필요」를 판정한다 ([호환성](internals/api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 ### 검증 스텁
 
-정적 검증을 통과한 코드에는, 브라우저의 진짜 WGSL 검사 전에 스텁 코드가 합성된다: `var<private> bloxdValidationP: vec4f` 와 `bloxdValidateVertex` / `bloxdValidateFragment` — 형 스텁 표 (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) 가 입력 구조체를 구축해 훅을 부른다. 상세: [WGSL 컴파일](internals/wgsl-compilation.md).
+정적 검증을 통과한 코드에는, 브라우저의 진짜 WGSL 검사 전에 스텁 코드가 합성된다: `var<private> bloxdValidationP: vec4f` 와 `bloxdValidateVertex` / `bloxdValidateFragment` — 형 스텁 표 (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) 가 입력 구조체를 구축해 훅을 부른다. 상세: [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md).
 
 ### 관련 문서
 
-- [검증 오류](troubleshooting/validation.md) · [WGSL 컴파일](internals/wgsl-compilation.md) · [텍스처 레지스트리](internals/texture-registry.md) · [엔진 데이터](internals/engine-data.md)
-
-
----
+- [검증 오류](internals/troubleshooting/validation.md) · [WGSL 컴파일](internals/shader-validation.md/wgsl-compilation.md) · [텍스처 레지스트리](internals/shader-validation.md/texture-registry.md) · [엔진 데이터](internals/shader-validation.md/engine-data.md)
 
 ## WGSL 컴파일의 내부
-> 대상 API: 5 · 상태: Analyzed (라이브 번들에서 복원)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 두 번째 검증 단계 — 브라우저의 WGSL 컴파일러를 통한 진짜 컴파일 — 과 v5 의 검증 스텁.
 
 ### 두 단계인 이유
 
-정적 검증의 형 검사는 불완전하므로, 어떤 실수는 여기서만 드러난다 (예: `mixing '*' and '^' requires parenthesis` 같은 WGSL 연산자 우선순위 요건). 오류는 게임 안에 베리언트명과 함께 나타난다 ([컴파일 오류](troubleshooting/compilation.md)).
+정적 검증의 형 검사는 불완전하므로, 어떤 실수는 여기서만 드러난다 (예: `mixing '*' and '^' requires parenthesis` 같은 WGSL 연산자 우선순위 요건). 오류는 게임 안에 베리언트명과 함께 나타난다 ([컴파일 오류](internals/troubleshooting/compilation.md)).
 
 ### 검증 스텁 생성
 
@@ -5703,26 +5692,22 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ### 참가 시점의 런타임 재검증
 
-`checkCompilation` 은 게임 참가마다 돌며, 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다. 이 검사에는 60초 강제 타임아웃이 있다 ([퍼포먼스](troubleshooting/performance.md)).
+`checkCompilation` 은 게임 참가마다 돌며, 실제로 모든 기존 지형 머티리얼을 컴파일한다 (설정 화면 검사보다 엄격). 실패하면 그 게임에서 팩이 떨어진다. 이 검사에는 60초 강제 타임아웃이 있다 ([퍼포먼스](internals/troubleshooting/performance.md)).
 
 ### 관련 문서
 
-- [컴파일 오류](troubleshooting/compilation.md) · [셰이더 검증의 내부](internals/shader-validation.md) · [시작하기: 검증](getting-started/validation.md)
-
-
----
+- [컴파일 오류](internals/troubleshooting/compilation.md) · [셰이더 검증의 내부](internals/wgsl-compilation.md/shader-validation.md) · [시작하기: 검증](internals/getting-started/validation.md)
 
 ## 예약 식별자의 내부
-> 대상 API: 5 · 상태: Analyzed (라이브 번들의 생성기에서 복원)
 
-`bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](api/restrictions.md).
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+`bloxdSp*` 네임스페이스 — 생성기가 주입할 수 있어 팩이 재선언할 수 없는 심볼. 팩 작가용 요약: [제한과 예약명](internals/api/restrictions.md).
 ### 88 심볼
 
-v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 폐기 0. 역사상 유일한 폐기는 `bloxdSpLitColour` — 공개 `bloxdLitColour()`로 승격):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### 새 이름 ↔ `bbb6l5` 섀도 시스템
 
 새 42 심볼은 모두 `bloxdShadow()` / `bloxdAirShadow()`를 뒷받침하는 엔진의 태양/달 섀도 구현에서 왔습니다:
 
@@ -5739,42 +5724,38 @@ v4의 27에서 v5 출시 때 46으로, 그리고 `bbb6l5`에서 **88**로 (+42, 
 - `bloxdSpFlags` — `BloxdFlags` 구조체의 전달
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — 새 입력 (인챈트, 모델 로컬 위치)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — 셀 샘플링 텍스처팩 경로
-- `bloxdSpQuarterTurns` — 회전 체인 ([텍스처 샘플링](internals/texture-sampling.md))
+- `bloxdSpQuarterTurns` — 회전 체인 ([텍스처 샘플링](internals/reserved-identifiers.md/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — 확장 훅 로컬
 
 ### 팩 수준 규칙
 
-이 네임스페이스보다 넓다: **`/^bloxd/i` (대소문자 무관) 에 맞는 전부**. 선언할 수 있는 것은 9개 훅 함수명뿐이다 ([검증 오류](troubleshooting/validation.md)).
+이 네임스페이스보다 넓다: **`/^bloxd/i` (대소문자 무관) 에 맞는 전부**. 선언할 수 있는 것은 9개 훅 함수명뿐이다 ([검증 오류](internals/troubleshooting/validation.md)).
 
-`bloxdTextureId` 접두 식별자는 텍스처 이름으로 해석되며, 전용 오류 계열이 붙는다 ([텍스처 문제](troubleshooting/textures.md)).
+`bloxdTextureId` 접두 식별자는 텍스처 이름으로 해석되며, 전용 오류 계열이 붙는다 ([텍스처 문제](internals/troubleshooting/textures.md)).
 
 ### 관련 문서
 
-- [제한과 예약명](api/restrictions.md) · [텍스처 샘플링](internals/texture-sampling.md) · [버전 히스토리: v5](history/v5.md)
-
-
----
+- [제한과 예약명](internals/api/restrictions.md) · [텍스처 샘플링](internals/reserved-identifiers.md/texture-sampling.md) · [버전 히스토리: v5](internals/history/v5.md)
 
 ## 라이팅 내부
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 - `blockLight` 는 RGB 3채널의 **색 있는 빛**이다. 광원 블록마다 발광색 `[R, G, B]` (각 0-15) 가 정의되어 있고, 그것이 그대로 빛의 색이 된다 (통상 횃불 = 온백 (14,14,12) / 라바 = 오렌지 (14,8,2) / 비콘 = 시안 (5,14,14) / 흰 횃불 = (15,15,15) 등). 정점단에서는 1개의 float 속성에 r / g / b / sky 의 4 니블로 팩되어 도착한다. light 훅 안에서는 3채널을 따로따로 다루는 것으로 색 있는 국소 조명을 만들 수 있다 — 난색 토치 계열 레시피 (R9.1) 가 기준으로 하는 거동의 실체는 이것이다.
 
 `aPackedLightLevels` 를 디코딩할 때, 엔진은 각 채널에 **RGB 가장 밝은 채널의 35% 를 하한으로 까는 「35% 채널 바닥」** 을 깐다. 예를 들어 「순수 빨간 광원」 은 정점에서 (1.00, 0.35, 0) 으로 들려서 보간·리프트를 탄다. 횃불 오렌지가 게임 안에서 「빨강이라기보다 하얀 핑크」 로 보이는 것은 이 때문이다. 난색 토치 계열 레시피 (R9.1) 의 채도는 이 기본 동작을 기준으로 조정하면 좋다.
-- 조명의 합성은 가산이 아니다. 엔진 내부에서는, 35% 바닥을 깐 블록 빛과 `mix(앰비언트색, 스카이색, skyLight)` 로 만든 하늘 빛의 **max** 를 취하고, 손에 든 빛 (앰비언트 부스트 적용 후) 를 더 max 로 얹는다. 이 합성에 쓰이는 채널값은 **리프트 후**의 값이다 — 엔진은 훅 입력에 도착하는 것과 같은, 리프트 곡선을 거친 `terrainLightLevels` 로 합성한다. 따라서 `blockLight` 와 `skyLight` 는 서로 상쇄하지 않고, 어두운 쪽의 기여는 버려진다 — 하늘 빛을 약하게 해도 블록 빛이 지배적인 곳은 거의 어두워지지 않는다. 노출이나 감쇠의 레시피는 이 구조를 전제로 설계한다 ([야간 표현 설계](guides/night.md)의 국소광 보호는 이 구조에 대한 보상이다).
+- 조명의 합성은 가산이 아니다. 엔진 내부에서는, 35% 바닥을 깐 블록 빛과 `mix(앰비언트색, 스카이색, skyLight)` 로 만든 하늘 빛의 **max** 를 취하고, 손에 든 빛 (앰비언트 부스트 적용 후) 를 더 max 로 얹는다. 이 합성에 쓰이는 채널값은 **리프트 후**의 값이다 — 엔진은 훅 입력에 도착하는 것과 같은, 리프트 곡선을 거친 `terrainLightLevels` 로 합성한다. 따라서 `blockLight` 와 `skyLight` 는 서로 상쇄하지 않고, 어두운 쪽의 기여는 버려진다 — 하늘 빛을 약하게 해도 블록 빛이 지배적인 곳은 거의 어두워지지 않는다. 노출이나 감쇠의 레시피는 이 구조를 전제로 설계한다 ([야간 표현 설계](internals/guides/night.md)의 국소광 보호는 이 구조에 대한 보상이다).
 
 
 손에 든 빛 (`heldLight`) 의 범위는 가장 밝은 빛색 채널을 따르며 (최대 15 블록), `dist^0.75` 전처리가 들어가고, 같은 35% 채널 바닥이 적용되며, `l.heldLight` 는 앰비언트 부스트 **전** 값이다. 원뿔 감쇠는 엔진의 light 모듈에서 복원했다: 빔의 각도 감쇠는 `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))` 이며, 여기서 `t` 는 원뿔 축에서 잰 정규화 각도다 (0 = 중심, 1 = 가장자리). 도달 거리는 `(rangeOverride > 0 ? rangeOverride : 가장 밝은 채널) × 원뿔 감쇠` 이고, `rangeOverride` 는 held-light 색의 alpha에서 읽는다. 도달 거리 안에서 override는 `(range − dist) / range` 로 감쇠하고, 기본값은 (전처리된) 거리를 채널별로 뺀다. 그다음 35% 바닥, 15로 나누기, 리프트 곡선, 마지막으로 앰비언트 부스트가 이어진다. 커스텀 아이템에는 `spotlightRange` (사정) 와 원뿔각을 정할 수 있어, 「들고 있는 동안 지향성 빔을 쏜다」 모드가 존재하며 그 원뿔은 카메라를 따라간다. 팩측에서는 빔 방향을 알 방법이 없다.
 
 커스텀 블록에는 `skyLightEmission` (0~15) 이 달릴 수 있어, **blockLight BFS 와는 별개로 skyLight 채널 자체를 주입할 수 있다**. R9.12 같은 「skyLight 임계값으로 낮/그림자를 판별하는」 팩은, 인공광으로 skyLight 가 들려 있는 월드에서는 오판할 수 있다. 배포 팩은 blockLight 와 조합해 판정하는 편이 견고하다.
 
-
----
-
 ## 포그 내부
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
 
-포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](history/v3.md)에 보존되어 있다.)
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+포그 계산은 항상 LINEAR 모드 (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` 와 등가, clamp 0..1) 이며, `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = 포그 거리 설정; D = 0 일 때만 fogEnd = 5 특례) 이다. **포그 기울기대는 고작 32 블록 폭**이며, `l.fogAlpha` 는 「거리 안개」라기보다 **「로드된 월드의 가장자리까지의 정규화 거리」**에 가깝다. 플레이어마다 로드 거리가 다르므로, 거리 기반 연출은 직접 `distance(l.position, bloxdEyePosition())` 을 계산해야 한다 (아래 「로드 경계 밴드」 절). (참고: 렌더러의 포그 함수는 실제로 **네 가지** 모드 — 끔 / 지수 / 지수 제곱 / 선형 — 를 구현하며, 출하된 타이틀은 선형을 구동한다. 복원된 소스와 견고성 논거는 [버전 히스토리: v3](internals/history/v3.md)에 보존되어 있다.)
 
 - 기본 포그색은 `rgb(183, 191, 195)` (엷은 청회색). 월드 작성자는 `fogColourOverride` (hex) 로 바꾼다. 포그 모드가 0 (NONE) 인 상태에서는 **fogColour 는 흑으로 도착한다**. 표준형 `bloxdApplyFog(col, l)` 은 fogAlpha 가 0 일 때 안개색이 쓰이지 않으므로 안전하다. 스크립트 API 측에는 그 외에 `fogChunkDistanceOverride` 와 `fogOnSkybox` 옵션이 있어, 커스텀 게임은 포그 거리 (D 에 해당하는 값) 와 스카이박스로의 포그 적용을 개별 설정할 수 있다. 기본에서는 스카이박스는 포그의 영향을 받지 않는다 (`fogOnSkybox` 를 유효화한 게임에서만, 스카이박스도 포그색으로 물든다).
 
@@ -5795,13 +5776,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-
----
-
 ## 텍스처 샘플링의 내부
-> 대상 API: 5 · 상태: Analyzed (라이브 생성기 c56 에서 복원)
 
-`bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](api/texture-api.md).
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+`bloxdTexel` / `bloxdTextureSize` 가 실제로 어떻게 컴파일되는가 — 3변형 텍스처 코드젠. 사용자 쪽: [텍스처 API](internals/api/texture-api.md).
 
 ### 세 가지 변형
 
@@ -5842,7 +5821,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 애니메이션 프레임 사다리
 
-애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](api/texture-catalog.md#애니메이션-계열-43-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
+애니메이션 텍스처 (42 계열) 는 계열별 고정 간격 (200 / 250 / 300 ms — [텍스처 카탈로그](internals/api/texture-catalog.md#애니메이션-계열-43-이름) 의 간격 열) 으로 진행된다. 애니메이션 계열 id 를 `bloxdTexel` 에 넘기면 현재 프레임이 샘플된다.
 
 ### 샘플러 설정
 
@@ -5854,39 +5833,13 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 관련 문서
 
-- [텍스처 API](api/texture-api.md) · [텍스처 레지스트리](internals/texture-registry.md) · [렌더링 파이프라인](internals/rendering-pipeline.md)
-
-
----
-
-## 텍스처 레지스트리 작동 방식
-
-> 대상 API: 5 · 용도: 이름으로 텍스처 참조하기
-
-셰이더 팩은 숫자 ID가 아니라 이름 상수로 텍스처를 참조합니다. 상수 형식은 `bloxdTextureId<Name>`입니다. 사용할 수 있는 이름은 [텍스처 카탈로그](internals/api/texture-catalog.md)를 확인하세요.
-
-### 이름 해석
-
-팩을 로드할 때 로더는 각 이름 상수를 사용 가능한 텍스처 이름에 대응시킵니다. 내부 배치가 바뀌더라도 이름이 계속 제공되면 팩은 해당 이름으로 텍스처를 참조할 수 있습니다.
-
-**WGSL에 숫자 텍스처 ID를 직접 작성하지 마세요.** 게임 콘텐츠가 업데이트되면 내부 ID와 아틀라스 위치가 바뀔 수 있습니다. 이름 상수를 사용하면 팩 코드가 이러한 내부 위치에 의존하지 않습니다.
-
-### 애니메이션과 회전
-
-- **애니메이션:** `lava0`–`lava7` 같은 프레임 표기 대신 `lava` 같은 기본 이름을 사용하세요. 샘플링할 때 현재 프레임이 선택됩니다.
-- **회전:** 내부 회전 슬롯 대신 카탈로그에 있는 기본 이름을 사용하세요. 샘플링 과정에서 면의 회전이 적용됩니다.
-- **프레임 전환:** 엔진은 인접한 애니메이션 프레임을 보간하기 위한 내부 슬롯을 사용합니다. 팩에서는 일반 이름 상수를 계속 사용하면 됩니다.
-
-### 관련 문서
-
-- [텍스처 카탈로그](internals/api/texture-catalog.md) — 사용 가능한 이름과 상수
-- [텍스처 API](internals/api/texture-api.md) — 텍스처 조회와 샘플링
-- [텍스처 샘플링 내부](internals/texture-registry.md/texture-sampling.md) — 샘플링 방식
+- [텍스처 API](internals/api/texture-api.md) · [텍스처 레지스트리](internals/texture-sampling.md/texture-registry.md) · [렌더링 파이프라인](internals/texture-sampling.md/rendering-pipeline.md)
 
 ## 모델 렌더링의 내부
-> 대상 API: 5 · 상태: Analyzed (라이브 번들에서 복원)
 
-v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](guides/models.md).
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+v5 Model 프로그램의 내부. 사용자용 가이드: [모델과 텍스처](internals/guides/models.md).
 
 ### Model 프로그램이란
 
@@ -5904,7 +5857,7 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ### 인챈트 계산
 
-엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](api/lighting.md#전체-파이프라인)).
+엔진은 글린트 스윕을 애니메이션해 `enchantColour.a` 로 서피스/light 훅에 건넨다 ([인챈트 효과](internals/recipes/enchant-effects.md)). 혼합은 `bloxdLitColour()` 안에서 — 셰이딩 직후, 월드 라이트 전 — 일어난다 ([라이팅](internals/api/lighting.md#전체-파이프라인)).
 
 ### 오버레이 (피격 플래시 등)
 
@@ -5912,66 +5865,19 @@ v5 이전에는 팩이 지형/액체에만 끼어들 수 있었다. 블록 모�
 
 ### 텍스처 경로
 
-대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](api/texture-api.md#모델-자체-텍스처-textureid-0)).
+대부분의 모델 면은 `textureId: 0` (텍스처 없음) 이다 — 플레이어 스킨과 몹 텍스처는 블록 텍스처 아틀라스 네임스페이스에 없다. `surface.colour` 에는 스킨 × tint 가 구워져 도착하므로, 모델 면 처리는 `colour` 에서 시작한다 ([모델 자체 텍스처](internals/api/texture-api.md#모델-자체-텍스처-textureid-0)).
 
 ### 베리언트
 
-Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](api/preprocessor.md#매크로--베리언트-매트릭스)). strict.model 에는 버텍스 훅이 없다.
+Model 프로그램은 베리언트 매트릭스의 한 축을 이룬다: `strict.model` / `allow.model`. `BLOXD_ALPHA` 는 allow.model 에서만 정의된다 ([전처리기](internals/api/preprocessor.md#매크로--베리언트-매트릭스)). strict.model 에는 버텍스 훅이 없다.
 
 ### 관련 문서
 
-- [모델과 텍스처](guides/models.md) · [모델 셰이더 레시피](recipes/model-shaders.md) · [플래그](api/flags.md) · [렌더링 파이프라인](internals/rendering-pipeline.md)
-
-
----
-
-## 엔진 데이터
-
-> 대상 API: 5 · 용도: 사양 요약
-
-이 페이지에서는 셰이더 팩에서 사용할 수 있는 API와 팩 제작 시 알아야 할 제한을 정리합니다. 구체적인 정의와 예시는 각 참조 문서를 확인하세요.
-
-### API 개요
-
-| 항목 | 사양 |
-|---|---|
-| API 버전 | `5` |
-| 훅 | 9개 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| 베리언트 | 6개 (allow / strict × terrain / liquid / model) |
-| 매크로 | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`. `BLOXD_LIGHTING`은 사용할 수 없습니다 |
-| 팩 uniform | 80바이트. 필드 오프셋은 [팩 형식](internals/api/pack-format.md) 참조 |
-| 텍스처 | `bloxdTextureId<Name>` 형식의 이름 상수를 사용하세요. 숫자 ID를 고정하지 마세요 |
-| 예약 이름 | `bloxd`로 시작하는 식별자는 엔진용으로 예약되어 있습니다 |
-
-### 팩 제한
-
-| 항목 | 제한 |
-|---|---:|
-| WGSL 파일 수 | 256 |
-| WGSL 소스 총량 | 256 KB |
-| `pack.json` | 64 KB |
-| ZIP 파일 | 32 MB |
-| ZIP 항목 수 | 1,024 |
-
-ZIP 루트에 매니페스트를 하나만 두고 파일은 UTF-8로 저장하세요. 중복 경로나 지원하지 않는 ZIP 형식은 허용되지 않습니다. 자세한 내용은 [팩 형식](internals/api/pack-format.md)을 참조하세요.
-
-### API v5 주요 기능
-
-- `bloxdShadow()` 및 `bloxdAirShadow(t)`로 태양광과 달빛에 의한 그림자 정보를 가져올 수 있습니다.
-- `bloxdShadowDirection()`은 그림자를 만드는 빛의 방향을 반환합니다.
-- 그림자 API를 사용하면서 기존 원형 그림자를 유지하려면 `pack.json`의 선택 항목 `keepCircleShadows`를 `true`로 설정하세요.
-- 광원 활성 상태는 `BLOXD_LIGHTING`이 아니라 `bloxdLit()`으로 런타임에 확인하세요.
-
-### 관련 문서
-
-- [API 참조](internals/api) — 함수, 구조체, 상수
-- [팩 형식](internals/api/pack-format.md) — 매니페스트, uniform, 로더 제한
-- [텍스처 카탈로그](internals/api/texture-catalog.md) — 사용할 수 있는 텍스처 이름
-- [게임별 적용 정책](internals/engine-data.md/policy.md) — allow / strict 범위
-- [API v4 마이그레이션 가이드](internals/history/v4.md) — 이전 버전에서 마이그레이션
+- [모델과 텍스처](internals/guides/models.md) · [모델 셰이더 레시피](internals/recipes/model-shaders.md) · [플래그](internals/api/flags.md) · [렌더링 파이프라인](internals/model-rendering.md/rendering-pipeline.md)
 
 ## 팩에 보이는 값을 바꾸는 요인
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 같은 팩도 **월드와 플레이어 설정에 따라** 다르게 보인다. 배포 전에는 적어도 다음 3 환경에서 겉모습을 확인할 것:
 
@@ -5981,19 +5887,16 @@ ZIP 루트에 매니페스트를 하나만 두고 파일은 UTF-8로 저장하�
 
 - 주된 변동원: `lightingOverride` (조명 강제) / `skyLightColourOverride`·`ambientLightColourOverride` (hex 교체) / `visionMinLightColour` (시인 최암색. 구현은 `uSkyLightColour` 와 `uAmbientLightColour` 쌍방에의 성분별 max 이며, Night Vision 이 사용한다. 「동굴을 깜깜하게」 계열은 예상보다 어두워지지 않고, 하늘색 자체도 바닥 올림이 된다) / `heldLightColourOverride`·`Range`·`ConeAngle` / `fogChunkDistanceOverride`·`fogColourOverride`·`fogOnSkybox` / `skyBox` (bloxdSunDirection() 유무). `uSkyLightColour` 기본 = (1,1,1) 흰색, `uAmbientLightColour` 기본 = (0.25,0.25,0.30). `l.ambient` 의 씬측 = 그래픽 설정 「Ambient Lighting Intensity」 (기본 0.5). `(1.0 - l.fogAlpha)` 는 플레이어의 포그/청크 거리 설정을 따라간다. 그 외에 `cameraTint` (화면 전체로의 RGBA 틴트) 와 `proximityFadeDistance`·`proximityFadeMinOpacity` (엔티티의 카메라 근접 페이드) 도 월드 설정 유래의 변동 요인이며, 특히 `cameraTint` 는 팩 출력 위에 얹히는 최종 처리이다. 이것들의 다수는 스크립트 API (`serverOption`) 경유로도 설정할 수 있어, 게임 실행 중에도 갱신될 수 있다.
 
-
----
-
 ## 게임별 셰이더 팩 정책
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
+
+> 대상 API: 5 · 문서 유형: 기술 참조
 
 이 페이지는 `allow / strict` 가 타이틀 단위에서 무엇을 의미하는지 확정한다. 게임 정의 측의 `shaderPackPolicy` 이 명시적으로 `"allow"` 인 타이틀만 full 모드 (vertex 훅, `discard`, 지형 `alpha`) 로 움직이고, 지정이 없는 (또는 allow 이외의) 타이틀은 strict 가 된다 — `BLOXD_STRICT` 가 정의되고, 가드 내부의 코드는 자동으로 무효화된다. 이 판정은 팩 측에서 고를 수 없으므로, 어느 타이틀에서 무엇이 움직이는지 아는 것이 배포의 전제가 된다.
 
-- 근거 빌드: `szby6g.main.94a7596c.js` (2026-10-17 시점의 정식 배포). 전체 111 게임 정의를 정적으로 분석한 결과 **allow 26 엔트리 (12 타이틀) / strict 85 엔트리**. 같은 12개의 allow 리터럴이 같은 12개 타이틀에서 v3 프로덕션 번들 (`3ymzdd`, 2026-10-20) 과 v4 번들 (`cnty9`, 2026-10-27) 에서도 변경 없이 재확인되었다 — 아래 목록은 v3·v4에도 그대로 적용된다. 그리고 v5 빌드에서도 다시 불변: `ab90qa` (2026-11-03) 와 `xkg8x` (2026-11-04, allow 리터럴 12개 재계산) 에서 재확인했다. `bny9u` (2026-11-05) 에서는 전체 열거를 다시 실행했다: 게임 정의 수는 111 에서 **115** 로, allow 측은 26 에서 **28 엔트리** 로 늘었다 — 타이틀 12개는 그대로이고 Test Gym 의 새 변형 2종 (Imported Mobs, Interest) 이 합류했다. 아래 목록은 v5 에도 그대로 적용된다. `v98qt8` (2026-11-08)에도 열거를 재실행했습니다 (메인 번들의 게임 모듈 513을 하네스에서 평가): **116 정의 / 28 allow 항목 (12 타이틀) / 88 strict** — allow 측은 불변, strict 정의가 하나 더 늘었습니다.
 - `shaderPackPolicy` 보다 상위의 판정으로서 배포 채널 측의 게이트 (`canUseShaderPacks` 상당) 도 있어, 외부 포털 경유의 배포 (Coolmath Games 판 등) 에서는 `shaderPackPolicy` 의 판정에 이르기 전단에서 셰이더 팩 기구 자체가 무효화될 수 있다. 이하의 allow / strict 의 판별은 bloxd.io 본가 Web판의 해석에 근거한다.
-- allow 는 게임 정의 안의 직접 리터럴 8곳과 기저 변수 (`tb` / `kz` / `cb` / `Fb`) 4곳, 합계 12곳에서 선언되고, 베리언트는 스프레드 상속 (`{...tb,...}`) 으로 받는다. 베리언트 단위의 개별 덮어쓰기 (부모 allow·자식 strict 의 역 패턴) 는 현재 제로.
 
-allow 의 12 타이틀 (합계 26 엔트리):
+
+### allow 적용 타이틀
 
 - **Test Gym** — 기본 + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (합계 13 엔트리)
 - **Doodle Cube** — 기본 + Solos / Duos (합계 3)
@@ -6011,7 +5914,62 @@ strict 측에서 특히 오해하기 쉬운 점:
 이 일람은 상기 빌드 시점의 정적 분석 결과이며, 엔진 갱신으로 allow/strict 의 배분은 변할 수 있다. 새판이 나오면 재확인할 것.
 
 
----
+팩을 배포하기 전에 대상 게임에서 직접 테스트하고 필요한 훅이 해당 게임에서 작동하는지 확인하세요.
+
+## 태양과 달
+
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+`bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
+
+| 스카이박스 | `bloxdSunDirection()` |
+|---|---|
+| `default` (절차 하늘) | 0이 아님 (기존값 아래) |
+| `gloomy` / `interstellar` / `space_*` (큐브 텍스처) | **항상 (0,0,0)** |
+
+**달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 밤낮 판정은 태양 고도로 한다 — `bloxdSunDirection().y < 0` (태양이 지평선 밑) 일 때 달이 위에 있다. 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다.
+
+기존 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 에서 계산되는 단위 벡터, 정지). 배포 팩 테스트 때 하이라이트 방향을 미리 예측할 수 있는 실용 기준값이다.
+
+낮밤 사이클은 엔진에 내장되어 있지 않다 — inclination 은 정적인 수치이며, 낮밤이 움직이는 월드는 게임측이 갱신한다. 그 갱신 때마다 `bloxdSunDirection()` 도 다시 쓰이므로 따라간다.
+
+지형의 방향광은 씬 기동시에 만들어지는 2등뿐이며 **방향도 강도도 고정, 낮밤에 변하지 않는다**. 정리하면 **지형 밝기를 정하는 요소는 어느 것도 시간에 의존하지 않는다. 낮밤의 「겉모습」 은 스카이박스와 bloxdSunDirection() 뿐**이며, 밤에 지형을 어둡게 하고 싶은 팩은 bloxdSunDirection() 에서 직접 시간대를 추정할 수밖에 없다 ([야간 표현 설계](internals/guides/night.md)의 `sunPresent` 수법).
+
+### R-A. 방향성 달빛 — moonDir = −bloxdSunDirection()
+
+달이 위에 있을 때만 푸르스름한 흰 Lambert 와 약한 스페큘러를 더한다. `moonUp` 이 0인 세계 (기존 정지 태양 월드) 에서는 아무 일도 일어나지 않으므로, **낮밤 사이클 있는 월드에서만 발동하는 안전한 달빛**이 된다.
+
+```wgsl
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    if (bloxdLit()) {
+        // 달은 항상 태양의 정반대. 낮 동안은 moonDir.y < 0 으로 자동 소등된다
+        let moonDir = -bloxdSunDirection();
+        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+        if (moonUp > 0.0) {
+            let n     = normalize(l.normal);
+            let diff  = max(0.0, dot(n, moonDir));
+            let view  = normalize(bloxdEyePosition() - l.position);
+            let halfV = normalize(moonDir + view);
+            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+        }
+}
+    return out;
+}
+```
+
+## 디버깅 도구
+
+> 대상 API: 5 · 문서 유형: 기술 참조
+
+- URL 파라미터 `?renderer=lite` — Lite (WebGPU) 렌더러를 강제 (`webgl2` / `babylon` 도 가능. `babylon` 은 webgl2 의 옛 이름 에일리어스). 우선순위는 URL 파라미터 > localStorage 의 `bloxdRenderer` > 설정 화면 > 기본 (webgl2). 무효값은 경고와 함께 무시된다. URL 이나 localStorage 에 오버라이드가 남아 있으면, WebGPU (lite) 가 필요한 국면에서 실패해 「needs the new WebGPU renderer, so remove the renderer override...」 가 나올 수 있다 ([로드 에러](internals/troubleshooting/loading.md) 참조)
+- URL 파라미터 `?vconsole` — 화면 안 콘솔 (VConsole) 기동. 모바일 실기 검증에 요긴하다
+- URL 파라미터 `?drawcalls=1` — 그리기 통계의 디버그 패널이 추가된다. 디버그용 콘솔에서 게임 오브젝트를 고르거나, `drawCalls()`·`why()`·`configureDrawCallWatching()` 를 써서, 팩에 한정되지 않은 대규모 기믹의 중복 그리기 (오버드로) 나 1 도면당 약 6.5만 정점의 상한 도달을 확인해, 성능 부족의 원인을 가를 수 있다
+- 콘솔에는 `noa-engine v0.33.0` 과 `Renderer: lite from <소스>` 가 나온다 — 그리기 경로 오진단 방지에 먼저 이것을 확인할 것
+- WebGPU 렌더러는 팩 적용 중 「강제 ON」 으로 잠긴다. 「Disable Block Texture Atlas」 설정도 잠기며 (아틀라스 ON 유지), WebGPU 미대응 환경에서는 애초 팩이 적용되지 않는다. 배포 페이지에 「WebGPU 대응 브라우저가 필요」 라고 쓰는 근거는 여기이다
+- 블록 텍스처의 실체는 2D 배열 텍스처 (`texture_2d_array`) 로, 지형의 샘플러는 nearest 이며 repeat 로 설정되어 있다. 더 나아가 메셔는 재질·AO·라이트가 일치하는 면을 1개의 구형으로 묶는 (**greedy meshing**) 때문에, 정점의 UV는 병합면 위에서는 타일 폭을 넘을 수 있다 (가장자리에 0.0015 의 인셋). 반복 측은 하드의 repeat 어드레싱이 담당하므로, 병합면은 심 없이 보인다. 단 `vUV` 를 기준으로 절차적 디테일을 얹으면, 병합면의 경계에서 불연속이 될 수 있으므로, 월드 위치 (`s.position` + `bloxdRenderOffset()`) 를 기준으로 설계하는 것이 안전하다
+- 게임 참가 때마다 런타임 재검증 (`checkCompilation`) 이 돌아, 실재하는 전 지형 소재를 브라우저 WebGPU 로 실컴파일한다 (설정 화면의 정적 검증보다 엄격). 여기서 떨어지면 팩은 그 게임에서 제외된다
 
 ## 태양과 달
 > 대상 API: 5 · preprod 확인) · 상태: Analyzed (프로덕션 번들의 JavaScript 수준 분석)
