@@ -86,12 +86,26 @@ function escapeLine(line) {
     .join('')
 }
 
+const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetivo|build\s+alvo|build\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)\s*[:：]/i
+
+// ビルドIDと確認日時は配信時刻・公開仕様を示すものではないため、利用者向け表示から除外する。
+// APIバージョンや検証状態など、利用者にも意味のある情報は残す。
+function stripBuildMetadataLine(line) {
+  if (!line.startsWith('>')) return line
+  const parts = line.replace(/^>\s*/, '').split(/\s*[·•]\s*/)
+  const kept = parts.filter(part => !BUILD_METADATA_FIELD.test(part))
+  if (kept.length === 0) return null
+  return '> ' + kept.join(' · ')
+}
+
 function transform(src) {
   const lines = src.replace(/\r\n/g, '\n').split('\n')
   let inFence = false
   let prevBlank = false
   const out = []
-  for (const line of lines) {
+  for (const originalLine of lines) {
+    const line = stripBuildMetadataLine(originalLine)
+    if (line === null) continue
     if (/^\s*(```|~~~)/.test(line)) {
       inFence = !inFence
       prevBlank = false
