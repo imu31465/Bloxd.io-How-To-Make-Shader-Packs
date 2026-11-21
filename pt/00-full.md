@@ -446,7 +446,7 @@ Veja o [guia de testes](guides/testing.md) para a lista de verificação complet
 ## Referência da API
 Esta página documenta a API v5 atual. A principal fonte das definições é o cabeçalho que o motor acrescenta automaticamente ao início de cada pacote (consulte [Mecanismos internos do motor](internals/engine-header.md) para ver o cabeçalho completo).
 
-### Mapa
+### Conteúdo
 
 | Página | Conteúdo |
 |---|---|
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` chegam já mapeados a 0–1**: os níveis 0–15 passam por uma curva ease-out (p. ex. `6 → 0.45`, `12 → 0.92`). Todos excluem `ambientLightColour`
 - **Curva de lift**: `skyLight` é na verdade "esta posição consegue ver o céu" — dados de oclusão por voxel, ou seja, um shadow map. A separação sol/sombra por limiar pode precisar da transformada inversa (veja o [guia de realismo](guides/realism.md))
-- **Interioridades da névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Interioridades do motor: interioridades da névoa](internals/fog-internals.md))
+- **Funcionamento interno da névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Interioridades do motor: interioridades da névoa](internals/fog-internals.md))
 
 ### Receitas
 
@@ -2879,7 +2879,7 @@ Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). 
 ## Guias
 Material de "mecanismo e mentalidade". O que é possível em primeiro lugar está em [O que pacotes de shaders podem e não podem fazer](guides/constraints.md); exemplos de código orientados a objetivo vivem em [Receitas](recipes/).
 
-### Mapa
+### Conteúdo
 
 | Página | Conteúdo |
 |---|---|
@@ -3357,7 +3357,7 @@ Os pacotes de texturas têm especificação própria (para referência): o limit
 ## Receitas
 Exemplos de código orientados a objetivo. O lado do "como funciona" vive em [Guias](guides/). Tudo aqui está portado ao vocabulário do v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) e protegido para passar nas 6 variantes (strict × terreno / líquido / modelo).
 
-### Mapa
+### Conteúdo
 
 | Página | Conteúdo |
 |---|---|
@@ -4835,7 +4835,7 @@ Compila bem, mas o visual fica errado.
 
 ### Relacionado
 
-- [Problemas de iluminação](troubleshooting/lighting.md) · [Dicas de depuração](guides/debugging.md) · [Interioridades da névoa](internals/fog-internals.md)
+- [Problemas de iluminação](troubleshooting/lighting.md) · [Dicas de depuração](guides/debugging.md) · [Funcionamento interno da névoa](internals/fog-internals.md)
 
 
 ---
@@ -4964,7 +4964,7 @@ Problemas de brilho, sombra e névoa.
 
 ### Relacionado
 
-- [Iluminação](api/lighting.md) · [Problemas visuais](troubleshooting/visual.md) · [Interioridades da iluminação](internals/lighting-internals.md)
+- [Iluminação](api/lighting.md) · [Problemas visuais](troubleshooting/visual.md) · [Funcionamento interno da iluminação](internals/lighting-internals.md)
 
 
 ---
@@ -5117,20 +5117,20 @@ Uma distribuição comunitária de "cinematic shader" que analisamos acabou send
 ## Funcionamento interno do motor
 Esta categoria explica o funcionamento interno do motor e pode ajudar a compreender como os shader packs são executados. Esses detalhes de implementação podem mudar; para regras de uso estáveis e APIs disponíveis, consulte a [Referência da API](api/).
 
-### Mapa
+### Conteúdo
 
 | Página | Conteúdo |
 |---|---|
 | [Pipeline de renderização](internals/rendering-pipeline.md) | posição do alphaTest, montagem de 2 luzes, realidade do uniform, greedy meshing |
-| [Invocação de hooks](internals/hook-invocation.md) | como os hooks são enxertados no WGSL do motor |
+| [Invocação de hooks](internals/hook-invocation.md) | como os hooks são inseridos no WGSL do motor |
 | [Cabeçalho do motor](internals/engine-header.md) | Declarações WGSL adicionadas aos shader packs |
-| [Validação de shaders](internals/shader-validation.md) | interioridades do analisador, a tabela de assinaturas, HEADER_VERSION |
+| [Validação de shaders](internals/shader-validation.md) | funcionamento interno do analisador, a tabela de assinaturas, HEADER_VERSION |
 | [Compilação de WGSL](internals/wgsl-compilation.md) | a compilação real da etapa 2 e os stubs de validação |
 | [Identificadores reservados](internals/reserved-identifiers.md) | os 46 símbolos `bloxdSp*` |
-| [Interioridades da iluminação](internals/lighting-internals.md) | estrutura de blockLight / heldLight |
-| [Interioridades da névoa](internals/fog-internals.md) | só linear, a faixa de gradiente de 32 blocos |
-| [Amostragem de texturas](internals/texture-sampling.md) | o codegen de texturas de 3 variantes |
-| [Registro de texturas](internals/texture-registry.md) | Resolução de nomes e nomes de animação e rotação |
+| [Funcionamento interno da iluminação](internals/lighting-internals.md) | estrutura de blockLight / heldLight |
+| [Funcionamento interno da névoa](internals/fog-internals.md) | apenas linear, com uma faixa de atenuação de 32 blocos |
+| [Amostragem de texturas](internals/texture-sampling.md) | a geração de código das texturas de 3 variantes |
+| [Registro de texturas](internals/texture-registry.md) | Resolução de nomes e identificadores de animação e rotação |
 | [Renderização de modelos](internals/model-rendering.md) | o programa Model da v5 |
 | [Dados do motor](internals/engine-data.md) | Recursos da API v5 e limites dos packs |
 | [Fatores de teste](internals/testing-factors.md) | que ajustes de mundo/jogador mudam os valores visíveis aos pacotes |
@@ -5262,7 +5262,7 @@ A arquitetura de injeção existia no renderizador da v2 e permaneceu estável n
 | `ambientLightColour` / `skyLightColour` | os uniforms correspondentes |
 | `heldLight` | construída a partir do varying de nível de luz e dos uniforms de luz na mão (a queda do cone em [Interioridades de iluminação](internals/lighting-internals.md)) |
 | `fogColour` | preta só em cenas inteiramente sem névoa (modo 0) |
-| `fogAlpha` | o fator de névoa limitado ([Interioridades da névoa](internals/fog-internals.md)) |
+| `fogAlpha` | o fator de névoa limitado ([Funcionamento interno da névoa](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings e valores de interpolação flat (os mesmos de `BloxdSurfaceIn` — valores posteriores ao hook de vertex) |
 
 ### Relacionado
@@ -5712,7 +5712,7 @@ Blocos personalizados podem carregar `skyLightEmission` (0–15), que **injeta n
 
 ---
 
-## Interioridades da névoa
+## Funcionamento interno da névoa
 > API alvo: 5 · Tipo: referência técnica
 O cálculo da névoa é sempre modo LINEAR (equivalente a `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), com `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = ajuste de distância da névoa; só D = 0 é especial, com fogEnd = 5). **A banda de gradiente da névoa tem apenas 32 blocos de largura**, e `l.fogAlpha` é menos "bruma por distância" que uma **distância normalizada até a borda do mundo carregado**. Ela varia por jogador conforme a distância de carregamento, então efeitos baseados em distância devem calcular `distance(l.position, bloxdEyePosition())` eles mesmos (a seção "Banda da borda de carga" abaixo). (a função de névoa do renderizador na verdade implementa **quatro** modos — desativada / exponencial / exponencial ao quadrado / linear —, e são os títulos publicados que acionam o linear; o código-fonte restaurado e o argumento de robustez estão preservados em [Histórico de versões: v3](history/v3.md).)
 
@@ -5741,7 +5741,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Interioridades da amostragem de texturas
 > API alvo: 5 · Tipo: referência técnica
 
-Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — o codegen de texturas de 3 variantes. O lado do usuário: [API de texturas](api/texture-api.md).
+Como `bloxdTexel` / `bloxdTextureSize` realmente compilam — a geração de código das texturas de 3 variantes. O lado do usuário: [API de texturas](api/texture-api.md).
 
 ### As três variantes
 
