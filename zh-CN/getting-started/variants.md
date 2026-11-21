@@ -29,7 +29,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 
 `BLOXD_LIGHTING` 已在 **v5 移除**。使用它会验证失败: *「BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead.」*
 
-## strict 游戏的契约
+## strict 游戏中的限制
 
 大多数游戏是 strict (无顶点动画、无 `discard`)。未加守卫的 vertex 钩子会报 `<hook> moves terrain, which strict games prevent.`，可达的 `discard` 会报 `discard makes terrain see-through, which strict games prevent.` — 两者都会在该 strict 游戏中禁用**全部钩子**。永远用 `#ifndef BLOXD_STRICT` 包住 vertex 钩子。
 
