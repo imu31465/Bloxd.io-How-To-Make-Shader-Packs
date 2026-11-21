@@ -36,7 +36,7 @@ Cuando necesites la especificación completa, sigue a [Referencia de la API](api
 
 Un shader pack de Bloxd.io cambia el aspecto del **renderizador WebGPU** del juego, y solo de él. Los paquetes se escriben en un **subconjunto restringido de WGSL** y se cargan desde los ajustes del juego → pantalla Shader Pack como zip o carpeta. Mientras un paquete está instalado, el renderizador WebGPU queda activado por la fuerza en los ajustes.
 
-Los paquetes se validan y compilan como WGSL puro — sin ejecución de JavaScript ni red. Con código normal no puede ocurrir nada peligroso.
+El código del pack se valida y compila como WGSL. Desde el WGSL del pack no se puede ejecutar JavaScript ni realizar solicitudes de red.
 
 ### Qué puedes cambiar
 
@@ -61,7 +61,6 @@ Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayo
 - El juego actual solo acepta paquetes `apiVersion: 5`; los paquetes v1–v4 se rechazan al cargar (los guardados quedan inactivos en silencio — [Compatibilidad](api/compatibility.md))
 - ¿Migras un paquete escrito para una versión antigua? Ver [Historial de versiones](history/)
 - Las interioridades del motor pueden cambiar con las actualizaciones, así que cada página nombra su build objetivo
-
 
 ---
 

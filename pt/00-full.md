@@ -36,7 +36,7 @@ Quando você precisar da especificação completa, siga para a [Referência da A
 
 Um pacote de shaders do Bloxd.io muda a aparência do jogo **somente no renderizador WebGPU**. Pacotes são escritos em um **subconjunto restrito de WGSL** e carregados pela tela de configurações do jogo → Shader Pack, como zip ou pasta. Enquanto um pacote estiver instalado, o renderizador WebGPU fica ativado à força nas configurações.
 
-Pacotes são validados e compilados como WGSL puro — sem execução de JavaScript, sem rede. Nada de perigoso pode acontecer com código normal.
+O código do pack é validado e compilado como WGSL. O WGSL do pack não pode executar JavaScript nem fazer requisições de rede.
 
 ### O que você pode mudar
 
@@ -61,7 +61,6 @@ Cada jogo tem uma política de pacotes de shaders (`shaderPackPolicy`), e **a ma
 - O jogo atual aceita apenas pacotes `apiVersion: 5`; pacotes v1–v4 são rejeitados no carregamento (pacotes salvos ficam silenciosamente inativos — [Compatibilidade](api/compatibility.md))
 - Está migrando um pacote escrito para uma versão mais antiga? Veja o [Histórico de versões](history/)
 - As interioridades do motor podem mudar com as atualizações, então cada página indica sua build alvo
-
 
 ---
 
