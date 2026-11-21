@@ -6027,7 +6027,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Version History
 > Type: Historical · API v1–v5 migration guides
 
-This section preserves the changes, migration steps, and removed APIs from versions v1 through v5. It focuses on API behavior and migration paths rather than build identifiers or verification dates.
+This section preserves the changes, migration steps, and removed APIs from versions v1 through v5, with an emphasis on API behavior and migration paths.
 
 ### Versions
 
@@ -6268,7 +6268,7 @@ The code printed in this guide contains none of this pattern (the `+`/`*` mixing
 This page is a historical guide for migrating API v2 packs to v3. To move from v3 to v4, apply the [API v4 migration guide](history/v4.md), then use the [API v5 migration guide](history/v5.md) to move to the current version. For new packs, see the current [API reference](api/).
 
 Parts I–VII of this guide are still written on the v2 baseline. This part collects, in the same order as [the v2 guide](history/v2.md), the v2 → v3 migration points and the new v3 features. Conversion is mostly mechanical (§47), but only one change actually alters behavior — the default light now attenuates emission with fog (§43) — and `blockId` is replaced wholesale by `blockFlags` (§42), so always verify with an in-game compile before distribution.
-New in this revision: sections **§49–§54** go past the migration itself into engine internals restored from the production build — how the Lite renderer actually invokes your hooks, the real four-mode fog function, the exact `bloxdOpaqueBehind()` implementation, the complete blockFlags delivery path from block registration to your hook, and the validation pipeline with its measured header hash. These are the deepest publicly documented facts about the pack system to date, and they settle several questions other guides still list as open.
+New in this revision: sections **§49–§54** document hook invocation, fog calculations, the `bloxdOpaqueBehind()` implementation, the `blockFlags` delivery path, and validation behavior.
 ### 40. Fate of v2 packs (conclusion first)
 The build requires the manifest `apiVersion` to **match 3 exactly**, and there is **no parallel v2/v3 support**. A v2 pack is rejected at load with the "wrong API version" messages (i18n keys, placeholder text):
 > `loadWrongApiVersion`: "This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
