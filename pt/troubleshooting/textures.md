@@ -1,8 +1,8 @@
 # Problemas de texturas
 
-> API alvo: 5 · Build alvo: `bbb6l5` · Estado: Verified (mensagens registradas literalmente do validador em produção)
+> API alvo: 5 · Tipo: referência técnica
 
-Problemas em torno de `bloxdTextureId*` / `bloxdTexel`. Pesquise os 896 nomes no [catálogo de texturas](../api/texture-catalog.md).
+Problemas em torno de `bloxdTextureId*` / `bloxdTexel`. Pesquise os nomes disponíveis no [catálogo de texturas](../api/texture-catalog.md).
 
 ## "There's no texture called X. Did you mean bloxdTextureIdY?"
 

@@ -1,6 +1,6 @@
 # Funções
 
-> API alvo: 5 · Build alvo: `bbb6l5` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
+> API alvo: 5 · Tipo: referência técnica
 
 Toda função do cabeçalho. A API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) é tratada em [API de texturas](texture-api.md), junto com `bloxdOpaqueBehind`.
 
@@ -142,7 +142,7 @@ A própria receita de iluminação do motor, documentada como WGSL chamável —
 
 ## Funções de sombras
 
-A build `bbb6l5` adicionou à API de packs o sistema real de sombras sol/lua do engine — sombras projetadas que seguem o sol, lançadas por blocos, jogadores, mobs e itens. Estas duas funções são **injetadas no módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) e constam na tabela de funções do validador, mas não no texto legível do cabeçalho.
+A API v5 adicionou à API de packs o sistema real de sombras sol/lua do engine — sombras projetadas que seguem o sol, lançadas por blocos, jogadores, mobs e itens. Estas duas funções são **injetadas no módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) e constam na tabela de funções do validador, mas não no texto legível do cabeçalho.
 
 ### bloxdShadow
 
@@ -150,7 +150,7 @@ A build `bbb6l5` adicionou à API de packs o sistema real de sombras sol/lua do 
 fn bloxdShadow() -> f32
 ```
 
-- **Retorna**: a luz de sol ou lua que chega a este fragmento — **0 na sombra, 1 iluminado** — *novo no `bbb6l5`*
+- **Retorna**: a luz de sol ou lua que chega a este fragmento — **0 na sombra, 1 iluminado** — *novo no API v5*
 - O que as lança: **blocos, jogadores, mobs e itens** (o item segurado em primeira pessoa fica de fora de propósito)
 - Comportamento (literal da descrição do validador): esmaece para 0 quando o sol ou a lua se põe ou a face se afasta; **1 em faces `flags.emissive`**; a luz viaja ao longo de `bloxdShadowDirection()`, então há sombras até sob um céu sem sol
 - **Chamável de**: hooks surface / light
@@ -162,7 +162,7 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 ```
 
-- **Retorna**: como `bloxdShadow()`, mas num ponto **entre a câmera (t = 0) e este fragmento (t = 1)** — *novo no `bbb6l5`* — para raios de luz
+- **Retorna**: como `bloxdShadow()`, mas num ponto **entre a câmera (t = 0) e este fragmento (t = 1)** — *novo no API v5* — para raios de luz
 - Só blocos as lançam (jogadores e mobs não), desfocadas em blocos inteiros; `t` é limitado a 0–1
 - Receita: amostrar vários `t` ao longo do raio de visão e acumular — [Sombras](../guides/shadows.md)
 

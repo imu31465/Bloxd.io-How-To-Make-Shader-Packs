@@ -1,6 +1,6 @@
 # FAQ e notas legais
 
-> API alvo: 5 · Build alvo: `bbb6l5` (2026-11-20, produção e preprod) · Estado: Verified
+> API alvo: 5 · Tipo: referência técnica
 
 ## Perguntas frequentes
 

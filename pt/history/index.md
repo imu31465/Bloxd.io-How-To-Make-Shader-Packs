@@ -1,28 +1,28 @@
 # Histórico de versões
 
-> Estado: Historical — registros versão por versão; cada guia indica a própria build alvo
+> Tipo: histórico · Guias de migração da API v1–v5
 
-Mudanças, etapas de migração e APIs removidas da v1 à v5. Para migrar pacotes antigos e para as especificações preservadas de cada época.
+Esta seção preserva as mudanças, os passos de migração e as APIs removidas das versões v1 a v5. O foco é o comportamento da API e os caminhos de migração, não identificadores de build ou datas de verificação.
 
-## Cronologia
+## Versões
 
-| Versão | Em produção desde | Guia | Destaques |
-|---|---|---|---|
-| v1 | (inicial) | [v1](v1.md) | primeira API de pacotes de shaders. 6 hooks (terrain/liquid × vertex/surface); vocabulário `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
-| v2 | — | [v2](v2.md) | renomeação total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` e `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` (flags de bits), `bloxdPi` / `bloxdTau`, hooks de líquido oficiais, interioridades da invocação de hooks |
-| v4 | 2026-10-26 | [v4](v4.md) | API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), o contrato strict, análise do cabeçalho e do registro do motor |
-| **v5** | **2026-11-03** | [v5](v5.md) | **atual** — struct `BloxdFlags` (14 bools), hooks de Model (9 no total), a API de iluminação `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entradas e saídas de encantamento/sobreposição, 6 variantes |
+| Versão | Guia de migração | Principais mudanças |
+|---|---|---|
+| v1 | [v1](v1.md) | API inicial de shader packs |
+| v2 | [v2](v2.md) | Renomeação de identificadores, `blockId` e acesso à profundidade da cena |
+| v3 | [v3](v3.md) | `blockFlags`, `bloxdPi` / `bloxdTau` e hooks Liquid |
+| v4 | [v4](v4.md) | API de texturas e restrições de jogos strict |
+| **v5** | [v5](v5.md) | **Atual** — `BloxdFlags`, hooks Model e APIs de iluminação e sombras |
 
-## O prefácio comum
+## Como as versões antigas são tratadas
 
-O jogo atual aceita apenas `apiVersion: 5` e **pacotes de versões antigas falham no instante do carregamento** (pacotes salvos são silenciosamente desativados — [Compatibilidade](../api/compatibility.md)). Cada guia cobre "anterior → próxima". Vai cruzar várias versões? Aplique-as da mais antiga para a mais nova.
+O jogo atual aceita apenas packs com `apiVersion: 5`. Packs antigos não podem ser carregados sem alterações. Para migrar entre várias versões, aplique os guias em ordem, começando pela versão mais antiga.
 
-## Caminho rápido para uma lista de verificação
+## Caminhos de migração
 
-- pacote v4 → [guia da v5](v5.md) §77 (quase tudo mecânico)
-- pacote v3 → [v4](v4.md) §61 → [v5](v5.md) §77
-- pacote v2 → [v3](v3.md) §47 → v4 → v5
-- pacote v1 → comece pela [v2](v2.md) §37
+- Pack v4 → [guia de migração v5](v5.md)
+- Pack v3 → [v4](v4.md) → [v5](v5.md)
+- Pack v2 → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
+- Pack v1 → [v2](v2.md) → [v3](v3.md) → [v4](v4.md) → [v5](v5.md)
 
-> Para a especificação atual em si, veja a [Referência da API](../api/); para as interioridades da build atual, veja [Interioridades do motor](../internals/).
+Para consultar a API atual, veja a [Referência da API](../api/).

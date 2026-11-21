@@ -1,72 +1,58 @@
-# Formato do pacote
+# Formato do pack
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (remedido no carregador em produção)
+> API alvo: 5 · Tipo: referência da API
 
-O modelo inteiro de pacote em uma página só — manifesto, limites do carregador, uniform por frame. Para a versão passo a passo, veja [Primeiros passos](../getting-started/manifest.md).
+Esta página resume o manifesto, os limites do arquivo ZIP e o uniform do pack. Para ver as etapas de configuração, consulte [Primeiros passos](../getting-started/manifest.md).
 
 ## pack.json
+
+Coloque `pack.json` na raiz do arquivo ZIP. Ele deve ser um objeto JSON.
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `apiVersion` | number | obrigatório | **deve ser estritamente igual a `5`** (`===`). Uma string `"5"` falha e é reportada com a sua grafia JSON |
-| `name` | string | obrigatório | não vazio após o trim; exibido nos ajustes |
-| `author` | string | opcional | deve ser uma string se presente |
-| `keepCircleShadows` | boolean | opcional | **novo no `bbb6l5`** — mantém as antigas sombras circulares sob jogadores e mobs quando seus shaders também usam a API real de sombras solares ([Sombras](../guides/shadows.md)). Padrão `false`; qualquer outro tipo é rejeitado com mensagem dedicada |
+| `apiVersion` | number | Sim | Defina o valor numérico `5`. Uma string não é aceita |
+| `name` | string | Sim | Nome não vazio após remover os espaços externos |
+| `author` | string | Não | Nome do autor |
+| `keepCircleShadows` | boolean | Não | Defina como `true` para manter as sombras circulares tradicionais ao usar a API de sombras |
 
-Todo o resto do manifesto é ignorado. `pack.json` deve ser exatamente um objeto JSON na raiz do zip.
+## Limites do carregador
 
-## Limites do carregador (remedidos no c53 em produção)
+| Item | Limite |
+|---|---:|
+| Arquivos `.wgsl` por pack | 256 |
+| Fonte `.wgsl` total | 256 KB |
+| `pack.json` | 64 KB |
+| Arquivo ZIP | 32 MB |
+| Entradas ZIP | 1.024 |
 
-| Limite | Valor | Mensagem ao exceder |
+Arquivos ZIP divididos, Zip64, entradas criptografadas e métodos de compactação não suportados não são aceitos. Salve todos os arquivos em UTF-8 e não inclua caminhos duplicados no arquivo.
+
+## Uniform do pack
+
+O uniform do pack tem 80 bytes e é vinculado em `@group(3) @binding(0)`.
+
+| Offset | Campo | Tipo |
 |---|---|---|
-| arquivos `.wgsl` por pacote | 256 | `The pack has more than 256 .wgsl files.` |
-| código-fonte `.wgsl` total | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| tamanho de `pack.json` | 64 KB | `pack.json is over 64 KB.` |
-| tamanho do zip | 32 MB | `The zip is over 32 MB.` |
-| entradas do zip | 1.024 | `The zip has more than 1024 entries.` |
-| forma do zip | — | zip dividido / zip64 / criptografado / compressão não suportada, cada um rejeitado com a própria mensagem; todos os arquivos em UTF-8 válido; exatamente um `pack.json`; sem caminhos duplicados |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-## Verificação da versão da API
+O tamanho mínimo do vínculo do uniform é 80 bytes. Os outros vínculos do grupo 3 são a textura de profundidade de cena para variantes Liquid e o buffer de armazenamento `bloxdSpTextureLayers`.
 
-O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScript. A constante de versão `5` e o template do cabeçalho vivem no mesmo módulo (c55 / módulo 29836), então a validação e o cabeçalho que ela pressupõe se movem juntos. Mensagens de incompatibilidade: veja [Compatibilidade](compatibility.md).
+## Relacionado
 
-## Uniform por frame: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — continua com 64 bytes, mas a v5 adicionou um membro (do módulo de layout do uniform em produção):
-
-| Offset | Campo | Tipo | Nota |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | sustenta `bloxdSeconds()` |
-| 4 | `lit` | `u32` | 1 quando a iluminação de bloco/céu está ligada; sustenta `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | sustenta `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | sustenta `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | sustenta `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **novo no `bbb6l5`** — a direção em que viaja a luz que projeta sombras; respalda `bloxdShadowDirection()` |
-
-`shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. Sua chegada levou o uniform de 64 a 80 bytes e elevou o `minBindingSize` a 80.
-
-`lit` coube no preenchimento que o v4 já tinha entre `seconds` e `renderOffset`.
-
-**Nunca referencie o uniform diretamente de um pacote.** Use-o por meio das funções de cabeçalho (`bloxdSeconds()` etc.). A visibilidade de estágios é VERTEX|FRAGMENT, então as funções de cabeçalho funcionam também a partir de funções de escopo de módulo e de hooks vertex.
-
-## Layout do bind group
-
-| binding | Conteúdo |
-|---|---|
-| 0 | uniform `bloxdPackInputs` (64 B) |
-| 1 | textura de profundidade de cena (variantes liquid) |
-| 2 | storage buffer `bloxdSpTextureLayers` |
-
-`minBindingSize` continua 64. A textura de profundidade (binding 1) é FRAGMENT-only, e é por isso que `bloxdOpaqueBehind()` é exclusivo de hooks surface/light.
-
-## Concatenação wgsl
-
-Múltiplos arquivos `.wgsl` são concatenados em um único módulo em **ordem de dicionário pelo nome do caminho**. Declarações de escopo de módulo são independentes de ordem; só a ordem de inicialização de `var` pode importar. Arquivos que não são `.wgsl` são ignorados.
+- [Criar o manifesto](../getting-started/manifest.md)
+- [Referência da API](./)
+- [Guia de migração da API v5](../history/v5.md)
