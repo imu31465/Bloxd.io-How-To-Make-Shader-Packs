@@ -446,7 +446,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ## API 参考
 本页介绍当前 API v5。API 定义的主要依据是引擎自动添加到每个着色器包开头的引擎标头（完整内容见[引擎内部](internals/engine-header.md)）。
 
-### 导航
+### 内容
 
 | 页面 | 内容 |
 |---|---|
@@ -2884,7 +2884,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ## 指南
 「机制与思路」类材料。什么从根本上可行见[着色器包能与不能做的事](guides/constraints.md)；按目的组织的代码示例在[实战配方](recipes/)。
 
-### 导航
+### 内容
 
 | 页面 | 内容 |
 |---|---|
@@ -3366,7 +3366,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## 实战配方
 按目的组织的代码示例。「原理怎么运作」的一面在[指南](guides/)。这里的一切都已移植到 v5 词汇 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) 并加了守卫以通过 6 种变体 (strict × terrain / liquid / model)。
 
-### 导航
+### 内容
 
 | 页面 | 内容 |
 |---|---|
@@ -5135,11 +5135,11 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 本分类介绍引擎内部行为，帮助理解着色器包的执行过程。这些实现细节可能随游戏更新而变化；稳定的使用规则和可用 API 请参阅 [API 参考](api/)。
 
 
-### 导航
+### 内容
 
 | 页面 | 内容 |
 |---|---|
-| [渲染管线](internals/rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 实情、贪心网格合并 |
+| [渲染管线](internals/rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 的实际数据布局、贪心网格合并 |
 | [钩子接入](internals/hook-invocation.md) | 钩子如何拼接进引擎的 WGSL |
 | [引擎标头](internals/engine-header.md) | 添加到着色器包前面的 WGSL 声明 |
 | [着色器验证](internals/shader-validation.md) | 分析器内部、签名表、HEADER_VERSION |
