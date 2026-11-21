@@ -1,6 +1,6 @@
 # Shader validation
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored from the live validator)
+> Target API: 5 · Type: technical reference
 
 The static validation (analyzer, stage 1 of the load check). User-facing fixes: [Validation errors](../troubleshooting/validation.md).
 

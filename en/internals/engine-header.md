@@ -1,8 +1,8 @@
 # Engine header (verbatim)
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Analyzed (restored verbatim from the live build's validator)
+> Target API: 5 · Type: technical reference
 
-The exact text the engine prepends to every pack, rendered from the live build's validator with its interpolations applied (`apiVersion` and the six uniform reads via `bloxdPackInputs`). 216 lines decoded. No paraphrase anywhere. Re-verified on the previous production builds (`bny9u`, `v98qt8`) with the shadow additions isolated as the only change.
+A reference listing of the WGSL header prepended to shader packs. See the [API reference](../api/) for explanations of individual fields and functions.
 
 Reading guide:
 - Field-by-field explanations → [Structures](../api/structures.md)

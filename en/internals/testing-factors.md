@@ -1,6 +1,6 @@
 # What changes pack-visible values
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (production-bundle JavaScript analysis)
+> Target API: 5 · Type: technical reference
 The same pack renders differently across **world and player settings**. Check at least these 3 environments before distribution:
 
 1. **Normal world** (default skybox, no overrides) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`, default colors

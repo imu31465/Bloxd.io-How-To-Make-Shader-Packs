@@ -1,6 +1,6 @@
 # Model rendering internals
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (restored from the live bundle)
+> Target API: 5 · Type: technical reference
 
 The internals of the v5 Model program. The user-facing guide: [Models and textures](../guides/models.md).
 

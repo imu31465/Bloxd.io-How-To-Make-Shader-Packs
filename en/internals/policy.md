@@ -1,13 +1,12 @@
 # Per-game shader-pack policy
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Analyzed (production-bundle JavaScript analysis)
+> Target API: 5 · Type: technical reference
 This page pins down what `allow / strict` means at the title level. Only titles whose game definition explicitly carries `shaderPackPolicy: "allow"` run in full mode (vertex hooks, `discard`, terrain `alpha`); titles with no setting (or any non-allow value) are strict — `BLOXD_STRICT` is defined and guarded code is disabled automatically. The pack side cannot choose this, so knowing which titles run what is a prerequisite for distribution.
 
-- Reference build: `szby6g.main.94a7596c.js` (production deploy as of 2026-10-17). Statically enumerating all 111 game definitions gives **26 allow entries (12 titles) / 85 strict entries**. The same 12 allow literals across the same 12 titles were re-confirmed unchanged on the v3 production bundle (`3ymzdd`, 2026-10-20) and again on the v4 bundle (`cnty9`, 2026-10-27) — the list below carries over verbatim to v3 and v4. And on the v5 builds: unchanged again on `ab90qa` (2026-11-03) and `xkg8x` (2026-11-04, 12 allow literals re-counted). On `bny9u` (2026-11-05) the full enumeration was re-run: the game-definition count grew from 111 to **115**, and the allow side from 26 to **28 entries** — still the same 12 titles, joined by two new Test Gym variants (Imported Mobs, Interest). On `v98qt8` (2026-11-08) the enumeration was re-run again: **116 definitions / 28 allow entries (12 titles) / 88 strict** — the allow side unchanged, one more strict definition joined. On `bbb6l5` (2026-11-20) it was re-run once more: **119 definitions / 28 allow entries (12 titles) / 91 strict** — the same 12 allow titles again, three more strict definitions (the Atomic Age games). The list below carries over verbatim to v5.
 - Above `shaderPackPolicy` there is a delivery-channel gate (roughly `canUseShaderPacks`): through external portals (e.g. Coolmath Games builds) the shader pack system itself can be disabled before `shaderPackPolicy` is ever consulted. The allow/strict analysis below is based on the bloxd.io main web build.
-- allow is declared in 12 places: 8 direct literals in game definitions and 4 base variables (`tb` / `kz` / `cb` / `Fb`); variants inherit it via spread (`{...tb,...}`). There are currently no per-variant overrides (no parent-allow / child-strict pattern either).
 
-The 12 allow titles (28 entries in total, re-measured on `v98qt8`):
+
+## Allow titles
 
 - **Test Gym** — base + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (13 entries)
 - **Doodle Cube** — base + Solos / Duos (3)
@@ -22,4 +21,5 @@ The most misleading strict-side cases:
 
 Note that in strict titles the pack itself is still loaded and compiled, and fragment-side recipes such as surface / light run as usual. What is constrained: the vertex hooks (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard`, and terrain `alpha` (liquids always have it).
 
-This list reflects the static analysis of the build above; engine updates can change the allow/strict split. Re-check when a new version ships.
+
+Before distributing a pack, test it in the target game and confirm that the hooks you rely on work there.
