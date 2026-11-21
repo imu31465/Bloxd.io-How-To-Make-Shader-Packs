@@ -1031,7 +1031,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **戻り値**: ワールド座標 (`position + vec3f(bloxdRenderOffset())`)
 - **注意**: f32 の精度限界があるため、遠くの座標では誤差が出うる (ヘッダー注記: *"with possible f32 inaccuracy"*)
 
-#### bloxdFragmentBlockPosition — 非公開だが今も注入される
+#### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -1086,7 +1086,7 @@ v4 作者が手で再導出し続けてきたエンジン自身のライティ�
 
 ### シャドウ関数
 
-`API v5` では、エンジンの太陽・月シャドウシステムを利用できます。ブロック・プレイヤー・モブ・アイテムが落とす投影影は太陽に追従します。この2関数は**パックのコンパイル済みモジュールに注入**され（`bloxdFragmentBlockPosition` と同様）、バリデータの関数表に登録されていますが、可読ヘッダー本文には含まれません。
+この3関数は**各パックのコンパイル済みモジュールに注入**され（`bloxdFragmentBlockPosition` と同様）、バリデータの関数表に登録されていますが、可読ヘッダー本文には含まれません。
 
 #### bloxdShadow
 
