@@ -1,6 +1,6 @@
 # API 参考
 
-当前 API v5 的系统性规格。这里的一切都实测自目标构建 `bny9u` (2026-11-05；生产与预发环境一致)。拼在每个包前的引擎标头 (复现于[引擎内部](../internals/engine-header.md)) 是首要资料来源。
+本页介绍当前 API v5。API 定义的主要依据是引擎自动添加到每个着色器包开头的引擎标头（完整内容见[引擎内部](../internals/engine-header.md)）。
 
 ## 导航
 
@@ -17,8 +17,8 @@
 | [预处理器](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [限制](restrictions.md) | 语言限制、保留标识符 |
 | [兼容性](compatibility.md) | 旧版本包、已保存包重验 |
-| [纹理目录](texture-catalog.md) | 全部 896 个可用名称 (可搜索) |
+| [纹理目录](texture-catalog.md) | 1,017 个可用的具名常量（可搜索） |
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
+> API: 5 · 状态: Analyzed（根据引擎标头和验证器还原）
 
 从 v4 迁移？请看[版本历史: v5](../history/v5.md)。
