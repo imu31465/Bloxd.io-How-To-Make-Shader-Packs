@@ -79,7 +79,7 @@ function stripH1(src) {
 const CATS = ['getting-started', 'api', 'guides', 'recipes', 'troubleshooting', 'internals', 'history']
 
 // ビルドID・確認日は配信日時ではないため、利用者向け総合マニュアルには掲載しない。
-const BUILD_METADATA_LINE = /^>.*(?:target build|対象ビルド|Ziel-Build|build objetivo|build cible|लक्ष्य बिल्ड|대상 빌드|build alvo|целевой билд|目标构建)/i
+const BUILD_METADATA_LINE = /(?:target build|build target|last verified|last verification|対象ビルド|Ziel-Build|Zuletzt verifiziert|Letzte Prüfung|build objetivo|build cible|dernière vérification|última verificación|लक्ष्य बिल्ड|अंतिम सत्यापन|대상 빌드|최종 확인|최종 검증|build alvo|última verificação|целевой билд|последняя проверка|目标构建|最后验证)/i
 function stripBuildMetadata(src) {
   return src.split('\n').filter(line => !BUILD_METADATA_LINE.test(line)).join('\n')
 }
@@ -95,7 +95,7 @@ for (const code of langs) {
   const readme = fs.readFileSync(path.join(langDir, 'README.md'), 'utf8')
   const cut = readme.indexOf('## ')
   const readmeHead = cut > 0 ? readme.slice(0, cut).trimEnd() : readme.trimEnd()
-  parts.push(readmeHead)
+  parts.push(stripBuildMetadata(readmeHead))
 
   for (const cat of CATS) {
     const catDir = path.join(langDir, cat)

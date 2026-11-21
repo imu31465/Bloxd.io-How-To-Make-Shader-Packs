@@ -35,7 +35,7 @@ const NAV_LINE = /^ *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\)(?: *[·・] *\[(?:[^[\]
 
 // ユーザー向けページには、調査時点のビルドIDや確認日を表示しない。
 // これらは配信日時を示す情報ではなく、必要な内部調査記録は internals に分離する。
-const BUILD_METADATA_LINE = /^>.*(?:target build|対象ビルド|Ziel-Build|build objetivo|build cible|लक्ष्य बिल्ड|대상 빌드|build alvo|целевой билд|目标构建)/i
+const BUILD_METADATA_LINE = /(?:target build|build target|last verified|last verification|対象ビルド|Ziel-Build|Zuletzt verifiziert|Letzte Prüfung|build objetivo|build cible|dernière vérification|última verificación|लक्ष्य बिल्ड|अंतिम सत्यापन|대상 빌드|최종 확인|최종 검증|build alvo|última verificação|целевой билд|последняя проверка|目标构建|最后验证)/i
 
 function titleOf(src, fallback) {
   const match = src.match(/^#\s+(.+)$/m)
