@@ -4762,50 +4762,35 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 ---
 
 ## इंजन डेटा लेजर
+> लक्ष्य API: 5 · स्थिति: Analyzed
 
-यह लेजर मौजूदा बिल्ड में shader packs के लिए उपलब्ध API के पुष्टि किए गए मानों को समेटता है। मॉड्यूल ID और chunk नंबर जैसे bundle के आंतरिक विवरण API विनिर्देश का हिस्सा नहीं हैं, इसलिए यहाँ शामिल नहीं किए गए हैं।
+यह पृष्ठ shader packs के लिए उपलब्ध API का सारांश देता है। उपयोग के विवरण के लिए [API रेफ़रेंस](api/) देखें।
 
-### मौजूदा विनिर्देश
+### API का दायरा
 
-| मद | मौजूदा मान |
+| मद | विनिर्देश |
 |---|---|
-| `apiVersion` | `5` (संख्या के साथ सख़्त तुलना) |
-| इंजन हेडर | 216 पंक्तियाँ; पूरा पाठ [इंजन हेडर](internals/engine-header.md) में |
-| हुक | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| वेरिएंट | 6 (strict × terrain / liquid / model) |
-| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` को v5 में हटाया गया |
-| पैक uniform | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| पैक binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| फ़्लैग | 14 boolean फ़ील्ड वाला `BloxdFlags` स्ट्रक्चर |
-| टेक्सचर एटलस | 1,650 लेयर; 1,017 नाम; 776 उपनाम |
-| टेक्सचर परिवार | 64 रोटेशन और 71 एनीमेशन परिवार |
-| आरक्षित पहचानकर्ता | `/^bloxd/i` से मेल खाते नाम और 88 आंतरिक `bloxdSp*` प्रतीक |
-| गेम परिभाषाएँ | 119 |
-| shader-pack नीति | 12 अनुमत शीर्षक, 28 प्रविष्टियाँ; [गेम-वार नीति](internals/policy.md) देखें |
-| डिफ़ॉल्ट पैक टेम्पलेट | 1,633 bytes |
-| लोडर सीमाएँ | 256 WGSL फ़ाइलें / कुल 256 KB स्रोत / `pack.json` 64 KB / ZIP 32 MB / 1,024 प्रविष्टियाँ |
+| API संस्करण | `5` |
+| इंजन हेडर | 216 पंक्तियाँ; [इंजन हेडर](internals/engine-header.md) देखें |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Variants | 6 (strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Pack uniform | 80 bytes; [Pack format](api/pack-format.md) देखें |
+| Uniform fields | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Texture names | उपयोग योग्य named constants [texture catalog](api/texture-catalog.md) में हैं |
 
+### Shadow API
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` और `bloxdShadowDirection()` इंजन द्वारा गणना की गई सूर्य और चंद्रमा की छाया उपलब्ध कराते हैं।
-- uniform में offset 64 पर `shadowDirection: vec3f` जोड़ा गया; आकार 64 से 80 bytes हुआ।
-- `pack.json` में पुरानी गोल छायाएँ बनाए रखने के लिए वैकल्पिक boolean फ़ील्ड `keepCircleShadows` जोड़ा गया।
-- एटलस 1,227 से 1,650 लेयर और उपलब्ध नाम 906 से 1,017 हुए।
+- `bloxdShadow()` इंजन द्वारा गणना किया गया सूर्य/चंद्रमा छाया गुणांक लौटाता है।
+- `bloxdAirShadow(t)` कैमरा और fragment के बीच किसी बिंदु पर छाया का मूल्यांकन करता है।
+- `bloxdShadowDirection()` छाया बनाने वाले प्रकाश की दिशा लौटाता है।
+- `keepCircleShadows` `pack.json` का वैकल्पिक फ़ील्ड है, जो पुराने गोलाकार shadows को बनाए रखता है।
 
-मापन का विवरण और प्रमाण [रिसर्च लॉग](internals/research-log.md) तथा [टेक्सचर रजिस्ट्री का आंतरिक विवरण](internals/texture-registry.md) में हैं।
+### संबंधित पृष्ठ
 
-### पुराने संस्करण
-
-- [संस्करण इतिहास](history/) — पुराने API के बदलाव और माइग्रेशन
-- [रिसर्च लॉग](internals/research-log.md) — मापन विधि और स्रोत
-
-### संबंधित
-
-- [इंजन हेडर](internals/engine-header.md) — पूरा हेडर पाठ
-- [गेम-वार नीति](internals/policy.md) — allow / strict नीति वाले गेम
-- [टेक्सचर रजिस्ट्री](internals/texture-registry.md) — नाम और ID का मिलान
-
----
-
+- [API रेफ़रेंस](api/) — packs के लिए उपलब्ध API
+- [Pack format](api/pack-format.md) — manifest, uniform और loader limits
+- [गेम नीति](internals/policy.md) — प्रति-गेम प्रतिबंध
 ## पैक-दृश्य मान बदलने वाली चीज़ें
 वही पैक **दुनिया और खिलाड़ी की सेटिंगों** के आर-पार अलग-अलग रेंडर होता है। वितरण से पहले कम से कम इन 3 परिवेशों में जाँच करें:
 

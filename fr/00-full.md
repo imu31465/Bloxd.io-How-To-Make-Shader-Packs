@@ -4761,50 +4761,35 @@ Le programme Model forme un axe de la matrice de variantes : `strict.model` / `a
 ---
 
 ## Relevé des données du moteur
+> API cible : 5 · État : Analyzed
 
-Ce relevé rassemble les valeurs confirmées de l'API visible par les shader packs sur le build actuel. Les détails internes du bundle, tels que les ID de modules et de chunks, ne font pas partie de la spécification et sont donc omis.
+Cette page résume l'API disponible pour les shader packs. Consultez la [Référence API](api/) pour les détails d'utilisation.
 
-### Spécification actuelle
+### Surface de l'API
 
-| Élément | Valeur |
+| Élément | Spécification |
 |---|---|
-| `apiVersion` | `5` (comparaison stricte avec un nombre) |
-| En-tête du moteur | 216 lignes ; texte intégral dans [En-tête du moteur](internals/engine-header.md) |
+| Version de l'API | `5` |
+| En-tête du moteur | 216 lignes ; voir l'[en-tête du moteur](internals/engine-header.md) |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` ; `BLOXD_LIGHTING` a été supprimée en v5 |
-| Uniform du pack | 80 octets : `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Binding du pack | `@group(3) @binding(0)` ; `minBindingSize` 80 |
-| Flags | structure `BloxdFlags` avec 14 champs booléens |
-| Atlas de textures | 1 650 couches ; 1 017 noms ; 776 alias |
-| Familles de textures | 64 familles de rotation et 71 d'animation |
-| Identifiants réservés | noms correspondant à `/^bloxd/i` et 88 symboles internes `bloxdSp*` |
-| Définitions de jeux | 119 |
-| Politique des shader packs | 12 titres autorisés, 28 entrées ; voir la [Politique par jeu](internals/policy.md) |
-| Modèle de pack par défaut | 1 633 octets |
-| Limites du chargeur | 256 fichiers WGSL / 256 Ko de code / 64 Ko pour `pack.json` / ZIP de 32 Mo / 1 024 entrées |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Uniform du pack | 80 octets ; voir le [format du pack](api/pack-format.md) |
+| Champs de l'uniform | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Noms de textures | Les constantes utilisables figurent dans le [catalogue de textures](api/texture-catalog.md) |
 
+### API des ombres
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` et `bloxdShadowDirection()` exposent le système d'ombres du soleil et de la lune calculé par le moteur.
-- L'uniform reçoit `shadowDirection: vec3f` à l'offset 64 et passe de 64 à 80 octets.
-- `pack.json` accepte le booléen facultatif `keepCircleShadows` pour conserver les anciennes ombres circulaires.
-- L'atlas passe de 1 227 à 1 650 couches et de 906 à 1 017 noms disponibles.
+- `bloxdShadow()` renvoie le facteur d'ombre solaire/lunaire calculé par le moteur.
+- `bloxdAirShadow(t)` évalue l'ombre en un point entre la caméra et le fragment.
+- `bloxdShadowDirection()` renvoie la direction de la lumière qui produit l'ombre.
+- `keepCircleShadows` est un champ booléen facultatif de `pack.json` qui conserve les anciennes ombres circulaires.
 
-Les détails et les preuves de ces mesures figurent dans le [Journal de recherche](internals/research-log.md) et les [Intérieurs du registre des textures](internals/texture-registry.md).
+### Pages associées
 
-### Versions antérieures
-
-- [Historique des versions](history/) — changements et migrations des anciennes API
-- [Journal de recherche](internals/research-log.md) — méthode et références des mesures
-
-### Voir aussi
-
-- [En-tête du moteur](internals/engine-header.md) — texte intégral de l'en-tête
-- [Politique par jeu](internals/policy.md) — titres soumis aux politiques allow / strict
-- [Registre des textures](internals/texture-registry.md) — noms et attribution des ID
-
----
-
+- [Référence API](api/) — API accessible aux packs
+- [Format du pack](api/pack-format.md) — manifeste, uniform et limites du chargeur
+- [Politique par jeu](internals/policy.md) — restrictions propres à chaque jeu
 ## Ce qui change les valeurs visibles des packs
 
 Le même pack rend différemment selon **les réglages de monde et de joueur**. Vérifiez au moins ces 3 environnements avant de distribuer :
