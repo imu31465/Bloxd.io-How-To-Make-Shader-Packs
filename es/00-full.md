@@ -466,7 +466,6 @@ Ver la [guía de pruebas](guides/testing.md) para la lista completa y la lista �
 ---
 
 ## Formato del paquete
-
 El modelo completo del paquete en una sola página — manifiesto, límites del cargador, uniform por fotograma. Para la versión paso a paso ver [Primeros pasos](getting-started/manifest.md).
 
 ### pack.json
@@ -484,10 +483,11 @@ El modelo completo del paquete en una sola página — manifiesto, límites del 
 | `apiVersion` | número | obligatorio | **debe ser exactamente `5`** (`===`). Un string `"5"` falla y se informa con su grafía JSON |
 | `name` | string | obligatorio | no vacío tras recortar espacios; se muestra en los ajustes |
 | `author` | string | opcional | debe ser un string si está presente |
+| `keepCircleShadows` | boolean | opcional | conserva las antiguas sombras circulares bajo jugadores y mobs cuando tus shaders también usan la API real de sombras sol ([Sombras](guides/shadows.md)). Por defecto `false`; cualquier otro tipo se rechaza con un mensaje dedicado |
 
 Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un objeto JSON en la raíz del zip.
 
-### Límites del cargador (remedidos en el c53 en vivo)
+### Límites del cargador
 
 | Límite | Valor | Mensaje al superarlo |
 |---|---|---|
@@ -500,11 +500,11 @@ Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un obj
 
 ### Comprobación de versión de API
 
-El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScript. La constante de versión `5` y la plantilla de cabecera viven en el mismo módulo (c55 / módulo 29836), así que la validación y la cabecera que asume se mueven juntas. Mensajes de desajuste: ver [Compatibilidad](api/compatibility.md).
+El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScript. Mensajes de desajuste: ver [Compatibilidad](api/compatibility.md).
 
 ### Uniform por fotograma: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 64 bytes, pero v5 añadió un miembro (del módulo de diseño de uniform en vivo):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 80 bytes, pero v5 añadió un miembro:
 
 | Desplazamiento | Campo | Tipo | Nota |
 |---|---|---|---|
@@ -513,6 +513,7 @@ El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScr
 | 16 | `renderOffset` | `vec3i` | respalda `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | respalda `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | respalda `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | la dirección en que viaja la luz que proyecta sombras; respalda `bloxdShadowDirection()` |
 
 `lit` cupo en el relleno que v4 ya tenía entre `seconds` y `renderOffset` (los desplazamientos 4–15 eran huecos de alineación; `vec3i` necesita alineación de 16 bytes, así que `renderOffset` se queda en 16). El tamaño total y todos los demás desplazamientos no cambian. El motor lo escribe con un único `setUint32(4, lit ? 1 : 0)` — es un flag, no un nivel de luz (los nombres del lado JS de v4 `terrainLightLevels` / `terrainHeldLight` han desaparecido por completo del bundle).
 
@@ -522,19 +523,15 @@ El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScr
 
 | binding | Contenido |
 |---|---|
-| 0 | uniform `bloxdPackInputs` (64 B) |
+| 0 | uniform `bloxdPackInputs` (80 B) |
 | 1 | textura de profundidad de escena (variantes de líquido) |
 | 2 | buffer de almacenamiento `bloxdSpTextureLayers` |
 
-`minBindingSize` sigue siendo 64. La textura de profundidad (binding 1) es exclusiva de FRAGMENT, razón por la que `bloxdOpaqueBehind()` solo existe en hooks surface/light.
+`minBindingSize` sigue siendo 80. La textura de profundidad (binding 1) es exclusiva de FRAGMENT, razón por la que `bloxdOpaqueBehind()` solo existe en hooks surface/light.
 
 ### Concatenación de wgsl
 
 Los múltiples archivos `.wgsl` se concatenan en un solo módulo en **orden de diccionario por nombre de ruta**. Las declaraciones de ámbito de módulo son independientes del orden; solo el orden de inicialización de `var` puede importar. Los archivos que no son `.wgsl` se ignoran.
-
-
----
-
 ## Hooks de sombreado
 
 Los paquetes pueden definir **9 hooks** — 3 objetivos de render (programas) × 3 etapas del pipeline, todos opcionales (indefinido significa valor por defecto del motor).

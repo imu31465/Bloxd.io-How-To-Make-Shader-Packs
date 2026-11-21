@@ -466,7 +466,6 @@ Vous migrez depuis la v4 ? Voir [Historique des versions : v5](history/v5.md).
 ---
 
 ## Format du pack
-
 Tout le modèle de pack sur une seule page — manifeste, limites du chargeur, uniform par frame. Pour la version pas à pas, voir [Prise en main](getting-started/manifest.md).
 
 ### pack.json
@@ -484,10 +483,11 @@ Tout le modèle de pack sur une seule page — manifeste, limites du chargeur, u
 | `apiVersion` | number | requis | **doit être strictement égal à `5`** (`===`). Une chaîne `"5"` échoue et est signalée avec son orthographe JSON |
 | `name` | string | requis | non vide après trim ; affiché dans les réglages |
 | `author` | string | optionnel | doit être une chaîne s'il est présent |
+| `keepCircleShadows` | boolean | optionnel | conserve les anciennes ombres circulaires sous les joueurs et mobs quand vos shaders utilisent aussi la véritable API d'ombres solaires ([Ombres](guides/shadows.md)). Défaut `false` ; tout autre type est rejeté avec un message dédié |
 
 Tout le reste du manifeste est ignoré. `pack.json` doit être exactement un objet JSON à la racine du zip.
 
-### Limites du chargeur (remesurées sur le c53 en production)
+### Limites du chargeur
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -500,11 +500,11 @@ Tout le reste du manifeste est ignoré. `pack.json` doit être exactement un obj
 
 ### Vérification de la version d'API
 
-Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScript. La constante de version `5` et le gabarit de l'en-tête vivent dans le même module (c55 / module 29836), donc la validation et l'en-tête qu'elle présuppose évoluent ensemble. Messages d'incompatibilité : voir [Compatibilité](api/compatibility.md).
+Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScript. Messages d'incompatibilité : voir [Compatibilité](api/compatibility.md).
 
 ### Uniform par frame : bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — toujours 64 octets, mais v5 a ajouté un membre (d'après le module de disposition de l'uniform en production) :
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — toujours 80 octets, mais v5 a ajouté un membre :
 
 | Offset | Champ | Type | Remarque |
 |---|---|---|---|
@@ -513,6 +513,7 @@ Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScri
 | 16 | `renderOffset` | `vec3i` | alimente `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | alimente `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | alimente `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | la direction de trajet de la lumière qui projette les ombres ; supporte `bloxdShadowDirection()` |
 
 `lit` s'insère dans le padding que v4 avait déjà entre `seconds` et `renderOffset` (les offsets 4–15 étaient des trous d'alignement ; un `vec3i` exige un alignement de 16 octets, donc `renderOffset` reste à 16). La taille totale et tous les autres offsets sont inchangés. Le moteur l'écrit avec un seul `setUint32(4, lit ? 1 : 0)` — c'est un flag, pas un niveau de lumière (les noms côté JS de v4 `terrainLightLevels` / `terrainHeldLight` ont entièrement disparu du bundle).
 
@@ -522,19 +523,15 @@ Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScri
 
 | binding | Contenu |
 |---|---|
-| 0 | uniform `bloxdPackInputs` (64 o) |
+| 0 | uniform `bloxdPackInputs` (80 o) |
 | 1 | texture de profondeur de scène (variantes liquid) |
 | 2 | buffer de stockage `bloxdSpTextureLayers` |
 
-`minBindingSize` reste 64. La texture de profondeur (binding 1) est FRAGMENT-only, ce qui explique pourquoi `bloxdOpaqueBehind()` est réservé aux hooks surface/light.
+`minBindingSize` reste 80. La texture de profondeur (binding 1) est FRAGMENT-only, ce qui explique pourquoi `bloxdOpaqueBehind()` est réservé aux hooks surface/light.
 
 ### Concaténation wgsl
 
 Les fichiers `.wgsl` multiples sont concaténés en un seul module en **ordre dictionnaire du nom de chemin**. Les déclarations à portée module sont indépendantes de l'ordre ; seul l'ordre d'initialisation des `var` peut compter. Les fichiers non-`.wgsl` sont ignorés.
-
-
----
-
 ## Hooks de shader
 
 Les packs peuvent définir **9 hooks** — 3 cibles de rendu (programmes) × 3 étapes de pipeline, tous optionnels (non défini = défaut du moteur).
