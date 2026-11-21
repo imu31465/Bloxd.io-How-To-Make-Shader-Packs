@@ -56,4 +56,4 @@ Erros que passam pela validação estática mas falham como WGSL, ou falham apen
 
 ## Relacionado
 
-- [Erros de validação](validation.md) · [Interioridades do motor: compilação de WGSL](../internals/wgsl-compilation.md) · [Restrições](../api/restrictions.md)
+- [Erros de validação](validation.md) · [Funcionamento interno do motor: compilação de WGSL](../internals/wgsl-compilation.md) · [Restrições](../api/restrictions.md)
