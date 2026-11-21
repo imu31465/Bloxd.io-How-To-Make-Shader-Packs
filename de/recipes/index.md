@@ -2,7 +2,7 @@
 
 Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [Leitfäden](../guides/). Alles hier ist auf die v5-Vokabel (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) portiert und mit Guards versehen, um die 6 Varianten (strict × Terrain / Liquid / Model) zu bestehen.
 
-## Map
+## Übersicht
 
 | Seite | Inhalt |
 |---|---|
