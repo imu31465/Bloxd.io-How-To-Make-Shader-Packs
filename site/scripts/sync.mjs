@@ -33,6 +33,10 @@ const EXCLUDED = new Set(['00-full.md'])
 // テーマ内蔵の prev/next ページネーションが担うため、サイト掲載時は剥がす
 const NAV_LINE = /^ *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\)(?: *[·・] *\[(?:[^[\]]*)\]\([^)#h/][^)]*\.md\))* *$/
 
+// ユーザー向けページには、調査時点のビルドIDや確認日を表示しない。
+// これらは配信日時を示す情報ではなく、必要な内部調査記録は internals に分離する。
+const BUILD_METADATA_LINE = /^>.*(?:target build|対象ビルド|Ziel-Build|build objetivo|build cible|लक्ष्य बिल्ड|대상 빌드|build alvo|целевой билд|目标构建)/i
+
 function titleOf(src, fallback) {
   const match = src.match(/^#\s+(.+)$/m)
   return match ? match[1].trim() : fallback
@@ -98,7 +102,7 @@ function transform(src) {
       out.push(line)
       continue
     }
-    if (!inFence && NAV_LINE.test(line)) continue
+    if (!inFence && (NAV_LINE.test(line) || BUILD_METADATA_LINE.test(line))) continue
     if (!inFence) {
       if (line === '') {
         if (prevBlank) continue

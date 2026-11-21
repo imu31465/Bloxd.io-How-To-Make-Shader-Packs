@@ -78,6 +78,12 @@ function stripH1(src) {
 
 const CATS = ['getting-started', 'api', 'guides', 'recipes', 'troubleshooting', 'internals', 'history']
 
+// ビルドID・確認日は配信日時ではないため、利用者向け総合マニュアルには掲載しない。
+const BUILD_METADATA_LINE = /^>.*(?:target build|対象ビルド|Ziel-Build|build objetivo|build cible|लक्ष्य बिल्ड|대상 빌드|build alvo|целевой билд|目标构建)/i
+function stripBuildMetadata(src) {
+  return src.split('\\n').filter(line => !BUILD_METADATA_LINE.test(line)).join('\\n')
+}
+
 for (const code of langs) {
   const langDir = path.join(repoRoot, code)
   if (!fs.existsSync(langDir)) continue
@@ -99,7 +105,7 @@ for (const code of langs) {
     // --- カテゴリ index ---
     const indexPath = path.join(catDir, 'index.md')
     if (fs.existsSync(indexPath)) {
-      const { body } = stripH1(fs.readFileSync(indexPath, 'utf8'))
+      const { body } = stripH1(stripBuildMetadata(fs.readFileSync(indexPath, 'utf8')))
       parts.push('\n---\n', `## ${catTitle}`, demoteHeadings(rewriteLinksForRoot(body.replace(/^\n+/, ''), `${cat}/`)))
     }
 
@@ -119,7 +125,7 @@ for (const code of langs) {
       return a < b ? -1 : a > b ? 1 : 0
     })
     for (const f of files) {
-      const { title, body } = stripH1(fs.readFileSync(path.join(catDir, f), 'utf8'))
+      const { title, body } = stripH1(stripBuildMetadata(fs.readFileSync(path.join(catDir, f), 'utf8')))
       parts.push('\n---\n', `## ${title || f.replace(/\.md$/, '')}`, demoteHeadings(rewriteLinksForRoot(body.replace(/^\n+/, ''), `${cat}/`)))
     }
   }
