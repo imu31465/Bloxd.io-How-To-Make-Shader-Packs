@@ -14,6 +14,5 @@
 8. [验证](validation.md) — 三阶段加载检查与实机测试
 9. [分发](distribution.md) — 打 zip 与发布卫生
 
-> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](../api/)；要现成效果请看[实战配方](../recipes/)。

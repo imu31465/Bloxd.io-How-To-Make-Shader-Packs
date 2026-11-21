@@ -1,6 +1,6 @@
 # API 레퍼런스
 
-현행 API v5 의 체계적인 사양서이다. 모두 대상 빌드 `bny9u` (2026-11-05; 프로덕션과 preprod 가 동일 번들) 에서의 실측에 기반한다. 모든 팩 앞에 엔진이 자동으로 붙이는 헤더 (전문은 [엔진 내부와 연구](../internals/engine-header.md)) 가 이 절의 1차 자료다.
+이 페이지는 현행 API v5 사양을 설명한다. API 정의의 기본 자료는 엔진이 모든 팩의 앞에 자동으로 추가하는 엔진 헤더다 (전체 내용은 [엔진 내부와 연구](../internals/engine-header.md) 참조).
 
 ## 구성
 
@@ -17,8 +17,8 @@
 | [전처리기](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [제한과 예약명](restrictions.md) | 언어 기능 제한, 예약 식별자 |
 | [호환성](compatibility.md) | 구버전 팩의 취급, 저장 팩 재검증 |
-| [텍스처 카탈로그](texture-catalog.md) | 사용 가능 896 이름의 실측 카탈로그 (검색 가능) |
+| [텍스처 카탈로그](texture-catalog.md) | 사용 가능한 이름 지정 상수 1,017개 (검색 가능) |
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Analyzed (헤더·검증기에서 그대로 복원)
+> 대상 API: 5 · 검증 상태: Analyzed (엔진 헤더와 검증기에서 복원)
 
 v4 에서 이주해야 한다면 [버전 히스토리: v5](../history/v5.md) 를 보라.

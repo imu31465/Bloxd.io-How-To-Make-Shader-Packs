@@ -1,6 +1,6 @@
 # Référence API
 
-La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est mesuré sur le build cible `bny9u` (2026-11-05 ; production et preprod identiques). L'en-tête du moteur préfixé à chaque pack (reproduit dans [Internals du moteur](../internals/engine-header.md)) est la source principale.
+Cette page présente la référence de l’API v5 actuelle. La source principale des définitions est l’en-tête que le moteur ajoute automatiquement au début de chaque pack (voir [Internals du moteur](../internals/engine-header.md) pour l’en-tête complet).
 
 ## Plan
 
@@ -17,8 +17,8 @@ La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est
 | [Préprocesseur](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](restrictions.md) | limites du langage, identifiants réservés |
 | [Compatibilité](compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
-| [Catalogue de textures](texture-catalog.md) | les 896 noms utilisables (recherchables) |
+| [Catalogue de textures](texture-catalog.md) | 1 017 constantes nommées disponibles (recherchables) |
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
+> API : 5 · État : Analyzed (reconstitué à partir de l’en-tête du moteur et du validateur)
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](../history/v5.md).

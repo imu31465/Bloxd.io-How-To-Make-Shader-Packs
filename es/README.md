@@ -6,13 +6,11 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 
 - API actual: **5** (`pack.json` debe declarar `apiVersion: 5`)
 - Objetivo: renderizador WebGPU
-- Última verificación: 2026-11-20
-- Build objetivo: `bbb6l5` (verificado en producción y preprod el 2026-11-20)
 - Hooks de sombreado: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 ¿Nuevo con los shader packs? Empieza por [Primeros pasos](getting-started/). ¿Consultas de la API? Mira [Referencia de la API](api/).
 
-> Esta documentación no es un recurso oficial de los desarrolladores del juego. Las interioridades del motor pueden cambiar con las actualizaciones — comprueba el build objetivo y el estado de verificación anotados en cada página.
+> Esta documentación no es un recurso oficial de los desarrolladores del juego. Los mecanismos internos del motor son detalles de implementación y pueden cambiar con las actualizaciones; consulta la referencia de la API para conocer el comportamiento compatible.
 >
 > Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifícala contra el comportamiento real del juego. Sigue verificando las recetas contra la pantalla del cargador y la compilación en el juego.
 >
@@ -41,11 +39,11 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 
 ## Estados de verificación
 
-Cada página anota su versión de API objetivo, build, fecha de última verificación y estado.
+Cada página indica la versión de API que cubre y el estado de verificación de su contenido.
 
 | Etiqueta | Significado |
 |---|---|
-| Verified | verificado en el dispositivo / en el build objetivo |
+| Verified | verificado mediante el juego |
 | Analyzed | confirmado analizando la implementación interna |
 | Partially Verified | confirmado solo parcialmente |
 | Experimental | experimental / sin consolidar |

@@ -14,6 +14,5 @@ Ce guide vous accompagne de la découverte des bases jusqu’aux tests et à la 
 8. [Validation](validation.md) — le contrôle de chargement en 3 étapes et les tests sur appareil
 9. [Distribution](distribution.md) — compression en zip et hygiène de publication
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20) · État : Verified/Analyzed
 
 Quand vous avez besoin de la spécification complète, poursuivez vers la [Référence API](../api/) ; pour des effets prêts à l'emploi, voyez les [Recettes](../recipes/).

@@ -1,6 +1,6 @@
 # API Reference
 
-The systematic specification of the current API v5. Everything here is measured from target build `bny9u` (2026-11-05; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](../internals/engine-header.md)) is the primary source.
+This page documents the current API v5. The primary source for API definitions is the engine header automatically prepended to each pack (see [Engine Internals](../internals/engine-header.md) for the full header).
 
 ## Map
 
@@ -17,8 +17,8 @@ The systematic specification of the current API v5. Everything here is measured 
 | [Preprocessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](restrictions.md) | language limits, reserved identifiers |
 | [Compatibility](compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](texture-catalog.md) | all 896 usable names (searchable) |
+| [Texture catalog](texture-catalog.md) | 1,017 available named constants (searchable) |
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Analyzed (restored verbatim from header & validator)
+> Target API: 5 · Status: Analyzed (reconstructed from the engine header and validator)
 
 Migrating from v4? See [Version History: v5](../history/v5.md).

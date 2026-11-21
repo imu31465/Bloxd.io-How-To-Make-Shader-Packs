@@ -53,12 +53,38 @@ function rewriteLinksForRoot(src, pageDir) {
 }
 
 // 見出しを 1 段下げ (コードフェンス内はそのまま)
+const BUILD_METADATA_FIELD = /^(?:target\s*build|対象ビルド|build\s+objetivo|build\s+alvo|build\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड|last[- ]verified|last verification|last checked|última verificación|última verificação|dernière vérification|zuletzt verifiziert|letzte verifikation|最后验证|最終確認日?|最後確認日|최종 확인일|마지막 확인|последняя проверка|дата последней проверки|अंतिम[- ]सत्यापन(?: तिथि)?)\s*[:：]/i
+
+// ビルドIDと確認日時は配信時刻・公開仕様を示すものではないため、全文版から除外する。
+function stripBuildMetadata(src) {
+  const out = []
+  let inFence = false
+  for (const originalLine of src.split('\n')) {
+    if (/^\s*(?:\x60{3}|~~~)/.test(originalLine)) {
+      inFence = !inFence
+      out.push(originalLine)
+      continue
+    }
+    if (!inFence && originalLine.startsWith('>')) {
+      if (/historical/i.test(originalLine) && /(?:target +build|対象ビルド|build +objetivo|build +alvo|build +cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)/i.test(originalLine)) continue
+      const parts = originalLine.replace(/^>\s*/, '').split(/\s*[·•]\s*/)
+      const kept = parts.filter(part => !BUILD_METADATA_FIELD.test(part))
+      if (kept.length === 0) continue
+      out.push('> ' + kept.join(' · '))
+      continue
+    }
+    out.push(originalLine)
+  }
+  return out.join('\n')
+}
+
+// 見出しを 1 段下げ (コードフェンス内はそのまま)
 function demoteHeadings(src) {
-  const lines = src.split('\n')
+  const lines = stripBuildMetadata(src).split('\n')
   let inFence = false
   return lines
     .map(line => {
-      if (/^\s*(```|~~~)/.test(line)) {
+      if (/^\s*(?:\x60{3}|~~~)/.test(line)) {
         inFence = !inFence
         return line
       }
@@ -67,7 +93,6 @@ function demoteHeadings(src) {
     })
     .join('\n')
 }
-
 function stripH1(src) {
   const m = src.match(/^#\s+[^\n]+\n/)
   if (!m) return { body: src, title: null }
@@ -89,7 +114,7 @@ for (const code of langs) {
   const readme = fs.readFileSync(path.join(langDir, 'README.md'), 'utf8')
   const cut = readme.indexOf('## ')
   const readmeHead = cut > 0 ? readme.slice(0, cut).trimEnd() : readme.trimEnd()
-  parts.push(readmeHead)
+  parts.push(stripBuildMetadata(readmeHead))
 
   for (const cat of CATS) {
     const catDir = path.join(langDir, cat)
