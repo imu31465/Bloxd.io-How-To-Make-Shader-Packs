@@ -14,6 +14,5 @@ Este guia apresenta o processo de criação de um shader pack, dos conceitos bá
 8. [Validação](validation.md) — a verificação de carga em 3 etapas e os testes no dispositivo
 9. [Distribuição](distribution.md) — compactação em zip e higiene de lançamento
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified/Analyzed
 
 Quando você precisar da especificação completa, siga para a [Referência da API](../api/); para efeitos prontos, veja [Receitas](../recipes/).
