@@ -446,7 +446,7 @@ v4 और उससे पहले का "लाइटिंग चालू/�
 ## API रेफ़रेंस
 यह पृष्ठ मौजूदा API v5 का विवरण देता है। API की परिभाषाओं का मुख्य स्रोत इंजन हेडर है, जिसे इंजन हर पैक की शुरुआत में अपने-आप जोड़ता है (पूरा हेडर [इंजन की आंतरिक जानकारी](internals/engine-header.md) में देखें)।
 
-### नक़्शा
+### विषय-सूची
 
 | पेज | सामग्री |
 |---|---|
@@ -2872,7 +2872,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 - [टेक्सचर API](api/texture-api.md) — नाम lookup और sampling
 - [टेक्सचर रजिस्ट्री कैसे काम करती है](internals/texture-registry.md) — नामित constants
-- [टेक्सचर सैंपलिंग इंटर्नल्स](internals/texture-sampling.md) — sampling का व्यवहार
+- [टेक्सचर सैंपलिंग आंतरिक विवरण](internals/texture-sampling.md) — sampling का व्यवहार
 
 
 ---
@@ -2986,7 +2986,7 @@ let lit = sunL * sky;
 
 ### संबंधित
 
-- [यथार्थवाद रेसिपियाँ](recipes/realism.md) (पूरी प्रक्षेपित-छाया रेसिपी) · [प्रकाश इंटर्नल्स](internals/lighting-internals.md) · [दोषमार्जन युक्तियाँ](guides/debugging.md)
+- [यथार्थवाद रेसिपियाँ](recipes/realism.md) (पूरी प्रक्षेपित-छाया रेसिपी) · [प्रकाश व्यवस्था का आंतरिक विवरण](internals/lighting-internals.md) · [दोषमार्जन युक्तियाँ](guides/debugging.md)
 
 
 ---
@@ -3151,9 +3151,9 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 `bloxdModelLight` वही `BloxdSurface` / `BloxdLightIn` लेता है और `bloxdDefaultLight` / `bloxdLitColour()` के साथ काम करता है। एनचैंट चमक (`enchantColour`) और हर्ट फ़्लैश (`overlayColour`) `bloxdLitColour` के भीतर मिलते हैं, इसलिए **डिफ़ॉल्ट दोनों रूप अपने आप बनाए रखते हैं**; इन्हें नियंत्रित करने के लिए [एनचैंट प्रभाव](recipes/enchant-effects.md) देखें।
 
-### इंटर्नल्स
+### आंतरिक विवरण
 
-मॉडल कैसे रेंडर होते हैं और फ़्लैग/एनचैंट इनपुट कैसे बहते हैं: [इंजन इंटर्नल्स: मॉडल रेंडरिंग](internals/model-rendering.md); `bloxdSpItemLocalPosition` और `bloxdSpEnchant` जैसे जनरेटेड प्रतीक [प्रतिबंधों](api/restrictions.md) में सूचीबद्ध हैं।
+मॉडल कैसे रेंडर होते हैं और फ़्लैग/एनचैंट इनपुट कैसे बहते हैं: [इंजन की आंतरिक संरचना: मॉडल रेंडरिंग](internals/model-rendering.md); `bloxdSpItemLocalPosition` और `bloxdSpEnchant` जैसे जनरेटेड प्रतीक [प्रतिबंधों](api/restrictions.md) में सूचीबद्ध हैं।
 
 
 ---
@@ -4643,7 +4643,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### संबंधित
 
-- [सत्यापन त्रुटियाँ](troubleshooting/validation.md) · [इंजन इंटर्नल्स: WGSL कंपाइलेशन](internals/wgsl-compilation.md) · [प्रतिबंध](api/restrictions.md)
+- [सत्यापन त्रुटियाँ](troubleshooting/validation.md) · [इंजन आंतरिक विवरण: WGSL कंपाइलेशन](internals/wgsl-compilation.md) · [प्रतिबंध](api/restrictions.md)
 
 
 ---
@@ -4714,7 +4714,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### संबंधित
 
-- [प्रतिबंध और आरक्षित नाम](api/restrictions.md) · [इंजन इंटर्नल्स: शेडर सत्यापन](internals/shader-validation.md) · [वेरिएंट-विशिष्ट समस्याएँ](troubleshooting/variants.md)
+- [प्रतिबंध और आरक्षित नाम](api/restrictions.md) · [इंजन आंतरिक विवरण: शेडर सत्यापन](internals/shader-validation.md) · [वेरिएंट-विशिष्ट समस्याएँ](troubleshooting/variants.md)
 
 
 ---
@@ -4832,7 +4832,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### संबंधित
 
-- [लाइटिंग समस्याएँ](troubleshooting/lighting.md) · [दोषमार्जन युक्तियाँ](guides/debugging.md) · [फ़ॉग इंटर्नल्स](internals/fog-internals.md)
+- [लाइटिंग समस्याएँ](troubleshooting/lighting.md) · [दोषमार्जन युक्तियाँ](guides/debugging.md) · [कोहरे का आंतरिक विवरण](internals/fog-internals.md)
 
 
 ---
@@ -4905,7 +4905,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### संबंधित
 
-- [टेक्सचर API](api/texture-api.md) · [टेक्सचर कैटलॉग](api/texture-catalog.md) · [टेक्सचर रजिस्ट्री इंटर्नल्स](internals/texture-registry.md)
+- [टेक्सचर API](api/texture-api.md) · [टेक्सचर कैटलॉग](api/texture-catalog.md) · [टेक्सचर रजिस्ट्री आंतरिक विवरण](internals/texture-registry.md)
 
 
 ---
@@ -4957,11 +4957,11 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### सिद्धांत चाहिए?
 
 - छाया: [छायाएँ](guides/shadows.md) (skyLight = वॉक्सेल छाया-नक्शा)
-- फ़ॉग: [इंजन इंटर्नल्स: फ़ॉग इंटर्नल्स](internals/fog-internals.md)
+- फ़ॉग: [इंजन आंतरिक विवरण: कोहरे का आंतरिक विवरण](internals/fog-internals.md)
 
 ### संबंधित
 
-- [लाइटिंग](api/lighting.md) · [विज़ुअल समस्याएँ](troubleshooting/visual.md) · [प्रकाश इंटर्नल्स](internals/lighting-internals.md)
+- [लाइटिंग](api/lighting.md) · [विज़ुअल समस्याएँ](troubleshooting/visual.md) · [प्रकाश व्यवस्था का आंतरिक विवरण](internals/lighting-internals.md)
 
 
 ---
@@ -5078,7 +5078,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### प्र. पैक किन गेमों में चलते हैं?
 
-ज़्यादातर गेम strict मोड में चलते हैं (कोई vertex एनीमेशन नहीं, कोई `discard` नहीं)। Vertex एनीमेशन केवल allow-सूचीबद्ध गेमों में चलता है। प्रति-शीर्षक सूची [इंजन इंटर्नल्स: पॉलिसी](internals/policy.md) में है।
+ज़्यादातर गेम strict मोड में चलते हैं (कोई vertex एनीमेशन नहीं, कोई `discard` नहीं)। Vertex एनीमेशन केवल allow-सूचीबद्ध गेमों में चलता है। प्रति-शीर्षक सूची [इंजन आंतरिक विवरण: पॉलिसी](internals/policy.md) में है।
 
 #### प्र. क्या पैक मोबाइल पर चलते हैं?
 
@@ -5124,8 +5124,8 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [शेडर सत्यापन](internals/shader-validation.md) | एनालाइज़र की आंतरिक बनावट, सिग्नेचर तालिका, HEADER_VERSION |
 | [WGSL कंपाइलेशन](internals/wgsl-compilation.md) | चरण-2 का असली कंपाइलेशन और सत्यापन स्टब |
 | [आरक्षित पहचानकर्ता](internals/reserved-identifiers.md) | 46 `bloxdSp*` प्रतीक |
-| [प्रकाश इंटर्नल्स](internals/lighting-internals.md) | blockLight / heldLight की संरचना |
-| [फ़ॉग इंटर्नल्स](internals/fog-internals.md) | केवल रैखिक कमी, 32 ब्लॉक में फैला संक्रमण क्षेत्र |
+| [प्रकाश व्यवस्था का आंतरिक विवरण](internals/lighting-internals.md) | blockLight / heldLight की संरचना |
+| [कोहरे का आंतरिक विवरण](internals/fog-internals.md) | केवल रैखिक कमी, 32 ब्लॉक में फैला संक्रमण क्षेत्र |
 | [टेक्सचर सैंपलिंग](internals/texture-sampling.md) | तीन वेरिएंट के लिए टेक्सचर कोड जनरेशन |
 | [टेक्सचर रजिस्ट्री](internals/texture-registry.md) | नाम lookup, animation और rotation नाम |
 | [मॉडल रेंडरिंग](internals/model-rendering.md) | v5 का Model प्रोग्राम |
@@ -5214,7 +5214,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ---
 
-## हुक इनवोकेशन इंटर्नल्स
+## हुक इनवोकेशन आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 इंजन रनटाइम पर हुक कैसे बुलाता है। इससे आपके लिखे कोड पर कुछ नहीं बदलता, पर हुक क्या पाते हैं इसका अंदाज़ा-लगाना मिट जाता है।
@@ -5256,11 +5256,11 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | `directional` | प्रति-दिशात्मक-प्रकाश लैम्बर्ट का vertex-इंटरपोलेटेड योग ([रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) में 2-प्रकाश सेटअप) |
 | `diffuse` / `emissive` | सामग्री की दिशात्मक RGB प्रतिक्रिया / RGB चमक |
 | `ambient` | `material.ambient × sceneAmbient` — प्रति सामग्री, प्रति फ़्रेम |
-| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश इंटर्नल्स](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश व्यवस्था का आंतरिक विवरण](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | संगत uniform |
-| `heldLight` | लाइट-लेवल varying और held-light uniform से बनता है (शंकु-फ़ॉलऑफ़ [प्रकाश इंटर्नल्स](internals/lighting-internals.md) में) |
+| `heldLight` | लाइट-लेवल varying और held-light uniform से बनता है (शंकु-फ़ॉलऑफ़ [प्रकाश व्यवस्था का आंतरिक विवरण](internals/lighting-internals.md) में) |
 | `fogColour` | केवल पूरी तरह फ़ॉग-रहित scene (मोड 0) में काला |
-| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([फ़ॉग इंटर्नल्स](internals/fog-internals.md)) |
+| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([कोहरे का आंतरिक विवरण](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying और flat-इंटरपोलेटेड मान (`BloxdSurfaceIn` जैसे ही — vertex-हुक-बाद के मान) |
 
 ### संबंधित
@@ -5655,7 +5655,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## आरक्षित पहचानकर्ता इंटर्नल्स
+## आरक्षित पहचानकर्ता आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 `bloxdSp*` नेमस्पेस — वे प्रतीक जो जनरेटर इंजेक्ट कर सकते हैं और जिन्हें पैक इसीलिए पुनः घोषित नहीं कर सकते। पैक-लेखकों के लिए सारांश: [प्रतिबंध](api/restrictions.md)।
@@ -5696,7 +5696,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## लाइटिंग इंटर्नल्स
+## लाइटिंग आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 `blockLight` तीन RGB चैनलों वाला **रंगीन प्रकाश** है। प्रत्येक प्रकाश-उत्सर्जक ब्लॉक एक उत्सर्जन रंग `[R, G, B]` (प्रत्येक 0–15) परिभाषित करता है, जो सीधे ही प्रकाश का रंग बन जाता है (सामान्य मशाल = उष्ण श्वेत (14,14,12) / लावा = नारंगी (14,8,2) / बीकन = सियान (5,14,14) / श्वेत मशाल = (15,15,15) आदि)। शीर्ष (vertex) चरण में यह एक float एट्रिब्यूट में r / g / b / sky — चार निबल के रूप में पैक होकर आता है। लाइट हुक के भीतर तीनों चैनलों को अलग-अलग संभालना रंगीन स्थानीय प्रकाश को संभव बनाता है — उष्ण-मशाल रेसिपी (R9.1) इसी व्यवहार के विरुद्ध कैलिब्रेट है।
 
@@ -5711,7 +5711,7 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ---
 
-## फ़ॉग इंटर्नल्स
+## कोहरे का आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 फ़ॉग-परिकलन सदा LINEAR मोड है (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` के बराबर, clamp 0..1), जिसमें `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = फ़ॉग-दूरी सेटिंग; केवल D = 0 विशेष है, fogEnd = 5 के साथ)। **फ़ॉग प्रवणता पट्टी केवल 32 ब्लॉक चौड़ी** है, और `l.fogAlpha` "दूरी-धुंध" से कम और **लोड होती दुनिया के किनारे तक की प्रसामान्यीकृत दूरी** ज़्यादा है। यह लोड-दूरी के साथ खिलाड़ी-अनुसार बदलती है, इसलिए दूरी-आधारित प्रभाव `distance(l.position, bloxdEyePosition())` ख़ुद गिनें (नीचे "लोड-सीमा पट्टी" अनुभाग)। (रेंडरर का फ़ॉग फ़ंक्शन वास्तव में **चार** मोड लागू करता है — बंद / चरघातांकी / चरघातांकी-वर्ग / रैखिक — और भेजे गए शीर्षक रैखिक वाला चलाते हैं; बहाल स्रोत और टिकाऊपन का तर्क [संस्करण इतिहास: v3](history/v3.md) में सुरक्षित हैं।)
@@ -5738,7 +5738,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## टेक्सचर सैंपलिंग इंटर्नल्स
+## टेक्सचर सैंपलिंग आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 `bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — तीन वेरिएंट के लिए टेक्सचर कोड जनरेशन। उपयोगकर्ता-पक्ष: [टेक्सचर API](api/texture-api.md)।
@@ -5820,12 +5820,12 @@ Pack लोड करते समय loader हर नामित constant क
 
 - [टेक्सचर कैटलॉग](api/texture-catalog.md) — उपलब्ध नाम और constants
 - [टेक्सचर API](api/texture-api.md) — टेक्सचर lookup और sampling
-- [टेक्सचर सैंपलिंग इंटर्नल्स](internals/texture-sampling.md) — sampling कैसे काम करती है
+- [टेक्सचर सैंपलिंग आंतरिक विवरण](internals/texture-sampling.md) — sampling कैसे काम करती है
 
 
 ---
 
-## मॉडल रेंडरिंग इंटर्नल्स
+## मॉडल रेंडरिंग आंतरिक विवरण
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 v5 Model प्रोग्राम की आंतरिक बनावट। उपयोगकर्ता-सामने की गाइड: [मॉडल और टेक्सचर](guides/models.md)।
