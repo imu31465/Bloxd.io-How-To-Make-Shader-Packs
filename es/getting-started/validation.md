@@ -2,13 +2,13 @@
 
 > API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
 
-## La comprobación de carga de 3 etapas
+## Las tres etapas de comprobación
 
 1. **Límites del cargador** — tamaño, forma, validez del manifiesto (ver [Estructura del paquete](pack-structure.md))
 2. **Validación estática (analizador)** — sintaxis, tipos, nombres reservados, contrato strict, en las 6 variantes
 3. **Compilación WebGPU real en el navegador** — la comprobación de tipos de la validación estática es incompleta, así que algunos errores solo afloran aquí
 
-Para leer cada error, ver [Solución de problemas](../troubleshooting/) (organizado por síntoma).
+Para interpretar los errores, consulta [Solución de problemas](../troubleshooting/), organizado por síntoma.
 
 ## Procedimiento
 
