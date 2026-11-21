@@ -9,9 +9,9 @@
 ---
 
 ## 入门指南
-面向初次制作着色器包的作者的单线教程，从概览到分发。它直接讲授已完成的 API v5 形态 (无需先读旧版本 — 那是[版本历史](history/)的职责)。
+本指南按步骤介绍如何创建、测试并发布第一个着色器包。内容以当前 API v5 为准；旧版本的迁移方法见[版本历史](history/)。
 
-### 学习路线
+### 学习顺序
 
 1. [概览与前置条件](getting-started/overview.md) — 着色器包能做什么、不能做什么
 2. [环境要求](getting-started/requirements.md) — 浏览器与渲染器要求
@@ -23,10 +23,9 @@
 8. [验证](getting-started/validation.md) — 三阶段加载检查与实机测试
 9. [分发](getting-started/distribution.md) — 打 zip 与发布卫生
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified/Analyzed
+> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified/Analyzed
 
 需要完整规格时请继续前往 [API 参考](api/)；要现成效果请看[实战配方](recipes/)。
-
 
 ---
 
@@ -37,7 +36,7 @@
 
 Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包以**受限的 WGSL 子集**编写，从游戏内设置 → 着色器包 (Shader Pack) 界面以 zip 或文件夹形式加载。安装包期间，设置中的 WebGPU 渲染器会被强制启用。
 
-包以纯 WGSL 验证与编译 — 没有 JavaScript 执行、没有网络访问。正常编写不会发生任何危险。
+包内代码会作为 WGSL 进行验证和编译。WGSL 包代码无法执行 JavaScript，也无法发起网络请求。
 
 ### 你能改变什么
 
@@ -62,7 +61,6 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 - 当前游戏只接受 `apiVersion: 5` 的包；v1–v4 包加载即被拒绝 (已保存的包会静默失效 — [兼容性](api/compatibility.md))
 - 要迁移为旧版本编写的包？见[版本历史](history/)
 - 引擎内部可能随更新变化，因此每页都标注目标构建
-
 
 ---
 
@@ -470,7 +468,7 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 | [兼容性](api/compatibility.md) | 旧版本包、已保存包重验 |
 | [纹理目录](api/texture-catalog.md) | 全部 896 个可用名称 (可搜索) |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Analyzed (从标头与验证器逐字复原)
 
 从 v4 迁移？请看[版本历史: v5](history/v5.md)。
 
@@ -1843,11 +1841,11 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 **名称**列是注册表名称 — 也就是你实际书写的句柄。常量拼写取文件名的驼峰形式: `grass_top` → `bloxdTextureIdGrassTop`、`lava` → `bloxdTextureIdLava`。**大小写与下划线不区分** (`bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析结果相同)。名称即 API — 加载器在加载时对照现行注册表重新解析，因此名称能在注册表漂移中幸存 ([纹理 API](api/texture-api.md))。
 
-**id**列是常量比较时所对的值 — 实测于 `v98qt8` (图集层 + 1)。用它解读 `surface.textureId` 转储、把调试输出与当日构建互相核对即可。**切勿把 id 写进 WGSL** — 它只是某一构建图集顺序的快照 (见下方漂移实测)。
+**id**列是常量比较时所对的值 — 实测于 `bbb6l5` (图集层 + 1)。用它解读 `surface.textureId` 转储、把调试输出与当日构建互相核对即可。**切勿把 id 写进 WGSL** — 它只是某一构建图集顺序的快照 (见下方漂移实测)。
 
 **备注**列标出两个折叠族。「动画（N帧）」表示采样该名称会自动返回当前动画帧 — **切勿书写帧号后缀** (`lava0` 是已知的别名，有专属诊断)。「旋转族（4副本）」表示该纹理只以预旋转槽位存在 — 名称指向根，`bloxdTexel` 会在采样时重新应用旋转。恰好一个名称 (`radar_screen`) 同时带两条备注。
 
-刻意**不**列出的是: 其余注册表拼写 — 196 个帧别名与 228 个旋转别名 — 它们不是可用常量；写它们会得到引擎的专属错误消息。底层的 1,650 行层表 (含 171 个预旋转槽位) 属引擎内部数据，见[引擎内部: 纹理注册表](internals/texture-registry.md)。
+这张包含 1,650 层的图集表属于引擎内部数据，结构和测量方法见[引擎内部：纹理注册表](internals/texture-registry.md)。
 
 #### 数字之间如何对上
 
@@ -1856,14 +1854,14 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | 数量 | 统计对象 |
 |---|---|
 | **1,017** | 可用具名常量 — 可写成 `bloxdTextureId*` 的纹理名称 |
-| **776** | 别名 (196 帧 + 228 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
+| **776** | 别名 (520 帧 + 256 旋转) — 被识别却*被拒绝*并指回基础名称的拼写；它们是名称不是常量，也不贡献 id |
 | **1,650** | 图集条目 — 纹理图集中的实际槽位 (id 1–1650) |
 
-906 个名称各自映射到一个不同的图集条目。其余 **321 个条目**是没有可用名称的附加动画帧 (150) 与预旋转副本 (171) — 包从不直接引用它们，因为 `bloxdTexel` 会自动播放帧并应用旋转。每个动画族的首帧与每个旋转族的根*都*有名称，因此有些条目既计入「具名」又计入「帧/旋转基」。对比: v4 有 905 个可用名称，v5 首发构建 896 个，次日构建 1,017 个，`bny9u` 911 个；本构建为 1,017 — v5 首发时移除的 10 个名称在 `xkg8x` 回归 (加上先前的 +1 `scorpion_eggs`)，`bny9u` 加入了交易终端 (×3) 与石头发生器 (×2)，`v98qt8` 用 `hay_block_top` 换掉了六个转为模型的方块纹理 — `xkg8x` 幸存的 1,017 个名称中 864 个在 `bny9u` 改 id，另有 905 个中的 716 个在 `v98qt8` 改 id。
+`bbb6l5` 注册表中有 1,017 个可用名称，比 `v98qt8` 多 111 个。纹理 ID 可能随构建版本变化，因此应使用具名常量，不要在 WGSL 中硬编码数字 ID。
 
 ### 目录
 
-全部可用名称，按字母序。id 列即 `bloxdTextureId*` 的值 — 实测于 `v98qt8` (2026-11-08)。**id 是快照；把名称当作 API**: v4 构建 (cnty9) 与 v5 首发构建 (ab90qa) 之间有 334 个幸存名称改了 id，ab90qa 与 xkg8x 之间有 376 个，xkg8x 与本构建之间又有 864 个 (见下方漂移实测)。
+目录按字母顺序列出全部 1,017 个可用名称。id 列显示的是在 `bbb6l5` 上测得的值。ID 可能随构建版本变化，因此应在 WGSL 中通过名称引用纹理。
 
 | 名称 | id (bbb6l5) | 备注 |
 |---|---|---|
@@ -3026,7 +3024,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 
 - [纹理 API](api/texture-api.md) · [引擎内部: 纹理注册表](internals/texture-registry.md) · [版本历史: v4](history/v4.md)
 
-
 ---
 
 ## 指南
@@ -3048,7 +3045,7 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [与纹理包组合](guides/combinations.md) | 与纹理包的搭配 |
 | [调试技巧](guides/debugging.md) | 症状 → 原因诊断 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
 
 
 ---
@@ -3090,7 +3087,8 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | 树下/屋檐下明确压暗 (投影式) | ◎ | `skyLight` 提升逆变换 + 阈值切割 (见下) |
 | 阴影实时跟随方块编辑 | ◎ | LightEngine 立即重算 — 自动的 |
 | 阴影偏冷 / 向阳偏暖 | ◎ | 双色偏移 |
-| 阴影随太阳旋转 (阴影贴图) | ✕ | 深度仅限液体；光线遮挡不是输入 |
+| 随太阳和月亮移动的阴影 | ◎ | `bloxdShadow()` |
+| 读取阴影贴图深度 | ✕ | API 只提供最终阴影因子，不提供深度数据。 |
 | 物理半影 | ✕ | 受体素分辨率 BFS 扩散所限 |
 | 实时 AO (SSAO) | ✕ | 只有烘焙进顶点色的 AO |
 
@@ -3134,16 +3132,15 @@ let lit = sunL * sky;
 
 旋钮: **面积** = `shTh` (0.93→半径 1.5 / 0.87→2 / 0.80→3 / 0.67→5)；**边缘柔度** = `shSoft`；**影芯暗度** = 最低环境光与天空散射光的两点偏移；傍晚长影 ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`。
 
-### 老实的极限
+### `skyLight` 方案的限制
 
-- 阴影以**上方天空**为基准，因此**不随太阳旋转** (体素分辨率；柔边来自 BFS 扩散)
-- 引擎的光照模板保留着一个未使用的 `var shadow: f32 = 1.;` (恒为 1.0 = 禁用) — 像是像素级旋转阴影「未来计划」的痕迹
+- 这一限制只适用于旧的 `skyLight` 方法：它以**上方天空**为基准，**不会随太阳转动**。当前 API 的 `bloxdShadow()` 可以跟随太阳或月亮。
+
 - 像素级旋转阴影在当前 API 之外 ([达不到的表现](guides/constraints.md))
 
 ### 相关
 
 - [写实系配方](recipes/realism.md) (完整投影阴影配方) · [光照内部](internals/lighting-internals.md) · [调试技巧](guides/debugging.md)
-
 
 ---
 
@@ -3343,7 +3340,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - **逐面控制颜色、透明度与发光** —— 三个 `Surface` 钩子为地形、液体和模型返回颜色 (外加条件性的 alpha 与 emission)
 - **完整重建光照** —— 三个 `Light` 钩子与光照 API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) 把引擎自己的配方作为可组合的函数公开 ([光照 API](api/lighting.md))
-- **实时跟随方块编辑的投影风阴影** —— `skyLight` 是体素级的天空遮蔽数据；提升逆变换 + 阈值切割即可变成树下与屋檐下清晰的阴影 ([阴影](guides/shadows.md))
+- **随太阳与月亮移动的阴影** —— `bloxdShadow()` 返回引擎计算的最终阴影因子；`bloxdAirShadow(t)` 可沿相机到片元之间的视线采样阴影，`bloxdShadowDirection()` 返回光线方向（见[阴影](guides/shadows.md)）
 - **读取游戏自己的纹理** —— `bloxdTexel()` 以与引擎采样器完全相同的方式采样方块纹理图集与模型自有纹理 ([纹理 API](api/texture-api.md))
 - **逐模型特效** —— `flags` 直接告诉你「这是手持物」「这是掉落物」「这是玩家」「这是台阶」 ([flags](api/flags.md))；`localPosition` 提供模型局部坐标 ([输入输出结构体](api/structures.md))
 - **附魔辉光与受击闪光覆盖** —— `enchantTier` / `enchantColour` / `enchantSpeed` 与 `overlayColour` 均可读取、可覆写 ([附魔效果](recipes/enchant-effects.md))
@@ -3394,20 +3391,8 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | 水深吸收 | 液体钩子内的 `bloxdOpaqueBehind()` 厚度 + 底面投影 ([液体](recipes/liquids.md)) |
 | 水下氛围 | 接受色幕；对幕后可见的内容做文章 (地形/液体在水下仍正常渲染) |
 
-### 阴影的真相 —— 「树影」做得出来
-
-上表中不可能的只是**随太阳旋转的像素级阴影贴图**。引擎从一开始就在算「影」，那就是 `skyLight`。网格侧 LightEngine 运行类 Minecraft 算法：
-
-1. **纵列扫描**：每 (x,z) 列自上而下扫描。天空来光从 15 开始，**不透明方块处归 0**，此后按 `lightFilter` (空气 1 / 水 3 / 不透明 15) 衰减下降
-2. **BFS 泛洪**：向 6 邻横向扩散 (每格 -1) —— 这正是影缘变软的正体。半径 r 遮蔽物下的原始值为 (15-r)/15
-3. blockLight (火把等) 为 RGB 3 通道 (4bit 打包) 的另一路 BFS
-
-于是 `l.skyLight` 不是单纯的亮度参数，而是**「该处能否看见天空」的体素分辨率遮蔽数据 = 阴影贴图**。树下、屋檐下、室内数值本已偏低，经顶点插值平滑到达。放置/破坏方块即刻重算 = **实时跟随的阴影**。原版仅以 `mix(环境色, 空色, skyLight)` 「轻混」使用。
-
-正确的工具是[阴影](guides/shadows.md)中的两步 (**提升逆变换恢复原始值 → 阈值 `smoothstep` 二值化**；`th = 1 - r/15` 直接拨定「视为阴影的遮蔽半径」) 加上**以 sky 门控太阳直射光** (太阳只到达看得见天空之处 = 投影的正体)，再以向阳暖色 / 阴影冷色染色构成。
-
-**如实声明的限制**：该阴影以「上方天空」为基准，**不随太阳移动旋转**。分辨率为方块级 (柔边来自 BFS 扩散)。引擎光照模板中仍残留闭合的 `var shadow: f32 = 1.;` 阴影贴图桩 (恒为 1.0 = 无效)，可解读为「计划中的像素级旋转阴影」的痕迹。若非要像素级旋转阴影，只剩 API 之外的路线 (如 userscript GLSL 注入，有规则风险)。
-
+### `skyLight` 旧方案
+上文的 `skyLight` 方法可以压暗树下和屋檐下的区域，但它依据的是上方天空的可见性，不会随太阳转动。要使用随太阳或月亮移动的阴影，请改用 `bloxdShadow()`。
 ### 水下环境的实情
 
 水中的外观由 3 层构成：
@@ -3426,7 +3411,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - [模型与纹理](guides/models.md) —— 模型管线能到达哪里
 - [兼容性](api/compatibility.md) —— 旧版本包的行为
 - 这些限制逐版本的变化：[版本历史](history/)
-
 
 ---
 
@@ -3552,7 +3536,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [模型着色器](recipes/model-shaders.md) | v5 — 手持物品、皮肤、植物摇摆 |
 | [附魔效果](recipes/enchant-effects.md) | v5 — 移除、增强、重着色闪光 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
 
 
 ---
@@ -4661,7 +4645,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 卡顿 / 被实机检查弃用 | [性能](troubleshooting/performance.md) |
 | 法律、安全、常见问题 | [FAQ](troubleshooting/faq.md) |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (消息逐字采录自现行验证器与加载器)
 
 ### 错误出现在哪里
 
@@ -5307,7 +5291,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | [调试手段](internals/debugging.md) | URL 参数、统计面板 |
 | [研究日志](internals/research-log.md) | 方法论、构建历史、未验证事项 |
 
-> 目标API: 5 · 目标构建: `v98qt8` (2026-11-08 生产与preprod确认)
+> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认)
 
 内部机制不是稳定的 API 契约 — 它们可能随引擎更新而变化，每页都标注其证据构建 ([研究日志](internals/research-log.md))。
 
@@ -5976,111 +5960,63 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 ---
 
 ## 纹理注册表内部机制
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified (通过重新运行引擎自身的注册表构建器提取)
+> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified
 
-名称→id 的解析机制与实测的注册表漂移。面向用户的目录: [纹理目录](api/texture-catalog.md)。
+本页说明纹理名称如何解析为 ID，并汇总不同构建版本之间的注册表变化。供着色器包作者使用的当前名称列表见[纹理目录](api/texture-catalog.md)。
 
-### 方法论
+### 测量方法
 
-我们在微型 webpack harness 中，以随包分发的方块注册表纹理数据运行引擎自己的注册表构建模块 (本构建为 29812，由 chunk 52/53/54 携带)，以随包分发的方块注册表纹理数据 (主 bundle 中的数据模块 1351) 为对象，并记录其输出 — 这些数字是**生产包自身的计算结果**，不是重实现。
+我们使用生产构建自带的注册表构建器，对随游戏发布的方块纹理数据重新计算注册表。得到的指纹 `32451195` 与 `bbb6l5` 中预构建的图集一致。这些是引擎本身的计算结果，并非另行实现的估算。
 
-### 输出结构
+### 当前注册表
 
-| 输出 | v5 实测 | 含义 |
-|---|---|---|
-| `named` | **906** | 可写作 `bloxdTextureId<Name>` 引用的名称 |
-| `aliases` | 424 | 被折叠的拼写 — 196 个帧别名 (`lava0`…) 与 228 个旋转别名 (`chest_top[rot[1`…) |
-| `layers` | 1,227 | 完整的图集层表 — 911 个具名根、150 个附加动画帧、171 个预旋转槽位 |
+| 输出 | `bbb6l5` | 含义 |
+|---|---:|---|
+| `named` | **1,017** | 可作为 `bloxdTextureId<Name>` 常量使用的名称 |
+| `aliases` | **776** | 会解析到基名的其他拼写 |
+| `layers` | **1,650** | 纹理图集的总层数 |
+| 图集条带 | **7** | 六条完整条带和一条未填满的条带 |
+| 旋转族 | **64** | 带有逐面旋转变体的名称 |
+| 动画族 | **71** | 带有动画帧的名称 |
 
-### 折叠规则
+动画别名包括普通帧名称，以及用于混合相邻帧的过渡拼写。`radar_screen` 同时属于旋转族和动画族。
 
-- **动画族** (43 个): 帧拼写 (`lava0`–`lava7`) 折叠为基础名称 (`lava`)；`bloxdTexel` 在采样时返回当前帧
-- **旋转族** (57 个): 旋转槽位 (`[rot[1..4`) 折叠为根名称；`bloxdTexel` 重新应用逐面的 `textureRotation`
-- `radar_screen` 是唯一同属两族的名称 (它的四个预旋转副本各带一条 4 帧阶梯 — 因此图集上有 46 个动画根而非 43)
+### 名称折叠规则
 
-### 漂移 (cnty9 → ab90qa)
+- **动画：** `lava0`–`lava7` 这样的帧名称会解析到基名 `lava`。`bloxdTexel` 采样时会选择当前帧。
+- **旋转：** `[rot[1`–`[rot[4` 这样的槽位会解析到基名。`bloxdTexel` 会应用面的 `textureRotation`。
+- **过渡：** `frameA~frameB~interval` 表示图集中用于混合相邻两个动画帧的槽位。
 
-| 测量项 | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| 图集条目 | 1,219 | **1,210** |
-| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
-| 动画族 (帧拼写) | 42 (188) | **42 (188) — 不变** |
-| 可用具名常量 | 905 | **896** |
-| 幸存名称中的 id 变更 | — | **905 个中 334 个** |
+在 WGSL 中请使用名称常量，不要硬编码数字 ID。即使纹理名称仍然存在，ID 也可能随构建更新而变化。
 
-完整漂移 (11 个名称): 新增 (1) `scorpion_eggs`；移除 (10) 八个双箱纹理加 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (双箱离开了游戏数据；刷怪笼保留 `mob_spawner_block_top`)。
+### 各构建版本的变化
 
-### 漂移 (ab90qa → xkg8x)
+| 比较 | 图集层数 | 可用名称 | 主要变化 |
+|---|---:|---:|---|
+| `sjr0p7` → `cnty9` | 1,200 → 1,219 | — | 新增98项、删除79项；旋转纹理的命名规则改变 |
+| `cnty9` → `ab90qa` | 1,219 → 1,210 | 905 → 896 | 新增1个名称，删除10个 |
+| `ab90qa` → `xkg8x` | 1,210 → 1,220 | 896 → 906 | v5 首发时删除的10个名称全部恢复 |
+| `xkg8x` → `bny9u` | 1,220 → 1,232 | 906 → 911 | 为 Trading Terminal 和 Stone Generator 新增5个名称 |
+| `bny9u` → `v98qt8` | 1,232 → 1,227 | 911 → 906 | 新增1个名称；6种方块转为模型后，其纹理从注册表移除 |
+| `v98qt8` → `bbb6l5` | 1,227 → 1,650 | 906 → 1,017 | 新增423层；旋转族与动画族扩大；折叠回归已修复 |
 
-| 计量 | ab90qa (v5 首发) | xkg8x (v5 现行) |
-|---|---|---|
-| 图集条目 | 1,210 | **1,220** |
-| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
-| 动画族 (帧拼写) | 42 (188) | **42 (188) — 不变** |
-| 可用具名常量 | 896 | **906** |
-| 幸存名称的 id 变化 | — | **896 个中的 376 个** |
+每次更新都有许多名称被重新分配 ID。使用名称常量可以避免包依赖这些数字变化。
 
-完整漂移 (10 个名称): 新增 (10) — 双箱的 8 个纹理加上 `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side`。v5 首发时移除的名称全部回归 (双箱回到了游戏数据；刷怪笼侧面变体一并回归)。没有移除任何名称。
+### v98qt8 折叠回归（已修复）
 
-11月5日 (xkg8x → bny9u，1天): 条目 1,220 → 1,232 (+5，交易终端 ×3 与石头发电机 ×2 的纹理)；906 个名称中 864 个改 id (95%)；无移除；旋转族不变，动画族 42 → 43 (`trading_terminal_front`，8 帧 / 250 ms)。生产与预发环境提供同一字节一致的 bundle。
+在 `v98qt8` 中，引擎的动画纹理表使用拼写作为键，而折叠逻辑却要求键为槽位索引。因此，动画纹理的基名无法通过验证，各帧名称反而被公开为互相独立、没有动画效果的常量。
 
-### 漂移 (xkg8x → bny9u)
-
-| 计量 | xkg8x (v5) | bny9u (v5 现行) |
-|---|---|---|
-| 图集条目 | 1,220 | **1,232** |
-| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
-| 动画族 (帧拼写) | 42 (188) | **43 (196)** |
-| 可用具名常量 | 906 | **911** |
-| 幸存名称的 id 变化 | — | **906 个中的 864 个** |
-
-完整漂移 (5 个名称): 新增 (5) — `trading_terminal_front` (动画, 8帧) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top`。两个新方块 (交易终端、石头发电机) 加入了游戏数据。无移除；id 洗牌几乎全量 (幸存名称的 95%)。
-
-
-### 漂移 (bny9u → v98qt8)
-
-| 测量 | bny9u (v5) | v98qt8 (v5, 现行) |
-|---|---|---|
-| 图集条目 | 1,232 | **1,227** |
-| 旋转族 (旋转拼写) | 57 (228) | **57 (228) — 不变** |
-| 动画族 (帧拼写) | 43 (196) | **43 (196) — 不变** |
-| 可用命名常量 | 911 | **906** |
-| 幸存名称的 id 变动 | — | **905 个中的 716 个** (79%) |
-
-完整漂移 (7 个名称): 新增 (1) `hay_block_top`; 移除 (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — 熔炉、工作台 (合成台) 与工匠台从带地形纹理的方块转为方块模型，其地形纹理随之离开注册表 (工作台保留了 `crafting_table_top` — 顶面仍是地形纹理))生产与 preprod 提供同一字节相同的包 (md5 `7458fd47ff88331d9f451d1456ff48ac`)。
-
-### v98qt8 折叠回归
-
-`v98qt8` 携带一个经字节级验证的纹理常量折叠回归。数据模块 (1351) 现在把 `animatedBlockTextures` 构建为**以拼写为键的 Array** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — 已在线上主包中 hexdump 验证)，而分类器 (模块 30048) 仍在两处期待**以槽位为键的数组**:
-
-1. `hii.forEach((value, key))` — `Array.prototype.forEach` 永远不会遍历字符串键，因此额外帧的 slot→base 映射保持为空
-2. `hii[Qi]` (其中 `Qi` = 图集槽位) — 以槽位索引进行的方括号访问永远命中不了拼写键，因此基本拼写的折叠 (`lava0` → `lava`) 永远不会触发
-
-后果 (全部通过在 Node 中原样运行生产分类器与解析器实测):
-
-- 43 个动画族基本名 (`lava`、全部 `*_portal`、`smoke`、`radar_screen`、`trading_terminal_front`、19 个 `*_running` 机器纹理等) **验证失败**: `bloxdTextureIdLava` → "There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?"
-- 196 个帧拼写 (`lava0`–`lava7` 等) 解析为**各自独立的可用常量** (只采样基本帧 — 无动画)
-- 专用诊断 "names a frame of the animated texture" 永远无法触发 (不存在帧别名)
-- 引擎的运行时 `named` 集合为 1,047 行，因此引擎为 `HEADER_VERSION` 计算的注册表哈希是 `694df62c` — 而非预期的 `df6c1915` (折叠后) — 这还额外迫使**每个已保存的包在本构建上重新验证**
-
-对照实验: 向同一分类器喂入以槽位为键的数组 (折叠逻辑自身所期待的、也是 `bny9u` 的数据模块所产出的形式) 可精确重现文档记载的折叠输出 — 906 named (`lava` 位于 id 1)、`lava0`–`lava7` 作为帧别名、424 个别名、1,227 层。下面的折叠规则描述的正是该预期 API。
+该问题已在 `bbb6l5` 修复：动画表重新使用槽位索引，动画基名恢复验证，注册表指纹也与随游戏发布的图集一致。本节仅保留为历史记录，不代表当前构建的状态。
 
 ### 对 HEADER_VERSION 的影响
 
-注册表哈希后缀烘焙了 id，因此这次漂移会把**每个已保存的包标记为「需要重新检查」** (页面加载时自动重验)。按名称编写的包经得起重新解析；裸 id 包会损坏 ([兼容性](api/compatibility.md))。
+注册表指纹是 `HEADER_VERSION` 的一部分，因此注册表变化可能触发包重新验证。使用名称的包会解析到新的 ID；硬编码数字 ID 的包则可能无法正常工作。详见[兼容性](api/compatibility.md)。
 
-### 过往漂移记录
+### 相关页面
 
-十月的双构建对比 (sjr0p7 → cnty9，10 天): 条目 1200 → 1219 (新增 98、移除 79)；1121 个未改名名称中 779 个改了 id (69%)；一次命名约定迁移 (`_rot1..4` 后缀 → `[rot[1..4` 槽位)；双箱出现。完整记录见[版本历史: v4](history/v4.md)。
-
-11月4日 (ab90qa → xkg8x，1天): 条目 1,210 → 1,220 (+10，全部为回归名称 — v5 首发时的移除被逆转)；896 个名称中 376 个改 id (42%)；无移除；两个折叠族不变。双箱回归。
-
-11月8日 (bny9u → v98qt8, 3天): 条目 1,232 → 1,227 (+1 `hay_block_top`, −6 个转为模型的方块纹理: 熔炉、工作台、工匠台); 905 个名称中的 716 个变更 id (79%); 旋转/动画族均不变 (57 / 43)。生产与 preprod 提供同一字节相同的包 — 且本构建携带上文记录的折叠回归。
-
-### 相关
-
-- [纹理目录](api/texture-catalog.md) · [着色器验证](internals/shader-validation.md) · [研究日志](internals/research-log.md)
-
+- [纹理目录](api/texture-catalog.md) — 包可使用的名称
+- [纹理采样内部机制](internals/texture-sampling.md) — 纹理采样方式
+- [研究日志](internals/research-log.md) — 测量方法和构建历史
 
 ---
 
@@ -6126,52 +6062,53 @@ Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BL
 
 ---
 
-## 引擎数据台账 (v5 实测)
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+## 引擎数据台账
+> 目标 API：5 · 目标构建：`bbb6l5`（2026-11-20 已在生产环境与 preprod 验证）· 状态：Verified
 
-本文档的实测台账 — 每个已确认的值，全部实测于当前目标构建 `bny9u`。
+本台账汇总当前构建中着色器包可见 API 的已确认数值。模块 ID、chunk 编号等 bundle 内部细节不属于 API 规格，因此不在此列出。
 
-### 台账
+### 当前规格
 
-| 项目 | 值 |
+| 项目 | 当前值 |
 |---|---|
-| `apiVersion` | `5` (严格 `===`，数字) |
-| 引擎标头 | 解码后 8,954 B / 208 行 (随包分发形态 9,125 B，6 处插值)。首行 `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — 全文见[引擎标头](internals/engine-header.md) |
-| 钩子 | 9 个 (terrain/liquid/model × vertex/surface/light)。名称不变；默认模板捆绑全部 9 个 |
-| 变体 | 6 种 (strict × 程序)。名称 `strict\|allow.terrain\|liquid\|model` — 光照轴已移除 |
-| 宏 | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (全部 liquid + 非 strict 的 terrain/model) · `BLOXD_SCENE_DEPTH` (全部 liquid) · ~~`BLOXD_LIGHTING`~~ **已移除** |
-| 包 uniform | `@group(3) @binding(0)`，64 B: seconds@0、**lit@4 (u32，新增)**、renderOffset@16、sunDirection@32、eyePosition@48 |
-| 包绑定 | group 3: 0 uniform · 1 场景深度 (液体) · 2 `bloxdSpTextureLayers` 存储 |
-| 标志 | `BloxdFlags` 结构体，14 个布尔；v4 的位值退役 |
-| 加载器限制 | 256 个 `.wgsl` / 256 KB 源码 / 64 KB `pack.json` / 32 MB zip / 1,024 条目；UTF-8；单一 manifest；路径唯一 — 均不变 |
-| 纹理注册表 | 1,210 条目 → **896 个可用名称**；相对 cnty9 漂移 +1/−10 ([纹理注册表](internals/texture-registry.md)) → `xkg8x` (2026-11-04)：1,220 / **906** → `bny9u` (2026-11-05)：1,232 / **911 个可用名称** — +5 (交易终端 ×3、石头发电机 ×2)，864 个 id 变化  → `v98qt8` (2026-11-08): 1,227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
-| 光照曲线 | 0–15 级 → 0–1，缓出 (`6 → 0.45`、`12 → 0.92`) — 在标头中，不变 |
-| 提升曲线 | `1 - (1 - x / (3 - 2x))^3` — 不变 (当前位于 chunk c9) |
-| 方向光锥 | `0.12 / 0.65 / 0.62 / 0.95` — 不变 (chunk c9) |
-| 雾颜色 | `vec3f(183/255, 191/255, 195/255)` — 不变 |
-| 保留名称 | `/^bloxd/i` (不区分大小写) + 46 个 `bloxdSp*` 引擎符号 ([保留标识符](internals/reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict 标题 | 除 [策略](internals/policy.md) 中 12 个 allow 标题外的一切 (已在 v98qt8 上重新枚举: 116 个游戏定义、28 条 allow 条目 — 同样的 12 个标题) |
-| 标头/注册表构建器 | 标头模块 29815 位于 chunk c56 (自 c55 重新编号); 在 `bny9u` 上注册表构建器为模块 29812 (chunk c52/c53/c54、数据模块 1351; `xkg8x` 上为 30093 + 1391) |
-| 默认包模板 | chunk c122 (`xkg8x` 上为 c116，v4 为 c124)，1,633 B |
+| `apiVersion` | `5`（与数值进行严格比较） |
+| 引擎标头 | 216 行；全文见[引擎标头](internals/engine-header.md) |
+| 钩子 | 9 个（Terrain / Liquid / Model × Vertex / Surface / Light） |
+| 变体 | 6 个（strict × terrain / liquid / model） |
+| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH`；`BLOXD_LIGHTING` 已在 v5 移除 |
+| 包 uniform | 80 字节：`seconds` @0、`lit` @4、`renderOffset` @16、`sunDirection` @32、`eyePosition` @48、`shadowDirection` @64 |
+| 包 binding | `@group(3) @binding(0)`；`minBindingSize` 为 80 |
+| 标志 | `BloxdFlags` 结构体，包含 14 个布尔字段 |
+| 纹理图集 | 1,650 层；1,017 个名称；776 个别名 |
+| 纹理族 | 64 个旋转族、71 个动画族 |
+| 保留标识符 | 匹配 `/^bloxd/i` 的名称，以及 88 个内部 `bloxdSp*` 符号 |
+| 游戏定义 | 119 个 |
+| 着色器包策略 | 12 个允许的游戏标题、28 条目；见[按游戏划分的策略](internals/policy.md) |
+| 默认包模板 | 1,633 字节 |
+| 加载器限制 | 256 个 WGSL 文件 / 源码总计 256 KB / `pack.json` 64 KB / ZIP 32 MB / 1,024 个条目 |
 
-### bundle 布局 (供重新调查者)
+### bbb6l5 的变化
 
-着色器管线簇: 加载器 (zip/manifest/限制，模块 32942) 与注册表构建器位于 c52–c54、验证器/标头 c56、WebGPU/代码生成 c57、雾 c9。**默认包模板在 c122** (`xkg8x` 上为 c116，v4 为 c124)。
+`bbb6l5` 保持 `apiVersion: 5` 不变，但扩展了包可见 API：
 
-chunk 格式说明: 每个 chunk 都是一个 ES 模块 (`export const modules = {...}`) — c53 同时携带 c52 与 c53 的模块 — 因此对 bundle 做纯文本检索仍然有效 (模块 id `1371` 位于 *main* 的稀疏模块数组中，不在任何 chunk 里)。
+- 新增 `bloxdShadow()`、`bloxdAirShadow(t)` 和 `bloxdShadowDirection()`，用于访问引擎计算的太阳与月亮阴影。
+- uniform 在偏移 64 处增加 `shadowDirection: vec3f`，大小从 64 字节增加到 80 字节。
+- `pack.json` 新增可选布尔字段 `keepCircleShadows`，用于保留旧版圆形影子。
+- 图集从 1,227 层增至 1,650 层，可用名称从 906 个增至 1,017 个。
+- 修复了 `v98qt8` 引入的纹理常量折叠回归。
 
-主 bundle 为 3,362,913 字节 (3.36 MB)；chunk 映射增至 201 个 ID (c0–c201，其中 7 个为命名 chunk c0–c6)。
+测量说明与证据见[研究日志](internals/research-log.md)和[纹理注册表内部机制](internals/texture-registry.md)。
 
-### 过往台账
+### 过往版本
 
-- v4 (cnty9, 2026-10-27) → [版本历史: v4](history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [版本历史: v3](history/v3.md)
+- [版本历史](history/) — 旧 API 的变化与迁移
+- [研究日志](internals/research-log.md) — 测量方法与依据
 
 ### 相关
 
-- [研究日志](internals/research-log.md) · [引擎标头](internals/engine-header.md) · [策略](internals/policy.md)
-
+- [引擎标头](internals/engine-header.md) — 完整标头文本
+- [按游戏划分的策略](internals/policy.md) — allow / strict 策略列表
+- [纹理注册表](internals/texture-registry.md) — 名称与 ID 的对应关系
 
 ---
 

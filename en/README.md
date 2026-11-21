@@ -7,7 +7,7 @@ An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from cr
 - Current API: **5** (`pack.json` must declare `apiVersion: 5`)
 - Target: WebGPU renderer
 - Last verified: 2026-11-20
-- Target build: `bbb6l5.main.0244a119.js` (production and preprod, verified 2026-11-20 — registry, header, hooks, limits and the new shadow API re-measured)
+- Target build: `bbb6l5` (verified in production and preprod on 2026-11-20)
 - Shader hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 New to shader packs? Start with [Getting Started](getting-started/). Looking up the API? Start with [API Reference](api/).
@@ -16,7 +16,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 >
 > This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior. Keep verifying recipes against the loader screen and in-game compilation.
 >
-> The shader pack feature itself is an official feature accessible from the in-game UI, and packs are pure WGSL (no JS execution, no networking), so nothing dangerous happens with normal code.
+> Packs are written in WGSL; they do not execute JavaScript or make network requests.
 
 ## Entry points by goal
 
@@ -31,8 +31,8 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 
 ## Documentation map
 
-- **[Getting Started](getting-started/)** — overview, quick start, pack structure, pack.json, the 9 hooks, variants, validation, distribution. A single-track tutorial to your first pack.
-- **[API Reference](api/)** — the systematic v5 specification: hooks, flags, input/output structures, all functions, lighting, texture API, constants, preprocessor, restrictions, compatibility, and the 911-name texture catalog.
+- **[Getting Started](getting-started/)** — overview, quick start, pack structure, pack.json, the 9 hooks, variants, validation, distribution.
+- **[API Reference](api/)** — the systematic v5 specification: hooks, flags, input/output structures, all functions, lighting, texture API, constants, preprocessor, restrictions, compatibility, and the 1,017-name texture catalog.
 - **[Guides](guides/)** — how lighting works, shadows, water, night, model rendering, performance, realism concepts.
 - **[Recipes](recipes/)** — goal-oriented code examples: colors, lighting, emission, coordinates, animation, liquids, vertices, math, realism, model shaders, enchant effects.
 - **[Troubleshooting](troubleshooting/)** — symptom-driven error resolution: loading, API version, compilation, validation, variants, visual, texture, lighting, model, performance.

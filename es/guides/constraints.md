@@ -8,7 +8,7 @@ El techo de realismo de los paquetes de sombreadores en una página: hasta dónd
 
 - **Colores, transparencia y emisión, por cara** — los tres hooks de `Surface` devuelven color (más alpha y emisión condicionales) para terreno, líquidos y modelos
 - **Una reiluminación completa** — los tres hooks de `Light` y la API de iluminación (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) exponen la propia receta del motor como funciones componibles ([Iluminación](../api/lighting.md))
-- **Sombras de estilo proyectado que siguen las ediciones de bloques en tiempo real** — `skyLight` es dato de oclusión de cielo por vóxel; la inversión del realce + corte por umbral lo convierte en sombras nítidas bajo árboles y techos ([Sombras](shadows.md))
+- **Sombras que siguen al sol y a la luna** — `bloxdShadow()` devuelve el factor de sombra calculado por el motor; `bloxdAirShadow(t)` permite muestrear la sombra entre la cámara y el fragmento, y `bloxdShadowDirection()` devuelve la dirección de la luz ([Sombras](shadows.md))
 - **Leer las texturas del propio juego** — `bloxdTexel()` muestrea el atlas de texturas de bloques y las texturas de los modelos exactamente como lo hace el sampler del motor ([API de texturas](../api/texture-api.md))
 - **Efectos por modelo** — `flags` te dice "esto es un ítem en mano", "esto es un ítem tirado", "esto es un jugador", "esto es una losa" ([Flags](../api/flags.md)); `localPosition` da coordenadas locales de modelo ([Estructuras](../api/structures.md))
 - **Destellos de encantamiento y superposiciones de destello de daño** — `enchantTier` / `enchantColour` / `enchantSpeed` y `overlayColour` son legibles y sobrescribibles ([Efectos de encantamiento](../recipes/enchant-effects.md))
@@ -59,20 +59,8 @@ El velo submarino es un caso especial de la misma estructura: es un quad emissiv
 | Absorción por profundidad del agua | Grosor vía `bloxdOpaqueBehind()` + proyección de fondo en hooks de líquido ([Líquidos](../recipes/liquids.md)) |
 | Ambiente submarino | Acepta el velo; estiliza lo visible a través de él (terreno/líquido siguen renderizando con normalidad bajo el agua) |
 
-## La verdad sobre las sombras — las "sombras de árboles" sí se pueden hacer
-
-Solo los **mapas de sombras con precisión de píxel que siguen al sol** son imposibles en la tabla de arriba. El motor ya calcula "sombras" desde el inicio, y eso es `skyLight`. El LightEngine del lado de malla ejecuta un algoritmo estilo Minecraft:
-
-1. **Escaneo de columnas**: recorre cada columna (x,z) de arriba abajo. La luz del cielo empieza en 15, se vuelve **0 en bloques opacos**, atenuando al bajar con `lightFilter` (aire 1 / agua 3 / opaco 15)
-2. **Relleno BFS**: se expande lateralmente a 6 vecinos (-1 por bloque) — esto suaviza los bordes de sombra. El valor crudo bajo oclusión de radio r es (15-r)/15
-3. blockLight (antorchas etc.) es un BFS separado de 3 canales RGB (empaquetado 4bit)
-
-Así que `l.skyLight` no es un mero parámetro de brillo sino **dato de oclusión por vóxeles de "si el cielo es visible desde aquí" = un mapa de sombras**. Bajo árboles, bajo techos e interiores ya es numéricamente bajo, llegando suavizado por interpolación de vértices. Colocar/romper bloques recalcula al instante = **sombras que siguen en tiempo real**. Vanilla solo lo usa "suavemente" vía `mix(ambiente, cielo, skyLight)`.
-
-Las herramientas correctas son los dos pasos de [Sombras](shadows.md) (**restaurar valores crudos vía inversión del realce → binarizar con umbral `smoothstep`**; `th = 1 - r/15` marca directamente el "radio de oclusión tratado como sombra") más **abrir el sol directo con sky** (el sol solo llega donde el cielo es visible = la esencia de la proyección), con tinte cálido en sol / frío en sombra.
-
-**Límites honestos**: estas sombras usan como base "el cielo hacia arriba", así que **no rotan cuando el sol se mueve**. La resolución es por bloque (los bordes suaves vienen de la dispersión BFS). La plantilla de iluminación aún contiene un stub cerrado `var shadow: f32 = 1.;` para mapas de sombras (siempre 1.0 = desactivado) — interpretado como rastro de sombras rotatorias pixeladas "planificadas". Si las sombras rotatorias con precisión de píxel son imprescindibles, solo quedan vías fuera de la API (p. ej. inyección GLSL por userscript, con riesgo de política).
-
+## El método `skyLight` como alternativa
+La técnica `skyLight` descrita arriba sirve para oscurecer zonas bajo árboles y techos, pero usa la visibilidad del cielo hacia arriba y no gira con el sol. Para sombras que sigan al sol o a la luna, usa `bloxdShadow()`.
 ## Realidad submarina
 
 Los looks submarinos constan de 3 capas:

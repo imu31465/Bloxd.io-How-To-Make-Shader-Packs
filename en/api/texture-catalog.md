@@ -14,7 +14,7 @@ The **id** column is the value the constant compares against — measured on `bb
 
 The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
 
-Deliberately **not** listed: the remaining registry spellings — 776 alias names (520 frame spellings, of which 208 are the new `a~b~interval` transition spellings, plus 256 rotation spellings) — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,650-row layer table is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
+Deliberately **not** listed: the remaining registry spellings — 776 alias names (520 frame spellings and 256 rotation spellings) — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,650-row layer table is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
 
 ### How the numbers relate
 
@@ -26,11 +26,11 @@ The counts name different sets, so they do not sum naively:
 | **776** | alias names (520 frame + 256 rotation) — recognized spellings that are *rejected* with guidance to the base name; they are names, not constants, and add no ids |
 | **1,650** | atlas entries — the actual slots in the texture atlas (ids 1–1650) |
 
-Every one of the 1,017 names maps to one distinct atlas entry. The remaining entries are extra animation frames, the 208 pre-blended transition slots, and pre-rotated copies with no usable name — packs never reference them directly, because `bloxdTexel` animates frames and applies rotation automatically. The first frame of each animation family and the root of each rotation family *are* named, which is why some entries count as both "named" and "frame/rotation base". For comparison: v4 had 905 usable names, the v5 launch build 896, `xkg8x` 906, `bny9u` 911, `v98qt8` 906 — and this build has **1,017**, because the Atomic Age content (reactor, uranium, batteries, conveyors) added 111 names in one step; 863 of the 906 `v98qt8` survivors changed id.
+The `bbb6l5` registry has 1,017 usable names, 111 more than `v98qt8`. Texture IDs can change between builds, so use the named constants and never hard-code numeric IDs in WGSL.
 
 ## The catalog
 
-All usable names, alphabetically. The id column is the `bloxdTextureId*` value — measured on `bbb6l5` (2026-11-20). **Ids are snapshots; treat names as the API**.
+All 1,017 usable names are listed alphabetically. The id column shows values measured on `bbb6l5`; IDs can change between builds, so reference textures by name in WGSL.
 
 | Name | id (bbb6l5) | Notes |
 |---|---|---|

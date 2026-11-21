@@ -1,46 +1,48 @@
 # Engine-Daten-Hauptbuch
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20; Produktion und Preprod liefern dasselbe byte-identische Bundle) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified
 
-Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `bny9u` gemessen.
+Dieses Hauptbuch fasst die bestätigten Werte der für Shader-Packs sichtbaren API im aktuellen Build zusammen. Interne Bundle-Details wie Modul-IDs und Chunk-Nummern gehören nicht zur Spezifikation und werden hier nicht aufgeführt.
 
-## Das Hauptbuch
+## Aktuelle Spezifikation
 
-| Posten | Wert |
+| Element | Wert |
 |---|---|
-| `apiVersion` | `5` (strikt `===`, Zahl) |
-| Engine-Header | 8.954 B dekodiert / 208 Zeilen (9.125 B wie ausgeliefert, 6 Interpolationen). Erste Zeile `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — Volltext im [Engine-Header](engine-header.md) |
-| Hooks | 9 (terrain/liquid/model × vertex/surface/light). Namen unverändert; die Standard-Vorlage bündelt alle 9 |
-| Varianten | 6 (strict × Programm). Namen `strict\|allow.terrain\|liquid\|model` — die Beleuchtungs-Achse ist weg |
-| Makros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model) · `BLOXD_SCENE_DEPTH` (alle Liquid) · ~~`BLOXD_LIGHTING`~~ **entfernt** |
-| Paket-Uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, neu)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| Paket-Bindings | Gruppe 3: 0 Uniform · 1 Szenentiefe (Liquid) · 2 `bloxdSpTextureLayers`-Storage |
-| Flags | die `BloxdFlags`-Struktur, 14 Bools; die Bitwerte von v4 sind ausgemustert |
-| Loader-Limits | 256 `.wgsl` / 256 KB Quelltext / 64 KB `pack.json` / 32 MB Zip / 1.024 Einträge; UTF-8; ein Manifest; eindeutige Pfade — alles unverändert |
-| Textur-Registry | 1.210 Einträge → **896 benutzbare Namen**; Drift gegenüber cnty9 +1/−10 ([Textur-Registry](texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 benutzbare Namen** — +5 (Trading Terminal ×3, Stone Generator ×2), 864 id-Änderungen  → `v98qt8` (2026-11-08): 1.227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
-| Lichtkurve | Stufen 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — im Header, unverändert |
-| Lift-Kurve | `1 - (1 - x / (3 - 2x))^3` — unverändert (aktuell Chunk c9) |
-| Richtlicht-Kegel | `0.12 / 0.65 / 0.62 / 0.95` — unverändert (Chunk c9) |
-| Fog-Farbe | `vec3f(183/255, 191/255, 195/255)` — unverändert |
-| reservierte Namen | `/^bloxd/i` (case-insensitive) + die 46 `bloxdSp*`-Engine-Symbole ([Reservierte Bezeichner](reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict-Titel | alles außer den 12 allow-Titeln in [Policy](policy.md) (auf v98qt8 neu aufgezählt: 116 Spieldefinitionen, 28 allow-Einträge — dieselben 12 Titel) |
-| Header-/Registry-Builder | Header-Modul 29815 in Chunk c56 (umnummeriert von c55); auf `bny9u` ist der Registry-Builder Modul 29812 (Chunks c52/c53/c54, Datenmodul 1351; auf `xkg8x` war es 30093 + 1391) |
-| Standard-Pack-Vorlage | Chunk c122 (c116 auf `xkg8x`, c124 in v4), 1.633 B |
+| `apiVersion` | `5` (strikter Zahlenvergleich) |
+| Engine-Header | 216 Zeilen; Volltext im [Engine-Header](engine-header.md) |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Varianten | 6 (strict × terrain / liquid / model) |
+| Makros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` wurde in v5 entfernt |
+| Pack-Uniform | 80 Byte: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Pack-Binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| Flags | `BloxdFlags`-Struktur mit 14 booleschen Feldern |
+| Texturatlas | 1.650 Layer; 1.017 Namen; 776 Aliasse |
+| Texturfamilien | 64 Rotations- und 71 Animationsfamilien |
+| Reservierte Bezeichner | Namen passend zu `/^bloxd/i` sowie 88 interne `bloxdSp*`-Symbole |
+| Spieleddefinitionen | 119 |
+| Shader-Pack-Richtlinie | 12 erlaubte Titel, 28 Einträge; siehe [Richtlinie pro Spiel](policy.md) |
+| Standard-Packvorlage | 1.633 Byte |
+| Loader-Limits | 256 WGSL-Dateien / 256 KB Quelltext / 64 KB für `pack.json` / 32-MB-ZIP / 1.024 Einträge |
 
-## Bundle-Layout (für Nachvermesser)
+## Änderungen in bbb6l5
 
-Der Shader-Pipeline-Cluster: Loader (Zip/Manifest/Limits, Modul 32942) und Registry-Builder c52–c54, Validator/Header c56, WebGPU/Codegen c57, Fog c9. **Die Standard-Pack-Vorlage ist c122** (c116 auf `xkg8x`, c124 in v4).
+`bbb6l5` behält `apiVersion: 5` bei, erweitert aber die für Packs sichtbare API:
 
-Chunk-Format-Hinweis: jeder Chunk ist ein ES-Modul (`export const modules = {...}`) — c53 trägt sowohl c52s als auch c53s Module — daher bleibt die Klartext-Suche im Bundle aussagekräftig (Modul-id `1371` lebt im dünnen Modul-Array von *main*, in keinem Chunk).
+- `bloxdShadow()`, `bloxdAirShadow(t)` und `bloxdShadowDirection()` machen das von der Engine berechnete Sonnen- und Mondschatten-System verfügbar.
+- Das Uniform erhält `shadowDirection: vec3f` bei Offset 64 und wächst von 64 auf 80 Byte.
+- `pack.json` akzeptiert das optionale boolesche Feld `keepCircleShadows`, um die bisherigen Kreisschatten beizubehalten.
+- Der Atlas wächst von 1.227 auf 1.650 Layer und von 906 auf 1.017 verfügbare Namen.
+- Die in `v98qt8` eingeführte Faltungs-Regression der Texturkonstanten wurde behoben.
 
-Das Main-Bundle ist 3.362.913 Byte (3,36 MB); die Chunk-Map wuchs auf 201 ids (c0–c201; 7 benannte Chunks c0–c6).
+Erläuterungen und Belege zu diesen Messungen stehen im [Forschungslog](research-log.md) und in den [Textur-Registry-Interna](texture-registry.md).
 
-## Frühere Hauptbücher
+## Frühere Versionen
 
-- v4 (cnty9, 2026-10-27) → [Versionsgeschichte: v4](../history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Versionsgeschichte: v3](../history/v3.md)
+- [Versionsgeschichte](../history/) — Änderungen und Migrationen früherer APIs
+- [Forschungslog](research-log.md) — Messmethode und Quellen der Messwerte
 
 ## Verwandte Seiten
 
-- [Forschungslog](research-log.md) · [Engine-Header](engine-header.md) · [Policy](policy.md)
+- [Engine-Header](engine-header.md) — vollständiger Headertext
+- [Richtlinie pro Spiel](policy.md) — Titel mit allow- / strict-Richtlinie
+- [Textur-Registry](texture-registry.md) — Namen und ID-Zuordnung

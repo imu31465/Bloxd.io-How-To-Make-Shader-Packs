@@ -10,11 +10,11 @@ Der vollständige Katalog der benutzbaren Textur-Namenskonstanten (`bloxdTexture
 
 Die Spalte **name** ist der Registry-Name — das Handle, das du tatsächlich schreibst. Die Schreibweise der Konstante CamelCaset den Dateinamen: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Groß/Klein und Unterstriche werden nicht unterschieden** (`bloxdTextureId_grass_top` löst identisch zu `bloxdTextureIdGrassTop` auf). Namen sind die API — der Loader löst sie beim Laden gegen die Live-Registry neu auf, daher überstehen Namen Registry-Drift ([Textur-API](texture-api.md)).
 
-Die Spalte **id** ist der Wert, gegen den die Konstante vergleicht — gemessen auf `v98qt8` (Atlas-Layer + 1). Nutze sie, um `surface.textureId`-Dumps zu dekodieren und Debug-Ausgaben gegen den Build des Tages abzugleichen. **Ids nie in WGSL schreiben** — sie sind eine Momentaufnahme der Atlas-Reihenfolge eines Builds (siehe die Drift-Messungen unten).
+Die Spalte **id** ist der Wert, gegen den die Konstante vergleicht — gemessen auf `bbb6l5` (Atlas-Layer + 1). Nutze sie, um `surface.textureId`-Dumps zu dekodieren und Debug-Ausgaben gegen den Build des Tages abzugleichen. **Ids nie in WGSL schreiben** — sie sind eine Momentaufnahme der Atlas-Reihenfolge eines Builds (siehe die Drift-Messungen unten).
 
 Die Spalte **notes** markiert die beiden Faltungs-Familien. „anim (N Frames)“ bedeutet: Dieser Name zu sampeln liefert automatisch den aktuellen Animationsrahmen — **niemals das Rahmen-Suffix schreiben** (`lava0` ist ein bekannter Alias mit eigener Diagnose). „Rotationsfamilie (4 Kopien)“ bedeutet: Die Textur existiert nur als vor-rotierte Slots — der Name verweist auf die Wurzel, und `bloxdTexel` wendet die Rotation erneut an. Genau ein Name (`radar_screen`) trägt beide Hinweise.
 
-Bewusst **nicht** gelistet: die übrigen Registry-Schreibweisen — 196 Rahmen-Aliasse und 228 Rotations-Aliasse —, die keine benutzbaren Konstanten sind; sie zu schreiben zieht eigene Engine-Fehlermeldungen nach sich. Die zugrunde liegende 1.227-zeilige Layer-Tabelle (einschließlich 171 vor-rotierter Slots) ist engine-intern und in [Engine-Interna: Textur-Registry](../internals/texture-registry.md) abgedeckt.
+Die 1.650 Atlas-Layer bilden interne Engine-Daten. Aufbau und Messmethode sind in [Engine-Interna: Textur-Registry](../internals/texture-registry.md) beschrieben.
 
 ### Wie die Zahlen zusammenhängen
 
@@ -23,14 +23,14 @@ Die Zählungen benennen verschiedene Mengen, sie summieren sich also nicht naiv:
 | Zählung | Was sie zählt |
 |---|---|
 | **1,017** | benutzbare benannte Konstanten — Texturnamen, die du als `bloxdTextureId*` schreiben kannst |
-| **776** | Alias-Namen (196 Rahmen + 228 Rotation) — erkannte Schreibweisen, die *abgelehnt* werden mit einem Hinweis auf den Basisnamen; sie sind Namen, keine Konstanten, und fügen keine ids hinzu |
-| **1.227** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1650) |
+| **776** | Alias-Namen (520 Rahmen + 256 Rotation) — erkannte Schreibweisen, die *abgelehnt* werden mit einem Hinweis auf den Basisnamen; sie sind Namen, keine Konstanten, und fügen keine ids hinzu |
+| **1.650** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1650) |
 
-Jeder der 1,017 Namen bildet auf einen eigenen Atlas-Eintrag ab. Die übrigen **321 Einträge** sind zusätzliche Animationsrahmen (150) und vor-rotierte Kopien (171) ohne benutzbaren Namen — Pakete referenzieren sie nie direkt, weil `bloxdTexel` Rahmen animiert und Rotation automatisch anwendet. Der erste Rahmen jeder Animationsfamilie und die Wurzel jeder Rotationsfamilie *sind* benannt, weshalb manche Einträge sowohl als „benannt“ als auch als „Rahmen-/Rotations-Basis“ zählen. Zum Vergleich: v4 hatte 905 benutzbare Namen, der v5-Start-Build 896, der Folgetag-Build 906, `bny9u` 911; dieser Build hat 1,017 — die 10 beim v5-Start entfernten Namen (Double-Chest ×8, Mob-Spawner-Seite ×2) sind auf `xkg8x` zurück (neben dem früheren +1 `scorpion_eggs`), `bny9u` fügte Trading Terminal (×3) und Stone Generator (×2) hinzu, und `v98qt8` tauschte sechs modellkonvertierte Blocktexturen gegen `hay_block_top` — 864 der 1,017 `xkg8x`-Überlebenden änderten die id auf `bny9u`, weitere 716 von 905 auf `v98qt8`.
+Das Registry von `bbb6l5` enthält 1.017 nutzbare Namen, 111 mehr als `v98qt8`. Textur-IDs können sich zwischen Builds ändern. Verwende deshalb die benannten Konstanten und trage keine numerischen IDs fest in WGSL ein.
 
 ## Der Katalog
 
-Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-Wert — gemessen auf `v98qt8` (2026-11-08). **Ids sind Momentaufnahmen; behandle Namen als die API**: Zwischen dem v4-Build (cnty9) und dem v5-Start-Build (ab90qa) änderten 334 überlebende Namen die id, und zwischen ab90qa und `v98qt8` weitere 376, zwischen `v98qt8` und diesem Build weitere 864 (siehe die Drift-Messungen unten).
+Der Katalog enthält alle 1.017 nutzbaren Namen in alphabetischer Reihenfolge. Die id-Spalte zeigt die auf `bbb6l5` gemessenen Werte. Da sich IDs zwischen Builds ändern können, solltest du Texturen in WGSL über ihre Namen referenzieren.
 
 | Name | id (bbb6l5) | Anmerkungen |
 |---|---|---|

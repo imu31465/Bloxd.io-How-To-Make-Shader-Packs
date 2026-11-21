@@ -1,8 +1,8 @@
 # Premiers pas
 
-Un tutoriel au parcours unique pour les auteurs de packs de shaders qui débutent, de la vue d'ensemble à la distribution. Il enseigne directement la forme aboutie de l'API v5 (nul besoin de lire d'abord les anciennes versions — c'est le rôle de l'[Historique des versions](../history/)).
+Ce guide vous accompagne de la découverte des bases jusqu’aux tests et à la distribution de votre premier shader pack. Il repose sur l’API v5 actuelle ; la migration depuis les anciennes versions est expliquée dans l’[Historique des versions](../history/).
 
-## Le parcours
+## Parcours du guide
 
 1. [Vue d'ensemble et prérequis](overview.md) — ce que les packs de shaders peuvent et ne peuvent pas faire
 2. [Prérequis](requirements.md) — exigences de navigateur et de renderer
@@ -14,6 +14,6 @@ Un tutoriel au parcours unique pour les auteurs de packs de shaders qui débuten
 8. [Validation](validation.md) — le contrôle de chargement en 3 étapes et les tests sur appareil
 9. [Distribution](distribution.md) — compression en zip et hygiène de publication
 
-> API cible : 5 · Build cible : `v98qt8` (vérifié en production le 2026-11-08) · État : Verified/Analyzed
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20) · État : Verified/Analyzed
 
 Quand vous avez besoin de la spécification complète, poursuivez vers la [Référence API](../api/) ; pour des effets prêts à l'emploi, voyez les [Recettes](../recipes/).

@@ -24,6 +24,6 @@ Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. A
 | [Debugging](debugging.md) | URL-Parameter, Statistik-Panels |
 | [Forschungslog](research-log.md) | Methodik, Build-Historie, unverifizierte Punkte |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod)
 
 Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates ändern, und jede Seite nennt ihren Evidenz-Build ([Forschungslog](research-log.md)).

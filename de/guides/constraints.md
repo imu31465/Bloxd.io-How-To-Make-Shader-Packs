@@ -8,7 +8,7 @@ Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erre
 
 - **Farben, Transparenz und Emission pro Fläche** — die drei `Surface`-Hooks liefern colour (plus bedingtes alpha und emission) für Terrain, Flüssigkeiten und Modelle
 - **Ein vollständiger Licht-Rebuild** — die drei `Light`-Hooks und die Lighting-API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) legen das hauseigene Rezept der Engine als komponierbare Funktionen offen ([Lighting](../api/lighting.md))
-- **Projektionsartige Schatten, die Block-Edits in Echtzeit folgen** — `skyLight` sind Voxel-Himmelsverdeckungsdaten; Lift-Inversion + Schwellenschnitt macht daraus klare Schatten unter Bäumen und Dächern ([Schatten](shadows.md))
+- **Schatten, die Sonne und Mond folgen** — `bloxdShadow()` gibt den von der Engine berechneten Schattenfaktor zurück; mit `bloxdAirShadow(t)` lässt sich der Schatten zwischen Kamera und Fragment abtasten, und `bloxdShadowDirection()` liefert die Lichtrichtung ([Schatten](shadows.md))
 - **Die Texturen des Spiels selbst lesen** — `bloxdTexel()` sampelt den Block-Textur-Atlas und modell eigene Texturen exakt so wie der Sampler der Engine ([Textur-API](../api/texture-api.md))
 - **Effekte pro Modell** — `flags` sagt dir „das ist ein gehaltenes Item“, „das ist ein fallengelassenes Item“, „das ist ein Spieler“, „das ist eine Stufe“ ([Flags](../api/flags.md)); `localPosition` liefert modelllokale Koordinaten ([Strukturen](../api/structures.md))
 - **Verzauberungs-Glints und Treffer-Blitz-Overlays** — `enchantTier` / `enchantColour` / `enchantSpeed` und `overlayColour` sind lesbar und übersteuerbar ([Verzauberungs-Effekte](../recipes/enchant-effects.md))
@@ -59,20 +59,8 @@ Der Unterwasser-Schleier ist ein Spezialfall derselben Struktur: ein emissives, 
 | Wasser-Dickenabsorption | `bloxdOpaqueBehind()`-Dicke + Grundprojektion in Liquid-Hooks ([Flüssigkeiten](../recipes/liquids.md)) |
 | Unterwasser-Stimmung | Den Schleier akzeptieren; gestalten, was durch ihn sichtbar ist (Terrain/Flüssigkeit rendern unter Wasser weiterhin normal) |
 
-## Die Wahrheit über Schatten — „Baumschatten" sind baubar
-
-Nur **mit der Sonne rotierende pixelgenaue Shadowmaps** sind in der Tabelle oben unmöglich. Die Engine berechnet „Schatten" von Anfang an, und das ist `skyLight`. Die mesh-seitige LightEngine läuft mit Minecraft-artigem Algorithmus:
-
-1. **Spalten-Scan**: jede (x,z)-Spalte von oben nach unten durchgehen. Himmelslicht startet bei 15, wird an opaken Blöcken **0** und dimmt beim Absteigen mit `lightFilter` (Luft 1 / Wasser 3 / opak 15)
-2. **BFS-Flutfüllung**: seitlich zu 6 Nachbarn expandieren (-1 pro Block) — das weicht Schattenkanten auf. Rohwert unter Radius-r-Verdeckung ist (15-r)/15
-3. blockLight (Fackeln etc.) ist separates BFS aus 3 RGB-Kanälen (4bit-gepackt)
-
-`l.skyLight` ist also kein bloßer Helligkeitsparameter, sondern **Voxel-Verdeckungsdaten für „ist von hier Himmel sichtbar" = eine Schattenkarte**. Unterm Baum, unterm Dach und innen ist sie bereits numerisch niedrig und kommt per Vertex-Interpolation geglättet an. Blöcke zu setzen/brechen rechnet sofort neu = **in Echtzeit folgende Schatten**. Vanilla nutzt sie nur „sanft" via `mix(Ambiente, Himmel, skyLight)`.
-
-Die richtigen Werkzeuge sind die zwei Schritte aus [Schatten](shadows.md) (**Rohwerte per Lift-Inversion wiederherstellen → per Schwellen-`smoothstep` binarisieren**; `th = 1 - r/15` wählt direkt den „als Schatten zählenden Verdeckungsradius") plus **direkte Sonne per Sky gaten** (Sonne erreicht nur sichtbaren Himmel = Essenz der Projektion), komponiert mit warmer Sonnen- und kalter Schatten-Tönung.
-
-**Ehrliche Limits**: Diese Schatten basieren auf „Himmel nach oben" und **rotieren daher nicht mit der Sonne**. Auflösung ist pro Block (weiche Kanten kommen aus der BFS-Streuung). Das Licht-Template der Engine enthält noch einen geschlossenen `var shadow: f32 = 1.;`-Stub für Shadowmaps (immer 1.0 = deaktiviert) — als Spur „geplanter" pixelgenauer Rotationsschatten gedeutet. Sind diese unbedingt nötig, bleiben nur API-ferne Wege (z. B. GLSL-Injektion per Userscript, mit Policy-Risiko).
-
+## Die `skyLight`-Methode als Alternative
+Die oben beschriebene `skyLight`-Technik kann Bereiche unter Bäumen und Dächern abdunkeln. Sie basiert jedoch auf der Sicht zum Himmel nach oben und dreht sich nicht mit der Sonne. Für Schatten, die Sonne oder Mond folgen, verwende `bloxdShadow()`.
 ## Unterwasser-Realität
 
 Unterwasser-Looks bestehen aus 3 Schichten:

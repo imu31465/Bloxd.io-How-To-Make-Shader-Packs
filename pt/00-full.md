@@ -9,9 +9,9 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 ---
 
 ## Primeiros passos
-Um tutorial de trilha única para autores de pacotes de shaders de primeira viagem, da visão geral à distribuição. Ele ensina diretamente a forma completa da API v5 (não é preciso ler as versões antigas primeiro — esse é o trabalho do [Histórico de versões](history/)).
+Este guia apresenta o processo de criação de um shader pack, dos conceitos básicos aos testes e à distribuição. Ele usa a API v5 atual; a migração de versões anteriores está descrita no [Histórico de versões](history/).
 
-### A trilha
+### Conteúdo do guia
 
 1. [Visão geral e pré-requisitos](getting-started/overview.md) — o que pacotes de shaders podem e não podem fazer
 2. [Requisitos](getting-started/requirements.md) — requisitos de navegador e renderizador
@@ -23,10 +23,9 @@ Um tutorial de trilha única para autores de pacotes de shaders de primeira viag
 8. [Validação](getting-started/validation.md) — a verificação de carga em 3 etapas e os testes no dispositivo
 9. [Distribuição](getting-started/distribution.md) — compactação em zip e higiene de lançamento
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção em 2026-11-08) · Estado: Verified/Analyzed
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified/Analyzed
 
 Quando você precisar da especificação completa, siga para a [Referência da API](api/); para efeitos prontos, veja [Receitas](recipes/).
-
 
 ---
 
@@ -37,7 +36,7 @@ Quando você precisar da especificação completa, siga para a [Referência da A
 
 Um pacote de shaders do Bloxd.io muda a aparência do jogo **somente no renderizador WebGPU**. Pacotes são escritos em um **subconjunto restrito de WGSL** e carregados pela tela de configurações do jogo → Shader Pack, como zip ou pasta. Enquanto um pacote estiver instalado, o renderizador WebGPU fica ativado à força nas configurações.
 
-Pacotes são validados e compilados como WGSL puro — sem execução de JavaScript, sem rede. Nada de perigoso pode acontecer com código normal.
+O código do pack é validado e compilado como WGSL. O WGSL do pack não pode executar JavaScript nem fazer requisições de rede.
 
 ### O que você pode mudar
 
@@ -62,7 +61,6 @@ Cada jogo tem uma política de pacotes de shaders (`shaderPackPolicy`), e **a ma
 - O jogo atual aceita apenas pacotes `apiVersion: 5`; pacotes v1–v4 são rejeitados no carregamento (pacotes salvos ficam silenciosamente inativos — [Compatibilidade](api/compatibility.md))
 - Está migrando um pacote escrito para uma versão mais antiga? Veja o [Histórico de versões](history/)
 - As interioridades do motor podem mudar com as atualizações, então cada página indica sua build alvo
-
 
 ---
 
@@ -470,7 +468,7 @@ A especificação sistemática da API v5 atual. Tudo aqui foi medido sobre o bui
 | [Compatibilidade](api/compatibility.md) | pacotes de versões antigas, revalidação de pacotes salvos |
 | [Catálogo de texturas](api/texture-catalog.md) | todos os 896 nomes utilizáveis (com busca) |
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Analyzed (restaurado literalmente do cabeçalho e do validador)
 
 Migrando da v4? Veja [Histórico de versões: v5](history/v5.md).
 
@@ -1840,11 +1838,11 @@ O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdText
 
 A coluna **nome** é o nome do registro — o identificador que você realmente escreve. A grafia da constante converte o nome do arquivo para CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Maiúsculas e sublinhados não são distinguidos** (`bloxdTextureId_grass_top` resolve de forma idêntica a `bloxdTextureIdGrassTop`). Os nomes são a API — o carregador os resolve novamente contra o registro vivo ao carregar, então os nomes sobrevivem à deriva do registro ([API de texturas](api/texture-api.md)).
 
-A coluna **id** é o valor contra o qual a constante se compara — medido em `v98qt8` (camada do atlas + 1). Use-o para decodificar dumps de `surface.textureId` e para conferir a saída de depuração com o build do dia. **Nunca escreva ids em WGSL** — eles são o instantâneo da ordem do atlas de um único build (veja as medições de deriva abaixo).
+A coluna **id** é o valor contra o qual a constante se compara — medido em `bbb6l5` (camada do atlas + 1). Use-o para decodificar dumps de `surface.textureId` e para conferir a saída de depuração com o build do dia. **Nunca escreva ids em WGSL** — eles são o instantâneo da ordem do atlas de um único build (veja as medições de deriva abaixo).
 
 A coluna **notas** marca as duas famílias de dobramento. «anim (N quadros)» significa que amostrar este nome retorna automaticamente o quadro de animação atual — **nunca escreva o sufixo de quadro** (`lava0` é um alias conhecido com um diagnóstico dedicado). «família de rotação (4 cópias)» significa que a textura existe apenas como slots pré-rotacionados — o nome refere-se à raiz e `bloxdTexel` reaplica a rotação. Exatamente um nome (`radar_screen`) carrega ambas as notas.
 
-Deliberadamente **não** listadas: as demais grafias do registro — 196 aliases de quadro e 228 aliases de rotação — que não são constantes utilizáveis; escrevê-las dispara mensagens de erro dedicadas do motor. A tabela de camadas subjacente, de 1.227 linhas (incluindo 171 slots pré-rotacionados), é interna do motor e tratada em [Interior do motor: registro de texturas](internals/texture-registry.md).
+A tabela de 1.650 camadas do atlas é um dado interno do motor; sua estrutura e o método de medição estão em [Interior do motor: registro de texturas](internals/texture-registry.md).
 
 #### Como os números se relacionam
 
@@ -1853,14 +1851,14 @@ As contagens nomeiam conjuntos distintos, então elas não se somam de forma ing
 | Contagem | O que conta |
 |---|---|
 | **1,017** | constantes nomeadas utilizáveis — nomes de textura que você pode escrever como `bloxdTextureId*` |
-| **776** | nomes de alias (196 de quadro + 228 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
-| **1.227** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1650) |
+| **776** | nomes de alias (520 de quadro + 256 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
+| **1.650** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1650) |
 
-Cada um dos 1,017 nomes mapeia para uma entrada distinta do atlas. As **321 entradas** restantes são quadros extras de animação (150) e cópias pré-rotacionadas (171) sem nome utilizável — os pacotes nunca as referenciam diretamente, porque `bloxdTexel` anima os quadros e aplica a rotação automaticamente. O primeiro quadro de cada família de animação e a raiz de cada família de rotação *têm* nome, razão pela qual algumas entradas contam ao mesmo tempo como «com nome» e «base de quadro/rotação». Em comparação: a v4 tinha 905 nomes utilizáveis, o build de lançamento da v5 896, o do dia seguinte 906, `bny9u` 911; este build tem 1,017 — os 10 nomes removidos no lançamento da v5 voltaram em `xkg8x` (além do anterior +1 `scorpion_eggs`), `bny9u` adicionou o Terminal de trocas (×3) e o Gerador de pedra (×2), e `v98qt8` trocou seis texturas de blocos convertidos em modelo por `hay_block_top` — 864 dos 1,017 sobreviventes de `xkg8x` mudaram de id em `bny9u` e outros 716 de 905 em `v98qt8`.
+O registro de `bbb6l5` contém 1.017 nomes utilizáveis, 111 a mais que `v98qt8`. Os IDs podem mudar entre builds; use as constantes nomeadas e nunca fixe IDs numéricos no WGSL.
 
 ### O catálogo
 
-Todos os nomes utilizáveis, em ordem alfabética. A coluna id é o valor de `bloxdTextureId*` — medido em `v98qt8` (2026-11-08). **Ids são instantâneos; trate os nomes como a API**: entre o build da v4 (cnty9) e o build de lançamento da v5 (ab90qa) mudaram de id 334 nomes sobreviventes, e entre ab90qa e `v98qt8` outros 376, e entre `v98qt8` e este build outros 864 (veja as medições de deriva abaixo).
+O catálogo lista os 1.017 nomes utilizáveis em ordem alfabética. A coluna id mostra os valores medidos em `bbb6l5`; eles podem mudar entre builds, portanto use os nomes para referenciar texturas no WGSL.
 
 | Nome | id (bbb6l5) | Notas |
 |---|---|---|
@@ -3022,7 +3020,6 @@ O mesmo princípio de sempre: 716 dos 905 sobreviventes mudaram de id neste úni
 
 - [API de texturas](api/texture-api.md) · [Interior do motor: registro de texturas](internals/texture-registry.md) · [Histórico de versões: v4](history/v4.md)
 
-
 ---
 
 ## Guias
@@ -3044,7 +3041,7 @@ Material de "mecanismo e mentalidade". O que é possível em primeiro lugar est�
 | [Combinando com pacotes de texturas](guides/combinations.md) | pareamento com pacotes de texturas |
 | [Dicas de depuração](guides/debugging.md) | diagnóstico de sintoma → causa |
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20)
 
 
 ---
@@ -3074,7 +3071,6 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 > API alvo: 5 · Build alvo: `bbb6l5` · Estado: Verified (comportamento do LightEngine inalterado desde a medição da v4)
 > **Desde `bbb6l5`**: a API real de sombras solares foi adicionada — `bloxdShadow()` (fator de sombra 0–1; blocos, jogadores, mobs e itens projetam e seguem o sol), `bloxdAirShadow(t)` (para raios de luz) e `bloxdShadowDirection()` (direção da luz). `keepCircleShadows` no pack.json permite manter também as antigas sombras circulares. Detalhes em [Funções](api/functions.md).
 
-
 As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 
 ### Pode / não pode
@@ -3084,7 +3080,8 @@ As três formas de fazer "sombras" num pacote de shaders, e seus limites.
 | Escurecer claramente sob árvores/telhados (estilo projetado) | ◎ | inversão do lift de `skyLight` + corte por limiar (abaixo) |
 | Sombras que acompanham edições de blocos em tempo real | ◎ | o LightEngine recalcula imediatamente — automático |
 | Sombras coloridas frias / áreas ao sol quentes | ◎ | deslocamento em duas cores |
-| Sombras girando com o sol (mapa de sombras) | ✕ | a profundidade é exclusiva de líquidos; a oclusão por raios de luz não é uma entrada |
+| Sombras que acompanham o sol e a lua | ◎ | `bloxdShadow()` |
+| Acesso à profundidade do mapa de sombras | ✕ | A API retorna o fator final, não os dados de profundidade. |
 | Penumbra física | ✕ | limitada pela dispersão BFS em resolução de voxel |
 | AO em tempo real (SSAO) | ✕ | só o AO cozido nas cores de vértice |
 
@@ -3128,16 +3125,15 @@ let lit = sunL * sky;
 
 Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **suavidade de borda** = `shSoft`; **escuridão do núcleo** = o ambiente mínimo e o deslocamento de dois pontos da dispersão do céu; sombras longas de fim de tarde ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-### Limites honestos
+### Limites da técnica `skyLight`
 
-- As sombras têm como referência o **céu para cima**, então elas **não giram com o sol** (resolução de voxel; bordas suaves vêm da dispersão BFS)
-- O template de iluminação do motor retém um `var shadow: f32 = 1.;` não usado (sempre 1.0 = desativado) — um rastro plausível de "planos futuros" para sombras rotativas precisas ao pixel
+- Essa limitação se aplica apenas à técnica antiga baseada em `skyLight`: ela usa o céu acima como referência e **não gira com o sol**. A API atual `bloxdShadow()` acompanha a luz do sol ou da lua.
+
 - Sombras rotativas precisas ao pixel estão fora da API atual ([Looks inalcançáveis](guides/constraints.md))
 
 ### Relacionado
 
 - [receitas de realismo](recipes/realism.md) (a receita completa de sombra projetada) · [Interioridades de iluminação](internals/lighting-internals.md) · [Dicas de depuração](guides/debugging.md)
-
 
 ---
 
@@ -3336,7 +3332,7 @@ O teto de realismo dos pacotes de shaders em uma página: até onde a API atual 
 
 - **Cores, transparência e emissão, por face** — os três hooks de `Surface` devolvem cor (mais alpha e emissão condicionais) para terreno, líquidos e modelos
 - **Uma reiluminação completa** — os três hooks de `Light` e a API de iluminação (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) expõem a própria receita do motor como funções componíveis ([Iluminação](api/lighting.md))
-- **Sombras de estilo projetado que acompanham edições de blocos em tempo real** — `skyLight` é dado de oclusão de céu por voxel; a inversão do lift + corte por limiar o transforma em sombras nítidas sob árvores e telhados ([Sombras](guides/shadows.md))
+- **Sombras que acompanham o sol e a lua** — `bloxdShadow()` retorna o fator de sombra calculado pelo motor; `bloxdAirShadow(t)` permite amostrar a sombra entre a câmera e o fragmento, e `bloxdShadowDirection()` retorna a direção da luz ([Sombras](guides/shadows.md))
 - **Ler as texturas do próprio jogo** — `bloxdTexel()` amostra o atlas de texturas de blocos e as texturas próprias de modelo exatamente como o sampler do motor faz ([API de texturas](api/texture-api.md))
 - **Efeitos por modelo** — `flags` diz "isto é um item na mão", "isto é um item caído", "isto é um jogador", "isto é uma laje" ([Flags](api/flags.md)); `localPosition` dá coordenadas locais de modelo ([Estruturas](api/structures.md))
 - **Brilhos de encantamento e sobreposições de flash de dano** — `enchantTier` / `enchantColour` / `enchantSpeed` e `overlayColour` são legíveis e sobrescrevíveis ([Efeitos de encantamento](recipes/enchant-effects.md))
@@ -3387,20 +3383,8 @@ O véu submarino é um caso especial da mesma estrutura: é um quad emissive de 
 | Absorção por profundidade da água | Espessura via `bloxdOpaqueBehind()` + projeção de fundo em hooks de líquido ([Líquidos](recipes/liquids.md)) |
 | Ambiente submarino | Aceite o véu; estilize o que é visível através dele (terreno/líquido continuam renderizando normalmente debaixo d'água) |
 
-### A verdade sobre as sombras — "sombras de árvores" dá para fazer
-
-Só os **mapas de sombras precisos ao pixel que acompanham o sol** são impossíveis na tabela acima. O motor já calcula "sombras" desde o início, e isso é `skyLight`. O LightEngine do lado da malha roda um algoritmo estilo Minecraft:
-
-1. **Varredura de colunas**: percorre cada coluna (x,z) de cima para baixo. A luz do céu começa em 15, vira **0 nos blocos opacos**, atenuando ao descer com `lightFilter` (ar 1 / água 3 / opaco 15)
-2. **Preenchimento por inundação BFS**: espalha-se lateralmente aos 6 vizinhos (-1 por bloco) — isto é o que suaviza as bordas de sombra. O valor cru sob oclusão de raio r é (15-r)/15
-3. blockLight (tochas etc.) é um BFS separado de 3 canais RGB (empacotado em 4 bits)
-
-Então `l.skyLight` não é um mero parâmetro de brilho, mas **dado de oclusão em resolução de voxel de "se o céu é visível daqui" = um mapa de sombras**. Sob árvores, sob telhados e em interiores já é numericamente baixo, chegando suavizado por interpolação de vértices. Colocar/quebrar blocos recalcula imediatamente = **sombras que acompanham em tempo real**. Vanilla só o usa "suavemente" via `mix(ambiente, céu, skyLight)`.
-
-As ferramentas certas são os dois passos de [Sombras](guides/shadows.md) (**restaurar valores crus via inversão do lift → binarizar com limiar `smoothstep`**; `th = 1 - r/15` ajusta diretamente o "raio de oclusão tratado como sombra") mais **condicionar o sol direto ao céu** (o sol só chega onde o céu é visível = a essência da projeção), composto com tingimento quente ao sol / frio na sombra.
-
-**Limites honestos**: essas sombras têm como base "o céu para cima", então **elas não giram conforme o sol se move ao longo do tempo**. A resolução é por bloco (bordas suaves vêm da dispersão BFS). O template de iluminação do motor ainda contém um stub fechado `var shadow: f32 = 1.;` para mapas de sombras (sempre 1.0 = desativado) — interpretado como rastro de sombras rotativas precisas ao pixel "planejadas". Se sombras rotativas precisas ao pixel forem imprescindíveis, só restam abordagens fora da API (ex. injeção GLSL por userscript, com risco de política).
-
+### A técnica `skyLight` como alternativa
+A técnica `skyLight` descrita acima serve para escurecer áreas sob árvores e telhados, mas usa a visibilidade do céu acima e não gira com o sol. Para sombras que acompanham o sol ou a lua, use `bloxdShadow()`.
 ### Realidade submarina
 
 Os looks submarinos consistem em 3 camadas:
@@ -3419,7 +3403,6 @@ Pontos práticos: os pacotes continuam funcionando debaixo d'água / o véu não
 - [Modelos e texturas](guides/models.md) — até onde chega o pipeline de modelos
 - [Compatibilidade](api/compatibility.md) — como se comportam os pacotes de versões antigas
 - Mudanças nesses limites versão por versão: [Histórico de versões](history/)
-
 
 ---
 
@@ -3543,7 +3526,7 @@ Exemplos de código orientados a objetivo. O lado do "como funciona" vive em [Gu
 | [Shaders de modelo](recipes/model-shaders.md) | v5 — itens na mão, skins, vaivém de plantas |
 | [Efeitos de encantamento](recipes/enchant-effects.md) | v5 — remover, reforçar e recolorir o brilho |
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified (portes v5 das receitas originais — verifique ainda assim com compilação no jogo antes de distribuir)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (portes v5 das receitas originais — verifique ainda assim com compilação no jogo antes de distribuir)
 
 
 ---
@@ -4639,7 +4622,7 @@ Erros e problemas visuais, localizáveis **por sintoma**. As páginas seguem a e
 | Lento / descartado pela verificação no dispositivo | [Desempenho](troubleshooting/performance.md) |
 | Jurídico, segurança, perguntas comuns | [FAQ](troubleshooting/faq.md) |
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08) · Estado: Verified (mensagens registradas literalmente do validador e do carregador em produção)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (mensagens registradas literalmente do validador e do carregador em produção)
 
 ### Onde os erros aparecem
 
@@ -5283,7 +5266,7 @@ Especificações internas restauradas analisando a implementação do motor. Tud
 | [Depuração](internals/debugging.md) | parâmetros de URL, painéis de estatísticas |
 | [Registro de pesquisa](internals/research-log.md) | metodologia, histórico de builds, itens não verificados |
 
-> API alvo: 5 · Build alvo: `v98qt8` (verificado em produção 2026-11-08)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20)
 
 As interioridades não são um contrato de API estável — elas podem mudar com as atualizações do motor, e cada página nomeia sua build de evidência ([registro de pesquisa](internals/research-log.md)).
 
@@ -5950,111 +5933,63 @@ O mesher funde faces com material/AO/luz correspondentes num único retângulo (
 ---
 
 ## Interioridades do registro de texturas
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (extraído reexecutando o próprio construtor de registro do motor)
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified
 
-A maquinaria de resolução nome→id e a deriva medida do registro. O catálogo voltado ao usuário: [Catálogo de texturas](api/texture-catalog.md).
+Esta página explica como os nomes de textura são convertidos em IDs e resume as mudanças do registro entre builds. A lista atual para quem cria packs está no [Catálogo de texturas](api/texture-catalog.md).
 
-### Metodologia
+### Como foi medido
 
-Executamos o próprio módulo de construção de registro do motor (29812 nesta build, carregada pelos chunks 52/53/54) contra os dados de textura do registro de blocos distribuído (módulo de dados 1351 no bundle principal) contra os dados de textura do registro de blocos distribuído dentro de um mini harness webpack e registramos sua saída — esses números são **a computação do próprio bundle de produção**, não uma reimplementação.
+Recalculamos o registro executando o próprio construtor do build de produção sobre os dados de textura distribuídos com o jogo. A impressão digital resultante, `32451195`, corresponde ao atlas pré-compilado incluído em `bbb6l5`. São resultados do próprio motor, não de uma reimplementação.
 
-### Estrutura da saída
+### Registro atual
 
-| Saída | medido na v5 | Significado |
-|---|---|---|
-| `named` | **906** | nomes referenciáveis como `bloxdTextureId<Name>` |
-| `aliases` | 424 | grafias dobradas — 196 aliases de quadro (`lava0`…) e 228 aliases de rotação (`chest_top[rot[1`…) |
-| `layers` | 1,227 | a tabela de camadas completa do atlas — 911 raízes nomeadas, 150 quadros extras de animação, 171 slots pré-rotacionados |
+| Saída | `bbb6l5` | Significado |
+|---|---:|---|
+| `named` | **1.017** | Nomes disponíveis como constantes `bloxdTextureId<Name>` |
+| `aliases` | **776** | Grafias alternativas resolvidas para um nome-base |
+| `layers` | **1.650** | Total de camadas do atlas de texturas |
+| Faixas do atlas | **7** | Seis faixas completas e uma parcial |
+| Famílias de rotação | **64** | Nomes com variantes de rotação por face |
+| Famílias de animação | **71** | Nomes com quadros animados |
 
-### Regras de dobramento
+Os aliases de animação incluem os nomes normais dos quadros e as grafias de transição usadas para mesclar quadros consecutivos. `radar_screen` pertence às famílias de rotação e de animação.
 
-- **famílias de animação** (43): grafias de quadro (`lava0`–`lava7`) se dobram ao nome base (`lava`); `bloxdTexel` devolve o quadro atual no momento da amostragem
-- **famílias de rotação** (57): slots girados (`[rot[1..4`) se dobram ao nome raiz; `bloxdTexel` reaplica a `textureRotation` por face
-- `radar_screen` é o único nome nas duas famílias (suas quatro cópias pré-rotacionadas carregam cada uma sua própria escada de 4 quadros — daí 46 raízes de animação no atlas, não 43)
+### Como os nomes são agrupados
 
-### Deriva (cnty9 → ab90qa)
+- **Animação:** nomes de quadro como `lava0`–`lava7` são resolvidos para o nome-base `lava`. `bloxdTexel` seleciona o quadro atual durante a amostragem.
+- **Rotação:** slots como `[rot[1`–`[rot[4` são resolvidos para o nome-base. `bloxdTexel` aplica o `textureRotation` da face.
+- **Transições:** `frameA~frameB~interval` identifica um slot do atlas que mistura dois quadros adjacentes.
 
-| Medição | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| entradas do atlas | 1,219 | **1,210** |
-| famílias de rotação (grafias giradas) | 57 (228) | **57 (228) — sem mudanças** |
-| famílias de animação (grafias de quadro) | 42 (188) | **42 (188) — sem mudanças** |
-| constantes nomeadas utilizáveis | 905 | **896** |
-| mudanças de id entre nomes sobreviventes | — | **334 de 905** |
+No WGSL, use as constantes pelo nome. Não fixe IDs numéricos: eles podem mudar entre builds mesmo quando o nome da textura continua disponível.
 
-A deriva completa (11 nomes): adicionado (1) `scorpion_eggs`; removidas (10) as oito texturas de baú duplo mais `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (o baú duplo saiu dos dados do jogo; os spawners mantêm `mob_spawner_block_top`).
+### Mudanças entre builds
 
-### Deriva (ab90qa → xkg8x)
+| Comparação | Camadas do atlas | Nomes disponíveis | Mudança principal |
+|---|---:|---:|---|
+| `sjr0p7` → `cnty9` | 1.200 → 1.219 | — | 98 adicionados e 79 removidos; mudou a convenção de nomes das texturas rotacionadas |
+| `cnty9` → `ab90qa` | 1.219 → 1.210 | 905 → 896 | Um nome adicionado e dez removidos |
+| `ab90qa` → `xkg8x` | 1.210 → 1.220 | 896 → 906 | Os dez nomes removidos no lançamento do v5 voltaram |
+| `xkg8x` → `bny9u` | 1.220 → 1.232 | 906 → 911 | Cinco nomes adicionados para Trading Terminal e Stone Generator |
+| `bny9u` → `v98qt8` | 1.232 → 1.227 | 911 → 906 | Um nome adicionado; seis texturas saíram do registro quando os blocos viraram modelos |
+| `v98qt8` → `bbb6l5` | 1.227 → 1.650 | 906 → 1.017 | Mais 423 camadas; famílias de rotação e animação ampliadas; regressão corrigida |
 
-| Medição | ab90qa (lançamento v5) | xkg8x (v5, atual) |
-|---|---|---|
-| entradas do atlas | 1,210 | **1,220** |
-| famílias de rotação (grafias giradas) | 57 (228) | **57 (228) — inalteradas** |
-| famílias de animação (grafias de quadro) | 42 (188) | **42 (188) — inalteradas** |
-| constantes nomeadas utilizáveis | 896 | **906** |
-| mudanças de id entre sobreviventes | — | **376 de 896** |
+Muitos nomes receberam novos IDs em cada atualização. As constantes por nome mantêm os packs independentes dessas alterações numéricas.
 
-A deriva completa (10 nomes): adicionados (10) as oito texturas do baú duplo mais `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — todo nome removido no lançamento da v5 voltou (o baú duplo retornou aos dados do jogo; as variantes laterais do spawner junto com ele). Nada foi removido.
+### Regressão de dobragem do v98qt8 (corrigida)
 
-5 de novembro (xkg8x → bny9u, 1 dia): entradas 1,220 → 1,232 (+5: as texturas Terminal de Troca ×3 e Gerador de Pedra ×2); 864 de 906 nomes mudaram de id (95%); sem remoções; famílias de rotação inalteradas, famílias de animação 42 → 43 (`trading_terminal_front`, 8 quadros a 250 ms). Produção e preprod servem o mesmo bundle idêntico byte a byte.
+No `v98qt8`, a tabela de texturas animadas do motor passou a usar chaves de texto, mas a lógica de dobragem ainda esperava índices de slot. Com isso, os nomes-base das texturas animadas falhavam na validação, e os nomes de cada quadro apareciam como constantes separadas, sem animação.
 
-### Deriva (xkg8x → bny9u)
-
-| Medição | xkg8x (v5) | bny9u (v5, atual) |
-|---|---|---|
-| entradas do atlas | 1,220 | **1,232** |
-| famílias de rotação (grafias giradas) | 57 (228) | **57 (228) — inalteradas** |
-| famílias de animação (grafias de quadro) | 42 (188) | **43 (196)** |
-| constantes nomeadas utilizáveis | 906 | **911** |
-| mudanças de id entre sobreviventes | — | **864 de 906** |
-
-A deriva completa (5 nomes): adicionados (5) `trading_terminal_front` (anim, 8 quadros) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top` — dois blocos novos (Terminal de Troca, Gerador de Pedra) entraram nos dados do jogo. Nada foi removido; a rotatividade de ids é quase total (95% dos sobreviventes).
-
-
-### Deriva (bny9u → v98qt8)
-
-| Medição | bny9u (v5) | v98qt8 (v5, atual) |
-|---|---|---|
-| entradas do atlas | 1.232 | **1.227** |
-| famílias de rotação (grafias giradas) | 57 (228) | **57 (228) — inalteradas** |
-| famílias de animação (grafias de quadro) | 43 (196) | **43 (196) — inalteradas** |
-| constantes nomeadas utilizáveis | 911 | **906** |
-| mudanças de id entre sobreviventes | — | **716 de 905** (79 %) |
-
-A deriva completa (7 nomes): adicionado (1) `hay_block_top`; removidos (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — a Fornalha, a Bancada (mesa de crafting) e a Bancada de artesão foram convertidas de blocos texturizados do terreno em modelos de bloco, então suas texturas de terreno saíram do registro (a Bancada manteve `crafting_table_top` — a face superior continua sendo textura de terreno). Produção e preprod servem o mesmo pacote idêntico byte a byte (md5 `7458fd47ff88331d9f451d1456ff48ac`).
-
-### A regressão de dobragem do v98qt8
-
-`v98qt8` contém uma regressão verificada byte a byte na dobragem de constantes de textura. O módulo de dados (1351) agora constrói `animatedBlockTextures` como um **Array indexado por grafia** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — verificado por hexdump no bundle principal em produção), enquanto o classificador (módulo 30048) ainda espera um **array indexado por slot** em dois pontos:
-
-1. `hii.forEach((value, key))` — `Array.prototype.forEach` nunca visita chaves string, então o mapa slot→base dos quadros extra permanece vazio
-2. `hii[Qi]` com `Qi` = o slot do atlas — o acesso por colchetes com um índice de slot nunca atinge uma chave de grafia, então a dobragem da grafia base (`lava0` → `lava`) nunca dispara
-
-Consequências, todas medidas executando o classificador e o resolvedor de produção tal como estão em Node:
-
-- os 43 nomes-base das famílias de animação (`lava`, todos os `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, as 19 texturas de máquina `*_running`, …) **falham na validação**: `bloxdTextureIdLava` → «There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?»
-- as 196 grafias de quadro (`lava0`–`lava7`, …) resolvem como **constantes individuais utilizáveis** (amostrando só o quadro base — sem animação)
-- o diagnóstico dedicado «names a frame of the animated texture» nunca pode disparar (não existem aliases de quadro)
-- o conjunto `named` em execução do motor tem 1.047 linhas, então o hash de registro que o motor calcula para `HEADER_VERSION` é `694df62c` — não o `df6c1915` pretendido (dobrado) — o que ainda força **cada pacote salvo a revalidar** neste build
-
-Experimento de controle: alimentar o mesmo classificador com um array indexado por slot (o que a própria lógica de dobragem espera e o que o módulo de dados do `bny9u` produzia) reproduz exatamente a saída dobrada documentada — 906 named com `lava` no id 1, `lava0`–`lava7` como aliases de quadro, 424 aliases, 1.227 camadas. As regras de dobragem abaixo descrevem essa API pretendida.
+O problema foi corrigido no `bbb6l5`: a tabela voltou a usar índices de slot, os nomes-base de animação passaram na validação e a impressão digital do registro corresponde ao atlas distribuído. Esta seção fica como histórico; ela não descreve o build atual.
 
 ### Efeito sobre HEADER_VERSION
 
-O sufixo de hash do registro cozinha os ids, então esta deriva marca **cada pacote salvo "precisa de nova verificação"** (revalidado automaticamente ao carregar a página). Pacotes escritos com nomes sobrevivem à re-resolução; pacotes com ids crus quebram ([Compatibilidade](api/compatibility.md)).
-
-### Registros de deriva anteriores
-
-A comparação de duas builds de outubro (sjr0p7 → cnty9, 10 dias): entradas 1200 → 1219 (98 adicionadas, 79 removidas); 779 dos 1121 nomes de grafia inalterada mudaram de id (69%); uma migração de convenção de nomes (sufixos `_rot1..4` → slots `[rot[1..4`); o surgimento do baú duplo. O registro completo vive em [Histórico de versões: v4](history/v4.md).
-
-4 de novembro (ab90qa → xkg8x, 1 dia): entradas 1,210 → 1,220 (+10, todas nomes que retornam — as remoções do lançamento da v5 se reverteram); 376 de 896 nomes mudaram de id (42%); sem remoções; ambas as famílias de dobragem inalteradas. O baú duplo está de volta.
-
-8 de novembro (bny9u → v98qt8, 3 dias): entradas 1.232 → 1.227 (+1 `hay_block_top`, −6 texturas de blocos convertidos em modelo: Fornalha, Bancada, Bancada de artesão); 716 de 905 nomes mudaram de id (79 %); famílias de rotação e animação inalteradas (57 / 43). Produção e preprod servem o mesmo pacote idêntico byte a byte — e o build carrega a regressão de dobragem documentada acima.
+A impressão digital do registro faz parte de `HEADER_VERSION`. Uma mudança no registro pode, portanto, provocar nova validação dos packs. Packs que usam nomes são resolvidos com os novos IDs; os que fixam IDs numéricos podem parar de funcionar. Consulte [Compatibilidade](api/compatibility.md).
 
 ### Relacionado
 
-- [Catálogo de texturas](api/texture-catalog.md) · [Validação de shaders](internals/shader-validation.md) · [Registro de pesquisa](internals/research-log.md)
-
+- [Catálogo de texturas](api/texture-catalog.md) — nomes disponíveis para packs
+- [Internals de amostragem de texturas](internals/texture-sampling.md) — como as texturas são amostradas
+- [Registro de pesquisa](internals/research-log.md) — método de medição e histórico de builds
 
 ---
 
@@ -6101,51 +6036,52 @@ O programa Model forma um eixo da matriz de variantes: `strict.model` / `allow.m
 ---
 
 ## Ledger de dados do motor
-> API alvo: 5 · Build alvo: `bbb6l5` (2026-11-20, produção e preprod) · Estado: Verified
+> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20) · Estado: Verified
 
-O ledger de medições desta documentação — cada valor confirmado, todos medidos sobre o build alvo atual `bny9u`.
+Este ledger reúne os valores confirmados da API visível aos shader packs no build atual. Detalhes internos do bundle, como IDs de módulos e chunks, não fazem parte da especificação e não são listados aqui.
 
-### O ledger
+### Especificação atual
 
 | Item | Valor |
 |---|---|
-| `apiVersion` | `5` (`===` estrito, número) |
-| cabeçalho do motor | 8.954 B decodificados / 208 linhas (9.125 B como distribuído, 6 interpolações). Primeira linha `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — texto completo em [Cabeçalho do motor](internals/engine-header.md) |
-| hooks | 9 (terreno/líquido/modelo × vertex/surface/light). Nomes inalterados; o template padrão embute todos os 9 |
-| variantes | 6 (strict × programa). Nomes `strict\|allow.terrain\|liquid\|model` — o eixo de iluminação desapareceu |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (todo líquido + terreno/modelo não strict) · `BLOXD_SCENE_DEPTH` (todo líquido) · ~~`BLOXD_LIGHTING`~~ **removida** |
-| uniform do pacote | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, novo)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| bindings do pacote | group 3: 0 uniform · 1 profundidade de cena (líquido) · 2 storage `bloxdSpTextureLayers` |
-| flags | a struct `BloxdFlags`, 14 bools; os valores de bits da v4 retirados |
-| limites do carregador | 256 `.wgsl` / 256 KB de fonte / 64 KB `pack.json` / 32 MB de zip / 1.024 entradas; UTF-8; um manifesto; caminhos únicos — tudo inalterado |
-| registro de texturas | 1.210 entradas → **896 nomes utilizáveis**; deriva vs cnty9 +1/−10 ([Registro de texturas](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 nomes utilizáveis** — +5 (Terminal de Troca ×3, Gerador de Pedra ×2), 864 mudanças de id  → `v98qt8` (2026-11-08): 1.227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
-| curva de luz | níveis 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — no cabeçalho, inalterada |
-| curva de lift | `1 - (1 - x / (3 - 2x))^3` — inalterada (atualmente chunk c9) |
-| cone direcional | `0.12 / 0.65 / 0.62 / 0.95` — inalterado (chunk c9) |
-| cor da névoa | `vec3f(183/255, 191/255, 195/255)` — inalterada |
-| nomes reservados | `/^bloxd/i` (não distingue maiúsculas de minúsculas) + os 46 símbolos `bloxdSp*` do motor ([Identificadores reservados](internals/reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| títulos strict | tudo exceto os 12 títulos allow de [Política](internals/policy.md) (reenumerados em v98qt8: 116 definições de jogo, 28 entradas allow — os mesmos 12 títulos) |
-| construtores de cabeçalho/registro | módulo de cabeçalho 29815 no chunk c56 (renumerado de c55); no `bny9u` o construtor do registro é o módulo 29812 (chunks c52/c53/c54, módulo de dados 1351; no `xkg8x` era 30093 + 1391) |
-| template de pacote padrão | chunk c122 (c116 no `xkg8x`, c124 na v4), 1.633 B |
+| `apiVersion` | `5` (comparação estrita com número) |
+| Cabeçalho do motor | 216 linhas; texto completo em [Cabeçalho do motor](internals/engine-header.md) |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Variantes | 6 (strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` foi removida no v5 |
+| Uniform do pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Binding do pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| Flags | estrutura `BloxdFlags` com 14 campos booleanos |
+| Atlas de texturas | 1.650 camadas; 1.017 nomes; 776 aliases |
+| Famílias de textura | 64 de rotação e 71 de animação |
+| Identificadores reservados | nomes que correspondem a `/^bloxd/i` e 88 símbolos internos `bloxdSp*` |
+| Definições de jogos | 119 |
+| Política de shader packs | 12 títulos permitidos, 28 entradas; veja [Política por jogo](internals/policy.md) |
+| Template padrão do pack | 1.633 bytes |
+| Limites do loader | 256 arquivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
 
-### Layout do bundle (para refazer o levantamento)
+### Mudanças do bbb6l5
 
-O cluster do pipeline de shaders: carregador (zip/manifest/limites, módulo 32942) e construtor do registro c52–c54, validador/cabeçalho c56, WebGPU/codegen c57, névoa c9. **O template de pacote padrão é o c122** (c116 no `xkg8x`, c124 na v4).
+O `bbb6l5` mantém `apiVersion: 5`, mas amplia a API visível aos packs:
 
-Nota sobre o formato dos chunks: cada chunk é um módulo ES (`export const modules = {...}`) — o c53 carrega tanto os módulos do c52 quanto os do próprio c53 — então a busca de texto puro no bundle continua fazendo sentido (o id de módulo `1371` vive no array esparso de módulos de *main*, em nenhum chunk).
+- `bloxdShadow()`, `bloxdAirShadow(t)` e `bloxdShadowDirection()` expõem o sistema de sombras do sol e da lua calculado pelo motor.
+- O uniform recebe `shadowDirection: vec3f` no deslocamento 64 e aumenta de 64 para 80 bytes.
+- `pack.json` aceita o booleano opcional `keepCircleShadows` para manter as antigas sombras circulares.
+- O atlas cresce de 1.227 para 1.650 camadas e passa de 906 para 1.017 nomes disponíveis.
+- A regressão de dobragem de constantes de textura introduzida em `v98qt8` foi corrigida.
 
-O bundle principal tem 3,39 MB (+115 KB frente à build da v4); o mapa de chunks tem 195 IDs (188 emitidos, 7 lacunas conhecidas).
+A explicação e as evidências dessas medições estão no [Registro de pesquisa](internals/research-log.md) e nas [Interioridades do registro de texturas](internals/texture-registry.md).
 
-### Ledgers passados
+### Versões anteriores
 
-- v4 (cnty9, 2026-10-27) → [Histórico de versões: v4](history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Histórico de versões: v3](history/v3.md)
+- [Histórico de versões](history/) — mudanças e migrações das APIs anteriores
+- [Registro de pesquisa](internals/research-log.md) — método e referências das medições
 
 ### Relacionado
 
-- [Registro de pesquisa](internals/research-log.md) · [Cabeçalho do motor](internals/engine-header.md) · [Política](internals/policy.md)
-
+- [Cabeçalho do motor](internals/engine-header.md) — texto completo do cabeçalho
+- [Política por jogo](internals/policy.md) — títulos com política allow / strict
+- [Registro de texturas](internals/texture-registry.md) — nomes e atribuição de IDs
 
 ---
 

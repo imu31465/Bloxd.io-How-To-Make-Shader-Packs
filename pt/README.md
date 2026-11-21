@@ -7,7 +7,7 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 - API atual: **5** (o `pack.json` deve declarar `apiVersion: 5`)
 - Alvo: renderizador WebGPU
 - Última verificação: 2026-11-20
-- Build alvo: `bbb6l5.main.0244a119.js` (produção e preprod, verificado em 2026-11-20 — registro, cabeçalho, hooks, limites e a nova API de sombras remedidos)
+- Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20)
 - Hooks de shader: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultando a API? Veja [Referência da API](api/).
@@ -16,7 +16,7 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 >
 > Este guia foi criado com assistência de IA; a precisão não é garantida. Verifique contra o comportamento real do jogo. Continue verificando as receitas contra a tela do carregador e a compilação no jogo.
 >
-> A função de shader packs em si é um recurso oficial acessível pela interface do jogo, e os packs são WGSL puro (sem execução de JS, sem rede) — nada de perigoso acontece com código normal.
+> Os packs são escritos apenas em WGSL: não executam JavaScript nem fazem requisições de rede.
 
 ## Entradas por objetivo
 
@@ -31,8 +31,8 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 
 ## Mapa da documentação
 
-- **[Primeiros passos](getting-started/)** — visão geral, início rápido, estrutura do pacote, pack.json, os 9 hooks, variantes, validação, distribuição. Um tutorial de pista única até seu primeiro pack.
-- **[Referência da API](api/)** — a especificação sistemática da v5: hooks, flags, estruturas de entrada/saída, todas as funções, iluminação, API de texturas, constantes, pré-processador, restrições, compatibilidade e o catálogo de 911 nomes.
+- **[Primeiros passos](getting-started/)** — visão geral, início rápido, estrutura do pacote, pack.json, os 9 hooks, variantes, validação, distribuição.
+- **[Referência da API](api/)** — a especificação sistemática da v5: hooks, flags, estruturas de entrada/saída, todas as funções, iluminação, API de texturas, constantes, pré-processador, restrições, compatibilidade e o catálogo de 1,017 nomes.
 - **[Guias](guides/)** — como funciona a iluminação, sombras, água, noite, renderização de modelos, desempenho, conceitos de realismo.
 - **[Receitas](recipes/)** — exemplos de código orientados a objetivo: cores, iluminação, emissão, coordenadas, animação, líquidos, vértices, matemática, realismo, shaders de modelo, efeitos de encantamento.
 - **[Solução de problemas](troubleshooting/)** — resolução de erros por sintoma: carregamento, versão de API, compilação, validação, variantes, visual, texturas, iluminação, modelos, desempenho.

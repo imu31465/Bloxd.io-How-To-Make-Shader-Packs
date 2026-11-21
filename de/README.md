@@ -6,8 +6,8 @@ Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer —
 
 - Aktuelle API: **5** (`pack.json` muss `apiVersion: 5` deklarieren)
 - Ziel: WebGPU-Renderer
-- Zuletzt verifiziert: 2026-11-05
-- Ziel-Build: `bbb6l5.main.0244a119.js` (Produktion und Preprod, verifiziert am 2026-11-20 — Registry, Header, Hooks, Limits und die neue Schatten-API neu vermessen)
+- Zuletzt verifiziert: 2026-11-20
+- Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert)
 - Shader-Hooks: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachschlagen? Siehe [API-Referenz](api/).
@@ -16,7 +16,7 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 >
 > Dieses Handbuch wurde mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Verifiziere am tatsächlichen In-Game-Verhalten. Rezepte weiterhin gegen den Loader-Bildschirm und die In-Game-Kompilierung prüfen.
 >
-> Die Shader-Pack-Funktion selbst ist ein offizielles Feature, erreichbar aus der In-Game-UI, und Packs sind reines WGSL (keine JS-Ausführung, kein Netzwerk) — mit normalem Code passiert nichts Gefährliches.
+> Shader-Packs bestehen ausschließlich aus WGSL-Code. Sie führen kein JavaScript aus und senden keine Netzwerkanfragen.
 
 ## Einstiege nach Ziel
 
@@ -32,7 +32,7 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 ## Dokumentationsstruktur
 
 - **[Erste Schritte](getting-started/)** — Überblick, Quick Start, Pack-Struktur, pack.json, die 9 Hooks, Varianten, Validierung, Vertrieb. Ein durchgängiges Tutorial bis zum ersten Paket.
-- **[API-Referenz](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Beleuchtung, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 911-Namen-Texturkatalog.
+- **[API-Referenz](api/)** — die systematische v5-Spezifikation: Hooks, Flags, Ein-/Ausgabe-Strukturen, alle Funktionen, Beleuchtung, Textur-API, Konstanten, Präprozessor, Einschränkungen, Kompatibilität und der 1,017-Namen-Texturkatalog.
 - **[Leitfäden](guides/)** — wie Beleuchtung funktioniert, Schatten, Wasser, Nacht, Modell-Rendering, Performance, Realismus-Konzepte.
 - **[Rezepte](recipes/)** — zielgerichtete Codebeispiele: Farben, Beleuchtung, Emission, Koordinaten, Animation, Flüssigkeiten, Vertices, Mathematik, Realismus, Modell-Shader, Enchant-Effekte.
 - **[Fehlerbehebung](troubleshooting/)** — symptomgetriebene Fehlerlösung: Laden, API-Version, Kompilierung, Validierung, Varianten, visuell, Texturen, Beleuchtung, Modelle, Performance.

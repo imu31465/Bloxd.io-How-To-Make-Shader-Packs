@@ -1,46 +1,48 @@
 # Ledger de datos del motor
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
+> API objetivo: 5 · Build objetivo: `bbb6l5` (verificado en producción y preprod el 2026-11-20) · Estado: Verified
 
-El ledger de mediciones de esta documentación — cada valor confirmado, todo medido sobre el build objetivo vigente `bny9u`.
+Este ledger reúne los valores confirmados de la API visible para los shader packs en el build actual. Los detalles internos del bundle, como IDs de módulos y chunks, no forman parte de la especificación y se omiten aquí.
 
-## El ledger
+## Especificación actual
 
 | Elemento | Valor |
 |---|---|
-| `apiVersion` | `5` (`===` estricto, número) |
-| cabecera del motor | 8.954 B decodificados / 208 líneas (9.125 B tal como se distribuye, 6 interpolaciones). Primera línea `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — texto completo en [Cabecera del motor](engine-header.md) |
-| hooks | 9 (terrain/liquid/model × vertex/surface/light). Nombres sin cambios; la plantilla por defecto incluye los 9 |
-| variantes | 6 (strict × programa). Nombres `strict\|allow.terrain\|liquid\|model` — el eje de iluminación ha desaparecido |
-| macros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (todo líquido + terreno/modelo no strict) · `BLOXD_SCENE_DEPTH` (todo líquido) · ~~`BLOXD_LIGHTING`~~ **eliminada** |
-| uniform del paquete | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, nuevo)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| bindings del paquete | group 3: 0 uniform · 1 profundidad de escena (líquido) · 2 almacenamiento `bloxdSpTextureLayers` |
-| flags | la estructura `BloxdFlags`, 14 bools; los valores de bits de v4 retirados |
-| límites del cargador | 256 `.wgsl` / 256 KB de fuente / 64 KB `pack.json` / 32 MB zip / 1.024 entradas; UTF-8; un manifiesto; rutas únicas — todo sin cambios |
-| registro de texturas | 1.210 entradas → **896 nombres utilizables**; deriva frente a cnty9 +1/−10 ([Registro de texturas](texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 nombres utilizables** — +5 (Terminal de Intercambio ×3, Generador de Piedra ×2), 864 cambios de id  → `v98qt8` (2026-11-08): 1.227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
-| curva de luz | niveles 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — en la cabecera, sin cambios |
-| curva de realce | `1 - (1 - x / (3 - 2x))^3` — sin cambios (actualmente chunk c9) |
-| cono direccional | `0.12 / 0.65 / 0.62 / 0.95` — sin cambios (chunk c9) |
-| color de niebla | `vec3f(183/255, 191/255, 195/255)` — sin cambios |
-| nombres reservados | `/^bloxd/i` (sin distinguir mayúsculas) + los 46 símbolos `bloxdSp*` del motor ([Identificadores reservados](reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| títulos strict | todo salvo los 12 títulos allow de [Política](policy.md) (reenumerado en v98qt8: 116 definiciones de juego, 28 entradas allow — los mismos 12 títulos) |
-| constructores de cabecera/registro | módulo de cabecera 29815 en el chunk c56 (renumerado desde c55); en `bny9u` el constructor del registro es el módulo 29812 (chunks c52/c53/c54, módulo de datos 1351; en `xkg8x` era 30093 + 1391) |
-| plantilla de paquete por defecto | chunk c122 (c116 en `xkg8x`, c124 en v4), 1.633 B |
+| `apiVersion` | `5` (comparación estricta con un número) |
+| Cabecera del motor | 216 líneas; texto completo en [Cabecera del motor](engine-header.md) |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Variantes | 6 (strict × terrain / liquid / model) |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` fue eliminado en v5 |
+| Uniform del pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Binding del pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| Flags | `BloxdFlags`, estructura con 14 campos booleanos |
+| Atlas de texturas | 1.650 capas; 1.017 nombres; 776 alias |
+| Familias de textura | 64 de rotación y 71 de animación |
+| Identificadores reservados | nombres que coinciden con `/^bloxd/i` y 88 símbolos internos `bloxdSp*` |
+| Definiciones de juegos | 119 |
+| Política de shader packs | 12 títulos permitidos, 28 entradas; ver [Política por juego](policy.md) |
+| Plantilla de pack predeterminada | 1.633 bytes |
+| Límites del cargador | 256 archivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
 
-## Disposición del bundle (para reinspectores)
+## Cambios de bbb6l5
 
-El clúster del pipeline de sombreado: cargador (zip/manifiest/límites, módulo 32942) y constructor del registro c52–c54, validador/cabecera c56, WebGPU/codegen c57, niebla c9. **La plantilla de paquete por defecto es c122** (c116 en `xkg8x`, c124 en v4).
+`bbb6l5` mantiene `apiVersion: 5`, pero amplía la API visible para los packs:
 
-Nota sobre el formato de chunks: cada chunk es un módulo ES (`export const modules = {...}`) — c53 lleva los módulos de c52 y de c53 — así que la búsqueda de texto plano del bundle sigue teniendo sentido (el id de módulo `1371` vive en el array disperso de módulos de *main*, en ningún chunk).
+- `bloxdShadow()`, `bloxdAirShadow(t)` y `bloxdShadowDirection()` exponen el sistema de sombras del sol y la luna calculado por el motor.
+- El uniform incorpora `shadowDirection: vec3f` en el desplazamiento 64 y aumenta de 64 a 80 bytes.
+- `pack.json` admite el booleano opcional `keepCircleShadows` para conservar las antiguas sombras circulares.
+- El atlas crece de 1.227 a 1.650 capas y pasa de 906 a 1.017 nombres disponibles.
+- Se corrige la regresión de plegado de constantes de textura introducida en `v98qt8`.
 
-El bundle principal ocupa 3,39 MB (+115 KB frente al build de v4); el mapa de chunks tiene 195 ids (188 emitidos, 7 huecos conocidos).
+La explicación y la evidencia de estas mediciones están en el [Registro de investigación](research-log.md) y en [Internas del registro de texturas](texture-registry.md).
 
-## Ledgers pasados
+## Versiones anteriores
 
-- v4 (cnty9, 2026-10-27) → [Historial de versiones: v4](../history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Historial de versiones: v3](../history/v3.md)
+- [Historial de versiones](../history/) — cambios y migraciones de las API anteriores
+- [Registro de investigación](research-log.md) — método y referencias de las mediciones
 
 ## Relacionado
 
-- [Registro de investigación](research-log.md) · [Cabecera del motor](engine-header.md) · [Política](policy.md)
+- [Cabecera del motor](engine-header.md) — texto completo de la cabecera
+- [Política por juego](policy.md) — títulos con política allow / strict
+- [Registro de texturas](texture-registry.md) — nombres y asignación de IDs

@@ -9,9 +9,9 @@ Ein inoffizielles Handbuch zu Shader Packs für den Bloxd.io-WebGPU-Renderer —
 ---
 
 ## Erste Schritte
-Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom Überblick bis zum Vertrieb. Es vermittelt direkt die fertige Form der API v5 (ältere Versionen zuerst zu lesen ist unnötig — das ist die Aufgabe der [Versionsgeschichte](history/)).
+Dieser Leitfaden führt dich Schritt für Schritt durch die Erstellung deines ersten Shader Packs — von den Grundlagen über Tests bis zur Veröffentlichung. Er basiert auf der aktuellen API v5; die Migration älterer Versionen wird in der [Versionsgeschichte](history/) erklärt.
 
-### Der Weg
+### Aufbau des Leitfadens
 
 1. [Überblick & Voraussetzungen](getting-started/overview.md) — was Shader Packs können und was nicht
 2. [Voraussetzungen](getting-started/requirements.md) — Browser- und Renderer-Anforderungen
@@ -23,10 +23,9 @@ Ein durchgängiges Tutorial für alle, die ihr erstes Shader Pack bauen — vom 
 8. [Validierung](getting-started/validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](getting-started/distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified/Analyzed
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/); für fertige Effekte siehe [Rezepte](recipes/).
-
 
 ---
 
@@ -37,7 +36,7 @@ Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/
 
 Ein Bloxd.io-Shader-Pack verändert nur das Aussehen des **WebGPU-Renderers** des Spiels. Pakete werden in einer **beschränkten Teilmenge von WGSL** geschrieben und aus den In-Game-Einstellungen → dem Shader-Pack-Bildschirm als Zip oder Ordner geladen. Während ein Paket installiert ist, ist der WebGPU-Renderer in den Einstellungen zwangsweise aktiviert.
 
-Pakete werden als reines WGSL validiert und kompiliert — keine JavaScript-Ausführung, kein Netzwerk. Mit normalem Code kann nichts Gefährliches passieren.
+Der Pack-Code wird als WGSL validiert und kompiliert. WGSL in einem Pack kann weder JavaScript ausführen noch Netzwerkanfragen senden.
 
 ### Was du ändern kannst
 
@@ -62,7 +61,6 @@ Jedes Spiel hat eine Shader-Pack-Policy (`shaderPackPolicy`), und **die meisten 
 - Das aktuelle Spiel akzeptiert nur `apiVersion: 5`-Pakete; v1–v4-Pakete werden beim Laden abgelehnt (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](api/compatibility.md))
 - Du migrierst ein Paket, das für eine ältere Version geschrieben wurde? Siehe [Versionsgeschichte](history/)
 - Engine-Interna können sich mit Updates ändern, daher nennt jede Seite ihren Ziel-Build
-
 
 ---
 
@@ -470,7 +468,7 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Kompatibilität](api/compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
 | [Texturkatalog](api/texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
 
 Migration von v4? Siehe [Versionsgeschichte: v5](history/v5.md).
 
@@ -1840,11 +1838,11 @@ Der vollständige Katalog der benutzbaren Textur-Namenskonstanten (`bloxdTexture
 
 Die Spalte **name** ist der Registry-Name — das Handle, das du tatsächlich schreibst. Die Schreibweise der Konstante CamelCaset den Dateinamen: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Groß/Klein und Unterstriche werden nicht unterschieden** (`bloxdTextureId_grass_top` löst identisch zu `bloxdTextureIdGrassTop` auf). Namen sind die API — der Loader löst sie beim Laden gegen die Live-Registry neu auf, daher überstehen Namen Registry-Drift ([Textur-API](api/texture-api.md)).
 
-Die Spalte **id** ist der Wert, gegen den die Konstante vergleicht — gemessen auf `v98qt8` (Atlas-Layer + 1). Nutze sie, um `surface.textureId`-Dumps zu dekodieren und Debug-Ausgaben gegen den Build des Tages abzugleichen. **Ids nie in WGSL schreiben** — sie sind eine Momentaufnahme der Atlas-Reihenfolge eines Builds (siehe die Drift-Messungen unten).
+Die Spalte **id** ist der Wert, gegen den die Konstante vergleicht — gemessen auf `bbb6l5` (Atlas-Layer + 1). Nutze sie, um `surface.textureId`-Dumps zu dekodieren und Debug-Ausgaben gegen den Build des Tages abzugleichen. **Ids nie in WGSL schreiben** — sie sind eine Momentaufnahme der Atlas-Reihenfolge eines Builds (siehe die Drift-Messungen unten).
 
 Die Spalte **notes** markiert die beiden Faltungs-Familien. „anim (N Frames)“ bedeutet: Dieser Name zu sampeln liefert automatisch den aktuellen Animationsrahmen — **niemals das Rahmen-Suffix schreiben** (`lava0` ist ein bekannter Alias mit eigener Diagnose). „Rotationsfamilie (4 Kopien)“ bedeutet: Die Textur existiert nur als vor-rotierte Slots — der Name verweist auf die Wurzel, und `bloxdTexel` wendet die Rotation erneut an. Genau ein Name (`radar_screen`) trägt beide Hinweise.
 
-Bewusst **nicht** gelistet: die übrigen Registry-Schreibweisen — 196 Rahmen-Aliasse und 228 Rotations-Aliasse —, die keine benutzbaren Konstanten sind; sie zu schreiben zieht eigene Engine-Fehlermeldungen nach sich. Die zugrunde liegende 1.227-zeilige Layer-Tabelle (einschließlich 171 vor-rotierter Slots) ist engine-intern und in [Engine-Interna: Textur-Registry](internals/texture-registry.md) abgedeckt.
+Die 1.650 Atlas-Layer bilden interne Engine-Daten. Aufbau und Messmethode sind in [Engine-Interna: Textur-Registry](internals/texture-registry.md) beschrieben.
 
 #### Wie die Zahlen zusammenhängen
 
@@ -1853,14 +1851,14 @@ Die Zählungen benennen verschiedene Mengen, sie summieren sich also nicht naiv:
 | Zählung | Was sie zählt |
 |---|---|
 | **1,017** | benutzbare benannte Konstanten — Texturnamen, die du als `bloxdTextureId*` schreiben kannst |
-| **776** | Alias-Namen (196 Rahmen + 228 Rotation) — erkannte Schreibweisen, die *abgelehnt* werden mit einem Hinweis auf den Basisnamen; sie sind Namen, keine Konstanten, und fügen keine ids hinzu |
-| **1.227** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1650) |
+| **776** | Alias-Namen (520 Rahmen + 256 Rotation) — erkannte Schreibweisen, die *abgelehnt* werden mit einem Hinweis auf den Basisnamen; sie sind Namen, keine Konstanten, und fügen keine ids hinzu |
+| **1.650** | Atlas-Einträge — die tatsächlichen Slots im Textur-Atlas (ids 1–1650) |
 
-Jeder der 1,017 Namen bildet auf einen eigenen Atlas-Eintrag ab. Die übrigen **321 Einträge** sind zusätzliche Animationsrahmen (150) und vor-rotierte Kopien (171) ohne benutzbaren Namen — Pakete referenzieren sie nie direkt, weil `bloxdTexel` Rahmen animiert und Rotation automatisch anwendet. Der erste Rahmen jeder Animationsfamilie und die Wurzel jeder Rotationsfamilie *sind* benannt, weshalb manche Einträge sowohl als „benannt“ als auch als „Rahmen-/Rotations-Basis“ zählen. Zum Vergleich: v4 hatte 905 benutzbare Namen, der v5-Start-Build 896, der Folgetag-Build 906, `bny9u` 911; dieser Build hat 1,017 — die 10 beim v5-Start entfernten Namen (Double-Chest ×8, Mob-Spawner-Seite ×2) sind auf `xkg8x` zurück (neben dem früheren +1 `scorpion_eggs`), `bny9u` fügte Trading Terminal (×3) und Stone Generator (×2) hinzu, und `v98qt8` tauschte sechs modellkonvertierte Blocktexturen gegen `hay_block_top` — 864 der 1,017 `xkg8x`-Überlebenden änderten die id auf `bny9u`, weitere 716 von 905 auf `v98qt8`.
+Das Registry von `bbb6l5` enthält 1.017 nutzbare Namen, 111 mehr als `v98qt8`. Textur-IDs können sich zwischen Builds ändern. Verwende deshalb die benannten Konstanten und trage keine numerischen IDs fest in WGSL ein.
 
 ### Der Katalog
 
-Alle benutzbaren Namen, alphabetisch. Die id-Spalte ist der `bloxdTextureId*`-Wert — gemessen auf `v98qt8` (2026-11-08). **Ids sind Momentaufnahmen; behandle Namen als die API**: Zwischen dem v4-Build (cnty9) und dem v5-Start-Build (ab90qa) änderten 334 überlebende Namen die id, und zwischen ab90qa und `v98qt8` weitere 376, zwischen `v98qt8` und diesem Build weitere 864 (siehe die Drift-Messungen unten).
+Der Katalog enthält alle 1.017 nutzbaren Namen in alphabetischer Reihenfolge. Die id-Spalte zeigt die auf `bbb6l5` gemessenen Werte. Da sich IDs zwischen Builds ändern können, solltest du Texturen in WGSL über ihre Namen referenzieren.
 
 | Name | id (bbb6l5) | Anmerkungen |
 |---|---|---|
@@ -3023,7 +3021,6 @@ Dasselbe Prinzip wie immer: 716 der 905 Überlebenden änderten die id allein in
 
 - [Textur-API](api/texture-api.md) · [Engine-Interna: Textur-Registry](internals/texture-registry.md) · [Versionsgeschichte: v4](history/v4.md)
 
-
 ---
 
 ## Leitfäden
@@ -3045,7 +3042,7 @@ Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht 
 | [Kombination mit Texturpacks](guides/combinations.md) | Zusammenspiel mit Texturpacks |
 | [Debugging-Tipps](guides/debugging.md) | Diagnose Symptom → Ursache |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod)
 
 
 ---
@@ -3077,7 +3074,6 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 > Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (LightEngine-Verhalten seit der v4-Messung unverändert)
 > **Seit `bbb6l5`**: die echte Sonnenschatten-API wurde hinzugefügt — `bloxdShadow()` (0–1-Schattenfaktor; Blöcke, Spieler, Mobs und Items werfen und folgen der Sonne), `bloxdAirShadow(t)` (für Lichtsäulen) und `bloxdShadowDirection()` (Laufrichtung des Lichts). `keepCircleShadows` in pack.json hält optional auch die alten Kreisschatten. Details in [Funktionen](api/functions.md).
 
-
 Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Grenzen.
 
 ### Möglich / unmöglich
@@ -3087,7 +3083,8 @@ Die drei Wege, in einem Shader-Pack „Schatten“ zu erzeugen — und ihre Gren
 | Unter Bäumen/Dächern klar abdunkeln (projektionsartig) | ◎ | `skyLight`-Lift-Inversion + Schwellenwert-Schnitt (unten) |
 | Schatten folgen Block-Edits in Echtzeit | ◎ | LightEngine rechnet sofort neu — automatisch |
 | Schatten kühl / Sonnenlicht warm färben | ◎ | Zwei-Farb-Verschiebung |
-| Schatten, die mit der Sonne rotieren (Shadow-Map) | ✕ | Tiefe ist liquid-only; Lichtstrahl-Okklusion ist keine Eingabe |
+| Schatten, die Sonne und Mond folgen | ◎ | `bloxdShadow()` |
+| Zugriff auf die Shadowmap-Tiefe | ✕ | Die API liefert nur den fertigen Faktor, nicht die Tiefendaten. |
 | Physische Penumbra | ✕ | begrenzt durch die Voxel-auflösende BFS-Ausbreitung |
 | Echtzeit-AO (SSAO) | ✕ | nur das in Vertex-Farben gebackene AO |
 
@@ -3131,16 +3128,15 @@ let lit = sunL * sky;
 
 Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5); **Kanten-Weichheit** = `shSoft`; **Kerndunkelheit** = die Zwei-Punkt-Verschiebung aus Mindest-Ambiente und Himmelsstreulicht; lange Abend-Schatten ≈ `thEff = shTh + 0.10 * (1 - clamp(sunDir.y, 0.0, 1.0))`.
 
-### Ehrliche Grenzen
+### Grenzen der `skyLight`-Methode
 
-- Schatten referenzieren den **Himmel nach oben**, daher **rotieren sie nicht mit der Sonne** (Voxel-Auflösung; weiche Kanten kommen aus der BFS-Ausbreitung)
-- Die Beleuchtungs-Vorlage der Engine behält ein unbenutztes `var shadow: f32 = 1.;` (immer 1.0 = deaktiviert) — eine plausible Spur „geplante Zukunft“ für pixelgenaue rotierende Schatten
+- Diese Einschränkung gilt nur für die ältere `skyLight`-Methode: Sie orientiert sich am Himmel nach oben und **rotiert nicht mit der Sonne**. Die aktuelle API `bloxdShadow()` folgt dem Sonnen- oder Mondlicht.
+
 - Pixelgenaue rotierende Schatten liegen außerhalb der aktuellen API ([Unerreichbare Effekte](guides/constraints.md))
 
 ### Verwandte Seiten
 
 - [Realismus-Rezepte](recipes/realism.md) (das vollständige Projektions-Schatten-Rezept) · [Beleuchtungs-Interna](internals/lighting-internals.md) · [Debugging-Tipps](guides/debugging.md)
-
 
 ---
 
@@ -3340,7 +3336,7 @@ Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erre
 
 - **Farben, Transparenz und Emission pro Fläche** — die drei `Surface`-Hooks liefern colour (plus bedingtes alpha und emission) für Terrain, Flüssigkeiten und Modelle
 - **Ein vollständiger Licht-Rebuild** — die drei `Light`-Hooks und die Lighting-API (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) legen das hauseigene Rezept der Engine als komponierbare Funktionen offen ([Lighting](api/lighting.md))
-- **Projektionsartige Schatten, die Block-Edits in Echtzeit folgen** — `skyLight` sind Voxel-Himmelsverdeckungsdaten; Lift-Inversion + Schwellenschnitt macht daraus klare Schatten unter Bäumen und Dächern ([Schatten](guides/shadows.md))
+- **Schatten, die Sonne und Mond folgen** — `bloxdShadow()` gibt den von der Engine berechneten Schattenfaktor zurück; mit `bloxdAirShadow(t)` lässt sich der Schatten zwischen Kamera und Fragment abtasten, und `bloxdShadowDirection()` liefert die Lichtrichtung ([Schatten](guides/shadows.md))
 - **Die Texturen des Spiels selbst lesen** — `bloxdTexel()` sampelt den Block-Textur-Atlas und modell eigene Texturen exakt so wie der Sampler der Engine ([Textur-API](api/texture-api.md))
 - **Effekte pro Modell** — `flags` sagt dir „das ist ein gehaltenes Item“, „das ist ein fallengelassenes Item“, „das ist ein Spieler“, „das ist eine Stufe“ ([Flags](api/flags.md)); `localPosition` liefert modelllokale Koordinaten ([Strukturen](api/structures.md))
 - **Verzauberungs-Glints und Treffer-Blitz-Overlays** — `enchantTier` / `enchantColour` / `enchantSpeed` und `overlayColour` sind lesbar und übersteuerbar ([Verzauberungs-Effekte](recipes/enchant-effects.md))
@@ -3391,20 +3387,8 @@ Der Unterwasser-Schleier ist ein Spezialfall derselben Struktur: ein emissives, 
 | Wasser-Dickenabsorption | `bloxdOpaqueBehind()`-Dicke + Grundprojektion in Liquid-Hooks ([Flüssigkeiten](recipes/liquids.md)) |
 | Unterwasser-Stimmung | Den Schleier akzeptieren; gestalten, was durch ihn sichtbar ist (Terrain/Flüssigkeit rendern unter Wasser weiterhin normal) |
 
-### Die Wahrheit über Schatten — „Baumschatten" sind baubar
-
-Nur **mit der Sonne rotierende pixelgenaue Shadowmaps** sind in der Tabelle oben unmöglich. Die Engine berechnet „Schatten" von Anfang an, und das ist `skyLight`. Die mesh-seitige LightEngine läuft mit Minecraft-artigem Algorithmus:
-
-1. **Spalten-Scan**: jede (x,z)-Spalte von oben nach unten durchgehen. Himmelslicht startet bei 15, wird an opaken Blöcken **0** und dimmt beim Absteigen mit `lightFilter` (Luft 1 / Wasser 3 / opak 15)
-2. **BFS-Flutfüllung**: seitlich zu 6 Nachbarn expandieren (-1 pro Block) — das weicht Schattenkanten auf. Rohwert unter Radius-r-Verdeckung ist (15-r)/15
-3. blockLight (Fackeln etc.) ist separates BFS aus 3 RGB-Kanälen (4bit-gepackt)
-
-`l.skyLight` ist also kein bloßer Helligkeitsparameter, sondern **Voxel-Verdeckungsdaten für „ist von hier Himmel sichtbar" = eine Schattenkarte**. Unterm Baum, unterm Dach und innen ist sie bereits numerisch niedrig und kommt per Vertex-Interpolation geglättet an. Blöcke zu setzen/brechen rechnet sofort neu = **in Echtzeit folgende Schatten**. Vanilla nutzt sie nur „sanft" via `mix(Ambiente, Himmel, skyLight)`.
-
-Die richtigen Werkzeuge sind die zwei Schritte aus [Schatten](guides/shadows.md) (**Rohwerte per Lift-Inversion wiederherstellen → per Schwellen-`smoothstep` binarisieren**; `th = 1 - r/15` wählt direkt den „als Schatten zählenden Verdeckungsradius") plus **direkte Sonne per Sky gaten** (Sonne erreicht nur sichtbaren Himmel = Essenz der Projektion), komponiert mit warmer Sonnen- und kalter Schatten-Tönung.
-
-**Ehrliche Limits**: Diese Schatten basieren auf „Himmel nach oben" und **rotieren daher nicht mit der Sonne**. Auflösung ist pro Block (weiche Kanten kommen aus der BFS-Streuung). Das Licht-Template der Engine enthält noch einen geschlossenen `var shadow: f32 = 1.;`-Stub für Shadowmaps (immer 1.0 = deaktiviert) — als Spur „geplanter" pixelgenauer Rotationsschatten gedeutet. Sind diese unbedingt nötig, bleiben nur API-ferne Wege (z. B. GLSL-Injektion per Userscript, mit Policy-Risiko).
-
+### Die `skyLight`-Methode als Alternative
+Die oben beschriebene `skyLight`-Technik kann Bereiche unter Bäumen und Dächern abdunkeln. Sie basiert jedoch auf der Sicht zum Himmel nach oben und dreht sich nicht mit der Sonne. Für Schatten, die Sonne oder Mond folgen, verwende `bloxdShadow()`.
 ### Unterwasser-Realität
 
 Unterwasser-Looks bestehen aus 3 Schichten:
@@ -3423,7 +3407,6 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 - [Modelle und Texturen](guides/models.md) — was die Modell-Pipeline erreicht
 - [Kompatibilität](api/compatibility.md) — wie sich Pakete alter Versionen verhalten
 - Änderungen dieser Grenzen Version für Version: [Versionsgeschichte](history/)
-
 
 ---
 
@@ -3549,7 +3532,7 @@ Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [L
 | [Modell-Shader](recipes/model-shaders.md) | v5 — gehaltene Items, Skins, Pflanzen-Wiegen |
 | [Enchant-Effekte](recipes/enchant-effects.md) | v5 — Glint entfernen, verstärken, umfärben |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
 
 
 ---
@@ -4658,7 +4641,7 @@ Fehler und visuelle Probleme, **nach Symptom** auffindbar. Die Seiten folgen der
 | Langsam / von der Geräte-Prüfung rausgeworfen | [Performance](troubleshooting/performance.md) |
 | Rechtliches, Sicherheit, häufige Fragen | [FAQ](troubleshooting/faq.md) |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
 
 ### Wo Fehler erscheinen
 
@@ -5302,7 +5285,7 @@ Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. A
 | [Debugging](internals/debugging.md) | URL-Parameter, Statistik-Panels |
 | [Forschungslog](internals/research-log.md) | Methodik, Build-Historie, unverifizierte Punkte |
 
-> Ziel-API: 5 · Ziel-Build: `v98qt8` (2026-11-08, Produktion und Preprod)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod)
 
 Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates ändern, und jede Seite nennt ihren Evidenz-Build ([Forschungslog](internals/research-log.md)).
 
@@ -5972,111 +5955,63 @@ Der Mesher verschmilzt Flächen mit gleichem Material/AO/Licht zu einzelnen Rech
 ---
 
 ## Textur-Registry-Interna
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified
 
-Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](api/texture-catalog.md).
+Diese Seite erklärt, wie Textur-Namen in IDs aufgelöst werden, und fasst die Änderungen des Registry zwischen Builds zusammen. Die aktuelle Liste für Pack-Autoren steht im [Texturkatalog](api/texture-catalog.md).
 
-### Methodik
+### Messmethode
 
-Wir haben das eigene Registry-Bau-Modul der Engine (29812 auf diesem Build, getragen von den Chunks 52/53/54) gegen die Texturdaten des ausgelieferten Block-Registry (Datenmodul 1351 im Haupt-Bundle) in einem Mini-Webpack-Harness gegen die Texturdaten des ausgelieferten Block-Registry laufen lassen und seine Ausgabe aufgezeichnet — diese Zahlen sind **die eigene Berechnung des Produktions-Bundles**, keine Re-Implementierung.
+Wir haben das Registry mit dem Registry-Builder des Produktions-Builds und den ausgelieferten Block-Texturdaten neu berechnet. Der resultierende Fingerabdruck `32451195` stimmt mit dem vorgefertigten Atlas aus `bbb6l5` überein. Es sind Ergebnisse der Engine selbst, keine separate Nachimplementierung.
 
-### Ausgabe-Struktur
+### Aktuelles Registry
 
-| Ausgabe | v5 gemessen | Bedeutung |
-|---|---|---|
-| `named` | **906** | als `bloxdTextureId<Name>` referenzierbare Namen |
-| `aliases` | 424 | gefaltete Schreibweisen — 196 Rahmen-Aliasse (`lava0`…) und 228 Rotations-Aliasse (`chest_top[rot[1`…) |
-| `layers` | 1,227 | die vollständige Atlas-Layer-Tabelle — 911 benannte Wurzeln, 150 zusätzliche Animationsrahmen, 171 vor-rotierte Slots |
+| Ausgabe | `bbb6l5` | Bedeutung |
+|---|---:|---|
+| `named` | **1.017** | Namen, die als `bloxdTextureId<Name>`-Konstanten verfügbar sind |
+| `aliases` | **776** | alternative Schreibweisen, die auf einen Basisnamen verweisen |
+| `layers` | **1.650** | alle Layer des Texturatlas |
+| Atlas-Streifen | **7** | sechs volle und ein teilweiser Streifen |
+| Rotationsfamilien | **64** | Namen mit flächenbezogenen Rotationsvarianten |
+| Animationsfamilien | **71** | Namen mit animierten Frames |
 
-### Faltungsregeln
+Animations-Aliasse umfassen normale Frame-Schreibweisen und Übergangs-Schreibweisen, mit denen benachbarte Frames überblendet werden. `radar_screen` gehört sowohl zur Rotations- als auch zur Animationsfamilie.
 
-- **Animationsfamilien** (43): Rahmen-Schreibweisen (`lava0`–`lava7`) falten auf den Basisnamen (`lava`); `bloxdTexel` liefert zur Sample-Zeit den aktuellen Rahmen
-- **Rotationsfamilien** (57): gedrehte Slots (`[rot[1..4`) falten auf den Wurzelnamen; `bloxdTexel` wendet pro Fläche die `textureRotation` erneut an
-- `radar_screen` ist der einzige Name in beiden Familien (seine vier vor-rotierten Kopien tragen jeweils eine eigene 4-Rahmen-Leiter — daher 46 Animationswurzeln im Atlas, nicht 43)
+### Zusammenfassen von Namen
 
-### Drift (cnty9 → ab90qa)
+- **Animation:** Frame-Namen wie `lava0`–`lava7` werden auf den Basisnamen `lava` abgebildet. `bloxdTexel` wählt beim Sampling den aktuellen Frame.
+- **Rotation:** Slots wie `[rot[1`–`[rot[4` werden auf den Basisnamen abgebildet. `bloxdTexel` wendet das `textureRotation` der Fläche an.
+- **Übergänge:** `frameA~frameB~interval` bezeichnet einen Atlas-Slot, der zwei benachbarte Animationsframes mischt.
 
-| Messung | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| Atlas-Einträge | 1.219 | **1.210** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Rahmen-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
-| benutzbare benannte Konstanten | 905 | **896** |
-| id-Änderungen unter überlebenden Namen | — | **334 von 905** |
+Verwende in WGSL die benannten Konstanten. Numerische Textur-IDs sollten nicht fest codiert werden: Sie können sich zwischen Builds ändern, auch wenn der Name verfügbar bleibt.
 
-Der vollständige Drift (11 Namen): hinzu (1) `scorpion_eggs`; entfernt (10) die acht Doppel-Truhentexturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (die Doppel-Truhe hat die Spieldaten verlassen; Spawner behalten `mob_spawner_block_top`).
+### Änderungen zwischen Builds
 
-### Drift (ab90qa → xkg8x)
+| Vergleich | Atlas-Layer | Verfügbare Namen | Wichtigste Änderung |
+|---|---:|---:|---|
+| `sjr0p7` → `cnty9` | 1.200 → 1.219 | — | 98 hinzugefügt, 79 entfernt; Namenskonvention für rotierte Texturen geändert |
+| `cnty9` → `ab90qa` | 1.219 → 1.210 | 905 → 896 | Ein Name hinzugefügt, zehn entfernt |
+| `ab90qa` → `xkg8x` | 1.210 → 1.220 | 896 → 906 | Die zehn zum v5-Start entfernten Namen kehrten zurück |
+| `xkg8x` → `bny9u` | 1.220 → 1.232 | 906 → 911 | Fünf Namen für Trading Terminal und Stone Generator hinzugefügt |
+| `bny9u` → `v98qt8` | 1.232 → 1.227 | 911 → 906 | Ein Name hinzugefügt; sechs Texturen verließen das Registry, als ihre Blöcke zu Modellen wurden |
+| `v98qt8` → `bbb6l5` | 1.227 → 1.650 | 906 → 1.017 | 423 Layer hinzugefügt; Rotations- und Animationsfamilien erweitert; Regression behoben |
 
-| Messung | ab90qa (v5-Start) | xkg8x (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1,210 | **1,220** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
-| benutzbare benannte Konstanten | 896 | **906** |
-| id-Änderungen unter überlebenden Namen | — | **376 von 896** |
+Bei jeder Aktualisierung wurden die IDs vieler Namen neu vergeben. Benannte Konstanten halten Packs von diesen numerischen Änderungen unabhängig.
 
-Die vollständige Drift (10 Namen): hinzu (10) die acht Double-Chest-Texturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — jeder beim v5-Start entfernte Name ist zurück (die Double-Chest kehrte in die Spieldaten zurück, die Spawner-Seitenvarianten gleich mit). Nichts wurde entfernt.
+### Faltungs-Regression in v98qt8 (behoben)
 
+In `v98qt8` verwendete die Tabelle animierter Texturen Schreibweisen als Schlüssel, während die Faltungslogik Slot-Indizes erwartete. Dadurch bestanden die Basisnamen animierter Texturen die Validierung nicht; die Frame-Namen erschienen stattdessen als einzelne Konstanten ohne Animation.
 
-### Drift (xkg8x → bny9u)
+Der Fehler wurde in `bbb6l5` behoben: Die Tabelle verwendet wieder Slot-Indizes, die Basisnamen der Animationen bestehen die Validierung und der Registry-Fingerabdruck stimmt mit dem ausgelieferten Atlas überein. Dieser Abschnitt bleibt als historische Dokumentation erhalten und beschreibt nicht den aktuellen Build.
 
-| Messung | xkg8x (v5) | bny9u (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1,220 | **1,232** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **43 (196)** |
-| benutzbare benannte Konstanten | 906 | **911** |
-| id-Änderungen unter überlebenden Namen | — | **864 von 906** |
+### Auswirkung auf HEADER_VERSION
 
-Die vollständige Drift (5 Namen): hinzu (5) `trading_terminal_front` (anim, 8 Frames) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top` — zwei neue Blöcke (Trading Terminal, Stone Generator) sind in die Spieldaten gekommen. Nichts wurde entfernt; die id-Fluktuation ist fast total (95 % der Überlebenden).
-
-
-### Drift (bny9u → v98qt8)
-
-| Messung | bny9u (v5) | v98qt8 (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1.232 | **1.227** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Rahmen-Schreibweisen) | 43 (196) | **43 (196) — unverändert** |
-| benutzbare benannte Konstanten | 911 | **906** |
-| id-Änderungen unter Überlebenden | — | **716 von 905** (79 %) |
-
-Der vollständige Drift (7 Namen): hinzu (1) `hay_block_top`; entfernt (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — Furnace, Workbench (Crafting Table) und Artisan Bench wurden von texturierten Terrain-Blöcken zu Block-Modellen konvertiert, sodass ihre Terrain-Texturen die Registry verließen (die Workbench behielt `crafting_table_top` — die Oberseite bleibt eine Terrain-Textur). Produktion und Preprod liefern dasselbe byte-identische Bundle (md5 `7458fd47ff88331d9f451d1456ff48ac`).
-
-### Die v98qt8-Faltungs-Regression
-
-`v98qt8` liefert eine byte-verifizierte Regression in der Texturkonstanten-Faltung. Das Datenmodul (1351) baut `animatedBlockTextures` jetzt als **schreibweise-verschlüsseltes Array** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — hexdump-verifiziert im Live-Main-Bundle), während der Klassifikator (Modul 30048) an zwei Stellen ein **slot-verschlüsseltes Array** erwartet:
-
-1. `hii.forEach((value, key))` — `Array.prototype.forEach` besucht nie String-Schlüssel, daher bleibt die Slot→Basis-Map für Zusatzrahmen leer
-2. `hii[Qi]` mit `Qi` = der Atlas-Slot — Klammer-Zugriff mit einem Slot-Index trifft nie einen Schreibweise-Schlüssel, daher löst die Basis-Faltung (`lava0` → `lava`) nie aus
-
-Folgen, alles gemessen durch verbatim-Ausführung des Produktions-Klassifikators und -Resolvers in Node:
-
-- die 43 Animationsfamilien-Basisnamen (`lava`, alle `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, die 19 `*_running`-Maschinentexturen, …) **scheitern an der Validierung**: `bloxdTextureIdLava` → „There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?“
-- die 196 Rahmen-Schreibweisen (`lava0`–`lava7`, …) lösen als **einzelne benutzbare Konstanten** auf (nur den Basisrahmen sampelnd — keine Animation)
-- die dedizierte Diagnose „names a frame of the animated texture“ kann nie feuern (keine Rahmen-Aliasse existieren)
-- das Laufzeit-`named`-Set der Engine hat 1.047 Zeilen, daher berechnet die Engine für `HEADER_VERSION` den Registry-Hash `694df62c` — nicht den beabsichtigten `df6c1915` (gefaltet) — was zusätzlich **jedes gespeicherte Paket zur Neuprüfung** zwingt
-
-Kontrollversuch: demselben Klassifikator ein slot-verschlüsseltes Array zu übergeben (was die Faltungslogik selbst erwartet und was `bny9u`s Datenmodul erzeugte) reproduziert die dokumentierte gefaltete Ausgabe exakt — 906 named mit `lava` bei id 1, `lava0`–`lava7` als Rahmen-Aliasse, 424 Aliasse, 1.227 Layer. Die Faltungsregeln unten beschreiben diese beabsichtigte API.
-
-### Wirkung auf HEADER_VERSION
-
-Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes gespeicherte Paket als „muss erneut geprüft werden“** (beim Seitenladen automatisch revalidiert). Namens-geschriebene Pakete überstehen die Neuauflösung; Roh-id-Pakete brechen ([Kompatibilität](api/compatibility.md)).
-
-### Frühere Drift-Aufzeichnungen
-
-Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt); 779 von 1121 unveränderten Namen änderten die id (69 %); eine Namenskonventions-Migration (Suffixe `_rot1..4` → Slots `[rot[1..4`); das Auftauchen der Doppel-Truhe. Die vollständige Aufzeichnung lebt in [Versionsgeschichte: v4](history/v4.md).
-
-4. November (ab90qa → xkg8x, 1 Tag): Einträge 1,210 → 1,220 (+10, alles Rückkehrer — die v5-Start-Entfernungen kehrten sich um); 376 von 896 Namen änderten die id (42 %); keine Entfernungen; beide Faltfamilien unverändert. Die Double-Chest ist zurück.
-
-November 5 (xkg8x → bny9u, 1 Tag): Einträge 1,220 → 1,232 (+5: die Trading-Terminal- ×3 und Stone-Generator- ×2 Texturen); 864 von 906 Namen änderten die id (95 %); keine Entfernungen; Rotationsfamilien unverändert, Animationsfamilien 42 → 43 (`trading_terminal_front`, 8 Frames bei 250 ms). Produktion und Preprod liefern dasselbe byte-identische Bundle.
-8. November (bny9u → v98qt8, 3 Tage): Einträge 1.232 → 1.227 (+1 `hay_block_top`, −6 modellkonvertierte Blocktexturen: Furnace, Workbench, Artisan Bench); 716 von 905 Namen änderten die id (79 %); Rotations- und Animationsfamilien unverändert (57 / 43). Produktion und Preprod liefern dasselbe byte-identische Bundle — und der Build trägt die oben dokumentierte Faltungs-Regression.
+Der Registry-Fingerabdruck ist Bestandteil von `HEADER_VERSION`. Änderungen am Registry können deshalb eine erneute Pack-Validierung auslösen. Packs mit Namen werden auf die neuen IDs aufgelöst; fest codierte numerische IDs können dagegen brechen. Siehe [Kompatibilität](api/compatibility.md).
 
 ### Verwandte Seiten
 
-- [Texturkatalog](api/texture-catalog.md) · [Shader-Validierung](internals/shader-validation.md) · [Forschungslog](internals/research-log.md)
-
+- [Texturkatalog](api/texture-catalog.md) — verfügbare Namen für Packs
+- [Textur-Sampling-Interna](internals/texture-sampling.md) — wie Texturen abgetastet werden
+- [Forschungslog](internals/research-log.md) — Messmethode und Build-Verlauf
 
 ---
 
@@ -6123,51 +6058,52 @@ Das Model-Programm bildet eine Achse der Varianten-Matrix: `strict.model` / `all
 ---
 
 ## Engine-Daten-Hauptbuch
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20; Produktion und Preprod liefern dasselbe byte-identische Bundle) · Status: Verified
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified
 
-Das Mess-Hauptbuch der Dokumentation — jeder bestätigte Wert, alles am aktuellen Ziel-Build `bny9u` gemessen.
+Dieses Hauptbuch fasst die bestätigten Werte der für Shader-Packs sichtbaren API im aktuellen Build zusammen. Interne Bundle-Details wie Modul-IDs und Chunk-Nummern gehören nicht zur Spezifikation und werden hier nicht aufgeführt.
 
-### Das Hauptbuch
+### Aktuelle Spezifikation
 
-| Posten | Wert |
+| Element | Wert |
 |---|---|
-| `apiVersion` | `5` (strikt `===`, Zahl) |
-| Engine-Header | 8.954 B dekodiert / 208 Zeilen (9.125 B wie ausgeliefert, 6 Interpolationen). Erste Zeile `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — Volltext im [Engine-Header](internals/engine-header.md) |
-| Hooks | 9 (terrain/liquid/model × vertex/surface/light). Namen unverändert; die Standard-Vorlage bündelt alle 9 |
-| Varianten | 6 (strict × Programm). Namen `strict\|allow.terrain\|liquid\|model` — die Beleuchtungs-Achse ist weg |
-| Makros | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (alle Liquid + nicht-strict Terrain/Model) · `BLOXD_SCENE_DEPTH` (alle Liquid) · ~~`BLOXD_LIGHTING`~~ **entfernt** |
-| Paket-Uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, neu)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| Paket-Bindings | Gruppe 3: 0 Uniform · 1 Szenentiefe (Liquid) · 2 `bloxdSpTextureLayers`-Storage |
-| Flags | die `BloxdFlags`-Struktur, 14 Bools; die Bitwerte von v4 sind ausgemustert |
-| Loader-Limits | 256 `.wgsl` / 256 KB Quelltext / 64 KB `pack.json` / 32 MB Zip / 1.024 Einträge; UTF-8; ein Manifest; eindeutige Pfade — alles unverändert |
-| Textur-Registry | 1.210 Einträge → **896 benutzbare Namen**; Drift gegenüber cnty9 +1/−10 ([Textur-Registry](internals/texture-registry.md)) → `xkg8x` (2026-11-04): 1.220 / **906** → `bny9u` (2026-11-05): 1.232 / **911 benutzbare Namen** — +5 (Trading Terminal ×3, Stone Generator ×2), 864 id-Änderungen  → `v98qt8` (2026-11-08): 1.227 / **906** (+1 `hay_block_top`, −6 model-converted block textures, 716 id changes; **folding regression**) |
-| Lichtkurve | Stufen 0–15 → 0–1, ease-out (`6 → 0.45`, `12 → 0.92`) — im Header, unverändert |
-| Lift-Kurve | `1 - (1 - x / (3 - 2x))^3` — unverändert (aktuell Chunk c9) |
-| Richtlicht-Kegel | `0.12 / 0.65 / 0.62 / 0.95` — unverändert (Chunk c9) |
-| Fog-Farbe | `vec3f(183/255, 191/255, 195/255)` — unverändert |
-| reservierte Namen | `/^bloxd/i` (case-insensitive) + die 46 `bloxdSp*`-Engine-Symbole ([Reservierte Bezeichner](internals/reserved-identifiers.md)) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict-Titel | alles außer den 12 allow-Titeln in [Policy](internals/policy.md) (auf v98qt8 neu aufgezählt: 116 Spieldefinitionen, 28 allow-Einträge — dieselben 12 Titel) |
-| Header-/Registry-Builder | Header-Modul 29815 in Chunk c56 (umnummeriert von c55); auf `bny9u` ist der Registry-Builder Modul 29812 (Chunks c52/c53/c54, Datenmodul 1351; auf `xkg8x` war es 30093 + 1391) |
-| Standard-Pack-Vorlage | Chunk c122 (c116 auf `xkg8x`, c124 in v4), 1.633 B |
+| `apiVersion` | `5` (strikter Zahlenvergleich) |
+| Engine-Header | 216 Zeilen; Volltext im [Engine-Header](internals/engine-header.md) |
+| Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
+| Varianten | 6 (strict × terrain / liquid / model) |
+| Makros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` wurde in v5 entfernt |
+| Pack-Uniform | 80 Byte: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Pack-Binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
+| Flags | `BloxdFlags`-Struktur mit 14 booleschen Feldern |
+| Texturatlas | 1.650 Layer; 1.017 Namen; 776 Aliasse |
+| Texturfamilien | 64 Rotations- und 71 Animationsfamilien |
+| Reservierte Bezeichner | Namen passend zu `/^bloxd/i` sowie 88 interne `bloxdSp*`-Symbole |
+| Spieleddefinitionen | 119 |
+| Shader-Pack-Richtlinie | 12 erlaubte Titel, 28 Einträge; siehe [Richtlinie pro Spiel](internals/policy.md) |
+| Standard-Packvorlage | 1.633 Byte |
+| Loader-Limits | 256 WGSL-Dateien / 256 KB Quelltext / 64 KB für `pack.json` / 32-MB-ZIP / 1.024 Einträge |
 
-### Bundle-Layout (für Nachvermesser)
+### Änderungen in bbb6l5
 
-Der Shader-Pipeline-Cluster: Loader (Zip/Manifest/Limits, Modul 32942) und Registry-Builder c52–c54, Validator/Header c56, WebGPU/Codegen c57, Fog c9. **Die Standard-Pack-Vorlage ist c122** (c116 auf `xkg8x`, c124 in v4).
+`bbb6l5` behält `apiVersion: 5` bei, erweitert aber die für Packs sichtbare API:
 
-Chunk-Format-Hinweis: jeder Chunk ist ein ES-Modul (`export const modules = {...}`) — c53 trägt sowohl c52s als auch c53s Module — daher bleibt die Klartext-Suche im Bundle aussagekräftig (Modul-id `1371` lebt im dünnen Modul-Array von *main*, in keinem Chunk).
+- `bloxdShadow()`, `bloxdAirShadow(t)` und `bloxdShadowDirection()` machen das von der Engine berechnete Sonnen- und Mondschatten-System verfügbar.
+- Das Uniform erhält `shadowDirection: vec3f` bei Offset 64 und wächst von 64 auf 80 Byte.
+- `pack.json` akzeptiert das optionale boolesche Feld `keepCircleShadows`, um die bisherigen Kreisschatten beizubehalten.
+- Der Atlas wächst von 1.227 auf 1.650 Layer und von 906 auf 1.017 verfügbare Namen.
+- Die in `v98qt8` eingeführte Faltungs-Regression der Texturkonstanten wurde behoben.
 
-Das Main-Bundle ist 3.362.913 Byte (3,36 MB); die Chunk-Map wuchs auf 201 ids (c0–c201; 7 benannte Chunks c0–c6).
+Erläuterungen und Belege zu diesen Messungen stehen im [Forschungslog](internals/research-log.md) und in den [Textur-Registry-Interna](internals/texture-registry.md).
 
-### Frühere Hauptbücher
+### Frühere Versionen
 
-- v4 (cnty9, 2026-10-27) → [Versionsgeschichte: v4](history/v4.md)
-- v3 (3ymzdd, 2026-10-19) → [Versionsgeschichte: v3](history/v3.md)
+- [Versionsgeschichte](history/) — Änderungen und Migrationen früherer APIs
+- [Forschungslog](internals/research-log.md) — Messmethode und Quellen der Messwerte
 
 ### Verwandte Seiten
 
-- [Forschungslog](internals/research-log.md) · [Engine-Header](internals/engine-header.md) · [Policy](internals/policy.md)
-
+- [Engine-Header](internals/engine-header.md) — vollständiger Headertext
+- [Richtlinie pro Spiel](internals/policy.md) — Titel mit allow- / strict-Richtlinie
+- [Textur-Registry](internals/texture-registry.md) — Namen und ID-Zuordnung
 
 ---
 

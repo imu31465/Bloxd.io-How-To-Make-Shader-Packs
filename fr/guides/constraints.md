@@ -8,7 +8,7 @@ Le plafond de réalisme des packs de shaders en une page : jusqu'où va l'API ac
 
 - **Couleurs, transparence et émission, par face** — les trois hooks `Surface` renvoient la couleur (plus alpha et émission conditionnels) pour le terrain, les liquides et les modèles
 - **Un rééclairage complet** — les trois hooks `Light` et l'API d'éclairage (`bloxdShading()` / `bloxdWorldLight()` / `bloxdLitColour()`) exposent la recette même du moteur comme fonctions composables ([Éclairage](../api/lighting.md))
-- **Des ombres de style projeté qui suivent les éditions de blocs en temps réel** — `skyLight` est une donnée d'occlusion du ciel par voxel ; l'inversion du lift + la coupe par seuil en font des ombres nettes sous les arbres et les toits ([Ombres](shadows.md))
+- **Ombres qui suivent le soleil et la lune** — `bloxdShadow()` renvoie le facteur d’ombre calculé par le moteur ; `bloxdAirShadow(t)` permet d’échantillonner l’ombre entre la caméra et le fragment, et `bloxdShadowDirection()` renvoie la direction de la lumière ([Ombres](shadows.md))
 - **Lire les textures du jeu lui-même** — `bloxdTexel()` échantillonne l'atlas de textures de blocs et les textures propres aux modèles exactement comme le sampler du moteur ([API de textures](../api/texture-api.md))
 - **Des effets par modèle** — `flags` vous dit « ceci est un objet tenu », « ceci est un objet lâché », « ceci est un joueur », « ceci est un demi-bloc » ([Flags](../api/flags.md)) ; `localPosition` fournit les coordonnées locales au modèle ([Structures](../api/structures.md))
 - **Éclats d'enchantement et superpositions de flash de dégâts** — `enchantTier` / `enchantColour` / `enchantSpeed` et `overlayColour` sont lisibles et surchargeables ([Effets d'enchantement](../recipes/enchant-effects.md))
@@ -59,20 +59,8 @@ Le voile sous-marin est un cas particulier de la même structure : c'est un quad
 | Absorption de profondeur de l'eau | Épaisseur via `bloxdOpaqueBehind()` + projection du fond dans les hooks de liquides ([Liquides](../recipes/liquids.md)) |
 | Ambiance sous-marine | Acceptez le voile ; stylisez ce qui est visible à travers lui (terrain/liquides continuent de s'afficher normalement sous l'eau) |
 
-## La vérité sur les ombres — les « ombres d'arbres » sont réalisables
-
-Seules les **cartes d'ombres précises au pixel suivant le soleil** sont impossibles dans le tableau ci-dessus. Le moteur calcule déjà des « ombres » dès le départ, et c'est `skyLight`. Le LightEngine côté maille exécute un algorithme façon Minecraft :
-
-1. **Balayage de colonnes** : parcourt chaque colonne (x,z) de haut en bas. La lumière du ciel part de 15, devient **0 aux blocs opaques**, en s'atténuant à la descente avec `lightFilter` (air 1 / eau 3 / opaque 15)
-2. **Remplissage BFS** : s'étend latéralement vers 6 voisins (-1 par bloc) — c'est ce qui adoucit les bords d'ombre. La valeur brute sous une occlusion de rayon r est (15-r)/15
-3. blockLight (torches etc.) est un BFS séparé de 3 canaux RGB (empaqueté 4 bits)
-
-Donc `l.skyLight` n'est pas un simple paramètre de luminosité mais **la donnée d'occlusion à résolution voxel de « le ciel est-il visible d'ici » = une carte d'ombres**. Sous les arbres, sous les toits et à l'intérieur, elle est déjà numériquement basse, et arrive lissée par interpolation de sommets. Poser/casser des blocs recalcule immédiatement = **des ombres qui suivent en temps réel**. Vanilla ne l'utilise que « doucement » via `mix(ambiant, ciel, skyLight)`.
-
-Les bons outils sont les deux étapes de [Ombres](shadows.md) (**restaurer les valeurs brutes par inversion du lift → binariser par seuil `smoothstep`** ; `th = 1 - r/15` règle directement le « rayon d'occlusion traité comme ombre ») plus **le filtrage du soleil direct par le ciel** (le soleil n'atteint que là où le ciel est visible = l'essence de la projection), le tout composé avec une teinte chaude au soleil / froide à l'ombre.
-
-**Limites honnêtes** : ces ombres se fondent sur le « ciel vers le haut », donc **elles ne tournent pas quand le soleil se déplace**. La résolution est par bloc (les bords doux viennent de la dispersion BFS). Le gabarit d'éclairage du moteur contient encore un stub fermé `var shadow: f32 = 1.;` pour les cartes d'ombres (toujours 1.0 = désactivé) — interprété comme la trace de cartes d'ombres rotatives précises au pixel « planifiées ». Si des ombres rotatives précises au pixel sont indispensables, seules restent des voies hors API (p. ex. injection GLSL par userscript, avec risque de politique).
-
+## La méthode `skyLight` comme solution de repli
+La technique `skyLight` présentée ci-dessus permet d’assombrir les zones sous les arbres et les toits, mais elle se base sur la visibilité du ciel vers le haut et ne suit pas le soleil. Pour des ombres qui suivent le soleil ou la lune, utilisez `bloxdShadow()`.
 ## Réalité sous-marine
 
 Les looks sous-marins se composent de 3 couches :

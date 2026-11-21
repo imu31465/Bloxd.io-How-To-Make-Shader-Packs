@@ -7,7 +7,7 @@ Un guide non officiel sur les shader packs du renderer WebGPU de Bloxd.io — de
 - API actuelle : **5** (`pack.json` doit déclarer `apiVersion: 5`)
 - Cible : renderer WebGPU
 - Dernière vérification : 2026-11-20
-- Build cible : `bbb6l5.main.0244a119.js` (production et preprod, vérifié le 2026-11-20 — registre, en-tête, hooks, limites et la nouvelle API d’ombres remesurés)
+- Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20)
 - Hooks de shader : 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). Cherchez-vous une fonction de l'API ? Voir la [Référence API](api/).
@@ -16,7 +16,7 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 >
 > Ce guide a été créé avec l'assistance d'une IA ; l'exactitude n'est pas garantie. Vérifiez par rapport au comportement réel en jeu. Continuez à vérifier les recettes face à l'écran du chargeur et à la compilation en jeu.
 >
-> La fonctionnalité shader pack elle-même est une fonctionnalité officielle accessible depuis l'interface du jeu, et les packs sont du WGSL pur (pas d'exécution JS, pas de réseau), donc rien de dangereux ne se produit avec du code normal.
+> Les packs sont écrits uniquement en WGSL : ils n'exécutent pas de JavaScript et n'effectuent aucune requête réseau.
 
 ## Entrées par objectif
 
@@ -31,8 +31,8 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 
 ## Carte de la documentation
 
-- **[Premiers pas](getting-started/)** — vue d'ensemble, démarrage rapide, structure du pack, pack.json, les 9 hooks, variantes, validation, distribution. Un tutoriel en voie unique jusqu'à votre premier pack.
-- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 911 noms de textures.
+- **[Premiers pas](getting-started/)** — vue d'ensemble, démarrage rapide, structure du pack, pack.json, les 9 hooks, variantes, validation, distribution.
+- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 1,017 noms de textures.
 - **[Guides](guides/)** — comment fonctionne l'éclairage, les ombres, l'eau, la nuit, le rendu des modèles, les performances, les concepts de réalisme.
 - **[Recettes](recipes/)** — exemples de code orientés objectif : couleurs, éclairage, émission, coordonnées, animation, liquides, sommets, maths, réalisme, shaders de modèle, effets d'enchantement.
 - **[Dépannage](troubleshooting/)** — résolution d'erreurs par symptôme : chargement, version d'API, compilation, validation, variantes, visuel, textures, éclairage, modèles, performances.
