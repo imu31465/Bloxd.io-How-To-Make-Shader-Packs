@@ -5149,46 +5149,43 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## Внутренности движка и исследования
-Внутренние спецификации, восстановленные анализом реализации движка. Всё здесь восстановлено напрямую из JavaScript текущего продакшн-билда (`bny9u`). Отделено от документации публичного API ([Справочник API](api/)) ради сохранения точного внутреннего поведения и результатов анализа.
+## Внутреннее устройство движка
+
+В этом разделе описано внутреннее поведение движка, помогающее понять выполнение шейдер-паков. Детали реализации могут меняться при обновлениях игры. Стабильные правила использования и поддерживаемые API приведены в [Справочнике API](internals/api).
 
 ### Карта
 
 | Страница | Содержимое |
 |---|---|
-| [Пайплайн рендеринга](internals/rendering-pipeline.md) | позиция alphaTest, схема с 2 источниками света, что на самом деле лежит в uniform, greedy meshing |
-| [Вызов хуков](internals/hook-invocation.md) | как хуки врезаются в WGSL движка |
-| [Заголовок движка](internals/engine-header.md) | полный заголовок v5 (дословно, 8,954B) |
-| [Валидация шейдеров](internals/shader-validation.md) | внутренности анализатора, таблица сигнатур, HEADER_VERSION |
-| [Компиляция WGSL](internals/wgsl-compilation.md) | настоящая компиляция этапа 2 и заглушки валидации |
-| [Зарезервированные идентификаторы](internals/reserved-identifiers.md) | 46 символов `bloxdSp*` |
-| [Внутрянка освещения](internals/lighting-internals.md) | структура blockLight / heldLight |
-| [Внутрянка тумана](internals/fog-internals.md) | только линейный, 32-блочная полоса градиента |
-| [Сэмплинг текстур](internals/texture-sampling.md) | кодогенерация текстур в 3 вариантах |
-| [Реестр текстур](internals/texture-registry.md) | разрешение имя→id, 896 имён, измеренный дрейф |
-| [Рендеринг моделей](internals/model-rendering.md) | программа Model в v5 |
-| [Данные движка](internals/engine-data.md) | сводка констант/лимитов/раскладок v5 |
-| [Факторы тестирования](internals/testing-factors.md) | какие настройки мира/игрока меняют видимые паку значения |
-| [Политика](internals/policy.md) | shaderPackPolicy — 12 allow-титулов |
-| [Солнце и луна](internals/sun-and-moon.md) | что питает bloxdSunDirection |
-| [Отладка](internals/debugging.md) | URL-параметры, панели статистики |
-| [Журнал исследований](internals/research-log.md) | методология, история билдов, непроверенные пункты |
-
-> Целевой API: 5
-
-Внутрянка — не стабильный API-контракт: она может меняться с обновлениями движка, и каждая страница называет свой опорный билд ([журнал исследований](internals/research-log.md)).
+| [Пайплайн рендеринга](internals/index.md/rendering-pipeline.md) | позиция alphaTest, схема с 2 источниками света, что на самом деле лежит в uniform, greedy meshing |
+| [Вызов хуков](internals/index.md/hook-invocation.md) | как хуки врезаются в WGSL движка |
+| [Заголовок движка](internals/index.md/engine-header.md) | Объявления WGSL, добавляемые перед кодом шейдер-паков |
+| [Валидация шейдеров](internals/index.md/shader-validation.md) | внутренности анализатора, таблица сигнатур, HEADER_VERSION |
+| [Компиляция WGSL](internals/index.md/wgsl-compilation.md) | настоящая компиляция этапа 2 и заглушки валидации |
+| [Зарезервированные идентификаторы](internals/index.md/reserved-identifiers.md) | 46 символов `bloxdSp*` |
+| [Внутрянка освещения](internals/index.md/lighting-internals.md) | структура blockLight / heldLight |
+| [Внутрянка тумана](internals/index.md/fog-internals.md) | только линейный, 32-блочная полоса градиента |
+| [Сэмплинг текстур](internals/index.md/texture-sampling.md) | кодогенерация текстур в 3 вариантах |
+| [Реестр текстур](internals/index.md/texture-registry.md) | Разрешение имён, имена анимаций и поворотов |
+| [Рендеринг моделей](internals/index.md/model-rendering.md) | программа Model в v5 |
+| [Данные движка](internals/index.md/engine-data.md) | Возможности API v5 и ограничения паков |
+| [Факторы тестирования](internals/index.md/testing-factors.md) | какие настройки мира/игрока меняют видимые паку значения |
+| [Политика](internals/index.md/policy.md) | shaderPackPolicy — 12 allow-титулов |
+| [Солнце и луна](internals/index.md/sun-and-moon.md) | что питает bloxdSunDirection |
+| [Отладка](internals/index.md/debugging.md) | URL-параметры, панели статистики |
 
 
----
+Внутренние детали реализации не являются стабильным контрактом API. При создании паков ориентируйтесь на публичную спецификацию в [Справочнике API](internals/api).
 
 ## Пайплайн рендеринга
-> Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
+
+> Целевая API: 5 · Тип: техническая справка
 - **Surface-хуки идут «до» alphaTest**: `out.alpha` кормит тест отброса напрямую. Cutout-материалы (трава, листья) допускают dither-эффекты растворения (рецепт R-C). В жидкостях (смешивание) `out.alpha` — настоящая прозрачность (рецепт R-D). На обычном непрозрачном террейне эффекта нет — не перепутайте
 - **Содержимое `l.ambient`** — это `material.ambient × sceneAmbient`, различающееся по материалам. Сценовая сторона привязана к графической настройке «Ambient Lighting Intensity» (дефолт 0.5) — никогда не программируйте фиксированные дефолты
 - **Сценовые направленные огни — сетап из двух источников**: ламбертова сумма главного (направление из позиции солнца в настройках неба, интенсивность 1.0) и заполняющего (направление `[-0.5, -1, -1]`, интенсивность 0.35) приходит как `l.directional`. Заполняющий направлен вниз, так что верхним граням он ничего не даёт, но выцепляет обращённые вниз поверхности (потолки пещер и т.п.). Террейн учитывает только лампы, добавленные в `_initScene`; лампы, добавленные в сцену после запуска, игнорируются террейном и блочными моделями (об этом говорит официальное предупреждающее сообщение)
 - **`bloxdSeconds()` — на самом деле `performance.now()`**: аптайм браузера, завёрнутый на 1 час. Не связано с днём/ночью в игре и прошедшим временем мира. Для анимации, синхронной с игровыми часами, оценивайте время по азимуту `bloxdSunDirection()` в мирах с циклом день/ночь
-- **Функции заголовка читают один uniform**: движок размещает 64-байтный uniform `bloxdPackInputs` на `@group(3) @binding(0)` (5 слотов — seconds / lit / renderOffset / sunDirection / eyePosition, little-endian), а `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` соответствуют чтению этих слотов ([Формат пака: кадровый uniform](api/pack-format.md#кадровый-uniform-bloxdpackinputs)). Пак не может писать в этот uniform, а поскольку WGSL пака и движка склеиваются в единый модуль, объявить тот же group/binding самостоятельно тоже нельзя. `@group(3) @binding(1)` несёт текстуру глубины сцены для жидкостей, а `@binding(2)` — storage-буфер `bloxdSpTextureLayers`
-- **Вершинные данные строит мешер (Web Worker)**: блочный террейн идёт интерливингом по 28 байт на вершину (32 байта при включённом атласе) — позиция = float32×3 / нормаль = знаковый 8-битный целый ×4 / цвет = нормализованный 8-битный целый ×4 (суть `s.colour` — tint × AO запекается в 8 бит на стадии мешера, поэтому разделить или восстановить это на стороне пака принципиально невозможно) / UV = float32×2 / atlasIndex = float32. Лишь уровни света едут отдельным 4-байтным вершинным буфером (измеренные значения: [реестр данных движка](internals/engine-data.md)). Вершины рисуются instancing'ом по чанкам
+- **Функции заголовка читают один uniform**: движок размещает 64-байтный uniform `bloxdPackInputs` на `@group(3) @binding(0)` (5 слотов — seconds / lit / renderOffset / sunDirection / eyePosition, little-endian), а `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` соответствуют чтению этих слотов ([Формат пака: кадровый uniform](internals/api/pack-format.md#кадровый-uniform-bloxdpackinputs)). Пак не может писать в этот uniform, а поскольку WGSL пака и движка склеиваются в единый модуль, объявить тот же group/binding самостоятельно тоже нельзя. `@group(3) @binding(1)` несёт текстуру глубины сцены для жидкостей, а `@binding(2)` — storage-буфер `bloxdSpTextureLayers`
+- **Вершинные данные строит мешер (Web Worker)**: блочный террейн идёт интерливингом по 28 байт на вершину (32 байта при включённом атласе) — позиция = float32×3 / нормаль = знаковый 8-битный целый ×4 / цвет = нормализованный 8-битный целый ×4 (суть `s.colour` — tint × AO запекается в 8 бит на стадии мешера, поэтому разделить или восстановить это на стороне пака принципиально невозможно) / UV = float32×2 / atlasIndex = float32. Лишь уровни света едут отдельным 4-байтным вершинным буфером (измеренные значения: [реестр данных движка](internals/rendering-pipeline.md/engine-data.md)). Вершины рисуются instancing'ом по чанкам
 - Мелкие шахматки на границах чанков при загрузке — чанк-фейд screen-space Bayer 4×4 dither движка, а не баги пака (можно отключить графической настройкой `chunkFadeIn`)
 - **`mod` — зарезервированное слово**: отклоняется с ошибкой `pack.wgsl:3 'mod' is a reserved word in WGSL.` Остатки пишите оператором `%`
 
@@ -5250,11 +5247,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-
----
-
 ## Внутрянка вызова хуков
-> Целевой API: 5 · Статус: Analyzed (восстановлено из продакшн-бандла — Lite-рендерер; интегрированный исходный файл `lite/terrainShaderPack.ts` сохранился в строках ошибок)
+
+> Целевая API: 5 · Тип: техническая справка
 
 Как движок вызывает хуки во время выполнения. Это ничего не меняет в коде, который вы пишете, но убирает догадки о том, что получают хуки.
 
@@ -5271,9 +5266,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### Что диктует врезка
 
-- **strict-террейн игнорирует изменения alpha из surface-хука.** Запись `alpha = bloxdSpSurface.alpha` вживляется только для жидкостной программы или не-strict вариантов — реализация, стоящая за таблицей макросов ([Препроцессор](api/preprocessor.md))
+- **strict-террейн игнорирует изменения alpha из surface-хука.** Запись `alpha = bloxdSpSurface.alpha` вживляется только для жидкостной программы или не-strict вариантов — реализация, стоящая за таблицей макросов ([Препроцессор](internals/api/preprocessor.md))
 - **strict-вариант, объявляющий vertex-хук, никогда его не запускает.** Движок сообщает об этом во время сборки: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`. Отсюда `#ifndef BLOXD_STRICT` в шаблоне
-- **Идентификаторы `bloxdSp*`** — временные переменные движка: невидимы для вашего кода, но присутствуют в диагностике и в результатах обратной разработки ([Зарезервированные идентификаторы](internals/reserved-identifiers.md) — 46 в v5)
+- **Идентификаторы `bloxdSp*`** — временные переменные движка: невидимы для вашего кода, но присутствуют в диагностике и в результатах обратной разработки ([Зарезервированные идентификаторы](internals/hook-invocation.md/reserved-identifiers.md) — 46 в v5)
 - **Сокращение для дефолтного surface.** Если surface-хук варианта — буквально `bloxdDefaultSurface`, движок целиком пропускает вживление записи `baseColor` / `alpha` — дефолт и так выдаёт эти значения, так что присваивания были бы мёртвым кодом. **Неизменённые цепочки хуков ничего не стоят**
 
 ### Что изменилось в v5
@@ -5282,8 +5277,8 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - `vBlockFlags` (биты) → **структура `BloxdFlags`** (доставляется через `bloxdSpFlags`)
 - захват `litColour` перешёл из внутренности движка в **публичный API** (`bloxdLitColour()` — повышенный `bloxdSpLitColour` из v4)
-- `BloxdLightIn` получил `diffuse` / `emissive`, а `bloxdShading()` заново собирает отклик материала ([Освещение](api/lighting.md))
-- доставка `localPosition` (`bloxdSpItemLocalPosition`), входов зачарования (`bloxdSpEnchant`) и `overlayColour` ([Рендеринг моделей](internals/model-rendering.md))
+- `BloxdLightIn` получил `diffuse` / `emissive`, а `bloxdShading()` заново собирает отклик материала ([Освещение](internals/api/lighting.md))
+- доставка `localPosition` (`bloxdSpItemLocalPosition`), входов зачарования (`bloxdSpEnchant`) и `overlayColour` ([Рендеринг моделей](internals/hook-invocation.md/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (инвертирован)
 - программа Model вошла в матрицу вариантов (3 программы × 2 режима = 6 вариантов)
 
@@ -5292,36 +5287,34 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | Поле | Источник на стороне движка |
 |---|---|
 | `litColour` | цвет фрагмента, захваченный прямо перед смешиванием с туманом — «before emission and fog» в терминах заголовка |
-| `directional` | интерполированная по вершинам сумма ламбертов по каждому направленному свету (сетап из двух источников в [Пайплайне рендеринга](internals/rendering-pipeline.md)) |
+| `directional` | интерполированная по вершинам сумма ламбертов по каждому направленному свету (сетап из двух источников в [Пайплайне рендеринга](internals/hook-invocation.md/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | направленный RGB-отклик материала / RGB-свечение |
 | `ambient` | `material.ambient × sceneAmbient` — по материалу, на кадр |
-| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутрянка освещения](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутрянка освещения](internals/hook-invocation.md/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | соответствующие uniform |
-| `heldLight` | собирается из varying уровня света и uniform ручного света (затухание конуса — в [Внутрянке освещения](internals/lighting-internals.md)) |
+| `heldLight` | собирается из varying уровня света и uniform ручного света (затухание конуса — в [Внутрянке освещения](internals/hook-invocation.md/lighting-internals.md)) |
 | `fogColour` | чёрный только в сценах, полностью лишённых тумана (режим 0) |
-| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутрянка тумана](internals/fog-internals.md)) |
+| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутрянка тумана](internals/hook-invocation.md/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying и flat-интерполированные значения (как в `BloxdSurfaceIn` — значения после vertex-хука) |
 
 ### См. также
 
-- [Хуки шейдеров](api/hooks.md) · [Пайплайн рендеринга](internals/rendering-pipeline.md) · [Зарезервированные идентификаторы](internals/reserved-identifiers.md) · [История версий: v3](history/v3.md)
-
-
----
+- [Хуки шейдеров](internals/api/hooks.md) · [Пайплайн рендеринга](internals/hook-invocation.md/rendering-pipeline.md) · [Зарезервированные идентификаторы](internals/hook-invocation.md/reserved-identifiers.md) · [История версий: v3](internals/history/v3.md)
 
 ## Заголовок движка (дословно)
-> Целевой API: 5 · Статус: Analyzed (восстановлено из живого продакшн-бандла)
 
-Точный текст, который движок ставит в начало каждого пака, отрендеренный из валидатора живого билда с применёнными интерполяциями (`apiVersion` и 6 чтений uniform через `bloxdPackInputs`). 216 строк. Без пересказа. Проверен повторно на предыдущих билдах (`bny9u`, `v98qt8`) — единственное изменение — теневое содержимое.
+> Целевая API: 5 · Тип: техническая справка
+
+Справочный текст заголовка WGSL, который движок добавляет перед кодом шейдер-пака. Назначение полей и функций описано в [Справочнике API](internals/api).
 
 Как читать:
-- Пояснения по каждому полю → [Структуры](api/structures.md)
-- По каждой функции → [Функции](api/functions.md) / [Освещение](api/lighting.md)
-- Флаги (BloxdFlags) → [Флаги](api/flags.md)
-- Блока `bloxdTextureId*` в этом заголовке **нет** — он генерируется для каждого пака из упомянутых имён ([API текстур](api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` помечает условные поля ([Препроцессор](api/preprocessor.md))
-- Отличия от заголовка v4 (6 021 Б) → [История версий: v5](history/v5.md)
-- Как валидируется заголовок (HEADER_VERSION) → [Валидация шейдеров](internals/shader-validation.md)
+- Пояснения по каждому полю → [Структуры](internals/api/structures.md)
+- По каждой функции → [Функции](internals/api/functions.md) / [Освещение](internals/api/lighting.md)
+- Флаги (BloxdFlags) → [Флаги](internals/api/flags.md)
+- Блока `bloxdTextureId*` в этом заголовке **нет** — он генерируется для каждого пака из упомянутых имён ([API текстур](internals/api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` помечает условные поля ([Препроцессор](internals/api/preprocessor.md))
+- Отличия от заголовка v4 (6 021 Б) → [История версий: v5](internals/history/v5.md)
+- Как валидируется заголовок (HEADER_VERSION) → [Валидация шейдеров](internals/engine-header.md/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5543,23 +5536,21 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### См. также
 
-- [Справочник API](api/) — аннотированная версия этого заголовка
-- [Валидация шейдеров](internals/shader-validation.md) — HEADER_VERSION и перепроверка сохранённых паков
-- [Данные движка](internals/engine-data.md) — реестр измерений
-
-
----
+- [Справочник API](internals/api) — аннотированная версия этого заголовка
+- [Валидация шейдеров](internals/engine-header.md/shader-validation.md) — HEADER_VERSION и перепроверка сохранённых паков
+- [Данные движка](internals/engine-header.md/engine-data.md) — реестр измерений
 
 ## Валидация шейдеров
-> Целевой API: 5 · Статус: Analyzed (восстановлено из живого валидатора)
 
-Статическая валидация (анализатор, этап 1 проверки при загрузке). Исправления для пользователя: [Ошибки валидации](troubleshooting/validation.md).
+> Целевая API: 5 · Тип: техническая справка
+
+Статическая валидация (анализатор, этап 1 проверки при загрузке). Исправления для пользователя: [Ошибки валидации](internals/troubleshooting/validation.md).
 
 ### Этапы
 
-1. **Лимиты загрузчика** (форма zip / pack.json) → [Формат пака](api/pack-format.md)
+1. **Лимиты загрузчика** (форма zip / pack.json) → [Формат пака](internals/api/pack-format.md)
 2. **Статическая валидация (анализатор)** — эта страница; синтаксис, типы, зарезервированные имена, контракты хуков по всем 6 вариантам
-3. **Настоящая компиляция в браузере** → [Компиляция WGSL](internals/wgsl-compilation.md)
+3. **Настоящая компиляция в браузере** → [Компиляция WGSL](internals/shader-validation.md/wgsl-compilation.md)
 4. **Рантайм-перепроверка при входе в игру** — реально компилирует каждый существующий материал террейна (строже проверки на экране настроек); провал отбрасывает пак для этой игры
 
 ### Таблица сигнатур специальных функций
@@ -5589,7 +5580,7 @@ const Jq = new Map([
 
 ### Разрешение имён текстур и диагностики
 
-У разрешения `bloxdTextureId*` есть выделенный путь ([сообщения](api/texture-api.md#ошибки-разрешения-имён-дословно-из-валидатора)):
+У разрешения `bloxdTextureId*` есть выделенный путь ([сообщения](internals/api/texture-api.md#ошибки-разрешения-имён-дословно-из-валидатора)):
 
 - **сворачивание**: разбиение по не-буквенно-цифровым символам, CamelCase, префикс `bloxdTextureId`; обратное сопоставление не различает регистр и подчёркивания
 - **подсказки написания** (новое в v5): имена без совпадения получают предложения Левенштейна с порогом `max(2, floor(len/4)) + 1`
@@ -5603,36 +5594,34 @@ const Jq = new Map([
 
 ### Переписывание Y-производной
 
-Проход перезаписи токенов анализатора переписывает каждый вызов `dpdy` / `dpdyCoarse` / `dpdyFine` в `(-dpdy(...))` (семейство dpdy явно перечислено как набор инверсии). `dpdx` и `fwidth` не трогаются ([Ограничения](api/restrictions.md#автоматические-перезаписи)).
+Проход перезаписи токенов анализатора переписывает каждый вызов `dpdy` / `dpdyCoarse` / `dpdyFine` в `(-dpdy(...))` (семейство dpdy явно перечислено как набор инверсии). `dpdx` и `fwidth` не трогаются ([Ограничения](internals/api/restrictions.md#автоматические-перезаписи)).
 
 ### Генерация заголовка и текстурных констант
 
-- заголовок дописывается спереди как read-only ([Заголовок движка](internals/engine-header.md))
+- заголовок дописывается спереди как read-only ([Заголовок движка](internals/shader-validation.md/engine-header.md))
 - блок `bloxdTextureId*` генерируется **на каждый пак** из упомянутых имён
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` — это `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (ведущее целое 8 → 9 начиная с v4). Два суффикса fnv1a32 снимают отпечаток материала заголовка и отсортированного реестра имя-id. Повторная валидация сохранённых паков использует этот отпечаток, чтобы решить «нужна перепроверка» ([Совместимость](api/compatibility.md#перепроверка-сохранённых-паков-нужна-перепроверка)).
+`HEADER_VERSION` — это `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (ведущее целое 8 → 9 начиная с v4). Два суффикса fnv1a32 снимают отпечаток материала заголовка и отсортированного реестра имя-id. Повторная валидация сохранённых паков использует этот отпечаток, чтобы решить «нужна перепроверка» ([Совместимость](internals/api/compatibility.md#перепроверка-сохранённых-паков-нужна-перепроверка)).
 
 ### Стабы валидации
 
-Код, прошедший статическую валидацию, получает синтезированный стаб-код перед настоящей проверкой браузерным WGSL: `var<private> bloxdValidationP: vec4f` плюс `bloxdValidateVertex` / `bloxdValidateFragment` — таблица стабов типов (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) строит входные структуры и вызывает хуки. Подробности: [Компиляция WGSL](internals/wgsl-compilation.md).
+Код, прошедший статическую валидацию, получает синтезированный стаб-код перед настоящей проверкой браузерным WGSL: `var<private> bloxdValidationP: vec4f` плюс `bloxdValidateVertex` / `bloxdValidateFragment` — таблица стабов типов (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) строит входные структуры и вызывает хуки. Подробности: [Компиляция WGSL](internals/shader-validation.md/wgsl-compilation.md).
 
 ### Смотрите также
 
-- [Ошибки валидации](troubleshooting/validation.md) · [Компиляция WGSL](internals/wgsl-compilation.md) · [Реестр текстур](internals/texture-registry.md) · [Данные движка](internals/engine-data.md)
-
-
----
+- [Ошибки валидации](internals/troubleshooting/validation.md) · [Компиляция WGSL](internals/shader-validation.md/wgsl-compilation.md) · [Реестр текстур](internals/shader-validation.md/texture-registry.md) · [Данные движка](internals/shader-validation.md/engine-data.md)
 
 ## Компиляция WGSL
-> Целевой API: 5 · Статус: Analyzed (восстановлено из живого бандла)
+
+> Целевая API: 5 · Тип: техническая справка
 
 Вторая ступень валидации — настоящая компиляция через WGSL-компилятор браузера — и стабы валидации v5.
 
 ### Зачем две ступени
 
-Проверка типов в статической валидации неполна, поэтому некоторые ошибки всплывают только здесь (например, требования WGSL к приоритету операторов вроде `mixing '*' and '^' requires parenthesis`). Ошибки всплывают в игре с именем варианта ([Ошибки компиляции](troubleshooting/compilation.md)).
+Проверка типов в статической валидации неполна, поэтому некоторые ошибки всплывают только здесь (например, требования WGSL к приоритету операторов вроде `mixing '*' and '^' requires parenthesis`). Ошибки всплывают в игре с именем варианта ([Ошибки компиляции](internals/troubleshooting/compilation.md)).
 
 ### Генерация стабов валидации
 
@@ -5685,27 +5674,23 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ### Рантайм-перепроверка при входе в игру
 
-`checkCompilation` выполняется при каждом входе в игру и реально компилирует каждый существующий материал террейна (строже проверки на экране настроек). Провал отбрасывает пак для этой игры. У проверки есть принудительный таймаут в 60 секунд ([Производительность](troubleshooting/performance.md)).
+`checkCompilation` выполняется при каждом входе в игру и реально компилирует каждый существующий материал террейна (строже проверки на экране настроек). Провал отбрасывает пак для этой игры. У проверки есть принудительный таймаут в 60 секунд ([Производительность](internals/troubleshooting/performance.md)).
 
 ### Смотрите также
 
-- [Ошибки компиляции](troubleshooting/compilation.md) · [Валидация шейдеров](internals/shader-validation.md) · [Начало работы: валидация](getting-started/validation.md)
-
-
----
+- [Ошибки компиляции](internals/troubleshooting/compilation.md) · [Валидация шейдеров](internals/wgsl-compilation.md/shader-validation.md) · [Начало работы: валидация](internals/getting-started/validation.md)
 
 ## Внутрянка зарезервированных идентификаторов
-> Целевой API: 5 · Статус: Analyzed (восстановлено из генераторов живого бандла)
 
-Пространство имён `bloxdSp*` — символы, которые генераторы могут внедрять, и поэтому паки не могут их переобъявлять. Сводка для авторов паков: [Ограничения](api/restrictions.md).
+> Целевая API: 5 · Тип: техническая справка
+
+Пространство имён `bloxdSp*` — символы, которые генераторы могут внедрять, и поэтому паки не могут их переобъявлять. Сводка для авторов паков: [Ограничения](internals/api/restrictions.md).
 
 ### 88 символов
 
-С 27 в v4 до 46 на запуске v5 и до **88** на `bbb6l5` (+42, 0 удалено; единственное историческое удаление — `bloxdSpLitColour`, повышенный до публичного `bloxdLitColour()`):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### Новые имена ↔ теневая система `bbb6l5`
 
 Все 42 новых символа происходят из реализации солнечных/лунных теней движка, на которой работают `bloxdShadow()` / `bloxdAirShadow()`:
 
@@ -5722,40 +5707,36 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 - `bloxdSpFlags` — доставка структуры `BloxdFlags`
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — новые входы (зачарование, локальная позиция модели)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — путь текстурных паков с сэмплингом по ячейкам
-- `bloxdSpQuarterTurns` — цепочка поворотов ([Сэмплинг текстур](internals/texture-sampling.md))
+- `bloxdSpQuarterTurns` — цепочка поворотов ([Сэмплинг текстур](internals/reserved-identifiers.md/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — локальные переменные расширенных хуков
 
 ### Правило на уровне пака
 
-Шире, чем это пространство имён: **всё, что совпадает с `/^bloxd/i` (без учёта регистра)**. Объявлять можно только 9 имён хук-функций ([Ошибки валидации](troubleshooting/validation.md)).
+Шире, чем это пространство имён: **всё, что совпадает с `/^bloxd/i` (без учёта регистра)**. Объявлять можно только 9 имён хук-функций ([Ошибки валидации](internals/troubleshooting/validation.md)).
 
-Идентификаторы с префиксом `bloxdTextureId` разрешаются как имена текстур — со своим отдельным семейством ошибок ([Проблемы текстур](troubleshooting/textures.md)).
+Идентификаторы с префиксом `bloxdTextureId` разрешаются как имена текстур — со своим отдельным семейством ошибок ([Проблемы текстур](internals/troubleshooting/textures.md)).
 
 ### См. также
 
-- [Ограничения](api/restrictions.md) · [Сэмплинг текстур](internals/texture-sampling.md) · [История версий: v5](history/v5.md)
-
-
----
+- [Ограничения](internals/api/restrictions.md) · [Сэмплинг текстур](internals/reserved-identifiers.md/texture-sampling.md) · [История версий: v5](internals/history/v5.md)
 
 ## Внутрянка освещения
-> Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
+
+> Целевая API: 5 · Тип: техническая справка
 `blockLight` — **цветной свет** с тремя RGB-каналами. Каждый светящийся блок задаёт цвет свечения `[R, G, B]` (0–15 на канал), который как есть становится цветом света (обычный факел = тёплый белый (14,14,12) / лава = оранжевый (14,8,2) / маяк = циан (5,14,14) / белый факел = (15,15,15) и т.д.). На вершинной стадии он приходит упакованным в 4 ниббла — r / g / b / sky — в одном float-атрибуте. Обработка трёх каналов по отдельности внутри light-хука включает цветной локальный свет — рецепт тёплых факелов (R9.1) откалиброван именно под это поведение.
 
 При декодировании `aPackedLightLevels` движок кладёт на каждый канал **пол в 35% ярчайшего RGB-канала**. Напр. «чисто красный свет» в вершинах поднимается до (1.00, 0.35, 0) до интерполяции и лифта. Оранжевый факелов, выглядящий в игре «розовато-белым, а не красным», — отсюда: насыщенность рецепта тёплых факелов (R9.1) крутите против этого дефолта.
 
-Композиция света — не сумма. Внутри движок берёт **max** блочного света (после пола 35%) и небесного света, собранного как `mix(ambient-цвет, sky-цвет, skyLight)`, а затем снова берёт max с ручным светом (после ambient-буста). Значения каналов в этой композиции — значения **после лифта**: движок собирает её из тех же поднятых уровней света, что доходят до входов хуков (`terrainLightLevels` после кривой лифта). Поэтому `blockLight` и `skyLight` никогда не гасят друг друга — вклад более тёмной стороны просто отбрасывается — и ослабление небесного света почти не темнит места, где доминирует блочный свет. Рецепты экспозиции/затухания проектируйте вокруг этой структуры (защита локального света в [Проектировании ночных видов](guides/night.md) существует как компенсация этого).
+Композиция света — не сумма. Внутри движок берёт **max** блочного света (после пола 35%) и небесного света, собранного как `mix(ambient-цвет, sky-цвет, skyLight)`, а затем снова берёт max с ручным светом (после ambient-буста). Значения каналов в этой композиции — значения **после лифта**: движок собирает её из тех же поднятых уровней света, что доходят до входов хуков (`terrainLightLevels` после кривой лифта). Поэтому `blockLight` и `skyLight` никогда не гасят друг друга — вклад более тёмной стороны просто отбрасывается — и ослабление небесного света почти не темнит места, где доминирует блочный свет. Рецепты экспозиции/затухания проектируйте вокруг этой структуры (защита локального света в [Проектировании ночных видов](internals/guides/night.md) существует как компенсация этого).
 
 Дальность ручного света (`heldLight`) следует ярчайшему каналу цвета света (макс 15 блоков) с препроцессингом `dist^0.75`, тем же полом каналов 35%, а `l.heldLight` — значение до ambient-буста. Затухание конуса, восстановленное из светового модуля движка: угловое ослабление луча — `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))`, где `t` — нормированный угол от оси конуса (0 = центр, 1 = край); дальность — `(rangeOverride > 0 ? rangeOverride : ярчайший канал) × затухание конуса`, где `rangeOverride` читается из alpha цвета ручного света; внутри дальности override ослабляет по `(range − dist) / range`, а дефолт вычитает (препроцессированную) дистанцию покомпонентно; затем идут пол 35%, деление на 15, кривая лифта и, наконец, ambient-буст. Кастомные предметы могут задавать `spotlightRange` и угол конуса — режим «луч, пока держишь», чья позиция конуса следует за камерой. Паки не могут узнать направление луча.
 
 Кастомные блоки могут нести `skyLightEmission` (0–15), который **инжектит в сам канал skyLight, отдельно от BFS blockLight**. Паки в духе R9.12, судящие солнце/тень по порогу skyLight, могут ошибаться в мирах, где искусственные источники поднимают skyLight. Дистрибутивные паки должны судить в связке с blockLight, чтобы оставаться надёжными.
 
-
----
-
 ## Внутрянка тумана
-> Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
-Расчёт тумана всегда идёт в режиме LINEAR (эквивалент: `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), при `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = настройка дистанции тумана; лишь D = 0 особенный с fogEnd = 5). **Градиентная полоса тумана имеет ширину всего 32 блока**, а `l.fogAlpha` — не столько «дымка по дистанции», сколько **нормированная дистанция до края загруженного мира**. Она меняется от игрока к игроку вместе с дистанцией загрузки, поэтому дистанционные эффекты должны сами вычислять `distance(l.position, bloxdEyePosition())` (раздел «Полоса края загрузки» ниже). (функция тумана рендерера на самом деле реализует **четыре** режима — выключен / экспоненциальный / экспоненциальный в квадрате / линейный — и поставляемые титулы управляют линейным; восстановленный исходный код и обоснование устойчивости сохранены в [Истории версий: v3](history/v3.md).)
+
+> Целевая API: 5 · Тип: техническая справка
+Расчёт тумана всегда идёт в режиме LINEAR (эквивалент: `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), при `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = настройка дистанции тумана; лишь D = 0 особенный с fogEnd = 5). **Градиентная полоса тумана имеет ширину всего 32 блока**, а `l.fogAlpha` — не столько «дымка по дистанции», сколько **нормированная дистанция до края загруженного мира**. Она меняется от игрока к игроку вместе с дистанцией загрузки, поэтому дистанционные эффекты должны сами вычислять `distance(l.position, bloxdEyePosition())` (раздел «Полоса края загрузки» ниже). (функция тумана рендерера на самом деле реализует **четыре** режима — выключен / экспоненциальный / экспоненциальный в квадрате / линейный — и поставляемые титулы управляют линейным; восстановленный исходный код и обоснование устойчивости сохранены в [Истории версий: v3](internals/history/v3.md).)
 
 Дефолтный цвет тумана — `rgb(183, 191, 195)` (бледный сине-серый). Создатели миров меняют его через `fogColourOverride` (hex). При режиме тумана 0 (NONE) **fogColour приходит чёрным**. Стандартная форма `bloxdApplyFog(col, l)` безопасна: при fogAlpha, равном 0, цвет тумана не используется. У скриптового API есть ещё две опции, `fogChunkDistanceOverride` и `fogOnSkybox`: кастомные игры могут независимо задавать дистанцию тумана (значение D) и применение тумана к скайбоксу. По умолчанию скайбокс туманом не затрагивается (скайбокс окрашивается цветом тумана только в играх с включённым `fogOnSkybox`).
 
@@ -5776,13 +5757,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-
----
-
 ## Внутрянка сэмплинга текстур
-> Целевой API: 5 · Статус: Analyzed (восстановлено из живого генератора, c56)
 
-Как `bloxdTexel` / `bloxdTextureSize` компилируются на самом деле — кодогенерация текстур в 3 вариантах. Со стороны пользователя: [API текстур](api/texture-api.md).
+> Целевая API: 5 · Тип: техническая справка
+
+Как `bloxdTexel` / `bloxdTextureSize` компилируются на самом деле — кодогенерация текстур в 3 вариантах. Со стороны пользователя: [API текстур](internals/api/texture-api.md).
 
 ### Три варианта
 
@@ -5823,7 +5802,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### Лестница кадров анимации
 
-Анимированные текстуры (42 семейства) продвигаются с фиксированными для каждого семейства интервалами (200 / 250 / 300 мс — колонка интервалов в [каталоге текстур](api/texture-catalog.md#семейства-анимации-43-имени)). Передача id семейства анимации в `bloxdTexel` сэмплит текущий кадр.
+Анимированные текстуры (42 семейства) продвигаются с фиксированными для каждого семейства интервалами (200 / 250 / 300 мс — колонка интервалов в [каталоге текстур](internals/api/texture-catalog.md#семейства-анимации-43-имени)). Передача id семейства анимации в `bloxdTexel` сэмплит текущий кадр.
 
 ### Настройки сэмплера
 
@@ -5835,39 +5814,13 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### См. также
 
-- [API текстур](api/texture-api.md) · [Реестр текстур](internals/texture-registry.md) · [Пайплайн рендеринга](internals/rendering-pipeline.md)
-
-
----
-
-## Как работает реестр текстур
-
-> Целевой API: 5 · Назначение: ссылки на текстуры по имени
-
-Шейдер-паки ссылаются на текстуры с помощью именованных констант, а не числовых ID. Константы имеют формат `bloxdTextureId<Name>`. Доступные имена приведены в [Каталоге текстур](internals/api/texture-catalog.md).
-
-### Разрешение имён
-
-При загрузке пака загрузчик сопоставляет каждую именованную константу с доступными именами текстур. Если внутренняя организация меняется, но имя остаётся доступным, пак может и дальше обращаться к текстуре по имени.
-
-**Не записывайте числовые ID текстур непосредственно в WGSL.** Внутренние ID и позиции в атласе могут меняться при обновлении игрового контента. Именованные константы не позволяют коду пака зависеть от этих внутренних позиций.
-
-### Анимация и поворот
-
-- **Анимация:** используйте базовое имя, например `lava`, а не обозначения кадров `lava0`–`lava7`. При сэмплировании выбирается текущий кадр.
-- **Поворот:** используйте базовое имя из каталога, а не внутренние слоты поворота. Сэмплирование учитывает поворот грани.
-- **Переходы между кадрами:** движок использует внутренние слоты для интерполяции соседних кадров анимации. В паках следует использовать обычные именованные константы.
-
-### Связанные страницы
-
-- [Каталог текстур](internals/api/texture-catalog.md) — доступные имена и константы
-- [API текстур](internals/api/texture-api.md) — поиск и сэмплирование текстур
-- [Внутреннее устройство сэмплирования текстур](internals/texture-registry.md/texture-sampling.md) — описание сэмплирования
+- [API текстур](internals/api/texture-api.md) · [Реестр текстур](internals/texture-sampling.md/texture-registry.md) · [Пайплайн рендеринга](internals/texture-sampling.md/rendering-pipeline.md)
 
 ## Внутрянка рендеринга моделей
-> Целевой API: 5 · Статус: Analyzed (восстановлено из живого бандла)
 
-Внутрянка программы Model в v5. Пользовательское руководство: [Модели и текстуры](guides/models.md).
+> Целевая API: 5 · Тип: техническая справка
+
+Внутрянка программы Model в v5. Пользовательское руководство: [Модели и текстуры](internals/guides/models.md).
 
 ### Что такое программа Model
 
@@ -5885,7 +5838,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### Вычисление зачарования
 
-Движок анимирует пробег блеска и доставляет его как `enchantColour.a` в surface/light-хуки ([Эффекты зачарования](recipes/enchant-effects.md)). Смешение происходит внутри `bloxdLitColour()` — сразу после шейдинга, до мирового света ([Освещение](api/lighting.md#полный-пайплайн)).
+Движок анимирует пробег блеска и доставляет его как `enchantColour.a` в surface/light-хуки ([Эффекты зачарования](internals/recipes/enchant-effects.md)). Смешение происходит внутри `bloxdLitColour()` — сразу после шейдинга, до мирового света ([Освещение](internals/api/lighting.md#полный-пайплайн)).
 
 ### Оверлей (вспышка урона и т.п.)
 
@@ -5893,66 +5846,19 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### Путь текстуры
 
-Большинство граней моделей использует `textureId: 0` (без текстуры) — скины игроков и текстуры мобов не входят в пространство имён атласа блочных текстур. `surface.colour` приходит с уже запечёнными скином × тинтом, поэтому обработка граней моделей стартует от `colour` ([текстуры, принадлежащие модели](api/texture-api.md#собственные-текстуры-моделей-textureid-0)).
+Большинство граней моделей использует `textureId: 0` (без текстуры) — скины игроков и текстуры мобов не входят в пространство имён атласа блочных текстур. `surface.colour` приходит с уже запечёнными скином × тинтом, поэтому обработка граней моделей стартует от `colour` ([текстуры, принадлежащие модели](internals/api/texture-api.md#собственные-текстуры-моделей-textureid-0)).
 
 ### Варианты
 
-Программа Model образует одну ось матрицы вариантов: `strict.model` / `allow.model`. `BLOXD_ALPHA` определён только в allow.model ([Препроцессор](api/preprocessor.md#матрица-макрос--вариант)); в strict.model вершинных хуков нет.
+Программа Model образует одну ось матрицы вариантов: `strict.model` / `allow.model`. `BLOXD_ALPHA` определён только в allow.model ([Препроцессор](internals/api/preprocessor.md#матрица-макрос--вариант)); в strict.model вершинных хуков нет.
 
 ### См. также
 
-- [Модели и текстуры](guides/models.md) · [Шейдеры моделей](recipes/model-shaders.md) · [Флаги](api/flags.md) · [Пайплайн рендеринга](internals/rendering-pipeline.md)
-
-
----
-
-## Данные движка
-
-> Целевой API: 5 · Назначение: краткая спецификация
-
-На этой странице собраны сведения об API, доступном шейдер-пакам, и об ограничениях, важных при создании пака. Определения и примеры см. в соответствующих справочниках.
-
-### Обзор API
-
-| Параметр | Спецификация |
-|---|---|
-| Версия API | `5` |
-| Хуки | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| Варианты | 6 (allow / strict × terrain / liquid / model) |
-| Макросы | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`. Макрос `BLOXD_LIGHTING` недоступен |
-| Uniform пака | 80 байт. Смещения полей приведены в [Формате пака](internals/api/pack-format.md) |
-| Текстуры | Используйте именованные константы вида `bloxdTextureId<Name>`. Не фиксируйте числовые ID |
-| Зарезервированные имена | Идентификаторы с префиксом `bloxd` зарезервированы движком |
-
-### Ограничения пака
-
-| Параметр | Ограничение |
-|---|---:|
-| Файлы WGSL | 256 |
-| Общий объём исходного кода WGSL | 256 КБ |
-| `pack.json` | 64 КБ |
-| ZIP-архив | 32 МБ |
-| Записи ZIP | 1 024 |
-
-Размещайте ровно один манифест в корне ZIP и сохраняйте файлы в UTF-8. Дублирующиеся пути и неподдерживаемые форматы ZIP не принимаются. Подробности см. в [Формате пака](internals/api/pack-format.md).
-
-### Основные возможности API v5
-
-- `bloxdShadow()` и `bloxdAirShadow(t)` предоставляют сведения о тенях от солнечного и лунного света.
-- `bloxdShadowDirection()` возвращает направление света, отбрасывающего тень.
-- Установите необязательное поле `keepCircleShadows` в `pack.json` в значение `true`, чтобы сохранить привычные круглые тени при использовании API теней.
-- Проверяйте освещение во время выполнения через `bloxdLit()`; макрос `BLOXD_LIGHTING` не поддерживается.
-
-### Связанные страницы
-
-- [Справочник API](internals/api) — функции, структуры и константы
-- [Формат пака](internals/api/pack-format.md) — манифест, uniform и ограничения загрузчика
-- [Каталог текстур](internals/api/texture-catalog.md) — доступные имена текстур
-- [Политика по играм](internals/engine-data.md/policy.md) — охват allow / strict
-- [Руководство по переходу с API v4](internals/history/v4.md) — переход с предыдущей версии
+- [Модели и текстуры](internals/guides/models.md) · [Шейдеры моделей](internals/recipes/model-shaders.md) · [Флаги](internals/api/flags.md) · [Пайплайн рендеринга](internals/model-rendering.md/rendering-pipeline.md)
 
 ## Что меняет видимые паком значения
-> Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
+
+> Целевая API: 5 · Тип: техническая справка
 
 Один и тот же пак рендерится по-разному в зависимости от **мира и настроек игрока**. Перед распространением проверьте хотя бы эти 3 окружения:
 
@@ -5962,18 +5868,15 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 Главные источники вариации: `lightingOverride` (принудительный свет) / `skyLightColourOverride`, `ambientLightColourOverride` (hex-замены) / `visionMinLightColour` (минимальный цвет видимости; реализация — покомпонентный max в обе стороны на `uSkyLightColour` и `uAmbientLightColour`; использует Night Vision. Паки «кромешная пещера» темнее задуманного не станут — пол приподнимает и сам цвет неба) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (есть ли bloxdSunDirection()). `uSkyLightColour` дефолт = (1,1,1) белый, `uAmbientLightColour` дефолт = (0.25,0.25,0.30). Сценовая сторона `l.ambient` = графическая настройка «Ambient Lighting Intensity» (дефолт 0.5). `(1.0 - l.fogAlpha)` следует настройкам тумана/дистанции чанков игрока. Кроме того, на вариации влияют `cameraTint` (RGBA-тинт всего экрана) и `proximityFadeDistance` / `proximityFadeMinOpacity` (подсвечка fade сущностей у камеры), причём `cameraTint` — финальный слой поверх вывода пака. Многие из них настраиваются и через скриптовый API (`serverOption`) и могут обновляться прямо во время игры.
 
-
----
-
 ## Политика шейдер-паков по играм
-> Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
+
+> Целевая API: 5 · Тип: техническая справка
 Эта страница закрепляет, что значит `allow / strict` на уровне отдельных игр. Полный режим (vertex-хуки, `discard`, `alpha` террейна) получают только игры, в чьём определении явно стоит `shaderPackPolicy: "allow"`; игры без настройки (или с любым значением, кроме allow) — strict: `BLOXD_STRICT` определён, а защищённый гардом код отключается автоматически. Выбрать это со стороны пака нельзя, поэтому знание того, какие игры что исполняют, — предпосылка для распространения.
 
-- Опорный билд: `szby6g.main.94a7596c.js` (прод-деплой на 2026-10-17). Статический перебор всех 111 определений игр даёт **26 allow-записей (12 игр) / 85 strict-записей**. Те же 12 allow-литералов в тех же 12 играх были повторно подтверждены без изменений на продакшн-бандле v3 (`3ymzdd`, 2026-10-20) и ещё раз на бандле v4 (`cnty9`, 2026-10-27) — список ниже переносится в v3 и v4 дословно. И на билдах v5 снова без изменений: переподтверждено на `ab90qa` (2026-11-03) и `xkg8x` (2026-11-04, 12 allow-литералов пересчитано). На `bny9u` (2026-11-05) полный перебор запущен заново: число определений игр выросло со 111 до **115**, allow-сторона — с 26 до **28 записей** — всё те же 12 игр, к которым добавились два новых варианта Test Gym (Imported Mobs, Interest). Список ниже переносится дословно и на v5. На `v98qt8` (2026-11-08) перечисление выполнено снова (модуль игр 513 из main-бандла, вычислен в harness): **116 определений / 28 allow-записей (12 тайтлов) / 88 strict** — сторона allow без изменений, добавилось ещё одно strict-определение.
 - Над `shaderPackPolicy` стоит ещё один рубеж — гейт канала поставки (примерно `canUseShaderPacks`): во внешних порталах (напр., сборках Coolmath Games) сама система шейдер-паков может быть выключена ещё до того, как до `shaderPackPolicy` дойдёт очередь. Разбор allow/strict ниже основан на основной веб-версии bloxd.io.
-- allow объявляется в 12 местах: 8 прямых литералов в определениях игр и 4 базовые переменные (`tb` / `kz` / `cb` / `Fb`); варианты наследуют его через спред (`{...tb,...}`). Перезаписей на уровне отдельных вариантов сейчас нет (как и обратной схемы «родитель allow — потомок strict»).
 
-12 allow-игр (всего 26 записей):
+
+### Игры с политикой allow
 
 - **Test Gym** — базовая + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (13 записей)
 - **Doodle Cube** — базовая + Solos / Duos (3)
@@ -5988,10 +5891,61 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 При этом в strict-играх сам пак загружается и компилируется, а рецепты фрагментной стороны вроде surface / light работают как обычно. Ограничение касается vertex-хуков (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard` и `alpha` террейна (у жидкостей она есть всегда).
 
-Этот список отражает статический анализ указанного билда; обновления движка могут менять распределение allow/strict. При выходе новой версии перепроверяйте.
 
+Перед распространением пака проверьте его непосредственно в целевой игре и убедитесь, что нужные хуки там работают.
 
----
+## Солнце и луна
+
+> Целевая API: 5 · Тип: техническая справка
+Источник `bloxdSunDirection()` — буфер солнечного направления, перезаписываемый лишь при смене типа скайбокса: критерий не «есть ли в небе солнце», а **«скайбокс ли земного типа»**.
+
+| Скайбокс | `bloxdSunDirection()` |
+|---|---|
+| `default` (процедурное небо) | Ненулевой (дефолты ниже) |
+| `gloomy` / `interstellar` / `space_*` (куб-текстуры) | **Всегда (0,0,0)** |
+
+**Луна всегда `-bloxdSunDirection()`** (движок считает позицию луны точной противоположностью солнца). Ночь судится по высоте солнца — луна наверху, когда `bloxdSunDirection().y < 0` (солнце под горизонтом). Но в дефолтных мирах солнце статично, и луна тоже — движущуюся луну видят лишь миры, реализующие цикл день/ночь.
+
+Дефолтное солнечное направление — около `(-0.56, 0.81, -0.18)` (единичный вектор, вычисленный из inclination = −0.2 / azimuth = 0.55, статичен). Практический референс для предсказания направлений бликов на бумаге при тестах дистрибутивных паков.
+
+Циклы день/ночь не встроены в движок — inclination статическое число, которое миры с подвижным днём обновляют на стороне игры. `bloxdSunDirection()` следует каждому обновлению.
+
+Направленные огни террейна — лишь 2 лампы, созданные при старте сцены, с **фиксированными направлением и интенсивностью, без смены день/ночь**. Коротко: **ни один фактор яркости террейна не зависит от времени. «Виды» день/ночь идут лишь от скайбокса и bloxdSunDirection()**, так что паки, затемняющие террейн ночью, должны сами оценивать полосу времени из bloxdSunDirection() (техника `sunPresent` из [Проектирования ночных видов](internals/guides/night.md)).
+
+### R-A. Направленный лунный свет — moonDir = −bloxdSunDirection()
+
+Добавляет бело-голубой Ламберт и слабый спекуляр, лишь пока луна наверху. `moonUp` в дефолтных статично-солнечных мирах равен 0: там ничего не происходит — **лунный свет, срабатывающий лишь в мирах с циклом день/ночь, а значит безопасный**.
+
+```wgsl
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    if (bloxdLit()) {
+        // луна всегда точно напротив солнца; дневной авто-офф через moonDir.y < 0
+        let moonDir = -bloxdSunDirection();
+        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+        if (moonUp > 0.0) {
+            let n     = normalize(l.normal);
+            let diff  = max(0.0, dot(n, moonDir));
+            let view  = normalize(bloxdEyePosition() - l.position);
+            let halfV = normalize(moonDir + view);
+            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+        }
+}
+    return out;
+}
+```
+
+## Средства отладки
+
+> Целевая API: 5 · Тип: техническая справка
+- URL-параметр `?renderer=lite` — форсирует Lite (WebGPU) рендер (`webgl2` / `babylon` тоже работают; `babylon` — старое имя webgl2). Приоритет: URL-параметр > `bloxdRenderer` в localStorage > экран настроек > дефолт (webgl2). Невалидные значения игнорируются с предупреждением. Override, оставленный в URL или localStorage, может ломать сцены, которым нужен WebGPU (lite), с сообщением «needs the new WebGPU renderer, so remove the renderer override...» ([Ошибки загрузки](internals/troubleshooting/loading.md))
+- URL-параметр `?vconsole` — экранная консоль (VConsole). Удобно для проверки на мобильных устройствах
+- URL-параметр `?drawcalls=1` — добавляет отладочную панель статистики отрисовки. Выбирайте игровые объекты в отладочной консоли или используйте `drawCalls()` / `why()` / `configureDrawCallWatching()`, чтобы инспектировать перерисовку (overdraw) крупными механиками (паком и не только) и приближения к лимиту ~65 000 вершин на draw call — полезно для изоляции узких мест производительности
+- В консоли видны `noa-engine v0.33.0` и `Renderer: lite from <источник>` — проверьте их первым делом, чтобы не ошибиться с трактом рендера
+- WebGPU-рендер лочится «форсированно ВКЛ», пока применён пак. Настройка «Disable Block Texture Atlas» тоже лочится (атлас остаётся ВКЛ), а на устройствах без WebGPU паки вовсе не применяются. Основание писать «нужен WebGPU-браузер» на страницах распространения
+- Блочные текстуры — 2D array texture (`texture_2d_array`), сэмплер террейна — nearest и repeat. Мешер к тому же склеивает грани с совпадающими материалом / AO / светом в один прямоугольник (**greedy meshing**), поэтому UV слитой грани может выходить за ширину одного тайла (инсет по краям 0.0015). Повторяемость обеспечивает аппаратный repeat-адресинг, так что слитые грани выглядят бесшовно. Учтите: процедурные детали, привязанные к `vUV`, могут ломаться на границах слитых граней — привяжите их вместо этого к мировой позиции (`s.position` + `bloxdRenderOffset()`)
+- Рантайм-перепроверка при каждом входе в игру (`checkCompilation`) компилирует настоящие материалы террейна в браузерном WebGPU (строже статической валидации на экране настроек). Паки, падающие здесь, исключаются из этой игры
 
 ## Солнце и луна
 > Целевой API: 5 · Статус: Analyzed (анализ JavaScript продакшн-бандла)
