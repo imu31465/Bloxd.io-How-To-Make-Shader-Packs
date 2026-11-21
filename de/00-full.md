@@ -4781,50 +4781,35 @@ Das Model-Programm bildet eine Achse der Varianten-Matrix: `strict.model` / `all
 ---
 
 ## Engine-Daten-Hauptbuch
+> Ziel-API: 5 · Status: Analyzed
 
-Dieses Hauptbuch fasst die bestätigten Werte der für Shader-Packs sichtbaren API im aktuellen Build zusammen. Interne Bundle-Details wie Modul-IDs und Chunk-Nummern gehören nicht zur Spezifikation und werden hier nicht aufgeführt.
+Diese Seite fasst die Shader-Packs zur Verfügung stehende API zusammen. Einzelheiten zur Verwendung stehen in der [API-Referenz](api/).
 
-### Aktuelle Spezifikation
+### API-Umfang
 
-| Element | Wert |
+| Element | Spezifikation |
 |---|---|
-| `apiVersion` | `5` (strikter Zahlenvergleich) |
-| Engine-Header | 216 Zeilen; Volltext im [Engine-Header](internals/engine-header.md) |
+| API-Version | `5` |
+| Engine-Header | 216 Zeilen; siehe [Engine-Header](internals/engine-header.md) |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | Varianten | 6 (strict × terrain / liquid / model) |
-| Makros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` wurde in v5 entfernt |
-| Pack-Uniform | 80 Byte: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Pack-Binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| Flags | `BloxdFlags`-Struktur mit 14 booleschen Feldern |
-| Texturatlas | 1.650 Layer; 1.017 Namen; 776 Aliasse |
-| Texturfamilien | 64 Rotations- und 71 Animationsfamilien |
-| Reservierte Bezeichner | Namen passend zu `/^bloxd/i` sowie 88 interne `bloxdSp*`-Symbole |
-| Spieleddefinitionen | 119 |
-| Shader-Pack-Richtlinie | 12 erlaubte Titel, 28 Einträge; siehe [Richtlinie pro Spiel](internals/policy.md) |
-| Standard-Packvorlage | 1.633 Byte |
-| Loader-Limits | 256 WGSL-Dateien / 256 KB Quelltext / 64 KB für `pack.json` / 32-MB-ZIP / 1.024 Einträge |
+| Makros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Pack-Uniform | 80 Byte; siehe [Packformat](api/pack-format.md) |
+| Uniform-Felder | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Textur-Namen | Nutzbare benannte Konstanten stehen im [Texturkatalog](api/texture-catalog.md) |
 
+### Schatten-API
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` und `bloxdShadowDirection()` machen das von der Engine berechnete Sonnen- und Mondschatten-System verfügbar.
-- Das Uniform erhält `shadowDirection: vec3f` bei Offset 64 und wächst von 64 auf 80 Byte.
-- `pack.json` akzeptiert das optionale boolesche Feld `keepCircleShadows`, um die bisherigen Kreisschatten beizubehalten.
-- Der Atlas wächst von 1.227 auf 1.650 Layer und von 906 auf 1.017 verfügbare Namen.
-
-Erläuterungen und Belege zu diesen Messungen stehen im [Forschungslog](internals/research-log.md) und in den [Textur-Registry-Interna](internals/texture-registry.md).
-
-### Frühere Versionen
-
-- [Versionsgeschichte](history/) — Änderungen und Migrationen früherer APIs
-- [Forschungslog](internals/research-log.md) — Messmethode und Quellen der Messwerte
+- `bloxdShadow()` gibt den von der Engine berechneten Sonnen-/Mondschattenfaktor zurück.
+- `bloxdAirShadow(t)` wertet den Schatten an einem Punkt zwischen Kamera und Fragment aus.
+- `bloxdShadowDirection()` gibt die Richtung des schattenwerfenden Lichts zurück.
+- `keepCircleShadows` ist ein optionales `pack.json`-Feld, mit dem die bisherigen Kreisschatten erhalten bleiben.
 
 ### Verwandte Seiten
 
-- [Engine-Header](internals/engine-header.md) — vollständiger Headertext
-- [Richtlinie pro Spiel](internals/policy.md) — Titel mit allow- / strict-Richtlinie
-- [Textur-Registry](internals/texture-registry.md) — Namen und ID-Zuordnung
-
----
-
+- [API-Referenz](api/) — APIs für Shader-Packs
+- [Packformat](api/pack-format.md) — Manifest, Uniform und Loader-Limits
+- [Richtlinien pro Spiel](internals/policy.md) — Einschränkungen einzelner Spiele
 ## Was paket-sichtbare Werte verändert
 
 Dasselbe Paket rendert je nach **Welt und Spieler-Einstellungen** anders. Vor Verteilung mindestens diese 3 Umgebungen prüfen:

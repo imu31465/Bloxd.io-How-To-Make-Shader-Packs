@@ -4778,50 +4778,35 @@ El programa Model forma un eje de la matriz de variantes: `strict.model` / `allo
 ---
 
 ## Ledger de datos del motor
+> API objetivo: 5 · Estado: Analyzed
 
-Este ledger reúne los valores confirmados de la API visible para los shader packs en el build actual. Los detalles internos del bundle, como IDs de módulos y chunks, no forman parte de la especificación y se omiten aquí.
+Esta página resume la API disponible para los shader packs. Consulta la [Referencia de la API](api/) para conocer su uso.
 
-### Especificación actual
+### Superficie de la API
 
-| Elemento | Valor |
+| Elemento | Especificación |
 |---|---|
-| `apiVersion` | `5` (comparación estricta con un número) |
-| Cabecera del motor | 216 líneas; texto completo en [Cabecera del motor](internals/engine-header.md) |
+| Versión de API | `5` |
+| Cabecera del motor | 216 líneas; consulta la [cabecera del motor](internals/engine-header.md) |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` fue eliminado en v5 |
-| Uniform del pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Binding del pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| Flags | `BloxdFlags`, estructura con 14 campos booleanos |
-| Atlas de texturas | 1.650 capas; 1.017 nombres; 776 alias |
-| Familias de textura | 64 de rotación y 71 de animación |
-| Identificadores reservados | nombres que coinciden con `/^bloxd/i` y 88 símbolos internos `bloxdSp*` |
-| Definiciones de juegos | 119 |
-| Política de shader packs | 12 títulos permitidos, 28 entradas; ver [Política por juego](internals/policy.md) |
-| Plantilla de pack predeterminada | 1.633 bytes |
-| Límites del cargador | 256 archivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Uniform del pack | 80 bytes; consulta el [Formato del paquete](api/pack-format.md) |
+| Campos del uniform | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Nombres de textura | Las constantes utilizables están en el [Catálogo de texturas](api/texture-catalog.md) |
 
+### API de sombras
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` y `bloxdShadowDirection()` exponen el sistema de sombras del sol y la luna calculado por el motor.
-- El uniform incorpora `shadowDirection: vec3f` en el desplazamiento 64 y aumenta de 64 a 80 bytes.
-- `pack.json` admite el booleano opcional `keepCircleShadows` para conservar las antiguas sombras circulares.
-- El atlas crece de 1.227 a 1.650 capas y pasa de 906 a 1.017 nombres disponibles.
-
-La explicación y la evidencia de estas mediciones están en el [Registro de investigación](internals/research-log.md) y en [Internas del registro de texturas](internals/texture-registry.md).
-
-### Versiones anteriores
-
-- [Historial de versiones](history/) — cambios y migraciones de las API anteriores
-- [Registro de investigación](internals/research-log.md) — método y referencias de las mediciones
+- `bloxdShadow()` devuelve el factor de sombra solar/lunar calculado por el motor.
+- `bloxdAirShadow(t)` evalúa la sombra en un punto entre la cámara y el fragmento.
+- `bloxdShadowDirection()` devuelve la dirección de la luz que genera la sombra.
+- `keepCircleShadows` es un campo booleano opcional de `pack.json` que conserva las sombras circulares anteriores.
 
 ### Relacionado
 
-- [Cabecera del motor](internals/engine-header.md) — texto completo de la cabecera
-- [Política por juego](internals/policy.md) — títulos con política allow / strict
-- [Registro de texturas](internals/texture-registry.md) — nombres y asignación de IDs
-
----
-
+- [Referencia de la API](api/) — API disponible para los packs
+- [Formato del paquete](api/pack-format.md) — manifiesto, uniform y límites del cargador
+- [Política por juego](internals/policy.md) — restricciones de cada juego
 ## Qué cambia los valores visibles para los paquetes
 
 El mismo paquete renderiza distinto según **mundo y ajustes de jugador**. Revisa al menos estos 3 entornos antes de distribuir:
