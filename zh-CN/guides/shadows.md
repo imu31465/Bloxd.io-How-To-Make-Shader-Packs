@@ -1,7 +1,7 @@
 # 阴影
 
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Verified (LightEngine 行为自 v4 实测以来不变)
-> **`bbb6l5` 起**：新增了真实的太阳阴影 API — `bloxdShadow()`（0–1 的阴影因子；方块、玩家、生物、物品都会投影并跟随太阳）、`bloxdAirShadow(t)`（用于光柱）、`bloxdShadowDirection()`（光线行进方向）。pack.json 的 `keepCircleShadows` 还能选择保留旧圆形团影。详见[函数](../api/functions.md)。
+> 目标 API：5 · 类型：技术参考
+> **API v5 起**：新增了真实的太阳阴影 API — `bloxdShadow()`（0–1 的阴影因子；方块、玩家、生物、物品都会投影并跟随太阳）、`bloxdAirShadow(t)`（用于光柱）、`bloxdShadowDirection()`（光线行进方向）。pack.json 的 `keepCircleShadows` 还能选择保留旧圆形团影。详见[函数](../api/functions.md)。
 
 
 着色器包里做出「阴影」的三种方式，以及它们的极限。

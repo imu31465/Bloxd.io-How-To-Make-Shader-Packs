@@ -1,6 +1,6 @@
 # 函数
 
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行标头逐字复原)
+> 目标 API：5 · 类型：技术参考
 
 标头函数一览。纹理 API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) 连同 `bloxdOpaqueBehind` 在[纹理 API](texture-api.md) 中讲述。
 
@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 阴影函数
 
-\u0060bbb6l5\u0060 构建把引擎真实的太阳/月亮阴影系统（方块、玩家、生物、物品投下的、随太阳移动的投影阴影）加进了包 API。这两个函数会被**注入每个包编译后的模块**（与 \u0060bloxdFragmentBlockPosition\u0060 一样），并记录在验证器的函数表里，但不属于可读头文本。
+\u0060API v5\u0060 构建把引擎真实的太阳/月亮阴影系统（方块、玩家、生物、物品投下的、随太阳移动的投影阴影）加进了包 API。这两个函数会被**注入每个包编译后的模块**（与 \u0060bloxdFragmentBlockPosition\u0060 一样），并记录在验证器的函数表里，但不属于可读头文本。
 
 ### bloxdShadow
 
@@ -150,7 +150,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 fn bloxdShadow() -> f32
 \u0060\u0060\u0060
 
-- **返回值**: 到达此片元的阳光或月光 — **阴影中为 0，被照到为 1** — *`bbb6l5` 新增*
+- **返回值**: 到达此片元的阳光或月光 — **阴影中为 0，被照到为 1** — *API v5 新增*
 - 谁投下阴影: **方块、玩家、生物和物品**（第一人称手持物被有意排除——身体转动时会自己遮住自己）
 - 行为（逐字来自验证器说明）:
   - 随太阳/月亮落下、或面转向背离光，渐变到 0
@@ -165,7 +165,7 @@ fn bloxdShadow() -> f32
 fn bloxdAirShadow(t: f32) -> f32
 \u0060\u0060\u0060
 
-- **返回值**: 与 \u0060bloxdShadow()\u0060 相同，但在**相机 (t = 0) 与此片元 (t = 1) 之间的点**上求值 — *`bbb6l5` 新增* — 用于光柱
+- **返回值**: 与 \u0060bloxdShadow()\u0060 相同，但在**相机 (t = 0) 与此片元 (t = 1) 之间的点**上求值 — *API v5 新增* — 用于光柱
 - 特性（逐字来自验证器说明）:
   - **只有方块投下**（玩家和生物不投），**模糊到整个方块**
   - \u0060t\u0060 被钳制到 0–1

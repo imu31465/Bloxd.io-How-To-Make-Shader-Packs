@@ -1,72 +1,43 @@
 # 兼容性
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> 目标 API：5 · 类型：API 参考
 
-当前游戏与旧版本包如何互操作。
+本页说明当前游戏接受的着色器包 API 版本，以及旧版本已保存包的处理方式。
 
-## 接受的版本
+## 当前接受的 API 版本
 
-**仅接受 `apiVersion: 5`。** 加载器以 `manifest.apiVersion !== 5` 严格比较，v1/v2/v3/v4 包在**加载瞬间即告失败**。不存在多版本并行接受。
+当前游戏只接受清单中 `apiVersion` 为数字 `5` 的着色器包。字符串 `"5"` 不会被接受。为 API v1–v4 创建的着色器包必须迁移后才能加载。
 
-## 加载时消息 (逐字取自现行 i18n 字典)
+## 加载时的提示
 
 - `pack.json needs "apiVersion": {{version}}.` — 缺少 `apiVersion` 键
-- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 键存在但不是 5
+- `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — 指定的版本与当前版本不一致
 
-## 已保存的旧包 (无例外 — 静默失效)
+## 已保存的旧版本着色器包
 
-此前保存的 v1–v4 包不会抛错。已保存包的解析结果为：
+为旧 API 版本保存的着色器包无法在当前游戏中运行。着色器包设置页面会提示该包使用了不受支持的版本。请参照对应的迁移指南更新着色器包。
 
-```
-{kind: "none", reason: "otherApiVersion"}
-```
+## 已保存着色器包的重新验证
 
-包随即**静默失效**。只有着色器包设置页会解释原因：
+当引擎提供的标头或纹理名称定义发生变化时，已保存的着色器包会重新验证。重新验证会在游戏加载时自动执行。在包代码中，请使用具名常量引用纹理，不要使用可能变化的数字 ID。
 
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
+## 运行环境兼容性
 
-## v4 → v5 转换的本质
+- **WebGPU：** 着色器包需要支持 WebGPU 的渲染器。
+- **移动设备：** 不支持 WebGPU 的环境无法使用着色器包（[运行要求](../getting-started/requirements.md)）。
+- **纹理访问：** 在不使用纹理图集的渲染器配置中，`bloxdTexel` 和 `bloxdTextureSize` 无法正常访问图集纹理（[纹理 API](texture-api.md)）。
 
-转换大多是机械性的 (完整清单见 [v5 迁移指南](../history/v5.md))：
+## API 版本支持情况
 
-- `blockFlags & bloxdBlockFlagX != 0u` → `flags.x` (1:1 改名)
-- `#ifdef BLOXD_LIGHTING` → `if (bloxdLit()) { ... } else { return bloxdDefaultLight(...); }`
-- `bloxdFragmentBlockPosition` 调用点仍能编译 (引擎会注入它)，但它已不再有文档 — 迁移离开它才是稳妥做法 ([函数](functions.md#bloxdfragmentblockposition--未写入文档但仍在注入))
-- 把 `pack.json` 提升为 `"apiVersion": 5`
+| API 版本 | 当前游戏中的支持情况 |
+|---|---|
+| v1 | 加载时拒绝 |
+| v2 | 加载时拒绝 |
+| v3 | 加载时拒绝 |
+| v4 | 加载时拒绝 |
+| **v5** | **当前版本** |
 
-这次的暗坑：继续读取 `blockFlags`、或把光照钩子包在 `#ifdef BLOXD_LIGHTING` 里的包会**以专用消息验证失败** (分析器现在会对两种情形分别说明)，因此不会有静默的错误行为 — 只是迁移完成前始终被拒绝。
+## 相关页面
 
-## 已保存包的重验 (「需要重新检查」)
-
-`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。当引擎标头或纹理注册表变化时 (常见于游戏更新)，已保存包会被标记为「需要重新检查」，并在页面加载时自动重新验证。
-
-**v98qt8 注意:** 现行构建的折叠回归 ([引擎内部: 纹理注册表](../internals/texture-registry.md#the-v98qt8-folding-regression)) 改变了引擎哈希的对象 — 它计算出的注册表后缀是*未折叠*的 1,047 行表 (`694df62c`)，而非预期的折叠后 906 行表 (`df6c1915`，`bny9u` 上为 `e735ebdc`)。因此每个已保存的包都会在本构建上重新验证，且引用 43 个动画族基本名 (`lava` 等) 之一的包在引擎侧修复之前会**失败** — 尽管如此仍请写折叠名; 它们才是 API。
-
-
-
-一个实测的注册表漂移示例 (相隔 10 天的两个构建)：条目 1200 → 1219 (新增 98 个、移除 79 个)，且拼写未变的名称中 **1121 个里有 779 个改了 id**。换言之：
-
-- **按名称编写的包 (`bloxdTextureIdLava`) 能在漂移中幸存** (加载器会对照现行注册表重新解析)
-- **按裸 id 编写的包 (`19`) 在重验时损坏**
-
-详情: [引擎内部: 纹理注册表](../internals/texture-registry.md)。
-
-## 运行环境
-
-- **仅 WebGPU 渲染器**: 安装包会强制启用 WebGPU 渲染器
-- **移动端**: 受 WebGPU 限制的环境完全无法运行包 ([环境要求](../getting-started/requirements.md))
-- **非图集渲染器配置**: `bloxdTexel` / `bloxdTextureSize` 退化为桩 (白色纹素、1×1)；代码仍可编译运行 ([纹理 API](texture-api.md#纹理-api-到不了的地方))
-
-## 版本支持一览
-
-| API 版本 | 上线时间 | 当前游戏的处理 |
-|---|---|---|
-| v1 | — | 加载即拒绝 (经 [v2](../history/v2.md) 迁移) |
-| v2 | — | 加载即拒绝 |
-| v3 | 2026-10-19 | 加载即拒绝 |
-| v4 | 2026-10-26 | 加载即拒绝 |
-| **v5** | **2026-11-03** | **现行** |
-
-## 相关
-
-- [v5 迁移清单](../history/v5.md) · [版本历史](../history/)
+- [从 v4 迁移到 v5](../history/v5.md)
+- [版本历史](../history/)
