@@ -4536,7 +4536,9 @@ Les zips découpés (split), zip64, les entrées chiffrées et les compressions 
 
 Erreurs autour de `apiVersion`. Le jeu actuel n'accepte **que `5`**.
 
-### "pack.json needs "apiVersion": {{version}}."
+### Clé apiVersion manquante
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **Symptôme** : ce message juste après le chargement (`loadNoApiVersion`)
 - **Cause** : la clé `apiVersion` est entièrement absente
@@ -4730,7 +4732,9 @@ Problèmes qui n'apparaissent que dans certaines des 6 variantes (`strict|allow`
 - **Correction** : encadrez les hooks vertex et `discard` dans `#ifndef BLOXD_STRICT`
 - **Prévention** : partez toujours du modèle avec garde pour les hooks vertex ([Variantes et gardes](getting-started/variants.md))
 
-### ".alpha is undefined"
+### Le champ `alpha` n’est pas disponible dans cette variante
+
+> `.alpha is undefined`
 
 - **Cause** : `alpha` n'existe que derrière `#ifdef BLOXD_ALPHA` (tout liquide + terrain/modèle non strict)
 - **Correction** : encadrez le code qui touche à alpha dans `#ifdef BLOXD_ALPHA` ([Préprocesseur](api/preprocessor.md#matrice-macros--variantes))
