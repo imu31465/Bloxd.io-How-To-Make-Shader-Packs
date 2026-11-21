@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Возвращает**: `position + vec3f(bloxdRenderOffset())`
 - **Примечание**: пределы точности f32 означают, что дальние координаты могут быть неточными (заголовок: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — не документирована, но всё ещё инжектится
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i

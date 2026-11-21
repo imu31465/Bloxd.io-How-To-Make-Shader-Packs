@@ -36,7 +36,9 @@
 - **Причина**: входы только для освещения (`blockLight` и т.п.) используются без защиты. В v5 нет `#ifdef BLOXD_LIGHTING` — ветвитесь по **runtime-проверке `bloxdLit()`**
 - **Исправление**: ранний возврат `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Освещение](../api/lighting.md#bloxdlit--гейт))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## Переполнение очереди LightEngine
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Причина**: плотные скопления светящихся блоков переполняют очередь семян света, и расчёт света чанка обрывается. **Паком не вызвано**, но дыры в свете возле светящихся скоплений объясняются именно этим
 - **Исправление**: распределите источники света в мире

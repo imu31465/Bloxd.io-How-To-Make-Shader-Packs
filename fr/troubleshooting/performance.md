@@ -4,7 +4,7 @@
 
 Problèmes de vitesse et leurs corrections.
 
-## Le contrôle sur appareil ne se termine jamais et écarte le pack
+## Vérification sur l’appareil bloquée
 
 - **Cause** : le contrôle a un **délai impératif de 60 secondes** (le dépassement est traité comme `skipped`) — courant sur les appareils peu puissants et les mondes lourds
 - **Correction** : réduisez le travail lourd sur les sommets et les boucles complexes, puis réessayez

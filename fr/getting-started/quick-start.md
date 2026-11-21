@@ -1,6 +1,6 @@
 # Démarrage rapide
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified
+> API cible : 5 · État : Verified
 
 Votre premier pack en cinq minutes.
 

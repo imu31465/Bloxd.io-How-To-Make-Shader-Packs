@@ -10,7 +10,7 @@
 - Os finos padrões quadriculados nas bordas de chunk durante o carregamento são o fade de chunk por dither Bayer 4×4 em espaço de tela do motor, não bugs do pacote (desativável pelo ajuste gráfico `chunkFadeIn`)
 - **`mod` é uma palavra reservada**: rejeitado com `pack.wgsl:3 'mod' is a reserved word in WGSL.` Escreva restos com o operador `%`
 
-## R-C. Dissolução por dither Bayer — out.alpha controla o discard
+## R-C. Dissolução com dither Bayer
 
 Reproduz a **mesma tabela Bayer 4×4** que o motor usa nos fades de chunk, dissolvendo cutouts desde os blocos baixos para cima. O discard dispara em materiais alphaTest (grama, folhas); em líquidos ele se torna transparência de blend.
 
@@ -53,7 +53,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## R-D. Fade de água perto da câmera — o alpha do líquido preserva as linhas de visão
+## R-D. Fade de água junto à câmera
 
 O `out.alpha` do hook de líquido alimenta o blend diretamente. Faz fade apenas da superfície de água sob a câmera para preservar a visão ao mergulhar e com a câmera fora da água.
 

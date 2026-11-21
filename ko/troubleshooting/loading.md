@@ -4,14 +4,17 @@
 
 **로더 단계** (첫 관문) 에서 거부되는 오류. 설정 상태줄에 `shaderPack:load*` ID 로 표시된다.
 
-## "There's no pack.json at the top of the pack."
+## 팩 매니페스트를 찾을 수 없음
+
+> `There's no pack.json at the top of the pack.`
 
 - **원인**: zip 루트에 `pack.json` 이 없다 (예: 폴더를 한 단계 더 감싸서 압축함)
 - **확인**: zip 을 열어본다 — `pack.json` 이 최상위에 (또는 공통 루트 폴더 하나 바로 아래에) 있는가
 - **해결**: `pack.json` 과 `.wgsl` 파일을 직접 zip 한다. 단일 공통 루트 폴더는 자동으로 벗겨진다 ([팩 구조](../getting-started/pack-structure.md))
 - **예방**: 압축 절차를 고정한다. macOS 「Compress」 는 그대로 통한다 (OS 찌꺼기는 자동 제외)
 
-## zip 로드 시 `loadDuplicateManifest`
+## 중복 매니페스트
+
 
 - **원인**: `pack.json` 이 두 개 (대소문자 차이 포함)
 - **해결**: 정확히 하나만 둔다
@@ -49,7 +52,9 @@
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 경로 중복 / 비UTF-8 / 압축 해제 실패 / zip 손상 |
 | `loadNoManifest` / `loadDuplicateManifest` | 매니페스트 위치 / 중복 |
 
-## "Ready. Reload the page to use it." 인데 아무 변화가 없다
+## 로드 후 페이지 새로고침 필요
+
+> `Ready. Reload the page to use it." 인데 아무 변화가 없다`
 
 - **원인**: 팩은 활성화에 **페이지 새로고침** 이 필요하다
 - **해결**: 선택 후 다시 불러온다. 상태가 `Ready to use` 가 되어야 한다

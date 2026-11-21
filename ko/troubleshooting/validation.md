@@ -4,28 +4,38 @@
 
 정적 검증 (분석기, 1단계) 오류 — 대부분 예약명, strict 계약, 훅 간 호출 제한.
 
-## "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+## 출력 구조체 직접 생성 금지
+
+> `Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **원인**: `BloxdSurface(...)` 같은 생성자 호출
 - **해결**: `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` 에서 시작해 필드를 바꾼다 (light 훅에서는 `var out = s;` 도 통한다)
 
-## "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+## 예약된 식별자
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **원인**: `bloxd` 로 시작하는 식별자 (대소문자 무관)
 - **해결**: 이름을 바꾼다 (예: `packTint`). 허용되는 것은 9개 훅명뿐이다
 - **예방**: 자신의 이름에는 `pack` / `my` 등의 접두사를 붙인다
 
-## "bloxdPackInputs isn't part of the bloxd_ header"
+## 잘못된 유니폼 입력 이름
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **원인**: uniform 을 직접 참조함
 - **해결**: 헤더 함수를 통해 쓴다 ([팩 형식](../api/pack-format.md#프레임별-uniform-bloxdpackinputs))
 
-## "... reaches bloxdTexel, which only surface and light hooks can use."
+## 정점 훅에서 텍스처 접근
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **원인**: 버텍스 훅 (또는 거기서 도달 가능한 함수) 에서 호출함 — 「reaches」 는 **호출 경로** 를 뜻한다
 - **해결**: 호출을 서피스 / light 훅으로 옮긴다
 
-## "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+## 씬 깊이 접근에는 조건 확인이 필요함
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **원인**: `bloxdOpaqueBehind()` 에는 모든 액체 베리언트에서만 정의되는 `BLOXD_SCENE_DEPTH` 가 필요하다. terrain/model 훅 코드에서 공유하면 컴파일 불가능한 베리언트가 생긴다
 - **해결**: 호출을 `#ifdef BLOXD_SCENE_DEPTH` 로 감싼다

@@ -16,7 +16,9 @@
 - **원인**: `alpha` 는 `#ifdef BLOXD_ALPHA` (모든 액체 + 비strict 지형/모델) 뒤에만 존재한다
 - **해결**: alpha 를 만지는 코드를 `#ifdef BLOXD_ALPHA` 로 감싼다 ([전처리기](../api/preprocessor.md#매크로--베리언트-매트릭스))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## 정점 훅에는 allow 모드가 필요함
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **원인**: strict 베리언트에는 버텍스 훅 자체가 없어 `BloxdVertex` 도 없다. 버텍스 코드가 strict 베리언트에서 도달 가능하다
 - **해결**: 버텍스 훅을 가드한다

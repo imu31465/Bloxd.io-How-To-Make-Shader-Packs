@@ -4,28 +4,38 @@
 
 Ошибки статической валидации (анализатор, этап 1) — в основном зарезервированные имена, strict-контракт и ограничения вызовов между хуками.
 
-## "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+## Нельзя создавать выходные структуры напрямую
+
+> `Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **Причина**: вызов конструкторов вида `BloxdSurface(...)`
 - **Исправление**: начинайте от `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` и мутируйте поля (`var out = s;` работает в light-хуках)
 
-## "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+## Зарезервированные идентификаторы
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **Причина**: идентификатор, начинающийся с `bloxd` (регистр не важен)
 - **Исправление**: переименуйте (напр. `packTint`). Разрешены только 9 имён хуков
 - **Профилактика**: префиксуйте свои имена `pack` / `my` и т.п.
 
-## "bloxdPackInputs isn't part of the bloxd_ header"
+## Неизвестное имя входного буфера
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **Причина**: прямая ссылка на uniform
 - **Исправление**: работайте с ним через функции заголовка ([Формат пака](../api/pack-format.md#кадровый-uniform-bloxdpackinputs))
 
-## "... reaches bloxdTexel, which only surface and light hooks can use."
+## Обращение к текстурам из вершинных хуков
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **Причина**: вызов из вершинного хука (или из функции, достижимой из него) — «reaches» означает **путь вызова**
 - **Исправление**: перенесите вызов в surface / light-хук
 
-## "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+## Доступ к глубине сцены требует проверки условия
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **Причина**: `bloxdOpaqueBehind()` требует `BLOXD_SCENE_DEPTH`, определённый только во всех жидкостных вариантах; шаринг вызова из кода террейн/модель-хуков создаёт некомпилируемые варианты
 - **Исправление**: оберните вызов в `#ifdef BLOXD_SCENE_DEPTH`

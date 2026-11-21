@@ -11,7 +11,9 @@ Erreurs autour de `apiVersion`. Le jeu actuel n'accepte **que `5`**.
 - **Correction** : ajoutez `"apiVersion": 5` — un **nombre** (la chaîne `"5"` échoue)
 - **Prévention** : partez du modèle [pack.json](../getting-started/manifest.md)
 
-## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
+## Version d’API incompatible
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.`
 
 - **Symptôme** : `loadWrongApiVersion`
 - **Cause** : `apiVersion` existe mais ne vaut pas 5 (un pack v1–v4)

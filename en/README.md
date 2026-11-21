@@ -1,6 +1,6 @@
 # Bloxd.io Shader Pack Documentation
 
-An unofficial guide to shader packs for the Bloxd.io WebGPU renderer — from creating, implementing, validating and distributing packs to the API specification and engine-internals research.
+An unofficial guide to shader packs for Bloxd.io’s WebGPU renderer. It covers the full workflow—from creating and testing packs to the API reference and research into engine internals.
 
 ## Current spec
 

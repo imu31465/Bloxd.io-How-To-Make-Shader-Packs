@@ -67,7 +67,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Ambiente hemisférico (cielo arriba / rebote del suelo abajo)
+## R9.4 Iluminación hemisférica
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -102,7 +102,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Perspectiva aérea ("atmósfera" por desaturación con distancia)
+## R9.6 Perspectiva aérea
 
 > A diferencia de la niebla (reemplazo de color), superponer "desaturación con distancia" hace las vistas lejanas mucho más realistas.  
 > Precaución: reduce solo la saturación — nunca toques la luminancia.
@@ -119,7 +119,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Normales de ola + destello solar ("camino del sol" en el agua)
+## R9.7 Normales de ola y reflejos solares
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -150,7 +150,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Micro-relieve procedural (truco ante la prohibición de texturas)
+## R9.8 Micro-relieve procedural
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -182,7 +182,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Oscurecimiento no lineal de cuevas + protección de lámparas
+## R9.9 Oscurecimiento de cuevas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -198,7 +198,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Reaplicar niebla (obligatorio al descartar engineColour)
+## R9.10 Reaplicar la niebla
 
 > Poner un suelo como `min(l.fogAlpha, 0.75)` limita "no más denso que esto"
 > (0.0 = fiel al motor / 0.3–0.5 = distancia más clara).
@@ -220,7 +220,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Grado cine (sombras frías / altas cálidas / desaturación nocturna)
+## R9.11 Gradación de color cinematográfica
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -237,7 +237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Sombras proyectadas — inversión del realce + corte por umbral (definitivo)
+## R9.12 Sombras proyectadas
 
 > **Repaso de la premisa (sección 10)**: `l.skyLight` no es el valor de vóxel crudo (n/15) sino el valor tras la "curva de realce" del motor  
 > `y = 1-(1-x/(3-2x))³` (una curva S que levanta zonas oscuras).

@@ -1,6 +1,6 @@
 # Documentación de shader packs de Bloxd.io
 
-Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io — desde la creación, implementación, validación y distribución hasta la especificación de la API y la investigación de las interioridades del motor.
+Guía no oficial sobre los shader packs del renderizador WebGPU de Bloxd.io. Cubre todo el proceso —desde la creación y las pruebas hasta la referencia de la API y el análisis del funcionamiento interno del motor—.
 
 ## Especificación vigente
 
@@ -22,15 +22,15 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 |---|---|---|
 | Crear tu primer shader pack | [Primeros pasos](getting-started/) | autores primerizos de packs |
 | Consultar funciones y campos de la API | [Referencia de la API](api/) | autores en plena implementación |
-| Implementar un efecto (luz, agua, modelos…) | [Guías](guides/) · [Recetas](recipes/) | cualquiera que construya un look |
+| Implementar un efecto (luz, agua, modelos…) | [Guías](guides/) · [Recetas](recipes/) | quienes quieran implementar un estilo visual |
 | Corregir un error | [Solución de problemas](troubleshooting/) | cualquiera con un pack roto |
-| Investigar las interioridades del motor | [Interior del motor e investigación](internals/) | analistas del motor |
+| Investigar las funcionamiento interno del motor | [Interior del motor e investigación](internals/) | analistas del motor |
 | Consultar versiones antiguas (v1–v5) | [Historial de versiones](history/) | quien migra packs antiguos |
 
 ## Mapa de la documentación
 
 - **[Primeros pasos](getting-started/)** — visión general, inicio rápido, estructura del pack, pack.json, los 9 hooks, variantes, validación, distribución.
-- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 1,017 nombres.
+- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 1.017 identificadores de textura.
 - **[Guías](guides/)** — cómo funciona la iluminación, sombras, agua, noche, renderizado de modelos, rendimiento, conceptos de realismo.
 - **[Recetas](recipes/)** — ejemplos de código orientados a objetivo: colores, iluminación, emisión, coordenadas, animación, líquidos, vértices, matemáticas, realismo, sombreadores de modelo, efectos de encantamiento.
 - **[Solución de problemas](troubleshooting/)** — resolución de errores por síntoma: carga, versión de API, compilación, validación, variantes, visual, texturas, iluminación, modelos, rendimiento.

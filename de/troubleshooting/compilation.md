@@ -4,29 +4,39 @@
 
 Fehler, die die statische Validierung bestehen, aber als WGSL scheitern — oder nur im WGSL-Compiler des Browsers scheitern (Stufe 2).
 
-## „bloxdTerrainVertex must be declared as: fn ..."
+## Unpassende Hook-Signatur
+
+> `bloxdTerrainVertex must be declared as: fn ...`
 
 - **Ursache**: Hook-Signatur-Nichtübereinstimmung (Argument-/Rückgabetypen)
 - **Fix**: zur in der Meldung gezeigten Deklaration umschreiben (Parameternamen sind frei; Typen müssen exakt passen)
 - **Vorbeugen**: von der [Hook-Vergleichstabelle](../api/hooks.md) ausgehen
 
-## „mixing '*' and '^' requires parenthesis (only in ...)"
+## Operatorrangfolge
+
+> `mixing '*' and '^' requires parenthesis (only in ...)`
 
 - **Ursache**: WGSL verlangt Klammern, wenn `^` `&` `|` `<<` `>>` mit anderen Operatoren gemischt werden
 - **Fix**: die Operanden einklammern
 
-## „... can only be a function's parameter or return type, ..."
+## Deklaration von Ausgabewerten
+
+> `... can only be a function's parameter or return type, ...`
 
 - **Ursache**: `var x: BloxdSurface;` — nackte typ-annotierte Deklarationen werden abgelehnt, weil Header-Strukturen Felder gewinnen
 - **Fix**: `var out = bloxdDefaultSurface(s);` (oder `var out = s;` in Light-Hooks)
 - **Vorbeugen**: Ausgaben immer aus `bloxdDefault*` bauen ([Konventionen](../api/structures.md#schreibkonventionen-recap))
 
-## „_ can only be the target of a phony assignment, as in _ = f();"
+## Zuweisung an den Unterstrich
+
+> `_ can only be the target of a phony assignment, as in _ = f();`
 
 - **Ursache**: `let _ = f();` ist ungültiges WGSL
 - **Fix**: `_ = f();` schreiben
 
-## „Lite: …reads scene depth on a page that didn't turn it on"
+## Verfügbarkeit der Szenentiefe
+
+> `Lite: …reads scene depth on a page that didn't turn it on`
 
 - **Ursache**: ein tiefenlesendes Paket (`bloxdOpaqueBehind`) war aktiv, als die Seite generiert wurde; die Tiefen-Verfügbarkeit wird bei der Seiten-Generierung entschieden
 - **Fix**: die Seite mit aktivem Paket neu laden
@@ -37,7 +47,9 @@ Fehler, die die statische Validierung bestehen, aber als WGSL scheitern — oder
 - **Fix**: nichts — `dpdy(h)` in der Bedeutung „wie ändert sich h nach oben“ schreiben, und der emittierte Code trägt den Flip ([Einschränkungen](../api/restrictions.md#automatische-umschreibungen))
 - `dpdx` und `fwidth` bleiben unberührt
 
-## Paket wird beim Spiel-Beitritt rausgeworfen / die Geräte-Prüfung endet nie
+## Pack wird beim Spielbeitritt deaktiviert
+
+> `Paket wird beim Spiel-Beitritt rausgeworfen / die Geräte-Prüfung endet nie`
 
 - **Ursache**: die Geräte-Prüfung ist gescheitert oder lief in den erzwungenen 60-Sekunden-Timeout (`skipped`) — üblich auf schwachen Geräten und schweren Welten
 - **Fix**: schwere Vertex-Arbeit und komplexe Schleifen reduzieren; siehe [Performance](performance.md)

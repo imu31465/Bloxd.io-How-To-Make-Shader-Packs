@@ -10,7 +10,7 @@
 - ロード時のチャンク境界に見える細かい市松模様は、エンジンの画面空間 Bayer 4×4 ディザによるチャンクフェードであり、パックのバグではありません (グラフィック設定 `chunkFadeIn` で無効化できます)
 - **`mod` は予約語**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` で拒否されます。剰余は `%` 演算子で書いてください
 
-## R-C. Bayer ディザ溶解 — out.alpha が discard を制御する
+## R-C. Bayer ディザによる溶解
 
 エンジンがチャンクフェードに使っているのと**同じ Bayer 4×4 テーブル**を再現し、低いブロックから上へ向かって cutout を溶かします。alphaTest マテリアル (草・葉) では discard が発生し、液体ではブレンドの透明度になります。
 
@@ -53,7 +53,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## R-D. カメラ近傍の水フェード — 液体 alpha で視界を確保
+## R-D. カメラ近傍の水フェード
 
 液体フックの `out.alpha` はブレンドに直接反映されます。カメラ直下の水面だけをフェードさせ、潜水時・水上カメラの視界を確保します。
 
