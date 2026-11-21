@@ -39,11 +39,11 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 
 ## Rótulos de status de verificação
 
-Cada página anota sua versão de API alvo, build, data da última verificação e status.
+Cada página informa a versão da API que abrange e o estado de verificação do conteúdo.
 
 | Rótulo | Significado |
 |---|---|
-| Verified | verificado no dispositivo / no build alvo |
+| Verified | verificado no jogo |
 | Analyzed | confirmado analisando a implementação interna |
 | Partially Verified | confirmado apenas parcialmente |
 | Experimental | experimental / não consolidado |
