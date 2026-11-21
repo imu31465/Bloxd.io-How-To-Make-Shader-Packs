@@ -5126,7 +5126,7 @@ Una distribución comunitaria de «cinematic shader» que analizamos resultó se
 
 ---
 
-## Interior del motor e investigación
+## Funcionamiento interno del motor
 Esta categoría explica el funcionamiento interno del motor y puede ayudar a comprender cómo se ejecutan los shader packs. Estos detalles de implementación pueden cambiar; para las reglas de uso estables y las API disponibles, consulta la [Referencia de API](api/).
 
 ### Mapa
