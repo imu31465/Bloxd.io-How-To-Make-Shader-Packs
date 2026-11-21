@@ -2,7 +2,7 @@
 // パイプライン管理・レンダーループ。シェーダー生成は shader-gen.mjs、
 // シーンは scenes.mjs、テクスチャは textures.mjs。
 //
-// アトラスは本番 bloxd.io (v98qt8) の実データ: 8x8 タイル 1227 枚を
+// アトラスは本番 bloxd.io (bbb6l5) の実データ: 8x8 タイル 1650 枚を
 // texture_2d_array へ (本番 Lite レンダラーと同一の積み上げ方)。
 // 空は本番が使う Babylon SkyMaterial (Preetham 散乱) を WGSL に 1:1 移植 —
 // パラメータも本番値 (turbidity 10 / rayleigh 2 / mieCoefficient 0.005 /
@@ -14,7 +14,7 @@ import { buildMeshes, SCENES } from './scenes.mjs'
 
 const FLOATS_PER_VERTEX = 21 // 84B (scenes.mjs の 1 頂点 21 float と一致)
 const MIP_LEVELS = 4         // 8, 4, 2, 1
-const ATLAS_STRIP_LAYERS = 256  // 5 ストリップ × 256 層 (本番 imagesPerAtlas 構成)
+const ATLAS_STRIP_LAYERS = 256  // 7 ストリップ × 256 層 (本番 imagesPerAtlas 構成)
 
 // ------------------------------------------------------------ skybox ----
 // Babylon.js SkyMaterial (Preetham) の WGSL 移植。 uniforms は本番ローダーが
@@ -273,9 +273,9 @@ export class StudioRenderer {
     }
     this.adapter = await navigator.gpu.requestAdapter()
     if (!this.adapter) throw new Error('WebGPU adapter unavailable')
-    // アトラスは本番と同じ 5 構成 (5 × ≤256 層) に分割してバインドするため、
+    // アトラスは本番と同じ 7 構成 (7 × ≤256 層) に分割してバインドするため、
     // maxTextureArrayLayers は既定下限 256 で足りる — requiredLimits の要求も不要。
-    // (単一 1240 層配列だと 256 が上限のアダプターで GPU パスが立たない)
+    // (単一 1663 層配列だと 256 が上限のアダプターで GPU パスが立たない)
     const adapterMaxLayers = this.adapter.limits?.maxTextureArrayLayers ?? 256
     if (adapterMaxLayers < ATLAS_STRIP_LAYERS) {
       throw new Error(
@@ -295,13 +295,13 @@ export class StudioRenderer {
     this._recompile()
   }
 
-  // ---- アトラス: 本番と同じ 5 構成 (5 × 256 層 × 8x8 × 4 mip) ----
+  // ---- アトラス: 本番と同じ 7 構成 (7 × 256 層 × 8x8 × 4 mip) ----
   async _buildAtlas() {
     const pixels = await buildAtlasPixels()      // fetch + decodeImage + getImageData
     const mips = buildMips(pixels)
     const sizes = [ATLAS_TILE, ATLAS_TILE / 2, ATLAS_TILE / 4, ATLAS_TILE / 8]
-    // 5 枚 × 256 層に分割 (imagesPerAtlas [256,256,256,256,203] 相当。
-    // 論理層 1240 ≤ 5×256=1280。残りは余白)
+    // 7 枚 × 256 層に分割 (imagesPerAtlas [256,256,256,256,256,256,114] 相当。
+    // 論理層 1663 ≤ 7×256=1792。残りは余白)
     this.atlasTexs = []
     for (let s = 0; s < ATLAS_STRIPS; s++) {
       const tex = this.device.createTexture({
@@ -316,7 +316,7 @@ export class StudioRenderer {
         const sz = sizes[m]
         const layerSize = sz * sz * 4
         // 全層を一括 write (bytesPerRow はレイヤー行 × 4、rowsPerImage=1 レイヤー分)
-        // → 5 ストリップ分だけ切り出して書く
+        // → 7 ストリップ分だけ切り出して書く
         const strip = new Uint8ClampedArray(ATLAS_STRIP_LAYERS * layerSize)
         const srcBase = s * ATLAS_STRIP_LAYERS * layerSize
         strip.set(mip.subarray(srcBase, srcBase + strip.length))
@@ -331,8 +331,8 @@ export class StudioRenderer {
     }
     this.atlasSampler = this.device.createSampler({ magFilter: 'nearest', minFilter: 'nearest', addressModeU: 'repeat', addressModeV: 'repeat' })
 
-    // bloxdSpTextureLayers: id → 論理層 (0..1239)。恒等写像 (layer = id-1)。
-    // anim 族は registry の frames (本番の状態列) を interval ごとに巡回。
+    // bloxdSpTextureLayers: id → 論理層 (0..1662)。恒等写像 (layer = id-1)。
+    // anim 族は registry の frames (本番の状態列 — 遷移スロット含む) を interval ごとに巡回。
     const layers = new Uint32Array(ATLAS_LAYERS + 1)
     for (let id = 0; id <= ATLAS_LAYERS; id++) layers[id] = Math.max(0, id - 1)
     this.layersBuf = this.device.createBuffer({ size: (ATLAS_LAYERS + 1) * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST })
@@ -342,9 +342,9 @@ export class StudioRenderer {
   }
 
   _buildUniforms() {
-    // bloxdPackInputs: 64B (エンジン実測レイアウト)
-    this.packInputsBuf = this.device.createBuffer({ size: 64, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
-    this.packInputsData = new ArrayBuffer(64)
+    // bloxdPackInputs: 80B (エンジン実測レイアウト — bbb6l5 で shadowDirection が追加)
+    this.packInputsBuf = this.device.createBuffer({ size: 80, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
+    this.packInputsData = new ArrayBuffer(80)
     // view uniform: vec4 並び 272B → 288B (256アライン)
     this.viewBuf = this.device.createBuffer({ size: 288, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
     this.viewData = new ArrayBuffer(288)
@@ -503,14 +503,14 @@ export class StudioRenderer {
 
   _buildPipelines() {
     if (!this.pipelines) return
-    // group(0): 0 view uniform / 1..5 atlas arrays / 6 sampler
+    // group(0): 0 view uniform / 1..7 atlas arrays / 8 sampler
     const entries0 = [
       { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' } }
     ]
     for (let i = 0; i < ATLAS_STRIPS; i++) {
       entries0.push({ binding: 1 + i, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: 'float', viewDimension: '2d-array' } })
     }
-    entries0.push({ binding: 6, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'filtering' } })
+    entries0.push({ binding: 1 + ATLAS_STRIPS, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'filtering' } })
     this.bgl0 = this.device.createBindGroupLayout({ entries: entries0 })
 
     const entries3 = [
@@ -594,7 +594,7 @@ export class StudioRenderer {
     for (let i = 0; i < ATLAS_STRIPS; i++) {
       e0.push({ binding: 1 + i, resource: this.atlasTexs[i].createView({ dimension: '2d-array' }) })
     }
-    e0.push({ binding: 6, resource: this.atlasSampler })
+    e0.push({ binding: 1 + ATLAS_STRIPS, resource: this.atlasSampler })
     this.bg0 = this.device.createBindGroup({ layout: this.bgl0, entries: e0 })
     const e3 = [
       { binding: 0, resource: { buffer: this.packInputsBuf } },
@@ -714,7 +714,7 @@ export class StudioRenderer {
       this.viewProj = mat4Mul(mat4Perspective(Math.PI / 3, aspect, near, far), mat4View(eye, yaw, -pitch))
     }
 
-    // bloxdPackInputs (64B): seconds@0 lit@4 renderOffset@16 sunDirection@32 eyePosition@48
+    // bloxdPackInputs (80B): seconds@0 lit@4 renderOffset@16 sunDirection@32 eyePosition@48 shadowDirection@64
     {
       const d = new DataView(this.packInputsData)
       d.setFloat32(0, seconds, true)
@@ -722,6 +722,12 @@ export class StudioRenderer {
       d.setInt32(16, 0, true); d.setInt32(20, 0, true); d.setInt32(24, 0, true)
       d.setFloat32(32, sun[0], true); d.setFloat32(36, sun[1], true); d.setFloat32(40, sun[2], true)
       d.setFloat32(48, eye[0], true); d.setFloat32(52, eye[1], true); d.setFloat32(56, eye[2], true)
+      // 影を落とす光の進行方向 (本番仕様: 昼は太陽から、夜は月から、太陽がなければ
+      // 既定空の太陽から。y は決して 0 より上にならない = 光は常に斜め下向き)
+      const sunUp = sun[1] > 0.02
+      const sh = sunUp ? [-sun[0], -sun[1], -sun[2]] : [sun[0], -sun[1], sun[2]]
+      const shLen = Math.hypot(sh[0], sh[1], sh[2]) || 1
+      d.setFloat32(64, sh[0] / shLen, true); d.setFloat32(68, -Math.abs(sh[1] / shLen), true); d.setFloat32(72, sh[2] / shLen, true)
       this.device.queue.writeBuffer(this.packInputsBuf, 0, this.packInputsData)
     }
     // view uniform (vec4 並び 272B)

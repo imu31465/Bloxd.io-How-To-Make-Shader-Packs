@@ -1,7 +1,9 @@
-// エンジンヘッダ (verbatim, 8954B) — bny9u チャンクc56から復元したもの。
-// WGSLテキストを default export する (webpack/Node 両方で読める形式)。
+// エンジンヘッダ (verbatim, bbb6l5 版 216 行) — ライブビルドのバリデータ (WASM) から
+// 補間適用済みで抽出したもの。bloxdDefaultSurface 本体のみ studio 近似
+// (アトラス texel 乗算 — 本番は textureId を頂点色に焼き込むためヘッダ上は
+// 単純パススルー)。WGSLテキストを default export する。
 export default `
-// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
+// The Bloxd shader pack API, apiVersion X. Read-only, prepended to all packs.
 
 const bloxdPi: f32 = 3.1415926535898;
 const bloxdTau: f32 = 6.2831853071796;
@@ -24,8 +26,17 @@ fn bloxdRenderOffset() -> vec3i {
 }
 
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
+// It's below the horizon (y < 0) at night. The moon is always opposite it.
 fn bloxdSunDirection() -> vec3f {
     return bloxdPackInputs.sunDirection;
+}
+
+// The unit vector the light that casts bloxdShadow's shadows travels along,
+// in world orientation: from the sun by day, the moon by night, and the
+// default sky's sun when there's no sun. Its y is never above 0 (0 when the
+// sun is on the horizon).
+fn bloxdShadowDirection() -> vec3f {
+    return bloxdPackInputs.shadowDirection;
 }
 
 // Seconds since the page loaded. As an f32, it has sub-millisecond precision
@@ -76,7 +87,7 @@ struct BloxdVertexIn {
 }
 
 struct BloxdVertex {
-    position: vec3f,      // The render position output.
+    position: vec3f,      // The render position output. Normals don't change.
 }
 
 struct BloxdSurfaceIn {
@@ -144,7 +155,7 @@ struct BloxdLightIn {
 }
 
 struct BloxdLight {
-    colour: vec3f, // RGB colour output.
+    colour: vec3f, // Final RGB colour, emission and fog included.
 }
 
 struct BloxdOpaqueBehind {
