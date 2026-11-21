@@ -1,6 +1,6 @@
 # FAQ y notas legales
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
+> API objetivo: 5 · Tipo: referencia técnica
 
 ## Preguntas frecuentes
 

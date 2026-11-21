@@ -1,6 +1,6 @@
 # API de texturas
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` · Estado: Verified (API sin cambios desde v4, reconfirmada en el build de v5)
+> API objetivo: 5 · Tipo: referencia técnica
 
 La API para leer las texturas propias del juego: dos funciones, una familia de constantes con nombre y cuatro campos de entrada. La frase de una línea de la propia cabecera: *"This face's texture. Compare with `bloxdTextureId*`."*
 
@@ -223,5 +223,5 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 ## Relacionado
 
-- **Los 896 nombres utilizables** → [Catálogo de texturas](texture-catalog.md)
+- **Los nombres disponibles utilizables** → [Catálogo de texturas](texture-catalog.md)
 - [Interior del motor: registro de texturas](../internals/texture-registry.md) · [Muestreo de texturas](../internals/texture-sampling.md)

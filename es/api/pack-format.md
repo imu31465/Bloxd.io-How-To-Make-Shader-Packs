@@ -1,70 +1,58 @@
-# Formato del paquete
+# Formato del pack
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (remedido en el cargador en vivo)
+> API objetivo: 5 · Tipo: referencia de API
 
-El modelo completo del paquete en una sola página — manifiesto, límites del cargador, uniform por fotograma. Para la versión paso a paso ver [Primeros pasos](../getting-started/manifest.md).
+Esta página resume el manifiesto, los límites del archivo ZIP y el uniform del pack. Para ver los pasos de configuración, consulta [Primeros pasos](../getting-started/manifest.md).
 
 ## pack.json
+
+Coloca `pack.json` en la raíz del archivo ZIP. Debe ser un objeto JSON.
 
 ```json
 {
   "apiVersion": 5,
   "name": "My Pack",
-  "author": "your name"
+  "author": "Author Name",
+  "keepCircleShadows": false
 }
 ```
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
-| `apiVersion` | número | obligatorio | **debe ser exactamente `5`** (`===`). Un string `"5"` falla y se informa con su grafía JSON |
-| `name` | string | obligatorio | no vacío tras recortar espacios; se muestra en los ajustes |
-| `author` | string | opcional | debe ser un string si está presente |
-| `keepCircleShadows` | boolean | opcional | **nuevo en `bbb6l5`** — conserva las antiguas sombras circulares bajo jugadores y mobs cuando tus shaders también usan la API real de sombras sol ([Sombras](../guides/shadows.md)). Por defecto `false`; cualquier otro tipo se rechaza con un mensaje dedicado |
+| `apiVersion` | number | Sí | Usa el valor numérico `5`. No se acepta una cadena |
+| `name` | string | Sí | Nombre no vacío después de quitar los espacios exteriores |
+| `author` | string | No | Nombre del autor |
+| `keepCircleShadows` | boolean | No | Establécelo en `true` para conservar las sombras circulares tradicionales al usar la API de sombras |
 
-Todo lo demás del manifiesto se ignora. `pack.json` debe ser exactamente un objeto JSON en la raíz del zip.
+## Límites del cargador
 
-## Límites del cargador (remedidos en el c53 en vivo)
+| Elemento | Límite |
+|---|---:|
+| Archivos `.wgsl` por pack | 256 |
+| Fuente `.wgsl` total | 256 KB |
+| `pack.json` | 64 KB |
+| Archivo ZIP | 32 MB |
+| Entradas ZIP | 1.024 |
 
-| Límite | Valor | Mensaje al superarlo |
+No se admiten archivos ZIP divididos, Zip64, entradas cifradas ni métodos de compresión no compatibles. Guarda todos los archivos en UTF-8 y evita las rutas duplicadas dentro del archivo.
+
+## Uniform del pack
+
+El uniform del pack ocupa 80 bytes y se enlaza en `@group(3) @binding(0)`.
+
+| Offset | Campo | Tipo |
 |---|---|---|
-| archivos `.wgsl` por paquete | 256 | `The pack has more than 256 .wgsl files.` |
-| fuente `.wgsl` total | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| tamaño de `pack.json` | 64 KB | `pack.json is over 64 KB.` |
-| tamaño del zip | 32 MB | `The zip is over 32 MB.` |
-| entradas del zip | 1.024 | `The zip has more than 1024 entries.` |
-| forma del zip | — | zip dividido / zip64 / cifrado / compresión no soportada: cada uno rechazado con su propio mensaje; todos los archivos UTF-8 válidos; exactamente un `pack.json`; sin rutas duplicadas |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-## Comprobación de versión de API
+El tamaño mínimo del enlace del uniform es de 80 bytes. Los demás enlaces del grupo 3 son la textura de profundidad de escena para las variantes Liquid y el búfer `bloxdSpTextureLayers`.
 
-El cargador compara `manifest.apiVersion !== 5` con el `!==` estricto de JavaScript. La constante de versión `5` y la plantilla de cabecera viven en el mismo módulo (c55 / módulo 29836), así que la validación y la cabecera que asume se mueven juntas. Mensajes de desajuste: ver [Compatibilidad](compatibility.md).
+## Relacionado
 
-## Uniform por fotograma: bloxdPackInputs
-
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — sigue siendo de 64 bytes, pero v5 añadió un miembro (del módulo de diseño de uniform en vivo):
-
-| Desplazamiento | Campo | Tipo | Nota |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | respalda `bloxdSeconds()` |
-| 4 | `lit` | `u32` | 1 cuando la iluminación de bloque/cielo está activada; respalda `bloxdLit()` |
-| 16 | `renderOffset` | `vec3i` | respalda `bloxdRenderOffset()` |
-| 32 | `sunDirection` | `vec3f` | respalda `bloxdSunDirection()` |
-| 48 | `eyePosition` | `vec3f` | respalda `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **nuevo en `bbb6l5`** — la dirección en que viaja la luz que proyecta sombras; respalda `bloxdShadowDirection()` |
-
-`lit` cupo en el relleno que v4 ya tenía entre `seconds` y `renderOffset` (los desplazamientos 4–15 eran huecos de alineación; `vec3i` necesita alineación de 16 bytes, así que `renderOffset` se queda en 16). El tamaño total y todos los demás desplazamientos no cambian. El motor lo escribe con un único `setUint32(4, lit ? 1 : 0)` — es un flag, no un nivel de luz (los nombres del lado JS de v4 `terrainLightLevels` / `terrainHeldLight` han desaparecido por completo del bundle).
-
-**Nunca referencies el uniform directamente desde un paquete.** Úsalo a través de las funciones de cabecera (`bloxdSeconds()` etc.). La visibilidad de etapa es VERTEX|FRAGMENT, así que las funciones de cabecera funcionan también desde funciones de ámbito de módulo y hooks de vértice.
-
-## Diseño del grupo de bindings
-
-| binding | Contenido |
-|---|---|
-| 0 | uniform `bloxdPackInputs` (64 B) |
-| 1 | textura de profundidad de escena (variantes de líquido) |
-| 2 | buffer de almacenamiento `bloxdSpTextureLayers` |
-
-`minBindingSize` sigue siendo 64. La textura de profundidad (binding 1) es exclusiva de FRAGMENT, razón por la que `bloxdOpaqueBehind()` solo existe en hooks surface/light.
-
-## Concatenación de wgsl
-
-Los múltiples archivos `.wgsl` se concatenan en un solo módulo en **orden de diccionario por nombre de ruta**. Las declaraciones de ámbito de módulo son independientes del orden; solo el orden de inicialización de `var` puede importar. Los archivos que no son `.wgsl` se ignoran.
+- [Crear el manifiesto](../getting-started/manifest.md)
+- [Referencia de API](./)
+- [Guía de migración a API v5](../history/v5.md)
