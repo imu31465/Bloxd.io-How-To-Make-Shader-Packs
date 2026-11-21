@@ -1,6 +1,6 @@
 # Intérieurs du moteur et recherche
 
-Spécifications internes restaurées en analysant l'implémentation du moteur. Tout ce qui est ici a été récupéré directement depuis le JavaScript du build de production actuel (`bny9u`). Séparé de la documentation d'API publique ([Référence API](../api/)) pour préserver le comportement interne exact et les résultats d'analyse.
+Cette section rassemble les observations techniques issues de l'analyse de l'implémentation du jeu. Le fonctionnement interne peut changer avec les mises à jour et ne constitue pas un contrat d'API stable.
 
 ## Plan
 
@@ -23,7 +23,5 @@ Spécifications internes restaurées en analysant l'implémentation du moteur. T
 | [Soleil et lune](sun-and-moon.md) | ce qui alimente bloxdSunDirection |
 | [Débogage](debugging.md) | paramètres URL, panneaux de statistiques |
 | [Journal de recherche](research-log.md) | méthodologie, historique des builds, éléments non vérifiés |
-
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20)
 
 Les intérieurs ne sont pas un contrat d'API stable — ils peuvent changer avec les mises à jour du moteur, et chaque page nomme son build de preuve ([journal de recherche](research-log.md)).

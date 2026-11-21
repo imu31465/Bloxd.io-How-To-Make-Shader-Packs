@@ -1,6 +1,6 @@
 # Engine-Interna & Forschung
 
-Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. Alles hier wurde direkt aus dem JavaScript des aktuellen Produktions-Builds (`bny9u`) zurückgewonnen. Von der öffentlichen API-Dokumentation ([API-Referenz](../api/)) getrennt, um exaktes internes Verhalten und Analyseergebnisse zu bewahren.
+Dieser Bereich enthält technische Erkenntnisse aus der Analyse der Spielimplementierung. Interne Abläufe können sich mit Updates ändern und sind kein stabiler API-Vertrag.
 
 ## Map
 
@@ -23,7 +23,5 @@ Interne Spezifikationen, durch Analyse der Engine-Implementierung restauriert. A
 | [Sonne & Mond](sun-and-moon.md) | was bloxdSunDirection speist |
 | [Debugging](debugging.md) | URL-Parameter, Statistik-Panels |
 | [Forschungslog](research-log.md) | Methodik, Build-Historie, unverifizierte Punkte |
-
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod)
 
 Interna sind kein stabiler API-Vertrag — sie können sich mit Engine-Updates ändern, und jede Seite nennt ihren Evidenz-Build ([Forschungslog](research-log.md)).
