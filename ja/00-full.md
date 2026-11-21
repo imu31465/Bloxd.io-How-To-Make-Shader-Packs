@@ -132,7 +132,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-> エンジンヘッダー (定数・構造体・関数の宣言一式) は読み込み時にパックの先頭へ自動付与されるため、自分で書く必要はありません。ヘッダー全文は [エンジン内部と研究](internals/engine-header.md) で確認できます。
+> エンジンヘッダー (定数・構造体・関数の宣言一式) は読み込み時にパックの先頭へ自動付与されるため、自分で書く必要はありません。ヘッダー全文は [エンジン内部](internals/engine-header.md) で確認できます。
 
 ### 2. ゲームに読み込ませる
 
@@ -394,7 +394,7 @@ v4 以前の「照明 on/off」軸は廃止されました (v4 は8バリアン�
 
 大多数のゲームは strict モードです (頂点移動・`discard` を禁止)。無防備な vertex フックは `<hook> moves terrain, which strict games prevent.` を報告し、到達可能な `discard` は `discard makes terrain see-through, which strict games prevent.` を報告します。いずれもその strict ゲームで**全フックを無効化**するため、vertex フックは必ず `#ifndef BLOXD_STRICT` で括ります。
 
-ゲームごとの適用モード (`shaderPackPolicy`) の内部仕様は [エンジン内部と研究](internals/policy.md) を参照してください。
+ゲームごとの適用モード (`shaderPackPolicy`) の内部仕様は [エンジン内部](internals/policy.md) を参照してください。
 
 
 ---
@@ -454,7 +454,7 @@ v4 以前の「照明 on/off」軸は廃止されました (v4 は8バリアン�
 ---
 
 ## APIリファレンス
-現行API v5の仕様書です。各パックの先頭にエンジンが自動付与するヘッダーがAPI定義の一次ソースです (全文は [エンジン内部と研究](internals/engine-header.md) を参照)。
+現行API v5の仕様書です。各パックの先頭にエンジンが自動付与するヘッダーがAPI定義の一次ソースです (全文は [エンジン内部](internals/engine-header.md) を参照)。
 
 ### このカテゴリーの構成
 
@@ -761,7 +761,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - v4 `blockFlags` からの移行の全体手順 → [バージョン履歴: v5](history/v5.md)
 - v3 時点の blockFlags 誕生時の仕様 → [バージョン履歴: v3](history/v3.md)
-- フラグの生成からフックへの受け渡しの内部 → [エンジン内部と研究](internals/rendering-pipeline.md)
+- フラグの生成からフックへの受け渡しの内部 → [エンジン内部](internals/rendering-pipeline.md)
 
 
 ---
@@ -1133,7 +1133,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **ガード**: `#ifdef BLOXD_SCENE_DEPTH` で囲む (Liquid バリアントでのみ定義)
 - **意味**: このフラグメントの奥にある不透明な面 (水越しの地形)。空 (何もない) では `hit == false`
 - **v2 からの改名**: `found` → `hit`
-- **詳説**: [バージョン履歴: v3](history/v3.md) の "bloxdOpaqueBehind: 正確な実装" と [エンジン内部と研究](internals/rendering-pipeline.md)
+- **詳説**: [バージョン履歴: v3](history/v3.md) の "bloxdOpaqueBehind: 正確な実装" と [エンジン内部](internals/rendering-pipeline.md)
 
 ### 関連
 
@@ -5341,7 +5341,7 @@ WebGPU 対応が限定される環境では動きません ([動作環境](getti
 
 ---
 
-## エンジン内部と研究
+## エンジン内部
 エンジン内部の動作を説明する技術資料です。シェーダーパックがどのように処理されるかを詳しく知りたい場合に参照してください。安定した利用方法と公開仕様は[APIリファレンス](api/)を参照してください。
 
 ### このカテゴリーの構成
