@@ -6278,7 +6278,6 @@ Al detectar una actualización del juego (un nuevo hash de main.js): re-comprueb
 ---
 
 ## Historial de versiones
-> Estado: Historical — registros versión por versión; cada guía indica su propio build objetivo
 
 Cambios, pasos de migración y API eliminadas de v1 a v5. Para migrar paquetes antiguos y para las especificaciones conservadas de cada época.
 
@@ -6345,7 +6344,6 @@ Después aplica v3 → v4 → v5 en orden ([el camino rápido](history/index.md#
 ---
 
 ## Guía de migración a API v2
-> Versión: 2 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 Build objetivo: `6qxffk.main.5912a15f.js` (despliegue en producción a 2026-10-16). Las Partes I–VII de esta guía ya están reescritas a la base v2; esta guía recoge los puntos de migración desde v1 y las novedades de v2. Los ejemplos de código de novedades pasan la validación de 8/8 variantes en el compilador v2 y la validación del compilador WGSL del navegador (Tint) (§38), pero la conversión v2 de recetas existentes es sustitución mecánica de identificadores — verifica siempre con compilación en juego antes de distribuir.
 
@@ -6588,7 +6586,6 @@ Investigado por ltf_ahel (investigado con glm)
 ---
 
 ## Guía de migración a API v3
-> Versión: 3 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 > **Sustituida el 2026-10-26: la API actual es la versión 5** — los paquetes v3 se rechazan al cargar tal como se describe aquí para v2. Aplica esta guía *y después* [la guía de migración v4](history/v4.md) (v3 → v4: API de texturas, cambio de nombre a `fogAlpha`, `bloxdFragmentBlockPosition`, `hit`). Las interioridades de esta guía (§49–§54) siguen siendo exactas para el build v3 en el que se midieron. Aplica también [la guía de migración v5](history/v5.md) (v4 → v5).
 
@@ -7206,7 +7203,6 @@ Investigado por ltf_ahel (investigado con glm)
 ---
 
 ## Guía de migración a API v4
-> Versión: 4 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 > **Sustituida el 2026-11-03: la API actual es la versión 5** — los paquetes v4 se rechazan al cargar exactamente como se describe aquí para v3. Aplica esta guía *y después* [la guía de migración v5](history/v5.md) (v4 → v5: la estructura `BloxdFlags` sustituye a `blockFlags`, `bloxdLit()` y la receta de iluminación pública, las entradas de encantamiento/superposición, el paquete por defecto de 9 hooks). Las interioridades de esta guía (§56–§66) siguen siendo exactas para los builds v4 en que se midieron.
 
@@ -9143,7 +9139,6 @@ wire_mill_top_rot4
 ---
 
 ## Guía de migración a API v5
-> Versión: 5 · Estado: Historical (guía de migración de la era; el build objetivo se indica en el texto)
 
 Build objetivo: `ab90qa.main.6188124c.js` — **en producción y preprod simultáneamente (medido 2026-11-03)**, y los dos bundles vuelven a ser idénticos byte a byte (md5 `fc3322212d15be2445c0e8dfc9733fcc` en el bundle principal, descargado en vivo de ambos hosts), así que todo lo que sigue se aplica a producción tal cual. Es la mayor revisión de la API desde v3: el bundle principal creció a 3,39 MB (+115 KB sobre el último build v4), el mapa de chunks tiene ahora 195 ids (c0–c195, 188 emitidos tras los 7 huecos conocidos), el pipeline de sombreadores sigue en el clúster c51–c56 (cargador c53, validador/cabecera/constructor del registro c55, WebGPU/codegen c56, niebla c9) — pero la plantilla del pack por defecto se movió a c116 (estaba en c124 en `tcwczu`). Ninguno de esos detalles de disposición es visible para un paquete. Reverificado en el build de producción actual `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`): la cabecera del motor es idéntica byte a byte y todas las mediciones de cargador / variantes / hooks / nombres reservados de abajo se re comprobaron sin cambios — la única superficie que se movió es el registro de texturas (896 → 906 nombres utilizables; adenda §80). Preprod (`2lcqcl`) sirve un bundle principal distinto pero midió idéntico en todas las superficies de shader packs. Reverificado de nuevo en `bny9u.main.02116121.js` (2026-11-05, md5 `60eea80ec48253b7ac6cc45604dc8273`, servido byte a byte idéntico por producción y preprod): cabecera, plantilla de pack por defecto, límites del cargador, disposición del uniform, hooks, variantes, macros, nombres reservados y mensajes de validación volvieron a medirse sin cambios; el registro volvió a moverse (906 → 911 nombres utilizables; adenda §80), el número de definiciones de juego creció de 111 a 115 y los chunks del pipeline de sombreado se renumeraron (cargador c54, validador/cabecera c56, WebGPU/codegen c57, plantilla c122).
 
