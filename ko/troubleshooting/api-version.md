@@ -4,7 +4,9 @@
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
-## "pack.json needs "apiVersion": {{version}}."
+## apiVersion 누락
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **증상**: 로드 직후 이 메시지 (`loadNoApiVersion`)
 - **원인**: `apiVersion` 키가 통째로 없다
