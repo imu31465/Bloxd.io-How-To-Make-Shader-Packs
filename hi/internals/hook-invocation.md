@@ -1,4 +1,4 @@
-# हुक इनवोकेशन इंटर्नल्स
+# हुक कैसे लागू होते हैं
 
 > लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
@@ -41,11 +41,11 @@
 | `directional` | प्रति-दिशात्मक-प्रकाश लैम्बर्ट का vertex-इंटरपोलेटेड योग ([रेंडरिंग पाइपलाइन](rendering-pipeline.md) में 2-प्रकाश सेटअप) |
 | `diffuse` / `emissive` | सामग्री की दिशात्मक RGB प्रतिक्रिया / RGB चमक |
 | `ambient` | `material.ambient × sceneAmbient` — प्रति सामग्री, प्रति फ़्रेम |
-| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश इंटर्नल्स](lighting-internals.md)) |
+| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश व्यवस्था का आंतरिक विवरण](lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | संगत uniform |
 | `heldLight` | लाइट-लेवल varying और held-light uniform से बनता है (शंकु-फ़ॉलऑफ़ [प्रकाश इंटर्नल्स](lighting-internals.md) में) |
 | `fogColour` | केवल पूरी तरह फ़ॉग-रहित scene (मोड 0) में काला |
-| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([फ़ॉग इंटर्नल्स](fog-internals.md)) |
+| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([कोहरे का आंतरिक विवरण](fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying और flat-इंटरपोलेटेड मान (`BloxdSurfaceIn` जैसे ही — vertex-हुक-बाद के मान) |
 
 ## संबंधित
