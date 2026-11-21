@@ -46,8 +46,8 @@
 ## Хотите теорию?
 
 - Тени: [Тени](../guides/shadows.md) (skyLight = воксельная карта теней)
-- Туман: [Внутрянка движка: туман](../internals/fog-internals.md)
+- Туман: [Внутреннее устройство движка: туман](../internals/fog-internals.md)
 
 ## Смотрите также
 
-- [Освещение](../api/lighting.md) · [Визуальные проблемы](visual.md) · [Внутрянка освещения](../internals/lighting-internals.md)
+- [Освещение](../api/lighting.md) · [Визуальные проблемы](visual.md) · [Внутреннее устройство освещения](../internals/lighting-internals.md)
