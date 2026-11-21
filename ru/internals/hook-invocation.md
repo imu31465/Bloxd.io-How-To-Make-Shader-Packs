@@ -1,4 +1,4 @@
-# Внутрянка вызова хуков
+# Как движок вызывает хуки
 
 > Целевая API: 5 · Тип: техническая справка
 
@@ -41,11 +41,11 @@
 | `directional` | интерполированная по вершинам сумма ламбертов по каждому направленному свету (сетап из двух источников в [Пайплайне рендеринга](rendering-pipeline.md)) |
 | `diffuse` / `emissive` | направленный RGB-отклик материала / RGB-свечение |
 | `ambient` | `material.ambient × sceneAmbient` — по материалу, на кадр |
-| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутрянка освещения](lighting-internals.md)) |
+| `blockLight` / `skyLight` | декодированные varying уровней света ([Внутреннее устройство освещения](lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | соответствующие uniform |
-| `heldLight` | собирается из varying уровня света и uniform ручного света (затухание конуса — в [Внутрянке освещения](lighting-internals.md)) |
+| `heldLight` | собирается из varying уровня света и uniform ручного света (затухание конуса — в [Внутреннем устройстве освещения](lighting-internals.md)) |
 | `fogColour` | чёрный только в сценах, полностью лишённых тумана (режим 0) |
-| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутрянка тумана](fog-internals.md)) |
+| `fogAlpha` | зажатый (clamped) фактор тумана ([Внутреннее устройство тумана](fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying и flat-интерполированные значения (как в `BloxdSurfaceIn` — значения после vertex-хука) |
 
 ## См. также
