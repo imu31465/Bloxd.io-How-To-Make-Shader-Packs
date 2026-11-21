@@ -1,18 +1,16 @@
 # Historial de versiones
 
-> Estado: Historical — registros versión por versión; cada guía indica su propio build objetivo
-
 Cambios, pasos de migración y API eliminadas de v1 a v5. Para migrar paquetes antiguos y para las especificaciones conservadas de cada época.
 
 ## Cronología
 
-| Versión | En producción desde | Guía | Lo esencial |
-|---|---|---|---|
-| v1 | (inicial) | [v1](v1.md) | primera API de shader packs. 6 hooks (terrain/liquid × vertex/surface); vocabulario `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
-| v2 | — | [v2](v2.md) | renombrado total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` (bits), `bloxdPi` / `bloxdTau`, hooks de líquido oficiales, interioridades de la invocación de hooks |
-| v4 | 2026-10-26 | [v4](v4.md) | API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), el contrato strict, análisis de cabecera y registro del motor |
-| **v5** | **2026-11-03** | [v5](v5.md) | **actual** — estructura `BloxdFlags` (14 bools), hooks de Model (9 en total), la API de iluminación `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entradas y salidas de encantamiento/superposición, 6 variantes |
+| Versión | Guía | Lo esencial |
+| --- | --- | --- |
+| v1 | [v1](v1.md) | primera API de shader packs. 6 hooks (terrain/liquid × vertex/surface); vocabulario `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
+| v2 | [v2](v2.md) | renombrado total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` |
+| v3 | [v3](v3.md) | `blockId` → `blockFlags` (bits), `bloxdPi` / `bloxdTau`, hooks de líquido oficiales, interioridades de la invocación de hooks |
+| v4 | [v4](v4.md) | API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), el contrato strict, análisis de cabecera y registro del motor |
+| **v5** | [v5](v5.md) | **actual** — estructura `BloxdFlags` (14 bools), hooks de Model (9 en total), la API de iluminación `bloxdLit()` / `bloxdLitColour()`, `localPosition`, entradas y salidas de encantamiento/superposición, 6 variantes |
 
 ## El prefacio común
 

@@ -1,18 +1,16 @@
 # संस्करण इतिहास
 
-> स्थिति: Historical — संस्करण-दर-संस्करण अभिलेख; हर गाइड अपना लक्ष्य बिल्ड स्वयं नाम देती है
-
 v1 से v5 तक के बदलाव, माइग्रेशन चरण और हटाए गए API। पुराने पैक माइग्रेट करने के लिए, और संरक्षित प्रति-दौर स्पेसिफ़िकेशन के लिए।
 
 ## टाइमलाइन
 
-| संस्करण | कब से लाइव | गाइड | मुख्य बातें |
-|---|---|---|---|
-| v1 | (प्रारंभिक) | [v1](v1.md) | पहला शेडर-पैक API। 6 हुक (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` शब्दावली |
-| v2 | — | [v2](v2.md) | पूर्ण पहचानकर्ता पुनर्नामकरण, `blockId`, `BLOXD_SCENE_DEPTH` और `bloxdOpaqueBehind()` |
-| v3 | 2026-10-19 | [v3](v3.md) | `blockId` → `blockFlags` बिट फ़्लैग, `bloxdPi` / `bloxdTau`, आधिकारिक तरल हुक, हुक-आह्वान इंटरनल्स |
-| v4 | 2026-10-26 | [v4](v4.md) | टेक्सचर API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict अनुबंध, इंजन हेडर व रजिस्ट्री विश्लेषण |
-| **v5** | **2026-11-03** | [v5](v5.md) | **मौजूदा** — `BloxdFlags` संरचना (14 bool), मॉडल हुक (कुल 9), `bloxdLit()` / `bloxdLitColour()` लाइटिंग API, `localPosition`, एनचांट/ओवरले इनपुट व आउटपुट, 6 वेरिएंट |
+| संस्करण | गाइड | मुख्य बातें |
+| --- | --- | --- |
+| v1 | [v1](v1.md) | पहला शेडर-पैक API। 6 हुक (terrain/liquid × vertex/surface); `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` शब्दावली |
+| v2 | [v2](v2.md) | पूर्ण पहचानकर्ता पुनर्नामकरण, `blockId`, `BLOXD_SCENE_DEPTH` और `bloxdOpaqueBehind()` |
+| v3 | [v3](v3.md) | `blockId` → `blockFlags` बिट फ़्लैग, `bloxdPi` / `bloxdTau`, आधिकारिक तरल हुक, हुक-आह्वान इंटरनल्स |
+| v4 | [v4](v4.md) | टेक्सचर API (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`), strict अनुबंध, इंजन हेडर व रजिस्ट्री विश्लेषण |
+| **v5** | [v5](v5.md) | **मौजूदा** — `BloxdFlags` संरचना (14 bool), मॉडल हुक (कुल 9), `bloxdLit()` / `bloxdLitColour()` लाइटिंग API, `localPosition`, एनचांट/ओवरले इनपुट व आउटपुट, 6 वेरिएंट |
 
 ## साझा प्रस्तावना
 
