@@ -3176,7 +3176,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 1. **重打雾**：light 钩子在雾之后调用，请自行施加 `mix(l.fogColour, col, (1.0 - l.fogAlpha))` (R9.10)。雾太浓时用 `min(l.fogAlpha, 0.70)` 设下限。反之在 engineColour 起点的包上再混雾色会导致双重雾发白
 2. **无光照变体回退**：`#ifdef BLOXD_LIGHTING` 之外直接返回 `defaultLight`
 3. **共用函数整体守卫**：以 `BloxdLightIn` 为参数的共用函数须整个 fn 用 `#ifdef BLOXD_LIGHTING` 包裹 (仅守卫调用处不够)
-4. **无太阳方向时**：`bloxdSunDirection()` 为零则不计算方向性高光。`l.directional` 是光量标量而非方向向量，无法恢复高光方向。必要时切换为无方向弱环境光。月亮方向经 `-bloxdSunDirection()` 可得 (只在昼夜循环世界移动——见[引擎内部机制与研究：太阳与月亮](internals/sun-and-moon.md))
+4. **无太阳方向时**：`bloxdSunDirection()` 为零则不计算方向性高光。`l.directional` 是光量标量而非方向向量，无法恢复高光方向。必要时切换为无方向弱环境光。月亮方向经 `-bloxdSunDirection()` 可得 (只在昼夜循环世界移动——见[引擎内部：太阳与月亮](internals/sun-and-moon.md))
 
 
 ---
@@ -3327,7 +3327,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - 包限于地形/液体钩子，同一代码不处理天空、实体与 UI。
 - 无添加阴影贴图、屏幕空间反射、折射、泛光等的输入 (场景深度为液体限定以 `bloxdOpaqueBehind()` 解禁——见[函数](api/functions.md))。
 - `bloxdSeconds()` 为动画时间，不保证关联游戏内昼夜。
-- `bloxdSunDirection()` 为零则真月亮方向未知，是氛围近似而非「月光物理」。方向性月光经 `-bloxdSunDirection()` 制作 (仅昼夜循环世界——见[引擎内部机制与研究：太阳与月亮](internals/sun-and-moon.md))。
+- `bloxdSunDirection()` 为零则真月亮方向未知，是氛围近似而非「月光物理」。方向性月光经 `-bloxdSunDirection()` 制作 (仅昼夜循环世界——见[引擎内部：太阳与月亮](internals/sun-and-moon.md))。
 - `s.position` / `l.position` 为局部坐标，世界相关效果请加 `bloxdRenderOffset()`。方块内局部花纹则有意用局部坐标。
 
 
@@ -3522,7 +3522,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 ### 夜晚蓝色环境光 (无月亮方向的拟似表现)
 
-> 本 API 中无太阳的天空 `bloxdSunDirection()` 为零。这不是方向性月光，只是天空暗时极弱的蓝色环境光。月亮方向本身经 `-bloxdSunDirection()` 可得 (仅昼夜循环世界——见[引擎内部机制与研究：太阳与月亮](internals/sun-and-moon.md))。
+> 本 API 中无太阳的天空 `bloxdSunDirection()` 为零。这不是方向性月光，只是天空暗时极弱的蓝色环境光。月亮方向本身经 `-bloxdSunDirection()` 可得 (仅昼夜循环世界——见[引擎内部：太阳与月亮](internals/sun-and-moon.md))。
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -5131,7 +5131,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## 引擎内部机制与研究
+## 引擎内部
 本分类介绍引擎内部行为，帮助理解着色器包的执行过程。这些实现细节可能随游戏更新而变化；稳定的使用规则和可用 API 请参阅 [API 参考](api/)。
 
 
@@ -6449,7 +6449,7 @@ fn bloxdLiquidLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 本页是将 API v3 着色器包迁移到 v4 的历史指南。若要从 v4 迁移到当前版本，请使用 [API v5 迁移指南](history/v5.md)。创建新着色器包时，请参阅[API 参考](api/)。
 
-这次发布前后有一项变化*不在* bundle 里: **引擎现在会指名引用参考文件。** 它自己的错误消息指向 `bloxd-api.wgsl` (带注释的引擎头文件) 与 `BLOCK_TEXTURES.md` (完整纹理名清单) —— `...BLOCK_TEXTURES.md lists them.`。本指南不再把读者支去别处，而是自带两者的内容: 从线上构建逐字复原的完整头文件收录于[引擎内部机制与研究：引擎头文件 (逐字)](internals/engine-header.md)，可用纹理名的完整名录 (v4 构建中共 905 个) 即[纹理名录](api/texture-catalog.md)。本部分的每一个面向包的事实都复原自生产 bundle。
+这次发布前后有一项变化*不在* bundle 里: **引擎现在会指名引用参考文件。** 它自己的错误消息指向 `bloxd-api.wgsl` (带注释的引擎头文件) 与 `BLOCK_TEXTURES.md` (完整纹理名清单) —— `...BLOCK_TEXTURES.md lists them.`。本指南不再把读者支去别处，而是自带两者的内容: 从线上构建逐字复原的完整头文件收录于[引擎内部：引擎头文件 (逐字)](internals/engine-header.md)，可用纹理名的完整名录 (v4 构建中共 905 个) 即[纹理名录](api/texture-catalog.md)。本部分的每一个面向包的事实都复原自生产 bundle。
 v4 的变更集一屏速览:
 | 领域 | v3 | v4 |
 |---|---|---|
