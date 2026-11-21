@@ -1,7 +1,5 @@
 # Formato do pacote
 
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20) · Estado: Verified (remedido no carregador em produção)
-
 O modelo inteiro de pacote em uma página só — manifesto, limites do carregador, uniform por frame. Para a versão passo a passo, veja [Primeiros passos](../getting-started/manifest.md).
 
 ## pack.json
@@ -19,7 +17,7 @@ O modelo inteiro de pacote em uma página só — manifesto, limites do carregad
 | `apiVersion` | number | obrigatório | **deve ser estritamente igual a `5`** (`===`). Uma string `"5"` falha e é reportada com a sua grafia JSON |
 | `name` | string | obrigatório | não vazio após o trim; exibido nos ajustes |
 | `author` | string | opcional | deve ser uma string se presente |
-| `keepCircleShadows` | boolean | opcional | **novo no `bbb6l5`** — mantém as antigas sombras circulares sob jogadores e mobs quando seus shaders também usam a API real de sombras solares ([Sombras](../guides/shadows.md)). Padrão `false`; qualquer outro tipo é rejeitado com mensagem dedicada |
+| `keepCircleShadows` | boolean | opcional | mantém as antigas sombras circulares sob jogadores e mobs quando seus shaders também usam a API real de sombras solares ([Sombras](../guides/shadows.md)). Padrão `false`; qualquer outro tipo é rejeitado com mensagem dedicada |
 
 Todo o resto do manifesto é ignorado. `pack.json` deve ser exatamente um objeto JSON na raiz do zip.
 
@@ -49,7 +47,7 @@ O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScri
 | 16 | `renderOffset` | `vec3i` | sustenta `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | sustenta `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | sustenta `bloxdEyePosition()` |
-| 64 | `shadowDirection` | `vec3f` | **novo no `bbb6l5`** — a direção em que viaja a luz que projeta sombras; respalda `bloxdShadowDirection()` |
+| 64 | `shadowDirection` | `vec3f` | a direção em que viaja a luz que projeta sombras; respalda `bloxdShadowDirection()` |
 
 `shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. Sua chegada levou o uniform de 64 a 80 bytes e elevou o `minBindingSize` a 80.
 
