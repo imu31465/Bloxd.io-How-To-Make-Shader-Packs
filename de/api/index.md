@@ -1,6 +1,6 @@
 # API-Referenz
 
-Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `bny9u` gemessen (2026-11-05; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](../internals/engine-header.md)), ist die Primärquelle.
+Dieser Bereich dokumentiert die aktuelle Shader-Pack-API v5. Die einzelnen Seiten erklären die Typen, Funktionen und Einschränkungen für die Entwicklung von Shader Packs.
 
 ## Map
 
@@ -17,8 +17,6 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Präprozessor](preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Einschränkungen](restrictions.md) | Sprachgrenzen, reservierte Bezeichner |
 | [Kompatibilität](compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
-| [Texturkatalog](texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
-
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+| [Texturkatalog](texture-catalog.md) | alle 1,017 benutzbaren Namen (durchsuchbar) |
 
 Migration von v4? Siehe [Versionsgeschichte: v5](../history/v5.md).
