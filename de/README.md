@@ -39,11 +39,11 @@ Neu bei Shader Packs? Beginne mit [Erste Schritte](getting-started/). API nachsc
 
 ## Verifikationsstatus
 
-Jede Seite nennt ihre Ziel-API-Version, ihren Build, das Datum der letzten Verifikation und ihren Status.
+Jede Seite nennt die abgedeckte API-Version und den Prüfstatus ihrer Angaben.
 
 | Label | Bedeutung |
 |---|---|
-| Verified | auf dem Gerät / am Ziel-Build verifiziert |
+| Verified | im Spiel überprüft |
 | Analyzed | per Analyse der internen Implementierung bestätigt |
 | Partially Verified | nur teilweise bestätigt |
 | Experimental | experimentell / ungeklärt |
