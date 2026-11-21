@@ -26,11 +26,10 @@ Build your first shader pack by following the guide from the basics through test
 > Target API: 5 · Target build: `bbb6l5` (verified in production and preprod on 2026-11-20) · Status: Verified/Analyzed
 
 When you need the full specification, continue to [API Reference](api/); for ready-made effects see [Recipes](recipes/).
-
 ---
 
 ## Overview & prerequisites
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified
+> API: 5 · Status: Verified
 
 ### What a shader pack is
 
@@ -48,9 +47,9 @@ A pack plugs into the renderer's **3-stage per-face pipeline**. The render targe
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Water |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block models (slabs, stairs, plants), items, players, mobs, NPCs, armour, cosmetics |
 
-- **Can do**: change colors, transparency and emission; rebuild lighting (the [Lighting API](api/lighting.md)); projected-style shadows (via `skyLight`); sample textures (`bloxdTexel` — reading the existing block-texture atlas); per-model effects (`flags` tell you "this is a held item", "this is a player"); vertex animation (allow games only)
-- **Cannot do**: add your own textures (that is the texture-pack system's job); post-processing (bloom etc.); shadow-map shadows that rotate with the sun; true reflections (SSR); affect the sky, clouds or the sun disc itself
-- **Easy to miss but powerful**: **projected-style shadows using `skyLight` (voxel sky occlusion)** — clearly darken areas under trees and roofs. Breaking blocks makes LightEngine recalculate immediately, so shadows follow in real time
+- **Can do**: change colors, transparency and emission; adjust lighting (the [Lighting API](api/lighting.md)); sample textures with `bloxdTexel`; create per-model effects using `flags`; animate vertices (allow games only)
+- **Cannot do**: add custom textures; create post-processing effects such as bloom; generate a custom shadow map or access its depth data; create true reflections (SSR); or shade the sky, clouds, or sun disc themselves
+- **Shadows**: `bloxdShadow()` provides the sun/moon shadow factor calculated by the engine, and `bloxdShadowDirection()` gives the direction travelled by the shadow-casting light. `bloxdAirShadow(t)` evaluates a point between the camera and the fragment. The older voxel sky-occlusion method using `skyLight` is also available ([Shadow guide](guides/shadows.md))
 
 ### strict and allow modes
 
@@ -60,8 +59,7 @@ Every game has a shader-pack policy (`shaderPackPolicy`), and **most games run i
 
 - The current game only accepts `apiVersion: 5` packs; v1–v4 packs are rejected at load (saved packs become silently inactive — [Compatibility](api/compatibility.md))
 - Migrating a pack written for an older version? See [Version History](history/)
-- Engine internals may change with updates, so every page names its target build
-
+- Treat engine-internals explanations as reference material; consult the API reference for the supported API contract
 ---
 
 ## Requirements
@@ -449,7 +447,7 @@ See the [testing guide](guides/testing.md) for the full checklist and the comple
 ---
 
 ## API Reference
-The systematic specification of the current API v5. Everything here is measured from target build `bny9u` (2026-11-05; production and preprod identical). The engine header prepended to every pack (reproduced in [Engine Internals](internals/engine-header.md)) is the primary source.
+This page documents the current API v5. The primary source for API definitions is the engine header automatically prepended to each pack (see [Engine Internals](internals/engine-header.md) for the full header).
 
 ### Map
 
@@ -466,13 +464,11 @@ The systematic specification of the current API v5. Everything here is measured 
 | [Preprocessor](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](api/restrictions.md) | language limits, reserved identifiers |
 | [Compatibility](api/compatibility.md) | old-version packs, saved-pack re-validation |
-| [Texture catalog](api/texture-catalog.md) | all 896 usable names (searchable) |
+| [Texture catalog](api/texture-catalog.md) | 1,017 available named constants (searchable) |
 
-> Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Analyzed (restored verbatim from header & validator)
+> Target API: 5 · Status: Analyzed (reconstructed from the engine header and validator)
 
 Migrating from v4? See [Version History: v5](history/v5.md).
-
-
 ---
 
 ## Pack format
