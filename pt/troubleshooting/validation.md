@@ -65,4 +65,4 @@ Erros de resolução de nomes de textura (sugestões de grafia, grafias de quadr
 
 ## Relacionado
 
-- [Restrições e nomes reservados](../api/restrictions.md) · [Interioridades do motor: validação de shaders](../internals/shader-validation.md) · [Problemas específicos de variantes](variants.md)
+- [Restrições e nomes reservados](../api/restrictions.md) · [Funcionamento interno do motor: validação de shaders](../internals/shader-validation.md) · [Problemas específicos de variantes](variants.md)
