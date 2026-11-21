@@ -16,13 +16,13 @@
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `apiVersion` | número | obrigatório | Deve ser **exatamente igual a `5`** (`===` estrito). Uma string `"5"` ou qualquer outro tipo falha, reportado com a grafia JSON |
+| `apiVersion` | número | obrigatório | Deve ser **exatamente igual a `5`** (`===` estrito). Uma string `"5"` ou qualquer outro tipo falha, e a mensagem mostra sua representação JSON |
 | `name` | string | obrigatório | Não vazio depois de aparar espaços. Mostrado na interface de configurações |
 | `author` | string | opcional | Pode ser omitido; deve ser uma string se estiver presente |
 
 Todos os demais campos são ignorados pelo carregador.
 
-## O que acontece quando a versão não corresponde
+## Se a versão não corresponder
 
 O carregador compara `manifest.apiVersion !== 5` de forma estrita e **falha no instante mesmo do carregamento**. Mensagens, verbatim do dicionário i18n em execução:
 
