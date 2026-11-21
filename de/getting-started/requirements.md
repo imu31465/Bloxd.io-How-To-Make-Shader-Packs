@@ -7,10 +7,10 @@
 Shader Packs laufen nur auf dem WebGPU-Renderer. Du brauchst einen WebGPU-fähigen Browser:
 
 - Chromium-basierte Browser (Chrome / Edge / Opera etc.) — auf dem Desktop stabil
-- Safari 17+ / Firefox (WebGPU-Support schwankt je nach Zeitraum)
+- Safari 17+ / Firefox (die WebGPU-Unterstützung hängt von Browser und Version ab)
 - **Mobil**: WebGPU-Support kann auf iOS / Android beschränkt sein. Erwähne das auf der Release-Seite deines Pakets
 
-Während ein Paket installiert ist, ist die Spiel-Einstellung für den WebGPU-Renderer zwangsweise aktiviert.
+Während ein Paket installiert ist, ist die Spiel-Einstellung für den WebGPU-Renderer automatisch aktiviert.
 
 ## Entwicklungsumgebung
 
@@ -20,7 +20,7 @@ Keine spezielle Toolchain nötig, aber das hier hilft:
 - Ein Zip-Werkzeug für den Vertrieb; während der Entwicklung kannst du Ordner-Laden benutzen (nur Desktop-Browser)
 - Browser-Entwicklertools — Kompilierfehler erscheinen in der In-Game-UI und zusätzlich in der Konsole
 
-## Umgebungen für die Verifikation auf dem Gerät
+## Tests auf dem Gerät
 
 Vor dem Vertrieb verifizieren auf ([Validierung](validation.md)):
 
