@@ -68,4 +68,4 @@ A resolução de nomes faz folding de maiúsculas e `_`, então `bloxdTextureId_
 
 ## Relacionado
 
-- [API de texturas](../api/texture-api.md) · [Catálogo de texturas](../api/texture-catalog.md) · [Interioridades do registro de texturas](../internals/texture-registry.md)
+- [API de texturas](../api/texture-api.md) · [Catálogo de texturas](../api/texture-catalog.md) · [Funcionamento interno do registro de texturas](../internals/texture-registry.md)
