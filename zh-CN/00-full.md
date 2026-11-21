@@ -4559,7 +4559,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 围绕 `apiVersion` 的错误。当前游戏**只接受 `5`**。
 
-### 「pack.json needs "apiVersion": {{version}}.」
+### 缺少 apiVersion
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **症状**: 加载后立刻出现该消息 (`loadNoApiVersion`)
 - **原因**: `apiVersion` 键完全缺失
@@ -4751,7 +4753,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **修复**: 用 `#ifndef BLOXD_STRICT` 包住 vertex 钩子与 `discard`
 - **预防**: vertex 钩子永远从带守卫的模板起步 ([变体](getting-started/variants.md))
 
-### 「.alpha is undefined」
+### 当前变体不提供 `alpha` 字段
+
+> `.alpha is undefined`
 
 - **原因**: `alpha` 只在 `#ifdef BLOXD_ALPHA` 之后存在 (全部 liquid + 非 strict 的 terrain/model)
 - **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](api/preprocessor.md#宏--变体矩阵))
