@@ -102,7 +102,6 @@ Las anulaciones de renderizador que queden en parámetros de URL o en localStora
 ---
 
 ## Inicio rápido
-> API objetivo: 5 · Estado: Verified
 
 Tu primer paquete en cinco minutos.
 
@@ -161,7 +160,6 @@ Comprímelo en zip — ver [Distribución](getting-started/distribution.md).
 ---
 
 ## Estructura del paquete
-> API objetivo: 5 · Estado: Verified
 
 ### Formato de distribución
 
@@ -190,7 +188,6 @@ Un zip que guarda todo bajo una carpeta raíz común ve ese prefijo eliminado au
 ---
 
 ## pack.json (manifiesto)
-> API objetivo: 5 · Estado: Verified
 
 `pack.json` es el manifiesto del paquete — exactamente un objeto JSON en la raíz del zip.
 
@@ -229,7 +226,6 @@ Para migrar desde v1–v4, ver [Historial de versiones](history/).
 ---
 
 ## Hooks de sombreado
-> API objetivo: 5 · Estado: Verified
 
 Un paquete puede enchufarse en **9 hooks**: 3 objetivos de render (Terrain / Liquid / Model) × 3 etapas del pipeline (Vertex / Surface / Light). Todos son opcionales — un hook indefinido cae en el valor por defecto del motor.
 
@@ -358,7 +354,6 @@ Para cada campo que cada hook puede leer y escribir, ver [Estructuras](api/struc
 ---
 
 ## Variantes y guardas
-> API objetivo: 5 · Estado: Analyzed
 
 ### 6 variantes
 
@@ -397,7 +392,6 @@ Para las interioridades de la política por juego, ver [Interior del motor: pol�
 ---
 
 ## Validación
-> API objetivo: 5 · Estado: Verified
 
 ### La comprobación de carga de 3 etapas
 
@@ -538,7 +532,6 @@ El tamaño mínimo del enlace del uniform es de 80 bytes. Los demás enlaces del
 ---
 
 ## Hooks de sombreado
-> API objetivo: 5 · Estado: Verified
 
 Los paquetes pueden definir **9 hooks** — 3 objetivos de render (programas) × 3 etapas del pipeline, todos opcionales (indefinido significa valor por defecto del motor).
 
@@ -630,7 +623,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Flags (BloxdFlags)
-> API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 v5 identifica las caras con una estructura de booleanos con nombre. La máscara de bits `blockFlags: u32` de v4 y sus 6 constantes `bloxdBlockFlag*` han desaparecido.
 
@@ -754,7 +746,6 @@ Las referencias restantes a las constantes `bloxdBlockFlag*` fallan el diagnóst
 ---
 
 ## Estructuras de entrada y salida
-> API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 Siete estructuras son legibles/escribibles por los paquetes. Abajo se listan todos los campos (los campos `#ifdef` son condicionales). La cabecera completa está en [Interior del motor](internals/engine-header.md).
 
@@ -1531,7 +1522,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Constantes
-> API objetivo: 5 · Estado: Analyzed (restaurado literalmente de la cabecera en vivo)
 
 La cabecera proporciona tres constantes (las constantes de nombre de textura `bloxdTextureId*` se tratan en [API de texturas](api/texture-api.md)).
 
@@ -1587,7 +1577,6 @@ Nota: `bloxdChunkSize` es `i32` — convierte con `f32(bloxdChunkSize)` al mezcl
 ---
 
 ## Preprocesador
-> API objetivo: 5 · Estado: Analyzed (restaurado del validador en vivo)
 
 La compilación condicional solo soporta `#define NAME` (sin valor) / `#ifdef` / `#ifndef` / `#else` / `#endif`. La `#` va al inicio de línea (dentro de funciones está bien). La coincidencia de nombres de flag no distingue mayúsculas; un nombre erróneo en `#ifdef` hace que el mensaje de error liste el conjunto oficial.
 
@@ -1669,7 +1658,6 @@ Ver [Estructuras](api/structures.md#campos-condicionales--macros).
 ---
 
 ## Restricciones y nombres reservados
-> API objetivo: 5 · Estado: Verified (límites de v4 reconfirmados byte a byte en v5)
 
 Qué pueden escribir los paquetes, y las reglas completas de reserva de nombres.
 
@@ -2907,13 +2895,10 @@ Material de «mecanismo y mentalidad». Qué es posible en primer lugar está en
 | [Combinación con texture packs](guides/combinations.md) | emparejamiento con paquetes de texturas |
 | [Consejos de depuración](guides/debugging.md) | diagnóstico de síntoma → causa |
 
-> API objetivo: 5
-
 
 ---
 
 ## Cómo funciona la iluminación
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 La iluminación por defecto del motor es "solo multiplicación" — no existen especular, fresnel, separación cálido/frío ni ambiente hemisférico. Lo siguiente se puede reconstruir:
 
@@ -3007,7 +2992,6 @@ Mandos: **área** = `shTh` (0.93→radio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 ---
 
 ## Hacer que el agua parezca natural
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 Esta API no puede muestrear color de escena, así que esto es **estilizado pseudo con mezcla de color fresnel e iluminaciones solares, no reflejo/refracción reales** (el cálculo de profundidad usa el `bloxdOpaqueBehind()` exclusivo de líquidos — la receta de absorción por grosor está más abajo en esta página). La muestra conserva el color base, mezcla un poco hacia un color cielo en ángulos rasantes y añade un pequeño destello solo cuando existe el sol.
 
@@ -3073,7 +3057,6 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 ---
 
 ## Diseñar looks nocturnos
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 Oscurecer solo sombras deja el color terminado (`engineColour`) brillante sin sol, y el salto cara/sombra se vuelve antinatural. Atenúa todo el color terminado.
 
@@ -3104,7 +3087,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Modelos y texturas
-> API objetivo: 5 · Estado: Analyzed (restaurado de la cabecera y el validador)
 
 Qué dibujan y qué leen los nuevos hooks de Model de v5.
 
@@ -3194,7 +3176,6 @@ Cómo se renderizan los modelos y cómo fluyen las entradas de flags/encantamien
 ---
 
 ## Qué pueden y qué no pueden hacer los paquetes de sombreadores
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 El techo de realismo de los paquetes de sombreadores en una página: hasta dónde llega la API actual, qué no puede hacer por principio, qué es condicional, por qué existen los límites y los sustitutos más cercanos. Valora aquí un look antes de construirlo.
 
@@ -3278,7 +3259,6 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 ---
 
 ## Rendimiento
-> API objetivo: 5 · Estado: Verified (práctica basada en mediciones)
 
 Los hooks del paquete corren en cada fragmento (todos los píxeles de terreno / líquido / modelo), así que las decisiones de estilo mueven la tasa de fotogramas de forma notable.
 
@@ -3325,7 +3305,6 @@ Los hooks del paquete corren en cada fragmento (todos los píxeles de terreno / 
 ---
 
 ## Lista de comprobación en juego
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 El éxito de compilación y el "buen aspecto" son cosas distintas. Revisa en este orden:
 
@@ -3349,7 +3328,6 @@ El éxito de compilación y el "buen aspecto" son cosas distintas. Revisa en est
 ---
 
 ## Combinación con texturas packs
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 Como los paquetes de sombreadores no pueden añadir ni muestrear texturas, no intentes resolver bultos finos de material o imágenes del cielo solo con sombreadores. El repositorio público de paquetes de texturas para Bloxd.io [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) maneja texturas, skybox, modelos, etc. por otra vía.
 
@@ -3363,7 +3341,6 @@ Los paquetes de texturas tienen su propia especificación (a título de referenc
 ---
 
 ## Consejos de depuración
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 - Cuevas muy claras → falta curva no lineal de `skyLight` (receta de cuevas R2 / R9.9)
 - Días quemados → baja la exposición pre-ACES
@@ -3399,13 +3376,10 @@ Ejemplos de código orientados a objetivo. El lado del «cómo funciona» vive e
 | [Sombreadores de modelo](recipes/model-shaders.md) | v5 — ítems en mano, pieles, vaivén de plantas |
 | [Efectos de encantamiento](recipes/enchant-effects.md) | v5 — quitar, reforzar y recolorear el brillo |
 
-> API objetivo: 5 · Estado: Verified (puertos a v5 de las recetas originales — verifica aún con compilación en el juego antes de distribuir)
-
 
 ---
 
 ## Colores
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ### Tinte único (lo más básico)
 
@@ -3486,7 +3460,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## Iluminación
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ### Curva S de contraste
 
@@ -3600,7 +3573,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Emisión
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > `emission` se suma tras el cálculo de iluminación, pero el proceso por defecto **lo atenúa con la cantidad de niebla (`fogAlpha`). En distancia totalmente anegada la emisión también desaparece. Para mantener brillo a lo lejos, no sumes a emission — suma directamente como `out.colour += ...` dentro del hook light** (la salida por defecto ya lleva niebla, así que a lo lejos la luz cae sobre el color de niebla)
 
@@ -3652,7 +3624,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Coordenadas
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ### Coordenadas de mundo
 
@@ -3707,7 +3678,6 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## Tiempo y animación
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > `bloxdSeconds()` se envuelve cada 3600 segundos (1 hora). Es tiempo transcurrido del sombreador sin garantía de sincronía con el día/noche del juego. Úsalo para animación periódica visual, pero prefiere `bloxdSunDirection()` y las entradas de iluminación para detectar la noche real.
 
@@ -3747,7 +3717,6 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## Líquidos
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ### Superficie rizada (parpadeo de color)
 
@@ -3809,7 +3778,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Vértices (solo allow)
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > Envuelve todo en `#ifndef BLOXD_STRICT`.
 > Para las condiciones exactas (la lista de títulos allow; Custom Games es estricto) ver [Política de shader packs por juego](internals/policy.md)
@@ -3875,7 +3843,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## Trucos matemáticos
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 ```wgsl
 // cuantización suave de 0..1 (n pasos)
@@ -3906,7 +3873,6 @@ let phase = t * 0.15;
 ---
 
 ## Realismo
-> API objetivo: 5 · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
 
 > Recetas físicas para "reconstruir el aspecto vainilla desde los materiales". Lee estas premisas primero:
 > 1. **El hook light se llama en la etapa final del fragmento**. Su color devuelto se convierte en el color final tal cual. **Debes reaplicar la niebla tú mismo** (R9.10)  
@@ -4207,7 +4173,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Sombreadores de modelo
-> API objetivo: 5 · Estado: Analyzed (escrito contra la especificación de cabecera v5)
 
 Recetas con los hooks de Model de v5 y los nuevos flags para selecciones de **«qué estoy mirando» que eran imposibles antes de v5**. Lo básico: [Modelos y texturas](guides/models.md).
 
@@ -4359,7 +4324,6 @@ El patrón de función compartida es el que la propia plantilla de paquete por d
 ---
 
 ## Efectos de encantamiento
-> API objetivo: 5 · Estado: Analyzed (restaurado de la cabecera en vivo)
 
 v5 abrió el pipeline de encantamiento tanto en entradas como en salidas. Recetas para controlar el brillo de los ítems y armaduras encantados conservando la matemática del motor.
 
@@ -4504,7 +4468,6 @@ Errores y problemas visuales, localizables **por síntoma**. Las páginas siguen
 | Lento / descartado por la comprobación en el dispositivo | [Rendimiento](troubleshooting/performance.md) |
 | Legal, seguridad, preguntas frecuentes | [FAQ](troubleshooting/faq.md) |
 
-> API objetivo: 5 · Estado: Verified (mensajes registrados literalmente del validador y el cargador en vivo)
 
 ### Dónde aparecen los errores
 
@@ -4581,7 +4544,6 @@ Los zips divididos, zip64, las entradas cifradas y la compresión no soportada s
 ---
 
 ## Errores de versión de API
-> API objetivo: 5 · Estado: Verified (literal del diccionario i18n en vivo)
 
 Errores en torno a `apiVersion`. El juego actual acepta **solo `5`**.
 
@@ -4912,7 +4874,6 @@ La resolución de nombres pliega mayúsculas y `_`, así que `bloxdTextureId_gra
 ### Los ids crudos se rompieron tras una actualización del juego
 
 - **Causa**: **los ids son instantáneas** — medido, 334 de 905 nombres supervivientes cambiaron de id entre dos builds
-- **Corrección**: escribe `bloxdTextureIdLava`, no `19` ([los nombres son la API](api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
 
 ### Relacionado
 
@@ -4976,7 +4937,6 @@ Problemas de brillo, sombra y niebla.
 ---
 
 ## Problemas de modelos
-> API objetivo: 5 · Estado: Analyzed (territorio nuevo de v5)
 
 Problemas en torno a los nuevos hooks de Model de v5.
 
@@ -5104,7 +5064,6 @@ El juego actual solo acepta `apiVersion: 5`; los paquetes antiguos se desactivan
 
 #### P. ¿Cambiará la API de nuevo?
 
-Las interioridades del motor pueden cambiar con las actualizaciones — cada página nombra su build objetivo. Los paquetes guardados se revalidan automáticamente cuando cambian la cabecera o el registro ([Compatibilidad](api/compatibility.md#revalidación-de-paquetes-guardados-necesita-revisión)).
 
 #### P. ¿Y las distribuciones de «shader cinematográfico»?
 
@@ -5114,7 +5073,6 @@ Una distribución comunitaria de «cinematic shader» que analizamos resultó se
 
 - Esta es una guía no oficial y no representa las opiniones de los desarrolladores. La API puede cambiar sin previo aviso
 - Creada con asistencia de IA; la exactitud no está garantizada. Verifícala contra el comportamiento real del juego
-- Los valores medidos (ids de textura etc.) son instantáneas de builds concretos y cambian entre builds ([los nombres son la API](api/texture-catalog.md#deriva-medida-cnty9--ab90qa))
 
 ### Relacionado
 
@@ -5536,7 +5494,6 @@ La validación estática (analizador, etapa 1 de la comprobación de carga). Cor
 
 ### La tabla de firmas de funciones especiales
 
-El validador mantiene una tabla en el módulo 29849 y comprueba las restricciones de llamada entre hooks:
 
 ```js
 const Jq = new Map([
@@ -5608,7 +5565,6 @@ La comprobación de tipos de la validación estática es incompleta, así que al
 
 ### Generación de stubs de validación
 
-El motor sintetiza stubs para el código que pasó la validación estática (restaurado del módulo 29866):
 
 - la tabla de stubs de tipos:
 
@@ -6469,7 +6425,6 @@ Las reglas de manifiesto en torno a `apiVersion` no cambian en lo demás y convi
 - `author` es opcional, pero si está debe ser una cadena — el `null` explícito se rechaza (`pack.json's "author" must be a string.`).
 - Todo lo demás del manifiesto lo ignora el cargador.
 ### 56. pack.json y el búfer uniform (lo que no cambia)
-Todo el modelo de paquetes sin texturas se traslada de v3 byte a byte, así que §41 de [la guía de migración v3](history/v3.md) sigue siendo la referencia. Las remediciones de v4, del chunk del cargador activo (c51):
 | Límite | Valor | Mensaje al superarlo |
 |---|---|---|
 | Archivos `.wgsl` por paquete | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6757,7 +6712,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ```
 Ambos hooks son solo surface/light, así que este paquete no necesita envoltorios `#ifndef BLOXD_STRICT` y corre (con sus nuevos efectos de texel) también en juegos estrictos. La guardia `textureId != 0u` cubre las caras sin textura; para el culling anti-X-ray de los juegos estrictos, los efectos de estilo además deberían degradarse con elegancia si una lectura de texel vuelve blanca pese a un id distinto de cero — ramifica por rangos y razones, nunca por un valor de texel esperado.
 ### 62. Otros cambios y notas de v4
-- **La reorganización del bundle** (números en la introducción) movió el pipeline de sombreadores a los chunks c49 (cargador/persistencia), c50–c51 (interfaz del cargador + zip), c53 (validador + cabecera + constructor del registro), c54 (generador de código WGSL + renderizador Lite). Para quien re-investigue el bundle tras una guía de la era v3: los anclajes se movieron todos, el código no.
 - **El texto de la cabecera se reescribió por claridad** — cada comentario de documentación redactado de nuevo (más terso, segunda persona), sin cambio semántico más allá de §59. Tamaño 5.637 → 6.021 bytes, 128 → 150 líneas; la primera línea es ahora `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **El orden de la emisión queda documentado en la cabecera**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — el hallazgo de §43 de v3, ahora redacción oficial.
 - **La superficie i18n** de la función de paquetes de sombreadores es de 58 claves (build v4); la familia del cargador (`load*`) se cita a lo largo de §55–§56, la familia de estado (`status*`) en §55, las etiquetas de variante en §60.1.
@@ -7154,4 +7108,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Solo se emiten las constantes de textura referenciadas.** El bloque `bloxdTextureId*` de la cabecera se genera por paquete a partir de los nombres que realmente referencias — un paquete que usa tres constantes recibe tres líneas `const` anteuestas, no las ~900 completas.
 - **`HEADER_VERSION` pasó a `9.<hash>.<hash>`** — misma estructura de dos sufijos que v4 (fnv1a32 del material de cabecera, fnv1a32 del registro ordenado nombre-id), con el entero inicial subido de 8 a 9. La lógica de recomprobación de paquetes guardados (§55 de [la guía de migración v4](history/v4.md)) no cambia: un cambio de cabecera/registro pasa los paquetes guardados a «necesita revisión».
 - **Superficie i18n**: la familia de claves de paquetes de sombreadores no cambia en forma (las claves `load*`, `status*` y de etiquetas de variante de la guía v4 §62 remedidas todas presentes; `loadNoWgsl`/`loadNotZip` siguen exactas).
-- **Disposición del bundle para re-investigadores**: cabecera c55 (sin cambios), cargador/persistencia c51–c53, validador + constructor del registro c55, codegen WebGPU c56, niebla c9, **plantilla del pack por defecto c116** (movida desde c124), los sitios de BLOXD_ALPHA c51/c52/c53/c55/c9. Nota de formato de chunks: cada chunk es ahora un módulo ES (`export const modules = {...}`) — c53 incluso lleva módulos tanto de c52 como de c53 — lo que importa si buscas texto en el bundle (un id de módulo como `1371` vive en el array disperso de módulos de *main*, no en ningún chunk).

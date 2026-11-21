@@ -102,7 +102,6 @@ URL 参数或 localStorage 中残留的渲染器覆盖项会让包拒绝启动 �
 ---
 
 ## 快速开始
-> 目标API: 5 · 状态: Verified
 
 五分钟做出你的第一个包。
 
@@ -161,7 +160,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 包结构
-> 目标API: 5 · 状态: Verified
 
 ### 分发格式
 
@@ -190,7 +188,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## pack.json (manifest)
-> 目标API: 5 · 状态: Verified
 
 `pack.json` 是包的 manifest — zip 根部恰好一个 JSON 对象。
 
@@ -229,7 +226,6 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 状态: Verified
 
 包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
 
@@ -358,7 +354,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 变体与守卫
-> 目标API: 5 · 状态: Analyzed
 
 ### 6 种变体
 
@@ -397,7 +392,6 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 验证
-> 目标API: 5 · 状态: Verified
 
 ### 三阶段加载检查
 
@@ -538,7 +532,6 @@ uniform 的最小绑定大小为 80 字节。组 3 的其他绑定是 Liquid 变
 ---
 
 ## 着色器钩子
-> 目标API: 5 · 状态: Verified
 
 包可以定义 **9 个钩子** — 3 个渲染目标 (程序) × 3 个管线阶段，全部可选 (未定义即用引擎默认)。
 
@@ -630,7 +623,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 标志 (BloxdFlags)
-> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 v5 以具名布尔结构体标识面。v4 的 `blockFlags: u32` 位掩码及其 6 个 `bloxdBlockFlag*` 常量已被移除。
 
@@ -754,7 +746,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 输入与输出结构体
-> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 包可读写的结构体共七个。每个字段都列在下面 (`#ifdef` 字段为条件存在)。完整标头见[引擎内部](internals/engine-header.md)。
 
@@ -1070,7 +1061,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ### 阴影函数
 
-\u0060API v5\u0060 构建把引擎真实的太阳/月亮阴影系统（方块、玩家、生物、物品投下的、随太阳移动的投影阴影）加进了包 API。这两个函数会被**注入每个包编译后的模块**（与 \u0060bloxdFragmentBlockPosition\u0060 一样），并记录在验证器的函数表里，但不属于可读头文本。
+`API v5` 提供引擎的太阳/月亮阴影系统：方块、玩家、生物和物品投下的投影阴影会随太阳移动。这两个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
 
 #### bloxdShadow
 
@@ -1536,7 +1527,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 常量
-> 目标API: 5 · 状态: Analyzed (从现行标头逐字复原)
 
 标头提供三个常量 (纹理名称常量 `bloxdTextureId*` 见[纹理 API](api/texture-api.md))。
 
@@ -1592,7 +1582,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 预处理器
-> 目标API: 5 · 状态: Analyzed (从现行验证器复原)
 
 条件编译只支持 `#define NAME` (不带值) / `#ifdef` / `#ifndef` / `#else` / `#endif`。`#` 须在行首 (函数体内也可以)。宏名匹配不区分大小写；`#ifdef` 的名称写错时，错误消息会列出官方集合。
 
@@ -1674,7 +1663,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 限制与保留名称
-> 目标API: 5 · 状态: Verified (v4 实测限制在 v5 上逐字节复验一致)
 
 包可以写什么，以及完整的名称保留规则。
 
@@ -2912,13 +2900,10 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [与纹理包组合](guides/combinations.md) | 与纹理包的搭配 |
 | [调试技巧](guides/debugging.md) | 症状 → 原因诊断 |
 
-> 目标API: 5
-
 
 ---
 
 ## 光照的机制
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 引擎默认光照只有「乘法」，不存在高光、菲涅尔、暖冷分离、半球环境光。以下为可重建范围：
 
@@ -3013,7 +2998,6 @@ let lit = sunL * sky;
 ---
 
 ## 让水看起来自然
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 本 API 采样不到场景色，因此**是以菲涅尔风颜色混合与太阳高光的拟似表现，而非真实的反射/折射** (深度计算使用液体限定的 `bloxdOpaqueBehind()`——厚度吸收配方在本页后文)。下例保留基色，掠角混入近空色，仅有太阳时加小闪光。
 
@@ -3079,7 +3063,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 夜间表现设计
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 只压暗阴影，太阳缺席时引擎完成色 (`engineColour`) 依然偏亮，面影落差会显得不自然。应对完成色整体施加衰减。
 
@@ -3110,7 +3093,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型与纹理
-> 目标API: 5 · 状态: Analyzed (从标头与验证器复原)
 
 v5 新的 Model 钩子绘制与读取什么。
 
@@ -3200,7 +3182,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 着色器包能做到什么、做不到什么
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 一页讲清着色器包的写实化天花板：当前 API 能到达哪里、原理上做不到什么、什么是有条件的、限制为何存在、以及最接近的替代手段。动手之前先在这里核对预想。
 
@@ -3284,7 +3265,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 性能
-> 目标API: 5 · 状态: Verified (基于实测的实践)
 
 包的钩子在每个片段 (地形 / 液体 / 模型的全部像素) 上运行，因此风格选择会显著左右帧率。
 
@@ -3331,7 +3311,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 实机测试清单
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 编译成功与「好看」是两回事。请按顺序确认：
 
@@ -3355,7 +3334,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 与纹理包的组合
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 着色器包不能添加或采样纹理，材质细微凹凸与天空图像不要只靠着色器解决。Bloxd.io 公开纹理包仓库 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 以另一方式处理纹理、天空盒、模型等。
 
@@ -3369,7 +3347,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 调试技巧
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 - 洞穴过亮 → `skyLight` 非线性曲线不足 (R2 洞穴配方 / R9.9)
 - 白天过曝 → 降低 ACES 前曝光
@@ -3405,13 +3382,10 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [模型着色器](recipes/model-shaders.md) | v5 — 手持物品、皮肤、植物摇摆 |
 | [附魔效果](recipes/enchant-effects.md) | v5 — 移除、增强、重着色闪光 |
 
-> 目标API: 5 · 状态: Verified (原始配方的 v5 移植 — 分发前仍建议以游戏内编译复核)
-
 
 ---
 
 ## 颜色
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 单色 tint (最基础)
 
@@ -3492,7 +3466,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 照明
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 对比 S 曲线
 
@@ -3606,7 +3579,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 发光
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `emission` 在光照计算后叠加，但默认处理会**按雾量 (`fogAlpha`) 衰减它。完全沉雾的远景发光也一并消失。远景也想发光的成分不要加到 emission，在 light 钩子内以 `out.colour += ...` 直接叠加** (默认输出已打雾，远景光落在雾色之上)
 
@@ -3658,7 +3630,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 坐标
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 世界坐标
 
@@ -3713,7 +3684,6 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 时间与动画
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > `bloxdSeconds()` 每 3600 秒 (1 小时) 回绕。但这是着色器流逝时间，不保证与游戏内太阳/昼夜同步。视觉周期动画可用，实际夜晚判定优先用 `bloxdSunDirection()` 与光照输入。
 
@@ -3753,7 +3723,6 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 液体
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ### 水面涟漪 (颜色明灭)
 
@@ -3815,7 +3784,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 顶点（仅 allow）
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 全部用 `#ifndef BLOXD_STRICT` 包裹。
 > 关于确切条件 (allow 标题一览；Custom Games 为 strict) 见[各游戏的着色器适用策略](internals/policy.md)
@@ -3881,7 +3849,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 数学小技巧
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 ```wgsl
 // 0..1 平滑分级 (n 级)
@@ -3912,7 +3879,6 @@ let phase = t * 0.15;
 ---
 
 ## 写实化
-> 目标API: 5 · 状态: Verified (已移植到当前API — 建议实机复核)
 
 > 「把原版外观从材质重新组装」的物理系配方集。先读前提：
 > 1. **light 钩子在片元最后阶段调用**。返回的 colour 原样成为最终颜色。**必须自行重打雾** (R9.10)  
@@ -4214,7 +4180,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型着色器配方
-> 目标API: 5 · 状态: Analyzed (依 v5 标头规格撰写)
 
 使用 v5 Model 钩子与新标志的配方，实现 **v5 之前不可能做到的「我看的是什么」选取**。基础: [模型与纹理](guides/models.md)。
 
@@ -4366,7 +4331,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 附魔效果
-> 目标API: 5 · 状态: Analyzed (从现行标头复原)
 
 v5 在输入与输出两端都开放了附魔管线。这些配方在保留引擎数学的前提下控制附魔物品与盔甲的闪光。
 
@@ -4511,7 +4475,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 卡顿 / 被实机检查弃用 | [性能](troubleshooting/performance.md) |
 | 法律、安全、常见问题 | [FAQ](troubleshooting/faq.md) |
 
-> 目标API: 5 · 状态: Verified (消息逐字采录自现行验证器与加载器)
 
 ### 错误出现在哪里
 
@@ -4588,7 +4551,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 版本错误
-> 目标API: 5 · 状态: Verified (逐字取自现行 i18n 字典)
 
 围绕 `apiVersion` 的错误。当前游戏**只接受 `5`**。
 
@@ -4919,7 +4881,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 游戏更新后裸 id 失效了
 
 - **原因**: **id 是快照** — 实测两个构建之间 905 个幸存名称中 334 个改了 id
-- **修复**: 写 `bloxdTextureIdLava`，而不是 `19` ([名称即 API](api/texture-catalog.md#实测漂移-cnty9--ab90qa))
 
 ### 相关
 
@@ -4983,7 +4944,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 模型问题
-> 目标API: 5 · 状态: Analyzed (v5 新领域)
 
 围绕 v5 新 Model 钩子的问题。
 
@@ -5111,7 +5071,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 #### 问: API 还会再变吗？
 
-引擎内部可能随更新变化 — 每页都标注目标构建。标头或注册表变化时，已保存的包会自动重验 ([兼容性](api/compatibility.md#已保存包的重验-需要重新检查))。
 
 #### 问: 那些「电影级着色器」分发物是怎么回事？
 
@@ -5121,7 +5080,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - 这是非官方指南，不代表开发者的观点。API 可能不加通知地变化
 - 借助 AI 协助编写，准确性不作保证。请以实际游戏行为为准验证
-- 实测值 (纹理 id 等) 是特定构建的快照，会随构建变化 ([名称即 API](api/texture-catalog.md#实测漂移-cnty9--ab90qa))
 
 ### 相关
 
@@ -6474,7 +6432,6 @@ v4 的变更集一屏速览:
 - `author` 可选，但若存在必须是字符串——显式 `null` 会被拒绝 (`pack.json's "author" must be a string.`)。
 - manifest 中的其余字段一律被加载器忽略。
 ### 56. pack.json 与 uniform 缓冲 (不变的部分)
-整个非纹理的包模型逐字节沿袭 v3，因此 [v3 迁移指南](history/v3.md) 的 §41 仍是参考。v4 的重新测量值，取自线上加载器 chunk (c51):
 | 限制 | 值 | 超限时的消息 |
 |---|---|---|
 | 每包 `.wgsl` 文件数 | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6762,7 +6719,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ```
 两个钩子都只用 surface/light，所以这个包不需要 `#ifndef BLOXD_STRICT` 包裹，(带着新的纹素效果) 在 strict 游戏中也能运行。`textureId != 0u` 守卫覆盖无纹理面；至于 strict 游戏的反 X-ray 剔除，样式效果还应优雅降级——当 id 非零而纹素读回白色时——按范围与比值分支，绝不按单个预期纹素值分支。
 ### 62. 其他 v4 变更与注意
-- **bundle 再编成** (数字见引言) 把着色器管线挪进了 c49 (加载器/持久化)、c50–c51 (加载器 UI + zip)、c53 (验证器 + 头文件 + 注册表构建器)、c54 (WGSL 代码生成器 + Lite 渲染器)。对想在 v3 时代指南之后再研究 bundle 的人: 锚点全动了，代码没动。
 - **头文件文本为清晰性重写**——每条文档注释重新措辞 (更简练、第二人称)，除 §59 外无语义变化。大小 5,637 → 6,021 字节，128 → 150 行；首行现在是 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission 的顺序现在写进了头文件**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` —— v3 §43 的发现，如今是官方措辞。
 - 着色器包功能的 **i18n 面**为 58 个键 (v4 构建)；加载器族 (`load*`) 引散见 §55–§56，状态族 (`status*`) 在 §55，变体标签在 §60.1。
@@ -7159,4 +7115,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **只生成被引用的纹理常量。** 头文件的 `bloxdTextureId*` 块按包生成，只含你实际引用的名字——用到三个常量的包前置三行 `const`，而不是全部约 900 行。
 - **`HEADER_VERSION` 移至 `9.<hash>.<hash>`** —— 与 v4 相同的双后缀结构 (头文件材料的 fnv1a32、排序后名称-id 注册表的 fnv1a32)，前导整数从 8 升到 9。已保存包的重检逻辑 ([v4 迁移指南](history/v4.md) §55) 不变: 头文件/注册表变化会把已保存包翻成「需要重检」。
 - **i18n 面**: 着色器包的键族形态不变 (v4 指南 §62 的 `load*`、`status*`、变体标签键全部重新测量在位；`loadNoWgsl`/`loadNotZip` 仍逐字一致)。
-- **给再研究者的 bundle 布局**: 头文件 c55 (不变)、加载器/持久化 c51–c53、验证器 + 注册表构建器 c55、WebGPU 代码生成 c56、雾 c9、**默认包模板 c116** (自 c124 移来)、BLOXD_ALPHA 位置 c51/c52/c53/c55/c9。chunk 格式注意: 每个 chunk 现在是 ES 模块 (`export const modules = {...}`)——c53 甚至同时携带 c52 与 c53 两边的模块——这对文本搜索 bundle 的人有影响 (形如 `1371` 的模块 id 位于 *main* 的稀疏模块数组里，不在任何 chunk 中)。

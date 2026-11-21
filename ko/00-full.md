@@ -102,7 +102,6 @@ URL 파라미터나 localStorage 에 남은 렌더러 오버라이드는 팩의 
 ---
 
 ## 퀵 스타트
-> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 5분 만에 첫 팩을 만든다.
 
@@ -161,7 +160,6 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## 팩 구조
-> 대상 API: 5 · 상태: Verified
 
 ### 배포 형식
 
@@ -190,7 +188,6 @@ zip 으로 묶는다 — [배포](getting-started/distribution.md) 를 보라.
 ---
 
 ## pack.json (매니페스트)
-> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 `pack.json` 은 팩의 매니페스트다 — zip 루트에 정확히 하나의 JSON 객체.
 
@@ -229,7 +226,6 @@ v1–v4 에서의 이주는 [버전 히스토리](history/) 를 보라.
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 팩은 **9개의 훅**에 끼어들 수 있다: 3개 렌더 대상 (Terrain / Liquid / Model) × 3개 파이프라인 단계 (Vertex / Surface / Light). 모두 선택 사항이다 — 정의하지 않은 훅은 엔진 기본값으로 폴백한다.
 
@@ -358,7 +354,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 베리언트와 가드
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed
 
 ### 6개 베리언트
 
@@ -397,7 +392,6 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 ---
 
 ## 검증
-> 대상 API: 5 · preprod 확인) · 상태: Verified
 
 ### 3단계 로드 검사
 
@@ -538,7 +532,6 @@ uniform의 최소 바인딩 크기는 80바이트입니다. 그룹 3의 다른 �
 ---
 
 ## 셰이더 훅
-> 대상 API: 5 · 상태: Verified
 
 팩은 **9개의 훅** — 3개의 렌더 대상 (프로그램) × 3개의 파이프라인 단계 — 을 정의할 수 있다. 모두 선택 사항이다 (정의하지 않으면 엔진 기본값).
 
@@ -630,7 +623,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 플래그 (BloxdFlags)
-> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 v5 는 면을 이름 붙은 bool 구조체로 식별한다. v4 의 `blockFlags: u32` 비트마스크와 그 6개 `bloxdBlockFlag*` 상수는 사라졌다.
 
@@ -754,7 +746,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 입출력 구조체
-> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 7개의 구조체를 팩이 읽고 쓸 수 있다. 모든 필드를 아래에 실었다 (`#ifdef` 필드는 조건부). 헤더 전문은 [엔진 내부와 연구](internals/engine-header.md) 에 있다.
 
@@ -1070,7 +1061,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ### 섀도 함수
 
-\u0060API v5\u0060 빌드는 엔진의 실제 태양/달 섀도 시스템(블록·플레이어·몹·아이템이 드리우는, 태양을 따라가는 투영 섀도)을 팩 API에 추가했습니다. 이 두 함수는 (\u0060bloxdFragmentBlockPosition\u0060처럼) **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+`API v5`는 엔진의 태양/달 그림자 시스템을 제공합니다. 블록·플레이어·몹·아이템이 드리우는 투영 그림자는 태양을 따라 움직입니다. 이 두 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
 
 #### bloxdShadow
 
@@ -1536,7 +1527,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 상수
-> 대상 API: 5 · 상태: Analyzed (라이브 헤더에서 그대로 복원)
 
 헤더는 세 개의 상수를 제공한다 (텍스처 이름 상수 `bloxdTextureId*` 는 [텍스처 API](api/texture-api.md) 에서 다룬다).
 
@@ -1592,7 +1582,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 전처리기
-> 대상 API: 5 · 상태: Analyzed (라이브 검증기에서 복원)
 
 조건부 컴파일이 지원하는 것은 `#define NAME` (값 없음) / `#ifdef` / `#ifndef` / `#else` / `#endif` 뿐이다. `#` 은 행 머리에 붙인다 (함수 안도 상관없다). 플래그명 대조는 대소문자를 구별하지 않으며, 틀린 `#ifdef` 이름을 쓰면 오류 메시지가 공식 목록을 보여준다.
 
@@ -1674,7 +1663,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 제한과 예약명
-> 대상 API: 5 · 상태: Verified (v4 제한을 v5 에서 바이트 동일로 재확인)
 
 팩이 쓸 수 있는 것과, 이름 예약 규칙의 전모.
 
@@ -2913,13 +2901,10 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 | [텍스처팩과의 조합](guides/combinations.md) | 텍스처팩과의 역할 분담 |
 | [디버깅 팁](guides/debugging.md) | 증상 → 원인의 진단 가이드 |
 
-> 대상 API: 5 · preprod 확인)
-
 
 ---
 
 ## 조명이 작동하는 방식
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 엔진 기존의 조명은 곱셈뿐이며, 스페큘러·프레넬·난색-냉색 분리·반구 환경광은 존재하지 않는다. 아래가 재구축 가능한 범위이다:
 
@@ -3014,7 +2999,6 @@ let lit = sunL * sky;
 ---
 
 ## 물을 자연스럽게 보이게 하기
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 이 API는 씬색을 샘플링할 수 없으므로, 이것은 **진짜 반사·굴절이 아니라 프레넬풍 색 블렌드와 태양 하이라이트에 의한 유사 스타일링**이다 (깊이 계산에는 액체 한정의 `bloxdOpaqueBehind()`를 쓴다 — 두께 흡수 레시피는 이 페이지의 뒷부분에). 아래 샘플은 베이스 색을 남기면서 얕은 시선 각도에서 하늘빛에 가까운 색을 조금 섞고, 태양이 있을 때만 작은 글린트를 더한다.
 
@@ -3080,7 +3064,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 야간 표현 설계
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 그림자만 어둡게 하면, 태양 없을 때 엔진 완성색 (`engineColour`) 이 밝은 채 남아, 면과 그림자의 차이가 부자연스러워질 수 있다. 그림자의 색조가 아니라 완성색 전체에 감쇠를 걸 필요가 있다.
 
@@ -3111,7 +3094,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델과 텍스처
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (헤더 · 검증기에서 복원)
 
 v5 의 새 Model 훅이 그리는 것과 읽는 것.
 
@@ -3201,7 +3183,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 셰이더 팩으로 가능한 것과 불가능한 것
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩의 리얼화 「천장」을 한 페이지에 정리한다: 현재 API가 어디까지 닿는지, 원리적으로 불가능한 것은 무엇인지, 조건부인 것은 무엇인지, 제한이 존재하는 이유, 그리고 가장 가까운 대체 수단. 만들기 시작하기 전에 여기서 구상한 표현이 실현 가능한지 확인한다.
 
@@ -3285,7 +3266,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 퍼포먼스
-> 대상 API: 5 · 상태: Verified (실측 기반 실천)
 
 팩의 훅은 모든 프래그먼트 (지형 / 액체 / 모델의 모든 픽셀) 에서 돌므로, 스타일 선택이 프레임 레이트를 크게 움직인다.
 
@@ -3332,7 +3312,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 게임 내 테스트 체크리스트
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 컴파일 성공과 「보기 좋다」는 별개다. 다음 순서로 확인한다.
 
@@ -3356,7 +3335,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 텍스처 팩과의 조합
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 셰이더 팩측에서 텍스처를 추가·샘플링할 수 없다는 제약이 있으므로, 소재 그 자체의 미세한 요철이나 하늘의 화상을 바꾸고 싶으면 셰이더만으로 해결하려 하지 않는다. Bloxd.io용 공개 텍스처팩 리포지토리 [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) 에는 텍스처, skybox, 모델 등을 다루는 별도 방식이 있다.
 
@@ -3370,7 +3348,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 디버깅 요령
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 - 동굴이 너무 밝다 → `skyLight` 의 비선형 커브가 부족하다 (R2 동굴 레시피 / R9.9)
 - 낮이 하얗게 날린다 → ACES 앞의 노출을 낮춘다
@@ -3406,13 +3383,10 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 | [모델 셰이더](recipes/model-shaders.md) | v5 — 손에 든 아이템, 스킨, 식물 흔들림 |
 | [인챈트 효과](recipes/enchant-effects.md) | v5 — 글린트 제거·증폭·재색 |
 
-> 대상 API: 5 · preprod 확인) · 상태: Verified (원본 레시피의 v5 이식 — 배포 전에는 게임 내 컴파일로 재확인할 것)
-
 
 ---
 
 ## 색
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 단색 틴트 (가장 기본)
 
@@ -3493,7 +3467,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## 조명
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 콘트라스트 S자 커브
 
@@ -3607,7 +3580,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 발광
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > `emission` 은 조명 계산 후에 가산되지만, 기존 처리에서는 **포그량 (`fogAlpha`) 이 곱해져 감쇠한다. 즉 완전히 안개에 잠긴 원경에서는 emission 도 사라진다. 원경에서도 빛나게 하고 싶은 성분은 emission 에 더하지 말고, light 훅 안에서 `out.colour += ...` 로 직접 가산한다** (기본 출력은 이미 포그된 상태이므로, 원경에서는 안개색 위에 빛이 얹힌다)
 
 ### 등불의 맥동 (횃불이 숨쉰다)
@@ -3658,7 +3630,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 좌표
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 월드 좌표
 
@@ -3713,7 +3684,6 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## 시간과 애니메이션
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > `bloxdSeconds()` 은 3600초 (1시간) 마다 감긴다. 셰이더 경과 시간이며 게임 안의 태양 · 낮밤과 동기된다는 보장은 없다. 겉보기 주기 애니메이션에는 쓸 수 있지만 실제 밤 판정에는 `bloxdSunDirection()` 이나 조명 입력을 우선한다.
 
 ### 낮밤 사이클 (1시간에 1일)
@@ -3752,7 +3722,6 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## 액체
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 ### 수면의 잔물결 (색의 명멸)
 
@@ -3814,7 +3783,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 버텍스 (allow 전용)
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 전부 `#ifndef BLOXD_STRICT` 로 감쌀 것.
 > 정확한 조건 (allow 타이틀 일람; Custom Games 는 strict) 은 [게임별 셰이더 팩 정책](internals/policy.md) 참조
 
@@ -3879,7 +3847,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## 수식 도구 상자
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 
 
 ```wgsl
@@ -3911,7 +3878,6 @@ let phase = t * 0.15;
 ---
 
 ## 리얼화
-> 대상 API: 5 · preprod 확인) · 상태: Verified (현재 API로 이식됨 — 실기기 재확인 권장)
 > 「바닐라의 겉모습을 소재에서 다시 짜는」 물리계 레시피집. 먼저 이 전제들을 읽을 것:
 > 1. **light 훅은 프래그먼트의 최종단에서 불린다**. 반환한 colour 가 그대로 최종색. **직접 포그를 다시 걸 필요가 있다** (R9.10)  
 > 2. **엔진 기존의 조명은 곱셈뿐**. 스페큘러 / 프레넬 / 난색-냉색 분리 / 반구 환경광은 제로에서 만든다  
@@ -4212,7 +4178,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 셰이더
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (v5 헤더 사양에 맞춰 작성)
 
 v5 Model 훅과 새 플래그로, **v5 이전에는 불가능했던 「지금 무엇을 보고 있는가」 선택**을 하는 레시피. 기초: [모델과 텍스처](guides/models.md).
 
@@ -4364,7 +4329,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## 인챈트 효과
-> 대상 API: 5 · preprod 확인) · 상태: Analyzed (라이브 헤더에서 복원)
 
 v5 는 인챈트 파이프라인을 입력과 출력 양쪽으로 열었다. 엔진의 수식을 보존하면서 인챈트 아이템과 방어구의 글린트를 제어하는 레시피.
 
@@ -4509,7 +4473,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 | 느림 / 실기기 검사에서 탈락 | [퍼포먼스](troubleshooting/performance.md) |
 | 법적·안전·자주 묻는 질문 | [FAQ](troubleshooting/faq.md) |
 
-> 대상 API: 5 · preprod 확인) · 상태: Verified (메시지는 라이브 검증기 · 로더에서 그대로 기록)
 
 ### 오류가 나타나는 곳
 
@@ -4586,7 +4549,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## API 버전 오류
-> 대상 API: 5 · preprod 확인) · 상태: Verified (라이브 i18n 사전에서 그대로)
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
@@ -4917,7 +4879,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ### 게임 업데이트 후 원시 id 가 깨졌다
 
 - **원인**: **id 는 스냅샷이다** — 실측으로, 두 빌드 사이에서 생존 이름 905 중 334개가 id 를 바꿨다
-- **해결**: `19` 이 아니라 `bloxdTextureIdLava` 를 쓴다 ([이름이 API](api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ### 관련 문서
 
@@ -4981,7 +4942,6 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ---
 
 ## 모델 문제
-> 대상 API: 5 · 상태: Analyzed (v5 의 새 영역)
 
 새로운 v5 Model 훅 관련 문제.
 
@@ -5109,7 +5069,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 #### Q. API 는 또 바뀌나?
 
-엔진 내부는 업데이트로 바뀔 수 있다 — 모든 페이지가 대상 빌드를 명시한다. 헤더나 레지스트리가 바뀌면 저장 팩은 자동 재검증된다 ([호환성](api/compatibility.md#저장-팩-재검증-재확인-필요)).
 
 #### Q. 「시네마틱 셰이더」 배포물은 뭔가?
 
@@ -5119,7 +5078,6 @@ WebGPU 지원 환경에서만이다 ([요구 사항](getting-started/requirement
 
 - 이것은 비공식 가이드이며 개발사의 견해를 대변하지 않는다. API 는 예고 없이 바뀔 수 있다
 - AI 지원으로 작성되었으며 정확성은 보장되지 않는다. 실제 게임 동작으로 검증하라
-- 실측값 (텍스처 id 등) 은 특정 빌드의 스냅샷이며 빌드마다 바뀐다 ([이름이 API](api/texture-catalog.md#실측-드리프트-cnty9--ab90qa))
 
 ### 관련 문서
 
@@ -6476,7 +6434,6 @@ v3에서의 변환은 기계적이다 (§61). 단 하나의 조용한 함정이 
 - `author`는 선택이지만, 있다면 문자열이어야 한다 — 명시적 `null`은 거부된다 (`pack.json's "author" must be a string.`).
 - manifest의 나머지는 전부 로더가 무시한다.
 ### 56. pack.json과 uniform 버퍼 (불변인 것)
-텍스처를 제외한 팩 모델 전체가 v3에서 바이트 단위로 이어지므로, [v3 마이그레이션 가이드](history/v3.md)의 §41이 여전히 레퍼런스다. v4 재측정값, 라이브 로더 청크 (c51)에서:
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
 | 팩당 `.wgsl` 파일 | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6764,7 +6721,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ```
 두 훅 모두 surface/light 뿐이므로, 이 팩은 `#ifndef BLOXD_STRICT` 랩이 필요 없고 (새 텍셀 효과와 함께) strict 게임에서도 돈다. `textureId != 0u` 가드가 텍스처 없는 면을 덮는다; strict 게임의 엑스레이 방지 컬링을 고려해, 스타일 효과는 0이 아닌 id인데도 텍셀 판독이 흰색으로 돌아오는 경우에도 우아하게 열화되어야 한다 — 범위와 비율로 분기하고, 기대한 텍셀 값 하나로 분기하지 말 것.
 ### 62. 그 외의 v4 변경과 메모
-- **번들 재구성** (숫자는 서두 참조) 은 셰이더 파이프라인을 청크 c49 (로더/지속화), c50–c51 (로더 UI + zip), c53 (검증기 + 헤더 + 레지스트리 빌더), c54 (WGSL 코드 제너레이터 + Lite 렌더러) 로 옮겼다. v3 시대 가이드를 기준으로 번들을 재조사하는 사람에게: 앵커는 전부 움직였지만, 코드는 그렇지 않다.
 - **헤더 텍스트가 명료성을 위해 다시 쓰였다** — 모든 문서 주석이 다듬어지고 (더 짧게, 2인칭), §59 외에는 의미 변화가 없다. 크기 5,637 → 6,021 바이트, 128 → 150 줄; 첫 줄은 이제 `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **emission 순서가 헤더에 공식 기록됐다**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — v3의 §43 발견이 공식 문구가 되었다.
 - **i18n 면**: 셰이더 팩 기능의 i18n 키는 58개 (v4 빌드); 로더 패밀리 (`load*`) 는 §55–§56에, 상태 패밀리 (`status*`) 는 §55에, 배리언트 라벨은 §60.1에 인용돼 있다.
@@ -7161,4 +7117,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **참조된 텍스처 상수만 출력된다.** 헤더의 `bloxdTextureId*` 블록은 실제로 참조한 이름으로 팩마다 생성된다 — 상수 3개를 쓰는 팩에는 3줄의 `const`가 앞에 붙고, 약 900줄 전체가 아니라.
 - **`HEADER_VERSION`가 `9.<hash>.<hash>`로 이동** — v4와 같은 이중 접미사 구조 (헤더 재료의 fnv1a32, 정렬된 이름-id 레지스트리의 fnv1a32), 선행 정수만 8에서 9로. 저장 팩 재검사 논리 ([v4 마이그레이션 가이드](history/v4.md)의 §55) 는 불변: 헤더/레지스트리가 바뀌면 저장 팩이 「재확인 필요」로 넘어간다.
 - **i18n 면**: 셰이더 팩 키 패밀리는 형태가 불변 (v4 가이드 §62의 `load*`, `status*`, 배리언트 라벨 키가 모두 재측정되어 존재; `loadNoWgsl`/`loadNotZip`도 여전히 그대로).
-- **재조사하는 사람을 위한 번들 레이아웃**: 헤더 c55 (불변), 로더/지속화 c51–c53, 검증기 + 레지스트리 빌더 c55, WebGPU 코드젠 c56, 포그 c9, **기본 팩 템플릿 c116** (c124에서 이동), BLOXD_ALPHA 발생지 c51/c52/c53/c55/c9. 청크 형식 메모: 이제 모든 청크가 ES 모듈이다 (`export const modules = {...}`) — c53에는 c52와 c53 양쪽의 모듈까지 들어 있다 — 번들을 텍스트 검색할 때 중요하다 (`1371` 같은 모듈 id는 어떤 청크도 아닌 *main*의 희소 모듈 배열에 산다).

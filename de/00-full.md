@@ -102,7 +102,6 @@ In URL-Parametern oder localStorage zurückgebliebene Renderer-Overrides lassen 
 ---
 
 ## Quick Start
-> Ziel-API: 5 · Status: Verified
 
 Dein erstes Paket in fünf Minuten.
 
@@ -161,7 +160,6 @@ Als Zip packen — siehe [Vertrieb](getting-started/distribution.md).
 ---
 
 ## Pack-Struktur
-> Ziel-API: 5 · Status: Verified
 
 ### Vertriebsformat
 
@@ -190,7 +188,6 @@ Eine Zip, die alles unter einem gemeinsamen Wurzelordner ablegt, bekommt dieses 
 ---
 
 ## pack.json (Manifest)
-> Ziel-API: 5 · Status: Verified
 
 `pack.json` ist das Paket-Manifest — exakt ein JSON-Objekt im Zip-Root.
 
@@ -229,7 +226,6 @@ Für die Migration von v1–v4 siehe [Versionsgeschichte](history/).
 ---
 
 ## Shader-Hooks
-> Ziel-API: 5 · Status: Verified
 
 Ein Paket kann **9 Hooks** einhängen: 3 Render-Ziele (Terrain / Liquid / Model) × 3 Pipeline-Stufen (Vertex / Surface / Light). Alle sind optional — ein undefinierter Hook fällt auf den Engine-Standard zurück.
 
@@ -358,7 +354,6 @@ Welche Felder jeder Hook lesen und schreiben kann, steht in [Strukturen](api/str
 ---
 
 ## Varianten und Guards
-> Ziel-API: 5 · Status: Analyzed
 
 ### 6 Varianten
 
@@ -397,7 +392,6 @@ Zu den Interna der Policy je Spiel siehe [Engine-Interna: Policy](internals/poli
 ---
 
 ## Validierung
-> Ziel-API: 5 · Status: Verified
 
 ### Die 3-stufige Ladeprüfung
 
@@ -538,7 +532,6 @@ Die minimale Uniform-Binding-Größe beträgt 80 Byte. Die übrigen Bindings in 
 ---
 
 ## Shader-Hooks
-> Ziel-API: 5 · Status: Verified
 
 Pakete können **9 Hooks** definieren — 3 Render-Ziele (Programme) × 3 Pipeline-Stufen, alle optional (undefiniert bedeutet Engine-Standard).
 
@@ -630,7 +623,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Flags (BloxdFlags)
-> Ziel-API: 5 · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 identifiziert Flächen über eine benannte Boolean-Struktur. Die v4-Bitmaske `blockFlags: u32` und ihre 6 `bloxdBlockFlag*`-Konstanten sind weg.
 
@@ -754,7 +746,6 @@ Verbleibende Referenzen auf die `bloxdBlockFlag*`-Konstanten scheitern an der Re
 ---
 
 ## Ein- & Ausgabe-Strukturen
-> Ziel-API: 5 · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Sieben Strukturen sind für Pakete les-/schreibbar. Jedes Feld ist unten aufgelistet (`#ifdef`-Felder sind bedingt). Der vollständige Header steht in [Engine-Interna](internals/engine-header.md).
 
@@ -1070,7 +1061,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ### Schattenfunktionen
 
-Der Build API v5 hat der Pack-API das echte Sonnen-/Mondschattensystem der Engine hinzugefügt — projizierte, sonnenfolgende Schatten, geworfen von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+API v5 stellt das Sonnen-/Mondschattensystem der Engine bereit: projizierte, sonnenfolgende Schatten von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 #### bloxdShadow
 
@@ -1531,7 +1522,6 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ---
 
 ## Konstanten
-> Ziel-API: 5 · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 Der Header stellt drei Konstanten bereit (Textur-Namenskonstanten `bloxdTextureId*` stehen in der [Textur-API](api/texture-api.md)).
 
@@ -1587,7 +1577,6 @@ Hinweis: `bloxdChunkSize` ist `i32` — beim Mischen mit Floats per `f32(bloxdCh
 ---
 
 ## Präprozessor
-> Ziel-API: 5 · Status: Analyzed (aus dem Live-Validator restauriert)
 
 Die bedingte Kompilierung unterstützt nur `#define NAME` (ohne Wert) / `#ifdef` / `#ifndef` / `#else` / `#endif`. Die `#` steht am Zeilenanfang (auch innerhalb von Funktionen ist das zulässig). Das Abgleichen der Flag-Namen ist case-insensitive; ein falscher `#ifdef`-Name lässt die Fehlermeldung die offizielle Menge auflisten.
 
@@ -1669,7 +1658,6 @@ Siehe [Strukturen](api/structures.md#bedingte-felder--makros).
 ---
 
 ## Einschränkungen & reservierte Namen
-> Ziel-API: 5 · Status: Verified (v4-Grenzen auf v5 byte-identisch erneut bestätigt)
 
 Was Pakete schreiben dürfen — und die vollständigen Regeln der Namensreservierung.
 
@@ -2907,13 +2895,10 @@ Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht 
 | [Kombination mit Texturpacks](guides/combinations.md) | Zusammenspiel mit Texturpacks |
 | [Debugging-Tipps](guides/debugging.md) | Diagnose Symptom → Ursache |
 
-> Ziel-API: 5
-
 
 ---
 
 ## Wie das Lighting funktioniert
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, Warm-Kalt-Trennung oder Hemisphären-Ambiente existiert. Folgendes lässt sich neu aufbauen:
 
@@ -3007,7 +2992,6 @@ Regler: **Fläche** = `shTh` (0.93→Radius 1.5 / 0.87→2 / 0.80→3 / 0.67→5
 ---
 
 ## Wasser natürlich aussehen lassen
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Diese API kann die Szenenfarbe nicht sampeln: Es ist **Pseudo-Rendering per Fresnel-Farbmischung und Sonnen-Highlights, keine echte Reflexion/Refraktion** (die Tiefenberechnung nutzt das liquid-exklusive `bloxdOpaqueBehind()` — das Rezept für Dickenabsorption steht weiter unten auf dieser Seite). Das Sample behält die Basisfarbe, mischt bei streifenden Blickwinkeln etwas Richtung Himmelsfarbe und addiert nur mit Sonne einen kleinen Glint.
 
@@ -3073,7 +3057,6 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 ---
 
 ## Nacht-Looks gestalten
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Nur Schatten abzudunkeln lässt die fertige Farbe (`engineColour`) ohne Sonne hell, und die Flächen/Schatten-Lücke wird unnatürlich. Die ganze fertige Farbe dämpfen.
 
@@ -3104,7 +3087,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Modelle und Texturen
-> Ziel-API: 5 · Status: Analyzed (aus Header & Validator restauriert)
 
 Was die neuen v5-Model-Hooks zeichnen und lesen.
 
@@ -3194,7 +3176,6 @@ Wie Modelle rendern und wie Flags-/Enchant-Eingaben fließen: [Engine-Interna: M
 ---
 
 ## Was Shader-Pakete können und was nicht
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Die Realismus-Decke der Shader-Pakete auf einer Seite: Was die aktuelle API erreicht, was grundlegend nicht, was bedingt ist, warum die Grenzen existieren und welche Ersatzansätze am nächsten kommen. Vor dem Bauen eines Looks hier scopen.
 
@@ -3278,7 +3259,6 @@ Praktische Punkte: Pakete wirken auch unter Wasser weiter / der Schleier ist nic
 ---
 
 ## Performance
-> Ziel-API: 5 · Status: Verified (messbasierte Praxis)
 
 Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model), deshalb bewegen Stilentscheidungen die Framerate deutlich.
 
@@ -3325,7 +3305,6 @@ Paket-Hooks laufen auf jedem Fragment (alle Pixel von Terrain / Liquid / Model),
 ---
 
 ## Checkliste für Tests im Spiel
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihenfolge prüfen:
 
@@ -3349,7 +3328,6 @@ Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihen
 ---
 
 ## Kombination mit Texturpacks
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 Da Pakete keine Texturen hinzufügen oder sampeln können, keine feinen Material-Bumps oder Himmelsbilder per Shader allein lösen wollen. Das öffentliche Texturpaket-Repo für Bloxd.io [Bloxdy/texture-packs](https://github.com/Bloxdy/texture-packs) behandelt Texturen, Skybox, Modelle etc. auf anderem Weg.
 
@@ -3363,7 +3341,6 @@ Texturpakete haben ihre eigene Spezifikation (als Referenz): Das Größenlimit l
 ---
 
 ## Debugging-Tipps
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 - Zu helle Höhlen → nichtlineare `skyLight`-Kurve fehlt (Höhlenrezept R2 / R9.9)
 - Ausgebrannte Tage → Pre-ACES-Belichtung senken
@@ -3399,13 +3376,10 @@ Zielgerichtete Codebeispiele. Die „wie es funktioniert“-Seite lebt in den [L
 | [Modell-Shader](recipes/model-shaders.md) | v5 — gehaltene Items, Skins, Pflanzen-Wiegen |
 | [Enchant-Effekte](recipes/enchant-effects.md) | v5 — Glint entfernen, verstärken, umfärben |
 
-> Ziel-API: 5 · Status: Verified (v5-Ports der Original-Rezepte — vor dem Vertrieb trotzdem per In-Game-Kompilierung verifizieren)
-
 
 ---
 
 ## Farben
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Einzelfarbton (am grundlegendsten)
 
@@ -3486,7 +3460,6 @@ fn pack_posterize(c: vec3f, steps: f32) -> vec3f {
 ---
 
 ## Beleuchtung
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Kontrast-S-Kurve
 
@@ -3600,7 +3573,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Emission
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > `emission` wird nach der Lichtberechnung addiert, aber die Standardverarbeitung **dämpft es mit der Fog-Menge (`fogAlpha`). In völlig vernebelter Ferne verschwindet Emission ebenfalls. Um Glanz in der Ferne zu behalten, nicht auf emission addieren — direkt als `out.colour += ...` im Light-Hook addieren** (der Standard-Output ist bereits gefoggt, also landet Licht in der Ferne auf der Fog-Farbe)
 
@@ -3652,7 +3624,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Koordinaten
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Weltkoordinaten
 
@@ -3707,7 +3678,6 @@ let fresnel = pow(1.0 - facing, 3.0);
 ---
 
 ## Zeit & Animation
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > `bloxdSeconds()` wrappt alle 3600 Sekunden (1 Stunde). Es ist Shader-Laufzeit ohne garantierte Synchronisation mit Tag/Nacht im Spiel. Für sichtbare periodische Animation ok, aber für echte Nachterkennung `bloxdSunDirection()` und Licht-Inputs bevorzugen.
 
@@ -3747,7 +3717,6 @@ fn pack_auroraColour(x: f32, t: f32) -> vec3f {
 ---
 
 ## Flüssigkeiten
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ### Gekräuselte Oberfläche (Farbschimmer)
 
@@ -3809,7 +3778,6 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Vertices (nur allow)
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > Alles in `#ifndef BLOXD_STRICT` einpacken.
 > Zu den genauen Bedingungen (Liste der allow-Titel; Custom Games ist strict) siehe [Shader-Pack-Richtlinien je Spiel](internals/policy.md)
@@ -3875,7 +3843,6 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## Mathe-Tricks
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 ```wgsl
 // weiche Quantisierung von 0..1 (n Stufen)
@@ -3906,7 +3873,6 @@ let phase = t * 0.15;
 ---
 
 ## Realismus
-> Ziel-API: 5 · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
 > Physik-Rezepte zum „Vanilla-Look aus Materialien neu aufbauen". Erst diese Prämissen lesen:
 > 1. **Der Light-Hook läuft in der letzten Fragment-Stufe**. Seine zurückgegebene Farbe wird unverändert zur Endfarbe. **Fog selbst neu anwenden** (R9.10)  
@@ -4207,7 +4173,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ---
 
 ## Modell-Shader
-> Ziel-API: 5 · Status: Analyzed (gegen die v5-Header-Spezifikation geschrieben)
 
 Rezepte mit den v5-Model-Hooks und neuen Flags für **„Worauf schaue ich gerade“-Auswahlen, die vor v5 unmöglich waren**. Grundlagen: [Modelle und Texturen](guides/models.md).
 
@@ -4359,7 +4324,6 @@ Das Muster der geteilten Funktion ist es, das die Standard-Pack-Vorlage selbst e
 ---
 
 ## Enchant-Effekte
-> Ziel-API: 5 · Status: Analyzed (wortwörtlich aus dem Live-Header restauriert)
 
 v5 hat die Enchant-Pipeline für Ein- und Ausgaben geöffnet. Rezepte, um den Glint verzauberter Items und Rüstung zu steuern und dabei die Mathematik der Engine zu bewahren.
 
@@ -4504,7 +4468,6 @@ Fehler und visuelle Probleme, **nach Symptom** auffindbar. Die Seiten folgen der
 | Langsam / von der Geräte-Prüfung rausgeworfen | [Performance](troubleshooting/performance.md) |
 | Rechtliches, Sicherheit, häufige Fragen | [FAQ](troubleshooting/faq.md) |
 
-> Ziel-API: 5 · Status: Verified (Meldungen wortwörtlich aus dem Live-Validator & Loader aufgezeichnet)
 
 ### Wo Fehler erscheinen
 
@@ -4581,7 +4544,6 @@ Split-Zips, zip64, verschlüsselte Einträge und nicht unterstützte Kompression
 ---
 
 ## API-Versionsfehler
-> Ziel-API: 5 · Status: Verified (wortwörtlich aus dem Live-i18n-Wörterbuch)
 
 Fehler rund um `apiVersion`. Das aktuelle Spiel akzeptiert **nur `5`**.
 
@@ -4912,7 +4874,6 @@ Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top
 ### Roh-ids brachen nach einem Spiel-Update
 
 - **Ursache**: **ids sind Momentaufnahmen** — gemessen änderten 334 von 905 überlebenden Namen die id zwischen zwei Builds
-- **Fix**: `bloxdTextureIdLava` schreiben, nicht `19` ([Namen sind die API](api/texture-catalog.md#gemessener-drift-cnty9--ab90qa))
 
 ### Verwandte Seiten
 
@@ -4976,7 +4937,6 @@ Helligkeits-, Schatten- und Fog-Probleme.
 ---
 
 ## Modell-Probleme
-> Ziel-API: 5 · Status: Analyzed (neues v5-Territorium)
 
 Probleme rund um die neuen v5-Model-Hooks.
 
@@ -5104,7 +5064,6 @@ Das aktuelle Spiel akzeptiert nur `apiVersion: 5`; ältere Pakete werden still d
 
 #### F. Ändert sich die API nochmal?
 
-Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](api/compatibility.md#re-validierung-gespeicherter-pakete-muss-erneut-geprüft-werden)).
 
 #### F. Was ist mit „Cinematic-Shader“-Distributionen?
 
@@ -5114,7 +5073,6 @@ Eine von uns analysierte Community-„Cinematic-Shader“-Distribution entpuppte
 
 - Dies ist ein inoffizielles Handbuch und vertritt nicht die Sicht der Entwickler. Die API kann sich ohne Ankündigung ändern
 - Mit KI-Unterstützung erstellt; Genauigkeit wird nicht garantiert. Am tatsächlichen In-Game-Verhalten verifizieren
-- Messwerte (Textur-ids etc.) sind Momentaufnahmen spezifischer Builds und ändern sich zwischen Builds ([Namen sind die API](api/texture-catalog.md#gemessener-drift-cnty9--ab90qa))
 
 ### Verwandte Seiten
 
@@ -5537,7 +5495,6 @@ Die statische Validierung (Analyzer, Stufe 1 der Ladeprüfung). Nutzerseitige Fi
 
 ### Die Signaturentabelle der Spezialfunktionen
 
-Der Validator hält eine Tabelle in Modul 29849 und prüft hook-übergreifende Aufrufbeschränkungen:
 
 ```js
 const Jq = new Map([
@@ -5609,7 +5566,6 @@ Das Typ-Prüfen der statischen Validierung ist unvollständig, deshalb tauchen m
 
 ### Validierungs-Stub-Generierung
 
-Die Engine synthetisiert Stubs für Code, der die statische Validierung bestanden hat (aus Modul 29866 restauriert):
 
 - die Typ-Stub-Tabelle:
 
@@ -6474,7 +6430,6 @@ Die Manifest-Regeln rund um `apiVersion` sind sonst unverändert und verdienen d
 - `author` ist optional, aber falls vorhanden ein String — explizites `null` wird abgelehnt (`pack.json's "author" must be a string.`).
 - Alles andere im Manifest ignoriert der Loader.
 ### 56. pack.json und der Uniform-Buffer (was unverändert bleibt)
-Das gesamte Nicht-Textur-Paketmodell wird von v3 Byte für Byte übernommen, daher bleibt §41 des [v3-Migrationsleitfadens](history/v3.md) die Referenz. Die v4-Nachmessungen, aus dem Live-Loader-Chunk (c51):
 | Limit | Wert | Meldung bei Überschreitung |
 |---|---|---|
 | `.wgsl`-Dateien pro Paket | 256 | `The pack has more than 256 .wgsl files.` |
@@ -6762,7 +6717,6 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 ```
 Beide Hooks sind reine Surface-/Light-Hooks, dieses Paket braucht also keine `#ifndef BLOXD_STRICT`-Wrapper und läuft (mit seinen neuen Texel-Effekten) auch in Strict-Spielen. Der `textureId != 0u`-Guard deckt untexturierte Flächen ab; für das Anti-X-Ray-Culling der Strict-Spiele sollten Stil-Effekte außerdem sauber degradieren, wenn eine Texel-Lesung trotz nicht-null id weiß zurückkommt — auf Bereiche und Verhältnisse verzweigen, nie auf einen erwarteten einzelnen Texel-Wert.
 ### 62. Weitere v4-Änderungen und Notizen
-- **Die Bundle-Reorg** (Zahlen in der Einleitung) verlegte die Shader-Pipeline in die Chunks c49 (Loader/Persistenz), c50–c51 (Loader-UI + Zip), c53 (Validator + Header + Registry-Builder), c54 (WGSL-Code-Generator + Lite-Renderer). Für jeden, der das Bundle nach einem Leitfaden der v3-Ära neu untersucht: Die Anker sind alle gewandert, der Code nicht.
 - **Der Header-Text wurde für Klarheit neu geschrieben** — jeder Doc-Kommentar neu formuliert (knapper, zweite Person), keine semantische Änderung jenseits von §59. Größe 5.637 → 6.021 Byte, 128 → 150 Zeilen; die erste Zeile ist jetzt `// The Bloxd shader pack API, apiVersion 4. Read-only, prepended to all packs.`
 - **Die Emissions-Reihenfolge ist jetzt im Header dokumentiert**: `emission: vec3f, // Emissive RGB output, added after lighting, before fog.` — die Erkenntnis aus v3s §43, jetzt offizielle Formulierung.
 - **Die i18n-Oberfläche** des Shader-Pack-Features umfasst 58 Keys (v4-Build); die Loader-Familie (`load*`) ist über §55–§56 zitiert, die Status-Familie (`status*`) in §55, die Varianten-Labels in §60.1.
@@ -7159,4 +7113,3 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Nur referenzierte Textur-Konstanten werden emittiert.** Der `bloxdTextureId*`-Block des Headers wird pro Paket aus den Namen generiert, die du tatsächlich referenzierst — ein Paket mit drei Konstanten bekommt drei `const`-Zeilen vorangestellt, nicht die vollen ~900.
 - **`HEADER_VERSION` zog auf `9.<hash>.<hash>`** — dieselbe Zwei-Suffix-Struktur wie v4 (fnv1a32 des Header-Materials, fnv1a32 der sortierten Name-id-Registry), mit der führenden Ganzzahl von 8 auf 9 erhöht. Die Stored-Pack-Recheck-Logik (§55 des [v4-Migrationsleitfadens](history/v4.md)) ist unverändert: Eine Header-/Registry-Änderung kippt gespeicherte Pakete auf „muss erneut geprüft werden“.
 - **i18n-Oberfläche**: die Shader-Pack-Key-Familie ist in der Form unverändert (die `load*`-, `status*`- und Varianten-Label-Keys aus §62 des v4-Leitfadens alle nachgemessen vorhanden; `loadNoWgsl`/`loadNotZip` weiterhin exakt).
-- **Bundle-Layout für Nachuntersucher**: Header c55 (unverändert), Loader/Persistenz c51–c53, Validator + Registry-Builder c55, WebGPU-Codegen c56, Fog c9, **Standard-Pack-Vorlage c116** (aus c124 verschoben), die BLOXD_ALPHA-Stellen c51/c52/c53/c55/c9. Chunk-Format-Notiz: Jeder Chunk ist jetzt ein ES-Modul (`export const modules = {...}`) — c53 trägt sogar Module für c52 und c53 —, was zählt, wenn du das Bundle per Textsuche untersuchst (eine Modul-id wie `1371` lebt im Sparse-Module-Array von *main*, in keinem Chunk).
