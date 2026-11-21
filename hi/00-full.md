@@ -1821,1200 +1821,1110 @@ fn bloxdTerrainVertex(v: BloxdVertexIn) -> BloxdVertex {
 ---
 
 ## टेक्सचर कैटलॉग
-> लक्ष्य API: 5 · स्थिति: Verified (इंजन के अपने रजिस्ट्री बिल्डर को दोबारा चलाकर निकाला गया)
-
-प्रयोग-योग्य टेक्सचर-नाम स्थिरांकों (`bloxdTextureId*`) का पूरा कैटलॉग। **1,017 नाम**, वर्णनिक्रम में।
-
-**फ़ोल्डिंग स्थिति (`bbb6l5`, 2026-11-20):** `v98qt8` ले आई एनीमेशन-स्थिरांक प्रतिगमन **ठीक हो गया** — एनीमेटेड-टेक्सचर तालिका फिर से स्लॉट-इंडेक्स है, इसलिए नीचे के एनीमेशन-परिवार आधार नाम (`lava`, सभी `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, …) अब सामान्य रूप से सत्यापन पास करते हैं; सैंपल करने पर वर्तमान फ़्रेम मिलता है। नीचे लाइव बिल्ड पर पुनर्मापित फ़ोल्डेड (अभिप्रेत) दृश्य है।
 
 ### कैसे पढ़ें
 
-**नाम** कॉलम रजिस्ट्री का नाम है — वह हैंडल जो आप वास्तव में लिखते हैं। स्थिरांक की स्पेलिंग फ़ाइल नाम का CamelCase रूप है: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`। **केस और अंडरस्कोर का भेद नहीं किया जाता** (`bloxdTextureId_grass_top` वैसे ही रिज़ॉल्व होता है जैसे `bloxdTextureIdGrassTop`)। नाम ही API हैं — लोडर लोड के समय इन्हें लाइव रजिस्ट्री के मुकाबले दोबारा रिज़ॉल्व करता है, इसलिए नाम रजिस्ट्री के ड्रिफ़्ट से बच निकलते हैं ([टेक्सचर API](api/texture-api.md))।
-
-**id** कॉलम वह मान है जिससे स्थिरांक की तुलना होती है — `bbb6l5` पर मापा गया (एटलस लेयर + 1)। इसे `surface.textureId` डंप्स को डिकोड करने और डिबग आउटपुट को उस दिन के बिल्ड से मिलाने के लिए उपयोग करें। **WGSL में कभी id न लिखें** — वे एक बिल्ड के एटलस क्रम का स्नैपशॉट हैं (नीचे ड्रिफ़्ट माप देखें)।
+**नाम** कॉलम में उपयोग किया जाने वाला टेक्सचर नाम है। उदाहरण के लिए, `grass_top` को `bloxdTextureIdGrassTop` के रूप में संदर्भित करें। बड़े/छोटे अक्षर और underscore में अंतर नहीं किया जाता।
 
 **टिप्पणियाँ** कॉलम दो फ़ोल्डिंग परिवारों को चिह्नित करता है। "anim (N फ़्रेम)" का अर्थ है कि इस नाम को सैंपल करने पर मौजूदा एनीमेशन फ़्रेम अपने आप लौट आता है — **फ़्रेम सफ़िक्स कभी न लिखें** (`lava0` एक ज्ञात उपनाम है जिसके लिए समर्पित डायग्नोस्टिक मिलता है)। "रोटेशन परिवार (4 प्रतियाँ)" का अर्थ है कि टेक्सचर केवल पहले से घुमाई हुई स्लॉटों के रूप में मौजूद है — नाम मूल की ओर इशारा करता है और `bloxdTexel` रोटेशन दोबारा लगाता है। ठीक एक नाम (`radar_screen`) दोनों टिप्पणियाँ ले चलता है।
 
-1,650 लेयर वाली एटलस तालिका इंजन का आंतरिक डेटा है। इसकी संरचना और मापन-विधि [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](internals/texture-registry.md) में दी गई है।
-
-#### ये संख्याएँ आपस में कैसे जुड़ती हैं
-
-ये संख्याएँ अलग-अलग समुच्चयों को नाम देती हैं, इसलिए इनका सीधा-सादा योग नहीं बैठता:
-
-| संख्या | यह क्या गिनती है |
-|---|---|
-| **1,017** | प्रयोग-योग्य नामित स्थिरांक — टेक्सचर नाम जिन्हें आप `bloxdTextureId*` के रूप में लिख सकते हैं |
-| **776** | उपनाम नाम (520 फ़्रेम + 256 रोटेशन) — पहचानी जाने वाली स्पेलिंग जो *अस्वीकृत* होकर मूल नाम की ओर राह दिखाती हैं; वे नाम हैं, स्थिरांक नहीं, और कोई id नहीं जोड़तीं |
-| **1,650** | एटलस प्रविष्टियाँ — टेक्सचर एटलस के असली स्लॉट (ids 1–1650) |
-
-`bbb6l5` रजिस्ट्री में 1,017 उपयोग-योग्य नाम हैं, जो `v98qt8` से 111 अधिक हैं। टेक्सचर ID बिल्ड के बीच बदल सकती हैं, इसलिए नामित स्थिरांक उपयोग करें और WGSL में संख्यात्मक ID को सीधे न लिखें।
-
 ### कैटलॉग
 
-कैटलॉग में सभी 1,017 उपयोग-योग्य नाम वर्णक्रम में दिए गए हैं। id कॉलम में `bbb6l5` पर मापे गए मान हैं। बिल्ड के बीच ID बदल सकती हैं, इसलिए WGSL में टेक्सचर को नाम से संदर्भित करें।
+| नाम | टिप्पणियाँ |
+| --- | --- |
+| `alloy_kiln_back` |  |
+| `alloy_kiln_front` |  |
+| `alloy_kiln_side` |  |
+| `alloy_kiln_side_running` | anim (8 frames) |
+| `alloy_kiln_top` | rotation family (4 copies) |
+| `andesite_brick` |  |
+| `apple_block_bottom` |  |
+| `apple_block_side` |  |
+| `apple_block_top` |  |
+| `armour_lucky_block` |  |
+| `armour_lucky_block_rare` |  |
+| `armour_lucky_block_super` |  |
+| `ash` |  |
+| `atomic_bench_side` |  |
+| `atomic_bench_top` |  |
+| `atomic_bomb_side` |  |
+| `atomic_bomb_top` |  |
+| `atomic_spire` |  |
+| `auto_bench_back` |  |
+| `auto_bench_front` |  |
+| `auto_bench_side` |  |
+| `auto_bench_side_running` | anim (8 frames) |
+| `auto_bench_top` | rotation family (4 copies) |
+| `autocrafter_bottom` |  |
+| `autocrafter_lunite_bottom` |  |
+| `autocrafter_lunite_side` |  |
+| `autocrafter_side` |  |
+| `banana_block_side` |  |
+| `banana_block_top` |  |
+| `battery_casing` |  |
+| `battery_cell` |  |
+| `battery_cell_bottom` |  |
+| `battery_cell_running` | anim (8 frames) |
+| `battery_cell_top` |  |
+| `battery_controller_front` |  |
+| `battery_controller_front_running` | anim (8 frames) |
+| `beacon` |  |
+| `bedrock` |  |
+| `beetroot_block_bottom` |  |
+| `beetroot_block_side` |  |
+| `beetroot_block_top` |  |
+| `belt_drop_side` |  |
+| `belt_drop_top` |  |
+| `belt_lift_side` |  |
+| `belt_lift_top` |  |
+| `belt_loader_slab_front` |  |
+| `belt_loader_top` |  |
+| `belt_tunnel_back` |  |
+| `belt_tunnel_exit_top` | rotation family (4 copies) |
+| `belt_tunnel_mouth` |  |
+| `belt_tunnel_side` |  |
+| `belt_tunnel_top` | rotation family (4 copies) |
+| `black_concrete` |  |
+| `black_glazed_terracotta` | rotation family (4 copies) |
+| `black_planks` |  |
+| `black_portal` | anim (4 frames) |
+| `black_spawn_block_side` |  |
+| `black_spawn_block_top` | rotation family (4 copies) |
+| `block_destroyer_tnt_side` |  |
+| `block_destroyer_tnt_top` |  |
+| `blue_concrete` |  |
+| `blue_gen_spawn_coal` |  |
+| `blue_gen_spawn_iron` |  |
+| `blue_gen_spawn_top` |  |
+| `blue_glazed_terracotta` | rotation family (4 copies) |
+| `blue_lucky_block` |  |
+| `blue_lucky_block_rare` |  |
+| `blue_lucky_block_super` |  |
+| `blue_planks` |  |
+| `blue_portal` | anim (4 frames) |
+| `blue_spawn_block_side` |  |
+| `blue_spawn_block_top` | rotation family (4 copies) |
+| `bone_block_side` |  |
+| `bone_block_top` |  |
+| `bookshelf` |  |
+| `bookshelf_1` |  |
+| `bookshelf_2` |  |
+| `bookshelf_3` |  |
+| `bookshelf_4` |  |
+| `bookshelf_5` |  |
+| `bookshelf_empty` |  |
+| `bouncy_bomb_block` |  |
+| `bowling_alley_floor` |  |
+| `bread_block_back` |  |
+| `bread_block_front` |  |
+| `bread_block_side` |  |
+| `bread_block_top` |  |
+| `brick` |  |
+| `brown_concrete` |  |
+| `brown_glazed_terracotta` | rotation family (4 copies) |
+| `brown_mushroom_block` |  |
+| `brown_planks` |  |
+| `brown_portal` | anim (4 frames) |
+| `brown_spawn_block_side` |  |
+| `brown_spawn_block_top` | rotation family (4 copies) |
+| `building_lucky_block` |  |
+| `building_lucky_block_rare` |  |
+| `building_lucky_block_super` |  |
+| `burner_drill_back` |  |
+| `burner_drill_bottom` |  |
+| `burner_drill_front` |  |
+| `burner_drill_side` |  |
+| `burner_drill_side_running` | anim (8 frames) |
+| `burner_drill_top` | rotation family (4 copies) |
+| `cactus_dry` |  |
+| `cactus_top` |  |
+| `carrot_block_bottom` |  |
+| `carrot_block_side` |  |
+| `carrot_block_top` |  |
+| `carved_messy_stone` |  |
+| `carved_pumpkin` |  |
+| `centrifuge_back` |  |
+| `centrifuge_back_running` | anim (8 frames) |
+| `centrifuge_bottom` |  |
+| `centrifuge_side` |  |
+| `centrifuge_side_flip` |  |
+| `centrifuge_side_flip_running` | anim (8 frames) |
+| `centrifuge_side_running` | anim (8 frames) |
+| `centrifuge_top` | rotation family (4 copies) |
+| `chalk` |  |
+| `chalk_black` |  |
+| `chalk_blue` |  |
+| `chalk_bricks_black` |  |
+| `chalk_bricks_blue` |  |
+| `chalk_bricks_brown` |  |
+| `chalk_bricks_cyan` |  |
+| `chalk_bricks_gray` |  |
+| `chalk_bricks_green` |  |
+| `chalk_bricks_light_blue` |  |
+| `chalk_bricks_light_gray` |  |
+| `chalk_bricks_lime` |  |
+| `chalk_bricks_magenta` |  |
+| `chalk_bricks_orange` |  |
+| `chalk_bricks_pink` |  |
+| `chalk_bricks_purple` |  |
+| `chalk_bricks_red` |  |
+| `chalk_bricks_slab_side_black` |  |
+| `chalk_bricks_slab_side_blue` |  |
+| `chalk_bricks_slab_side_brown` |  |
+| `chalk_bricks_slab_side_cyan` |  |
+| `chalk_bricks_slab_side_gray` |  |
+| `chalk_bricks_slab_side_green` |  |
+| `chalk_bricks_slab_side_light_blue` |  |
+| `chalk_bricks_slab_side_light_gray` |  |
+| `chalk_bricks_slab_side_lime` |  |
+| `chalk_bricks_slab_side_magenta` |  |
+| `chalk_bricks_slab_side_orange` |  |
+| `chalk_bricks_slab_side_pink` |  |
+| `chalk_bricks_slab_side_purple` |  |
+| `chalk_bricks_slab_side_red` |  |
+| `chalk_bricks_slab_side_white` |  |
+| `chalk_bricks_slab_side_yellow` |  |
+| `chalk_bricks_white` |  |
+| `chalk_bricks_yellow` |  |
+| `chalk_brown` |  |
+| `chalk_cyan` |  |
+| `chalk_gray` |  |
+| `chalk_green` |  |
+| `chalk_light_blue` |  |
+| `chalk_light_gray` |  |
+| `chalk_lime` |  |
+| `chalk_magenta` |  |
+| `chalk_orange` |  |
+| `chalk_pink` |  |
+| `chalk_purple` |  |
+| `chalk_red` |  |
+| `chalk_white` |  |
+| `chalk_yellow` |  |
+| `charge_vault_side` |  |
+| `charge_vault_top` |  |
+| `charging_pad_side` |  |
+| `charging_pad_top` |  |
+| `checkpoint_block` | rotation family (4 copies) |
+| `cherry_block_bottom` |  |
+| `cherry_block_side` |  |
+| `cherry_block_top` |  |
+| `chest_back` |  |
+| `chest_double_back_hi` |  |
+| `chest_double_back_lo` |  |
+| `chest_double_front_hi` |  |
+| `chest_double_front_lo` |  |
+| `chest_double_top_1_hi` |  |
+| `chest_double_top_1_lo` |  |
+| `chest_double_top_2_hi` |  |
+| `chest_double_top_2_lo` |  |
+| `chest_front` |  |
+| `chest_side` |  |
+| `chest_top` | rotation family (4 copies) |
+| `chili_pepper_block_bottom` |  |
+| `chili_pepper_block_side` |  |
+| `chili_pepper_block_top` |  |
+| `chiseled_red_sandstone` |  |
+| `chiseled_sandstone` |  |
+| `clay` |  |
+| `coal_block` |  |
+| `coal_deposit` |  |
+| `coal_ore` |  |
+| `coarse_dirt` |  |
+| `coconut_block_bottom` |  |
+| `coconut_block_side` |  |
+| `coconut_block_top` |  |
+| `code_block` |  |
+| `collider_bottom` |  |
+| `collider_side_off` |  |
+| `collider_side_running` | anim (32 frames) |
+| `collider_top` | rotation family (4 copies) |
+| `comet_heart` |  |
+| `comet_ore` |  |
+| `compressed_messy_stone` |  |
+| `condenser_back` |  |
+| `condenser_back_running` | anim (8 frames) |
+| `condenser_bottom` |  |
+| `condenser_side` |  |
+| `condenser_side_flip` |  |
+| `condenser_side_flip_running` | anim (8 frames) |
+| `condenser_side_running` | anim (8 frames) |
+| `condenser_top` | rotation family (4 copies) |
+| `conveyor_belt_bottom` |  |
+| `conveyor_belt_slab_side` |  |
+| `conveyor_belt_top` |  |
+| `conveyor_belt_turn_left` |  |
+| `conveyor_belt_turn_right` |  |
+| `coolant_channel` | anim (8 frames) |
+| `coolant_mixer_back` |  |
+| `coolant_mixer_back_running` | anim (8 frames) |
+| `coolant_mixer_bottom` |  |
+| `coolant_mixer_side` |  |
+| `coolant_mixer_side_flip` |  |
+| `coolant_mixer_side_flip_running` | anim (8 frames) |
+| `coolant_mixer_side_running` | anim (8 frames) |
+| `coolant_mixer_top` | rotation family (4 copies) |
+| `copper_block` |  |
+| `copper_deposit` |  |
+| `copper_ore` |  |
+| `corn_block_bottom` |  |
+| `corn_block_side` |  |
+| `corn_block_top` |  |
+| `crafting_table_top` |  |
+| `crate` |  |
+| `crop_harvester_back` |  |
+| `crop_harvester_back_running` | anim (4 frames) |
+| `crop_harvester_front` |  |
+| `crop_harvester_side` |  |
+| `crop_harvester_side_running` | anim (4 frames) |
+| `crop_harvester_top` | rotation family (4 copies) |
+| `crusher_back` |  |
+| `crusher_front` |  |
+| `crusher_side` |  |
+| `crusher_side_running` | anim (4 frames) |
+| `crusher_top` | rotation family (4 copies) |
+| `crystal_block` |  |
+| `crystal_vat_back` |  |
+| `crystal_vat_front` |  |
+| `crystal_vat_side` |  |
+| `crystal_vat_side_running` | anim (8 frames) |
+| `crystal_vat_top` | rotation family (4 copies) |
+| `custom_lobby_block_side` |  |
+| `custom_lobby_block_top` | rotation family (4 copies) |
+| `cut_red_sandstone` |  |
+| `cut_sandstone` |  |
+| `cyan_concrete` |  |
+| `cyan_gen_spawn_coal` |  |
+| `cyan_gen_spawn_iron` |  |
+| `cyan_gen_spawn_top` |  |
+| `cyan_glazed_terracotta` | rotation family (4 copies) |
+| `cyan_planks` |  |
+| `cyan_portal` | anim (4 frames) |
+| `cyan_spawn_block_side` |  |
+| `cyan_spawn_block_top` | rotation family (4 copies) |
+| `dark_green_bricks` |  |
+| `darkstone` |  |
+| `darkstone_bricks` |  |
+| `darkstone_bricks_cracked` |  |
+| `darkstone_bricks_lava` |  |
+| `darkstone_engraved` |  |
+| `darkstone_smooth` |  |
+| `deep_drill_back` |  |
+| `deep_drill_bottom` |  |
+| `deep_drill_front` |  |
+| `deep_drill_side` |  |
+| `deep_drill_side_running` | anim (8 frames) |
+| `deep_drill_top` | rotation family (4 copies) |
+| `dense_silo_side` |  |
+| `dense_silo_top` |  |
+| `diamond_block` |  |
+| `diamond_gen_spawn_side` |  |
+| `diamond_gen_spawn_top` |  |
+| `diamond_ore` |  |
+| `diorite_brick` |  |
+| `dirt` |  |
+| `drop_location_block_side` |  |
+| `drop_location_block_top` |  |
+| `drop_pad` |  |
+| `dry_grass_block` |  |
+| `dry_grass_block_side` |  |
+| `electric_drill_back` |  |
+| `electric_drill_bottom` |  |
+| `electric_drill_front` |  |
+| `electric_drill_side` |  |
+| `electric_drill_side_running` | anim (8 frames) |
+| `electric_drill_top` | rotation family (4 copies) |
+| `emerald_block` |  |
+| `emerald_ore` |  |
+| `end_stone` |  |
+| `engraved_andesite` |  |
+| `engraved_diorite` |  |
+| `engraved_granite` |  |
+| `evil_lucky_block` |  |
+| `evil_lucky_block_face` |  |
+| `explosive_paint_black_side` |  |
+| `explosive_paint_black_top` |  |
+| `explosive_paint_blue_side` |  |
+| `explosive_paint_blue_top` |  |
+| `explosive_paint_brown_side` |  |
+| `explosive_paint_brown_top` |  |
+| `explosive_paint_cyan_side` |  |
+| `explosive_paint_cyan_top` |  |
+| `explosive_paint_gray_side` |  |
+| `explosive_paint_gray_top` |  |
+| `explosive_paint_green_side` |  |
+| `explosive_paint_green_top` |  |
+| `explosive_paint_light_blue_side` |  |
+| `explosive_paint_light_blue_top` |  |
+| `explosive_paint_light_gray_side` |  |
+| `explosive_paint_light_gray_top` |  |
+| `explosive_paint_lime_side` |  |
+| `explosive_paint_lime_top` |  |
+| `explosive_paint_magenta_side` |  |
+| `explosive_paint_magenta_top` |  |
+| `explosive_paint_orange_side` |  |
+| `explosive_paint_orange_top` |  |
+| `explosive_paint_pink_side` |  |
+| `explosive_paint_pink_top` |  |
+| `explosive_paint_purple_side` |  |
+| `explosive_paint_purple_top` |  |
+| `explosive_paint_quick_black` |  |
+| `explosive_paint_quick_blue` |  |
+| `explosive_paint_quick_brown` |  |
+| `explosive_paint_quick_cyan` |  |
+| `explosive_paint_quick_gray` |  |
+| `explosive_paint_quick_green` |  |
+| `explosive_paint_quick_light_blue` |  |
+| `explosive_paint_quick_light_gray` |  |
+| `explosive_paint_quick_lime` |  |
+| `explosive_paint_quick_magenta` |  |
+| `explosive_paint_quick_orange` |  |
+| `explosive_paint_quick_pink` |  |
+| `explosive_paint_quick_purple` |  |
+| `explosive_paint_quick_red` |  |
+| `explosive_paint_quick_white` |  |
+| `explosive_paint_quick_yellow` |  |
+| `explosive_paint_red_side` |  |
+| `explosive_paint_red_top` |  |
+| `explosive_paint_seeking_black` |  |
+| `explosive_paint_seeking_blue` |  |
+| `explosive_paint_seeking_brown` |  |
+| `explosive_paint_seeking_cyan` |  |
+| `explosive_paint_seeking_gray` |  |
+| `explosive_paint_seeking_green` |  |
+| `explosive_paint_seeking_light_blue` |  |
+| `explosive_paint_seeking_light_gray` |  |
+| `explosive_paint_seeking_lime` |  |
+| `explosive_paint_seeking_magenta` |  |
+| `explosive_paint_seeking_orange` |  |
+| `explosive_paint_seeking_pink` |  |
+| `explosive_paint_seeking_purple` |  |
+| `explosive_paint_seeking_red` |  |
+| `explosive_paint_seeking_white` |  |
+| `explosive_paint_seeking_yellow` |  |
+| `explosive_paint_sticky_black` |  |
+| `explosive_paint_sticky_blue` |  |
+| `explosive_paint_sticky_brown` |  |
+| `explosive_paint_sticky_cyan` |  |
+| `explosive_paint_sticky_gray` |  |
+| `explosive_paint_sticky_green` |  |
+| `explosive_paint_sticky_light_blue` |  |
+| `explosive_paint_sticky_light_gray` |  |
+| `explosive_paint_sticky_lime` |  |
+| `explosive_paint_sticky_magenta` |  |
+| `explosive_paint_sticky_orange` |  |
+| `explosive_paint_sticky_pink` |  |
+| `explosive_paint_sticky_purple` |  |
+| `explosive_paint_sticky_red` |  |
+| `explosive_paint_sticky_white` |  |
+| `explosive_paint_sticky_yellow` |  |
+| `explosive_paint_white_side` |  |
+| `explosive_paint_white_top` |  |
+| `explosive_paint_yellow_side` |  |
+| `explosive_paint_yellow_top` |  |
+| `express_belt_slab_side` |  |
+| `express_belt_top` |  |
+| `express_belt_turn_left` |  |
+| `express_belt_turn_right` |  |
+| `extra_compressed_messy_stone` |  |
+| `fallen_cherry_leaves_side` |  |
+| `fallen_maple_leaves_side` |  |
+| `farmland` |  |
+| `fast_belt_slab_side` |  |
+| `fast_belt_top` |  |
+| `fast_belt_turn_left` |  |
+| `fast_belt_turn_right` |  |
+| `fast_loader_slab_front` |  |
+| `fast_loader_top` |  |
+| `fertilised_soil` |  |
+| `finish_block` |  |
+| `fireball_block` |  |
+| `fluid_tank` |  |
+| `fluid_tank_fill1` | anim (8 frames) |
+| `fluid_tank_fill2` | anim (8 frames) |
+| `fluid_tank_fill3` | anim (8 frames) |
+| `fluid_tank_fill4` | anim (8 frames) |
+| `food_lucky_block` |  |
+| `food_lucky_block_rare` |  |
+| `food_lucky_block_super` |  |
+| `forge_hopper_top` |  |
+| `fuel_port` |  |
+| `fuel_rod` | anim (8 frames) |
+| `generator_side` |  |
+| `generator_side_running` | anim (8 frames) |
+| `generator_top` |  |
+| `ghost_chest_back` |  |
+| `ghost_chest_front` |  |
+| `ghost_chest_side` |  |
+| `ghost_chest_top` |  |
+| `ghost_lucky_block` |  |
+| `ghost_mystery_block` |  |
+| `glass` |  |
+| `glass_black` |  |
+| `glass_blue` |  |
+| `glass_brown` |  |
+| `glass_cyan` |  |
+| `glass_gray` |  |
+| `glass_green` |  |
+| `glass_light_blue` |  |
+| `glass_light_gray` |  |
+| `glass_lime` |  |
+| `glass_magenta` |  |
+| `glass_orange` |  |
+| `glass_pink` |  |
+| `glass_purple` |  |
+| `glass_red` |  |
+| `glass_silver` |  |
+| `glass_white` |  |
+| `glass_yellow` |  |
+| `glow_lamp` |  |
+| `glowstone` |  |
+| `gold_block` |  |
+| `gold_deposit` |  |
+| `gold_ore` |  |
+| `granite_brick` |  |
+| `graphite` |  |
+| `graphite_block` |  |
+| `grass_block_side` |  |
+| `grass_top` |  |
+| `gravel` |  |
+| `gray_concrete` |  |
+| `gray_gen_spawn_coal` |  |
+| `gray_gen_spawn_iron` |  |
+| `gray_gen_spawn_top` |  |
+| `gray_glazed_terracotta` | rotation family (4 copies) |
+| `gray_planks` |  |
+| `gray_portal` | anim (4 frames) |
+| `gray_spawn_block_side` |  |
+| `gray_spawn_block_top` | rotation family (4 copies) |
+| `green_bricks` |  |
+| `green_concrete` |  |
+| `green_glazed_terracotta` | rotation family (4 copies) |
+| `green_lucky_block` |  |
+| `green_lucky_block_rare` |  |
+| `green_lucky_block_super` |  |
+| `green_planks` |  |
+| `green_portal` | anim (4 frames) |
+| `green_spawn_block_side` |  |
+| `green_spawn_block_top` | rotation family (4 copies) |
+| `green_stone` |  |
+| `grenade_block` |  |
+| `grey_portal` | anim (4 frames) |
+| `gun_lucky_block` |  |
+| `hardened_clay` |  |
+| `hardened_clay_stained_black` |  |
+| `hardened_clay_stained_blue` |  |
+| `hardened_clay_stained_brown` |  |
+| `hardened_clay_stained_cyan` |  |
+| `hardened_clay_stained_gray` |  |
+| `hardened_clay_stained_green` |  |
+| `hardened_clay_stained_light_blue` |  |
+| `hardened_clay_stained_lime` |  |
+| `hardened_clay_stained_magenta` |  |
+| `hardened_clay_stained_orange` |  |
+| `hardened_clay_stained_pink` |  |
+| `hardened_clay_stained_purple` |  |
+| `hardened_clay_stained_red` |  |
+| `hardened_clay_stained_silver` |  |
+| `hardened_clay_stained_white` |  |
+| `hardened_clay_stained_yellow` |  |
+| `harvester_bottom` |  |
+| `harvester_lunite_bottom` |  |
+| `harvester_lunite_side_0` |  |
+| `harvester_lunite_side_1` |  |
+| `harvester_lunite_top` |  |
+| `harvester_side0` |  |
+| `harvester_side1` |  |
+| `harvester_top` |  |
+| `hay_block_side` |  |
+| `hay_block_top` |  |
+| `homestead_core` |  |
+| `homestead_core_cap` |  |
+| `homestead_core_crown` |  |
+| `homestead_core_mid` | anim (8 frames) |
+| `hyper_compressed_messy_stone` |  |
+| `ice` |  |
+| `ice_brick` |  |
+| `iceball_block` |  |
+| `invisible_solid` |  |
+| `iron_block` |  |
+| `iron_chest_back` |  |
+| `iron_chest_front` |  |
+| `iron_chest_side` |  |
+| `iron_chest_top` | rotation family (4 copies) |
+| `iron_deposit` |  |
+| `iron_ore` |  |
+| `iron_watermelon_side` |  |
+| `iron_watermelon_top` |  |
+| `isotope_comet_heart` |  |
+| `isotope_comet_ore` |  |
+| `jetpack_back` |  |
+| `jungle_grass_block` |  |
+| `jungle_grass_block_side` |  |
+| `lapis_block` |  |
+| `lapis_ore` |  |
+| `laser_back` |  |
+| `laser_front` |  |
+| `laser_side` |  |
+| `lava` | anim (16 frames) |
+| `leather_block_side` |  |
+| `leather_block_top` |  |
+| `leaves_aspen` |  |
+| `leaves_aspen_autumn` |  |
+| `leaves_cedar` |  |
+| `leaves_cherry` |  |
+| `leaves_cherry_fruity` |  |
+| `leaves_jungle` |  |
+| `leaves_mango` |  |
+| `leaves_mango_fruity` |  |
+| `leaves_maple` |  |
+| `leaves_maple_autumn` |  |
+| `leaves_maple_fruity` |  |
+| `leaves_palm` |  |
+| `leaves_palm_fruity` |  |
+| `leaves_pear` |  |
+| `leaves_pear_fruity` |  |
+| `leaves_pine` |  |
+| `leaves_pine_cone` |  |
+| `leaves_plum` |  |
+| `leaves_plum_fruity` |  |
+| `leaves_spectral` |  |
+| `light_blue_concrete` |  |
+| `light_blue_glazed_terracotta` | rotation family (4 copies) |
+| `light_blue_lucky_block` |  |
+| `light_blue_planks` |  |
+| `light_blue_spawn_block_side` |  |
+| `light_blue_spawn_block_top` | rotation family (4 copies) |
+| `light_gray_concrete` |  |
+| `light_gray_glazed_terracotta` | rotation family (4 copies) |
+| `light_gray_planks` |  |
+| `light_gray_spawn_block_side` |  |
+| `light_gray_spawn_block_top` | rotation family (4 copies) |
+| `lightblue_portal` | anim (4 frames) |
+| `lightgray_portal` | anim (4 frames) |
+| `lime_concrete` |  |
+| `lime_gen_spawn_coal` |  |
+| `lime_gen_spawn_iron` |  |
+| `lime_gen_spawn_top` |  |
+| `lime_glazed_terracotta` | rotation family (4 copies) |
+| `lime_planks` |  |
+| `lime_portal` | anim (4 frames) |
+| `lime_spawn_block_side` |  |
+| `lime_spawn_block_top` | rotation family (4 copies) |
+| `log_ancient_maple` |  |
+| `log_aspen` |  |
+| `log_cedar` |  |
+| `log_cherry` |  |
+| `log_jungle` |  |
+| `log_mango` |  |
+| `log_maple` |  |
+| `log_palm` |  |
+| `log_pear` |  |
+| `log_pine` |  |
+| `log_plum` |  |
+| `log_spectral` |  |
+| `lucky_block_pink_question` |  |
+| `lucky_block_pink_question_rare` |  |
+| `lucky_block_pink_question_super` |  |
+| `lunite_block` |  |
+| `lunite_ore` |  |
+| `machine_bench_side` |  |
+| `machine_bench_top` |  |
+| `machine_side` |  |
+| `magenta_concrete` |  |
+| `magenta_glazed_terracotta` | rotation family (4 copies) |
+| `magenta_planks` |  |
+| `magenta_portal` | anim (4 frames) |
+| `magenta_spawn_block_side` |  |
+| `magenta_spawn_block_top` | rotation family (4 copies) |
+| `magma` |  |
+| `mailbox_front` |  |
+| `mailbox_front_full` |  |
+| `mailbox_side` |  |
+| `mango_block_bottom` |  |
+| `mango_block_side` |  |
+| `mango_block_top` |  |
+| `mega_compressed_messy_stone` |  |
+| `melon_side` |  |
+| `melon_top` |  |
+| `melting_ice` |  |
+| `messy_stone` |  |
+| `mob_farm_back` |  |
+| `mob_farm_front` |  |
+| `mob_farm_side` |  |
+| `mob_farm_side_running` | anim (8 frames) |
+| `mob_farm_top` | rotation family (4 copies) |
+| `mob_spawner_block_empty_side` |  |
+| `mob_spawner_block_top` |  |
+| `mob_spawner_hostile_block_side` |  |
+| `mob_spawner_neutral_block_side` |  |
+| `mob_spawner_passive_block_side` |  |
+| `moonstone_block` |  |
+| `moonstone_chest_back` |  |
+| `moonstone_chest_front` |  |
+| `moonstone_chest_side` |  |
+| `moonstone_chest_top` | rotation family (4 copies) |
+| `moonstone_explosive_side` |  |
+| `moonstone_explosive_top` |  |
+| `moonstone_gen_spawn_side` |  |
+| `moonstone_gen_spawn_top` |  |
+| `moonstone_ore` |  |
+| `mossy_cobblestone` |  |
+| `mushroom_stem` |  |
+| `mystery_block` |  |
+| `neon_black` |  |
+| `neon_blue` |  |
+| `neon_brown` |  |
+| `neon_cyan` |  |
+| `neon_gray` |  |
+| `neon_green` |  |
+| `neon_light_blue` |  |
+| `neon_light_gray` |  |
+| `neon_lime` |  |
+| `neon_magenta` |  |
+| `neon_orange` |  |
+| `neon_pink` |  |
+| `neon_purple` |  |
+| `neon_red` |  |
+| `neon_white` |  |
+| `neon_yellow` |  |
+| `nether_brick` |  |
+| `netherrack` |  |
+| `nova_bomb_side` |  |
+| `nova_bomb_top` |  |
+| `obby_absorb_block` |  |
+| `obby_absorb_death_block` |  |
+| `obby_death_block` |  |
+| `obsidian` |  |
+| `orange_concrete` |  |
+| `orange_glazed_terracotta` | rotation family (4 copies) |
+| `orange_lucky_block` |  |
+| `orange_lucky_block_rare` |  |
+| `orange_lucky_block_super` |  |
+| `orange_planks` |  |
+| `orange_portal` | anim (4 frames) |
+| `orange_spawn_block_side` |  |
+| `orange_spawn_block_top` | rotation family (4 copies) |
+| `ore_gen_spawn_side` |  |
+| `ore_gen_spawn_top` |  |
+| `output` |  |
+| `packed_snow` |  |
+| `parts_bench_side` |  |
+| `parts_bench_top` |  |
+| `patterned_glass_black` |  |
+| `patterned_glass_blue` |  |
+| `patterned_glass_brown` |  |
+| `patterned_glass_cyan` |  |
+| `patterned_glass_gray` |  |
+| `patterned_glass_green` |  |
+| `patterned_glass_light_blue` |  |
+| `patterned_glass_light_gray` |  |
+| `patterned_glass_lime` |  |
+| `patterned_glass_magenta` |  |
+| `patterned_glass_orange` |  |
+| `patterned_glass_pink` |  |
+| `patterned_glass_purple` |  |
+| `patterned_glass_red` |  |
+| `patterned_glass_white` |  |
+| `patterned_glass_yellow` |  |
+| `pear_block_bottom` |  |
+| `pear_block_side` |  |
+| `pear_block_top` |  |
+| `pet_lucky_block` |  |
+| `pine_cone_block_side` |  |
+| `pine_cone_block_top` |  |
+| `pine_grass_block` |  |
+| `pine_grass_block_side` |  |
+| `pink_concrete` |  |
+| `pink_gen_spawn_coal` |  |
+| `pink_gen_spawn_iron` |  |
+| `pink_gen_spawn_top` |  |
+| `pink_glazed_terracotta` | rotation family (4 copies) |
+| `pink_planks` |  |
+| `pink_portal` | anim (4 frames) |
+| `pink_spawn_block_side` |  |
+| `pink_spawn_block_top` | rotation family (4 copies) |
+| `planks_aspen` |  |
+| `planks_cedar` |  |
+| `planks_cherry` |  |
+| `planks_jungle` |  |
+| `planks_mango` |  |
+| `planks_maple` |  |
+| `planks_palm` |  |
+| `planks_pear` |  |
+| `planks_pine` |  |
+| `planks_plum` |  |
+| `planks_spectral` |  |
+| `plum_block_bottom` |  |
+| `plum_block_side` |  |
+| `plum_block_top` |  |
+| `podzol_top` |  |
+| `potato_block` |  |
+| `potion_lucky_block` |  |
+| `potion_lucky_block_rare` |  |
+| `potion_lucky_block_super` |  |
+| `press_back` |  |
+| `press_front` |  |
+| `press_side` |  |
+| `press_side_running` | anim (4 frames) |
+| `press_top` | rotation family (4 copies) |
+| `protector` |  |
+| `protector_faction` |  |
+| `protector_tribe` |  |
+| `pump_bottom` |  |
+| `pump_side` |  |
+| `pump_side_running` | anim (8 frames) |
+| `pump_top` |  |
+| `pumpkin_face_on` |  |
+| `pumpkin_side` |  |
+| `pumpkin_top` |  |
+| `pure_coal_ore` |  |
+| `pure_copper_ore` |  |
+| `pure_diamond_ore` |  |
+| `pure_gold_ore` |  |
+| `pure_iron_ore` |  |
+| `pure_moonstone_ore` |  |
+| `pure_uranium_ore` |  |
+| `pure_voltite_ore` |  |
+| `purple_concrete` |  |
+| `purple_glazed_terracotta` | rotation family (4 copies) |
+| `purple_lucky_block` |  |
+| `purple_lucky_block_rare` |  |
+| `purple_lucky_block_super` |  |
+| `purple_planks` |  |
+| `purple_portal` | anim (4 frames) |
+| `purple_spawn_block_side` |  |
+| `purple_spawn_block_top` | rotation family (4 copies) |
+| `quartz_block_chiseled` |  |
+| `quartz_block_side` |  |
+| `radar_bottom` |  |
+| `radar_screen` | anim (8 frames); rotation family (4 copies) |
+| `radar_side_active` |  |
+| `radar_side_inactive` |  |
+| `radar_top_active` |  |
+| `radar_top_inactive` |  |
+| `reactor_base` |  |
+| `reactor_base_top` |  |
+| `reactor_casing` |  |
+| `reactor_controller_green` | anim (4 frames) |
+| `reactor_controller_orange` | anim (4 frames) |
+| `reactor_controller_red` | anim (4 frames) |
+| `reactor_controller_yellow` | anim (4 frames) |
+| `reactor_frame` |  |
+| `reactor_glass` |  |
+| `reactor_slag` |  |
+| `recycler_back` |  |
+| `recycler_front` |  |
+| `recycler_side` |  |
+| `recycler_side_running` | anim (8 frames) |
+| `recycler_top` | rotation family (4 copies) |
+| `red_concrete` |  |
+| `red_gen_spawn_coal` |  |
+| `red_gen_spawn_iron` |  |
+| `red_gen_spawn_top` |  |
+| `red_glazed_terracotta` | rotation family (4 copies) |
+| `red_lucky_block` |  |
+| `red_lucky_block_rare` |  |
+| `red_lucky_block_super` |  |
+| `red_mushroom_block` |  |
+| `red_planks` |  |
+| `red_portal` | anim (4 frames) |
+| `red_sand` |  |
+| `red_sandstone` |  |
+| `red_sandstone_brick` |  |
+| `red_sandstone_top` |  |
+| `red_spawn_block_side` |  |
+| `red_spawn_block_top` | rotation family (4 copies) |
+| `redstone_lamp_off` |  |
+| `redstone_lamp_on` |  |
+| `rocket_block` |  |
+| `rocky_dirt` |  |
+| `rope_block` |  |
+| `sand` |  |
+| `sandstone_brick` |  |
+| `sandstone_normal` |  |
+| `sandstone_top` |  |
+| `scaffolding` |  |
+| `scorpion_eggs` |  |
+| `shatter_mill_back` |  |
+| `shatter_mill_front` |  |
+| `shatter_mill_side` |  |
+| `shatter_mill_side_running` | anim (4 frames) |
+| `shatter_mill_top` | rotation family (4 copies) |
+| `shop_trader_spawn_face` |  |
+| `shop_trader_spawn_side` |  |
+| `shop_trader_spawn_top` | rotation family (4 copies) |
+| `shop_wizard_spawn_face` |  |
+| `shop_wizard_spawn_side` |  |
+| `shop_wizard_spawn_top` | rotation family (4 copies) |
+| `sky_spring` | anim (8 frames) |
+| `sky_tap_back` |  |
+| `sky_tap_bottom` |  |
+| `sky_tap_front` |  |
+| `sky_tap_side` |  |
+| `sky_tap_side_running` | anim (8 frames) |
+| `sky_tap_top` | rotation family (4 copies) |
+| `slab_andesite_brick_side` |  |
+| `slab_aspen_side` |  |
+| `slab_brick_side` |  |
+| `slab_cedar_side` |  |
+| `slab_cherry_side` |  |
+| `slab_chiseled_red_sandstone_side` |  |
+| `slab_chiseled_sandstone_side` |  |
+| `slab_cobblestone_side` |  |
+| `slab_cut_red_sandstone_side` |  |
+| `slab_cut_sandstone_side` |  |
+| `slab_diorite_brick_side` |  |
+| `slab_dirt_side` |  |
+| `slab_dry_grass_top_side` |  |
+| `slab_engraved_andesite_side` |  |
+| `slab_engraved_diorite_side` |  |
+| `slab_engraved_granite_side` |  |
+| `slab_granite_brick_side` |  |
+| `slab_grass_top_side` |  |
+| `slab_ice_brick_side` |  |
+| `slab_jungle_grass_top_side` |  |
+| `slab_jungle_side` |  |
+| `slab_mango_side` |  |
+| `slab_maple_side` |  |
+| `slab_mossy_cobblestone_side` |  |
+| `slab_palm_side` |  |
+| `slab_pear_side` |  |
+| `slab_pine_grass_top_side` |  |
+| `slab_pine_side` |  |
+| `slab_plum_side` |  |
+| `slab_red_sandstone_brick_side` |  |
+| `slab_red_sandstone_side` |  |
+| `slab_sandstone_brick_side` |  |
+| `slab_sandstone_normal_side` |  |
+| `slab_smooth_stone_side` |  |
+| `slab_spectral_side` |  |
+| `slab_stone_andesite_side` |  |
+| `slab_stone_andesite_smooth_side` |  |
+| `slab_stone_diorite_side` |  |
+| `slab_stone_diorite_smooth_side` |  |
+| `slab_stone_granite_side` |  |
+| `slab_stone_granite_smooth_side` |  |
+| `slab_stone_side` |  |
+| `slab_stonebrick_carved_side` |  |
+| `slab_stonebrick_mossy_side` |  |
+| `slab_stonebrick_side` |  |
+| `smelter_back` |  |
+| `smelter_front` |  |
+| `smelter_side` |  |
+| `smelter_side_running` | anim (8 frames) |
+| `smelter_top` | rotation family (4 copies) |
+| `smoke` | anim (8 frames) |
+| `smooth_stone` |  |
+| `snow` |  |
+| `snowy_messy_stone` |  |
+| `snowy_messy_stone_side` |  |
+| `solar_panel_bottom` |  |
+| `solar_panel_side` |  |
+| `solar_panel_top` |  |
+| `sorting_gate_slab_side` |  |
+| `sorting_gate_top` |  |
+| `sorting_gate_top_right` |  |
+| `splitter_slab_side` |  |
+| `splitter_top` |  |
+| `splitter_top_front_right` |  |
+| `splitter_top_left_front` |  |
+| `sponge` |  |
+| `starframe` |  |
+| `stone` |  |
+| `stone_andesite` |  |
+| `stone_andesite_smooth` |  |
+| `stone_deposit` |  |
+| `stone_diorite` |  |
+| `stone_diorite_smooth` |  |
+| `stone_generator_side` |  |
+| `stone_generator_top` |  |
+| `stone_granite` |  |
+| `stone_granite_smooth` |  |
+| `stonebrick` |  |
+| `stonebrick_carved` |  |
+| `stonebrick_cracked` |  |
+| `stonebrick_mossy` |  |
+| `storage_silo_side` |  |
+| `storage_silo_top` |  |
+| `stripped_aspen_log` |  |
+| `stripped_cedar_log` |  |
+| `stripped_cherry_log` |  |
+| `stripped_jungle_log` |  |
+| `stripped_mango_log` |  |
+| `stripped_maple_log` |  |
+| `stripped_palm_log` |  |
+| `stripped_pear_log` |  |
+| `stripped_pine_log` |  |
+| `stripped_plum_log` |  |
+| `stripped_spectral_log` |  |
+| `super_compressed_messy_stone` |  |
+| `super_rocket_block` |  |
+| `synthesizer_back` |  |
+| `synthesizer_back_running` | anim (8 frames) |
+| `synthesizer_bottom` |  |
+| `synthesizer_side` |  |
+| `synthesizer_side_flip` |  |
+| `synthesizer_side_flip_running` | anim (4 frames) |
+| `synthesizer_side_running` | anim (4 frames) |
+| `synthesizer_top` | rotation family (4 copies) |
+| `tool_bench_side` |  |
+| `tool_bench_top` |  |
+| `tools_lucky_block` |  |
+| `tools_lucky_block_rare` |  |
+| `tools_lucky_block_super` |  |
+| `toxic_waste` | anim (16 frames) |
+| `toxic_waste_barrel_bottom` |  |
+| `toxic_waste_barrel_side` |  |
+| `toxic_waste_barrel_top` | anim (8 frames) |
+| `toxin_ball_block` |  |
+| `trading_terminal_front` | anim (8 frames) |
+| `trading_terminal_side` |  |
+| `trading_terminal_top` |  |
+| `tree_cutter_back` |  |
+| `tree_cutter_back_running` | anim (4 frames) |
+| `tree_cutter_front` |  |
+| `tree_cutter_side` |  |
+| `tree_cutter_side_running` | anim (8 frames) |
+| `tree_cutter_top` | rotation family (4 copies) |
+| `ultra_compressed_messy_stone` |  |
+| `unloaded` |  |
+| `uranium_block` |  |
+| `uranium_deposit` |  |
+| `uranium_glass` |  |
+| `uranium_ore` |  |
+| `volt_engine_side` |  |
+| `volt_engine_side_running` | anim (8 frames) |
+| `volt_engine_top` |  |
+| `voltite_block` |  |
+| `voltite_deposit` |  |
+| `voltite_ore` |  |
+| `water_port` |  |
+| `watermelon_side` |  |
+| `watermelon_top` |  |
+| `weapon_lucky_block` |  |
+| `weapon_lucky_block_rare` |  |
+| `weapon_lucky_block_super` |  |
+| `white_concrete` |  |
+| `white_gen_spawn_coal` |  |
+| `white_gen_spawn_iron` |  |
+| `white_gen_spawn_top` |  |
+| `white_glazed_terracotta` | rotation family (4 copies) |
+| `white_planks` |  |
+| `white_portal` | anim (4 frames) |
+| `white_spawn_block_side` |  |
+| `white_spawn_block_top` | rotation family (4 copies) |
+| `wire_mill_back` |  |
+| `wire_mill_front` |  |
+| `wire_mill_side` |  |
+| `wire_mill_side_running` | anim (8 frames) |
+| `wire_mill_top` | rotation family (4 copies) |
+| `wireless_terminal_bottom` |  |
+| `wireless_terminal_front` |  |
+| `wireless_terminal_top` | rotation family (4 copies) |
+| `wool_colored_black` |  |
+| `wool_colored_blue` |  |
+| `wool_colored_brown` |  |
+| `wool_colored_cyan` |  |
+| `wool_colored_gray` |  |
+| `wool_colored_green` |  |
+| `wool_colored_light_blue` |  |
+| `wool_colored_light_grey` |  |
+| `wool_colored_lime` |  |
+| `wool_colored_magenta` |  |
+| `wool_colored_orange` |  |
+| `wool_colored_pink` |  |
+| `wool_colored_purple` |  |
+| `wool_colored_red` |  |
+| `wool_colored_white` |  |
+| `wool_colored_yellow` |  |
+| `yellow_concrete` |  |
+| `yellow_gen_spawn_coal` |  |
+| `yellow_gen_spawn_iron` |  |
+| `yellow_gen_spawn_top` |  |
+| `yellow_glazed_terracotta` | rotation family (4 copies) |
+| `yellow_lucky_block` |  |
+| `yellow_lucky_block_rare` |  |
+| `yellow_lucky_block_super` |  |
+| `yellow_planks` |  |
+| `yellow_portal` | anim (4 frames) |
+| `yellow_spawn_block_side` |  |
+| `yellow_spawn_block_top` | rotation family (4 copies) |
 
-| नाम | id (bbb6l5) | टिप्पणियाँ |
-|---|---|---|
-| `alloy_kiln_back` | 1413 |  |
-| `alloy_kiln_front` | 1407 |  |
-| `alloy_kiln_side` | 1408 |  |
-| `alloy_kiln_side_running` | 33 | anim (8 frames) |
-| `alloy_kiln_top` | 1409 | rotation family (4 copies) |
-| `andesite_brick` | 786 |  |
-| `apple_block_bottom` | 762 |  |
-| `apple_block_side` | 760 |  |
-| `apple_block_top` | 761 |  |
-| `armour_lucky_block` | 1317 |  |
-| `armour_lucky_block_rare` | 1319 |  |
-| `armour_lucky_block_super` | 1321 |  |
-| `ash` | 1353 |  |
-| `atomic_bench_side` | 1550 |  |
-| `atomic_bench_top` | 1551 |  |
-| `atomic_bomb_side` | 1595 |  |
-| `atomic_bomb_top` | 1596 |  |
-| `atomic_spire` | 1631 |  |
-| `auto_bench_back` | 1428 |  |
-| `auto_bench_front` | 1422 |  |
-| `auto_bench_side` | 1423 |  |
-| `auto_bench_side_running` | 35 | anim (8 frames) |
-| `auto_bench_top` | 1424 | rotation family (4 copies) |
-| `autocrafter_bottom` | 1284 |  |
-| `autocrafter_lunite_bottom` | 1295 |  |
-| `autocrafter_lunite_side` | 1294 |  |
-| `autocrafter_side` | 1282 |  |
-| `banana_block_side` | 1220 |  |
-| `banana_block_top` | 1221 |  |
-| `battery_casing` | 1598 |  |
-| `battery_cell` | 1599 |  |
-| `battery_cell_bottom` | 1601 |  |
-| `battery_cell_running` | 66 | anim (8 frames) |
-| `battery_cell_top` | 1600 |  |
-| `battery_controller_front` | 1597 |  |
-| `battery_controller_front_running` | 65 | anim (8 frames) |
-| `beacon` | 658 |  |
-| `bedrock` | 662 |  |
-| `beetroot_block_bottom` | 1246 |  |
-| `beetroot_block_side` | 1244 |  |
-| `beetroot_block_top` | 1245 |  |
-| `belt_drop_side` | 1507 |  |
-| `belt_drop_top` | 1506 |  |
-| `belt_lift_side` | 1505 |  |
-| `belt_lift_top` | 1504 |  |
-| `belt_loader_slab_front` | 1432 |  |
-| `belt_loader_top` | 1431 |  |
-| `belt_tunnel_back` | 1521 |  |
-| `belt_tunnel_exit_top` | 1522 | rotation family (4 copies) |
-| `belt_tunnel_mouth` | 1515 |  |
-| `belt_tunnel_side` | 1516 |  |
-| `belt_tunnel_top` | 1517 | rotation family (4 copies) |
-| `black_concrete` | 601 |  |
-| `black_glazed_terracotta` | 750 | rotation family (4 copies) |
-| `black_planks` | 689 |  |
-| `black_portal` | 2 | anim (4 frames) |
-| `black_spawn_block_side` | 1081 |  |
-| `black_spawn_block_top` | 1077 | rotation family (4 copies) |
-| `block_destroyer_tnt_side` | 1339 |  |
-| `block_destroyer_tnt_top` | 1340 |  |
-| `blue_concrete` | 602 |  |
-| `blue_gen_spawn_coal` | 1095 |  |
-| `blue_gen_spawn_iron` | 1096 |  |
-| `blue_gen_spawn_top` | 1094 |  |
-| `blue_glazed_terracotta` | 734 | rotation family (4 copies) |
-| `blue_lucky_block` | 1316 |  |
-| `blue_lucky_block_rare` | 1318 |  |
-| `blue_lucky_block_super` | 1320 |  |
-| `blue_planks` | 685 |  |
-| `blue_portal` | 3 | anim (4 frames) |
-| `blue_spawn_block_side` | 1076 |  |
-| `blue_spawn_block_top` | 1072 | rotation family (4 copies) |
-| `bone_block_side` | 1139 |  |
-| `bone_block_top` | 1140 |  |
-| `bookshelf` | 885 |  |
-| `bookshelf_1` | 887 |  |
-| `bookshelf_2` | 888 |  |
-| `bookshelf_3` | 889 |  |
-| `bookshelf_4` | 890 |  |
-| `bookshelf_5` | 891 |  |
-| `bookshelf_empty` | 886 |  |
-| `bouncy_bomb_block` | 912 |  |
-| `bowling_alley_floor` | 1300 |  |
-| `bread_block_back` | 756 |  |
-| `bread_block_front` | 755 |  |
-| `bread_block_side` | 757 |  |
-| `bread_block_top` | 758 |  |
-| `brick` | 643 |  |
-| `brown_concrete` | 603 |  |
-| `brown_glazed_terracotta` | 738 | rotation family (4 copies) |
-| `brown_mushroom_block` | 857 |  |
-| `brown_planks` | 686 |  |
-| `brown_portal` | 4 | anim (4 frames) |
-| `brown_spawn_block_side` | 1071 |  |
-| `brown_spawn_block_top` | 1067 | rotation family (4 copies) |
-| `building_lucky_block` | 1311 |  |
-| `building_lucky_block_rare` | 1313 |  |
-| `building_lucky_block_super` | 1315 |  |
-| `burner_drill_back` | 1370 |  |
-| `burner_drill_bottom` | 1369 |  |
-| `burner_drill_front` | 1363 |  |
-| `burner_drill_side` | 1364 |  |
-| `burner_drill_side_running` | 27 | anim (8 frames) |
-| `burner_drill_top` | 1365 | rotation family (4 copies) |
-| `cactus_dry` | 673 |  |
-| `cactus_top` | 672 |  |
-| `carrot_block_bottom` | 1242 |  |
-| `carrot_block_side` | 1240 |  |
-| `carrot_block_top` | 1241 |  |
-| `carved_messy_stone` | 1148 |  |
-| `carved_pumpkin` | 864 |  |
-| `centrifuge_back` | 1570 |  |
-| `centrifuge_back_running` | 53 | anim (8 frames) |
-| `centrifuge_bottom` | 1569 |  |
-| `centrifuge_side` | 1564 |  |
-| `centrifuge_side_flip` | 1571 |  |
-| `centrifuge_side_flip_running` | 54 | anim (8 frames) |
-| `centrifuge_side_running` | 52 | anim (8 frames) |
-| `centrifuge_top` | 1565 | rotation family (4 copies) |
-| `chalk` | 1160 |  |
-| `chalk_black` | 1176 |  |
-| `chalk_blue` | 1175 |  |
-| `chalk_bricks_black` | 1192 |  |
-| `chalk_bricks_blue` | 1191 |  |
-| `chalk_bricks_brown` | 1190 |  |
-| `chalk_bricks_cyan` | 1189 |  |
-| `chalk_bricks_gray` | 1188 |  |
-| `chalk_bricks_green` | 1187 |  |
-| `chalk_bricks_light_blue` | 1186 |  |
-| `chalk_bricks_light_gray` | 1185 |  |
-| `chalk_bricks_lime` | 1184 |  |
-| `chalk_bricks_magenta` | 1183 |  |
-| `chalk_bricks_orange` | 1182 |  |
-| `chalk_bricks_pink` | 1181 |  |
-| `chalk_bricks_purple` | 1180 |  |
-| `chalk_bricks_red` | 1179 |  |
-| `chalk_bricks_slab_side_black` | 1208 |  |
-| `chalk_bricks_slab_side_blue` | 1207 |  |
-| `chalk_bricks_slab_side_brown` | 1206 |  |
-| `chalk_bricks_slab_side_cyan` | 1205 |  |
-| `chalk_bricks_slab_side_gray` | 1204 |  |
-| `chalk_bricks_slab_side_green` | 1203 |  |
-| `chalk_bricks_slab_side_light_blue` | 1202 |  |
-| `chalk_bricks_slab_side_light_gray` | 1201 |  |
-| `chalk_bricks_slab_side_lime` | 1200 |  |
-| `chalk_bricks_slab_side_magenta` | 1199 |  |
-| `chalk_bricks_slab_side_orange` | 1198 |  |
-| `chalk_bricks_slab_side_pink` | 1197 |  |
-| `chalk_bricks_slab_side_purple` | 1196 |  |
-| `chalk_bricks_slab_side_red` | 1195 |  |
-| `chalk_bricks_slab_side_white` | 1194 |  |
-| `chalk_bricks_slab_side_yellow` | 1193 |  |
-| `chalk_bricks_white` | 1178 |  |
-| `chalk_bricks_yellow` | 1177 |  |
-| `chalk_brown` | 1174 |  |
-| `chalk_cyan` | 1173 |  |
-| `chalk_gray` | 1172 |  |
-| `chalk_green` | 1171 |  |
-| `chalk_light_blue` | 1170 |  |
-| `chalk_light_gray` | 1169 |  |
-| `chalk_lime` | 1168 |  |
-| `chalk_magenta` | 1167 |  |
-| `chalk_orange` | 1166 |  |
-| `chalk_pink` | 1165 |  |
-| `chalk_purple` | 1164 |  |
-| `chalk_red` | 1163 |  |
-| `chalk_white` | 1162 |  |
-| `chalk_yellow` | 1161 |  |
-| `charge_vault_side` | 1436 |  |
-| `charge_vault_top` | 1435 |  |
-| `charging_pad_side` | 1481 |  |
-| `charging_pad_top` | 1480 |  |
-| `checkpoint_block` | 1082 | rotation family (4 copies) |
-| `cherry_block_bottom` | 911 |  |
-| `cherry_block_side` | 909 |  |
-| `cherry_block_top` | 910 |  |
-| `chest_back` | 670 |  |
-| `chest_double_back_hi` | 1541 |  |
-| `chest_double_back_lo` | 1540 |  |
-| `chest_double_front_hi` | 1535 |  |
-| `chest_double_front_lo` | 1534 |  |
-| `chest_double_top_1_hi` | 1537 |  |
-| `chest_double_top_1_lo` | 1536 |  |
-| `chest_double_top_2_hi` | 1539 |  |
-| `chest_double_top_2_lo` | 1538 |  |
-| `chest_front` | 664 |  |
-| `chest_side` | 665 |  |
-| `chest_top` | 666 | rotation family (4 copies) |
-| `chili_pepper_block_bottom` | 999 |  |
-| `chili_pepper_block_side` | 997 |  |
-| `chili_pepper_block_top` | 998 |  |
-| `chiseled_red_sandstone` | 777 |  |
-| `chiseled_sandstone` | 653 |  |
-| `clay` | 523 |  |
-| `coal_block` | 561 |  |
-| `coal_deposit` | 1354 |  |
-| `coal_ore` | 555 |  |
-| `coarse_dirt` | 519 |  |
-| `coconut_block_bottom` | 843 |  |
-| `coconut_block_side` | 841 |  |
-| `coconut_block_top` | 842 |  |
-| `code_block` | 1000 |  |
-| `collider_bottom` | 1607 |  |
-| `collider_side_off` | 1602 |  |
-| `collider_side_running` | 67 | anim (32 frames) |
-| `collider_top` | 1603 | rotation family (4 copies) |
-| `comet_heart` | 1492 |  |
-| `comet_ore` | 1491 |  |
-| `compressed_messy_stone` | 851 |  |
-| `condenser_back` | 1562 |  |
-| `condenser_back_running` | 50 | anim (8 frames) |
-| `condenser_bottom` | 1561 |  |
-| `condenser_side` | 1556 |  |
-| `condenser_side_flip` | 1563 |  |
-| `condenser_side_flip_running` | 51 | anim (8 frames) |
-| `condenser_side_running` | 49 | anim (8 frames) |
-| `condenser_top` | 1557 | rotation family (4 copies) |
-| `conveyor_belt_bottom` | 1403 |  |
-| `conveyor_belt_slab_side` | 1402 |  |
-| `conveyor_belt_top` | 1401 |  |
-| `conveyor_belt_turn_left` | 1493 |  |
-| `conveyor_belt_turn_right` | 1494 |  |
-| `coolant_channel` | 64 | anim (8 frames) |
-| `coolant_mixer_back` | 1640 |  |
-| `coolant_mixer_back_running` | 69 | anim (8 frames) |
-| `coolant_mixer_bottom` | 1639 |  |
-| `coolant_mixer_side` | 1634 |  |
-| `coolant_mixer_side_flip` | 1641 |  |
-| `coolant_mixer_side_flip_running` | 70 | anim (8 frames) |
-| `coolant_mixer_side_running` | 68 | anim (8 frames) |
-| `coolant_mixer_top` | 1635 | rotation family (4 copies) |
-| `copper_block` | 1647 |  |
-| `copper_deposit` | 1357 |  |
-| `copper_ore` | 1362 |  |
-| `corn_block_bottom` | 915 |  |
-| `corn_block_side` | 913 |  |
-| `corn_block_top` | 914 |  |
-| `crafting_table_top` | 1283 |  |
-| `crate` | 1239 |  |
-| `crop_harvester_back` | 1514 |  |
-| `crop_harvester_back_running` | 45 | anim (4 frames) |
-| `crop_harvester_front` | 1508 |  |
-| `crop_harvester_side` | 1509 |  |
-| `crop_harvester_side_running` | 44 | anim (4 frames) |
-| `crop_harvester_top` | 1510 | rotation family (4 copies) |
-| `crusher_back` | 1377 |  |
-| `crusher_front` | 1371 |  |
-| `crusher_side` | 1372 |  |
-| `crusher_side_running` | 28 | anim (4 frames) |
-| `crusher_top` | 1373 | rotation family (4 copies) |
-| `crystal_block` | 1351 |  |
-| `crystal_vat_back` | 1488 |  |
-| `crystal_vat_front` | 1482 |  |
-| `crystal_vat_side` | 1483 |  |
-| `crystal_vat_side_running` | 42 | anim (8 frames) |
-| `crystal_vat_top` | 1484 | rotation family (4 copies) |
-| `custom_lobby_block_side` | 1090 |  |
-| `custom_lobby_block_top` | 1086 | rotation family (4 copies) |
-| `cut_red_sandstone` | 778 |  |
-| `cut_sandstone` | 774 |  |
-| `cyan_concrete` | 604 |  |
-| `cyan_gen_spawn_coal` | 1104 |  |
-| `cyan_gen_spawn_iron` | 1105 |  |
-| `cyan_gen_spawn_top` | 1103 |  |
-| `cyan_glazed_terracotta` | 726 | rotation family (4 copies) |
-| `cyan_planks` | 683 |  |
-| `cyan_portal` | 5 | anim (4 frames) |
-| `cyan_spawn_block_side` | 1066 |  |
-| `cyan_spawn_block_top` | 1062 | rotation family (4 copies) |
-| `dark_green_bricks` | 781 |  |
-| `darkstone` | 1528 |  |
-| `darkstone_bricks` | 1529 |  |
-| `darkstone_bricks_cracked` | 1530 |  |
-| `darkstone_bricks_lava` | 1531 |  |
-| `darkstone_engraved` | 1532 |  |
-| `darkstone_smooth` | 1533 |  |
-| `deep_drill_back` | 1462 |  |
-| `deep_drill_bottom` | 1461 |  |
-| `deep_drill_front` | 1455 |  |
-| `deep_drill_side` | 1456 |  |
-| `deep_drill_side_running` | 39 | anim (8 frames) |
-| `deep_drill_top` | 1457 | rotation family (4 copies) |
-| `dense_silo_side` | 1618 |  |
-| `dense_silo_top` | 1617 |  |
-| `diamond_block` | 663 |  |
-| `diamond_gen_spawn_side` | 1128 |  |
-| `diamond_gen_spawn_top` | 1127 |  |
-| `diamond_ore` | 560 |  |
-| `diorite_brick` | 784 |  |
-| `dirt` | 518 |  |
-| `drop_location_block_side` | 1135 |  |
-| `drop_location_block_top` | 1134 |  |
-| `drop_pad` | 1360 |  |
-| `dry_grass_block` | 1302 |  |
-| `dry_grass_block_side` | 1301 |  |
-| `electric_drill_back` | 1421 |  |
-| `electric_drill_bottom` | 1420 |  |
-| `electric_drill_front` | 1414 |  |
-| `electric_drill_side` | 1415 |  |
-| `electric_drill_side_running` | 34 | anim (8 frames) |
-| `electric_drill_top` | 1416 | rotation family (4 copies) |
-| `emerald_block` | 565 |  |
-| `emerald_ore` | 559 |  |
-| `end_stone` | 554 |  |
-| `engraved_andesite` | 785 |  |
-| `engraved_diorite` | 783 |  |
-| `engraved_granite` | 787 |  |
-| `evil_lucky_block` | 1344 |  |
-| `evil_lucky_block_face` | 1345 |  |
-| `explosive_paint_black_side` | 947 |  |
-| `explosive_paint_black_top` | 948 |  |
-| `explosive_paint_blue_side` | 945 |  |
-| `explosive_paint_blue_top` | 946 |  |
-| `explosive_paint_brown_side` | 943 |  |
-| `explosive_paint_brown_top` | 944 |  |
-| `explosive_paint_cyan_side` | 941 |  |
-| `explosive_paint_cyan_top` | 942 |  |
-| `explosive_paint_gray_side` | 939 |  |
-| `explosive_paint_gray_top` | 940 |  |
-| `explosive_paint_green_side` | 937 |  |
-| `explosive_paint_green_top` | 938 |  |
-| `explosive_paint_light_blue_side` | 935 |  |
-| `explosive_paint_light_blue_top` | 936 |  |
-| `explosive_paint_light_gray_side` | 933 |  |
-| `explosive_paint_light_gray_top` | 934 |  |
-| `explosive_paint_lime_side` | 931 |  |
-| `explosive_paint_lime_top` | 932 |  |
-| `explosive_paint_magenta_side` | 929 |  |
-| `explosive_paint_magenta_top` | 930 |  |
-| `explosive_paint_orange_side` | 927 |  |
-| `explosive_paint_orange_top` | 928 |  |
-| `explosive_paint_pink_side` | 925 |  |
-| `explosive_paint_pink_top` | 926 |  |
-| `explosive_paint_purple_side` | 923 |  |
-| `explosive_paint_purple_top` | 924 |  |
-| `explosive_paint_quick_black` | 964 |  |
-| `explosive_paint_quick_blue` | 963 |  |
-| `explosive_paint_quick_brown` | 962 |  |
-| `explosive_paint_quick_cyan` | 961 |  |
-| `explosive_paint_quick_gray` | 960 |  |
-| `explosive_paint_quick_green` | 959 |  |
-| `explosive_paint_quick_light_blue` | 958 |  |
-| `explosive_paint_quick_light_gray` | 957 |  |
-| `explosive_paint_quick_lime` | 956 |  |
-| `explosive_paint_quick_magenta` | 955 |  |
-| `explosive_paint_quick_orange` | 954 |  |
-| `explosive_paint_quick_pink` | 953 |  |
-| `explosive_paint_quick_purple` | 952 |  |
-| `explosive_paint_quick_red` | 951 |  |
-| `explosive_paint_quick_white` | 950 |  |
-| `explosive_paint_quick_yellow` | 949 |  |
-| `explosive_paint_red_side` | 921 |  |
-| `explosive_paint_red_top` | 922 |  |
-| `explosive_paint_seeking_black` | 980 |  |
-| `explosive_paint_seeking_blue` | 979 |  |
-| `explosive_paint_seeking_brown` | 978 |  |
-| `explosive_paint_seeking_cyan` | 977 |  |
-| `explosive_paint_seeking_gray` | 976 |  |
-| `explosive_paint_seeking_green` | 975 |  |
-| `explosive_paint_seeking_light_blue` | 974 |  |
-| `explosive_paint_seeking_light_gray` | 973 |  |
-| `explosive_paint_seeking_lime` | 972 |  |
-| `explosive_paint_seeking_magenta` | 971 |  |
-| `explosive_paint_seeking_orange` | 970 |  |
-| `explosive_paint_seeking_pink` | 969 |  |
-| `explosive_paint_seeking_purple` | 968 |  |
-| `explosive_paint_seeking_red` | 967 |  |
-| `explosive_paint_seeking_white` | 966 |  |
-| `explosive_paint_seeking_yellow` | 965 |  |
-| `explosive_paint_sticky_black` | 996 |  |
-| `explosive_paint_sticky_blue` | 995 |  |
-| `explosive_paint_sticky_brown` | 994 |  |
-| `explosive_paint_sticky_cyan` | 993 |  |
-| `explosive_paint_sticky_gray` | 992 |  |
-| `explosive_paint_sticky_green` | 991 |  |
-| `explosive_paint_sticky_light_blue` | 990 |  |
-| `explosive_paint_sticky_light_gray` | 989 |  |
-| `explosive_paint_sticky_lime` | 988 |  |
-| `explosive_paint_sticky_magenta` | 987 |  |
-| `explosive_paint_sticky_orange` | 986 |  |
-| `explosive_paint_sticky_pink` | 985 |  |
-| `explosive_paint_sticky_purple` | 984 |  |
-| `explosive_paint_sticky_red` | 983 |  |
-| `explosive_paint_sticky_white` | 982 |  |
-| `explosive_paint_sticky_yellow` | 981 |  |
-| `explosive_paint_white_side` | 919 |  |
-| `explosive_paint_white_top` | 920 |  |
-| `explosive_paint_yellow_side` | 917 |  |
-| `explosive_paint_yellow_top` | 918 |  |
-| `express_belt_slab_side` | 1620 |  |
-| `express_belt_top` | 1619 |  |
-| `express_belt_turn_left` | 1621 |  |
-| `express_belt_turn_right` | 1622 |  |
-| `extra_compressed_messy_stone` | 852 |  |
-| `fallen_cherry_leaves_side` | 907 |  |
-| `fallen_maple_leaves_side` | 799 |  |
-| `farmland` | 754 |  |
-| `fast_belt_slab_side` | 1479 |  |
-| `fast_belt_top` | 1478 |  |
-| `fast_belt_turn_left` | 1495 |  |
-| `fast_belt_turn_right` | 1496 |  |
-| `fast_loader_slab_front` | 1624 |  |
-| `fast_loader_top` | 1623 |  |
-| `fertilised_soil` | 1247 |  |
-| `finish_block` | 1133 |  |
-| `fireball_block` | 860 |  |
-| `fluid_tank` | 1587 |  |
-| `fluid_tank_fill1` | 71 | anim (8 frames) |
-| `fluid_tank_fill2` | 72 | anim (8 frames) |
-| `fluid_tank_fill3` | 73 | anim (8 frames) |
-| `fluid_tank_fill4` | 74 | anim (8 frames) |
-| `food_lucky_block` | 1329 |  |
-| `food_lucky_block_rare` | 1331 |  |
-| `food_lucky_block_super` | 1333 |  |
-| `forge_hopper_top` | 1490 |  |
-| `fuel_port` | 1591 |  |
-| `fuel_rod` | 63 | anim (8 frames) |
-| `generator_side` | 1385 |  |
-| `generator_side_running` | 30 | anim (8 frames) |
-| `generator_top` | 1386 |  |
-| `ghost_chest_back` | 1277 |  |
-| `ghost_chest_front` | 1274 |  |
-| `ghost_chest_side` | 1275 |  |
-| `ghost_chest_top` | 1276 |  |
-| `ghost_lucky_block` | 1278 |  |
-| `ghost_mystery_block` | 1279 |  |
-| `glass` | 622 |  |
-| `glass_black` | 623 |  |
-| `glass_blue` | 624 |  |
-| `glass_brown` | 625 |  |
-| `glass_cyan` | 626 |  |
-| `glass_gray` | 627 |  |
-| `glass_green` | 629 |  |
-| `glass_light_blue` | 630 |  |
-| `glass_light_gray` | 628 |  |
-| `glass_lime` | 631 |  |
-| `glass_magenta` | 632 |  |
-| `glass_orange` | 633 |  |
-| `glass_pink` | 634 |  |
-| `glass_purple` | 635 |  |
-| `glass_red` | 636 |  |
-| `glass_silver` | 639 |  |
-| `glass_white` | 637 |  |
-| `glass_yellow` | 638 |  |
-| `glow_lamp` | 1629 |  |
-| `glowstone` | 659 |  |
-| `gold_block` | 563 |  |
-| `gold_deposit` | 1358 |  |
-| `gold_ore` | 557 |  |
-| `granite_brick` | 788 |  |
-| `graphite` | 1593 |  |
-| `graphite_block` | 1593 |  |
-| `grass_block_side` | 520 |  |
-| `grass_top` | 521 |  |
-| `gravel` | 524 |  |
-| `gray_concrete` | 599 |  |
-| `gray_gen_spawn_coal` | 1113 |  |
-| `gray_gen_spawn_iron` | 1114 |  |
-| `gray_gen_spawn_top` | 1112 |  |
-| `gray_glazed_terracotta` | 718 | rotation family (4 copies) |
-| `gray_planks` | 681 |  |
-| `gray_portal` | 6 | anim (4 frames) |
-| `gray_spawn_block_side` | 1061 |  |
-| `gray_spawn_block_top` | 1057 | rotation family (4 copies) |
-| `green_bricks` | 780 |  |
-| `green_concrete` | 613 |  |
-| `green_glazed_terracotta` | 742 | rotation family (4 copies) |
-| `green_lucky_block` | 1328 |  |
-| `green_lucky_block_rare` | 1330 |  |
-| `green_lucky_block_super` | 1332 |  |
-| `green_planks` | 687 |  |
-| `green_portal` | 7 | anim (4 frames) |
-| `green_spawn_block_side` | 1056 |  |
-| `green_spawn_block_top` | 1052 | rotation family (4 copies) |
-| `green_stone` | 779 |  |
-| `grenade_block` | 902 |  |
-| `grey_portal` | 8 | anim (4 frames) |
-| `gun_lucky_block` | 1273 |  |
-| `hardened_clay` | 582 |  |
-| `hardened_clay_stained_black` | 598 |  |
-| `hardened_clay_stained_blue` | 594 |  |
-| `hardened_clay_stained_brown` | 595 |  |
-| `hardened_clay_stained_cyan` | 592 |  |
-| `hardened_clay_stained_gray` | 590 |  |
-| `hardened_clay_stained_green` | 596 |  |
-| `hardened_clay_stained_light_blue` | 586 |  |
-| `hardened_clay_stained_lime` | 588 |  |
-| `hardened_clay_stained_magenta` | 585 |  |
-| `hardened_clay_stained_orange` | 584 |  |
-| `hardened_clay_stained_pink` | 589 |  |
-| `hardened_clay_stained_purple` | 593 |  |
-| `hardened_clay_stained_red` | 597 |  |
-| `hardened_clay_stained_silver` | 591 |  |
-| `hardened_clay_stained_white` | 583 |  |
-| `hardened_clay_stained_yellow` | 587 |  |
-| `harvester_bottom` | 1291 |  |
-| `harvester_lunite_bottom` | 1299 |  |
-| `harvester_lunite_side_0` | 1296 |  |
-| `harvester_lunite_side_1` | 1297 |  |
-| `harvester_lunite_top` | 1298 |  |
-| `harvester_side0` | 1288 |  |
-| `harvester_side1` | 1289 |  |
-| `harvester_top` | 1290 |  |
-| `hay_block_side` | 656 |  |
-| `hay_block_top` | 1547 |  |
-| `homestead_core` | 1359 |  |
-| `homestead_core_cap` | 1444 |  |
-| `homestead_core_crown` | 1443 |  |
-| `homestead_core_mid` | 26 | anim (8 frames) |
-| `hyper_compressed_messy_stone` | 854 |  |
-| `ice` | 654 |  |
-| `ice_brick` | 789 |  |
-| `iceball_block` | 861 |  |
-| `invisible_solid` | 642 |  |
-| `iron_block` | 562 |  |
-| `iron_chest_back` | 1238 |  |
-| `iron_chest_front` | 1232 |  |
-| `iron_chest_side` | 1233 |  |
-| `iron_chest_top` | 1234 | rotation family (4 copies) |
-| `iron_deposit` | 1355 |  |
-| `iron_ore` | 556 |  |
-| `iron_watermelon_side` | 867 |  |
-| `iron_watermelon_top` | 868 |  |
-| `isotope_comet_heart` | 1633 |  |
-| `isotope_comet_ore` | 1632 |  |
-| `jetpack_back` | 1630 |  |
-| `jungle_grass_block` | 1210 |  |
-| `jungle_grass_block_side` | 1209 |  |
-| `lapis_block` | 564 |  |
-| `lapis_ore` | 558 |  |
-| `laser_back` | 1610 |  |
-| `laser_front` | 1608 |  |
-| `laser_side` | 1609 |  |
-| `lava` | 1 | anim (16 frames) |
-| `leather_block_side` | 1229 |  |
-| `leather_block_top` | 1230 |  |
-| `leaves_aspen` | 616 |  |
-| `leaves_aspen_autumn` | 1231 |  |
-| `leaves_cedar` | 791 |  |
-| `leaves_cherry` | 1,017 |  |
-| `leaves_cherry_fruity` | 1650 |  |
-| `leaves_jungle` | 618 |  |
-| `leaves_mango` | 1215 |  |
-| `leaves_mango_fruity` | 1228 |  |
-| `leaves_maple` | 617 |  |
-| `leaves_maple_autumn` | 798 |  |
-| `leaves_maple_fruity` | 1222 |  |
-| `leaves_palm` | 792 |  |
-| `leaves_palm_fruity` | 1225 |  |
-| `leaves_pear` | 846 |  |
-| `leaves_pear_fruity` | 1226 |  |
-| `leaves_pine` | 615 |  |
-| `leaves_pine_cone` | 1223 |  |
-| `leaves_plum` | 790 |  |
-| `leaves_plum_fruity` | 1224 |  |
-| `leaves_spectral` | 1152 |  |
-| `light_blue_concrete` | 605 |  |
-| `light_blue_glazed_terracotta` | 702 | rotation family (4 copies) |
-| `light_blue_lucky_block` | 1254 |  |
-| `light_blue_planks` | 677 |  |
-| `light_blue_spawn_block_side` | 1051 |  |
-| `light_blue_spawn_block_top` | 1047 | rotation family (4 copies) |
-| `light_gray_concrete` | 600 |  |
-| `light_gray_glazed_terracotta` | 722 | rotation family (4 copies) |
-| `light_gray_planks` | 682 |  |
-| `light_gray_spawn_block_side` | 1046 |  |
-| `light_gray_spawn_block_top` | 1042 | rotation family (4 copies) |
-| `lightblue_portal` | 9 | anim (4 frames) |
-| `lightgray_portal` | 10 | anim (4 frames) |
-| `lime_concrete` | 606 |  |
-| `lime_gen_spawn_coal` | 1098 |  |
-| `lime_gen_spawn_iron` | 1099 |  |
-| `lime_gen_spawn_top` | 1097 |  |
-| `lime_glazed_terracotta` | 710 | rotation family (4 copies) |
-| `lime_planks` | 679 |  |
-| `lime_portal` | 11 | anim (4 frames) |
-| `lime_spawn_block_side` | 1041 |  |
-| `lime_spawn_block_top` | 1037 | rotation family (4 copies) |
-| `log_ancient_maple` | 1343 |  |
-| `log_aspen` | 530 |  |
-| `log_cedar` | 529 |  |
-| `log_cherry` | 903 |  |
-| `log_jungle` | 531 |  |
-| `log_mango` | 1212 |  |
-| `log_maple` | 526 |  |
-| `log_palm` | 793 |  |
-| `log_pear` | 844 |  |
-| `log_pine` | 527 |  |
-| `log_plum` | 528 |  |
-| `log_spectral` | 1149 |  |
-| `lucky_block_pink_question` | 1280 |  |
-| `lucky_block_pink_question_rare` | 1335 |  |
-| `lucky_block_pink_question_super` | 1337 |  |
-| `lunite_block` | 1293 |  |
-| `lunite_ore` | 1292 |  |
-| `machine_bench_side` | 1437 |  |
-| `machine_bench_top` | 1438 |  |
-| `machine_side` | 1361 |  |
-| `magenta_concrete` | 607 |  |
-| `magenta_glazed_terracotta` | 698 | rotation family (4 copies) |
-| `magenta_planks` | 676 |  |
-| `magenta_portal` | 12 | anim (4 frames) |
-| `magenta_spawn_block_side` | 1036 |  |
-| `magenta_spawn_block_top` | 1032 | rotation family (4 copies) |
-| `magma` | 772 |  |
-| `mailbox_front` | 892 |  |
-| `mailbox_front_full` | 894 |  |
-| `mailbox_side` | 893 |  |
-| `mango_block_bottom` | 1219 |  |
-| `mango_block_side` | 1217 |  |
-| `mango_block_top` | 1218 |  |
-| `mega_compressed_messy_stone` | 856 |  |
-| `melon_side` | 865 |  |
-| `melon_top` | 866 |  |
-| `melting_ice` | 916 |  |
-| `messy_stone` | 544 |  |
-| `mob_farm_back` | 1586 |  |
-| `mob_farm_front` | 1580 |  |
-| `mob_farm_side` | 1581 |  |
-| `mob_farm_side_running` | 58 | anim (8 frames) |
-| `mob_farm_top` | 1582 | rotation family (4 copies) |
-| `mob_spawner_block_empty_side` | 1144 |  |
-| `mob_spawner_block_top` | 1142 |  |
-| `mob_spawner_hostile_block_side` | 1143 |  |
-| `mob_spawner_neutral_block_side` | 1159 |  |
-| `mob_spawner_passive_block_side` | 1141 |  |
-| `moonstone_block` | 771 |  |
-| `moonstone_chest_back` | 770 |  |
-| `moonstone_chest_front` | 764 |  |
-| `moonstone_chest_side` | 765 |  |
-| `moonstone_chest_top` | 766 | rotation family (4 copies) |
-| `moonstone_explosive_side` | 660 |  |
-| `moonstone_explosive_top` | 661 |  |
-| `moonstone_gen_spawn_side` | 1130 |  |
-| `moonstone_gen_spawn_top` | 1129 |  |
-| `moonstone_ore` | 763 |  |
-| `mossy_cobblestone` | 759 |  |
-| `mushroom_stem` | 859 |  |
-| `mystery_block` | 899 |  |
-| `neon_black` | 1272 |  |
-| `neon_blue` | 1271 |  |
-| `neon_brown` | 1270 |  |
-| `neon_cyan` | 1269 |  |
-| `neon_gray` | 1268 |  |
-| `neon_green` | 1267 |  |
-| `neon_light_blue` | 1266 |  |
-| `neon_light_gray` | 1265 |  |
-| `neon_lime` | 1264 |  |
-| `neon_magenta` | 1263 |  |
-| `neon_orange` | 1262 |  |
-| `neon_pink` | 1261 |  |
-| `neon_purple` | 1260 |  |
-| `neon_red` | 1259 |  |
-| `neon_white` | 1258 |  |
-| `neon_yellow` | 1257 |  |
-| `nether_brick` | 645 |  |
-| `netherrack` | 646 |  |
-| `nova_bomb_side` | 1649 |  |
-| `nova_bomb_top` | 1650 |  |
-| `obby_absorb_block` | 1137 |  |
-| `obby_absorb_death_block` | 1138 |  |
-| `obby_death_block` | 1136 |  |
-| `obsidian` | 655 |  |
-| `orange_concrete` | 608 |  |
-| `orange_glazed_terracotta` | 694 | rotation family (4 copies) |
-| `orange_lucky_block` | 1322 |  |
-| `orange_lucky_block_rare` | 1324 |  |
-| `orange_lucky_block_super` | 1326 |  |
-| `orange_planks` | 675 |  |
-| `orange_portal` | 13 | anim (4 frames) |
-| `orange_spawn_block_side` | 1031 |  |
-| `orange_spawn_block_top` | 1027 | rotation family (4 copies) |
-| `ore_gen_spawn_side` | 1132 |  |
-| `ore_gen_spawn_top` | 1131 |  |
-| `output` | 1555 |  |
-| `packed_snow` | 1147 |  |
-| `parts_bench_side` | 1439 |  |
-| `parts_bench_top` | 1440 |  |
-| `patterned_glass_black` | 869 |  |
-| `patterned_glass_blue` | 870 |  |
-| `patterned_glass_brown` | 871 |  |
-| `patterned_glass_cyan` | 872 |  |
-| `patterned_glass_gray` | 873 |  |
-| `patterned_glass_green` | 875 |  |
-| `patterned_glass_light_blue` | 876 |  |
-| `patterned_glass_light_gray` | 874 |  |
-| `patterned_glass_lime` | 877 |  |
-| `patterned_glass_magenta` | 878 |  |
-| `patterned_glass_orange` | 879 |  |
-| `patterned_glass_pink` | 880 |  |
-| `patterned_glass_purple` | 881 |  |
-| `patterned_glass_red` | 882 |  |
-| `patterned_glass_white` | 883 |  |
-| `patterned_glass_yellow` | 884 |  |
-| `pear_block_bottom` | 850 |  |
-| `pear_block_side` | 848 |  |
-| `pear_block_top` | 849 |  |
-| `pet_lucky_block` | 1281 |  |
-| `pine_cone_block_side` | 1157 |  |
-| `pine_cone_block_top` | 1158 |  |
-| `pine_grass_block` | 1155 |  |
-| `pine_grass_block_side` | 1154 |  |
-| `pink_concrete` | 609 |  |
-| `pink_gen_spawn_coal` | 1110 |  |
-| `pink_gen_spawn_iron` | 1111 |  |
-| `pink_gen_spawn_top` | 1109 |  |
-| `pink_glazed_terracotta` | 714 | rotation family (4 copies) |
-| `pink_planks` | 680 |  |
-| `pink_portal` | 14 | anim (4 frames) |
-| `pink_spawn_block_side` | 1026 |  |
-| `pink_spawn_block_top` | 1022 | rotation family (4 copies) |
-| `planks_aspen` | 533 |  |
-| `planks_cedar` | 537 |  |
-| `planks_cherry` | 905 |  |
-| `planks_jungle` | 535 |  |
-| `planks_mango` | 1214 |  |
-| `planks_maple` | 532 |  |
-| `planks_palm` | 794 |  |
-| `planks_pear` | 845 |  |
-| `planks_pine` | 536 |  |
-| `planks_plum` | 534 |  |
-| `planks_spectral` | 1151 |  |
-| `plum_block_bottom` | 840 |  |
-| `plum_block_side` | 838 |  |
-| `plum_block_top` | 839 |  |
-| `podzol_top` | 773 |  |
-| `potato_block` | 1243 |  |
-| `potion_lucky_block` | 1334 |  |
-| `potion_lucky_block_rare` | 1336 |  |
-| `potion_lucky_block_super` | 1338 |  |
-| `press_back` | 1393 |  |
-| `press_front` | 1387 |  |
-| `press_side` | 1388 |  |
-| `press_side_running` | 31 | anim (4 frames) |
-| `press_top` | 1389 | rotation family (4 copies) |
-| `protector` | 671 |  |
-| `protector_faction` | 896 |  |
-| `protector_tribe` | 895 |  |
-| `pump_bottom` | 1554 |  |
-| `pump_side` | 1552 |  |
-| `pump_side_running` | 48 | anim (8 frames) |
-| `pump_top` | 1553 |  |
-| `pumpkin_face_on` | 619 |  |
-| `pumpkin_side` | 862 |  |
-| `pumpkin_top` | 863 |  |
-| `pure_coal_ore` | 1346 |  |
-| `pure_copper_ore` | 1526 |  |
-| `pure_diamond_ore` | 1349 |  |
-| `pure_gold_ore` | 1348 |  |
-| `pure_iron_ore` | 1347 |  |
-| `pure_moonstone_ore` | 1350 |  |
-| `pure_uranium_ore` | 1646 |  |
-| `pure_voltite_ore` | 1527 |  |
-| `purple_concrete` | 610 |  |
-| `purple_glazed_terracotta` | 730 | rotation family (4 copies) |
-| `purple_lucky_block` | 1310 |  |
-| `purple_lucky_block_rare` | 1312 |  |
-| `purple_lucky_block_super` | 1314 |  |
-| `purple_planks` | 684 |  |
-| `purple_portal` | 15 | anim (4 frames) |
-| `purple_spawn_block_side` | 1021 |  |
-| `purple_spawn_block_top` | 1017 | rotation family (4 copies) |
-| `quartz_block_chiseled` | 648 |  |
-| `quartz_block_side` | 647 |  |
-| `radar_bottom` | 1250 |  |
-| `radar_screen` | 19 | anim (8 frames); rotation family (4 copies) |
-| `radar_side_active` | 1248 |  |
-| `radar_side_inactive` | 1251 |  |
-| `radar_top_active` | 1249 |  |
-| `radar_top_inactive` | 1252 |  |
-| `reactor_base` | 1642 |  |
-| `reactor_base_top` | 1643 |  |
-| `reactor_casing` | 1589 |  |
-| `reactor_controller_green` | 59 | anim (4 frames) |
-| `reactor_controller_orange` | 61 | anim (4 frames) |
-| `reactor_controller_red` | 62 | anim (4 frames) |
-| `reactor_controller_yellow` | 60 | anim (4 frames) |
-| `reactor_frame` | 1588 |  |
-| `reactor_glass` | 1590 |  |
-| `reactor_slag` | 1594 |  |
-| `recycler_back` | 1503 |  |
-| `recycler_front` | 1497 |  |
-| `recycler_side` | 1498 |  |
-| `recycler_side_running` | 43 | anim (8 frames) |
-| `recycler_top` | 1499 | rotation family (4 copies) |
-| `red_concrete` | 611 |  |
-| `red_gen_spawn_coal` | 1092 |  |
-| `red_gen_spawn_iron` | 1093 |  |
-| `red_gen_spawn_top` | 1091 |  |
-| `red_glazed_terracotta` | 746 | rotation family (4 copies) |
-| `red_lucky_block` | 1255 |  |
-| `red_lucky_block_rare` | 1306 |  |
-| `red_lucky_block_super` | 1308 |  |
-| `red_mushroom_block` | 858 |  |
-| `red_planks` | 688 |  |
-| `red_portal` | 16 | anim (4 frames) |
-| `red_sand` | 795 |  |
-| `red_sandstone` | 775 |  |
-| `red_sandstone_brick` | 796 |  |
-| `red_sandstone_top` | 776 |  |
-| `red_spawn_block_side` | 1016 |  |
-| `red_spawn_block_top` | 1012 | rotation family (4 copies) |
-| `redstone_lamp_off` | 641 |  |
-| `redstone_lamp_on` | 640 |  |
-| `rocket_block` | 900 |  |
-| `rocky_dirt` | 797 |  |
-| `rope_block` | 1352 |  |
-| `sand` | 522 |  |
-| `sandstone_brick` | 782 |  |
-| `sandstone_normal` | 553 |  |
-| `sandstone_top` | 652 |  |
-| `scaffolding` | 1644 |  |
-| `scorpion_eggs` | 1542 |  |
-| `shatter_mill_back` | 1469 |  |
-| `shatter_mill_front` | 1463 |  |
-| `shatter_mill_side` | 1464 |  |
-| `shatter_mill_side_running` | 40 | anim (4 frames) |
-| `shatter_mill_top` | 1465 | rotation family (4 copies) |
-| `shop_trader_spawn_face` | 1120 |  |
-| `shop_trader_spawn_side` | 1119 |  |
-| `shop_trader_spawn_top` | 1115 | rotation family (4 copies) |
-| `shop_wizard_spawn_face` | 1126 |  |
-| `shop_wizard_spawn_side` | 1125 |  |
-| `shop_wizard_spawn_top` | 1121 | rotation family (4 copies) |
-| `sky_spring` | 47 | anim (8 frames) |
-| `sky_tap_back` | 1477 |  |
-| `sky_tap_bottom` | 1476 |  |
-| `sky_tap_front` | 1470 |  |
-| `sky_tap_side` | 1471 |  |
-| `sky_tap_side_running` | 41 | anim (8 frames) |
-| `sky_tap_top` | 1472 | rotation family (4 copies) |
-| `slab_andesite_brick_side` | 819 |  |
-| `slab_aspen_side` | 804 |  |
-| `slab_brick_side` | 836 |  |
-| `slab_cedar_side` | 803 |  |
-| `slab_cherry_side` | 908 |  |
-| `slab_chiseled_red_sandstone_side` | 833 |  |
-| `slab_chiseled_sandstone_side` | 829 |  |
-| `slab_cobblestone_side` | 809 |  |
-| `slab_cut_red_sandstone_side` | 834 |  |
-| `slab_cut_sandstone_side` | 830 |  |
-| `slab_diorite_brick_side` | 823 |  |
-| `slab_dirt_side` | 807 |  |
-| `slab_dry_grass_top_side` | 1303 |  |
-| `slab_engraved_andesite_side` | 818 |  |
-| `slab_engraved_diorite_side` | 822 |  |
-| `slab_engraved_granite_side` | 826 |  |
-| `slab_granite_brick_side` | 827 |  |
-| `slab_grass_top_side` | 808 |  |
-| `slab_ice_brick_side` | 837 |  |
-| `slab_jungle_grass_top_side` | 1211 |  |
-| `slab_jungle_side` | 805 |  |
-| `slab_mango_side` | 1216 |  |
-| `slab_maple_side` | 800 |  |
-| `slab_mossy_cobblestone_side` | 814 |  |
-| `slab_palm_side` | 806 |  |
-| `slab_pear_side` | 847 |  |
-| `slab_pine_grass_top_side` | 1156 |  |
-| `slab_pine_side` | 801 |  |
-| `slab_plum_side` | 802 |  |
-| `slab_red_sandstone_brick_side` | 835 |  |
-| `slab_red_sandstone_side` | 832 |  |
-| `slab_sandstone_brick_side` | 831 |  |
-| `slab_sandstone_normal_side` | 828 |  |
-| `slab_smooth_stone_side` | 811 |  |
-| `slab_spectral_side` | 1153 |  |
-| `slab_stone_andesite_side` | 816 |  |
-| `slab_stone_andesite_smooth_side` | 817 |  |
-| `slab_stone_diorite_side` | 820 |  |
-| `slab_stone_diorite_smooth_side` | 821 |  |
-| `slab_stone_granite_side` | 824 |  |
-| `slab_stone_granite_smooth_side` | 825 |  |
-| `slab_stone_side` | 810 |  |
-| `slab_stonebrick_carved_side` | 812 |  |
-| `slab_stonebrick_mossy_side` | 815 |  |
-| `slab_stonebrick_side` | 813 |  |
-| `smelter_back` | 1384 |  |
-| `smelter_front` | 1378 |  |
-| `smelter_side` | 1379 |  |
-| `smelter_side_running` | 29 | anim (8 frames) |
-| `smelter_top` | 1380 | rotation family (4 copies) |
-| `smoke` | 23 | anim (8 frames) |
-| `smooth_stone` | 546 |  |
-| `snow` | 525 |  |
-| `snowy_messy_stone` | 1145 |  |
-| `snowy_messy_stone_side` | 1146 |  |
-| `solar_panel_bottom` | 1287 |  |
-| `solar_panel_side` | 1285 |  |
-| `solar_panel_top` | 1286 |  |
-| `sorting_gate_slab_side` | 1430 |  |
-| `sorting_gate_top` | 1429 |  |
-| `sorting_gate_top_right` | 1627 |  |
-| `splitter_slab_side` | 1405 |  |
-| `splitter_top` | 1404 |  |
-| `splitter_top_front_right` | 1626 |  |
-| `splitter_top_left_front` | 1625 |  |
-| `sponge` | 657 |  |
-| `starframe` | 1489 |  |
-| `stone` | 545 |  |
-| `stone_andesite` | 549 |  |
-| `stone_andesite_smooth` | 550 |  |
-| `stone_deposit` | 1356 |  |
-| `stone_diorite` | 547 |  |
-| `stone_diorite_smooth` | 548 |  |
-| `stone_generator_side` | 1545 |  |
-| `stone_generator_top` | 1546 |  |
-| `stone_granite` | 551 |  |
-| `stone_granite_smooth` | 552 |  |
-| `stonebrick` | 644 |  |
-| `stonebrick_carved` | 649 |  |
-| `stonebrick_cracked` | 651 |  |
-| `stonebrick_mossy` | 650 |  |
-| `storage_silo_side` | 1434 |  |
-| `storage_silo_top` | 1433 |  |
-| `stripped_aspen_log` | 539 |  |
-| `stripped_cedar_log` | 543 |  |
-| `stripped_cherry_log` | 904 |  |
-| `stripped_jungle_log` | 541 |  |
-| `stripped_mango_log` | 1213 |  |
-| `stripped_maple_log` | 538 |  |
-| `stripped_palm_log` | 897 |  |
-| `stripped_pear_log` | 898 |  |
-| `stripped_pine_log` | 542 |  |
-| `stripped_plum_log` | 540 |  |
-| `stripped_spectral_log` | 1150 |  |
-| `super_compressed_messy_stone` | 853 |  |
-| `super_rocket_block` | 901 |  |
-| `synthesizer_back` | 1578 |  |
-| `synthesizer_back_running` | 56 | anim (8 frames) |
-| `synthesizer_bottom` | 1577 |  |
-| `synthesizer_side` | 1572 |  |
-| `synthesizer_side_flip` | 1579 |  |
-| `synthesizer_side_flip_running` | 57 | anim (4 frames) |
-| `synthesizer_side_running` | 55 | anim (4 frames) |
-| `synthesizer_top` | 1573 | rotation family (4 copies) |
-| `tool_bench_side` | 1441 |  |
-| `tool_bench_top` | 1442 |  |
-| `tools_lucky_block` | 1323 |  |
-| `tools_lucky_block_rare` | 1325 |  |
-| `tools_lucky_block_super` | 1327 |  |
-| `toxic_waste` | 25 | anim (16 frames) |
-| `toxic_waste_barrel_bottom` | 1342 |  |
-| `toxic_waste_barrel_side` | 1341 |  |
-| `toxic_waste_barrel_top` | 24 | anim (8 frames) |
-| `toxin_ball_block` | 1001 |  |
-| `trading_terminal_front` | 46 | anim (8 frames) |
-| `trading_terminal_side` | 1543 |  |
-| `trading_terminal_top` | 1544 |  |
-| `tree_cutter_back` | 1451 |  |
-| `tree_cutter_back_running` | 37 | anim (4 frames) |
-| `tree_cutter_front` | 1445 |  |
-| `tree_cutter_side` | 1446 |  |
-| `tree_cutter_side_running` | 36 | anim (8 frames) |
-| `tree_cutter_top` | 1447 | rotation family (4 copies) |
-| `ultra_compressed_messy_stone` | 855 |  |
-| `unloaded` | 517 |  |
-| `uranium_block` | 1645 |  |
-| `uranium_deposit` | 1549 |  |
-| `uranium_glass` | 1628 |  |
-| `uranium_ore` | 1548 |  |
-| `volt_engine_side` | 1453 |  |
-| `volt_engine_side_running` | 38 | anim (8 frames) |
-| `volt_engine_top` | 1454 |  |
-| `voltite_block` | 1648 |  |
-| `voltite_deposit` | 1452 |  |
-| `voltite_ore` | 1406 |  |
-| `water_port` | 1592 |  |
-| `watermelon_side` | 620 |  |
-| `watermelon_top` | 621 |  |
-| `weapon_lucky_block` | 1256 |  |
-| `weapon_lucky_block_rare` | 1307 |  |
-| `weapon_lucky_block_super` | 1309 |  |
-| `white_concrete` | 612 |  |
-| `white_gen_spawn_coal` | 1107 |  |
-| `white_gen_spawn_iron` | 1108 |  |
-| `white_gen_spawn_top` | 1106 |  |
-| `white_glazed_terracotta` | 690 | rotation family (4 copies) |
-| `white_planks` | 674 |  |
-| `white_portal` | 17 | anim (4 frames) |
-| `white_spawn_block_side` | 1011 |  |
-| `white_spawn_block_top` | 1007 | rotation family (4 copies) |
-| `wire_mill_back` | 1400 |  |
-| `wire_mill_front` | 1394 |  |
-| `wire_mill_side` | 1395 |  |
-| `wire_mill_side_running` | 32 | anim (8 frames) |
-| `wire_mill_top` | 1396 | rotation family (4 copies) |
-| `wireless_terminal_bottom` | 1616 |  |
-| `wireless_terminal_front` | 1611 |  |
-| `wireless_terminal_top` | 1612 | rotation family (4 copies) |
-| `wool_colored_black` | 581 |  |
-| `wool_colored_blue` | 577 |  |
-| `wool_colored_brown` | 578 |  |
-| `wool_colored_cyan` | 575 |  |
-| `wool_colored_gray` | 573 |  |
-| `wool_colored_green` | 579 |  |
-| `wool_colored_light_blue` | 569 |  |
-| `wool_colored_light_grey` | 574 |  |
-| `wool_colored_lime` | 571 |  |
-| `wool_colored_magenta` | 568 |  |
-| `wool_colored_orange` | 567 |  |
-| `wool_colored_pink` | 572 |  |
-| `wool_colored_purple` | 576 |  |
-| `wool_colored_red` | 580 |  |
-| `wool_colored_white` | 566 |  |
-| `wool_colored_yellow` | 570 |  |
-| `yellow_concrete` | 614 |  |
-| `yellow_gen_spawn_coal` | 1101 |  |
-| `yellow_gen_spawn_iron` | 1102 |  |
-| `yellow_gen_spawn_top` | 1100 |  |
-| `yellow_glazed_terracotta` | 706 | rotation family (4 copies) |
-| `yellow_lucky_block` | 1253 |  |
-| `yellow_lucky_block_rare` | 1304 |  |
-| `yellow_lucky_block_super` | 1305 |  |
-| `yellow_planks` | 678 |  |
-| `yellow_portal` | 18 | anim (4 frames) |
-| `yellow_spawn_block_side` | 1006 |  |
-| `yellow_spawn_block_top` | 1002 | rotation family (4 copies) |
-
-#### घूर्णन परिवार (64 मूल)
+#### घूर्णन परिवार
 
 
 ये टेक्सचर केवल पहले-घुमाई प्रतियों (`name[rot[1..4`) के रूप में मौजूद हैं। रजिस्ट्री उन्हें नीचे दिए मूल पर फ़ोल्ड करता है, और `bloxdTexel` सैंपल के समय रोटेशन दोबारा लगाता है — मूल को संदर्भित करें, प्रतियों को कभी नहीं। कोई `[rot[N` स्पेलिंग लिखने पर समर्पित रोटेशन डायग्नोस्टिक मिलता है।
-- `alloy_kiln_top` (id 1409)
-- `auto_bench_top` (id 1424)
-- `belt_tunnel_exit_top` (id 1522)
-- `belt_tunnel_top` (id 1517)
-- `black_glazed_terracotta` (id 750)
-- `black_spawn_block_top` (id 1077)
-- `blue_glazed_terracotta` (id 734)
-- `blue_spawn_block_top` (id 1072)
-- `brown_glazed_terracotta` (id 738)
-- `brown_spawn_block_top` (id 1067)
-- `burner_drill_top` (id 1365)
-- `centrifuge_top` (id 1565)
-- `checkpoint_block` (id 1082)
-- `chest_top` (id 666)
-- `collider_top` (id 1603)
-- `condenser_top` (id 1557)
-- `coolant_mixer_top` (id 1635)
-- `crop_harvester_top` (id 1510)
-- `crusher_top` (id 1373)
-- `crystal_vat_top` (id 1484)
-- `custom_lobby_block_top` (id 1086)
-- `cyan_glazed_terracotta` (id 726)
-- `cyan_spawn_block_top` (id 1062)
-- `deep_drill_top` (id 1457)
-- `electric_drill_top` (id 1416)
-- `gray_glazed_terracotta` (id 718)
-- `gray_spawn_block_top` (id 1057)
-- `green_glazed_terracotta` (id 742)
-- `green_spawn_block_top` (id 1052)
-- `iron_chest_top` (id 1234)
-- `light_blue_glazed_terracotta` (id 702)
-- `light_blue_spawn_block_top` (id 1047)
-- `light_gray_glazed_terracotta` (id 722)
-- `light_gray_spawn_block_top` (id 1042)
-- `lime_glazed_terracotta` (id 710)
-- `lime_spawn_block_top` (id 1037)
-- `magenta_glazed_terracotta` (id 698)
-- `magenta_spawn_block_top` (id 1032)
-- `mob_farm_top` (id 1582)
-- `moonstone_chest_top` (id 766)
-- `orange_glazed_terracotta` (id 694)
-- `orange_spawn_block_top` (id 1027)
-- `pink_glazed_terracotta` (id 714)
-- `pink_spawn_block_top` (id 1022)
-- `press_top` (id 1389)
-- `purple_glazed_terracotta` (id 730)
-- `purple_spawn_block_top` (id 1017)
-- `radar_screen` (id 19)
-- `recycler_top` (id 1499)
-- `red_glazed_terracotta` (id 746)
-- `red_spawn_block_top` (id 1012)
-- `shatter_mill_top` (id 1465)
-- `shop_trader_spawn_top` (id 1115)
-- `shop_wizard_spawn_top` (id 1121)
-- `sky_tap_top` (id 1472)
-- `smelter_top` (id 1380)
-- `synthesizer_top` (id 1573)
-- `tree_cutter_top` (id 1447)
-- `white_glazed_terracotta` (id 690)
-- `white_spawn_block_top` (id 1007)
-- `wire_mill_top` (id 1396)
-- `wireless_terminal_top` (id 1612)
-- `yellow_glazed_terracotta` (id 706)
-- `yellow_spawn_block_top` (id 1002)
-### मापा गया ड्रिफ़्ट (cnty9 → ab90qa)
+- `alloy_kiln_top`
+- `auto_bench_top`
+- `belt_tunnel_exit_top`
+- `belt_tunnel_top`
+- `black_glazed_terracotta`
+- `black_spawn_block_top`
+- `blue_glazed_terracotta`
+- `blue_spawn_block_top`
+- `brown_glazed_terracotta`
+- `brown_spawn_block_top`
+- `burner_drill_top`
+- `centrifuge_top`
+- `checkpoint_block`
+- `chest_top`
+- `collider_top`
+- `condenser_top`
+- `coolant_mixer_top`
+- `crop_harvester_top`
+- `crusher_top`
+- `crystal_vat_top`
+- `custom_lobby_block_top`
+- `cyan_glazed_terracotta`
+- `cyan_spawn_block_top`
+- `deep_drill_top`
+- `electric_drill_top`
+- `gray_glazed_terracotta`
+- `gray_spawn_block_top`
+- `green_glazed_terracotta`
+- `green_spawn_block_top`
+- `iron_chest_top`
+- `light_blue_glazed_terracotta`
+- `light_blue_spawn_block_top`
+- `light_gray_glazed_terracotta`
+- `light_gray_spawn_block_top`
+- `lime_glazed_terracotta`
+- `lime_spawn_block_top`
+- `magenta_glazed_terracotta`
+- `magenta_spawn_block_top`
+- `mob_farm_top`
+- `moonstone_chest_top`
+- `orange_glazed_terracotta`
+- `orange_spawn_block_top`
+- `pink_glazed_terracotta`
+- `pink_spawn_block_top`
+- `press_top`
+- `purple_glazed_terracotta`
+- `purple_spawn_block_top`
+- `radar_screen`
+- `recycler_top`
+- `red_glazed_terracotta`
+- `red_spawn_block_top`
+- `shatter_mill_top`
+- `shop_trader_spawn_top`
+- `shop_wizard_spawn_top`
+- `sky_tap_top`
+- `smelter_top`
+- `synthesizer_top`
+- `tree_cutter_top`
+- `white_glazed_terracotta`
+- `white_spawn_block_top`
+- `wire_mill_top`
+- `wireless_terminal_top`
+- `yellow_glazed_terracotta`
+- `yellow_spawn_block_top`
 
-रजिस्ट्री बिल्ड के साथ भेजा गया कंटेंट है और हर ब्लॉक अपडेट के साथ खिसकता है। v4 बिल्ड (`cnty9`, 2026-10-27) → v5 बिल्ड (`ab90qa`, 2026-11-03):
-
-- एटलस प्रविष्टियाँ: 1,219 → 1,210
-- रोटेशन परिवार (टर्न्ड स्पेलिंग): 57 (228) → 57 (228) — **अपरिवर्तित**
-- एनीमेशन परिवार (फ़्रेम स्पेलिंग): 42 (188) → 42 (188) — **अपरिवर्तित**
-- प्रयोग-योग्य नामित स्थिरांक: 905 → **896**
-- बचे नामों में id परिवर्तन: **905 में से 334**
-
-पूरा ड्रिफ़्ट (11 नाम):
-
-- **जोड़े गए (1):** `scorpion_eggs`।
-- **हटाए गए (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — डबल चेस्ट (8 फ़ेस) गेम डेटा से चला गया (सिंगल-चेस्ट `chest_*` परिवार सुरक्षित बचा है), और स्पॉनर `mob_spawner_block_top` रखते हैं जबकि वेरिएंट साइड टेक्सचर चले गए हैं।
-
-**नाम ही API हैं; id स्नैपशॉट हैं।** दोनों बिल्डों के बीच, बचे हुए 905 नामों में से 334 का id बदल गया — `351` नहीं, `bloxdTextureIdStone` लिखें। इंजन सत्यापन के समय नाम रिज़ॉल्व करता है, इसलिए नाम से लिखे गए पैक ड्रिफ़्ट से बच निकलते हैं; कच्चे-id वाले पैक नहीं।
-
-### मापा गया ड्रिफ़्ट (ab90qa → xkg8x)
-
-रजिस्ट्री v5 लॉन्च के अगले ही दिन फिर खिसका — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, प्रोडक्शन पर लाइव; preprod `2lcqcl` शेडर-पैक की हर सतह पर समान मापा गया):
-
-- एटलस प्रविष्टियाँ: 1,210 → 1,220
-- रोटेशन परिवार (घुमाई गई स्पेलिंग): 57 (228) → 57 (228) — **अपरिवर्तित**
-- एनीमेशन परिवार (फ़्रेम स्पेलिंग): 42 (188) → 42 (188) — **अपरिवर्तित**
-- प्रयोग-योग्य नामित स्थिरांक: 896 → **1,017**
-- जीवित नामों में id परिवर्तन: **896 में से 376**
-
-पूरी ड्रिफ़्ट (10 नाम — v5 लॉन्च के सभी हटाए गए नाम वापस):
-
-- **जोड़े गए (10):** `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo`, `chest_double_top_2_hi`, `chest_double_top_2_lo`, `mob_spawner_hostile_block_side`, `mob_spawner_neutral_block_side` — डबल चेस्ट गेम डेटा में लौट आया और मॉब-स्पॉनर की साइड वैरिएंट भी वापस हैं।
-- **हटाए गए:** कोई नहीं।
-
-वही सिद्धांत और भी ज़्यादा लागू होता है: सिर्फ़ इसी कदम में 896 जीवित नामों में से 376 का id बदल गया।
-
-### मापा गया ड्रिफ़्ट (xkg8x → bny9u)
-
-रजिस्ट्री अगले ही दिन फिर खिसकी — `xkg8x` (2026-11-04) → `bny9u` (2026-11-05, प्रोडक्शन और preprod पर एक ही बाइट-समान बंडल के रूप में लाइव):
-
-- एटलस प्रविष्टियाँ: 1,220 → 1,232
-- रोटेशन परिवार (घुमाई गई स्पेलिंग): 57 (228) → 57 (228) — **अपरिवर्तित**
-- एनीमेशन परिवार (फ़्रेम स्पेलिंग): 42 (188) → **43 (196)** — नया `trading_terminal_front` 8-फ़्रेम / 250 ms की सीढ़ी चलाता है
-- प्रयोग-योग्य नामित स्थिरांक: 1,017 → **911**
-- जीवित नामों में id परिवर्तन: **1,017 में से 864** (95%)
-
-पूरी ड्रिफ़्ट (5 नाम — दो नए ब्लॉक):
-
-- **जोड़े गए (5):** `stone_generator_side`, `stone_generator_top`, `trading_terminal_front` (anim, 8 फ़्रेम), `trading_terminal_side`, `trading_terminal_top` — Trading Terminal और Stone Generator ब्लॉक गेम डेटा में शामिल हो गए।
-- **हटाए गए:** कोई नहीं।
-
-यह सिद्धांत हर कदम पर और मज़बूती से लागू होता है: सिर्फ़ इसी कदम में 1,017 जीवित नामों में से 864 का id बदला — लगभग बीस में से उन्नीस।
-
-### मापा गया ड्रिफ़्ट (bny9u → v98qt8)
-
-रजिस्ट्री सप्ताहांत में फिर एक बार खिसका — `bny9u` (2026-11-05) → `v98qt8` (2026-11-08, प्रोडक्शन और preprod एक ही बाइट-समान बंडल परोसते हैं, md5 `7458fd47ff88331d9f451d1456ff48ac`):
-
-- एटलस प्रविष्टियाँ: 1,232 → 1,650
-- रोटेशन परिवार (घुमाई गई स्पेलिंग): 57 (228) → 57 (228) — अपरिवर्तित
-- एनीमेशन परिवार (फ़्रेम स्पेलिंग): 43 (196) → 43 (196) — अपरिवर्तित
-- प्रयोग-योग्य नामित स्थिरांक: 911 → **1,017**
-- जीवित नामों में id परिवर्तन: **905 में से 716** (79%)
-
-पूरा ड्रिफ़्ट (7 नाम — तीन ब्लॉक मॉडल बन गए):
-
-- **जोड़ा गया (1):** `hay_block_top` — हे-ब्लॉक परिवार को एक अलग ऊपरी बनावट मिली।
-- **हटाए गए (6):** `artisan_table_side`, `artisan_table_top`, `crafting_table_side`, `furnace_front`, `furnace_side`, `furnace_top` — Furnace, Workbench (क्राफ़्टिंग टेबल) और Artisan Bench टेरेन-बनावट वाले ब्लॉकों से हटकर ब्लॉक-मॉडल बन गए, इसलिए उनकी टेरेन बनावटें रजिस्ट्री से निकल गईं (Workbench ने `crafting_table_top` बनाए रखा — ऊपरी फलक अब भी टेरेन-बनावट है))
-
-हमेशा जैसा सिद्धांत: इस एक ही कदम में 905 जीवित नामों में से 716 का id बदला — `bloxdTextureIdStone` लिखें, कच्चा नंबर नहीं।
 
 ### संबंधित
 
-- [टेक्सचर API](api/texture-api.md) · [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](internals/texture-registry.md) · [वर्शन हिस्ट्री: v4](history/v4.md)
-
-
----
+- [टेक्सचर API](api/texture-catalog.md/texture-api.md) — नाम lookup और sampling
+- [टेक्सचर रजिस्ट्री कैसे काम करती है](api/internals/texture-registry.md) — नामित constants
+- [टेक्सचर सैंपलिंग इंटर्नल्स](api/internals/texture-sampling.md) — sampling का व्यवहार
 
 ## गाइड
 "तंत्र और मानसिकता" वाली सामग्री। मूल रूप से क्या संभव है, यह [शेडर पैक क्या कर सकते हैं और क्या नहीं](guides/constraints.md) में है; लक्ष्य-उन्मुख कोड उदाहरण [रेसिपियाँ](recipes/) में रहते हैं।
@@ -5929,66 +5839,29 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ---
 
-## टेक्सचर रजिस्ट्री का आंतरिक विवरण
-> लक्ष्य API: 5 · स्थिति: Verified
+## टेक्सचर रजिस्ट्री कैसे काम करती है
 
-यह पृष्ठ बताता है कि टेक्सचर नाम ID में कैसे बदलते हैं और अलग-अलग बिल्ड के बीच रजिस्ट्री में क्या बदलाव हुए। पैक लेखकों के लिए उपलब्ध नामों की मौजूदा सूची [टेक्सचर कैटलॉग](api/texture-catalog.md) में है।
+> लक्ष्य API: 5 · उद्देश्य: नाम से टेक्सचर संदर्भित करना
 
-### मापन विधि
+Shader packs टेक्सचर को संख्यात्मक ID के बजाय नामित constants से संदर्भित करते हैं। Constants का रूप `bloxdTextureId<Name>` होता है। उपलब्ध नामों के लिए [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) देखें।
 
-हमने गेम के साथ आए ब्लॉक-टेक्सचर डेटा पर production build के अपने रजिस्ट्री-बिल्डर को चलाकर रजिस्ट्री दोबारा गणना की। प्राप्त फ़िंगरप्रिंट `32451195`, `bbb6l5` के साथ वितरित पहले से बने एटलस से मेल खाता है। ये इंजन की अपनी गणना के परिणाम हैं, अलग से लिखे गए पुनः-कार्यान्वयन के नहीं।
+### नाम का समाधान
 
-### वर्तमान रजिस्ट्री
+Pack लोड करते समय loader हर नामित constant को उपलब्ध टेक्सचर नाम से जोड़ता है। आंतरिक व्यवस्था बदलने पर भी, यदि नाम उपलब्ध रहता है, तो pack उस टेक्सचर को नाम से संदर्भित कर सकता है।
 
-| आउटपुट | `bbb6l5` | अर्थ |
-|---|---:|---|
-| `named` | **1,017** | `bloxdTextureId<Name>` स्थिरांक के रूप में उपलब्ध नाम |
-| `aliases` | **776** | वैकल्पिक लिखावटें जो आधार नाम पर हल होती हैं |
-| `layers` | **1,650** | टेक्सचर एटलस की कुल लेयर |
-| एटलस स्ट्रिप | **7** | छह पूरी स्ट्रिप और एक आंशिक स्ट्रिप |
-| रोटेशन परिवार | **64** | प्रति-फ़ेस रोटेशन वाले नाम |
-| एनीमेशन परिवार | **71** | एनीमेटेड फ़्रेम वाले नाम |
+**WGSL में संख्यात्मक texture IDs सीधे न लिखें।** गेम सामग्री अपडेट होने पर आंतरिक IDs और atlas की स्थितियाँ बदल सकती हैं। नामित constants pack code को इन आंतरिक स्थितियों पर निर्भर होने से बचाते हैं।
 
-एनीमेशन उपनामों में सामान्य फ़्रेम नाम और पास-पास के फ़्रेम को मिलाने वाली ट्रांज़िशन लिखावटें शामिल हैं। `radar_screen` रोटेशन और एनीमेशन, दोनों परिवारों में आता है।
+### एनीमेशन और रोटेशन
 
-### नामों को समेटने के नियम
-
-- **एनीमेशन:** `lava0`–`lava7` जैसे फ़्रेम नाम आधार नाम `lava` पर हल होते हैं। सैंपल करते समय `bloxdTexel` मौजूदा फ़्रेम चुनता है।
-- **रोटेशन:** `[rot[1`–`[rot[4` जैसे स्लॉट आधार नाम पर हल होते हैं। `bloxdTexel` फ़ेस का `textureRotation` लागू करता है।
-- **ट्रांज़िशन:** `frameA~frameB~interval` एटलस के उस स्लॉट को बताता है जो एनीमेशन के दो लगातार फ़्रेमों को मिलाता है।
-
-WGSL में नाम वाले स्थिरांक इस्तेमाल करें। संख्यात्मक टेक्सचर ID को कोड में स्थायी न करें: नाम उपलब्ध रहने पर भी ID बिल्ड बदलने पर बदल सकती है।
-
-### बिल्ड के बीच बदलाव
-
-| तुलना | एटलस लेयर | उपलब्ध नाम | मुख्य बदलाव |
-|---|---:|---:|---|
-| `sjr0p7` → `cnty9` | 1,200 → 1,219 | — | 98 जोड़े गए, 79 हटाए गए; घुमाए गए टेक्सचर के नामकरण नियम बदले |
-| `cnty9` → `ab90qa` | 1,219 → 1,210 | 905 → 896 | एक नाम जोड़ा गया और दस हटाए गए |
-| `ab90qa` → `xkg8x` | 1,210 → 1,220 | 896 → 906 | v5 लॉन्च पर हटाए गए सभी दस नाम वापस आए |
-| `xkg8x` → `bny9u` | 1,220 → 1,232 | 906 → 911 | Trading Terminal और Stone Generator के लिए पाँच नाम जोड़े गए |
-| `bny9u` → `v98qt8` | 1,232 → 1,227 | 911 → 906 | एक नाम जोड़ा गया; ब्लॉक मॉडल बनने पर छह टेक्सचर रजिस्ट्री से हटे |
-| `v98qt8` → `bbb6l5` | 1,227 → 1,650 | 906 → 1,017 | 423 लेयर जोड़ी गईं; रोटेशन और एनीमेशन परिवार बढ़े; फ़ोल्डिंग प्रतिगमन ठीक हुआ |
-
-हर अपडेट में कई नामों की ID फिर से निर्धारित हुई। नाम वाले स्थिरांक इस्तेमाल करने से पैक इन संख्यात्मक बदलावों पर निर्भर नहीं रहता।
-
-### v98qt8 की फ़ोल्डिंग प्रतिगमन (ठीक की गई)
-
-`v98qt8` में इंजन की एनीमेटेड-टेक्सचर तालिका में स्पेलिंग कुंजियाँ थीं, जबकि फ़ोल्डिंग लॉजिक स्लॉट इंडेक्स की अपेक्षा करता था। इसलिए एनीमेटेड टेक्सचर के आधार नाम सत्यापन में विफल हुए और हर फ़्रेम का नाम बिना एनीमेशन वाले अलग स्थिरांक के रूप में दिखा।
-
-यह समस्या `bbb6l5` में ठीक की गई: तालिका फिर से स्लॉट इंडेक्स इस्तेमाल करती है, एनीमेशन के आधार नाम सत्यापन पास करते हैं और रजिस्ट्री फ़िंगरप्रिंट वितरित एटलस से मेल खाता है। यह अनुभाग केवल इतिहास के लिए है; यह मौजूदा बिल्ड की स्थिति नहीं बताता।
-
-### HEADER_VERSION पर प्रभाव
-
-रजिस्ट्री फ़िंगरप्रिंट `HEADER_VERSION` का हिस्सा है। इसलिए रजिस्ट्री में बदलाव से पैक का फिर से सत्यापन हो सकता है। नाम इस्तेमाल करने वाले पैक नई ID पर हल हो जाते हैं; सीधे संख्यात्मक ID लिखने वाले पैक काम करना बंद कर सकते हैं। [कम्पैटिबिलिटी](api/compatibility.md) देखें।
+- **एनीमेशन:** `lava0`–`lava7` जैसे frame नामों के बजाय `lava` जैसा मूल नाम उपयोग करें। Sampling के समय वर्तमान frame चुना जाता है।
+- **रोटेशन:** आंतरिक rotation slots के बजाय कैटलॉग में दिया मूल नाम उपयोग करें। Sampling में face rotation लागू होती है।
+- **Frame transitions:** इंजन पास-पास के animation frames के बीच interpolation के लिए आंतरिक slots उपयोग करता है। Packs में सामान्य नामित constants ही उपयोग करें।
 
 ### संबंधित
 
-- [टेक्सचर कैटलॉग](api/texture-catalog.md) — पैक के लिए उपलब्ध नाम
-- [टेक्सचर सैंपलिंग का आंतरिक विवरण](internals/texture-sampling.md) — टेक्सचर सैंपल कैसे होते हैं
-- [रिसर्च लॉग](internals/research-log.md) — मापन विधि और बिल्ड इतिहास
-
----
+- [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) — उपलब्ध नाम और constants
+- [टेक्सचर API](internals/api/texture-api.md) — टेक्सचर lookup और sampling
+- [टेक्सचर सैंपलिंग इंटर्नल्स](internals/texture-registry.md/texture-sampling.md) — sampling कैसे काम करती है
 
 ## मॉडल रेंडरिंग इंटर्नल्स
 > लक्ष्य API: 5 · स्थिति: Analyzed (लाइव बंडल से बहाल)
@@ -6032,55 +5905,50 @@ Model प्रोग्राम वेरिएंट-मैट्रिक्
 
 ---
 
-## इंजन डेटा लेजर
-> लक्ष्य API: 5 · स्थिति: Verified
+## इंजन डेटा
 
-यह लेजर मौजूदा बिल्ड में shader packs के लिए उपलब्ध API के पुष्टि किए गए मानों को समेटता है। मॉड्यूल ID और chunk नंबर जैसे bundle के आंतरिक विवरण API विनिर्देश का हिस्सा नहीं हैं, इसलिए यहाँ शामिल नहीं किए गए हैं।
+> लक्ष्य API: 5 · उद्देश्य: स्पेसिफ़िकेशन सारांश
 
-### मौजूदा विनिर्देश
+यह पृष्ठ shader packs के लिए उपलब्ध API और pack बनाते समय लागू सीमाओं का सार देता है। परिभाषाओं और उदाहरणों के लिए संबंधित संदर्भ देखें।
 
-| मद | मौजूदा मान |
+### API का सार
+
+| मद | स्पेसिफ़िकेशन |
 |---|---|
-| `apiVersion` | `5` (संख्या के साथ सख़्त तुलना) |
-| इंजन हेडर | 216 पंक्तियाँ; पूरा पाठ [इंजन हेडर](internals/engine-header.md) में |
+| API संस्करण | `5` |
 | हुक | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| वेरिएंट | 6 (strict × terrain / liquid / model) |
-| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` को v5 में हटाया गया |
-| पैक uniform | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| पैक binding | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| फ़्लैग | 14 boolean फ़ील्ड वाला `BloxdFlags` स्ट्रक्चर |
-| टेक्सचर एटलस | 1,650 लेयर; 1,017 नाम; 776 उपनाम |
-| टेक्सचर परिवार | 64 रोटेशन और 71 एनीमेशन परिवार |
-| आरक्षित पहचानकर्ता | `/^bloxd/i` से मेल खाते नाम और 88 आंतरिक `bloxdSp*` प्रतीक |
-| गेम परिभाषाएँ | 119 |
-| shader-pack नीति | 12 अनुमत शीर्षक, 28 प्रविष्टियाँ; [गेम-वार नीति](internals/policy.md) देखें |
-| डिफ़ॉल्ट पैक टेम्पलेट | 1,633 bytes |
-| लोडर सीमाएँ | 256 WGSL फ़ाइलें / कुल 256 KB स्रोत / `pack.json` 64 KB / ZIP 32 MB / 1,024 प्रविष्टियाँ |
+| वेरिएंट | 6 (allow / strict × terrain / liquid / model) |
+| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`। `BLOXD_LIGHTING` उपलब्ध नहीं है |
+| Pack uniform | 80 bytes। फ़ील्ड offsets के लिए [Pack format](internals/api/pack-format.md) देखें |
+| टेक्सचर | `bloxdTextureId<Name>` रूप वाले नामित constants उपयोग करें। संख्यात्मक ID को स्थायी न मानें |
+| आरक्षित नाम | `bloxd` से शुरू होने वाले identifiers इंजन के लिए आरक्षित हैं |
 
-### bbb6l5 में बदलाव
+### Pack सीमाएँ
 
-`bbb6l5` में `apiVersion: 5` वही रहता है, लेकिन packs को दिखाई देने वाला API बढ़ता है:
+| मद | सीमा |
+|---|---:|
+| WGSL फ़ाइलें | 256 |
+| कुल WGSL source | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP archive | 32 MB |
+| ZIP entries | 1,024 |
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` और `bloxdShadowDirection()` इंजन द्वारा गणना की गई सूर्य और चंद्रमा की छाया उपलब्ध कराते हैं।
-- uniform में offset 64 पर `shadowDirection: vec3f` जोड़ा गया; आकार 64 से 80 bytes हुआ।
-- `pack.json` में पुरानी गोल छायाएँ बनाए रखने के लिए वैकल्पिक boolean फ़ील्ड `keepCircleShadows` जोड़ा गया।
-- एटलस 1,227 से 1,650 लेयर और उपलब्ध नाम 906 से 1,017 हुए।
-- `v98qt8` में आई टेक्सचर-स्थिरांक फ़ोल्डिंग प्रतिगमन ठीक की गई।
+ZIP की root में ठीक एक manifest रखें और फ़ाइलें UTF-8 में सहेजें। Duplicate paths और असमर्थित ZIP formats स्वीकार नहीं किए जाते। विवरण के लिए [Pack format](internals/api/pack-format.md) देखें।
 
-मापन का विवरण और प्रमाण [रिसर्च लॉग](internals/research-log.md) तथा [टेक्सचर रजिस्ट्री का आंतरिक विवरण](internals/texture-registry.md) में हैं।
+### API v5 की मुख्य सुविधाएँ
 
-### पुराने संस्करण
-
-- [संस्करण इतिहास](history/) — पुराने API के बदलाव और माइग्रेशन
-- [रिसर्च लॉग](internals/research-log.md) — मापन विधि और स्रोत
+- `bloxdShadow()` और `bloxdAirShadow(t)` सूर्य और चंद्रमा की रोशनी से बनने वाली छाया की जानकारी देते हैं।
+- `bloxdShadowDirection()` छाया डालने वाली रोशनी की दिशा लौटाता है।
+- Shadow API का उपयोग करते हुए पारंपरिक गोल छायाएँ बनाए रखने के लिए `pack.json` के वैकल्पिक `keepCircleShadows` फ़ील्ड को `true` करें।
+- रोशनी की स्थिति runtime पर `bloxdLit()` से जाँचें; `BLOXD_LIGHTING` मैक्रो समर्थित नहीं है।
 
 ### संबंधित
 
-- [इंजन हेडर](internals/engine-header.md) — पूरा हेडर पाठ
-- [गेम-वार नीति](internals/policy.md) — allow / strict नीति वाले गेम
-- [टेक्सचर रजिस्ट्री](internals/texture-registry.md) — नाम और ID का मिलान
-
----
+- [API संदर्भ](internals/api) — फ़ंक्शन, संरचनाएँ और constants
+- [Pack format](internals/api/pack-format.md) — manifest, uniform और loader सीमाएँ
+- [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) — उपलब्ध टेक्सचर नाम
+- [गेम-वार नीति](internals/engine-data.md/policy.md) — allow / strict दायरा
+- [API v4 माइग्रेशन गाइड](internals/history/v4.md) — पिछले संस्करण से माइग्रेशन
 
 ## पैक-दृश्य मान बदलने वाली चीज़ें
 > लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
@@ -6179,83 +6047,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 - पैक लागू होते समय WebGPU रेंडरर "ज़बरदस्ती ON" पर लॉक रहता है। "Disable Block Texture Atlas" सेटिंग भी लॉक हो जाती है (एटलस ON रहता है), और WebGPU-रहित डिवाइसों पर पैक बिल्कुल लागू नहीं हो सकते। वितरण पेजों पर "needs a WebGPU browser" लिखने का आधार यही है
 - ब्लॉक टेक्सचर एक 2D ऐरे टेक्सचर (`texture_2d_array`) हैं, और terrain सैंपलर nearest + repeat है। मेशर सामग्री / AO / प्रकाश मिलाने वाले फ़ेसों को एक आयत में भी मिला देता है (**greedy meshing**), इसलिए मिले फ़ेस का UV एक टाइल-चौड़ाई पार कर सकता है (किनारों पर 0.0015 इनसेट)। हार्डवेयर रिपीट एड्रेसिंग टाइलिंग सँभालती है, इसलिए मिले फ़ेस बेसीम दिखते हैं। ध्यान दें कि `vUV` से बँधा प्रोसीज़रल विवरण मिले-फ़ेस की सीमाओं पर टूट सकता है — उसे दुनिया की स्थिति (`s.position` + `bloxdRenderOffset()`) से बाँधें
 - प्रति-गेम-जॉइन रनटाइम पुनः-सत्यापन (`checkCompilation`) असली terrain सामग्री ब्राउज़र WebGPU में कंपाइल करता है (सेटिंग्स-स्क्रीन के स्थैतिक सत्यापन से सख़्त)। यहाँ विफल होने वाले पैक उस गेम से बाहर रख दिए जाते हैं
-
-
----
-
-## रिसर्च लॉग
-> स्थिति: Verified — इस दस्तावेज़ीकरण के माप कैसे प्राप्त किए गए
-
-यहाँ के तकनीकी कथन आधिकारिक डेवलपर दस्तावेज़ों पर नहीं, बल्कि **प्रोडक्शन-बंडल विश्लेषण** पर टिके हैं। यह पृष्ठ पद्धति और साक्ष्य दर्ज करता है ताकि भविष्य के बिल्डों को पुनः-सत्यापित किया जा सके।
-
-### मूल सिद्धांत
-
-1. **प्रत्यक्ष प्रोडक्शन-बंडल पुनर्प्राप्ति** — raw main.js और चंक दोनों प्रोडक्शन और प्रीप्रोड से लाए गए, पहचान md5 से सत्यापित
-2. **शब्दशः निष्ठा** — हेडर, त्रुटि संदेश और i18n स्ट्रिंग **जैसे हैं वैसे ही उद्धृत** होते हैं, कभी पेराफ़्रेज़ नहीं
-3. **पुनरुत्पादित माप** — रजिस्ट्री जैसे व्युत्पन्न मान इंजन के अपने मॉड्यूलों को एक हार्नेस में चलाकर पुनः गणना किए जाते हैं (असली आउटपुट, दिखने में-जैसा पुनर्कार्यान्वयन नहीं)
-4. **नामित बिल्ड** — हर माप के साथ बिल्ड id और तिथि रहती है
-
-### इस दस्तावेज़ीकरण द्वारा संदर्भित बिल्ड इतिहास
-
-| बिल्ड | API | तिथि | टिप्पणी |
-|---|---|---|---|
-| `szby6g` | v3-era | 2026-10-17 | पहला allow/strict स्थैतिक विश्लेषण (111 गेम-परिभाषाएँ) |
-| `3ymzdd` | v3 | 2026-10-20 | v3 गाइड का साक्ष्य बिल्ड |
-| `sjr0p7` | v3-era | 2026-10-17 | ड्रिफ़्ट-तुलना आधाररेखा |
-| `cnty9` | v4 | 2026-10-27 | v4 गाइड और 905-नाम कैटलॉग का साक्ष्य |
-| `6pf78` / `tcwczu` | v4 | 2026-10-31 | v4 फ़्रीज़ की पुष्टि (Halloween इवेंट + Skyblock रीवर्क) |
-| `ab90qa` | **v5** | 2026-11-03 | v5 लॉन्च बिल्ड; मूल v5 आधाररेखा। prod = preprod (md5 `fc3322212d15be2445c0e8dfc9733fcc`) |
-| `xkg8x` | **v5** | 2026-11-04 | रजिस्ट्री-ड्रिफ़्ट (+10 नाम); preprod `2lcqcl` शेडर-पैक की हर सतह पर समान मापा गया |
-| `bny9u` | **v5** | 2026-11-05 | ; इस दस्तावेज़ का बेसलाइन। prod = preprod (मुख्य बंडल पर md5 `60eea80ec48253b7ac6cc45604dc8273`, दोनों होस्ट से लाइव-फ़ेच करके पुष्ट) |
-| `v98qt8` | **v5** | 2026-11-08 | **वर्तमान**; इस दस्तावेज़ का बेसलाइन. prod = preprod (md5 `7458fd47ff88331d9f451d1456ff48ac`). रजिस्ट्री ड्रिफ़्ट (शुद्ध −5), गेम 115 → 116, और **टेक्सचर-स्थिरांक फ़ोल्डिंग प्रतिगमन** ([Texture registry](internals/texture-registry.md#the-v98qt8-folding-regression)) |
-
-### प्रमुख पद्धति
-
-#### इंजन-हेडर पुनर्स्थापना
-
-c55 हेडर टेम्पलेट को उसके लाइव इंटरपोलेशन के साथ रेंडर करना (`${vC}` = apiVersion, `${Gq.j}` से 5 uniform पठन) — v5 पर 6 इंटरपोलेशन ([इंजन हेडर](internals/engine-header.md))।
-
-#### टेक्सचर-रजिस्ट्री पुनर्गणना
-
-इंजन के रजिस्ट्री-बिल्डिंग मॉड्यूल (29812, चंक 52/53/54 द्वारा ढोया गया) को टेक्सचर डेटा (मुख्य बंडल में डेटा मॉड्यूल 1351) पर को भेजे गए ब्लॉक रजिस्ट्री के टेक्सचर डेटा पर एक मिनी webpack हार्नेस में चलाना; आउटपुट दर्ज करना (वर्तमान बिल्ड `bny9u`, 2026-11-05 पर नामित 911 / उपनाम 424 / एटलस 1,232 — मॉड्यूल 29812 + डेटा मॉड्यूल 1351; `xkg8x` पर 906 / 416 / 1,220 (मॉड्यूल 30093 + 1391); v5 लॉन्च पर 896) ([टेक्सचर रजिस्ट्री](internals/texture-registry.md))।
-
-एनीमेशन अंतराल `animDataPerTex`-शैली की तालिका से आते हैं (प्रति-लेयर `numAnimStates` / `animationInterval`) — केवल तीन अंतराल मान मौजूद हैं: 200 / 250 / 300 ms ([कैटलॉग](api/texture-catalog.md#एनीमेशन-परिवार-43-नाम))।
-
-#### त्रुटि-संदेश संग्रह
-
-लोडर संदेश लाइव i18n डिक्शनरी से शब्दशः; वैलिडेटर संदेश सत्यापन मॉड्यूल के स्ट्रिंग लिटरल से।
-
-#### allow / strict स्थैतिक विश्लेषण
-
-सभी 111 गेम-परिभाषाओं का स्थैतिक विश्लेषण: `shaderPackPolicy` के `"allow"` लिटरल — 8 सीधे + 4 आधार-चर = 12 शीर्षक (26 प्रविष्टियाँ), स्प्रेड-इनहेरिटेंस (`{...tb,...}`) भी ट्रैक किया गया ([नीति](internals/policy.md))।
-
-#### Uniform / पाइपलाइन पुनर्स्थापना
-
-uniform-लेआउट मॉड्यूल (29838) से `BloxdPackInputs` का फ़ील्ड लेआउट; WebGPU जनरेटर (c56) से टेक्सचर का 3-वेरिएंट कोडजन ([टेक्सचर सैंपलिंग](internals/texture-sampling.md))।
-
-### ड्रिफ़्ट अवलोकन
-
-| तुलना | अवधि | परिणाम |
-|---|---|---|
-| sjr0p7 → cnty9 | 10 दिन | 98 जोड़े, 79 हटाए; 779/1121 नामों का id बदला (69%) |
-| cnty9 → ab90qa | 7 दिन | +1 (scorpion_eggs), −10 (double chest ×8, spawner sides ×2); 334/905 नामों का id बदला |
-| ab90qa → xkg8x | 1 दिन | +10 (v5 लॉन्च के सभी हटाए नाम लौटे: डबल चेस्ट ×8, स्पॉनर साइड ×2); 376/896 नामों का id बदला; कोई हटाया नहीं गया |
-| xkg8x → bny9u | 1 दिन | +5 (Trading Terminal ×3, Stone Generator ×2); 864/906 नामों का id बदला (95%); कोई हटाया नहीं गया; एनीमेशन परिवार 42 → 43 |
-| bny9u → v98qt8 | 3 days | +1 `hay_block_top`, −6 (Furnace/Workbench/Artisan Bench became models); 716/905 names changed id (79%); families unchanged; **folding regression** — engine resolves 1,047 unfolded names |
-
-### असत्यापित / अनुमान-आधारित
-
-- पिक्सेल-सटीक शैडो मैप्स का "भविष्य की योजना" होना एक **व्याख्या** है (लाइटिंग टेम्पलेट के अप्रयुक्त `var shadow: f32 = 1.;` से अनुमित)
-- allow/strict विभाजन बिल्ड-दर-बिल्ड बदल सकता है (12-शीर्षक पहचान ab90qa और xkg8x पर पुनः-पुष्ट; भविष्य के गेम अज्ञात)
-- `bloxdFragmentBlockPosition` (v5 हेडर से बाहर): हस्ताक्षर-तालिका प्रविष्टि और रनटाइम इंजेक्शन दोनों लाइव पुष्ट — कॉल सत्यापित और संकलित होते हैं; इंजन टीम इसे रखने का इरादा रखती है या नहीं, अज्ञात है
-
-### कब पुनः-सत्यापित करें
-
-गेम अपडेट पकड़ में आने पर (नया main.js हैश): हेडर (9,125B) दोबारा जाँचें, apiVersion स्थिरांक, रजिस्ट्री पुनः गणना करें, और allow/strict सूची पुनः पुष्ट करें। विस्तृत निगरानी पद्धति इस दस्तावेज़ीकरण के दायरे से बाहर है, पर ऊपर दिए गए मॉड्यूल स्थान (c55 / c116 / c56) तब के शुरुआती बिंदु थे — `bny9u` पर: header/apiVersion मॉड्यूल 29815 और वैलिडेटर मॉड्यूल चंक c56 में, लोडर (zip/manifest/सीमाएँ) मॉड्यूल 32942 चंक c54 में, रजिस्ट्री-बिल्डर 29812 चंक c52/c53/c54 में, WebGPU कोडजेन चंक c57, डिफ़ॉल्ट पैक टेम्पलेट मॉड्यूल 33350 चंक c122 में, गेम/नीति मॉड्यूल 517 मुख्य बंडल में
-
-### संबंधित
-
-- [इंजन डेटा](internals/engine-data.md) · [टेक्सचर रजिस्ट्री](internals/texture-registry.md) · [संस्करण इतिहास](history/)
 
 
 ---
@@ -9116,71 +8907,41 @@ wire_mill_top_rot4
 ---
 
 ## API v5 माइग्रेशन गाइड
-लक्ष्य बिल्ड: `ab90qa.main.6188124c.js` — **2026-11-03 को मापा गया, प्रोडक्शन और preprod दोनों पर एक साथ लाइव**, और दोनों बंडल फिर से बाइट-समान हैं (मुख्य बंडल पर md5 `fc3322212d15be2445c0e8dfc9733fcc`, दोनों होस्ट से लाइव-फ़ेच किया गया), इसलिए यहाँ की हर बात प्रोडक्शन पर ज्यों की त्यों लागू होती है। v3 के बाद से यह सबसे बड़ा API संशोधन है: मुख्य बंडल बढ़कर 3.39 MB हुआ (+115 KB, पिछले v4 बिल्ड से), चंक मैप में अब 195 ids हैं (c0–c195, 7 ज्ञात छिद्रों के बाद 188 उत्सर्जित), शेडर पाइपलाइन अब भी c51–c56 क्लस्टर में है (लोडर c53, वैलिडेटर/हेडर/रजिस्ट्री-बिल्डर c55, WebGPU/कोडजेन c56, फ़ॉग c9) — पर डिफ़ॉल्ट पैक टेम्पलेट c116 पर चला गया (`tcwczu` में वह c124 था)। इस लेआउट विवरण की कोई भी बात पैक को दिखती नहीं। मौजूदा प्रोडक्शन बिल्ड `xkg8x.main.641a7732.js` (2026-11-04, md5 `f11cc032efd474aca567d3793b792057`) पर पुनः सत्यापित: इंजन हेडर बाइट-समान है और नीचे की सभी लोडर / वेरिएंट / हुक / आरक्षित-नाम माप अपरिवर्तित दोबारा जाँची गईं — केवल टेक्सचर रजिस्ट्री ही खिसकी है (896 → 906 प्रयोग-योग्य नाम; §80 परिशिष्ट)। Preprod (`2lcqcl`) एक अलग मेन बंडल चलाता है, लेकिन शेडर-पैक की हर सतह पर समान मापा गया। फिर `bny9u.main.02116121.js` (2026-11-05, md5 `60eea80ec48253b7ac6cc45604dc8273`, प्रोडक्शन और preprod दोनों से बाइट-समान रूप में) पर पुनः सत्यापित: हेडर, डिफ़ॉल्ट पैक टेम्पलेट, लोडर सीमाएँ, uniform लेआउट, हुक, वेरिएंट, मैक्रो, आरक्षित नाम और सत्यापन संदेश — सब दोबारा मापकर अपरिवर्तित; रजिस्ट्री फिर खिसकी (906 → 911 प्रयोग-योग्य नाम; §80 परिशिष्ट), गेम-परिभाषा संख्या 111 → 115 हुई, और शेडर-पाइपलाइन चंक पुनः क्रमांकित हुए (लोडर c54, वैलिडेटर/हेडर c56, WebGPU/कोडजेन c57, डिफ़ॉल्ट टेम्पलेट c122)।
 
-जो *दिखता* है: इंजन हेडर 6,021 से बढ़कर **8,954 डिकोडेड बाइट** हुआ (151 → 208 पंक्तियाँ) — लगभग हर स्ट्रक्चर को फ़ील्ड मिले, चार नए फ़ंक्शन इंजन की अपनी लाइटिंग रेसिपी प्रलेखित करते हैं, और `blockFlags` बिटमास्क गायब है, उसकी जगह boolean का एक उचित `BloxdFlags` स्ट्रक्चर आया है। `#ifdef BLOXD_LIGHTING` कंपाइल-टाइम गेट भी गायब है: लाइटिंग स्थिति प्रति-फ़्रेम uniform में `lit: u32` मेंबर के रूप में चली गई और रन-टाइम पर `bloxdLit()` से पूछी जाती है। डिफ़ॉल्ट पैक टेम्पलेट अब छह की जगह **सभी नौ हुक** लेकर आता है। और `bloxdSp*` इंजन-आंतरिक नेमस्पेस 27 से बढ़कर 46 सिंबल हो गया।
+### 69. v4 पैकों की अनुकूलता
 
-v5 का बदलाव-सेट एक ही स्क्रीन में:
+API v4 के लिए बनाए गए packs, migration के बिना API v5 के साथ संगत नहीं हैं। Pack को v5 के लिए अपडेट करें और manifest में `apiVersion` को संख्या `5` पर सेट करें। यह JSON number होना चाहिए, string `"5"` नहीं।
 
-| क्षेत्र | v4 | v5 |
+`pack.json` ZIP archive के root में रखा JSON object होना चाहिए। `name` आवश्यक है और whitespace हटाने के बाद भी non-empty string होना चाहिए। `author` वैकल्पिक है, लेकिन देने पर string होना चाहिए। Loader manifest की अन्य properties को अनदेखा करता है।
+
+### 70. pack.json, loader और uniform
+
+Packs और उनके archives को इन सीमाओं का पालन करना होगा।
+
+| मद | सीमा |
+|---|---:|
+| प्रति pack `.wgsl` फ़ाइलें | 256 |
+| कुल `.wgsl` source | 256 KB |
+| `pack.json` | 64 KB |
+| ZIP archive | 32 MB |
+| ZIP entries | 1,024 |
+
+Split ZIP archives, Zip64, encrypted entries और unsupported compression methods समर्थित नहीं हैं। सभी फ़ाइलें UTF-8 में सहेजें और archive में duplicate paths न रखें।
+
+#### Pack uniform
+
+Pack uniform 80 bytes का है।
+
+| Offset | Field | Type |
 |---|---|---|
-| `pack.json` `apiVersion` | `4` (strict) | **`5` (strict)** — v4 पैक लोड पर अस्वीकृत |
-| ब्लॉक पहचान | `blockFlags: u32` + 6 `bloxdBlockFlag*` बिट कॉन्स्टैंट | **`flags: BloxdFlags`** — 14 नामित bool फ़ील्ड (§71) |
-| नए फ़्लैग प्रकार | — | **`slab` `stairs` `flat` `placed` `held` `dropped` `thrown` `lifeform`** — मॉडल और एंटिटीज़ अब टेरेन से अलग पहचान योग्य हैं (§71) |
-| मॉडल स्थिति | — | हर इनपुट स्ट्रक्चर पर **`localPosition: vec3f`** (§72) |
-| एनचांट और ओवरले | केवल-इंजन | **`enchantTier` / `enchantColour` / `enchantSpeed` / `overlayColour` इनपुट + आउटपुट** (§72–§73) |
-| लाइटिंग गेट | `#ifdef BLOXD_LIGHTING` (कंपाइल-टाइम, 8 वेरिएंट) | **हटाया गया** — uniform को `lit: u32` @ ऑफ़सेट 4 मिला; रन-टाइम पर **`bloxdLit()`** से जाँच; 6 वेरिएंट (§74) |
-| लाइटिंग हेल्पर | इंजन-निजी `litColour` | **सार्वजनिक**: `bloxdShading()`, `bloxdWorldLight()`, `bloxdLitColour()` (§74) |
-| `bloxdFragmentBlockPosition()` | हेडर में प्रलेखित | **प्रलेखित हेडर से बाहर** — पर अब भी इंजेक्ट होता है और वैलिडेटर द्वारा अब भी स्वीकृत (§75) |
-| डिफ़ॉल्ट पैक | 6 हुक (vertex+surface) | **9 हुक** — लाइट हुक सहित (§76) |
-| `bloxdChunkSize` | हेडर में नहीं | **नया कॉन्स्टैंट `bloxdChunkSize: i32 = 32`** (§78) |
-| `bloxdSp*` नेमस्पेस | 27 सिंबल | **46 सिंबल** (+20, −1) (§79) |
-| टेक्सचर रजिस्ट्री | 905 प्रयोग-योग्य नाम | **896 प्रयोग-योग्य नाम** — +1, −10 (§80) |
-| लोडर सीमाएँ, zip नियम, `pack.json` स्वरूप, हुक नाम, strict अनुबंध | — | **जमा हुआ, बाइट-समान सीमाएँ** (§70) |
+| 0 | `seconds` | `f32` |
+| 4 | `lit` | `u32` |
+| 16 | `renderOffset` | `vec3i` |
+| 32 | `sunDirection` | `vec3f` |
+| 48 | `eyePosition` | `vec3f` |
+| 64 | `shadowDirection` | `vec3f` |
 
-v4 से रूपांतरण अधिकतर यांत्रिक है (§77): इस बार मौन-जाल अलग है — जो पैक अब भी `blockFlags` पढ़ता है या लाइट हुक `#ifdef BLOXD_LIGHTING` से बचाता है वह **विशिष्ट संदेश के साथ सत्यापन में विफल** होता है (एनालाइज़र अब दोनों समझाता है), इसलिए कुछ भी मौन रूप से ग़लत व्यवहार नहीं करता; पर जो पैक केवल *पुराने बिट-कॉन्स्टैंट को नाम से पढ़ता* है वह पोर्ट होने तक लोड से इनकार करेगा। हमेशा की तरह, वितरण से पहले एक इन-गेम कंपाइल से जाँच लें।
-
-### 69. v4 पैकों की अंतिम दशा (निष्कर्ष सबसे पहले)
-
-**हर v4 पैक — v4 के रूप में वितरित किया गया हर पैक सहित — अब प्रोडक्शन पर ठीक लोड के समय विफल होता है।** लोडर `manifest.apiVersion !== 5` की तुलना सख़्त JavaScript `!==` से करता है — इस बिल्ड में संस्करण कॉन्स्टैंट `5` और हेडर टेम्पलेट एक ही मॉड्यूल (मॉड्यूल 29836) में रहते हैं, इसलिए जाँच और वह हेडर-पाठ जिसके विरुद्ध वह प्रमाणित करती है, साथ-साथ चलते हैं। JSON को *संख्या* `5` ही ले जानी होगी; स्ट्रिंग `"5"` विफल होती है और उसकी JSON वर्तनी के साथ रिपोर्ट होती है, ठीक v4 की तरह।
-
-लोड-टाइम के दोनों संदेश v4 से अपरिवर्तित हैं, लाइव i18n शब्दकोश से शब्दशः:
-
-
-> `This pack is for shader pack API version {{packVersion}}. Bloxd supports version {{version}}.` — कुंजी मौजूद है, पर 5 के बराबर नहीं।
-
-संग्रहीत (पहले काम करने वाला) v4 पैक प्लेयर पर कुछ नहीं फेंकता: संग्रहीत-पैक परिणाम `{kind: "none", reason: "otherApiVersion"}` पर समाप्त होता है, पैक मौन रूप से निष्क्रिय रहता है, और शेडर-पैक सेटिंग्स टैब स्थिति-पंक्ति से ख़ुद को समझाता है:
-
-> `This shader pack is for API version {{packVersion}}, so it won't run. Load a version {{version}} pack to replace it.`
-
-मैनिफ़ेस्ट के नियम बाकी बातों में दोबारा मापे गए और अपरिवर्तित हैं: `pack.json` zip के रूट पर एक JSON ऑब्जेक्ट होना चाहिए; `apiVersion` मौजूद होना चाहिए और `=== 5` होना चाहिए; `name` अनिवार्य है, स्ट्रिंग, trim के बाद ग़ैर-रिक्त; `author` वैकल्पिक है पर मौजूद हो तो स्ट्रिंग होना चाहिए; मैनिफ़ेस्ट की बाकी सब चीज़ें नज़रअंदाज़ कर दी जाती हैं।
-
-### 70. pack.json, लोडर और uniform (जो अपरिवर्तित रहता है)
-
-पूरा पैक मॉडल v4 से बाइट-दर-बाइट आगे आता है। लोडर सीमाएँ, लाइव लोडर चंक (c53) पर दोबारा मापी गईं:
-
-| सीमा | मान | पार होने पर संदेश |
-|---|---|---|
-| प्रति पैक `.wgsl` फ़ाइलें | 256 | `The pack has more than 256 .wgsl files.` |
-| कुल `.wgsl` स्रोत | 256 KB | `The pack's .wgsl files are over 256 KB in total.` |
-| `pack.json` आकार | 64 KB | `pack.json is over 64 KB.` |
-| zip आकार | 32 MB | `The zip is over 32 MB.` |
-| zip प्रविष्टियाँ | 1,024 | `The zip has more than 1024 entries.` |
-| zip आकृति | — | split zip, Zip64, एन्क्रिप्टेड प्रविष्टियाँ, असमर्थित कंप्रेशन — हर एक अपने समर्पित संदेश के साथ अस्वीकृत; हर फ़ाइल वैध UTF-8 होनी चाहिए; ठीक एक `pack.json`; कोई डुप्लिकेट पाथ नहीं |
-
-प्रति-फ़्रेम uniform अब भी `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` है, अब भी 64 बाइट — पर उसे एक मेंबर मिला है। लेआउट तालिका, लाइव uniform-लेआउट मॉड्यूल से:
-
-| ऑफ़सेट | फ़ील्ड | टाइप | टिप्पणी |
-|---|---|---|---|
-| 0 | `seconds` | `f32` | `bloxdSeconds()` का आधार |
-| 4 | `lit` | `u32` | **v5 में नया** — ब्लॉक/स्काई लाइटिंग चालू होने पर 1; `bloxdLit()` का आधार |
-| 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` का आधार |
-| 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` का आधार |
-| 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` का आधार |
-
-`lit` उस पैडिंग में बैठता है जो v4 में `seconds` और `renderOffset` के बीच पहले से मौजूद थी (ऑफ़सेट 4–15 v4 में अलाइनमेंट की ढील थे; `renderOffset` 16 पर ही रहता है क्योंकि `vec3i` को 16-बाइट अलाइनमेंट चाहिए), इसलिए स्ट्रक्चर का कुल आकार और बाकी हर मेंबर का ऑफ़सेट अपरिवर्तित रहता है। इंजन इसे एक ही `setUint32(4, lit ? 1 : 0)` से लिखता है — यह एक फ़्लैग है, लाइट-लेवल नहीं: v4 के JS-पक्षीय नाम `terrainLightLevels` / `terrainHeldLight` बंडल से पूरी तरह ग़ायब हैं।
-
-पैक का बाइंड-ग्रुप लेआउट बाकी अपरिवर्तित है: group 3 अब भी `0` uniform · `1` scene-depth टेक्सचर (liquid वेरिएंट) · `2` `bloxdSpTextureLayers` स्टोरेज बफ़र। `minBindingSize` अब भी 64 है।
+Uniform `@group(3) @binding(0)` पर bind होता है। इसका `minBindingSize` 80 है। Group 3 के अन्य bindings Liquid variants के लिए scene-depth texture और `bloxdSpTextureLayers` storage buffer हैं।
 
 ### 71. फ़्लैग-पुनर्लेखन: `blockFlags` → `BloxdFlags` (मुख्य बदलाव)
 
@@ -9469,7 +9230,7 @@ strict-गेम अनुबंध ख़ुद (v4 §60) अपरिवर्
 एक सघन v4 पैक — "हरियाली टिंट + हेल्ड-लाइट बूस्ट" — जैसा वह आज विफल होता, और पोर्ट किया हुआ:
 
 ```wgsl
-// ---- v4 (ab90qa पर सत्यापन में विफल) ----
+// ---- v4 (API v5 पर सत्यापन में विफल) ----
 fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
     var out = bloxdDefaultSurface(surface);
     if ((surface.blockFlags & bloxdBlockFlagVegetation) != 0u) {
@@ -9530,311 +9291,6 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 - **Y-डिरिवेटिव पैक कोड में स्वतः चिह्न-पलटे जाते हैं।** एनालाइज़र `dpdy`, `dpdyCoarse` या `dpdyFine` की हर कॉल `(-dpdy(...))` में रीराइट कर देता है — स्क्रीन-स्पेस y नीचे की ओर इशारा करता है, इसलिए यह उलटाव "ऊपर की ओर परिवर्तन की दर" को सहज बोध से मेल देता है। आप `dpdy(h)` इस आशय से लिखते हैं कि "ऊपर जाने पर h कैसे बदलता है"; उत्सर्जित कोड वह उलटाव आपके लिए ले लेता है। `dpdx` और `fwidth` परिवार अछूते रहते हैं। (वैलिडेटर के टोकन-रीराइट पास में मापा गया; dpdy परिवार को उलटाव-सेट के रूप में स्पष्ट रूप से सूचीबद्ध किया गया है।)
 - **टेक्सचर-नाम डायग्नॉस्टिक्स को वर्तनी-इंजन मिला।** `bloxdTextureId` से शुरू होकर भी रिज़ॉल्व न होने वाला नाम अब Levenshtein-संचालित सुझाव पाता है: *"`X' isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdY?`"* — साथ ही फ़्रेम स्पेलिंग के लिए समर्पित संदेश (*"names a frame of the animated texture Z: use bloxdTextureIdZ, which bloxdTexel animates."*) और turned स्पेलिंग के लिए (*"names a turned copy of Z: use bloxdTextureIdZ, which bloxdTexel turns as each face shows it."*)। सामान्य आरक्षण नियम डायग्नॉस्टिक्स में दोबारा कहा गया है: *"Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"*, और *"Packs can't use X: the engine binds every texture and sampler. Surface and light hooks can read atlas textures with bloxdTexel."*
 - **केवल संदर्भित टेक्सचर कॉन्स्टैंट उत्सर्जित होते हैं।** हेडर का `bloxdTextureId*` ब्लॉक हर पैक के लिए उन नामों से जनरेट होता है जिन्हें आप वास्तव में संदर्भित करते हैं — तीन कॉन्स्टैंट उपयोग करने वाले पैक को तीन `const` पंक्तियाँ आगे जुड़ती हैं, पूरे ~900 नहीं।
-- **`HEADER_VERSION` अब `9.<hash>.<hash>` है** — v4 जैसी ही दो-सफ़िक्स संरचना (हेडर सामग्री का fnv1a32, क्रमबद्ध नाम-id रजिस्ट्री का fnv1a32), अग्रणी पूर्णांक 8 से बढ़कर 9। संग्रहीत-पैक पुनःजाँच तर्क ([v4 गाइड](history/v4.md) का §55) अपरिवर्तित है: हेडर/रजिस्ट्री बदलने पर संग्रहीत पैक "needs re-check" पर पलट जाते हैं।
+- **`HEADER_VERSION` अब `9.<hash>.<hash>` है** — v4 जैसी ही दो-सफ़िक्स संरचना (हेडर सामग्री का fnv1a32, क्रमबद्ध नाम-id रजिस्ट्री का fnv1a32), अग्रणी पूर्णांक 8 से बढ़कर 9। संग्रहीत-पैक पुनःजाँच तर्क ([v4 गाइड](history/v5.md/v4.md) का §55) अपरिवर्तित है: हेडर/रजिस्ट्री बदलने पर संग्रहीत पैक "needs re-check" पर पलट जाते हैं।
 - **i18n सतह**: शेडर-पैक कुंजी-परिवार स्वरूप में अपरिवर्तित है (v4 गाइड §62 की `load*`, `status*` और वेरिएंट-लेबल कुंजियाँ सब दोबारा मापी गईं — मौजूद; `loadNoWgsl`/`loadNotZip` अब भी यथार्थ)।
 - **पुनः-शोधकर्ताओं के लिए बंडल लेआउट**: हेडर c55 (अपरिवर्तित), लोडर/पर्सिस्टेंस c51–c53, वैलिडेटर + रजिस्ट्री बिल्डर c55, WebGPU कोडजेन c56, फ़ॉग c9, **डिफ़ॉल्ट पैक टेम्पलेट c116** (c124 से खिसका), BLOXD_ALPHA साइटें c51/c52/c53/c55/c9। चंक-फ़ॉर्मैट टिप्पणी: अब हर चंक एक ES मॉड्यूल है (`export const modules = {...}`) — c53 c52 और c53 दोनों के मॉड्यूल लेकर चलता है — जो तब मायने रखता है जब आप बंडल में टेक्स्ट-सर्च करें (`1371` जैसी मॉड्यूल id *main* के स्पार्स मॉड्यूल ऐरे में रहती है, किसी चंक में नहीं)।
-
-### 79. इंजन इंटरनल्स v5: टेक्सचर पाइपलाइन और 46-सिंबल वाला `bloxdSp*` नेमस्पेस
-
-v4 §63 का तीन-वेरिएंट टेक्सचर कोडजेन उसी स्वरूप के साथ आगे आता है। लाइव जेनरेटर (c56) से पुनर्स्थापित:
-
-**वेरिएंट 1 — कोई टेक्सचर पैक सक्रिय नहीं** (पूरा जनरेटेड ब्लॉक; `bloxdTextureSize` और `bloxdTexel` स्टब हैं):
-
-```wgsl
-fn bloxdTextureSize(bloxdSpMipLevel: f32) -> vec2u {
-        return vec2u(1u);
-}
-fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> vec4f {
-        return vec4f(1.0);
-}
-```
-
-**वेरिएंट 2 — एटलस पथ** (गेमों में डिफ़ॉल्ट): `bloxdTextureSize`, `textureDimensions(textureAtlas0, u32(clamp(round(bloxdSpMipLevel), 0.0, f32(textureNumLevels(textureAtlas0) - 1u))))` लौटाता है, और `bloxdTexel` लोड से पहले फलक का चौथाई-घुमाव लगाता है — v4 की रोटेशन-बारीकी (v4 गाइड §57.4), अब जनरेट किए `bloxdSpTurned` पर स्पष्ट if-श्रृंखला के रूप में:
-
-```wgsl
-        // Each quarter turn clockwise the face shows its texture at reads the unturned texture at (v, 1 - u)
-        var bloxdSpTurned = bloxdSpUv;
-        if (bloxdSpTextureRotation == 1u) {
-                bloxdSpTurned = vec2f(bloxdSpUv.y, 1.0 - bloxdSpUv.x);
-        } else if (bloxdSpTextureRotation == 2u) {
-                bloxdSpTurned = 1.0 - bloxdSpUv;
-        } else if (bloxdSpTextureRotation == 3u) {
-                bloxdSpTurned = vec2f(1.0 - bloxdSpUv.y, bloxdSpUv.x);
-        }
-```
-
-(उस अंश में `bloxdSpTextureRotation` नाम इनपुट चतुष्टय के रोटेशन मेंबर के लिए इंजन का अपना भंडारण है — v4 §63.2 का डिलिवरी पथ, भूमिका में अपरिवर्तित।) **वेरिएंट 3 — कस्टम टेक्सचर-पैक टेक्सचर** — `textureLoad(<atlas>, min(bloxdSpCellAt * bloxdSpSize + bloxdSpAt, <dims> - 1u), bloxdSpLevel)` से लेयर्ड एटलस की प्रति-टेक्सचर सेल सैंपल करता है, साथ में पैक के अपने टेक्सल के लिए एक `bloxdSpOwnTexel` पथ।
-
-`bloxdSp*` नेमस्पेस — जो कुछ जेनरेटर इंजेक्ट कर सकता है और इसलिए आप पुनः घोषित नहीं कर सकते — 27 से बढ़कर **46 सिंबल** हुआ: 20 नए, 1 रिटायर (`bloxdSpLitColour`, जिसका काम अब सार्वजनिक `bloxdLitColour` है), 26 आगे बढ़े:
-
-`bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEye` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLod` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpPixel` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpSize` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpWord` · `bloxdSpZ`
-
-नए नाम सीधे v5 की सुविधाओं तक जाते हैं: `bloxdSpFlags` (फ़्लैग-स्ट्रक्चर पथ), `bloxdSpEnchant` / `bloxdSpItemLocalPosition` (नए इनपुट), `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` (सेल-सैंपलिंग टेक्सचर-पैक पथ), `bloxdSpQuarterTurns` (ऊपर की रोटेशन चेन), `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` (एक्सटेंडेड हुकों में जनरेटेड लोकल)। पैक-स्तरीय आरक्षण नियम अपरिवर्तित और सूची से व्यापक है: `/^bloxd/i` से मेल खाता कुछ भी, केस-असंवेदनशील।
-
-### 80. टेक्सचर रजिस्ट्री: 896 प्रयोग-योग्य नाम (ड्रिफ़्ट, मापा हुआ)
-
-`ab90qa` (2026-11-03) पर v4 कैटलॉग ([v4 गाइड](history/v4.md) का §68) की ही कार्यप्रणाली से दोबारा मापा गया: इंजन का अपना रजिस्ट्री-बिल्डर मॉड्यूल (इस बिल्ड में मॉड्यूल 29833) शिप किए गए ब्लॉक-रजिस्ट्री टेक्सचर डेटा पर चलाया गया और उसका आउटपुट रिकॉर्ड किया गया।
-
-| माप | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| एटलस प्रविष्टियाँ | 1,219 | **1,210** |
-| Turned परिवार (रोटेटेड स्पेलिंग) | 57 (228) | **57 (228) — अपरिवर्तित** |
-| एनिमेटेड परिवार (फ़्रेम स्पेलिंग) | 42 (188) | **42 (188) — अपरिवर्तित** |
-| प्रयोग-योग्य नामित कॉन्स्टैंट | 905 | **896** |
-| बचे नामों में id-बदलाव | — | **905 में से 334 का id बदला** |
-
-ड्रिफ़्ट, संपूर्ण रूप में (यही पूरी सूची है — 11 नाम):
-
-- **जोड़े गए (1):** `scorpion_eggs`।
-- **हटाए गए (10):** आठ डबल-चेस्ट टेक्सचर `chest_double_front`, `chest_double_front_hi`, `chest_double_front_lo`, `chest_double_back`, `chest_double_back_hi`, `chest_double_back_lo`, `chest_double_top_1_hi`, `chest_double_top_1_lo` — और `chest_double_top_2_hi`, `chest_double_top_2_lo` (डबल चेस्ट गेम डेटा से गायब है; सिंगल-चेस्ट `chest_*` परिवार अक्षुण्ण बचा है) — साथ ही `mob_spawner_hostile_block_side` और `mob_spawner_neutral_block_side` (स्पॉनर `mob_spawner_block_top` रखता है; वेरिएंट साइड टेक्सचर गायब हैं)।
-
-v4 कैटलॉग का सिद्धांत ([v4 गाइड](history/v4.md) का §68) शब्द-दर-शब्द आगे बढ़ता है: **नाम ही API हैं, ids केवल स्नैपशॉट हैं।** दोनों बिल्डों के बीच बचे 905 नामों में से 334 का id बदल गया — `bloxdTextureIdStone` लिखें, कभी `351` नहीं। v4 कैटलॉग की वर्णनात्मक सूची ([v4 गाइड](history/v4.md) का §68.2) ऊपर बताए 11-नाम ड्रिफ़्ट को छोड़कर v5 के लिए वैध बनी हुई है; फ़ोल्डिंग नियम और दोनों परिवार-तालिकाएँ अपरिवर्तित हैं, इसलिए उसके §68.3–§68.4 (turned और animated परिवार) अब भी यथार्थ हैं। मौजूदा-रूप कैटलॉग [टेक्सचर कैटलॉग](api/texture-catalog.md) है।
-
-**परिशिष्ट (2026-11-04, `xkg8x`):** रजिस्ट्री v5 लॉन्च के अगले दिन फिर खिसका — नीचे की हर हटाई उलट गई है। एटलस प्रविष्टियाँ 1,210 → 1,220, प्रयोग-योग्य नाम 896 → **906** (डबल-चेस्ट की आठ टेक्सचर और दोनों स्पॉनर साइड वैरिएंट वापस; कुछ हटाया नहीं गया), 896 जीवित नामों में से 376 का id बदला, परिवार अपरिवर्तित (57 / 42)। Preprod `2lcqcl` शेडर-पैक की हर सतह पर समान मापा गया। वर्तमान रूप का कैटलॉग `xkg8x` पर दोबारा मापा गया है: [टेक्सचर कैटलॉग](api/texture-catalog.md)।
-
-**परिशिष्ट (2026-11-05, `bny9u`):** रजिस्ट्री फिर खिसकी — दो नए ब्लॉक आए। एटलस प्रविष्टियाँ 1,220 → 1,232, प्रयोग-योग्य नाम 906 → **911** (+5: `trading_terminal_front` / `_side` / `_top`, `stone_generator_side` / `_top`; कुछ हटाया नहीं गया), **906 जीवित नामों में से 864 का id बदला** (95%), रोटेशन परिवार अपरिवर्तित (57), एनीमेशन परिवार 42 → **43** (`trading_terminal_front`, 250 ms पर 8 फ़्रेम)। प्रोडक्शन और preprod एक ही बाइट-समान बंडल चलाते हैं (md5 `60eea80ec48253b7ac6cc45604dc8273`)। वर्तमान रूप का कैटलॉग `bny9u` पर दोबारा मापा गया है: [टेक्सचर कैटलॉग](api/texture-catalog.md)।
-
-**परिशिष्ट (2026-11-08, `v98qt8`):** रजिस्ट्री फिर खिसकी, और इस बार बिल्ड में एक **फ़ोल्डिंग प्रतिगमन** भी है। एटलस प्रविष्टियाँ 1,232 → 1,227, प्रयोग-योग्य नाम 911 → **906** (+1 `hay_block_top`; −6 `artisan_table_side`/`_top`, `crafting_table_side`, `furnace_front`/`_side`/`_top` — Furnace, Workbench और Artisan Bench ब्लॉक-मॉडल बन गए (Workbench ने `crafting_table_top` बनाए रखा — ऊपरी फलक अब भी टेरेन-बनावट है)), **905 में से 716 जीवित नामों का id बदला** (79%), दोनों परिवार-समुच्चय अपरिवर्तित (57 / 43)। प्रोडक्शन और preprod एक ही बाइट-समान बंडल परोसते हैं (md5 `7458fd47ff88331d9f451d1456ff48ac`)। प्रतिगमन: इंजन की एनीमेटेड-टेक्सचर तालिका अब स्पेलिंग से इंडेक्स होती है जबकि फ़ोल्डिंग कोड स्लॉट-इंडेक्स चाहता है, इसलिए 43 एनीमेशन-परिवार आधार नाम (`lava` …) फिलहाल सत्यापन में विफल हैं और 196 फ़्रेम स्पेलिंग अलग स्थिरांकों के रूप में रिज़ॉल्व हैं — पूरा बाइट-स्तरीय विश्लेषण [इंजन इंटरनल्स: टेक्सचर रजिस्ट्री](internals/texture-registry.md#the-v98qt8-folding-regression) में। वर्तमान रूप की कैटलॉग `v98qt8` पर पुनः मापी गई: [टेक्सचर कैटलॉग](api/texture-catalog.md)।
-
-
-**परिशिष्ट (2026-11-20, `bbb6l5`):** रजिस्ट्री ने अब तक का सबसे बड़ा कदम उठाया — और यह **v5 युग का पहला API सतह-परिवर्तन** है। एटलस प्रविष्टियाँ 1,227 → **1,650** (+423, −0), प्रयोगी नाम 906 → **1,017** (+111 — एटमिक एज कंटेंट पैक: रिएक्टर मशीनरी, यूरेनियम और सामग्री, बैटरियाँ, बम और विशेष), घूर्णन परिवार 57 → **64**, एनीमेशन परिवार 43 → **71** (+204 नए `frameA~frameB~interval` संक्रमण स्पेलिंग — पूर्व-मिश्रित क्रॉसफ़ेड स्लॉट), जीवित नामों में **863/906 का id बदला** (95%), और `v98qt8` की **फ़ोल्डिंग प्रतिगमन ठीक हो गई** (एनीमेशन तालिका फिर से स्लॉट-इंडेक्स — `lava` वगैरह सत्यापन पास करते हैं)। साथ ही, `apiVersion` बदले बिना पैक-दृश्य API बढ़ा: uniform में `shadowDirection: vec3f` @ 64 (64 → 80 बाइट, `minBindingSize` 80), हेडर में `bloxdShadowDirection()`, इंजेक्टेड फ़ंक्शन `bloxdShadow()` / `bloxdAirShadow(t)` ने पैकों के लिए असली सूर्य/चंद्र छाया प्रणाली खोली, और `pack.json` में वैकल्पिक boolean `keepCircleShadows`। फिंगरप्रिंट `13d4e18f` → `32451195` (बंडल में निहित पूर्व-निर्मित एटलस से मिलान-सत्यापित)। वर्तमान कैटलॉग `bbb6l5` पर पुनर्मापित: [टेक्सचर कैटलॉग](api/texture-catalog.md)।
-### 81. पुष्ट कॉन्स्टैंट, सीमाएँ और लेआउट (v5)
-
-गाइड के माप-खाते की v5 पंक्ति — सब कुछ `ab90qa` पर मापा गया (2026-11-03, prod = preprod, बाइट-समान):
-
-| मद | मान |
-|---|---|
-| `apiVersion` | `5` (सख़्त `===`, संख्या) |
-| इंजन हेडर | 8,954 B / 208 पंक्तियाँ डिकोडेड (9,125 B जैसा शिप हुआ, 6 इंटरपोलेशन); पहली पंक्ति `// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.` — पूरा पाठ §82 में |
-| हुक | 9 (terrain/liquid/model × vertex/surface/light); नाम अपरिवर्तित; डिफ़ॉल्ट टेम्पलेट सभी 9 लेकर आता है (§76) |
-| वेरिएंट | 6 (strict × प्रोग्राम); नाम `strict\|allow.terrain\|liquid\|model` — लाइटिंग-धुरी गायब (§74) |
-| मैक्रो | `BLOXD_STRICT` (strict) · `BLOXD_ALPHA` (सारा liquid + ग़ैर-strict terrain/model) · `BLOXD_SCENE_DEPTH` (सारा liquid) · ~~`BLOXD_LIGHTING`~~ **हटाया गया** |
-| पैक uniform | `@group(3) @binding(0)`, 64 B: seconds@0, **lit@4 (u32, नया)**, renderOffset@16, sunDirection@32, eyePosition@48 |
-| पैक बाइंडिंग | group 3: 0 uniform · 1 scene depth (liquid) · 2 `bloxdSpTextureLayers` स्टोरेज |
-| फ़्लैग | `BloxdFlags` स्ट्रक्चर, 14 bool (§71); v4 बिट-मान रिटायर |
-| लोडर सीमाएँ | 256 `.wgsl` / 256 KB स्रोत / 64 KB `pack.json` / 32 MB zip / 1,024 zip प्रविष्टियाँ; UTF-8; एक मैनिफ़ेस्ट; अद्वितीय पथ — सब अपरिवर्तित |
-| टेक्सचर रजिस्ट्री | 1,210 प्रविष्टियाँ → **896 प्रयोग-योग्य नाम**; cnty9 के मुक़ाबले ड्रिफ़्ट +1/−10 (§80); कैटलॉग: v4 गाइड §68 + §80 की ड्रिफ़्ट सूची (मौजूदा रूप: [टेक्सचर कैटलॉग](api/texture-catalog.md)); `xkg8x` (2026-11-04) पर पुनः मापा: 1,220 / **906**, सभी 10 हटाने उलटे, 376 id परिवर्तन (§80 परिशिष्ट); `bny9u` (2026-11-05) पर 1,232 / **911**, +5 (Trading Terminal ×3, Stone Generator ×2), 864 id परिवर्तन (§80 परिशिष्ट) |
-| लाइट वक्र | 0–15 लेवल → ईज़-आउट वक्र पर 0–1 (`6 → 0.45`, `12 → 0.92`) — हेडर-भीतर, अपरिवर्तित |
-| लिफ़्ट वक्र | `1 - (1 - x / (3 - 2x))^3` — अपरिवर्तित (अब चंक c9) |
-| डायरेक्शनल शंकु | `0.12 / 0.65 / 0.62 / 0.95` — अपरिवर्तित (चंक c9) |
-| फ़ॉग रंग | `vec3f(183/255, 191/255, 195/255)` — अपरिवर्तित |
-| आरक्षित नाम | `/^bloxd/i` (केस-असंवेदनशील) + 46 `bloxdSp*` इंजन सिंबल (§79) |
-| HEADER_VERSION | `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` |
-| strict शीर्षक | [गेम नीति](internals/policy.md) में सूचीबद्ध 12 allow शीर्षकों के अतिरिक्त सब कुछ (ab90qa पर पुनः-सत्यापित, अपरिवर्तित) |
-
-### 82. संपूर्ण v5 इंजन हेडर, शब्दशः
-
-§67 की कलाकृति, v5 के लिए दोबारा मापी गई: वह यथार्थ पाठ जो लोडर हर पैक के आगे जोड़ता है, लाइव प्रोडक्शन बंडल (`ab90qa`, चंक c55, अपने छह लाइव इंटरपोलेशनों के साथ रेंडर किया गया टेम्पलेट — `apiVersion` और `bloxdPackInputs` से होकर पाँच uniform रीड) से पुनर्स्थापित। 8,954 डिकोडेड बाइट, 208 पंक्तियाँ। कुछ भी पैराफ़्रेज़ नहीं किया गया:
-
-```wgsl
-
-// The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
-
-const bloxdPi: f32 = 3.1415926535898;
-const bloxdTau: f32 = 6.2831853071796;
-
-// Blocks along each side of a chunk.
-const bloxdChunkSize: i32 = 32;
-
-// These functions return the same value for the entire frame.
-
-// The camera's render position.
-fn bloxdEyePosition() -> vec3f {
-    return bloxdPackInputs.eyePosition;
-}
-
-// Integer distance, in blocks: render position + this offset = world position.
-// Changes as the player travels, so render positions stay close to 0,0,0.
-// See bloxdWorldPosition for one way to use it.
-fn bloxdRenderOffset() -> vec3i {
-    return bloxdPackInputs.renderOffset;
-}
-
-// The unit vector towards the sun, in world orientation; 0 when there's no sun.
-fn bloxdSunDirection() -> vec3f {
-    return bloxdPackInputs.sunDirection;
-}
-
-// Seconds since the page loaded. As an f32, it has sub-millisecond precision
-// for the first 4.5 hours. Get a recurring timer using bloxdSeconds() % period.
-fn bloxdSeconds() -> f32 {
-    return bloxdPackInputs.seconds;
-}
-
-// Whether block and sky lighting is on. When it's off, BloxdLightIn's
-// blockLight and heldLight are 0, and its skyLight and light colours are 1.
-fn bloxdLit() -> bool {
-    return bloxdPackInputs.lit != 0u;
-}
-
-// What kind of block, item or lifeform a face is. Any number of flags may be
-// set, possibly even none. For example, sandstone is sand and rock.
-struct BloxdFlags {
-    opaque: bool,     // Opaque blocks, i.e. full cubes with no gaps or holes.
-    emissive: bool,   // Blocks that emit light, e.g. lava and glowing ores.
-    vegetation: bool, // Leaves, grass blocks and leafy plants, e.g. tall grass.
-    dirt: bool,       // Soil, grass blocks included. Rocky Dirt is rock too.
-    sand: bool,       // Sand, Red Sand and every sandstone, which is rock too.
-    rock: bool,       // Stone variants, and more, e.g. gravel, ores and magma.
-
-    // Drawn as block models, so never part of terrain or flagged as opaque.
-    slab: bool,       // Half blocks.
-    stairs: bool,     // Stairs and corner stairs.
-    flat: bool,       // Planes, e.g. tall grass, flowers, crops and cobwebs.
-
-    placed: bool,     // Blocks placed as part of chunks. Not items or vehicles.
-    held: bool,       // Items in a hand, in first or third person.
-    dropped: bool,    // Dropped items, on the ground, on a belt or in a pipe.
-    thrown: bool,     // Items in flight, e.g. snowballs, arrows and rockets.
-
-    lifeform: bool,   // Players, mobs and NPCs. Includes armour and cosmetics.
-}
-
-// Convert a render position to a world position, with possible f32 inaccuracy.
-fn bloxdWorldPosition(position: vec3f) -> vec3f {
-    return position + vec3f(bloxdRenderOffset());
-}
-
-struct BloxdVertexIn {
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-}
-
-struct BloxdVertex {
-    position: vec3f,      // The render position output.
-}
-
-struct BloxdSurfaceIn {
-    colour: vec3f,        // RGB colour = texture * tint * ambient occlusion.
-    alpha: f32,           // Opacity.
-
-    // Enchanted items and armour only, all 0 for anything else.
-    enchantTier: u32,     // 1-5 for Tier 1-5.
-    enchantColour: vec4f, // RGB enchant colour, and its animated alpha.
-    enchantSpeed: f32,    // How fast the pattern moves, faster at higher tiers.
-
-    // Players and mobs only, 0 for anything else: RGB overlay colour, e.g. the
-    // red flash when hurt, and its alpha. bloxdLitColour mixes it into colour.
-    overlayColour: vec4f,
-
-    // These mean the same as in BloxdVertexIn, after the vertex hook.
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-
-    // These are all 0 if the face has no texture. Most models use textureId 0.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdSurface {
-    colour: vec3f,        // RGB colour output.
-#ifdef BLOXD_ALPHA
-    alpha: f32,           // Opacity output.
-#endif
-    emission: vec3f,      // Emissive RGB, added after lighting, before fog.
-    enchantColour: vec4f, // Enchant output, mixed in by bloxdLitColour.
-    overlayColour: vec4f, // Overlay output, mixed in by bloxdLitColour.
-}
-
-// blockLight, skyLight and heldLight are 0-1, from the 0-15 light levels on an
-// ease-out curve, e.g. 6->0.45, 12->0.92. They all exclude ambientLightColour.
-// bloxdLitColour lights a surface from these as the engine does.
-struct BloxdLightIn {
-    litColour: vec3f,  // Lit and enchanted RGB colour, before emission and fog.
-    directional: f32,  // Summed Lambert from directional lights; 0 if none.
-    diffuse: vec3f,    // The material's RGB response to directional light.
-    emissive: vec3f,   // The material's RGB glow, added to directional light.
-    ambient: vec3f,    // RGB ambient colour, added to directional light.
-    blockLight: vec3f, // RGB block light; 0 when !bloxdLit().
-    skyLight: f32,     // Sky light; 1 when !bloxdLit().
-    ambientLightColour: vec3f, // Minimum RGB light; 1 when !bloxdLit().
-    skyLightColour: vec3f, // RGB colour of skyLight; 1 when !bloxdLit().
-    heldLight: vec3f,  // RGB held light; 0 when !bloxdLit() or no light held.
-    fogColour: vec3f,  // The game's RGB fog colour; 0 when the game has no fog.
-    fogAlpha: f32,     // 0 = no fog, 1 = only fogColour.
-
-    // These are the same as in BloxdSurfaceIn.
-    position: vec3f,      // Render position.
-    normal: vec3f,        // Unit vector pointing away from the face.
-    localPosition: vec3f, // A model's local coordinates. 0 for terrain/liquid.
-    flags: BloxdFlags,    // What kind of block, item or lifeform.
-    textureId: u32,       // This face's texture. Compare with bloxdTextureId*.
-    textureRotation: u32, // Quarter turns clockwise, which bloxdTexel applies.
-    uv: vec2f,            // The texture spans 0-1. fract(uv) is drawn.
-    mipLevel: f32,        // Texture mipmap level. 0 = full size, 1 = half, etc.
-}
-
-struct BloxdLight {
-    colour: vec3f, // RGB colour output.
-}
-
-struct BloxdOpaqueBehind {
-    hit: bool,       // False where nothing opaque is behind (sky).
-    position: vec3f, // The render position; 0 when !hit.
-    distance: f32,   // From the camera; 0 when !hit.
-}
-
-fn bloxdDefaultVertex(vertex: BloxdVertexIn) -> BloxdVertex {
-    return BloxdVertex(vertex.position);
-}
-
-fn bloxdDefaultSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
-    return BloxdSurface(
-        surface.colour,
-#ifdef BLOXD_ALPHA
-        surface.alpha,
-#endif
-        vec3f(0.0),
-        surface.enchantColour,
-        surface.overlayColour,
-    );
-}
-
-// Apply this fragment's fog to colour, as the engine does.
-fn bloxdApplyFog(colour: vec3f, light: BloxdLightIn) -> vec3f {
-    return mix(colour, light.fogColour, light.fogAlpha);
-}
-
-// How the face's material and angle light it: directional light on its
-// diffuse colour, plus its emissive and ambient terms, clamped to 0-1.
-fn bloxdShading(light: BloxdLightIn) -> vec3f {
-    let diffuse = light.directional * light.diffuse;
-    return saturate(diffuse + light.emissive + light.ambient);
-}
-
-// The world's light at this fragment: the brightest of block, sky and held
-// light, none below ambientLightColour.
-fn bloxdWorldLight(light: BloxdLightIn) -> vec3f {
-    let ambientLight = light.ambientLightColour;
-    let blockLight = ambientLight + light.blockLight * (1.0 - ambientLight);
-    let skyLight = mix(ambientLight, light.skyLightColour, light.skyLight);
-    let heldLight = ambientLight + light.heldLight * (1.0 - ambientLight);
-    return max(max(blockLight, skyLight), heldLight);
-}
-
-// The surface's colour lit as the engine does, before emission and fog:
-// mixed with overlayColour, then bloxdShading, then mixed with
-// enchantColour, then bloxdWorldLight.
-fn bloxdLitColour(surface: BloxdSurface, light: BloxdLightIn) -> vec3f {
-    let overlay = surface.overlayColour;
-    let overlaid = mix(surface.colour, overlay.rgb, overlay.a);
-    let shaded = bloxdShading(light) * overlaid;
-    let enchant = surface.enchantColour;
-    let enchanted = mix(shaded, enchant.rgb, enchant.a);
-    return max(enchanted * bloxdWorldLight(light), vec3f(0.0));
-}
-
-fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
-    let lit = bloxdLitColour(surface, light);
-    return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
-}
-```
-
-ऊपर का हर हुक हस्ताक्षर, स्ट्रक्चर, कॉन्स्टैंट और कमेंट भार वहन करता है: यही वह है जो लाइव वैलिडेटर पार्स करता है, कोड जेनरेटर आगे जोड़ता है, और जिसके विरुद्ध आपका पैक संकलित होता है। इसे v4 हेडर ([v4 गाइड](history/v4.md) का §67) से diff करें तो v5 एक ही स्क्रीन में दिखता है: ऊपर की ओर `bloxdChunkSize` और `bloxdLit()`, बिट-कॉन्स्टैंट की जगह `BloxdFlags` स्ट्रक्चर, इनपुट स्ट्रक्चरों में `localPosition` और एनचांट/ओवरले फ़ील्ड, दो नए आउटपुट, और `bloxdDefaultLight` से पहले तीन लाइटिंग हेल्पर।
-
