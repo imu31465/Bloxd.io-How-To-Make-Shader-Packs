@@ -7,12 +7,10 @@ Um guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io �
 - API atual: **5** (o `pack.json` deve declarar `apiVersion: 5`)
 - Alvo: renderizador WebGPU
 - Última verificação: 2026-11-20
-- Build alvo: `bbb6l5` (verificado em produção e preprod em 2026-11-20)
 - Hooks de shader: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
 Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultando a API? Veja [Referência da API](api/).
 
-> Esta documentação não é um recurso oficial dos desenvolvedores do jogo. Os internals do motor podem mudar com atualizações — confira o build alvo e o status de verificação indicados em cada página.
 >
 > Este guia foi criado com assistência de IA; a precisão não é garantida. Verifique contra o comportamento real do jogo. Continue verificando as receitas contra a tela do carregador e a compilação no jogo.
 >
@@ -38,17 +36,3 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 - **[Solução de problemas](troubleshooting/)** — resolução de erros por sintoma: carregamento, versão de API, compilação, validação, variantes, visual, texturas, iluminação, modelos, desempenho.
 - **[Interior do motor e pesquisa](internals/)** — pipeline de renderização, invocação de hooks, cabeçalho do motor, internals de validação e compilação, identificadores reservados, internals de iluminação/névoa, amostragem e registro de texturas, renderização de modelos, dados medidos.
 - **[Histórico de versões](history/)** — de v1 a v5: mudanças por versão, passos de migração, APIs removidas.
-
-## Rótulos de status de verificação
-
-Cada página anota sua versão de API alvo, build, data da última verificação e status.
-
-| Rótulo | Significado |
-|---|---|
-| Verified | verificado no dispositivo / no build alvo |
-| Analyzed | confirmado analisando a implementação interna |
-| Partially Verified | confirmado apenas parcialmente |
-| Experimental | experimental / não consolidado |
-| Historical | material de uma versão passada |
-
-Os dados brutos extraídos do motor (cabeçalho, registro, medições) vivem em [Interior do motor e pesquisa](internals/); a metodologia e os registros por trás deles são acompanhados no [registro de pesquisa](internals/research-log.md).
