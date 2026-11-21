@@ -23,10 +23,8 @@ Bloxd.io の WebGPU レンダラー向けシェーダーパックについて、
 8. [検証と動作確認](getting-started/validation.md) — 読み込み時の3段階検証と実機チェック
 9. [配布](getting-started/distribution.md) — zip の固め方と運用
 
-> 対象API: 5 · 対象ビルド: `bbb6l5` (2026-11-20、本番・preprodで確認) · 検証状況: Verified/Analyzed
 
 API仕様を詳細に調べたくなったら [APIリファレンス](api/) へ、表現の実装例は [Recipes](recipes/) へ進んでください。
-
 ---
 
 ## 概要と前提
