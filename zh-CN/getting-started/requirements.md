@@ -7,7 +7,7 @@
 着色器包仅限 WebGPU 渲染器。你需要支持 WebGPU 的浏览器：
 
 - 基于 Chromium 的浏览器 (Chrome / Edge / Opera 等) — 桌面端稳定
-- Safari 17+ / Firefox (WebGPU 支持随时期而异)
+- Safari 17+ / Firefox（WebGPU 支持情况取决于浏览器及其版本）
 - **移动端**: iOS / Android 上的 WebGPU 支持可能受限。请在包的发布页说明这一点
 
 安装包期间，游戏的 WebGPU 渲染器设置会被强制启用。
@@ -20,7 +20,7 @@
 - 用于分发的 zip 工具；开发期间可用文件夹加载 (仅桌面浏览器)
 - 浏览器开发者工具 — 编译错误既显示在游戏内 UI，也显示在控制台
 
-## 实机验证环境
+## 设备测试
 
 分发前请在以下环境验证 ([验证](validation.md))：
 
