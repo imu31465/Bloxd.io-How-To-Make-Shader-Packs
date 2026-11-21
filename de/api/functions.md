@@ -142,7 +142,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ## Schattenfunktionen
 
-Der Build API v5 hat der Pack-API das echte Sonnen-/Mondschattensystem der Engine hinzugefügt — projizierte, sonnenfolgende Schatten, geworfen von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+API v5 stellt das Sonnen-/Mondschattensystem der Engine bereit: projizierte, sonnenfolgende Schatten von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 ### bloxdShadow
 
