@@ -1,6 +1,6 @@
 # Interior do motor e pesquisa
 
-Especificações internas restauradas analisando a implementação do motor. Tudo aqui foi recuperado diretamente do JavaScript da build de produção atual (`bny9u`). Separado da documentação da API pública ([Referência da API](../api/)) para preservar o comportamento interno exato e os resultados da análise.
+Esta seção reúne descobertas técnicas obtidas pela análise da implementação do jogo. O comportamento interno pode mudar com as atualizações e não é um contrato estável da API.
 
 ## Mapa
 
@@ -23,7 +23,5 @@ Especificações internas restauradas analisando a implementação do motor. Tud
 | [Sol e lua](sun-and-moon.md) | o que alimenta bloxdSunDirection |
 | [Depuração](debugging.md) | parâmetros de URL, painéis de estatísticas |
 | [Registro de pesquisa](research-log.md) | metodologia, histórico de builds, itens não verificados |
-
-> API alvo: 5 · Build alvo: `bbb6l5` (verificado em produção 2026-11-20)
 
 As interioridades não são um contrato de API estável — elas podem mudar com as atualizações do motor, e cada página nomeia sua build de evidência ([registro de pesquisa](research-log.md)).
