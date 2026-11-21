@@ -65,10 +65,11 @@ function stripBuildMetadata(src) {
       out.push(originalLine)
       continue
     }
+    if (!inFence && /^>\s*$/.test(originalLine)) continue
     if (!inFence && originalLine.startsWith('>')) {
       if (/historical/i.test(originalLine) && /(?:target +build|対象ビルド|build +objetivo|build +alvo|build +cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)/i.test(originalLine)) continue
       const parts = originalLine.replace(/^>\s*/, '').split(/\s*[·•]\s*/)
-      const kept = parts.filter(part => !BUILD_METADATA_FIELD.test(part))
+      const kept = parts.filter(part => part.trim() !== '' && !BUILD_METADATA_FIELD.test(part))
       if (kept.length === 0) continue
       out.push('> ' + kept.join(' · '))
       continue
@@ -149,7 +150,7 @@ for (const code of langs) {
     }
   }
 
-  const out = parts.join('\n').replace(/\n{4,}/g, '\n\n\n') + '\n'
+  const out = parts.join('\n').replace(/\n{4,}/g, '\n\n\n').trimEnd() + '\n'
   fs.writeFileSync(path.join(langDir, '00-full.md'), out)
   console.log(`build-full-doc: ${code}/00-full.md (${out.length} bytes)`)
 }
