@@ -1,6 +1,6 @@
 # 레시피
 
-목적 지향적 코드 예시집. 「어떻게 동작하는가」는 [가이드](../guides/) 에 있다. 여기의 모든 것은 v5 어휘 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) 로 이식되었고, 6베리언트 (strict × terrain / liquid / model) 를 통과하도록 가드되어 있다.
+목표별 코드 예시 모음이다. 작동 원리는 [가이드](../guides/)에서 설명한다. 예시는 API v5 용어 (`flags`, `bloxdLit()`, `fogAlpha`, `bloxdSeconds()`)를 사용하며, 6개 베리언트 (strict × terrain / liquid / model) 모두에서 동작하도록 가드를 포함한다.
 
 ## 구성
 
