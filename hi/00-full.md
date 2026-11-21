@@ -5147,47 +5147,44 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## इंजन इंटर्नल्स और रिसर्च
-इंजन के कार्यान्वयन का विश्लेषण करके बहाल की गई आंतरिक विनिर्देश। यहाँ की हर बात मौजूदा प्रोडक्शन बिल्ड (`bny9u`) के JavaScript से सीधे बहाल की गई है। सटीक आंतरिक व्यवहार और विश्लेषण परिणामों को बचाए रखने के लिए इसे सार्वजनिक-API दस्तावेज़ीकरण ([API रेफ़रेंस](api/)) से अलग रखा गया है।
+## इंजन इंटर्नल्स
+
+यह श्रेणी shader packs के निष्पादन को समझने में मदद करने वाले इंजन के आंतरिक व्यवहार का वर्णन करती है। कार्यान्वयन के ये विवरण गेम अपडेट के साथ बदल सकते हैं। स्थिर उपयोग नियमों और उपलब्ध APIs के लिए [API संदर्भ](internals/api) देखें।
 
 ### नक्शा
 
 | पेज | विषय-वस्तु |
 |---|---|
-| [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) | alphaTest की स्थिति, 2-प्रकाश सेटअप, uniform की हक़ीक़त, greedy meshing |
-| [हुक इनवोकेशन](internals/hook-invocation.md) | हुक इंजन के WGSL में कैसे जोड़े जाते हैं |
-| [इंजन हेडर](internals/engine-header.md) | पूरा v5 हेडर (verbatim, 8,954B) |
-| [शेडर सत्यापन](internals/shader-validation.md) | एनालाइज़र की आंतरिक बनावट, सिग्नेचर तालिका, HEADER_VERSION |
-| [WGSL कंपाइलेशन](internals/wgsl-compilation.md) | चरण-2 का असली कंपाइलेशन और सत्यापन स्टब |
-| [आरक्षित पहचानकर्ता](internals/reserved-identifiers.md) | 46 `bloxdSp*` प्रतीक |
-| [प्रकाश इंटर्नल्स](internals/lighting-internals.md) | blockLight / heldLight की संरचना |
-| [फ़ॉग इंटर्नल्स](internals/fog-internals.md) | केवल-रैखिक, 32-ब्लॉक प्रवणता पट्टी |
-| [टेक्सचर सैंपलिंग](internals/texture-sampling.md) | 3-वेरिएंट टेक्सचर कोडजेन |
-| [टेक्सचर रजिस्ट्री](internals/texture-registry.md) | name→id रिज़ॉल्यूशन, 896 नाम, मापी गई ड्रिफ़्ट |
-| [मॉडल रेंडरिंग](internals/model-rendering.md) | v5 का Model प्रोग्राम |
-| [इंजन डेटा](internals/engine-data.md) | v5 के कॉन्स्टैंट/सीमा/लेआउट का लेजर |
-| [परीक्षण कारक](internals/testing-factors.md) | कौन-सी दुनिया/खिलाड़ी सेटिंग पैक-दृश्य मान बदलती हैं |
-| [नीति](internals/policy.md) | shaderPackPolicy — 12 allow शीर्षक |
-| [सूर्य और चंद्र](internals/sun-and-moon.md) | bloxdSunDirection को क्या खिलाता है |
-| [दोषमार्जन](internals/debugging.md) | URL पैरामीटर, आँकड़ा पैनल |
-| [रिसर्च लॉग](internals/research-log.md) | पद्धति, बिल्ड इतिहास, असत्यापित मदें |
-
-> लक्ष्य API: 5
-
-इंटर्नल्स स्थिर API-अनुबंध नहीं हैं — इंजन अपडेट के साथ वे बदल सकते हैं, और हर पेज अपना साक्ष्य-बिल्ड नाम बताता है ([रिसर्च लॉग](internals/research-log.md))।
+| [रेंडरिंग पाइपलाइन](internals/index.md/rendering-pipeline.md) | alphaTest की स्थिति, 2-प्रकाश सेटअप, uniform की हक़ीक़त, greedy meshing |
+| [हुक इनवोकेशन](internals/index.md/hook-invocation.md) | हुक इंजन के WGSL में कैसे जोड़े जाते हैं |
+| [इंजन हेडर](internals/index.md/engine-header.md) | Shader packs के आगे जोड़ी जाने वाली WGSL घोषणाएँ |
+| [शेडर सत्यापन](internals/index.md/shader-validation.md) | एनालाइज़र की आंतरिक बनावट, सिग्नेचर तालिका, HEADER_VERSION |
+| [WGSL कंपाइलेशन](internals/index.md/wgsl-compilation.md) | चरण-2 का असली कंपाइलेशन और सत्यापन स्टब |
+| [आरक्षित पहचानकर्ता](internals/index.md/reserved-identifiers.md) | 46 `bloxdSp*` प्रतीक |
+| [प्रकाश इंटर्नल्स](internals/index.md/lighting-internals.md) | blockLight / heldLight की संरचना |
+| [फ़ॉग इंटर्नल्स](internals/index.md/fog-internals.md) | केवल-रैखिक, 32-ब्लॉक प्रवणता पट्टी |
+| [टेक्सचर सैंपलिंग](internals/index.md/texture-sampling.md) | 3-वेरिएंट टेक्सचर कोडजेन |
+| [टेक्सचर रजिस्ट्री](internals/index.md/texture-registry.md) | नाम lookup, animation और rotation नाम |
+| [मॉडल रेंडरिंग](internals/index.md/model-rendering.md) | v5 का Model प्रोग्राम |
+| [इंजन डेटा](internals/index.md/engine-data.md) | API v5 सुविधाएँ और pack सीमाएँ |
+| [परीक्षण कारक](internals/index.md/testing-factors.md) | कौन-सी दुनिया/खिलाड़ी सेटिंग पैक-दृश्य मान बदलती हैं |
+| [नीति](internals/index.md/policy.md) | shaderPackPolicy — 12 allow शीर्षक |
+| [सूर्य और चंद्र](internals/index.md/sun-and-moon.md) | bloxdSunDirection को क्या खिलाता है |
+| [दोषमार्जन](internals/index.md/debugging.md) | URL पैरामीटर, आँकड़ा पैनल |
 
 
----
+इंजन के आंतरिक कार्यान्वयन स्थिर API अनुबंध नहीं हैं। Packs बनाते समय [API संदर्भ](internals/api) की सार्वजनिक specification को प्राथमिकता दें।
 
 ## रेंडरिंग पाइपलाइन
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 - **Surface हुक alphaTest से "पहले" चलते हैं**: `out.alpha` सीधे discard परीक्षण को खिलाता है। कटआउट सामग्री (घास, पत्ते) dissolve-शैली के डाइथर प्रभाव की अनुमति देती है (रेसिपी R-C)। लिक्विड (ब्लेंडेड) के लिए `out.alpha` असली पारदर्शिता है (रेसिपी R-D)। सामान्य अपारदर्शी terrain पर कोई प्रभाव नहीं — ग़लत न समझें
 - **`l.ambient` की सामग्री** `material.ambient × sceneAmbient` है, सामग्री के अनुसार भिन्न। Scene-पक्ष ग्राफ़िक्स सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5) से जुड़ा है — डिफ़ॉल्ट कभी हार्डकोड न करें
 - **Scene के दिशात्मक प्रकाश 2-प्रकाश सेटअप हैं**: मुख्य प्रकाश (दिशा आकाश सेटिंग की सूर्य-स्थिति से, तीव्रता 1.0) और फ़िल प्रकाश (दिशा `[-0.5, -1, -1]`, तीव्रता 0.35) का लैम्बर्ट योग `l.directional` तक पहुँचता है। फ़िल प्रकाश नीचे की ओर इशारा करता है, इसलिए ऊपरी फलकों में कुछ नहीं जोड़ता और नीचे-देखने वाली सतहों (गुफ़ा-छतें आदि) को उठा लेता है। Terrain केवल `_initScene` में जोड़े गए प्रकाशों पर विचार करता है; स्टार्टअप के बाद scene में जोड़े गए प्रकाश terrain और ब्लॉक मॉडल नज़रअंदाज़ कर देते हैं (एक आधिकारिक चेतावनी संदेश ऐसा ही कहता है)
 - **`bloxdSeconds()` असल में `performance.now()` है**: ब्राउज़र का अपटाइम 1 घंटे पर लपेटा जाता है। इन-गेम दिन/रात और दुनिया के बीते समय से असंबंधित। गेम घड़ी से सिंक एनीमेशन के लिए दिन-रात-चक्र दुनियाओं में `bloxdSunDirection()` के एज़िमुथ से समय का अनुमान लगाएँ
-- **हेडर फ़ंक्शन एक uniform पढ़ते हैं**: इंजन 64-बाइट `bloxdPackInputs` uniform को `@group(3) @binding(0)` पर रखता है (5 स्लॉट — seconds / lit / renderOffset / sunDirection / eyePosition, लिटिल-एंडियन), और `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` उन स्लॉटों को पढ़ने से मेल खाते हैं ([पैक फ़ॉर्मैट: प्रति-फ़्रेम uniform](api/pack-format.md#प्रति-फ़्रेम-uniform-bloxdpackinputs))। पैक इस uniform को लिख नहीं सकते, और चूँकि पैक और इंजन का WGSL एक ही मॉड्यूल में घुल जाता है, वही group/binding ख़ुद घोषित करना भी असंभव है। `@group(3) @binding(1)` पर लिक्विड scene-depth टेक्सचर है, और `@binding(2)` पर `bloxdSpTextureLayers` स्टोरेज बफ़र
-- **Vertex डेटा मेशर (Web Worker) बनाता है**: ब्लॉक terrain प्रति vertex 28 बाइट (एटलस चालू होने पर 32 बाइट) पर इंटरलीव्ड होता है — position = float32×3 / normal = 8-bit signed integer×4 / colour = 8-bit normalized integer×4 (`s.colour` का असली तत्व — tint × AO मेशर चरण में ही 8-bit में बेक होता है, इसलिए उसे पैक-पक्ष से अलग करना या बहाल करना सैद्धांतिक रूप से असंभव है) / UV = float32×2 / atlasIndex = float32। केवल लाइट-लेवल अलग 4-बाइट vertex बफ़र में चलते हैं (मापे गए मान: [इंजन डेटा लेजर](internals/engine-data.md))। Vertex प्रति-खंड instancing से खिंचते हैं
+- **हेडर फ़ंक्शन एक uniform पढ़ते हैं**: इंजन 64-बाइट `bloxdPackInputs` uniform को `@group(3) @binding(0)` पर रखता है (5 स्लॉट — seconds / lit / renderOffset / sunDirection / eyePosition, लिटिल-एंडियन), और `bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` उन स्लॉटों को पढ़ने से मेल खाते हैं ([पैक फ़ॉर्मैट: प्रति-फ़्रेम uniform](internals/api/pack-format.md#प्रति-फ़्रेम-uniform-bloxdpackinputs))। पैक इस uniform को लिख नहीं सकते, और चूँकि पैक और इंजन का WGSL एक ही मॉड्यूल में घुल जाता है, वही group/binding ख़ुद घोषित करना भी असंभव है। `@group(3) @binding(1)` पर लिक्विड scene-depth टेक्सचर है, और `@binding(2)` पर `bloxdSpTextureLayers` स्टोरेज बफ़र
+- **Vertex डेटा मेशर (Web Worker) बनाता है**: ब्लॉक terrain प्रति vertex 28 बाइट (एटलस चालू होने पर 32 बाइट) पर इंटरलीव्ड होता है — position = float32×3 / normal = 8-bit signed integer×4 / colour = 8-bit normalized integer×4 (`s.colour` का असली तत्व — tint × AO मेशर चरण में ही 8-bit में बेक होता है, इसलिए उसे पैक-पक्ष से अलग करना या बहाल करना सैद्धांतिक रूप से असंभव है) / UV = float32×2 / atlasIndex = float32। केवल लाइट-लेवल अलग 4-बाइट vertex बफ़र में चलते हैं (मापे गए मान: [इंजन डेटा लेजर](internals/rendering-pipeline.md/engine-data.md))। Vertex प्रति-खंड instancing से खिंचते हैं
 - लोडिंग के दौरान खंड-सीमाओं पर बारीक चेकर पैटर्न इंजन का स्क्रीन-स्पेस Bayer 4×4 डाइथर खंड-फ़ेड है, पैक की ख़राबी नहीं (ग्राफ़िक्स सेटिंग `chunkFadeIn` से बंद करें)
 - **`mod` एक आरक्षित शब्द है**: `pack.wgsl:3 'mod' is a reserved word in WGSL.` के साथ अस्वीकृत। शेषफल `%` ऑपरेटर से लिखें
 
@@ -5249,11 +5246,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-
----
-
 ## हुक इनवोकेशन इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन बंडल से बहाल — Lite रेंडरर; एकीकृत स्रोत फ़ाइल `lite/terrainShaderPack.ts` त्रुटि-स्ट्रिंगों में बची रहती है)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 इंजन रनटाइम पर हुक कैसे बुलाता है। इससे आपके लिखे कोड पर कुछ नहीं बदलता, पर हुक क्या पाते हैं इसका अंदाज़ा-लगाना मिट जाता है।
 
@@ -5270,9 +5265,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### स्प्लाइस क्या लागू करता है
 
-- **strict terrain, surface-हुक के alpha बदलावों को नज़रअंदाज़ करता है।** `alpha = bloxdSpSurface.alpha` राइट-बैक केवल liquid प्रोग्राम या ग़ैर-strict वेरिएंट के लिए लगाया जाता है — मैक्रो तालिका के पीछे का कार्यान्वयन ([प्रीप्रोसेसर](api/preprocessor.md))
+- **strict terrain, surface-हुक के alpha बदलावों को नज़रअंदाज़ करता है।** `alpha = bloxdSpSurface.alpha` राइट-बैक केवल liquid प्रोग्राम या ग़ैर-strict वेरिएंट के लिए लगाया जाता है — मैक्रो तालिका के पीछे का कार्यान्वयन ([प्रीप्रोसेसर](internals/api/preprocessor.md))
 - **vertex हुक घोषित करने वाला strict वेरिएंट उसे कभी नहीं चलाता।** इंजन बिल्ड-टाइम पर रिपोर्ट करता है: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`। इसीलिए टेम्पलेट में `#ifndef BLOXD_STRICT` है
-- **`bloxdSp*` पहचानकर्ता** इंजन के टेम्परेरी हैं — आपके कोड को अदृश्य पर डायग्नोस्टिक्स और रिवर्स-इंजीनियरिंग आउटपुट में मौजूद ([आरक्षित पहचानकर्ता](internals/reserved-identifiers.md) — v5 में 46)
+- **`bloxdSp*` पहचानकर्ता** इंजन के टेम्परेरी हैं — आपके कोड को अदृश्य पर डायग्नोस्टिक्स और रिवर्स-इंजीनियरिंग आउटपुट में मौजूद ([आरक्षित पहचानकर्ता](internals/hook-invocation.md/reserved-identifiers.md) — v5 में 46)
 - **डिफ़ॉल्ट-सरफ़ेस शॉर्टकट।** यदि किसी वेरिएंट का surface हुक शब्दशः `bloxdDefaultSurface` है, तो इंजन `baseColor` / `alpha` राइट-बैक ग्राफ़्ट पूरी तरह छोड़ देता है — डिफ़ॉल्ट पहले से ही वे मान पैदा करता है, इसलिए वे असाइनमेंट मृत कोड हैं। **बिना बदले हुक-श्रृंखलाओं की कोई कीमत नहीं है**
 
 ### v5 में क्या बदला
@@ -5281,8 +5276,8 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - `vBlockFlags` (बिट) → **`BloxdFlags` स्ट्रक्चर** (`bloxdSpFlags` से वितरित)
 - `litColour` कैप्चर इंजन-आंतरिक से **सार्वजनिक API** हो गया (`bloxdLitColour()` — v4 के `bloxdSpLitColour` का प्रमोशन)
-- `BloxdLightIn` को `diffuse` / `emissive` मिले, और `bloxdShading()` सामग्री-प्रतिक्रिया दोबारा बनाता है ([लाइटिंग](api/lighting.md))
-- `localPosition` (`bloxdSpItemLocalPosition`), एनचैंट इनपुट (`bloxdSpEnchant`) और `overlayColour` की डिलीवरी ([मॉडल रेंडरिंग](internals/model-rendering.md))
+- `BloxdLightIn` को `diffuse` / `emissive` मिले, और `bloxdShading()` सामग्री-प्रतिक्रिया दोबारा बनाता है ([लाइटिंग](internals/api/lighting.md))
+- `localPosition` (`bloxdSpItemLocalPosition`), एनचैंट इनपुट (`bloxdSpEnchant`) और `overlayColour` की डिलीवरी ([मॉडल रेंडरिंग](internals/hook-invocation.md/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (उलटा)
 - Model प्रोग्राम वेरिएंट मैट्रिक्स में शामिल हुआ (3 प्रोग्राम × 2 मोड = 6 वेरिएंट)
 
@@ -5291,36 +5286,34 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | फ़ील्ड | इंजन-पक्ष स्रोत |
 |---|---|
 | `litColour` | फ़ॉग-मिक्स से ठीक पहले पकड़ा गया फ़्रैगमेंट रंग — हेडर के शब्दों में "emission और फ़ॉग से पहले" |
-| `directional` | प्रति-दिशात्मक-प्रकाश लैम्बर्ट का vertex-इंटरपोलेटेड योग ([रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) में 2-प्रकाश सेटअप) |
+| `directional` | प्रति-दिशात्मक-प्रकाश लैम्बर्ट का vertex-इंटरपोलेटेड योग ([रेंडरिंग पाइपलाइन](internals/hook-invocation.md/rendering-pipeline.md) में 2-प्रकाश सेटअप) |
 | `diffuse` / `emissive` | सामग्री की दिशात्मक RGB प्रतिक्रिया / RGB चमक |
 | `ambient` | `material.ambient × sceneAmbient` — प्रति सामग्री, प्रति फ़्रेम |
-| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश इंटर्नल्स](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | डिकोड किए गए लाइट-लेवल varying ([प्रकाश इंटर्नल्स](internals/hook-invocation.md/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | संगत uniform |
-| `heldLight` | लाइट-लेवल varying और held-light uniform से बनता है (शंकु-फ़ॉलऑफ़ [प्रकाश इंटर्नल्स](internals/lighting-internals.md) में) |
+| `heldLight` | लाइट-लेवल varying और held-light uniform से बनता है (शंकु-फ़ॉलऑफ़ [प्रकाश इंटर्नल्स](internals/hook-invocation.md/lighting-internals.md) में) |
 | `fogColour` | केवल पूरी तरह फ़ॉग-रहित scene (मोड 0) में काला |
-| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([फ़ॉग इंटर्नल्स](internals/fog-internals.md)) |
+| `fogAlpha` | clamp किया गया फ़ॉग गुणक ([फ़ॉग इंटर्नल्स](internals/hook-invocation.md/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying और flat-इंटरपोलेटेड मान (`BloxdSurfaceIn` जैसे ही — vertex-हुक-बाद के मान) |
 
 ### संबंधित
 
-- [शेडर हुक](api/hooks.md) · [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md) · [आरक्षित पहचानकर्ता](internals/reserved-identifiers.md) · [संस्करण इतिहास: v3](history/v3.md)
-
-
----
+- [शेडर हुक](internals/api/hooks.md) · [रेंडरिंग पाइपलाइन](internals/hook-invocation.md/rendering-pipeline.md) · [आरक्षित पहचानकर्ता](internals/hook-invocation.md/reserved-identifiers.md) · [संस्करण इतिहास: v3](internals/history/v3.md)
 
 ## इंजन हेडर (शब्दशः)
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव प्रोडक्शन बंडल से बहाल)
 
-वह सटीक पाठ जो इंजन हर पैक के आगे जोड़ता है, लाइव बिल्ड के वैलिडेटर से इंटरपोलेशन लागू कर रेंडर किया गया (`apiVersion` और `bloxdPackInputs` से 6 uniform रीड)। 216 पंक्तियाँ। कहीं भी पैराफ्रेज़ नहीं। पिछले बिल्ड पर दोबारा सत्यापित — एकमात्र बदलाव छाया संबंधी सामग्री है।
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+इंजन द्वारा shader packs के आगे जोड़े जाने वाले WGSL header का संदर्भ-पाठ। प्रत्येक field और function के अर्थ के लिए [API संदर्भ](internals/api) देखें।
 
 पठन गाइड:
-- फ़ील्ड-दर-फ़ील्ड व्याख्याएँ → [स्ट्रक्चर](api/structures.md)
-- फ़ंक्शन-दर-फ़ंक्शन → [फ़ंक्शन](api/functions.md) / [लाइटिंग](api/lighting.md)
-- फ़्लैग (BloxdFlags) → [फ़्लैग](api/flags.md)
-- `bloxdTextureId*` ब्लॉक इस हेडर में **नहीं** है — यह संदर्भित नामों से प्रति पैक जनरेट होता है ([टेक्सचर API](api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` सशर्त फ़ील्ड चिह्नित करता है ([प्रीप्रोसेसर](api/preprocessor.md))
-- v4 हेडर (6,021B) से अंतर → [संस्करण इतिहास: v5](history/v5.md)
-- हेडर का सत्यापन कैसे होता है (HEADER_VERSION) → [शेडर सत्यापन](internals/shader-validation.md)
+- फ़ील्ड-दर-फ़ील्ड व्याख्याएँ → [स्ट्रक्चर](internals/api/structures.md)
+- फ़ंक्शन-दर-फ़ंक्शन → [फ़ंक्शन](internals/api/functions.md) / [लाइटिंग](internals/api/lighting.md)
+- फ़्लैग (BloxdFlags) → [फ़्लैग](internals/api/flags.md)
+- `bloxdTextureId*` ब्लॉक इस हेडर में **नहीं** है — यह संदर्भित नामों से प्रति पैक जनरेट होता है ([टेक्सचर API](internals/api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` सशर्त फ़ील्ड चिह्नित करता है ([प्रीप्रोसेसर](internals/api/preprocessor.md))
+- v4 हेडर (6,021B) से अंतर → [संस्करण इतिहास: v5](internals/history/v5.md)
+- हेडर का सत्यापन कैसे होता है (HEADER_VERSION) → [शेडर सत्यापन](internals/engine-header.md/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5542,23 +5535,21 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### संबंधित
 
-- [API रेफ़रेंस](api/) — इस हेडर का टिप्पणी-सहित संस्करण
-- [शेडर सत्यापन](internals/shader-validation.md) — HEADER_VERSION और सेव-किए-पैक का पुनः-सत्यापन
-- [इंजन डेटा](internals/engine-data.md) — माप-लेजर
-
-
----
+- [API रेफ़रेंस](internals/api) — इस हेडर का टिप्पणी-सहित संस्करण
+- [शेडर सत्यापन](internals/engine-header.md/shader-validation.md) — HEADER_VERSION और सेव-किए-पैक का पुनः-सत्यापन
+- [इंजन डेटा](internals/engine-header.md/engine-data.md) — माप-लेजर
 
 ## शेडर सत्यापन
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव वैलिडेटर से पुनर्स्थापित)
 
-स्थैतिक सत्यापन (एनालाइज़र, लोड जाँच का चरण 1)। उपयोगकर्ता के लिए सुधार: [सत्यापन त्रुटियाँ](troubleshooting/validation.md)।
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+स्थैतिक सत्यापन (एनालाइज़र, लोड जाँच का चरण 1)। उपयोगकर्ता के लिए सुधार: [सत्यापन त्रुटियाँ](internals/troubleshooting/validation.md)।
 
 ### चरण
 
-1. **लोडर सीमाएँ** (zip / pack.json का आकार) → [पैक फ़ॉर्मैट](api/pack-format.md)
+1. **लोडर सीमाएँ** (zip / pack.json का आकार) → [पैक फ़ॉर्मैट](internals/api/pack-format.md)
 2. **स्थैतिक सत्यापन (एनालाइज़र)** — यह पृष्ठ; वाक्यरचना, प्रकार, आरक्षित नाम, सभी 6 वेरिएंटों में हुक अनुबंध
-3. **ब्राउज़र में असली संकलन** → [WGSL कंपाइलेशन](internals/wgsl-compilation.md)
+3. **ब्राउज़र में असली संकलन** → [WGSL कंपाइलेशन](internals/shader-validation.md/wgsl-compilation.md)
 4. **गेम-जॉइन पर रनटाइम पुनः-सत्यापन** — हर मौजूदा टेरेन सामग्री को वास्तव में संकलित करता है (सेटिंग्स-स्क्रीन जाँच से सख़्त); इसमें विफल होने पर पैक उस गेम के लिए हटा दिया जाता है
 
 ### स्पेशल-फ़ंक्शन हस्ताक्षर तालिका
@@ -5588,7 +5579,7 @@ const Jq = new Map([
 
 ### टेक्सचर-नाम रिज़ॉल्यूशन और डायग्नोस्टिक्स
 
-`bloxdTextureId*` रिज़ॉल्यूशन का एक समर्पित पथ है ([संदेश](api/texture-api.md#नाम-रिज़ॉल्यूशन-त्रुटियाँ-वैलिडेटर-से-अक्षरशः)):
+`bloxdTextureId*` रिज़ॉल्यूशन का एक समर्पित पथ है ([संदेश](internals/api/texture-api.md#नाम-रिज़ॉल्यूशन-त्रुटियाँ-वैलिडेटर-से-अक्षरशः)):
 
 - **फ़ोल्डिंग**: गैर-अल्फ़ान्यूमेरिक और CamelCase पर विभाजित करके `bloxdTextureId` उपसर्ग लगाना; रिवर्स मैचिंग केस/अंडरस्कोर-असंवेदनशील है
 - **स्पेलिंग सुझाव** (v5 में नया): बिना मेल खाए नामों को देहली `max(2, floor(len/4)) + 1` पर Levenshtein प्रस्ताव मिलते हैं
@@ -5602,36 +5593,34 @@ const Jq = new Map([
 
 ### Y-डिरिवेटिव रीराइट
 
-एनालाइज़र का टोकन-रीराइट पास `dpdy` / `dpdyCoarse` / `dpdyFine` की हर कॉल को `(-dpdy(...))` के रूप में रीराइट कर देता है (dpdy परिवार को उलटाव-सेट के रूप में स्पष्ट रूप से गिना गया है)। `dpdx` और `fwidth` अछूते रहते हैं ([प्रतिबंध](api/restrictions.md#स्वचालित-रीराइट))।
+एनालाइज़र का टोकन-रीराइट पास `dpdy` / `dpdyCoarse` / `dpdyFine` की हर कॉल को `(-dpdy(...))` के रूप में रीराइट कर देता है (dpdy परिवार को उलटाव-सेट के रूप में स्पष्ट रूप से गिना गया है)। `dpdx` और `fwidth` अछूते रहते हैं ([प्रतिबंध](internals/api/restrictions.md#स्वचालित-रीराइट))।
 
 ### हेडर और टेक्सचर-स्थिरांक जनरेशन
 
-- हेडर रीड-ओनली रूप में आगे जोड़ा जाता है ([इंजन हेडर](internals/engine-header.md))
+- हेडर रीड-ओनली रूप में आगे जोड़ा जाता है ([इंजन हेडर](internals/shader-validation.md/engine-header.md))
 - `bloxdTextureId*` ब्लॉक संदर्भित नामों से **प्रति पैक** जनरेट होता है
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` का रूप `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` है (अग्र पूर्णांक v4 से 8 → 9)। दोनों fnv1a32 प्रत्यय हेडर सामग्री और क्रमबद्ध नाम-id रजिस्ट्री की फ़िंगरप्रिंट बनाते हैं। सेव-किए-पैक का पुनः-सत्यापन यही फ़िंगरप्रिंट लेकर "needs re-check" का निर्णय करता है ([कम्पैटिबिलिटी](api/compatibility.md#सेव्ड-पैक-का-पुनः-सत्यापन-needs-re-check))।
+`HEADER_VERSION` का रूप `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` है (अग्र पूर्णांक v4 से 8 → 9)। दोनों fnv1a32 प्रत्यय हेडर सामग्री और क्रमबद्ध नाम-id रजिस्ट्री की फ़िंगरप्रिंट बनाते हैं। सेव-किए-पैक का पुनः-सत्यापन यही फ़िंगरप्रिंट लेकर "needs re-check" का निर्णय करता है ([कम्पैटिबिलिटी](internals/api/compatibility.md#सेव्ड-पैक-का-पुनः-सत्यापन-needs-re-check))।
 
 ### सत्यापन स्टब
 
-स्थैतिक सत्यापन पास करने वाले कोड के लिए असली ब्राउज़र-WGSL जाँच से पहले स्टब कोड संश्लेषित किया जाता है: `var<private> bloxdValidationP: vec4f` सहित `bloxdValidateVertex` / `bloxdValidateFragment` — टाइप-स्टब तालिका (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) इनपुट स्ट्रक्चर बनाती है और हुकों को बुलाती है। विवरण: [WGSL कंपाइलेशन](internals/wgsl-compilation.md)।
+स्थैतिक सत्यापन पास करने वाले कोड के लिए असली ब्राउज़र-WGSL जाँच से पहले स्टब कोड संश्लेषित किया जाता है: `var<private> bloxdValidationP: vec4f` सहित `bloxdValidateVertex` / `bloxdValidateFragment` — टाइप-स्टब तालिका (`bool` → `p.x > 0.0`, `vec3f` → `p.xyz`, …) इनपुट स्ट्रक्चर बनाती है और हुकों को बुलाती है। विवरण: [WGSL कंपाइलेशन](internals/shader-validation.md/wgsl-compilation.md)।
 
 ### संबंधित
 
-- [सत्यापन त्रुटियाँ](troubleshooting/validation.md) · [WGSL कंपाइलेशन](internals/wgsl-compilation.md) · [टेक्सचर रजिस्ट्री](internals/texture-registry.md) · [इंजन डेटा](internals/engine-data.md)
-
-
----
+- [सत्यापन त्रुटियाँ](internals/troubleshooting/validation.md) · [WGSL कंपाइलेशन](internals/shader-validation.md/wgsl-compilation.md) · [टेक्सचर रजिस्ट्री](internals/shader-validation.md/texture-registry.md) · [इंजन डेटा](internals/shader-validation.md/engine-data.md)
 
 ## WGSL कंपाइलेशन
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव बंडल से बहाल)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 सत्यापन का दूसरा चरण — ब्राउज़र के WGSL कंपाइलर से होने वाला असली संकलन — और v5 के सत्यापन स्टब।
 
 ### दो चरण क्यों
 
-स्थैतिक सत्यापन की टाइप-जाँच अपूर्ण होती है, इसलिए कुछ ग़लतियाँ केवल यहीं सामने आती हैं (उदाहरण: `mixing '*' and '^' requires parenthesis` जैसी WGSL ऑपरेटर-प्राथमिकता की अपेक्षाएँ)। त्रुटियाँ खेल के भीतर वेरिएंट नाम के साथ सामने आती हैं ([कंपाइलेशन त्रुटियाँ](troubleshooting/compilation.md))।
+स्थैतिक सत्यापन की टाइप-जाँच अपूर्ण होती है, इसलिए कुछ ग़लतियाँ केवल यहीं सामने आती हैं (उदाहरण: `mixing '*' and '^' requires parenthesis` जैसी WGSL ऑपरेटर-प्राथमिकता की अपेक्षाएँ)। त्रुटियाँ खेल के भीतर वेरिएंट नाम के साथ सामने आती हैं ([कंपाइलेशन त्रुटियाँ](internals/troubleshooting/compilation.md))।
 
 ### सत्यापन-स्टब जनरेशन
 
@@ -5684,26 +5673,22 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ### जॉइन पर रनटाइम पुनः-सत्यापन
 
-`checkCompilation` हर गेम-जॉइन पर चलता है और हर मौजूदा टेरेन सामग्री को वास्तव में संकलित करता है (सेटिंग्स-स्क्रीन जाँच से सख़्त)। विफल होने पर पैक उस गेम के लिए हटा दिया जाता है। जाँच का एक 60-सेकंड का बलात् टाइमआउट है ([परफ़ॉर्मेंस](troubleshooting/performance.md))।
+`checkCompilation` हर गेम-जॉइन पर चलता है और हर मौजूदा टेरेन सामग्री को वास्तव में संकलित करता है (सेटिंग्स-स्क्रीन जाँच से सख़्त)। विफल होने पर पैक उस गेम के लिए हटा दिया जाता है। जाँच का एक 60-सेकंड का बलात् टाइमआउट है ([परफ़ॉर्मेंस](internals/troubleshooting/performance.md))।
 
 ### संबंधित
 
-- [कंपाइलेशन त्रुटियाँ](troubleshooting/compilation.md) · [शेडर सत्यापन](internals/shader-validation.md) · [शुरुआत: सत्यापन](getting-started/validation.md)
-
-
----
+- [कंपाइलेशन त्रुटियाँ](internals/troubleshooting/compilation.md) · [शेडर सत्यापन](internals/wgsl-compilation.md/shader-validation.md) · [शुरुआत: सत्यापन](internals/getting-started/validation.md)
 
 ## आरक्षित पहचानकर्ता इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव बंडल के जनरेटरों से बहाल)
 
-`bloxdSp*` नेमस्पेस — वे प्रतीक जो जनरेटर इंजेक्ट कर सकते हैं और जिन्हें पैक इसीलिए पुनः घोषित नहीं कर सकते। पैक-लेखकों के लिए सारांश: [प्रतिबंध](api/restrictions.md)।
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+`bloxdSp*` नेमस्पेस — वे प्रतीक जो जनरेटर इंजेक्ट कर सकते हैं और जिन्हें पैक इसीलिए पुनः घोषित नहीं कर सकते। पैक-लेखकों के लिए सारांश: [प्रतिबंध](internals/api/restrictions.md)।
 ### 88 प्रतीक
 
-v4 के 27 से v5 लॉन्च पर 46, और `bbb6l5` पर **88** (+42, 0 रिटायर; एकमात्र ऐतिहासिक सेवानिवृत्ति `bloxdSpLitColour` था — सार्वजनिक `bloxdLitColour()` में पदोन्नत):
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### नए नाम ↔ `bbb6l5` की छाया प्रणाली
 
 सभी 42 नए प्रतीक इंजन के सूर्य/चंद्र छाया कार्यान्वयन से आए हैं, जो `bloxdShadow()` / `bloxdAirShadow()` को आधार देता है:
 
@@ -5720,41 +5705,37 @@ v4 के 27 से v5 लॉन्च पर 46, और `bbb6l5` पर **88** 
 - `bloxdSpFlags` — `BloxdFlags` स्ट्रक्चर की डिलीवरी
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — नए इनपुट (एनचैंट, मॉडल-स्थानीय स्थिति)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — सेल-सैंपलिंग टेक्सचर-पैक पथ
-- `bloxdSpQuarterTurns` — रोटेशन श्रृंखला ([टेक्सचर सैंपलिंग](internals/texture-sampling.md))
+- `bloxdSpQuarterTurns` — रोटेशन श्रृंखला ([टेक्सचर सैंपलिंग](internals/reserved-identifiers.md/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — विस्तारित-हुक लोकल
 
 ### पैक-स्तरीय नियम
 
-इस नेमस्पेस से भी व्यापक: **`/^bloxd/i` से मेल खाता सब कुछ (केस-असंवेदनशील)**। केवल 9 हुक फ़ंक्शन नाम ही घोषित किए जा सकते हैं ([सत्यापन त्रुटियाँ](troubleshooting/validation.md))।
+इस नेमस्पेस से भी व्यापक: **`/^bloxd/i` से मेल खाता सब कुछ (केस-असंवेदनशील)**। केवल 9 हुक फ़ंक्शन नाम ही घोषित किए जा सकते हैं ([सत्यापन त्रुटियाँ](internals/troubleshooting/validation.md))।
 
-`bloxdTextureId`-उपसर्गी पहचानकर्ता टेक्सचर नामों के रूप में रिज़ॉल्व होते हैं, जिनका अपना समर्पित त्रुटि-परिवार है ([टेक्सचर समस्याएँ](troubleshooting/textures.md))।
+`bloxdTextureId`-उपसर्गी पहचानकर्ता टेक्सचर नामों के रूप में रिज़ॉल्व होते हैं, जिनका अपना समर्पित त्रुटि-परिवार है ([टेक्सचर समस्याएँ](internals/troubleshooting/textures.md))।
 
 ### संबंधित
 
-- [प्रतिबंध](api/restrictions.md) · [टेक्सचर सैंपलिंग](internals/texture-sampling.md) · [संस्करण इतिहास: v5](history/v5.md)
-
-
----
+- [प्रतिबंध](internals/api/restrictions.md) · [टेक्सचर सैंपलिंग](internals/reserved-identifiers.md/texture-sampling.md) · [संस्करण इतिहास: v5](internals/history/v5.md)
 
 ## लाइटिंग इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 `blockLight` तीन RGB चैनलों वाला **रंगीन प्रकाश** है। प्रत्येक प्रकाश-उत्सर्जक ब्लॉक एक उत्सर्जन रंग `[R, G, B]` (प्रत्येक 0–15) परिभाषित करता है, जो सीधे ही प्रकाश का रंग बन जाता है (सामान्य मशाल = उष्ण श्वेत (14,14,12) / लावा = नारंगी (14,8,2) / बीकन = सियान (5,14,14) / श्वेत मशाल = (15,15,15) आदि)। शीर्ष (vertex) चरण में यह एक float एट्रिब्यूट में r / g / b / sky — चार निबल के रूप में पैक होकर आता है। लाइट हुक के भीतर तीनों चैनलों को अलग-अलग संभालना रंगीन स्थानीय प्रकाश को संभव बनाता है — उष्ण-मशाल रेसिपी (R9.1) इसी व्यवहार के विरुद्ध कैलिब्रेट है।
 
 `aPackedLightLevels` को डिकोड करते समय इंजन हर चैनल को **सबसे चमकीले RGB चैनल के 35% पर फ़्लोर** करता है। जैसे कोई "शुद्ध लाल प्रकाश" अंतर्वेशन और लिफ़्ट से पहले ही शीर्षों पर (1.00, 0.35, 0) तक उठ जाता है। मशाल का नारंगी खेल में "लाल की बजाय श्वेताभ-गुलाबी" दिखना यहीं से है — उष्ण-मशाल रेसिपी (R9.1) की संतृप्ति इसी डिफ़ॉल्ट के विरुद्ध समायोजित करें।
 
-प्रकाश-संयोजन योगात्मक नहीं है। इंजन भीतर 35% फ़्लोर के बाद के ब्लॉक-प्रकाश और `mix(ambient colour, sky colour, skyLight)` से बने आकाश-प्रकाश का **max** लेता है, फिर हस्त-प्रकाश (परिवेश-बूस्ट के बाद) के साथ दुबारा max लेता है। इस संयोजन में प्रयुक्त चैनल मान **लिफ़्ट-बाद** के होते हैं — इंजन उन्हीं उठे हुए प्रकाश-स्तरों से संयोजन करता है जो हुक इनपुट तक पहुँचते हैं (`terrainLightLevels`, लिफ़्ट वक्र के बाद)। इसलिए `blockLight` और `skyLight` एक-दूसरे को कभी नहीं काटते — गहरे पक्ष का योगदान बस छोड़ दिया जाता है — इस कारण आकाश-प्रकाश घटाने पर भी उन स्थानों में अंधेरा लगभग नहीं बढ़ता जहाँ ब्लॉक-प्रकाश प्रबल है। एक्सपोज़र/क्षय रेसिपियाँ इसी संरचना के इर्द-गिर्द बनाएँ ([रात के रूप डिज़ाइन करना](guides/night.md) की स्थानीय-प्रकाश रक्षा इसी की भरपाई के लिए है)।
+प्रकाश-संयोजन योगात्मक नहीं है। इंजन भीतर 35% फ़्लोर के बाद के ब्लॉक-प्रकाश और `mix(ambient colour, sky colour, skyLight)` से बने आकाश-प्रकाश का **max** लेता है, फिर हस्त-प्रकाश (परिवेश-बूस्ट के बाद) के साथ दुबारा max लेता है। इस संयोजन में प्रयुक्त चैनल मान **लिफ़्ट-बाद** के होते हैं — इंजन उन्हीं उठे हुए प्रकाश-स्तरों से संयोजन करता है जो हुक इनपुट तक पहुँचते हैं (`terrainLightLevels`, लिफ़्ट वक्र के बाद)। इसलिए `blockLight` और `skyLight` एक-दूसरे को कभी नहीं काटते — गहरे पक्ष का योगदान बस छोड़ दिया जाता है — इस कारण आकाश-प्रकाश घटाने पर भी उन स्थानों में अंधेरा लगभग नहीं बढ़ता जहाँ ब्लॉक-प्रकाश प्रबल है। एक्सपोज़र/क्षय रेसिपियाँ इसी संरचना के इर्द-गिर्द बनाएँ ([रात के रूप डिज़ाइन करना](internals/guides/night.md) की स्थानीय-प्रकाश रक्षा इसी की भरपाई के लिए है)।
 
 हस्तधृत प्रकाश (`heldLight`) की परास सबसे चमकीले प्रकाश-रंग चैनल का अनुसरण करती है (अधिकतम 15 ब्लॉक) — साथ में `dist^0.75` पूर्व-प्रक्रमण और वही 35% चैनल-फ़्लोर — और `l.heldLight` परिवेश-बूस्ट से पहले का मान है। शंकु क्षय, इंजन के प्रकाश मॉड्यूल से बहाल: किरण का कोणीय क्षीणन `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))` है, जहाँ `t` शंकु अक्ष से प्रसामान्यीकृत कोण है (0 = केंद्र, 1 = किनारा); पहुँच `(rangeOverride > 0 ? rangeOverride : brightest channel) × cone falloff` है, जिसमें `rangeOverride` हस्त-प्रकाश रंग के alpha से पढ़ा जाता है; पहुँच के भीतर override `(range − dist) / range` से क्षीण करता है, जबकि डिफ़ॉल्ट (पूर्व-प्रक्रमित) दूरी को चैनल-दर-चैनल घटाता है; फिर 35% फ़्लोर, 15 से विभाजन, लिफ़्ट वक्र, और अंत में परिवेश-बूस्ट आता है। कस्टम आइटम `spotlightRange` और शंकु कोण सेट कर सकते हैं — "पकड़े रहने पर किरण" विधा, जिसकी शंकु स्थिति कैमरे का अनुसरण करती है। पैक किरण की दिशा जान नहीं सकते।
 
 कस्टम ब्लॉक `skyLightEmission` (0–15) रख सकते हैं, जो **blockLight BFS से अलग, skyLight चैनल में ही इंजेक्ट होता है**। R9.12-शैली के पैक जो सूर्य/छाया का निर्णय skyLight देहली से करते हैं, वे ऐसी दुनियाओं में चूक सकते हैं जहाँ कृत्रिम प्रकाश skyLight उठा देते हैं। वितरण पैकों को सुदृढ़ रहने के लिए blockLight के साथ मिलाकर निर्णय करना चाहिए।
 
-
----
-
 ## फ़ॉग इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
 
-फ़ॉग-परिकलन सदा LINEAR मोड है (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` के बराबर, clamp 0..1), जिसमें `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = फ़ॉग-दूरी सेटिंग; केवल D = 0 विशेष है, fogEnd = 5 के साथ)। **फ़ॉग प्रवणता पट्टी केवल 32 ब्लॉक चौड़ी** है, और `l.fogAlpha` "दूरी-धुंध" से कम और **लोड होती दुनिया के किनारे तक की प्रसामान्यीकृत दूरी** ज़्यादा है। यह लोड-दूरी के साथ खिलाड़ी-अनुसार बदलती है, इसलिए दूरी-आधारित प्रभाव `distance(l.position, bloxdEyePosition())` ख़ुद गिनें (नीचे "लोड-सीमा पट्टी" अनुभाग)। (रेंडरर का फ़ॉग फ़ंक्शन वास्तव में **चार** मोड लागू करता है — बंद / चरघातांकी / चरघातांकी-वर्ग / रैखिक — और भेजे गए शीर्षक रैखिक वाला चलाते हैं; बहाल स्रोत और टिकाऊपन का तर्क [संस्करण इतिहास: v3](history/v3.md) में सुरक्षित हैं।)
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+फ़ॉग-परिकलन सदा LINEAR मोड है (`fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` के बराबर, clamp 0..1), जिसमें `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = फ़ॉग-दूरी सेटिंग; केवल D = 0 विशेष है, fogEnd = 5 के साथ)। **फ़ॉग प्रवणता पट्टी केवल 32 ब्लॉक चौड़ी** है, और `l.fogAlpha` "दूरी-धुंध" से कम और **लोड होती दुनिया के किनारे तक की प्रसामान्यीकृत दूरी** ज़्यादा है। यह लोड-दूरी के साथ खिलाड़ी-अनुसार बदलती है, इसलिए दूरी-आधारित प्रभाव `distance(l.position, bloxdEyePosition())` ख़ुद गिनें (नीचे "लोड-सीमा पट्टी" अनुभाग)। (रेंडरर का फ़ॉग फ़ंक्शन वास्तव में **चार** मोड लागू करता है — बंद / चरघातांकी / चरघातांकी-वर्ग / रैखिक — और भेजे गए शीर्षक रैखिक वाला चलाते हैं; बहाल स्रोत और टिकाऊपन का तर्क [संस्करण इतिहास: v3](internals/history/v3.md) में सुरक्षित हैं।)
 
 डिफ़ॉल्ट फ़ॉग रंग `rgb(183, 191, 195)` (हल्का नीला-धूसर) है। दुनिया रचने वाले इसे `fogColourOverride` (hex) से बदल सकते हैं। फ़ॉग मोड 0 (NONE) पर **fogColour काला आता है**। मानक `bloxdApplyFog(col, l)` रूप सुरक्षित है, क्योंकि fogAlpha 0 होने पर फ़ॉग रंग अप्रयुक्त रहता है। स्क्रिप्ट API में दो और विकल्प हैं, `fogChunkDistanceOverride` और `fogOnSkybox`: कस्टम गेम फ़ॉग-दूरी (D मान) और स्काईबॉक्स पर फ़ॉग लगाना अलग-अलग सेट कर सकते हैं। डिफ़ॉल्ट में स्काईबॉक्स फ़ॉग से प्रभावित नहीं होता (केवल `fogOnSkybox` सक्षम करने वाले गेमों में स्काईबॉक्स भी फ़ॉग रंग से रंग जाता है)।
 
@@ -5775,13 +5756,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-
----
-
 ## टेक्सचर सैंपलिंग इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव जेनरेटर से बहाल, c56)
 
-`bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — 3-वेरिएंट टेक्सचर कोडजेन। उपयोगकर्ता-पक्ष: [टेक्सचर API](api/texture-api.md)।
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+`bloxdTexel` / `bloxdTextureSize` असल में कैसे कंपाइल होते हैं — 3-वेरिएंट टेक्सचर कोडजेन। उपयोगकर्ता-पक्ष: [टेक्सचर API](internals/api/texture-api.md)।
 
 ### तीन वेरिएंट
 
@@ -5822,7 +5801,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### एनीमेशन फ़्रेम सीढ़ी
 
-एनिमेटेड टेक्सचर (42 फ़ैमिलियाँ) प्रति-फ़ैमिली तय अंतरालों पर बढ़ते हैं (200 / 250 / 300 ms — [टेक्सचर कैटलॉग](api/texture-catalog.md#एनीमेशन-परिवार-43-नाम) का अंतराल कॉलम)। `bloxdTexel` को कोई एनीमेशन-फ़ैमिली id देने पर मौजूदा फ़्रेम सैंपल होता है।
+एनिमेटेड टेक्सचर (42 फ़ैमिलियाँ) प्रति-फ़ैमिली तय अंतरालों पर बढ़ते हैं (200 / 250 / 300 ms — [टेक्सचर कैटलॉग](internals/api/texture-catalog.md#एनीमेशन-परिवार-43-नाम) का अंतराल कॉलम)। `bloxdTexel` को कोई एनीमेशन-फ़ैमिली id देने पर मौजूदा फ़्रेम सैंपल होता है।
 
 ### सैंपलर सेटिंग
 
@@ -5834,39 +5813,13 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### संबंधित
 
-- [टेक्सचर API](api/texture-api.md) · [टेक्सचर रजिस्ट्री](internals/texture-registry.md) · [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md)
-
-
----
-
-## टेक्सचर रजिस्ट्री कैसे काम करती है
-
-> लक्ष्य API: 5 · उद्देश्य: नाम से टेक्सचर संदर्भित करना
-
-Shader packs टेक्सचर को संख्यात्मक ID के बजाय नामित constants से संदर्भित करते हैं। Constants का रूप `bloxdTextureId<Name>` होता है। उपलब्ध नामों के लिए [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) देखें।
-
-### नाम का समाधान
-
-Pack लोड करते समय loader हर नामित constant को उपलब्ध टेक्सचर नाम से जोड़ता है। आंतरिक व्यवस्था बदलने पर भी, यदि नाम उपलब्ध रहता है, तो pack उस टेक्सचर को नाम से संदर्भित कर सकता है।
-
-**WGSL में संख्यात्मक texture IDs सीधे न लिखें।** गेम सामग्री अपडेट होने पर आंतरिक IDs और atlas की स्थितियाँ बदल सकती हैं। नामित constants pack code को इन आंतरिक स्थितियों पर निर्भर होने से बचाते हैं।
-
-### एनीमेशन और रोटेशन
-
-- **एनीमेशन:** `lava0`–`lava7` जैसे frame नामों के बजाय `lava` जैसा मूल नाम उपयोग करें। Sampling के समय वर्तमान frame चुना जाता है।
-- **रोटेशन:** आंतरिक rotation slots के बजाय कैटलॉग में दिया मूल नाम उपयोग करें। Sampling में face rotation लागू होती है।
-- **Frame transitions:** इंजन पास-पास के animation frames के बीच interpolation के लिए आंतरिक slots उपयोग करता है। Packs में सामान्य नामित constants ही उपयोग करें।
-
-### संबंधित
-
-- [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) — उपलब्ध नाम और constants
-- [टेक्सचर API](internals/api/texture-api.md) — टेक्सचर lookup और sampling
-- [टेक्सचर सैंपलिंग इंटर्नल्स](internals/texture-registry.md/texture-sampling.md) — sampling कैसे काम करती है
+- [टेक्सचर API](internals/api/texture-api.md) · [टेक्सचर रजिस्ट्री](internals/texture-sampling.md/texture-registry.md) · [रेंडरिंग पाइपलाइन](internals/texture-sampling.md/rendering-pipeline.md)
 
 ## मॉडल रेंडरिंग इंटर्नल्स
-> लक्ष्य API: 5 · स्थिति: Analyzed (लाइव बंडल से बहाल)
 
-v5 Model प्रोग्राम की आंतरिक बनावट। उपयोगकर्ता-सामने की गाइड: [मॉडल और टेक्सचर](guides/models.md)।
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+v5 Model प्रोग्राम की आंतरिक बनावट। उपयोगकर्ता-सामने की गाइड: [मॉडल और टेक्सचर](internals/guides/models.md)।
 
 ### Model प्रोग्राम क्या है
 
@@ -5884,7 +5837,7 @@ v5 से पहले पैक केवल terrain / liquid में जु�
 
 ### एनचैंट गणना
 
-इंजन झिलमिल-स्वीप को एनिमेट करके `enchantColour.a` के रूप में surface/light हुकों तक पहुँचाता है ([एनचैंट प्रभाव](recipes/enchant-effects.md))। मिश्रण `bloxdLitColour()` के भीतर होता है — शेडिंग के ठीक बाद, दुनिया-प्रकाश से पहले ([लाइटिंग](api/lighting.md#पूरी-पाइपलाइन))।
+इंजन झिलमिल-स्वीप को एनिमेट करके `enchantColour.a` के रूप में surface/light हुकों तक पहुँचाता है ([एनचैंट प्रभाव](internals/recipes/enchant-effects.md))। मिश्रण `bloxdLitColour()` के भीतर होता है — शेडिंग के ठीक बाद, दुनिया-प्रकाश से पहले ([लाइटिंग](internals/api/lighting.md#पूरी-पाइपलाइन))।
 
 ### ओवरले (चोट-फ़्लैश आदि)
 
@@ -5892,66 +5845,19 @@ v5 से पहले पैक केवल terrain / liquid में जु�
 
 ### टेक्सचर पथ
 
-ज़्यादातर मॉडल फ़ेस `textureId: 0` (कोई टेक्सचर नहीं) उपयोग करते हैं — प्लेयर स्किन और मॉब टेक्सचर ब्लॉक-टेक्सचर-एटलस नेमस्पेस में नहीं होते। `surface.colour` में स्किन × tint बेक हुआ आता है, इसलिए मॉडल-फ़ेस प्रोसेसिंग `colour` से शुरू होती है ([मॉडल-स्वामित्व टेक्सचर](api/texture-api.md#मॉडल-स्वामित्व-टेक्सचर-textureid-0))।
+ज़्यादातर मॉडल फ़ेस `textureId: 0` (कोई टेक्सचर नहीं) उपयोग करते हैं — प्लेयर स्किन और मॉब टेक्सचर ब्लॉक-टेक्सचर-एटलस नेमस्पेस में नहीं होते। `surface.colour` में स्किन × tint बेक हुआ आता है, इसलिए मॉडल-फ़ेस प्रोसेसिंग `colour` से शुरू होती है ([मॉडल-स्वामित्व टेक्सचर](internals/api/texture-api.md#मॉडल-स्वामित्व-टेक्सचर-textureid-0))।
 
 ### वेरिएंट
 
-Model प्रोग्राम वेरिएंट-मैट्रिक्स का एक अक्ष बनाता है: `strict.model` / `allow.model`। `BLOXD_ALPHA` केवल allow.model में परिभाषित होता है ([प्रीप्रोसेसर](api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स)); strict.model में कोई vertex हुक नहीं होते।
+Model प्रोग्राम वेरिएंट-मैट्रिक्स का एक अक्ष बनाता है: `strict.model` / `allow.model`। `BLOXD_ALPHA` केवल allow.model में परिभाषित होता है ([प्रीप्रोसेसर](internals/api/preprocessor.md#मैक्रो--वेरिएंट-मैट्रिक्स)); strict.model में कोई vertex हुक नहीं होते।
 
 ### संबंधित
 
-- [मॉडल और टेक्सचर](guides/models.md) · [मॉडल शेडर रेसिपी](recipes/model-shaders.md) · [फ़्लैग](api/flags.md) · [रेंडरिंग पाइपलाइन](internals/rendering-pipeline.md)
-
-
----
-
-## इंजन डेटा
-
-> लक्ष्य API: 5 · उद्देश्य: स्पेसिफ़िकेशन सारांश
-
-यह पृष्ठ shader packs के लिए उपलब्ध API और pack बनाते समय लागू सीमाओं का सार देता है। परिभाषाओं और उदाहरणों के लिए संबंधित संदर्भ देखें।
-
-### API का सार
-
-| मद | स्पेसिफ़िकेशन |
-|---|---|
-| API संस्करण | `5` |
-| हुक | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
-| वेरिएंट | 6 (allow / strict × terrain / liquid / model) |
-| मैक्रो | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`। `BLOXD_LIGHTING` उपलब्ध नहीं है |
-| Pack uniform | 80 bytes। फ़ील्ड offsets के लिए [Pack format](internals/api/pack-format.md) देखें |
-| टेक्सचर | `bloxdTextureId<Name>` रूप वाले नामित constants उपयोग करें। संख्यात्मक ID को स्थायी न मानें |
-| आरक्षित नाम | `bloxd` से शुरू होने वाले identifiers इंजन के लिए आरक्षित हैं |
-
-### Pack सीमाएँ
-
-| मद | सीमा |
-|---|---:|
-| WGSL फ़ाइलें | 256 |
-| कुल WGSL source | 256 KB |
-| `pack.json` | 64 KB |
-| ZIP archive | 32 MB |
-| ZIP entries | 1,024 |
-
-ZIP की root में ठीक एक manifest रखें और फ़ाइलें UTF-8 में सहेजें। Duplicate paths और असमर्थित ZIP formats स्वीकार नहीं किए जाते। विवरण के लिए [Pack format](internals/api/pack-format.md) देखें।
-
-### API v5 की मुख्य सुविधाएँ
-
-- `bloxdShadow()` और `bloxdAirShadow(t)` सूर्य और चंद्रमा की रोशनी से बनने वाली छाया की जानकारी देते हैं।
-- `bloxdShadowDirection()` छाया डालने वाली रोशनी की दिशा लौटाता है।
-- Shadow API का उपयोग करते हुए पारंपरिक गोल छायाएँ बनाए रखने के लिए `pack.json` के वैकल्पिक `keepCircleShadows` फ़ील्ड को `true` करें।
-- रोशनी की स्थिति runtime पर `bloxdLit()` से जाँचें; `BLOXD_LIGHTING` मैक्रो समर्थित नहीं है।
-
-### संबंधित
-
-- [API संदर्भ](internals/api) — फ़ंक्शन, संरचनाएँ और constants
-- [Pack format](internals/api/pack-format.md) — manifest, uniform और loader सीमाएँ
-- [टेक्सचर कैटलॉग](internals/api/texture-catalog.md) — उपलब्ध टेक्सचर नाम
-- [गेम-वार नीति](internals/engine-data.md/policy.md) — allow / strict दायरा
-- [API v4 माइग्रेशन गाइड](internals/history/v4.md) — पिछले संस्करण से माइग्रेशन
+- [मॉडल और टेक्सचर](internals/guides/models.md) · [मॉडल शेडर रेसिपी](internals/recipes/model-shaders.md) · [फ़्लैग](internals/api/flags.md) · [रेंडरिंग पाइपलाइन](internals/model-rendering.md/rendering-pipeline.md)
 
 ## पैक-दृश्य मान बदलने वाली चीज़ें
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 वही पैक **दुनिया और खिलाड़ी की सेटिंगों** के आर-पार अलग-अलग रेंडर होता है। वितरण से पहले कम से कम इन 3 परिवेशों में जाँच करें:
 
 1. **सामान्य दुनिया** (डिफ़ॉल्ट स्काईबॉक्स, कोई ओवरराइड नहीं) — bloxdSunDirection() ≈ `(−0.56, 0.81, −0.18)`, डिफ़ॉल्ट रंग
@@ -5960,19 +5866,16 @@ ZIP की root में ठीक एक manifest रखें और फ़�
 
 मुख्य भिन्नता स्रोत: `lightingOverride` (बलात् प्रकाश) / `skyLightColourOverride`, `ambientLightColourOverride` (hex अदला-बदली) / `visionMinLightColour` ("सबसे गहरा दिखने वाला रंग" — कार्यान्वयन `uSkyLightColour` और `uAmbientLightColour` दोनों के विरुद्ध घटक-वार max के रूप में; Night Vision इसी का प्रयोग करता है — "घोर-अंधेरी गुफ़ा" वाले पैक जितना अभीष्ट है उतने गहरे नहीं हो पाते, और आकाश का रंग भी उठ जाता है) / `heldLightColourOverride`, `Range`, `ConeAngle` / `fogChunkDistanceOverride`, `fogColourOverride`, `fogOnSkybox` / `skyBox` (bloxdSunDirection() की विद्यमानता)। `uSkyLightColour` डिफ़ॉल्ट = (1,1,1) श्वेत, `uAmbientLightColour` डिफ़ॉल्ट = (0.25,0.25,0.30)। `l.ambient` का दृश्य घटक = ग्राफ़िक्स सेटिंग "Ambient Lighting Intensity" (डिफ़ॉल्ट 0.5)। `(1.0 - l.fogAlpha)` खिलाड़ी की फ़ॉग/चंक दूरी सेटिंग का अनुसरण करता है। साथ ही `cameraTint` (पूरी स्क्रीन पर RGBA टिंट) और `proximityFadeDistance` / `proximityFadeMinOpacity` (इकाइयों के लिए कैमरा-निकटता फ़ेड) भी दुनिया-सेटिंग के भिन्नता कारक हैं — विशेषकर `cameraTint` पैक आउटपुट के **ऊपर** कंपोज़िट होने वाली अंतिम पास है। इनमें से अनेक स्क्रिप्ट API (`serverOption`) से भी सेट किए जा सकते हैं और खेल चलते समय अपडेट भी हो सकते हैं।
 
-
----
-
 ## प्रति-गेम शेडर-पैक पॉलिसी
-> लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
 
 यह पेज `allow / strict` के शीर्षक-स्तरीय अर्थ को पक्का करता है। केवल वही शीर्षक पूर्ण मोड (vertex हुक, `discard`, terrain `alpha`) में चलते हैं जिनकी गेम परिभाषा साफ़ तौर पर `shaderPackPolicy: "allow"` ले चलती है; बिना सेटिंग वाले (या कोई भी ग़ैर-allow मान वाले) शीर्षक strict हैं — `BLOXD_STRICT` परिभाषित होता है और गार्डेड कोड अपने आप निष्क्रिय हो जाता है। पैक-पक्ष यह नहीं चुन सकता, इसलिए यह जानना कि कौन-सा शीर्षक क्या चलाता है, वितरण की पूर्व-शर्त है।
 
-- संदर्भ बिल्ड: `szby6g.main.94a7596c.js` (2026-10-17 तक की प्रोडक्शन डिप्लॉय)। सभी 111 गेम परिभाषाओं का स्थैतिक गिनती-आधारित उल्लेख करने पर **26 allow प्रविष्टियाँ (12 शीर्षक) / 85 strict प्रविष्टियाँ** मिलती हैं। उन्हीं 12 शीर्षकों में उन्हीं 12 allow लिटरल्स को v3 प्रोडक्शन बंडल (`3ymzdd`, 2026-10-20) पर और फिर v4 बंडल (`cnty9`, 2026-10-27) पर अपरिवर्तित दोबारा पुष्ट किया गया — नीचे की सूची v3 और v4 पर जस-की-तस लागू होती है। और v5 बिल्डों पर भी अपरिवर्तित: `ab90qa` (2026-11-03) और `xkg8x` (2026-11-04, 12 allow लिटरल दोबारा गिने गए) पर पुनः पुष्टि। `bny9u` (2026-11-05) पर पूरी गिनती दोबारा चलाई गई: गेम-परिभाषा संख्या 111 से बढ़कर **115** हुई और allow पक्ष 26 से **28 प्रविष्टियाँ** — वही 12 शीर्षक, साथ में Test Gym की दो नई वैरिएंट (Imported Mobs, Interest)। नीचे की सूची v5 पर भी जस-की-तस लागू होती है। `v98qt8` (2026-11-08) पर गणना फिर चलाई गई (मुख्य बंडल का गेम मॉड्यूल 513, एक हार्नेस में मूल्यांकित): **116 परिभाषाएँ / 28 allow प्रविष्टियाँ (12 शीर्षक) / 88 strict** — allow पक्ष अपरिवर्तित, एक और strict परिभाषा जुड़ी।
 - `shaderPackPolicy` के ऊपर एक डिलीवरी-चैनल द्वार भी है (मोटे तौर पर `canUseShaderPacks`): बाहरी पोर्टलों (जैसे Coolmath Games बिल्ड) के ज़रिए शेडर पैक सिस्टम ख़ुद `shaderPackPolicy` के देखे जाने से पहले ही बंद किया जा सकता है। नीचे का allow/strict विश्लेषण bloxd.io के मुख्य वेब बिल्ड पर आधारित है।
-- allow 12 जगह घोषित है: गेम परिभाषाओं में 8 सीधे लिटरल और 4 बेस वेरिएबल (`tb` / `kz` / `cb` / `Fb`); वेरिएंट इसे spread (`{...tb,...}`) से उत्तराधिकार में लेते हैं। फ़िलहाल कोई प्रति-वेरिएंट ओवरराइड नहीं है (parent-allow / child-strict पैटर्न भी नहीं)।
 
-12 allow शीर्षक (कुल 26 प्रविष्टियाँ):
+
+### allow वाले गेम
 
 - **Test Gym** — बेस + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (13 प्रविष्टियाँ)
 - **Doodle Cube** — बेस + Solos / Duos (3)
@@ -5987,10 +5890,63 @@ ZIP की root में ठीक एक manifest रखें और फ़�
 
 ध्यान दें कि strict शीर्षकों में पैक फिर भी लोड और कंपाइल होता है, और surface / light जैसी फ़्रैगमेंट-पक्ष रेसिपें हमेशा की तरह चलती हैं। जो रोका जाता है वह है: vertex हुक (`bloxdTerrainVertex` / `bloxdLiquidVertex`), `discard`, और terrain `alpha` (लिक्विड में यह हमेशा रहता है)।
 
-यह सूची ऊपर बताए बिल्ड के स्थैतिक विश्लेषण को दर्शाती है; इंजन अपडेट allow/strict विभाजन बदल सकते हैं। नया संस्करण आने पर दोबारा जाँचें।
 
+Pack वितरित करने से पहले उसे लक्ष्य गेम में चलाकर जाँचें कि आवश्यक hooks वहाँ काम करते हैं।
 
----
+## सूर्य और चंद्र
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+`bloxdSunDirection()` का स्रोत एक सूर्य-दिशा बफ़र है जो केवल स्काईबॉक्स बदलने पर दोबारा लिखा जाता है — कसौटी "आकाश में सूर्य है या नहीं" नहीं, बल्कि **"स्काईबॉक्स पृथ्वी-प्रकार का है या नहीं"** है।
+
+| स्काईबॉक्स | `bloxdSunDirection()` |
+|---|---|
+| `default` (प्रोसीज़रल आकाश) | अशून्य (डिफ़ॉल्ट नीचे) |
+| `gloomy` / `interstellar` / `space_*` (घन टेक्सचर) | **सदा (0,0,0)** |
+
+**चंद्रमा सदा `-bloxdSunDirection()` है** (इंजन चंद्रमा की स्थिति सूर्य के ठीक विपरीत गिनता है)। रात सूर्य की ऊँचाई से तय होती है — `bloxdSunDirection().y < 0` (सूर्य क्षितिज से नीचे) पर चंद्रमा ऊपर होता है। पर डिफ़ॉल्ट दुनियाओं में सूर्य स्थिर है, इसलिए चंद्रमा भी स्थिर; उसे चलते हुए केवल दिन-रात चक्र लागू करने वाली दुनियाएँ देखती हैं।
+
+डिफ़ॉल्ट-दुनिया की सूर्य दिशा लगभग `(-0.56, 0.81, -0.18)` है (inclination = −0.2 / azimuth = 0.55 से गिनी गई इकाई सदिश, स्थिर)। वितरण-पैक परीक्षण के समय हाइलाइट दिशाएँ कागज़ पर भाँपने का व्यावहारिक संदर्भ।
+
+दिन-रात चक्र इंजन में अंतर्निहित नहीं है — inclination एक स्थिर संख्या है, और चलता दिन-रात रखने वाली दुनियाएँ उसे गेम-पक्ष से अपडेट करती हैं। `bloxdSunDirection()` हर अपडेट का अनुसरण करता है।
+
+Terrain के दिशात्मक प्रकाश बस scene-आरंभ पर बने 2 दीप हैं, **दिशा और तीव्रता तय, दिन-रात में अपरिवर्तित**। संक्षेप में, **terrain-चमक का कोई भी घटक समय पर निर्भर नहीं है। दिन-रात के "रूप" केवल स्काईबॉक्स और bloxdSunDirection() से आते हैं**, इसलिए रात में terrain काला करने वाले पैकों को समय-पट्टी bloxdSunDirection() से ख़ुद अनुमान लगानी होगी ([रात के रूप डिज़ाइन करना](internals/guides/night.md) की `sunPresent` तकनीक)।
+
+### R-A. दिशात्मक चांदनी — moonDir = −bloxdSunDirection()
+
+चंद्रमा ऊपर रहने पर ही नीली-सफ़ेद लैम्बर्ट और मंद स्पेक्युलर जोड़ता है। स्थिर-सूर्य डिफ़ॉल्ट दुनियाओं में `moonUp` 0 है, इसलिए वहाँ कुछ नहीं होता — **केवल दिन-रात-चक्र दुनियाओं में चलने वाली चांदनी, इसलिए सुरक्षित**।
+
+```wgsl
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    if (bloxdLit()) {
+        // चंद्रमा सदा सूर्य के ठीक विपरीत; दिन में moonDir.y < 0 से अपने आप बंद
+        let moonDir = -bloxdSunDirection();
+        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+        if (moonUp > 0.0) {
+            let n     = normalize(l.normal);
+            let diff  = max(0.0, dot(n, moonDir));
+            let view  = normalize(bloxdEyePosition() - l.position);
+            let halfV = normalize(moonDir + view);
+            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+        }
+}
+    return out;
+}
+```
+
+## दोषमार्जन टूल
+
+> लक्ष्य API: 5 · प्रकार: तकनीकी संदर्भ
+
+- URL पैरामीटर `?renderer=lite` — Lite (WebGPU) रेंडरर पर मज़बूरी से चलाएँ (`webgl2` / `babylon` भी चलते हैं; `babylon`, webgl2 का पुराना नाम है)। प्राथमिकता: URL पैरामीटर > localStorage `bloxdRenderer` > सेटिंग्स स्क्रीन > डिफ़ॉल्ट (webgl2)। अमान्य मान चेतावनी के साथ नज़रअंदाज़ किए जाते हैं। URL या localStorage में छूटे रेंडरर-ओवरराइड WebGPU (lite) माँगने वाले scene तोड़ सकते हैं — "needs the new WebGPU renderer, so remove the renderer override..." ([लोडिंग त्रुटियाँ](internals/troubleshooting/loading.md))
+- URL पैरामीटर `?vconsole` — ऑन-स्क्रीन कंसोल (VConsole)। मोबाइल डिवाइस सत्यापन के लिए सुविधाजनक
+- URL पैरामीटर `?drawcalls=1` — draw-आँकड़ों का डिबग पैनल जोड़ता है। डिबग कंसोल से गेम ऑब्जेक्ट चुनें, या `drawCalls()` / `why()` / `configureDrawCallWatching()` का उपयोग करें — बड़ी मशीनरियों (पैक और अन्य) के ओवरड्रॉइंग और प्रति-draw-call ~65,000-vertex सीमा के नज़दीक पहुँचने का निरीक्षण करने के लिए — प्रदर्शन-अड़चनों को अलग करने में उपयोगी
+- कंसोल `noa-engine v0.33.0` और `Renderer: lite from <source>` दिखाता है — रेंडर-पथ के ग़लत निदान से बचने के लिए पहले इन्हीं की जाँच करें
+- पैक लागू होते समय WebGPU रेंडरर "ज़बरदस्ती ON" पर लॉक रहता है। "Disable Block Texture Atlas" सेटिंग भी लॉक हो जाती है (एटलस ON रहता है), और WebGPU-रहित डिवाइसों पर पैक बिल्कुल लागू नहीं हो सकते। वितरण पेजों पर "needs a WebGPU browser" लिखने का आधार यही है
+- ब्लॉक टेक्सचर एक 2D ऐरे टेक्सचर (`texture_2d_array`) हैं, और terrain सैंपलर nearest + repeat है। मेशर सामग्री / AO / प्रकाश मिलाने वाले फ़ेसों को एक आयत में भी मिला देता है (**greedy meshing**), इसलिए मिले फ़ेस का UV एक टाइल-चौड़ाई पार कर सकता है (किनारों पर 0.0015 इनसेट)। हार्डवेयर रिपीट एड्रेसिंग टाइलिंग सँभालती है, इसलिए मिले फ़ेस बेसीम दिखते हैं। ध्यान दें कि `vUV` से बँधा प्रोसीज़रल विवरण मिले-फ़ेस की सीमाओं पर टूट सकता है — उसे दुनिया की स्थिति (`s.position` + `bloxdRenderOffset()`) से बाँधें
+- प्रति-गेम-जॉइन रनटाइम पुनः-सत्यापन (`checkCompilation`) असली terrain सामग्री ब्राउज़र WebGPU में कंपाइल करता है (सेटिंग्स-स्क्रीन के स्थैतिक सत्यापन से सख़्त)। यहाँ विफल होने वाले पैक उस गेम से बाहर रख दिए जाते हैं
 
 ## सूर्य और चंद्र
 > लक्ष्य API: 5 · स्थिति: Analyzed (प्रोडक्शन-बंडल JavaScript विश्लेषण)
