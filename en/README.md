@@ -1,6 +1,6 @@
 # Bloxd.io Shader Pack Documentation
 
-An unofficial guide to shader packs for Bloxd.io’s WebGPU renderer. It covers the full workflow—from creating and testing packs to the API reference and research into engine internals.
+An unofficial guide to shader packs for Bloxd.io’s WebGPU renderer. It covers the full workflow—from creating and testing packs to the API reference and engine internals.
 
 ## Current spec
 
@@ -12,7 +12,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 
 > This documentation is not an official resource from the game's developers. Engine internals are implementation details and may change with updates; consult the API reference for supported behavior.
 >
-> This guide was created with AI assistance; accuracy is not guaranteed. Verify against actual in-game behavior. Keep verifying recipes against the loader screen and in-game compilation.
+> AI assistance was used to prepare this guide. Confirm behavior in-game, as implementation details may change.
 >
 > Packs are written in WGSL; they do not execute JavaScript or make network requests.
 
@@ -24,7 +24,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 | Look up API functions & fields | [API Reference](api/) | Authors mid-implementation |
 | Implement an effect (light, water, models…) | [Guides](guides/) · [Recipes](recipes/) | Anyone building a look |
 | Fix an error | [Troubleshooting](troubleshooting/) | Anyone with a broken pack |
-| Research engine internals | [Engine Internals & Research](internals/) | Engine analysts |
+| Understand engine internals | [Engine Internals](internals/) | Technical readers |
 | Look up older versions (v1–v5) | [Version History](history/) | Migrating legacy packs |
 
 ## Documentation map
@@ -34,7 +34,7 @@ New to shader packs? Start with [Getting Started](getting-started/). Looking up 
 - **[Guides](guides/)** — how lighting works, shadows, water, night, model rendering, performance, realism concepts.
 - **[Recipes](recipes/)** — goal-oriented code examples: colors, lighting, emission, coordinates, animation, liquids, vertices, math, realism, model shaders, enchant effects.
 - **[Troubleshooting](troubleshooting/)** — symptom-driven error resolution: loading, API version, compilation, validation, variants, visual, texture, lighting, model, performance.
-- **[Engine Internals & Research](internals/)** — rendering pipeline, hook invocation, engine header, validation & compilation internals, reserved identifiers, lighting/fog internals, texture sampling & registry, model rendering, measured data.
+- **[Engine Internals](internals/)** — rendering pipeline, hook invocation, engine header, validation & compilation internals, reserved identifiers, lighting/fog internals, texture sampling & registry, model rendering, measured data.
 - **[Version History](history/)** — v1 through v5: changes per version, migration steps, removed APIs.
 
 ## Verification status labels
@@ -49,4 +49,4 @@ Each page notes the API version it covers and the status of its supporting infor
 | Experimental | Experimental / unsettled |
 | Historical | Material for a past version |
 
-Raw engine-extracted data (header, registry, measurements) lives in [Engine Internals](internals/); the methodology and logs behind it are tracked in the [research log](internals/research-log.md).
+Engine data (headers, registries, and measurements) is documented in [Engine Internals](internals/); the methodology and supporting records are in the [research log](internals/research-log.md).
