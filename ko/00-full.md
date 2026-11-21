@@ -465,7 +465,6 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 ---
 
 ## 팩 형식
-
 매니페스트, 로더 제한, 프레임별 uniform — 팩 모델 전체를 한 페이지에 담는다. 단계별 버전은 [시작하기](getting-started/manifest.md) 에 있다.
 
 ### pack.json
@@ -483,10 +482,11 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 | `apiVersion` | number | 필수 | **`5` 와 엄밀히 같아야 한다** (`===`). 문자열 `"5"` 는 실패하며, JSON 철자 그대로 보고된다 |
 | `name` | string | 필수 | 트림 후 비어 있지 않을 것. 설정 화면에 표시된다 |
 | `author` | string | 선택 | 있으면 string 이어야 한다 |
+| `keepCircleShadows` | boolean | 선택 | 팩 셰이더가 실제 태양 섀도 API를 쓸 때도 플레이어/몹 아래의 옛 원형 섀도를 유지 ([섀도](guides/shadows.md)). 기본 `false`. 다른 타입은 전용 로드 메시지로 거부 |
 
 매니페스트의 나머지는 모두 무시된다. `pack.json` 은 zip 루트에 정확히 하나의 JSON 객체여야 한다.
 
-### 로더 제한 (라이브 c53 에서 재실측)
+### 로더 제한
 
 | 제한 | 값 | 초과 시 메시지 |
 |---|---|---|
@@ -499,11 +499,11 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 
 ### API 버전 검사
 
-로더는 `manifest.apiVersion !== 5` 를 JavaScript 엄격 `!==` 로 비교한다. 버전 상수 `5` 와 헤더 템플릿은 같은 모듈 (c55 / 모듈 29836) 에 있으므로, 검증과 검증이 전제하는 헤더는 함께 움직인다. 불일치 메시지: [호환성](api/compatibility.md) 참조.
+로더는 `manifest.apiVersion !== 5` 를 JavaScript 엄격 `!==` 로 비교한다. 불일치 메시지: [호환성](api/compatibility.md) 참조.
 
 ### 프레임별 uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 64 바이트. 다만 v5 에서 멤버가 하나 늘었다 (라이브 uniform-레이아웃 모듈에서):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 여전히 80 바이트. 다만 v5 에서 멤버가 하나 늘었다:
 
 | 오프셋 | 필드 | 형 | 비고 |
 |---|---|---|---|
@@ -512,6 +512,7 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 | 16 | `renderOffset` | `vec3i` | `bloxdRenderOffset()` 의 기반 |
 | 32 | `sunDirection` | `vec3f` | `bloxdSunDirection()` 의 기반 |
 | 48 | `eyePosition` | `vec3f` | `bloxdEyePosition()` 의 기반 |
+| 64 | `shadowDirection` | `vec3f` | 그림자를 만드는 빛의 진행 방향. `bloxdShadowDirection()`의 뒷받침 |
 
 `lit` 은 v4 부터 있던 `seconds` 와 `renderOffset` 사이의 패딩에 들어갔다 (오프셋 4–15 는 정렬 틈이었고, `vec3i` 는 16바이트 정렬이 필요해 `renderOffset` 은 16 그대로다). 총 크기와 다른 모든 오프셋은 불변. 엔진은 `setUint32(4, lit ? 1 : 0)` 한 번으로 쓴다 — 라이트 레벨이 아니라 플래그다 (v4 의 JS 측 이름 `terrainLightLevels` / `terrainHeldLight` 는 번들에서 완전히 사라졌다).
 
@@ -525,15 +526,11 @@ v4 에서 이주해야 한다면 [버전 히스토리: v5](history/v5.md) 를 �
 | 1 | 씬 깊이 텍스처 (액체 베리언트) |
 | 2 | `bloxdSpTextureLayers` 스토리지 버퍼 |
 
-`minBindingSize` 는 64 그대로다. 깊이 텍스처 (binding 1) 는 FRAGMENT 전용이며, 이것이 `bloxdOpaqueBehind()` 가 서피스/light 훅 전용인 이유다.
+`minBindingSize` 는 80 그대로다. 깊이 텍스처 (binding 1) 는 FRAGMENT 전용이며, 이것이 `bloxdOpaqueBehind()` 가 서피스/light 훅 전용인 이유다.
 
 ### wgsl 연결
 
 여러 `.wgsl` 파일은 **경로명의 사전 순**으로 하나의 모듈에 연결된다. 모듈 스코프 선언은 순서 무관. `var` 초기화 순서만 영향을 줄 수 있다. `.wgsl` 이 아닌 파일은 무시된다.
-
-
----
-
 ## 셰이더 훅
 
 팩은 **9개의 훅** — 3개의 렌더 대상 (프로그램) × 3개의 파이프라인 단계 — 을 정의할 수 있다. 모두 선택 사항이다 (정의하지 않으면 엔진 기본값).

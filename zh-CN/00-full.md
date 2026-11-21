@@ -465,7 +465,6 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 ---
 
 ## 包格式
-
 整个包模型一页讲完 — manifest、加载器限制、逐帧 uniform。分步版本见[入门指南](getting-started/manifest.md)。
 
 ### pack.json
@@ -483,10 +482,11 @@ v4 及更早的「光照开/关」轴已不复存在 (v4 有 8 种变体)。光�
 | `apiVersion` | number | 必填 | **必须严格等于 `5`** (`===`)。字符串 `"5"` 会失败，并按其 JSON 写法原样报出 |
 | `name` | string | 必填 | 去除首尾空白后非空；显示在设置中 |
 | `author` | string | 可选 | 若存在则必须是字符串 |
+| `keepCircleShadows` | boolean | 可选 | 当你的着色器同时使用真实太阳阴影 API 时，仍保留玩家/生物脚下旧的圆形团影（[阴影](guides/shadows.md)）。默认 `false`；其他类型会被专用加载消息拒绝 |
 
 manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰好一个 JSON 对象。
 
-### 加载器限制 (在现行 c53 上重新实测)
+### 加载器限制
 
 | 限制 | 值 | 超限消息 |
 |---|---|---|
@@ -499,11 +499,11 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 
 ### API 版本检查
 
-加载器以 JavaScript 严格 `!==` 比较 `manifest.apiVersion !== 5`。版本常量 `5` 与标头模板位于同一模块 (c55 / 模块 29836)，因此校验与它所假定的标头同步变动。不符时的消息: 见[兼容性](api/compatibility.md)。
+加载器以 JavaScript 严格 `!==` 比较 `manifest.md)。
 
 ### 逐帧 uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 仍是 64 字节，但 v5 新增了一个成员 (来自现行 uniform 布局模块)：
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — 仍是 80 字节，但 v5 新增了一个成员：
 
 | 偏移 | 字段 | 类型 | 备注 |
 |---|---|---|---|
@@ -512,6 +512,7 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 | 16 | `renderOffset` | `vec3i` | 支撑 `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | 支撑 `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | 支撑 `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | 投影光线的行进方向。`bloxdShadowDirection()` 的来源 |
 
 `lit` 填进了 v4 在 `seconds` 与 `renderOffset` 之间本就存在的填充区 (偏移 4–15 原为对齐间隙；`vec3i` 需要 16 字节对齐，故 `renderOffset` 保持在 16)。总大小与其余偏移均未变。引擎以单次 `setUint32(4, lit ? 1 : 0)` 写入它 — 它是标志，不是光照等级 (v4 的 JS 侧名称 `terrainLightLevels` / `terrainHeldLight` 已从 bundle 中彻底消失)。
 
@@ -525,15 +526,11 @@ manifest 中的其他内容一律被忽略。`pack.json` 必须是 zip 根部恰
 | 1 | 场景深度纹理 (液体变体) |
 | 2 | `bloxdSpTextureLayers` 存储缓冲 |
 
-`minBindingSize` 仍为 64。深度纹理 (binding 1) 仅限 FRAGMENT，这正是 `bloxdOpaqueBehind()` 只能在 surface/light 钩子中使用的原因。
+`minBindingSize` 仍为 80。深度纹理 (binding 1) 仅限 FRAGMENT，这正是 `bloxdOpaqueBehind()` 只能在 surface/light 钩子中使用的原因。
 
 ### wgsl 拼接
 
 多个 `.wgsl` 文件按**路径名的字典序**拼接为一个模块。模块级声明与顺序无关；只有 `var` 的初始化顺序可能有影响。非 `.wgsl` 文件被忽略。
-
-
----
-
 ## 着色器钩子
 
 包可以定义 **9 个钩子** — 3 个渲染目标 (程序) × 3 个管线阶段，全部可选 (未定义即用引擎默认)。

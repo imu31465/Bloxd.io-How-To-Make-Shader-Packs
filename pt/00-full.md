@@ -465,7 +465,6 @@ Migrando da v4? Veja [Histórico de versões: v5](history/v5.md).
 ---
 
 ## Formato do pacote
-
 O modelo inteiro de pacote em uma página só — manifesto, limites do carregador, uniform por frame. Para a versão passo a passo, veja [Primeiros passos](getting-started/manifest.md).
 
 ### pack.json
@@ -483,10 +482,11 @@ O modelo inteiro de pacote em uma página só — manifesto, limites do carregad
 | `apiVersion` | number | obrigatório | **deve ser estritamente igual a `5`** (`===`). Uma string `"5"` falha e é reportada com a sua grafia JSON |
 | `name` | string | obrigatório | não vazio após o trim; exibido nos ajustes |
 | `author` | string | opcional | deve ser uma string se presente |
+| `keepCircleShadows` | boolean | opcional | mantém as antigas sombras circulares sob jogadores e mobs quando seus shaders também usam a API real de sombras solares ([Sombras](guides/shadows.md)). Padrão `false`; qualquer outro tipo é rejeitado com mensagem dedicada |
 
 Todo o resto do manifesto é ignorado. `pack.json` deve ser exatamente um objeto JSON na raiz do zip.
 
-### Limites do carregador (remedidos no c53 em produção)
+### Limites do carregador
 
 | Limite | Valor | Mensagem ao exceder |
 |---|---|---|
@@ -499,11 +499,11 @@ Todo o resto do manifesto é ignorado. `pack.json` deve ser exatamente um objeto
 
 ### Verificação da versão da API
 
-O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScript. A constante de versão `5` e o template do cabeçalho vivem no mesmo módulo (c55 / módulo 29836), então a validação e o cabeçalho que ela pressupõe se movem juntos. Mensagens de incompatibilidade: veja [Compatibilidade](api/compatibility.md).
+O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScript. Mensagens de incompatibilidade: veja [Compatibilidade](api/compatibility.md).
 
 ### Uniform por frame: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — continua com 64 bytes, mas a v5 adicionou um membro (do módulo de layout do uniform em produção):
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — continua com 80 bytes, mas a v5 adicionou um membro:
 
 | Offset | Campo | Tipo | Nota |
 |---|---|---|---|
@@ -512,8 +512,9 @@ O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScri
 | 16 | `renderOffset` | `vec3i` | sustenta `bloxdRenderOffset()` |
 | 32 | `sunDirection` | `vec3f` | sustenta `bloxdSunDirection()` |
 | 48 | `eyePosition` | `vec3f` | sustenta `bloxdEyePosition()` |
+| 64 | `shadowDirection` | `vec3f` | a direção em que viaja a luz que projeta sombras; respalda `bloxdShadowDirection()` |
 
-`shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. Sua chegada levou o uniform de 64 a 80 bytes e elevou o `minBindingSize` a 80.
+`shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. O uniform tem 80 bytes e o `minBindingSize` também é 80.
 
 `lit` coube no preenchimento que o v4 já tinha entre `seconds` e `renderOffset`.
 
@@ -523,19 +524,15 @@ O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScri
 
 | binding | Conteúdo |
 |---|---|
-| 0 | uniform `bloxdPackInputs` (64 B) |
+| 0 | uniform `bloxdPackInputs` (80 B) |
 | 1 | textura de profundidade de cena (variantes liquid) |
 | 2 | storage buffer `bloxdSpTextureLayers` |
 
-`minBindingSize` continua 64. A textura de profundidade (binding 1) é FRAGMENT-only, e é por isso que `bloxdOpaqueBehind()` é exclusivo de hooks surface/light.
+`minBindingSize` continua 80. A textura de profundidade (binding 1) é FRAGMENT-only, e é por isso que `bloxdOpaqueBehind()` é exclusivo de hooks surface/light.
 
 ### Concatenação wgsl
 
 Múltiplos arquivos `.wgsl` são concatenados em um único módulo em **ordem de dicionário pelo nome do caminho**. Declarações de escopo de módulo são independentes de ordem; só a ordem de inicialização de `var` pode importar. Arquivos que não são `.wgsl` são ignorados.
-
-
----
-
 ## Hooks de shader
 
 Pacotes podem definir **9 hooks** — 3 alvos de renderização (programas) × 3 estágios de pipeline, todos opcionais (não definido significa o padrão do motor).
