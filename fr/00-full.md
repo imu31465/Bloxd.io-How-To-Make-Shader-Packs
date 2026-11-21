@@ -446,7 +446,7 @@ Voir le [guide de tests](guides/testing.md) pour la liste de contrôle complète
 ## Référence API
 Cette page présente la référence de l’API v5 actuelle. La source principale des définitions est l’en-tête que le moteur ajoute automatiquement au début de chaque pack (voir [Internals du moteur](internals/engine-header.md) pour l’en-tête complet).
 
-### Plan
+### Contenu
 
 | Page | Contenu |
 |---|---|
@@ -4236,7 +4236,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-### Plantes qui se balancent au vent (allow seul)
+### Contenutes qui se balancent au vent (allow seul)
 
 Les plantes (`flags.flat`) sont dessinées comme des modèles — balancement via le hook de sommet :
 
@@ -4831,7 +4831,7 @@ Compile bien mais rend mal.
 
 ### Voir aussi
 
-- [Problèmes d'éclairage](troubleshooting/lighting.md) · [Astuces de débogage](guides/debugging.md) · [Intérieurs du brouillard](internals/fog-internals.md)
+- [Problèmes d'éclairage](troubleshooting/lighting.md) · [Astuces de débogage](guides/debugging.md) · [Fonctionnement interne du brouillard](internals/fog-internals.md)
 
 
 ---
@@ -4956,7 +4956,7 @@ Problèmes de luminosité, d'ombres et de brouillard.
 ### Vous voulez la théorie ?
 
 - Ombres : [Ombres](guides/shadows.md) (skyLight = carte d'ombres par voxels)
-- Brouillard : [Engine Internals : Intérieurs du brouillard](internals/fog-internals.md)
+- Brouillard : [Engine Internals : Fonctionnement interne du brouillard](internals/fog-internals.md)
 
 ### Voir aussi
 
@@ -5113,20 +5113,20 @@ Une distribution communautaire « cinematic shader » que nous avons analysée s
 ## Fonctionnement interne du moteur
 Cette catégorie présente le fonctionnement interne du moteur afin de mieux comprendre l'exécution des shader packs. Ces détails d'implémentation peuvent évoluer ; pour les règles d'utilisation stables et les API disponibles, consultez la [Référence de l'API](api/).
 
-### Plan
+### Contenu
 
 | Page | Contenu |
 |---|---|
 | [Pipeline de rendu](internals/rendering-pipeline.md) | position d'alphaTest, setup à 2 lumières, réalité de l'uniform, greedy meshing |
 | [Invocation des hooks](internals/hook-invocation.md) | comment les hooks sont greffés dans le WGSL du moteur |
 | [En-tête du moteur](internals/engine-header.md) | Déclarations WGSL ajoutées aux shader packs |
-| [Validation des shaders](internals/shader-validation.md) | les intérieurs de l'analyseur, la table des signatures, HEADER_VERSION |
+| [Validation des shaders](internals/shader-validation.md) | le fonctionnement interne de l'analyseur, la table des signatures, HEADER_VERSION |
 | [Compilation WGSL](internals/wgsl-compilation.md) | la vraie compilation de l'étape 2 et les stubs de validation |
 | [Identifiants réservés](internals/reserved-identifiers.md) | les 46 symboles `bloxdSp*` |
-| [Intérieurs de l'éclairage](internals/lighting-internals.md) | structure de blockLight / heldLight |
-| [Intérieurs du brouillard](internals/fog-internals.md) | linéaire uniquement, la bande de dégradé de 32 blocs |
-| [Échantillonnage des textures](internals/texture-sampling.md) | le codegen de textures à 3 variantes |
-| [Registre de textures](internals/texture-registry.md) | Résolution des noms et noms d'animation et de rotation |
+| [Fonctionnement interne de l'éclairage](internals/lighting-internals.md) | structure de blockLight / heldLight |
+| [Fonctionnement interne du brouillard](internals/fog-internals.md) | linéaire uniquement, la zone d'atténuation de 32 blocs |
+| [Échantillonnage des textures](internals/texture-sampling.md) | la génération du code des textures à 3 variantes |
+| [Registre de textures](internals/texture-registry.md) | Résolution des noms et identifiants d'animation et d'orientation |
 | [Rendu des modèles](internals/model-rendering.md) | le programme Model v5 |
 | [Données du moteur](internals/engine-data.md) | Fonctions de l'API v5 et limites des packs |
 | [Facteurs de test](internals/testing-factors.md) | quels réglages monde/joueur changent les valeurs visibles des packs |
@@ -5254,11 +5254,11 @@ L'architecture de greffe existait dans le renderer v2 et est restée stable de v
 | `directional` | la somme des Lambert par lumière directionnelle, interpolée par vertex (setup à 2 lumières dans [Pipeline de rendu](internals/rendering-pipeline.md)) |
 | `diffuse` / `emissive` | la réponse RVB directionnelle du matériau / la lueur RVB |
 | `ambient` | `material.ambient × sceneAmbient` — par matériau, par frame |
-| `blockLight` / `skyLight` | les varyings de niveaux de lumière décodés ([Intérieurs de l'éclairage](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | les varyings de niveaux de lumière décodés ([Fonctionnement interne de l'éclairage](internals/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | les uniforms correspondants |
-| `heldLight` | construit depuis le varying de niveau de lumière et les uniforms de lumière tenue (atténuation de cône dans [Intérieurs de l'éclairage](internals/lighting-internals.md)) |
+| `heldLight` | construit depuis le varying de niveau de lumière et les uniforms de lumière tenue (atténuation de cône dans [Fonctionnement interne de l'éclairage](internals/lighting-internals.md)) |
 | `fogColour` | noir uniquement dans les scènes entièrement sans brouillard (mode 0) |
-| `fogAlpha` | le facteur de brouillard clampé ([Intérieurs du brouillard](internals/fog-internals.md)) |
+| `fogAlpha` | le facteur de brouillard clampé ([Fonctionnement interne du brouillard](internals/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings et valeurs à interpolation flat (comme `BloxdSurfaceIn` — valeurs post-hook de vertex) |
 
 ### Voir aussi
@@ -5693,7 +5693,7 @@ Les identifiants préfixés par `bloxdTextureId` se résolvent en noms de textur
 
 ---
 
-## Intérieurs de l'éclairage
+## Fonctionnement interne de l'éclairage
 > API cible : 5 · Type : référence technique
 
 `blockLight` est une **lumière colorée** à trois canaux RVB. Chaque bloc émetteur définit une couleur d'émission `[R, G, B]` (0–15 chacun) reprise telle quelle comme couleur de lumière (torche normale = blanc chaud (14,14,12) / lave = orange (14,8,2) / beacon = cyan (5,14,14) / torche blanche = (15,15,15), etc.). À l'étage vertex elle arrive empaquetée en 4 nibbles — r / g / b / sky — dans un seul attribut flottant. Traiter les trois canaux séparément dans le hook light permet l'éclairage local coloré — la recette de torche chaude (R9.1) est calibrée sur ce comportement.
@@ -5709,7 +5709,7 @@ Les blocs personnalisés peuvent porter `skyLightEmission` (0–15), qui **s'inj
 
 ---
 
-## Intérieurs du brouillard
+## Fonctionnement interne du brouillard
 > API cible : 5 · Type : référence technique
 Le calcul du brouillard est toujours en mode LINEAR (équivalent à `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`, clamp 0..1), avec `fogStart = 32 × D`, `fogEnd = 32 × (D + 1)` (D = réglage de distance de brouillard ; seul D = 0 est spécial avec fogEnd = 5). **La bande de dégradé du brouillard ne fait que 32 blocs de large**, et `l.fogAlpha` est moins une « brume de distance » qu'une **distance normalisée au bord du monde chargé**. Elle varie par joueur selon la distance de chargement : les effets fondés sur la distance doivent donc calculer `distance(l.position, bloxdEyePosition())` eux-mêmes (la section « Bande de bord de chargement » ci-dessous). (la fonction de brouillard du renderer implémente en réalité **quatre** modes — désactivé / exponentiel / exponentiel au carré / linéaire — et les titres livrés pilotent le linéaire ; la source restaurée et l'argument de robustesse sont préservés dans [Historique des versions : v3](history/v3.md).)
 
@@ -5738,7 +5738,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 ## Intérieurs de l'échantillonnage des textures
 > API cible : 5 · Type : référence technique
 
-Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — le codegen de textures à 3 variantes. Le côté utilisateur : [API de textures](api/texture-api.md).
+Comment `bloxdTexel` / `bloxdTextureSize` se compilent réellement — la génération du code des textures à 3 variantes. Le côté utilisateur : [API de textures](api/texture-api.md).
 
 ### Les trois variantes
 
