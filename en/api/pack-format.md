@@ -38,7 +38,7 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Th
 
 ## Per-frame uniform: bloxdPackInputs
 
-`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — **80 bytes** as of the `` build (64 before it), from the live uniform-layout module:
+`@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs` — **80 bytes**, using the current uniform layout:
 
 | Offset | Field | Type | Note |
 |---|---|---|---|
@@ -49,7 +49,7 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Th
 | 48 | `eyePosition` | `vec3f` | backs `bloxdEyePosition()` |
 | 64 | `shadowDirection` | `vec3f` | **new in ``** — the direction the shadow-casting light travels; backs `bloxdShadowDirection()` |
 
-`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 64, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. Its arrival grew the uniform from 64 to 80 bytes and bumped the pack bind-group's `minBindingSize` to 80.
+`shadowDirection` slots into the padding after `eyePosition` (a `vec3f` spans 12 bytes, so offsets 60–63 were alignment slack; `shadowDirection` lands at 64, a 16-byte boundary, keeping the struct at exactly 80 bytes). The engine writes it as three `setFloat32` writes — it is a unit vector (from the sun by day, the moon by night, and the default sky's sun when there is no sun), never above the horizon. The uniform is 80 bytes, and the pack bind-group's `minBindingSize` is 80.
 
 `lit` still fits into the padding v4 had between `seconds` and `renderOffset` (offsets 4–15 were alignment gaps; `vec3i` needs 16-byte alignment so `renderOffset` stays at 16).
 
@@ -63,7 +63,7 @@ The loader compares `manifest.apiVersion !== 5` with JavaScript strict `!==`. Th
 | 1 | scene-depth texture (liquid variants) |
 | 2 | `bloxdSpTextureLayers` storage buffer |
 
-`minBindingSize` is 80 (it grew with the uniform). The depth texture (binding 1) is FRAGMENT-only, which is why `bloxdOpaqueBehind()` is surface/light-hook only.
+`minBindingSize` is 80. The depth texture (binding 1) is FRAGMENT-only, which is why `bloxdOpaqueBehind()` is surface/light-hook only.
 
 ## wgsl concatenation
 

@@ -49,7 +49,7 @@ O carregador compara `manifest.apiVersion !== 5` com o `!==` estrito de JavaScri
 | 48 | `eyePosition` | `vec3f` | sustenta `bloxdEyePosition()` |
 | 64 | `shadowDirection` | `vec3f` | **novo no ``** — a direção em que viaja a luz que projeta sombras; respalda `bloxdShadowDirection()` |
 
-`shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. Sua chegada levou o uniform de 64 a 80 bytes e elevou o `minBindingSize` a 80.
+`shadowDirection` coube no preenchimento após `eyePosition` (um `vec3f` ocupa 12 bytes, então os offsets 60–63 eram folga; `shadowDirection` pousa em 64, uma fronteira de 16 bytes, deixando o struct em exatamente 80 bytes). O engine o escreve com três `setFloat32` — é um vetor unitário (do sol de dia, da lua à noite, e do sol do céu padrão quando não há sol), nunca acima do horizonte. O uniform tem 80 bytes e o `minBindingSize` também é 80.
 
 `lit` coube no preenchimento que o v4 já tinha entre `seconds` e `renderOffset`.
 
