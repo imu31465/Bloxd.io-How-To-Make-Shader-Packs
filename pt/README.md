@@ -8,11 +8,11 @@ Guia não oficial sobre shader packs para o renderizador WebGPU do Bloxd.io. Abr
 - Alvo: renderizador WebGPU
 - Hooks de shader: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultando a API? Veja [Referência da API](api/).
+Está começando com shader packs? Acesse [Primeiros passos](getting-started/). Precisa consultar uma função ou um campo? Veja a [Referência da API](api/).
 
 > Esta documentação não é um recurso oficial dos desenvolvedores do jogo. Os mecanismos internos do motor são detalhes de implementação e podem mudar com as atualizações; consulte a referência da API para conhecer o comportamento compatível.
 >
-> Este guia foi criado com assistência de IA; a precisão não é garantida. Verifique contra o comportamento real do jogo. Continue verificando as receitas contra a tela do carregador e a compilação no jogo.
+> Este guia foi preparado com auxílio de IA. Confirme o comportamento no jogo, pois os detalhes de implementação podem mudar.
 >
 > Os packs são escritos apenas em WGSL: não executam JavaScript nem fazem requisições de rede.
 
@@ -34,7 +34,7 @@ Novo em shader packs? Comece por [Primeiros passos](getting-started/). Consultan
 - **[Guias](guides/)** — como funciona a iluminação, sombras, água, noite, renderização de modelos, desempenho, conceitos de realismo.
 - **[Receitas](recipes/)** — exemplos de código orientados a objetivo: cores, iluminação, emissão, coordenadas, animação, líquidos, vértices, matemática, realismo, shaders de modelo, efeitos de encantamento.
 - **[Solução de problemas](troubleshooting/)** — resolução de erros por sintoma: carregamento, versão de API, compilação, validação, variantes, visual, texturas, iluminação, modelos, desempenho.
-- **[Funcionamento interno do motor](internals/)** — pipeline de renderização, invocação de hooks, cabeçalho do motor, internals de validação e compilação, identificadores reservados, internals de iluminação/névoa, amostragem e registro de texturas, renderização de modelos, dados medidos.
+- **[Funcionamento interno do motor](internals/)** — pipeline de renderização, invocação de hooks, cabeçalho do motor, detalhes internos de validação e compilação, identificadores reservados, mecanismos internos de iluminação e neblina, amostragem e registro de texturas, renderização de modelos, dados medidos.
 - **[Histórico de versões](history/)** — de v1 a v5: mudanças por versão, passos de migração, APIs removidas.
 
 ## Rótulos de status de verificação
@@ -49,4 +49,4 @@ Cada página informa a versão da API que abrange e o estado de verificação do
 | Experimental | experimental / não consolidado |
 | Historical | material de uma versão passada |
 
-Os dados brutos extraídos do motor (cabeçalho, registro, medições) vivem em [Funcionamento interno do motor](internals/); a metodologia e os registros por trás deles são acompanhados no [registro de pesquisa](internals/research-log.md).
+Os dados extraídos do motor (cabeçalho, registro e medições) estão disponíveis em [Funcionamento interno do motor](internals/); a metodologia e os registros correspondentes estão no [registro de pesquisa](internals/research-log.md).
