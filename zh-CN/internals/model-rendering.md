@@ -1,6 +1,6 @@
 # 模型渲染内部机制
 
-> 目标API: 5 · 目标构建: `bbb6l5` · 状态: Analyzed (从现行 bundle 复原)
+> 目标 API：5 · 文档类型：技术参考
 
 v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](../guides/models.md)。
 
