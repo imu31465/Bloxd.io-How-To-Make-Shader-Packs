@@ -66,7 +66,7 @@ function stripBuildMetadata(src) {
       continue
     }
     if (!inFence && originalLine.startsWith('>')) {
-      if (/historical/i.test(originalLine) && /(?:target\\s*build|対象ビルド|build\\s+objetivo|build\\s+alvo|build\\s+cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)/i.test(originalLine)) continue
+      if (/historical/i.test(originalLine) && /(?:target +build|対象ビルド|build +objetivo|build +alvo|build +cible|ziel-build|目标构建|대상 빌드|целевой билд|लक्ष्य बिल्ड)/i.test(originalLine)) continue
       const parts = originalLine.replace(/^>\s*/, '').split(/\s*[·•]\s*/)
       const kept = parts.filter(part => !BUILD_METADATA_FIELD.test(part))
       if (kept.length === 0) continue
