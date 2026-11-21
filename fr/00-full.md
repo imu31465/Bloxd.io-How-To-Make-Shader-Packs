@@ -1103,7 +1103,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Garde** : `#ifdef BLOXD_SCENE_DEPTH` (défini dans les variantes liquides)
 - **Signification** : la face opaque derrière ce fragment (terrain vu à travers l'eau) ; `hit == false` pour le ciel
 - **Renommage depuis v2** : `found` → `hit`
-- **Pour aller plus loin** : [Historique des versions : v3](history/v3.md) et [Intérieurs du moteur](internals/rendering-pipeline.md)
+- **Pour aller plus loin** : [Historique des versions : v3](history/v3.md) et [Fonctionnement interne du moteur](internals/rendering-pipeline.md)
 
 ### Voir aussi
 
@@ -1250,7 +1250,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` arrivent déjà ramenés sur 0–1** : les niveaux 0–15 à travers une courbe d'ease-out (p. ex. `6 → 0.45`, `12 → 0.92`). Tous excluent `ambientLightColour`
 - **Courbe de lift** : `skyLight` est en réalité « cette position voit-elle le ciel » — des données d'occlusion par voxel, autrement dit une shadow map. Une séparation soleil/ombre par seuil peut nécessiter la transformation inverse (voir le [guide de réalisme](guides/realism.md))
-- **Internes du brouillard** : en mode linéaire `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clampé 0..1), calculé par sommet en espace de vue. Le build actuel est linéaire uniquement (détails dans [Intérieurs du moteur : intérieurs du brouillard](internals/fog-internals.md))
+- **Internes du brouillard** : en mode linéaire `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (clampé 0..1), calculé par sommet en espace de vue. Le build actuel est linéaire uniquement (détails dans [Fonctionnement interne du moteur : brouillard](internals/fog-internals.md))
 
 ### Recettes
 
@@ -1291,7 +1291,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### Voir aussi
 
-- [Fonctions](api/functions.md) · [Guides : éclairage](guides/lighting.md) · [Intérieurs du moteur : intérieurs de l'éclairage](internals/lighting-internals.md)
+- [Fonctions](api/functions.md) · [Guides : éclairage](guides/lighting.md) · [Fonctionnement interne du moteur : éclairage](internals/lighting-internals.md)
 
 
 ---
@@ -1516,7 +1516,7 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ### Voir aussi
 
 - **Les noms disponibles utilisables** → [Catalogue des textures](api/texture-catalog.md)
-- [Intérieurs du moteur : registre des textures](internals/texture-registry.md) · [Échantillonnage des textures](internals/texture-sampling.md)
+- [Fonctionnement interne du moteur : registre des textures](internals/texture-registry.md) · [Échantillonnage des textures](internals/texture-sampling.md)
 
 
 ---
@@ -1652,7 +1652,7 @@ Voir [Structures](api/structures.md#champs-conditionnels--macros).
 
 ### Voir aussi
 
-- [Premiers pas : Variantes](getting-started/variants.md) · [Intérieurs du moteur : Validation des shaders](internals/shader-validation.md)
+- [Premiers pas : Variantes](getting-started/variants.md) · [Fonctionnement interne du moteur : validation des shaders](internals/shader-validation.md)
 
 
 ---
@@ -1718,7 +1718,7 @@ Les identifiants commençant par `bloxdTextureId` sont résolus comme des consta
 
 ### Voir aussi
 
-- [Dépannage : compilation](troubleshooting/compilation.md) · [Intérieurs du moteur : Validation des shaders](internals/shader-validation.md)
+- [Dépannage : compilation](troubleshooting/compilation.md) · [Fonctionnement interne du moteur : validation des shaders](internals/shader-validation.md)
 
 
 ---
