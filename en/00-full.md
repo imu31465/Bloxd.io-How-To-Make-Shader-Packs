@@ -5172,7 +5172,7 @@ A community "cinematic shader" distribution we analyzed turned out to be a textu
 
 ---
 
-## Engine Internals & Research
+## Engine Internals
 This category explains engine behavior that may help when understanding shader-pack execution. These implementation details can change; for stable usage rules and supported APIs, see the [API reference](api/).
 ### Map
 | Page | Contents |
