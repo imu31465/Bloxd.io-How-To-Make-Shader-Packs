@@ -48,7 +48,7 @@ Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les ci
 
 - **Possible** : modifier les couleurs, la transparence et l'émission ; reconstruire l'éclairage ([API d'éclairage](api/lighting.md)) ; utiliser les ombres du soleil et de la lune calculées par le moteur (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`) ; utiliser l'occlusion voxel du ciel (`skyLight`) ; échantillonner les textures avec `bloxdTexel` ; créer des effets par modèle avec `flags` ; animer les sommets dans les jeux allow
 - **Impossible** : ajouter des textures personnalisées (c'est le rôle du système de packs de textures) ; appliquer un post-traitement à l'image finale (bloom, etc.) ; accéder aux données de profondeur de la shadow map ou générer sa propre shadow map ; ajouter de véritables reflets (SSR) ; modifier le ciel, les nuages ou le disque solaire lui-même
-- **Choisir une méthode d'ombre** : utilisez `bloxdShadow()` pour les ombres du moteur qui suivent le soleil et la lune. `skyLight` est une ancienne méthode pour assombrir les zones sous les arbres et les toits ; elle ne suit pas le soleil ni la lune. Voir [Ombres](guides/shadows.md).
+- **Facile à manquer mais puissant** : **les ombres de style projection via `skyLight` (occlusion voxel du ciel)** — assombrissent nettement les zones sous les arbres et les toits. Casser des blocs fait recalculer LightEngine immédiatement, de sorte que les ombres suivent en temps réel
 
 ### Modes strict et allow
 
@@ -58,6 +58,7 @@ Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et *
 
 - Le jeu actuel n'accepte que les packs `apiVersion: 5` ; les packs v1–v4 sont rejetés au chargement (les packs enregistrés deviennent silencieusement inactifs — [Compatibilité](api/compatibility.md))
 - Vous migrez un pack écrit pour une ancienne version ? Voir l'[Historique des versions](history/)
+- Les internals du moteur peuvent changer avec les mises à jour ; chaque page indique donc son build cible
 
 ---
 
@@ -456,7 +457,7 @@ Voir le [guide de tests](guides/testing.md) pour la liste de contrôle complète
 | [Préprocesseur](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](api/restrictions.md) | limites du langage, identifiants réservés |
 | [Compatibilité](api/compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
-| [Catalogue de textures](api/texture-catalog.md) | les 1,017 noms utilisables (recherchables) |
+| [Catalogue de textures](api/texture-catalog.md) | les 896 noms utilisables (recherchables) |
 
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](history/v5.md).
@@ -3975,6 +3976,7 @@ Le jeu actuel n'accepte que `apiVersion: 5` ; les packs plus anciens sont désac
 
 #### Q. L'API changera-t-elle encore ?
 
+Les internals du moteur peuvent changer avec les mises à jour — chaque page nomme son build cible. Les packs sauvegardés se revalident automatiquement quand l'en-tête ou le registre change ([Compatibilité](api/compatibility.md#revalidation-des-packs-sauvegardés--à-revérifier-)).
 
 #### Q. Qu'en est-il des distributions « cinematic shader » ?
 
@@ -4965,7 +4967,7 @@ Changements, étapes de migration et API supprimées, de la v1 à la v5. Pour mi
 ### Chronologie
 
 | Version | En production depuis | Guide | L'essentiel |
-| --- | --- | --- |
+|---|---|---|---|
 | v1 | (initiale) | [v1](history/v1.md) | première API de packs de shaders. 6 hooks (terrain/liquide × vertex/surface) ; le vocabulaire `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
 | v2 | — | [v2](history/v2.md) | renommage complet des identifiants, `blockId`, `BLOXD_SCENE_DEPTH` et `bloxdOpaqueBehind()` |
 
@@ -5487,6 +5489,7 @@ Deux choses changent pour les auteurs par rapport aux règles v2 ([guide v2](his
 
 ### 49. Intérieurs du moteur : comment le rendu Lite appelle vos hooks
 
+Tout ce qui précède, dans les §40 à §48, est ce que le chargeur et l'en-tête vous disent. Cette section et les quatre suivantes documentent ce que le moteur fait réellement à l'exécution, restauré depuis le bundle de production (le rendu Lite — un chunk de 175 Ko ; le vrai nom du fichier d'intégration `lite/terrainShaderPack.ts` survit dans ses chaînes d'erreur). Rien de tout cela ne change ce que vous écrivez, mais cela élimine les suppositions sur ce que vos hooks reçoivent — et tranche plusieurs questions que d'autres guides communautaires listent encore comme ouvertes.
 
 Le rendu n'appelle pas vos hooks depuis JavaScript au sens habituel. Quand un pack passe la validation, le moteur **insère les appels de vos hooks dans son propre WGSL de terrain** en remplaçant des lignes d'ancrage fixes dans le texte du shader. Une ancre doit correspondre exactement une fois — zéro ou plusieurs correspondances provoquent l'abandon avec `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`.
 
@@ -5665,6 +5668,7 @@ vertexOutputs.vBlockFlags = ((vertexInputs.blockFlagWords.x >> 24u) << 8u)
 
 ### 53. Intérieurs de la validation : HEADER_VERSION, signatures, noms réservés
 
+**Le hash d'en-tête mesuré.** Chaque validation de pack est estampillée avec le `HEADER_VERSION` du moteur. Exécuter directement le module de validation de production (voir la note sur le harness à la fin du §54) le mesure :
 
 ```
 v2 (sjr0p7):  6.bc5e8338
@@ -5729,6 +5733,7 @@ La disposition complète des ressources du programme terrain, directement depuis
 - **`vTerrainLambert`** (la source de `directional`, §49) est générée comme une somme sur les lumières directionnelles actives : `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, protégée par `BLOXD_TERRAIN_DIRECTIONAL`.
 - **Les index passent en 32 bits au premier grand maillage.** Le rendu Lite ne choisit des indices `Uint16Array` que tant que chaque valeur d'index reste ≤ 65 534 ; dès qu'un index atteint 65 535, le buffer devient un `Uint32Array` (suivi par buffer avec un flag `is32Bits`). En pratique : un maillage de chunk avec au plus 65 535 sommets tient dans des indices 16 bits ; un maillage avec exactement 65 536 sommets émet nécessairement un index 65 535 et bascule tout le buffer en 32 bits.
 - **Détails du chargement du manifeste** : les entrées zip sous `__MACOSX/`, les fichiers préfixés `._` et `.DS_Store` sont filtrés (bruit d'archive macOS) ; `pack.json` est localisé par comparaison de chemins en minuscules — zéro correspondance → `loadNoManifest`, deux ou plus → `loadDuplicateManifest` ; la lecture du manifeste est plafonnée à 65 536 octets.
+- **Comment tout cela a été vérifié** : les modules du bundle de production ont été restaurés (165 chunks ; le registre webpack de ce bundle compte 4 951 modules — le nombre varie de quelques unités selon que les dépendances enfants asynchrones sont incluses ou non, donc traitez cette valeur comme propre à ce bundle) et exécutés dans un harness compatible webpack sous Node.js. Le `HEADER_VERSION` mesuré (§53), l'en-tête rendu de 5 637 octets, l'ordre canonique de la table des variantes et la table des fonctions spéciales viennent tous de *l'exécution du code distribué*, pas de la lecture de chaînes. Le même harness est le noyau naturel d'un `pack_check` v6 communautaire — exécuter le validateur du moteur lui-même contre un pack reproduit exactement ses verdicts.
 
 #### L'en-tête du moteur v3, verbatim
 
@@ -5873,6 +5878,8 @@ Recherches de ltf_ahel (menées avec glm)
 ## Guide de migration vers l'API v4
 
 
+Une chose a changé autour de cette version qui n'est *pas* dans le bundle : **le moteur cite désormais des fichiers de référence par leur nom.** Ses propres messages d'erreur pointent `bloxd-api.wgsl` (l'en-tête du moteur annoté) et `BLOCK_TEXTURES.md` (la liste complète des noms de textures) — `...BLOCK_TEXTURES.md lists them.` Ce guide porte le contenu des deux au lieu de vous renvoyer ailleurs : l'en-tête complet, restauré verbatim du build en production, est intégré dans [Engine Internals : en-tête du moteur](internals/engine-header.md), et le catalogue complet des noms de textures utilisables (905 dans le build v4) est le [Catalogue de textures](api/texture-catalog.md). Chaque fait orienté pack de cette partie a été restauré depuis le bundle de production.
+
 L'ensemble des changements de la v4 en un écran :
 
 | Domaine | v3 | v4 |
@@ -5911,6 +5918,7 @@ Les règles de manifeste autour d'`apiVersion` sont inchangées par ailleurs et 
 
 ### 56. pack.json et le buffer d'uniformes (ce qui ne change pas)
 
+Tout le modèle de pack hors textures se transpose de la v3 octet pour octet, donc le §41 du [guide v3](history/v3.md) reste la référence. Les re-mesures de la v4, depuis le chunk du chargeur en production (c51) :
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -7806,6 +7814,7 @@ La conversion depuis v4 est pour l'essentiel mécanique (§77) : le piège silen
 
 ### 69. Le sort des packs v4 (d'abord la conclusion)
 
+**Tout pack v4 — y compris tout pack distribué comme v4 — échoue désormais en production, exactement au chargement.** Le chargeur compare `manifest.apiVersion !== 5` avec le `!==` strict de JavaScript — la constante de version `5` et le gabarit de l'en-tête vivent dans le même module de ce build (module 29836), donc la vérification et le texte d'en-tête auquel elle se rapporte évoluent ensemble. Le JSON doit porter le *nombre* `5` ; une chaîne `"5"` échoue et est signalée avec son orthographe JSON, exactement comme en v4.
 
 Les deux messages au moment du chargement sont inchangés par rapport à v4, verbatim du dictionnaire i18n en production :
 
@@ -7820,6 +7829,7 @@ Les règles du manifeste sont par ailleurs remesurées et inchangées : `pack.js
 
 ### 70. pack.json, le chargeur et l'uniform (ce qui ne change pas)
 
+Tout le modèle de pack passe de v4 octet par octet. Les limites du chargeur, remesurées sur le chunk du chargeur en production (c53) :
 
 | Limite | Valeur | Message en cas de dépassement |
 |---|---|---|
@@ -7830,6 +7840,7 @@ Les règles du manifeste sont par ailleurs remesurées et inchangées : `pack.js
 | entrées du zip | 1 024 | `The zip has more than 1024 entries.` |
 | forme du zip | — | les zips découpés, le Zip64, les entrées chiffrées et les méthodes de compression non prises en charge sont chacun rejetés avec un message dédié ; chaque fichier doit être de l'UTF-8 valide ; exactement un `pack.json` ; aucun chemin en double |
 
+L'uniform par frame reste `@group(3) @binding(0) var<uniform> bloxdPackInputs: BloxdPackInputs`, toujours 64 octets — mais il a gagné un membre. La table de disposition, tirée du module de disposition de l'uniform en production :
 
 | Offset | Champ | Type | Remarque |
 |---|---|---|---|
@@ -8111,6 +8122,7 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 Les commentaires sont une nouvelle rédaction et valent d'être lus comme documentation du modèle de suppression : *« Modify the return values to start building a shader pack. If you delete a hook, the default is used instead. »* La note liquid a changé aussi — v4 disait « If deleted, water uses your terrain hooks instead », v5 dit « To share code with another hook, define a function and call it from both places » — et la note strict explique désormais le `#ifndef` en une phrase : *« Strict games keep terrain where it is. Without the #ifndef, this hook would turn the whole shader pack off there. »*
 
+Le contrat des jeux stricts lui-même (v4 §60) est inchangé : un hook de sommet non protégé produit `<hook> moves terrain, which strict games prevent.`, un `discard` atteignable produit `discard makes terrain see-through, which strict games prevent.`, et chacun des deux désactive *tous* les hooks dans les jeux stricts. Les 12 titres allow ont été remesurés sur le bundle en production — toujours 12, inchangés.
 
 ### 77. Checklist de migration de v4 à v5
 
@@ -8481,3 +8493,5 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
     return BloxdLight(bloxdApplyFog(lit + surface.emission, light));
 }
 ```
+
+Chaque signature de hook, structure, constante et commentaire ci-dessus est porteur : c'est ce que le validateur en production analyse, ce que le générateur de code préfixe et ce contre quoi votre pack compile. Faites un diff avec l'en-tête v4 (§67 du [guide de migration v4](history/v4.md)) pour voir v5 en un écran : `bloxdChunkSize` et `bloxdLit()` près du début, la structure `BloxdFlags` remplaçant les constantes de bits, `localPosition` et les champs enchantement/superposition dans les structures d'entrée, les deux nouvelles sorties, et les trois auxiliaires d'éclairage avant `bloxdDefaultLight`.
