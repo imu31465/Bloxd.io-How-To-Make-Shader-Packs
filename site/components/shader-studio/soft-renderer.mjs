@@ -23,6 +23,8 @@
 import { transpileWgsl, evalWgslModule } from './wgsl-js.mjs'
 import { preprocessWgsl } from './preprocess.mjs'
 import { makeVariantMacros, detectHooks, makeTextureIdConstants, FRAGMENT_BLOCK_POSITION_WGSL } from './shader-gen.mjs'
+// SHADOW_FUNCTIONS_WGSL は GPU パス用。CPU パスは externals 経由で同挙動の
+// JS 実装を渡す (下 _wgslEnv.bloxdShadow / bloxdAirShadow)。
 import ENGINE_HEADER from './engine-header.mjs'
 import { buildMeshes, SCENES } from './scenes.mjs'
 import { buildAtlasPixels, buildMips, animLadderInfo, ATLAS_TILE, ATLAS_LAYERS } from './textures.mjs'
@@ -146,7 +148,7 @@ export class StudioSoftRenderer {
     this._fragErrors = 0
     this._animates = false
     // uniform の JS ミラー
-    this.packInputs = { seconds: 0, lit: 1, renderOffset: [0, 0, 0], sunDirection: [0, 0, 0], eyePosition: [0, 0, 0] }
+    this.packInputs = { seconds: 0, lit: 1, renderOffset: [0, 0, 0], sunDirection: [0, 0, 0], eyePosition: [0, 0, 0], shadowDirection: [0, -1, 0] }
     this.view = {
       eye: [0, 0, 0], nearFarViewport: [0.1, 400, 1, 1], sunDirection: [0, 0, 0],
       ambient: [0, 0, 0], diffuse: [0, 0, 0], ambientLightColour: [0, 0, 0],
@@ -162,13 +164,19 @@ export class StudioSoftRenderer {
     this._fragPos = this._zero3
     this._fragScreenUV = [0, 0]
     this._fragDepth = 0
+    this._fragSkyLight = 0
     this._outRGBA = [0, 0, 0, 0]
     // トランスパイル済みコードへ渡す環境 (this 束縛済み)
     this._wgslEnv = {
       bloxdPackInputs: this.packInputs,
       bloxdTexel: (id, uv, mip) => this._bloxdTexel(id, uv, mip),
       bloxdTextureSize: mip => this._bloxdTextureSize(mip),
-      bloxdOpaqueBehind: () => this._bloxdOpaqueBehind()
+      bloxdOpaqueBehind: () => this._bloxdOpaqueBehind(),
+      // bbb6l5 の注入関数 (studio 近似 — shader-gen.mjs の SHADOW_FUNCTIONS_WGSL
+      // と同一式): 影ボリュームの代わりに光方向・仰角・emissive と skyLight
+      // (LightEngine のブロック専用 BFS) から再現
+      bloxdShadow: () => this._bloxdShadow(),
+      bloxdAirShadow: t => this._bloxdAirShadow(t)
     }
     // エンジンヘッダーの重い関数の高速 JS 実装 (同一式 — 差分テストで検証)。
     // トランスパイル版は毎フラグメント ~20 の中間配列を割り当てるため、
@@ -260,7 +268,8 @@ export class StudioSoftRenderer {
       this._wgslEnv.bloxdDefaultSurface = this._makeDefaultSurface(program === 'liquid' || !this.strict)
       const externals = ['bloxdPackInputs', 'bloxdTexel', 'bloxdTextureSize',
         'bloxdDefaultSurface', 'bloxdLitColour', 'bloxdDefaultLight',
-        'bloxdApplyFog', 'bloxdShading', 'bloxdWorldLight']
+        'bloxdApplyFog', 'bloxdShading', 'bloxdWorldLight',
+        'bloxdShadow', 'bloxdAirShadow']
       if (program === 'liquid') externals.push('bloxdOpaqueBehind')
       const t = transpileWgsl(source, { externals })
       if (!t.js || t.errors.length) {
@@ -384,6 +393,28 @@ export class StudioSoftRenderer {
     return [size, size]
   }
 
+  // bbb6l5 の注入関数 (studio 近似 — shader-gen.mjs の SHADOW_FUNCTIONS_WGSL と同一式)
+  _bloxdShadow() {
+    if (this._fragEmissive) return 1
+    const sh = this.packInputs.shadowDirection
+    const light = [-sh[0], -sh[1], -sh[2]]               // 光源へ向かう方向 (y>0)
+    const n = this._fragNormal
+    const nl = Math.hypot(n[0], n[1], n[2]) || 1
+    const ll = Math.hypot(light[0], light[1], light[2]) || 1
+    const facing = smoothstep(0, 0.5, (n[0] * light[0] + n[1] * light[1] + n[2] * light[2]) / (nl * ll))
+    const elevation = smoothstep(0, 0.1, light[1])        // 太陽・月の沈み込みで 0 へ
+    return facing * elevation
+  }
+
+  _bloxdAirShadow(t) {
+    const tt = Math.min(1, Math.max(0, t))                 // t は 0-1 にクランプ
+    // lift 逆変換: c=(1-y)^(1/3); x=3(1-c)/(3-2c) — 生の天空可視率を復元
+    const y = this._fragSkyLight
+    const c = Math.pow(1 - y, 1 / 3)
+    const raw = 3 * (1 - c) / (3 - 2 * c)
+    return (this._fragEmissive ? 1 : raw) * (0.5 + 0.5 * tt)
+  }
+
   _bloxdOpaqueBehind() {
     const W = this.resW, H = this.resH
     let px = Math.floor(this._fragScreenUV[0] * W)
@@ -434,6 +465,11 @@ export class StudioSoftRenderer {
     PI.renderOffset = [0, 0, 0]
     PI.sunDirection = sun
     PI.eyePosition = eye
+    // 影を落とす光の進行方向 (renderer.mjs と同一式 — bbb6l5)
+    const sunUp = sun[1] > 0.02
+    const shRaw = sunUp ? [-sun[0], -sun[1], -sun[2]] : [sun[0], -sun[1], sun[2]]
+    const shLen = Math.hypot(shRaw[0], shRaw[1], shRaw[2]) || 1
+    PI.shadowDirection = [shRaw[0] / shLen, -Math.abs(shRaw[1] / shLen), shRaw[2] / shLen]
 
     const V = this.view
     V.eye = eye
@@ -952,6 +988,14 @@ export class StudioSoftRenderer {
     this._fragScreenUV[0] = (px + 0.5) / this.resW
     this._fragScreenUV[1] = (py + 0.5) / this.resH
     this._fragDepth = zdepth
+    // シャドウ関数用の現在フラグメント状態 (bbb6l5)
+    this._fragNormal = F.vNormal
+    this._fragEmissive = this._decodeFlags(F.vFlagsBits).emissive
+    { // skyLight (lift 済み — _runFragment の light 計算と同一式)
+      const lv = (F.vLightLevels >>> 12) & 15
+      const x = Math.min(1, Math.max(0, lv / 15))
+      this._fragSkyLight = 1 - Math.pow(1 - x / (3 - 2 * x), 3)
+    }
 
     // ---- buildSurfaceIn ----
     S.colour[0] = F.vColour[0]; S.colour[1] = F.vColour[1]; S.colour[2] = F.vColour[2]

@@ -1,106 +1,59 @@
 # Textur-Registry-Interna
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (extrahiert durch erneutes Ausführen des Registry-Builders der Engine)
+> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified
 
-Die Name→id-Auflösungsmaschinerie und der gemessene Registry-Drift. Der nutzerseitige Katalog: [Texturkatalog](../api/texture-catalog.md).
+Diese Seite erklärt, wie Textur-Namen in IDs aufgelöst werden, und fasst die Änderungen des Registry zwischen Builds zusammen. Die aktuelle Liste für Pack-Autoren steht im [Texturkatalog](../api/texture-catalog.md).
 
-## Methodik
+## Messmethode
 
-Wir haben das eigene Registry-Bau-Modul der Engine (29812 auf diesem Build, getragen von den Chunks 52/53/54) gegen die Texturdaten des ausgelieferten Block-Registry (Datenmodul 1351 im Haupt-Bundle) in einem Mini-Webpack-Harness gegen die Texturdaten des ausgelieferten Block-Registry laufen lassen und seine Ausgabe aufgezeichnet — diese Zahlen sind **die eigene Berechnung des Produktions-Bundles**, keine Re-Implementierung.
+Wir haben das Registry mit dem Registry-Builder des Produktions-Builds und den ausgelieferten Block-Texturdaten neu berechnet. Der resultierende Fingerabdruck `32451195` stimmt mit dem vorgefertigten Atlas aus `bbb6l5` überein. Es sind Ergebnisse der Engine selbst, keine separate Nachimplementierung.
 
-## Ausgabe-Struktur
+## Aktuelles Registry
 
-| Ausgabe | v5 gemessen | Bedeutung |
-|---|---|---|
-| `named` | **906** | als `bloxdTextureId<Name>` referenzierbare Namen |
-| `aliases` | 424 | gefaltete Schreibweisen — 196 Rahmen-Aliasse (`lava0`…) und 228 Rotations-Aliasse (`chest_top[rot[1`…) |
-| `layers` | 1,227 | die vollständige Atlas-Layer-Tabelle — 911 benannte Wurzeln, 150 zusätzliche Animationsrahmen, 171 vor-rotierte Slots |
+| Ausgabe | `bbb6l5` | Bedeutung |
+|---|---:|---|
+| `named` | **1.017** | Namen, die als `bloxdTextureId<Name>`-Konstanten verfügbar sind |
+| `aliases` | **776** | alternative Schreibweisen, die auf einen Basisnamen verweisen |
+| `layers` | **1.650** | alle Layer des Texturatlas |
+| Atlas-Streifen | **7** | sechs volle und ein teilweiser Streifen |
+| Rotationsfamilien | **64** | Namen mit flächenbezogenen Rotationsvarianten |
+| Animationsfamilien | **71** | Namen mit animierten Frames |
 
-## Faltungsregeln
+Animations-Aliasse umfassen normale Frame-Schreibweisen und Übergangs-Schreibweisen, mit denen benachbarte Frames überblendet werden. `radar_screen` gehört sowohl zur Rotations- als auch zur Animationsfamilie.
 
-- **Animationsfamilien** (43): Rahmen-Schreibweisen (`lava0`–`lava7`) falten auf den Basisnamen (`lava`); `bloxdTexel` liefert zur Sample-Zeit den aktuellen Rahmen
-- **Rotationsfamilien** (57): gedrehte Slots (`[rot[1..4`) falten auf den Wurzelnamen; `bloxdTexel` wendet pro Fläche die `textureRotation` erneut an
-- `radar_screen` ist der einzige Name in beiden Familien (seine vier vor-rotierten Kopien tragen jeweils eine eigene 4-Rahmen-Leiter — daher 46 Animationswurzeln im Atlas, nicht 43)
+## Zusammenfassen von Namen
 
-## Drift (cnty9 → ab90qa)
+- **Animation:** Frame-Namen wie `lava0`–`lava7` werden auf den Basisnamen `lava` abgebildet. `bloxdTexel` wählt beim Sampling den aktuellen Frame.
+- **Rotation:** Slots wie `[rot[1`–`[rot[4` werden auf den Basisnamen abgebildet. `bloxdTexel` wendet das `textureRotation` der Fläche an.
+- **Übergänge:** `frameA~frameB~interval` bezeichnet einen Atlas-Slot, der zwei benachbarte Animationsframes mischt.
 
-| Messung | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| Atlas-Einträge | 1.219 | **1.210** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Rahmen-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
-| benutzbare benannte Konstanten | 905 | **896** |
-| id-Änderungen unter überlebenden Namen | — | **334 von 905** |
+Verwende in WGSL die benannten Konstanten. Numerische Textur-IDs sollten nicht fest codiert werden: Sie können sich zwischen Builds ändern, auch wenn der Name verfügbar bleibt.
 
-Der vollständige Drift (11 Namen): hinzu (1) `scorpion_eggs`; entfernt (10) die acht Doppel-Truhentexturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (die Doppel-Truhe hat die Spieldaten verlassen; Spawner behalten `mob_spawner_block_top`).
+## Änderungen zwischen Builds
 
-## Drift (ab90qa → xkg8x)
+| Vergleich | Atlas-Layer | Verfügbare Namen | Wichtigste Änderung |
+|---|---:|---:|---|
+| `sjr0p7` → `cnty9` | 1.200 → 1.219 | — | 98 hinzugefügt, 79 entfernt; Namenskonvention für rotierte Texturen geändert |
+| `cnty9` → `ab90qa` | 1.219 → 1.210 | 905 → 896 | Ein Name hinzugefügt, zehn entfernt |
+| `ab90qa` → `xkg8x` | 1.210 → 1.220 | 896 → 906 | Die zehn zum v5-Start entfernten Namen kehrten zurück |
+| `xkg8x` → `bny9u` | 1.220 → 1.232 | 906 → 911 | Fünf Namen für Trading Terminal und Stone Generator hinzugefügt |
+| `bny9u` → `v98qt8` | 1.232 → 1.227 | 911 → 906 | Ein Name hinzugefügt; sechs Texturen verließen das Registry, als ihre Blöcke zu Modellen wurden |
+| `v98qt8` → `bbb6l5` | 1.227 → 1.650 | 906 → 1.017 | 423 Layer hinzugefügt; Rotations- und Animationsfamilien erweitert; Regression behoben |
 
-| Messung | ab90qa (v5-Start) | xkg8x (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1,210 | **1,220** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **42 (188) — unverändert** |
-| benutzbare benannte Konstanten | 896 | **906** |
-| id-Änderungen unter überlebenden Namen | — | **376 von 896** |
+Bei jeder Aktualisierung wurden die IDs vieler Namen neu vergeben. Benannte Konstanten halten Packs von diesen numerischen Änderungen unabhängig.
 
-Die vollständige Drift (10 Namen): hinzu (10) die acht Double-Chest-Texturen plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — jeder beim v5-Start entfernte Name ist zurück (die Double-Chest kehrte in die Spieldaten zurück, die Spawner-Seitenvarianten gleich mit). Nichts wurde entfernt.
+## Faltungs-Regression in v98qt8 (behoben)
 
+In `v98qt8` verwendete die Tabelle animierter Texturen Schreibweisen als Schlüssel, während die Faltungslogik Slot-Indizes erwartete. Dadurch bestanden die Basisnamen animierter Texturen die Validierung nicht; die Frame-Namen erschienen stattdessen als einzelne Konstanten ohne Animation.
 
-## Drift (xkg8x → bny9u)
+Der Fehler wurde in `bbb6l5` behoben: Die Tabelle verwendet wieder Slot-Indizes, die Basisnamen der Animationen bestehen die Validierung und der Registry-Fingerabdruck stimmt mit dem ausgelieferten Atlas überein. Dieser Abschnitt bleibt als historische Dokumentation erhalten und beschreibt nicht den aktuellen Build.
 
-| Messung | xkg8x (v5) | bny9u (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1,220 | **1,232** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Bild-Schreibweisen) | 42 (188) | **43 (196)** |
-| benutzbare benannte Konstanten | 906 | **911** |
-| id-Änderungen unter überlebenden Namen | — | **864 von 906** |
+## Auswirkung auf HEADER_VERSION
 
-Die vollständige Drift (5 Namen): hinzu (5) `trading_terminal_front` (anim, 8 Frames) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top` — zwei neue Blöcke (Trading Terminal, Stone Generator) sind in die Spieldaten gekommen. Nichts wurde entfernt; die id-Fluktuation ist fast total (95 % der Überlebenden).
-
-
-## Drift (bny9u → v98qt8)
-
-| Messung | bny9u (v5) | v98qt8 (v5, aktuell) |
-|---|---|---|
-| Atlas-Einträge | 1.232 | **1.227** |
-| Rotationsfamilien (gedrehte Schreibweisen) | 57 (228) | **57 (228) — unverändert** |
-| Animationsfamilien (Rahmen-Schreibweisen) | 43 (196) | **43 (196) — unverändert** |
-| benutzbare benannte Konstanten | 911 | **906** |
-| id-Änderungen unter Überlebenden | — | **716 von 905** (79 %) |
-
-Der vollständige Drift (7 Namen): hinzu (1) `hay_block_top`; entfernt (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — Furnace, Workbench (Crafting Table) und Artisan Bench wurden von texturierten Terrain-Blöcken zu Block-Modellen konvertiert, sodass ihre Terrain-Texturen die Registry verließen (die Workbench behielt `crafting_table_top` — die Oberseite bleibt eine Terrain-Textur). Produktion und Preprod liefern dasselbe byte-identische Bundle (md5 `7458fd47ff88331d9f451d1456ff48ac`).
-
-## Die v98qt8-Faltungs-Regression
-
-`v98qt8` liefert eine byte-verifizierte Regression in der Texturkonstanten-Faltung. Das Datenmodul (1351) baut `animatedBlockTextures` jetzt als **schreibweise-verschlüsseltes Array** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — hexdump-verifiziert im Live-Main-Bundle), während der Klassifikator (Modul 30048) an zwei Stellen ein **slot-verschlüsseltes Array** erwartet:
-
-1. `hii.forEach((value, key))` — `Array.prototype.forEach` besucht nie String-Schlüssel, daher bleibt die Slot→Basis-Map für Zusatzrahmen leer
-2. `hii[Qi]` mit `Qi` = der Atlas-Slot — Klammer-Zugriff mit einem Slot-Index trifft nie einen Schreibweise-Schlüssel, daher löst die Basis-Faltung (`lava0` → `lava`) nie aus
-
-Folgen, alles gemessen durch verbatim-Ausführung des Produktions-Klassifikators und -Resolvers in Node:
-
-- die 43 Animationsfamilien-Basisnamen (`lava`, alle `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, die 19 `*_running`-Maschinentexturen, …) **scheitern an der Validierung**: `bloxdTextureIdLava` → „There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0?“
-- die 196 Rahmen-Schreibweisen (`lava0`–`lava7`, …) lösen als **einzelne benutzbare Konstanten** auf (nur den Basisrahmen sampelnd — keine Animation)
-- die dedizierte Diagnose „names a frame of the animated texture“ kann nie feuern (keine Rahmen-Aliasse existieren)
-- das Laufzeit-`named`-Set der Engine hat 1.047 Zeilen, daher berechnet die Engine für `HEADER_VERSION` den Registry-Hash `694df62c` — nicht den beabsichtigten `df6c1915` (gefaltet) — was zusätzlich **jedes gespeicherte Paket zur Neuprüfung** zwingt
-
-Kontrollversuch: demselben Klassifikator ein slot-verschlüsseltes Array zu übergeben (was die Faltungslogik selbst erwartet und was `bny9u`s Datenmodul erzeugte) reproduziert die dokumentierte gefaltete Ausgabe exakt — 906 named mit `lava` bei id 1, `lava0`–`lava7` als Rahmen-Aliasse, 424 Aliasse, 1.227 Layer. Die Faltungsregeln unten beschreiben diese beabsichtigte API.
-
-## Wirkung auf HEADER_VERSION
-
-Der Registry-Hash-Suffix bäckt ids ein, daher markiert dieser Drift **jedes gespeicherte Paket als „muss erneut geprüft werden“** (beim Seitenladen automatisch revalidiert). Namens-geschriebene Pakete überstehen die Neuauflösung; Roh-id-Pakete brechen ([Kompatibilität](../api/compatibility.md)).
-
-## Frühere Drift-Aufzeichnungen
-
-Der Zwei-Build-Vergleich aus dem Oktober (sjr0p7 → cnty9, 10 Tage): Einträge 1200 → 1219 (98 hinzugekommen, 79 entfernt); 779 von 1121 unveränderten Namen änderten die id (69 %); eine Namenskonventions-Migration (Suffixe `_rot1..4` → Slots `[rot[1..4`); das Auftauchen der Doppel-Truhe. Die vollständige Aufzeichnung lebt in [Versionsgeschichte: v4](../history/v4.md).
-
-4. November (ab90qa → xkg8x, 1 Tag): Einträge 1,210 → 1,220 (+10, alles Rückkehrer — die v5-Start-Entfernungen kehrten sich um); 376 von 896 Namen änderten die id (42 %); keine Entfernungen; beide Faltfamilien unverändert. Die Double-Chest ist zurück.
-
-November 5 (xkg8x → bny9u, 1 Tag): Einträge 1,220 → 1,232 (+5: die Trading-Terminal- ×3 und Stone-Generator- ×2 Texturen); 864 von 906 Namen änderten die id (95 %); keine Entfernungen; Rotationsfamilien unverändert, Animationsfamilien 42 → 43 (`trading_terminal_front`, 8 Frames bei 250 ms). Produktion und Preprod liefern dasselbe byte-identische Bundle.
-8. November (bny9u → v98qt8, 3 Tage): Einträge 1.232 → 1.227 (+1 `hay_block_top`, −6 modellkonvertierte Blocktexturen: Furnace, Workbench, Artisan Bench); 716 von 905 Namen änderten die id (79 %); Rotations- und Animationsfamilien unverändert (57 / 43). Produktion und Preprod liefern dasselbe byte-identische Bundle — und der Build trägt die oben dokumentierte Faltungs-Regression.
+Der Registry-Fingerabdruck ist Bestandteil von `HEADER_VERSION`. Änderungen am Registry können deshalb eine erneute Pack-Validierung auslösen. Packs mit Namen werden auf die neuen IDs aufgelöst; fest codierte numerische IDs können dagegen brechen. Siehe [Kompatibilität](../api/compatibility.md).
 
 ## Verwandte Seiten
 
-- [Texturkatalog](../api/texture-catalog.md) · [Shader-Validierung](shader-validation.md) · [Forschungslog](research-log.md)
+- [Texturkatalog](../api/texture-catalog.md) — verfügbare Namen für Packs
+- [Textur-Sampling-Interna](texture-sampling.md) — wie Texturen abgetastet werden
+- [Forschungslog](research-log.md) — Messmethode und Build-Verlauf

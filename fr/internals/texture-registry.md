@@ -1,106 +1,59 @@
 # Intérieurs du registre des textures
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified (extrait en réexécutant le propre constructeur de registre du moteur)
+> API cible : 5 · Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20) · État : Verified
 
-La mécanique de résolution nom→id et la dérive mesurée du registre. Le catalogue côté utilisateur : [Catalogue de textures](../api/texture-catalog.md).
+Cette page explique comment les noms de texture sont associés à des ID et résume l'évolution du registre entre les builds. La liste actuelle destinée aux auteurs de packs figure dans le [Catalogue des textures](../api/texture-catalog.md).
 
-## Méthodologie
+## Méthode de mesure
 
-Nous avons exécuté le propre module de construction du registre du moteur (29812 sur ce build, porté par les chunks 52/53/54) sur les données de textures du registre de blocs livré (module de données 1351 dans le bundle principal) sur les données de textures du registre de blocs livré, dans un harnais webpack minimal, et enregistré sa sortie — ces chiffres sont **le calcul propre du bundle de production**, pas une réimplémentation.
+Nous avons recalculé le registre en exécutant le constructeur du build de production sur les données de texture livrées avec le jeu. L'empreinte obtenue, `32451195`, correspond à l'atlas préconstruit fourni avec `bbb6l5`. Il s'agit des résultats du moteur lui-même, pas d'une réimplémentation.
 
-## Structure de sortie
+## Registre actuel
 
-| Sortie | mesuré en v5 | Signification |
-|---|---|---|
-| `named` | **906** | noms référençables comme `bloxdTextureId<Name>` |
-| `aliases` | 424 | orthographes repliées — 196 alias d'image (`lava0`…) et 228 alias de rotation (`chest_top[rot[1`…) |
-| `layers` | 1,227 | la table de couches complète de l'atlas — 911 racines nommées, 150 images d'animation supplémentaires, 171 emplacements pré-rotés |
+| Sortie | `bbb6l5` | Signification |
+|---|---:|---|
+| `named` | **1 017** | Noms disponibles sous forme de constantes `bloxdTextureId<Name>` |
+| `aliases` | **776** | Autres graphies résolues vers un nom de base |
+| `layers` | **1 650** | Nombre total de couches de l'atlas |
+| Bandes de l'atlas | **7** | Six bandes complètes et une bande partielle |
+| Familles de rotation | **64** | Noms possédant des variantes de rotation par face |
+| Familles d'animation | **71** | Noms possédant des images animées |
 
-## Règles de pliage
+Les alias d'animation comprennent les graphies habituelles des images et les graphies de transition qui mélangent deux images consécutives. `radar_screen` appartient aux deux familles, rotation et animation.
 
-- **familles d'animation** (43) : les orthographes d'image (`lava0`–`lava7`) se replient vers le nom de base (`lava`) ; `bloxdTexel` renvoie l'image courante au moment de l'échantillonnage
-- **familles de rotation** (57) : les emplacements tournés (`[rot[1..4`) se replient vers le nom racine ; `bloxdTexel` réapplique le `textureRotation` par face
-- `radar_screen` est le seul nom appartenant aux deux familles à la fois (ses quatre copies pré-rotées portent chacune leur propre échelle de 4 images — d'où 46 racines d'animation dans l'atlas, et non 42)
+## Regroupement des noms
 
-## Dérive (cnty9 → ab90qa)
+- **Animation :** les noms d'image comme `lava0`–`lava7` sont ramenés au nom de base `lava`. `bloxdTexel` choisit l'image courante lors de l'échantillonnage.
+- **Rotation :** les emplacements comme `[rot[1`–`[rot[4` sont ramenés au nom de base. `bloxdTexel` applique le `textureRotation` de la face.
+- **Transitions :** `frameA~frameB~interval` désigne un emplacement de l'atlas qui mélange deux images consécutives.
 
-| Mesure | cnty9 (v4) | ab90qa (v5) |
-|---|---|---|
-| entrées d'atlas | 1,219 | **1,210** |
-| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
-| familles d'animation (orthographes d'image) | 42 (188) | **42 (188) — inchangé** |
-| constantes nommées utilisables | 905 | **896** |
-| changements d'id parmi les noms survivants | — | **334 sur 905** |
+En WGSL, utilisez les constantes nommées. Ne figez pas les ID numériques : ils peuvent changer d'un build à l'autre même si le nom reste disponible.
 
-La dérive complète (11 noms) : ajouté (1) `scorpion_eggs` ; retirés (10) les huit textures de coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` (le coffre double a quitté les données du jeu ; les générateurs conservent `mob_spawner_block_top`).
+## Évolution entre les builds
 
-## Dérive (ab90qa → xkg8x)
+| Comparaison | Couches de l'atlas | Noms disponibles | Changement principal |
+|---|---:|---:|---|
+| `sjr0p7` → `cnty9` | 1 200 → 1 219 | — | 98 ajouts, 79 suppressions ; la convention de nommage des textures pivotées change |
+| `cnty9` → `ab90qa` | 1 219 → 1 210 | 905 → 896 | Un nom ajouté et dix supprimés |
+| `ab90qa` → `xkg8x` | 1 210 → 1 220 | 896 → 906 | Les dix noms supprimés au lancement de v5 sont rétablis |
+| `xkg8x` → `bny9u` | 1 220 → 1 232 | 906 → 911 | Cinq noms ajoutés pour le Trading Terminal et le Stone Generator |
+| `bny9u` → `v98qt8` | 1 232 → 1 227 | 911 → 906 | Un nom ajouté ; six textures quittent le registre lorsque leurs blocs deviennent des modèles |
+| `v98qt8` → `bbb6l5` | 1 227 → 1 650 | 906 → 1 017 | 423 couches ajoutées ; familles de rotation et d'animation étendues ; régression corrigée |
 
-| Mesure | ab90qa (lancement v5) | xkg8x (v5, actuel) |
-|---|---|---|
-| entrées d'atlas | 1,210 | **1,220** |
-| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
-| familles d'animation (orthographes d'image) | 42 (188) | **42 (188) — inchangé** |
-| constantes nommées utilisables | 896 | **906** |
-| changements d'id parmi les survivants | — | **376 sur 896** |
+De nombreux noms ont reçu de nouveaux ID à chaque mise à jour. Les constantes nommées évitent de dépendre de ces changements numériques.
 
-La dérive complète (10 noms) : ajoutés (10) les huit textures du coffre double plus `mob_spawner_hostile_block_side` / `mob_spawner_neutral_block_side` — chaque nom retiré au lancement de la v5 est revenu (le coffre double est retourné dans les données du jeu ; les variantes latérales du générateur avec lui). Rien n'a été retiré.
+## Régression de pliage de v98qt8 (corrigée)
 
-5 novembre (xkg8x → bny9u, 1 jour) : entrées 1,220 → 1,232 (+5 : les textures Terminal d'Échange ×3 et Générateur de Pierre ×2) ; 864 noms sur 906 ont changé d'id (95 %) ; aucun retrait ; familles de rotation inchangées, familles d'animation 42 → 43 (`trading_terminal_front`, 8 images à 250 ms). Production et preprod servent le même bundle identique octet par octet.
+Dans `v98qt8`, la table des textures animées utilisait des clés textuelles alors que la logique de pliage attendait des indices d'emplacement. Les noms de base des textures animées échouaient donc à la validation, et les noms de chaque image apparaissaient comme des constantes séparées, sans animation.
 
-## Dérive (xkg8x → bny9u)
-
-| Mesure | xkg8x (v5) | bny9u (v5, actuel) |
-|---|---|---|
-| entrées d'atlas | 1,220 | **1,232** |
-| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
-| familles d'animation (orthographes d'image) | 42 (188) | **43 (196)** |
-| constantes nommées utilisables | 906 | **911** |
-| changements d'id parmi les survivants | — | **864 sur 906** |
-
-La dérive complète (5 noms) : ajoutés (5) `trading_terminal_front` (anim, 8 images) / `trading_terminal_side` / `trading_terminal_top` / `stone_generator_side` / `stone_generator_top` — deux nouveaux blocs (Terminal d'Échange, Générateur de Pierre) ont rejoint les données du jeu. Rien n'a été retiré ; le brassage des id est quasi total (95 % des survivants).
-
-
-## Dérive (bny9u → v98qt8)
-
-| Mesure | bny9u (v5) | v98qt8 (v5, actuel) |
-|---|---|---|
-| entrées d'atlas | 1,232 | **1,227** |
-| familles de rotation (orthographes tournées) | 57 (228) | **57 (228) — inchangé** |
-| familles d'animation (orthographes d'image) | 43 (196) | **43 (196) — inchangé** |
-| constantes nommées utilisables | 911 | **906** |
-| changements d'id parmi les survivants | — | **716 sur 905** (79 %) |
-
-La dérive complète (7 noms) : ajouté (1) `hay_block_top` ; retirés (6) `artisan_table_side` / `artisan_table_top` / `crafting_table_side` / `furnace_front` / `furnace_side` / `furnace_top` — le Four, l'Établi (table de craft) et l'Établi d'artisan ont été convertis de blocs texturés du terrain en modèles de bloc, donc leurs textures de terrain ont quitté le registre (l'Établi a gardé `crafting_table_top` — sa face supérieure reste une texture de terrain). Production et preprod servent le même bundle identique octet par octet (md5 `7458fd47ff88331d9f451d1456ff48ac`).
-
-## La régression de pliage de v98qt8
-
-`v98qt8` embarque une régression vérifiée octet par octet dans le pliage des constantes de texture. Le module de données (1351) construit désormais `animatedBlockTextures` comme un **Array indexé par orthographe** (`Yi[pii[0]] ??= {numAnimStates, animStartIdx, …}` — vérifié par hexdump dans le bundle principal en production), alors que le classifieur (module 30048) attend toujours un **tableau indexé par emplacement** à deux endroits :
-
-1. `hii.forEach((value, key))` — `Array.prototype.forEach` ne visite jamais les clés chaînes, donc la carte emplacement→base des images supplémentaires reste vide
-2. `hii[Qi]` avec `Qi` = l'emplacement d'atlas — l'accès par crochets avec un indice d'emplacement n'atteint jamais une clé d'orthographe, donc le pliage de l'orthographe de base (`lava0` → `lava`) ne se déclenche jamais
-
-Conséquences, toutes mesurées en exécutant tels quels le classifieur et le résolveur de production dans Node :
-
-- les 43 noms de base des familles d'animation (`lava`, tous les `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, les 19 textures de machine `*_running`, …) **échouent à la validation** : `bloxdTextureIdLava` → « There's no texture called bloxdTextureIdLava. Did you mean bloxdTextureIdLava0? »
-- les 196 orthographes d'image (`lava0`–`lava7`, …) se résolvent comme des **constantes individuelles utilisables** (échantillonnant seulement l'image de base — pas d'animation)
-- le diagnostic dédié « names a frame of the animated texture » ne peut jamais se déclencher (aucun alias d'image n'existe)
-- l'ensemble `named` à l'exécution du moteur compte 1 047 lignes, donc le hachage de registre que le moteur calcule pour `HEADER_VERSION` est `694df62c` — et non le `df6c1915` prévu (plié) — ce qui force de plus **chaque pack enregistré à se revalider** sur ce build
-
-Expérience témoin : fournir au même classifieur un tableau indexé par emplacement (ce qu'attend la logique de pliage elle-même et ce que produisait le module de données de `bny9u`) reproduit exactement la sortie pliée documentée — 906 named avec `lava` à l'id 1, `lava0`–`lava7` en alias d'image, 424 alias, 1 227 couches. Les règles de pliage ci-dessous décrivent cette API prévue.
+Le problème a été corrigé dans `bbb6l5` : la table utilise de nouveau des indices d'emplacement, les noms de base des animations passent la validation et l'empreinte du registre correspond à l'atlas livré. Cette section est conservée comme historique ; elle ne décrit pas le build actuel.
 
 ## Effet sur HEADER_VERSION
 
-Le suffixe de hachage du registre enregistre les ids en dur, donc cette dérive marque **chaque pack sauvegardé « à revérifier »** (revalidé automatiquement au chargement de la page). Les packs écrits avec des noms survivent à la re-résolution ; les packs à ids bruts cassent ([Compatibilité](../api/compatibility.md)).
-
-## Anciens relevés de dérive
-
-La comparaison d'octobre entre deux builds (sjr0p7 → cnty9, 10 jours) : entrées 1200 → 1219 (98 ajoutées, 79 retirées) ; 779 des 1121 noms inchangés ont changé d'id (69 %) ; une migration de convention de nommage (suffixes `_rot1..4` → emplacements `[rot[1..4`) ; l'apparition du coffre double. Le relevé complet se trouve dans [Historique des versions : v4](../history/v4.md).
-
-4 novembre (ab90qa → xkg8x, 1 jour) : entrées 1,210 → 1,220 (+10, toutes des retours — les retraits du lancement de la v5 se sont inversés) ; 376 noms sur 896 ont changé d'id (42 %) ; aucun retrait ; les deux familles de pliage inchangées. Le coffre double est de retour.
-
-8 novembre (bny9u → v98qt8, 3 jours) : entrées 1,232 → 1,227 (+1 `hay_block_top`, −6 textures de blocs convertis en modèles : Four, Établi, Établi d'artisan) ; 716 des 905 noms ont changé d'id (79 %) ; familles de rotation et d'animation inchangées (57 / 43). Production et preprod servent le même bundle identique octet par octet — et le build porte la régression de pliage documentée ci-dessus.
+L'empreinte du registre entre dans `HEADER_VERSION`. Une modification du registre peut donc déclencher une nouvelle validation des packs. Les packs qui utilisent les noms sont résolus avec les nouveaux ID ; ceux qui codent les ID numériques en dur peuvent cesser de fonctionner. Voir [Compatibilité](../api/compatibility.md).
 
 ## Voir aussi
 
-- [Catalogue de textures](../api/texture-catalog.md) · [Validation des shaders](shader-validation.md) · [Journal de recherche](research-log.md)
+- [Catalogue des textures](../api/texture-catalog.md) — noms disponibles pour les packs
+- [Internes de l'échantillonnage des textures](texture-sampling.md) — fonctionnement de l'échantillonnage
+- [Journal de recherche](research-log.md) — méthode de mesure et historique des builds
