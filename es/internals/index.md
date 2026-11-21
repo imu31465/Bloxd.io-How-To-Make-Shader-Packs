@@ -1,6 +1,6 @@
-# Internas del motor
+# Funcionamiento interno del motor
 
-Esta categoría explica el funcionamiento interno del motor y puede ayudar a comprender cómo se ejecutan los shader packs. Estos detalles de implementación pueden cambiar; para las reglas de uso estables y las API disponibles, consulta la [Referencia de API](../api/).
+Esta categoría describe cómo funciona el motor y ayuda a comprender la ejecución de los shader packs. Estos detalles de implementación pueden cambiar; para las reglas de uso estables y las API disponibles, consulta la [Referencia de API](../api/).
 
 ## Contenido
 
