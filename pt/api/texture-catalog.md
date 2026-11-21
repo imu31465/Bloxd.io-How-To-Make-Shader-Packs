@@ -2,8 +2,6 @@
 
 O catálogo completo das constantes de nomes de textura utilizáveis (`bloxdTextureId*`). **1,017 nomes**, em ordem alfabética.
 
-**Estado da dobragem (`bbb6l5`, 2026-11-20):** a regressão de constantes de animação que o `v98qt8` trouxe está **corrigida** — a tabela de texturas animadas volta a ser indexada por slot, então os nomes-base das famílias de animação abaixo (`lava`, todos os `*_portal`, `smoke`, `radar_screen`, `trading_terminal_front`, …) validam normalmente; amostrá-los devolve o quadro atual. O que segue é a vista dobrada (pretendida), re-medida no build em produção.
-
 ## Como ler
 
 A coluna **nome** é o nome do registro — o identificador que você realmente escreve. A grafia da constante converte o nome do arquivo para CamelCase: `grass_top` → `bloxdTextureIdGrassTop`, `lava` → `bloxdTextureIdLava`. **Maiúsculas e sublinhados não são distinguidos** (`bloxdTextureId_grass_top` resolve de forma idêntica a `bloxdTextureIdGrassTop`). Os nomes são a API — o carregador os resolve novamente contra o registro vivo ao carregar, então os nomes sobrevivem à deriva do registro ([API de texturas](texture-api.md)).
@@ -11,8 +9,6 @@ A coluna **nome** é o nome do registro — o identificador que você realmente 
 Os IDs numéricos das texturas são valores internos específicos de cada build e foram omitidos. Use as constantes nomeadas `bloxdTextureId*` nos packs.
 
 A coluna **notas** marca as duas famílias de dobramento. «anim (N quadros)» significa que amostrar este nome retorna automaticamente o quadro de animação atual — **nunca escreva o sufixo de quadro** (`lava0` é um alias conhecido com um diagnóstico dedicado). «família de rotação (4 cópias)» significa que a textura existe apenas como slots pré-rotacionados — o nome refere-se à raiz e `bloxdTexel` reaplica a rotação. Exatamente um nome (`radar_screen`) carrega ambas as notas.
-
-A tabela de 1.650 camadas do atlas é um dado interno do motor; sua estrutura e o método de medição estão em [Interior do motor: registro de texturas](../internals/texture-registry.md).
 
 ### Como os números se relacionam
 
@@ -22,13 +18,8 @@ As contagens nomeiam conjuntos distintos, então elas não se somam de forma ing
 |---|---|
 | **1,017** | constantes nomeadas utilizáveis — nomes de textura que você pode escrever como `bloxdTextureId*` |
 | **776** | nomes de alias (520 de quadro + 256 de rotação) — grafias reconhecidas que são *rejeitadas* com orientação para o nome base; são nomes, não constantes, e não adicionam ids |
-| **1.650** | entradas do atlas — os slots reais do atlas de texturas (ids 1–1650) |
-
-O registro de `bbb6l5` contém 1.017 nomes utilizáveis, 111 a mais que `v98qt8`. Os IDs podem mudar entre builds; use as constantes nomeadas e nunca fixe IDs numéricos no WGSL.
 
 ## O catálogo
-
-O catálogo lista os 1.017 nomes utilizáveis em ordem alfabética. A coluna id mostra os valores medidos em `bbb6l5`; eles podem mudar entre builds, portanto use os nomes para referenciar texturas no WGSL.
 
 | Nome | Notas |
 |---|---|
@@ -1117,9 +1108,6 @@ Estas texturas existem apenas como cópias pré-rotacionadas (`name[rot[1..4`). 
 - `wireless_terminal_top`
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
-## Deriva medida (cnty9 → ab90qa)
-
-O registro é conteúdo embarcado no build e se move a cada atualização de blocos. Build da v4 (`cnty9`, 2026-10-27) → build da v5 (`ab90qa`, 2026-11-03):
 
 - entradas do atlas: 1,219 → 1,210
 - famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **sem alterações**
@@ -1134,10 +1122,6 @@ A deriva completa (11 nomes):
 
 **Os nomes são a API; os ids são instantâneos.** Entre os dois builds, 334 dos 905 nomes sobreviventes mudaram de id — escreva `bloxdTextureIdStone`, não `351`. O motor resolve os nomes na validação, então pacotes escritos com nomes sobrevivem à deriva; pacotes com ids crus, não.
 
-## Deriva medida (ab90qa → xkg8x)
-
-O registro mudou novamente um dia após o lançamento da v5 — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, em produção; preprod `2lcqcl` medido idêntico em todas as superfícies de shader packs):
-
 - entradas do atlas: 1,210 → 1,220
 - famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **inalteradas**
 - famílias de animação (grafias de quadro): 42 (188) → 42 (188) — **inalteradas**
@@ -1151,10 +1135,6 @@ A deriva completa (10 nomes — toda remoção do lançamento da v5 voltou):
 
 A mesma doutrina vale com mais força: 376 dos 896 sobreviventes mudaram de id só nesta etapa.
 
-## Deriva medida (xkg8x → bny9u)
-
-O registro mudou de novo no dia seguinte — `xkg8x` (2026-11-04) → `bny9u` (2026-11-05, em produção e preprod como o mesmo bundle idêntico byte a byte):
-
 - entradas do atlas: 1,220 → 1,232
 - famílias de rotação (grafias giradas): 57 (228) → 57 (228) — **inalteradas**
 - famílias de animação (grafias de quadro): 42 (188) → **43 (196)** — o novo `trading_terminal_front` roda uma escada de 8 quadros a 250 ms
@@ -1167,10 +1147,6 @@ A deriva completa (5 nomes — dois blocos novos):
 - **removidos:** nenhum.
 
 A doutrina bate mais forte a cada passo: só nesta etapa mudaram de id 864 dos 1,017 sobreviventes — cerca de dezenove em vinte.
-
-## Deriva medida (bny9u → v98qt8)
-
-O registro moveu-se novamente no fim de semana — `bny9u` (2026-11-05) → `v98qt8` (2026-11-08, produção e preprod servem o mesmo pacote idêntico byte a byte, md5 `7458fd47ff88331d9f451d1456ff48ac`):
 
 - entradas do atlas: 1.232 → 1.227
 - famílias de rotação (grafias giradas): 57 (228) → 57 (228) — inalteradas

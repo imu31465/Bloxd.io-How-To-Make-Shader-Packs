@@ -10,8 +10,6 @@ Les ID numériques des textures sont des valeurs internes propres à chaque buil
 
 La colonne **notes** marque les deux familles de pliage. « anim (N images) » signifie que l'échantillonnage de ce nom renvoie automatiquement l'image d'animation courante — **n'écrivez jamais le suffixe d'image** (`lava0` est un alias connu avec un diagnostic dédié). « famille de rotation (4 copies) » signifie que la texture n'existe que sous forme d'emplacements pré-rotés — le nom désigne la racine et `bloxdTexel` réapplique la rotation. Exactement un nom (`radar_screen`) porte les deux notes.
 
-La table des 1 650 couches de l’atlas est une donnée interne au moteur ; sa structure et sa méthode de mesure sont expliquées dans [Intérieurs du moteur : Registre de textures](../internals/texture-registry.md).
-
 ### Comment les chiffres s'articulent
 
 Ces chiffres désignent des ensembles différents, donc ils ne s'additionnent pas naïvement :
@@ -20,13 +18,8 @@ Ces chiffres désignent des ensembles différents, donc ils ne s'additionnent pa
 |---|---|
 | **1,017** | constantes nommées utilisables — des noms de texture que vous pouvez écrire comme `bloxdTextureId*` |
 | **776** | noms d'alias (520 d'image + 256 de rotation) — des orthographes reconnues qui sont *rejetées* avec une orientation vers le nom de base ; ce sont des noms, pas des constantes, et ils n'ajoutent aucun id |
-| **1,650** | entrées d'atlas — les emplacements réels de l'atlas de textures (ids 1–1650) |
-
-Le registre de `bbb6l5` contient 1 017 noms utilisables, soit 111 de plus que `v98qt8`. Les ID peuvent changer d’un build à l’autre : utilisez les constantes nommées et ne codez jamais d’ID numériques en dur dans le WGSL.
 
 ## Le catalogue
-
-Le catalogue présente les 1 017 noms utilisables par ordre alphabétique. La colonne id indique les valeurs mesurées sur `bbb6l5` ; elles peuvent changer d’un build à l’autre, utilisez donc les noms pour référencer les textures en WGSL.
 
 | Nom | Notes |
 |---|---|
@@ -1048,7 +1041,7 @@ Le catalogue présente les 1 017 noms utilisables par ordre alphabétique. La co
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-### Familles de rotation (64 racines)
+### Familles de rotation
 
 Ces textures n'existent que comme copies pré-rotées (`name[rot[1..4`). Le registre les replie sur la racine ci-dessous, et `bloxdTexel` réapplique la rotation au moment de l'échantillonnage — référencez la racine, jamais les copies. Écrire une orthographe `[rot[N` déclenche le diagnostic dédié de rotation.
 - `alloy_kiln_top`

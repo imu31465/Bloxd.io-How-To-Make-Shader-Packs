@@ -10,11 +10,7 @@ Numeric texture IDs are build-specific internal values and are omitted. Use the 
 
 The **notes** column marks the two folding families. "anim (N frames)" means sampling this name automatically returns the current animation frame — **never write the frame suffix** (`lava0` is a known alias with a dedicated diagnostic). "rotation family (4 copies)" means the texture exists only as pre-rotated slots — the name refers to the root and `bloxdTexel` re-applies the rotation. Exactly one name (`radar_screen`) carries both notes.
 
-Deliberately **not** listed: the remaining registry spellings — 776 alias names (520 frame spellings and 256 rotation spellings) — which are not usable constants; writing them draws dedicated engine error messages. The underlying 1,650-row layer table is engine-internal and covered in [Engine Internals: Texture Registry](../internals/texture-registry.md).
-
 ## The catalog
-
-All 1,017 usable names are listed alphabetically. The id column shows values measured on `bbb6l5`; IDs can change between builds, so reference textures by name in WGSL.
 
 | Name | Notes |
 |---|---|
@@ -1036,7 +1032,7 @@ All 1,017 usable names are listed alphabetically. The id column shows values mea
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-### Rotation families (64 roots)
+### Rotation families
 
 These textures exist only as pre-rotated copies (`name[rot[1..4`). The registry folds them to the root below, and `bloxdTexel` re-applies the rotation at sample time — reference the root, never the copies. Writing a `[rot[N` spelling draws the dedicated rotation diagnostic.
 - `alloy_kiln_top`

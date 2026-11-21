@@ -10,11 +10,7 @@ Numerische Textur-IDs sind buildabhängige interne Werte und werden daher nicht 
 
 Die Spalte **notes** markiert die beiden Faltungs-Familien. „anim (N Frames)“ bedeutet: Dieser Name zu sampeln liefert automatisch den aktuellen Animationsrahmen — **niemals das Rahmen-Suffix schreiben** (`lava0` ist ein bekannter Alias mit eigener Diagnose). „Rotationsfamilie (4 Kopien)“ bedeutet: Die Textur existiert nur als vor-rotierte Slots — der Name verweist auf die Wurzel, und `bloxdTexel` wendet die Rotation erneut an. Genau ein Name (`radar_screen`) trägt beide Hinweise.
 
-Die 1.650 Atlas-Layer bilden interne Engine-Daten. Aufbau und Messmethode sind in [Engine-Interna: Textur-Registry](../internals/texture-registry.md) beschrieben.
-
 ## Der Katalog
-
-Der Katalog enthält alle 1.017 nutzbaren Namen in alphabetischer Reihenfolge. Die id-Spalte zeigt die auf `bbb6l5` gemessenen Werte. Da sich IDs zwischen Builds ändern können, solltest du Texturen in WGSL über ihre Namen referenzieren.
 
 | Name | Anmerkungen |
 |---|---|
@@ -1036,7 +1032,7 @@ Der Katalog enthält alle 1.017 nutzbaren Namen in alphabetischer Reihenfolge. D
 | `yellow_spawn_block_side` |  |
 | `yellow_spawn_block_top` | rotation family (4 copies) |
 
-### Rotationsfamilien (64 Wurzeln)
+### Rotationsfamilien
 
 Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Registry faltet sie auf die unten stehende Wurzel, und `bloxdTexel` wendet die Rotation zur Sample-Zeit erneut an — die Wurzel referenzieren, nie die Kopien. Eine `[rot[N`-Schreibweise zu schreiben zieht die eigene Rotationsdiagnose nach sich.
 - `alloy_kiln_top`
@@ -1103,9 +1099,6 @@ Diese Texturen existieren nur als vor-rotierte Kopien (`name[rot[1..4`). Die Reg
 - `wireless_terminal_top`
 - `yellow_glazed_terracotta`
 - `yellow_spawn_block_top`
-## Gemessener Drift (cnty9 → ab90qa)
-
-Die Registry ist mit dem Build ausgelieferter Inhalt und bewegt sich mit jedem Block-Update. v4-Build (`cnty9`, 2026-10-27) → v5-Build (`ab90qa`, 2026-11-03):
 
 - Atlas-Einträge: 1.219 → 1.210
 - Rotationsfamilien (gedrehte Schreibweisen): 57 (228) → 57 (228) — **unverändert**
@@ -1120,10 +1113,6 @@ Der vollständige Drift (11 Namen):
 
 **Namen sind die API; ids sind Momentaufnahmen.** Zwischen den beiden Builds änderten 334 von 905 überlebenden Namen die id — schreibe `bloxdTextureIdStone`, nicht `351`. Die Engine löst Namen bei der Validierung auf, daher überstehen namens-geschriebene Pakete den Drift; Roh-id-Pakete nicht.
 
-## Gemessener Drift (ab90qa → xkg8x)
-
-Die Registry bewegte sich erneut einen Tag nach dem v5-Start — `ab90qa` (2026-11-03) → `xkg8x` (2026-11-04, live in Produktion; Preprod `2lcqcl` auf jeder Shader-Pack-Oberfläche identisch gemessen):
-
 - Atlas-Einträge: 1,210 → 1,220
 - Rotationsfamilien (gedrehte Schreibweisen): 57 (228) → 57 (228) — **unverändert**
 - Animationsfamilien (Bild-Schreibweisen): 42 (188) → 42 (188) — **unverändert**
@@ -1137,10 +1126,6 @@ Die vollständige Drift (10 Namen — jede v5-Start-Entfernung ist zurück):
 
 Dieselbe Doktrin gilt mit Nachdruck: allein in diesem Schritt änderten 376 der 896 Überlebenden die id.
 
-## Gemessener Drift (xkg8x → bny9u)
-
-Die Registry bewegte sich am nächsten Tag erneut — `xkg8x` (2026-11-04) → `bny9u` (2026-11-05, live in Produktion und Preprod als dasselbe byte-identische Bundle):
-
 - Atlas-Einträge: 1,220 → 1,232
 - Rotationsfamilien (gedrehte Schreibweisen): 57 (228) → 57 (228) — **unverändert**
 - Animationsfamilien (Bild-Schreibweisen): 42 (188) → **43 (196)** — das neue `trading_terminal_front` läuft mit einer 8-Bild-Leiter bei 250 ms
@@ -1153,10 +1138,6 @@ Die vollständige Drift (5 Namen — zwei neue Blöcke):
 - **entfernt:** keine.
 
 Die Doktrin trifft mit jedem Schritt härter: allein in diesem Schritt änderten 864 der 1,017 Überlebenden die id — rund neunzehn von zwanzig.
-
-## Gemessener Drift (bny9u → v98qt8)
-
-Die Registry bewegte sich über das Wochenende erneut — `bny9u` (2026-11-05) → `v98qt8` (2026-11-08, Produktion und Preprod liefern dasselbe byte-identische Bundle, md5 `7458fd47ff88331d9f451d1456ff48ac`):
 
 - Atlas-Einträge: 1.232 → 1.227
 - Rotationsfamilien (gedrehte Schreibweisen): 57 (228) → 57 (228) — unverändert
