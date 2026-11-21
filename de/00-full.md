@@ -23,14 +23,12 @@ Dieser Leitfaden führt dich Schritt für Schritt durch die Erstellung deines er
 8. [Validierung](getting-started/validation.md) — die 3-stufige Ladeprüfung und Tests auf dem Gerät
 9. [Vertrieb](getting-started/distribution.md) — Zippen und Release-Hygiene
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (am 2026-11-20 in Produktion und Preprod verifiziert) · Status: Verified/Analyzed
 
 Wenn du die vollständige Spezifikation brauchst, weiter zur [API-Referenz](api/); für fertige Effekte siehe [Rezepte](recipes/).
-
 ---
 
 ## Überblick & Voraussetzungen
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> API: 5 · Status: Verified
 
 ### Was ein Shader Pack ist
 
@@ -48,9 +46,9 @@ Ein Paket dockt an die **3-stufige Flächen-Pipeline** des Renderers an. Die Ren
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | Wasser |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Block-Modelle (Stufen, Treppen, Pflanzen), Items, Spieler, Mobs, NPCs, Rüstung, Kosmetik |
 
-- **Möglich**: Farben, Transparenz und Emission ändern; Beleuchtung neu aufbauen (die [Beleuchtungs-API](api/lighting.md)); projektionsartige Schatten (über `skyLight`); Texturen sampeln (`bloxdTexel` — Lesen des bestehenden Block-Textur-Atlas); Effekte pro Modell (`flags` sagen dir „das ist ein gehaltenes Item“, „das ist ein Spieler“); Vertex-Animation (nur allow-Spiele)
-- **Nicht möglich**: eigene Texturen hinzufügen (das ist Aufgabe des Texturpack-Systems); Post-Processing (Bloom etc.); Shadow-Map-Schatten, die mit der Sonne rotieren; echte Reflexionen (SSR); Himmel, Wolken oder die Sonnenscheibe selbst anfassen
-- **Leicht zu übersehen, aber stark**: **projektionsartige Schatten über `skyLight` (Voxel-Himmels-Okklusion)** — Flächen unter Bäumen und Dächern klar abdunkeln. Blöcke abzubauen lässt die LightEngine sofort neu rechnen, Schatten folgen also in Echtzeit
+- **Möglich**: Farben, Transparenz und Emission ändern; Beleuchtung anpassen (siehe [Beleuchtungs-API](api/lighting.md)); Texturen mit `bloxdTexel` sampeln; mit `flags` Effekte je Modell erstellen; Vertices animieren (nur allow-Spiele)
+- **Nicht möglich**: eigene Texturen hinzufügen; Post-Processing-Effekte wie Bloom erstellen; eine eigene Shadowmap erzeugen oder auf deren Tiefendaten zugreifen; echte Reflexionen (SSR) erzeugen; oder Himmel, Wolken und Sonnenscheibe selbst schattieren
+- **Schatten**: `bloxdShadow()` liefert den von der Engine berechneten Sonnen-/Mondschatten-Faktor. `bloxdShadowDirection()` gibt die Bewegungsrichtung des schattenwerfenden Lichts an. `bloxdAirShadow(t)` wertet einen Punkt zwischen Kamera und Fragment aus. Die ältere voxelbasierte Himmelsabschattung mit `skyLight` bleibt ebenfalls verfügbar ([Schatten-Anleitung](guides/shadows.md))
 
 ### strict- und allow-Modi
 
@@ -60,8 +58,7 @@ Jedes Spiel hat eine Shader-Pack-Policy (`shaderPackPolicy`), und **die meisten 
 
 - Das aktuelle Spiel akzeptiert nur `apiVersion: 5`-Pakete; v1–v4-Pakete werden beim Laden abgelehnt (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](api/compatibility.md))
 - Du migrierst ein Paket, das für eine ältere Version geschrieben wurde? Siehe [Versionsgeschichte](history/)
-- Engine-Interna können sich mit Updates ändern, daher nennt jede Seite ihren Ziel-Build
-
+- Erklärungen zu Engine-Interna dienen als Hintergrundinformation. Für den unterstützten API-Vertrag ist die API-Referenz maßgeblich
 ---
 
 ## Voraussetzungen
@@ -449,7 +446,7 @@ Siehe den [Test-Leitfaden](guides/testing.md) für die vollständige Checkliste 
 ---
 
 ## API-Referenz
-Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Build `bny9u` gemessen (2026-11-05; Produktion und Preprod identisch). Der Engine-Header, der jedem Paket vorangestellt wird (abgedruckt in [Engine-Interna](internals/engine-header.md)), ist die Primärquelle.
+Diese Seite dokumentiert die aktuelle API v5. Die maßgebliche Quelle für die API-Definitionen ist der Engine-Header, den die Engine jedem Pack automatisch voranstellt (den vollständigen Header findest du unter [Engine-Interna](internals/engine-header.md)).
 
 ### Map
 
@@ -466,13 +463,11 @@ Die systematische Spezifikation der aktuellen API v5. Alles hier ist am Ziel-Bui
 | [Präprozessor](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Einschränkungen](api/restrictions.md) | Sprachgrenzen, reservierte Bezeichner |
 | [Kompatibilität](api/compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
-| [Texturkatalog](api/texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
+| [Texturkatalog](api/texture-catalog.md) | 1.017 verfügbare benannte Konstanten (durchsuchbar) |
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Analyzed (wortwörtlich aus Header & Validator restauriert)
+> API: 5 · Status: Analyzed (aus Engine-Header und Validator rekonstruiert)
 
 Migration von v4? Siehe [Versionsgeschichte: v5](history/v5.md).
-
-
 ---
 
 ## Packformat
