@@ -39,11 +39,11 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 
 ## Estados de verificación
 
-Cada página anota su versión de API objetivo, build, fecha de última verificación y estado.
+Cada página indica la versión de API que cubre y el estado de verificación de su contenido.
 
 | Etiqueta | Significado |
 |---|---|
-| Verified | verificado en el dispositivo / en el build objetivo |
+| Verified | verificado mediante el juego |
 | Analyzed | confirmado analizando la implementación interna |
 | Partially Verified | confirmado solo parcialmente |
 | Experimental | experimental / sin consolidar |
