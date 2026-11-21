@@ -4557,7 +4557,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
-### "pack.json needs "apiVersion": {{version}}."
+### apiVersion 누락
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **증상**: 로드 직후 이 메시지 (`loadNoApiVersion`)
 - **원인**: `apiVersion` 키가 통째로 없다
@@ -4749,7 +4751,9 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 - **해결**: 버텍스 훅과 `discard` 를 `#ifndef BLOXD_STRICT` 로 감싼다
 - **예방**: 버텍스 훅은 항상 가드된 템플릿에서 시작한다 ([베리언트](getting-started/variants.md))
 
-### ".alpha is undefined"
+### 이 베리언트에서는 `alpha` 필드를 사용할 수 없음
+
+> `.alpha is undefined`
 
 - **원인**: `alpha` 는 `#ifdef BLOXD_ALPHA` (모든 액체 + 비strict 지형/모델) 뒤에만 존재한다
 - **해결**: alpha 를 만지는 코드를 `#ifdef BLOXD_ALPHA` 로 감싼다 ([전처리기](api/preprocessor.md#매크로--베리언트-매트릭스))
