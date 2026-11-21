@@ -1,6 +1,6 @@
 # Documentation des shader packs de Bloxd.io
 
-Un guide non officiel sur les shader packs du renderer WebGPU de Bloxd.io — de la création, l'implémentation, la validation et la distribution jusqu'à la spécification de l'API et la recherche sur les intérieurs du moteur.
+Guide non officiel consacré aux shader packs du moteur de rendu WebGPU de Bloxd.io. Il couvre toutes les étapes, de la création et des tests à la référence de l’API et à l’analyse du fonctionnement interne du moteur.
 
 ## Spécification actuelle
 
@@ -24,17 +24,17 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 | Chercher fonctions et champs de l'API | [Référence API](api/) | auteurs en pleine implémentation |
 | Réaliser un effet (lumière, eau, modèles…) | [Guides](guides/) · [Recettes](recipes/) | toute personne construisant un rendu |
 | Corriger une erreur | [Dépannage](troubleshooting/) | toute personne avec un pack cassé |
-| Explorer les intérieurs du moteur | [Intérieurs du moteur et recherche](internals/) | analystes du moteur |
+| Explorer les fonctionnement interne du moteur | [Fonctionnement interne du moteur](internals/) | analystes du moteur |
 | Consulter les anciennes versions (v1–v5) | [Historique des versions](history/) | migrations d'anciens packs |
 
 ## Carte de la documentation
 
 - **[Premiers pas](getting-started/)** — vue d'ensemble, démarrage rapide, structure du pack, pack.json, les 9 hooks, variantes, validation, distribution.
-- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 1,017 noms de textures.
+- **[Référence API](api/)** — la spécification systématique de la v5 : hooks, flags, structures d'entrée/sortie, toutes les fonctions, éclairage, API de textures, constantes, préprocesseur, restrictions, compatibilité, et le catalogue de 1 017 identifiants de texture.
 - **[Guides](guides/)** — comment fonctionne l'éclairage, les ombres, l'eau, la nuit, le rendu des modèles, les performances, les concepts de réalisme.
 - **[Recettes](recipes/)** — exemples de code orientés objectif : couleurs, éclairage, émission, coordonnées, animation, liquides, sommets, maths, réalisme, shaders de modèle, effets d'enchantement.
 - **[Dépannage](troubleshooting/)** — résolution d'erreurs par symptôme : chargement, version d'API, compilation, validation, variantes, visuel, textures, éclairage, modèles, performances.
-- **[Intérieurs du moteur et recherche](internals/)** — pipeline de rendu, invocation des hooks, en-tête du moteur, intérieurs de validation et de compilation, identifiants réservés, intérieurs d'éclairage/brouillard, échantillonnage et registre des textures, rendu des modèles, données mesurées.
+- **[Fonctionnement interne du moteur](internals/)** — pipeline de rendu, invocation des hooks, en-tête du moteur, intérieurs de validation et de compilation, identifiants réservés, intérieurs d'éclairage/brouillard, échantillonnage et registre des textures, rendu des modèles, données mesurées.
 - **[Historique des versions](history/)** — de v1 à v5 : changements par version, étapes de migration, API retirées.
 
 ## Libellés de statut de vérification

@@ -4,19 +4,23 @@
 
 Problemas que ocurren solo en algunas de las 6 variantes (`strict|allow` × `terrain|liquid|model`). v5 eliminó el eje de iluminación (la vieja `BLOXD_LIGHTING`) y el cargador valida **las 6 variantes a la vez** en la carga.
 
-## Carga solo en juegos no strict / descartado en strict
+## Disponibilidad en los modos strict y allow
 
 - **Causa**: un hook de vértice sin guarda o un `discard` alcanzable; los juegos strict prohíben ambos y la infracción = **desactivación automática del paquete entero** (`shaderPack:offInStrict`)
 - **Comprobación**: la pantalla del cargador muestra `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
 - **Corrección**: envuelve los hooks de vértice y el `discard` en `#ifndef BLOXD_STRICT`
 - **Prevención**: parte siempre de la plantilla con guarda para los hooks de vértice ([Variantes](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## El campo `alpha` no está disponible en esta variante
+
+> `.alpha is undefined`
 
 - **Causa**: `alpha` existe solo tras `#ifdef BLOXD_ALPHA` (todo líquido + terreno/modelo no strict)
 - **Corrección**: envuelve el código que toca alpha en `#ifdef BLOXD_ALPHA` ([Preprocesador](../api/preprocessor.md#matriz-de-macros--variantes))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## Los hooks de vértice requieren modo allow
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **Causa**: las variantes strict no tienen hooks de vértice en absoluto, así que tampoco `BloxdVertex`; el código de vértice es alcanzable desde variantes strict
 - **Corrección**: guarda el hook de vértice

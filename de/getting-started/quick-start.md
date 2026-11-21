@@ -1,12 +1,12 @@
-# Quick Start
+# Schnellstart
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified
+> API-Version: 5 · Status: Verified
 
 Dein erstes Paket in fünf Minuten.
 
 ## 1. Die Dateien anlegen
 
-Einen Ordner mit `pack.json` und `pack.wgsl` anlegen:
+Lege einen Ordner mit `pack.json` und `pack.wgsl` an:
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@ Einen Ordner mit `pack.json` und `pack.wgsl` anlegen:
 }
 ```
 
-**`pack.wgsl`** — ein minimales Paket mit warmem Tint:
+**`pack.wgsl`** — ein minimales Shader-Pack mit warmer Farbgebung:
 
 ```wgsl
 const packWarmth = 0.18;

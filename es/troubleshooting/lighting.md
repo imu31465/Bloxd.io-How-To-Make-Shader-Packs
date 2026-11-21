@@ -36,7 +36,9 @@ Problemas de brillo, sombra y niebla.
 - **Causa**: entradas solo de iluminación (`blockLight` etc.) usadas sin guarda. v5 no tiene `#ifdef BLOXD_LIGHTING` — ramifica en el **`bloxdLit()` de ejecución**
 - **Corrección**: retorno anticipado `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Iluminación](../api/lighting.md#bloxdlit--la-compuerta))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## Desbordamiento de la cola de LightEngine
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Causa**: las regiones densas de bloques brillantes desbordan la cola de semillas de luz y el cómputo de luz del chunk se corta. **No lo causa el paquete**, pero los huecos de luz cerca de cúmulos brillantes se rastrean a esto
 - **Corrección**: reparte las fuentes de luz en el mundo

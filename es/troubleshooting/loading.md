@@ -4,14 +4,17 @@
 
 Errores rechazados en la **etapa del cargador** (la primera puerta), mostrados en la línea de estado de los ajustes con ids `shaderPack:load*`.
 
-## "There's no pack.json at the top of the pack."
+## Falta el manifiesto del paquete
+
+> `There's no pack.json at the top of the pack.`
 
 - **Causa**: no hay `pack.json` en la raíz del zip (p. ej. la carpeta se comprimió con un nivel extra de anidamiento)
 - **Comprobación**: abre el zip — `pack.json` en el nivel superior (o directamente bajo una única carpeta raíz común)
 - **Corrección**: comprime `pack.json` y los archivos `.wgsl` directamente. Una única carpeta raíz común se elimina automáticamente ([Estructura del paquete](../getting-started/pack-structure.md))
 - **Prevención**: mantén fijo tu procedimiento de comprimido; el «Comprimir» de macOS funciona tal cual (la basura del SO se excluye automáticamente)
 
-## `loadDuplicateManifest` al cargar el zip
+## Manifiesto duplicado
+
 
 - **Causa**: dos archivos `pack.json` (incluidas diferencias de mayúsculas)
 - **Corrección**: conserva exactamente uno
@@ -49,7 +52,9 @@ Los zips divididos, zip64, las entradas cifradas y la compresión no soportada s
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | ruta duplicada / no UTF-8 / fallo de descompresión / zip dañado |
 | `loadNoManifest` / `loadDuplicateManifest` | posición del manifiesto / duplicación |
 
-## "Ready. Reload the page to use it." pero nada cambia
+## Hay que recargar la página
+
+> `Ready. Reload the page to use it." pero nada cambia`
 
 - **Causa**: los paquetes necesitan una **recarga de página** para activarse
 - **Corrección**: recarga tras seleccionar; el estado debería volverse `Ready to use`

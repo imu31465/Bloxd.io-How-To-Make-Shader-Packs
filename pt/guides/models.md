@@ -67,6 +67,6 @@ Exemplos completos: [receitas de shaders de modelo](../recipes/model-shaders.md)
 
 `bloxdModelLight` recebe os mesmos `BloxdSurface` / `BloxdLightIn` e trabalha com `bloxdDefaultLight` / `bloxdLitColour()`. O brilho de encantamento (`enchantColour`) e o clarão de dano (`overlayColour`) se misturam dentro de `bloxdLitColour`, então **os padrões preservam ambos os looks automaticamente**; para controlá-los, veja [efeitos de encantamento](../recipes/enchant-effects.md).
 
-## Interioridades
+## Detalhes internos
 
-Como os modelos são renderizados e como as entradas de flags/encantamento fluem: [Interioridades do motor: renderização de modelos](../internals/model-rendering.md); símbolos gerados como `bloxdSpItemLocalPosition` e `bloxdSpEnchant` estão listados em [restrições](../api/restrictions.md).
+Para entender como os modelos são renderizados e como os dados de flags e encantamentos são transmitidos, consulte [Funcionamento interno do motor: renderização de modelos](../internals/model-rendering.md); símbolos gerados como `bloxdSpItemLocalPosition` e `bloxdSpEnchant` estão listados em [restrições](../api/restrictions.md).

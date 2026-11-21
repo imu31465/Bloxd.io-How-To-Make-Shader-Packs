@@ -4,30 +4,40 @@
 
 静的検証 (アナライザ、読み込み時の第1段階) で出るエラーです。多くは予約名・strict 契約・フック間の呼び出し制約に関わります。
 
-## 「Packs can't construct BloxdSurface directly」/「Packs can't construct BloxdLight directly, since header structs gain fields; ...」
+## 出力構造体は直接生成できない
+
+> `Packs can't construct BloxdSurface directly」/「Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **原因**: `BloxdSurface(...)` 等のコンストラクタ呼び出し。ヘッダー構造体はフィールドが増えるため直接構築が禁止されている
 - **解決方法**: `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` を起点にフィールドを書き換える。light フックなら `var out = s;` も可
 
-## 「Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>」
+## 予約済み識別子
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **原因**: 自分の識別子に `bloxd` 接頭辞 (大小文字無視) を使った
 - **確認方法**: 宣言した定数・関数・構造体名を確認
 - **解決方法**: 接頭辞を外す (`packTint` 等)。定義できるのは9つのフック関数名のみ
 - **再発防止**: パック独自の名前は `pack` / `my` 等の接頭辞で統一する
 
-## 「bloxdPackInputs isn't part of the bloxd_ header」
+## 入力バッファ名の誤り
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **原因**: PackInputs uniform をパックから直接参照した
 - **解決方法**: `bloxdSeconds()` / `bloxdLit()` 等のヘッダー関数経由で使う ([パック形式](../api/pack-format.md#per-frame-uniform-bloxdpackinputs))
 
-## 「... reaches bloxdTexel, which only surface and light hooks can use.」
+## 頂点フックからのテクスチャ参照
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **原因**: vertex フック (または vertex フックから到達可能な関数) から `bloxdTexel` / `bloxdTextureSize` を呼んだ
 - **確認方法**: メッセージの "reaches" は**呼び出し経路**を指す — vertex フックから呼ぶ共用関数内でも発生する
 - **解決方法**: 該当呼び出しを surface / light フック側に移動する
 
-## 「... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH.」
+## シーン深度を参照できる条件
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; in code other programs' hooks share, guard the call with #ifdef BLOXD_SCENE_DEPTH.`
 
 - **原因**: `bloxdOpaqueBehind()` は全 liquid バリアントでのみ定義される `BLOXD_SCENE_DEPTH` が必要。他プログラム (terrain/model) のフックと共有する関数内から呼ぶと、コンパイルできないバリアントが生じる
 - **解決方法**: 呼び出しを `#ifdef BLOXD_SCENE_DEPTH` で囲む

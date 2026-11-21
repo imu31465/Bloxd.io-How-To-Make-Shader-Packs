@@ -76,4 +76,4 @@ Voir [Structures](structures.md#champs-conditionnels--macros).
 
 ## Voir aussi
 
-- [Premiers pas : Variantes](../getting-started/variants.md) · [Intérieurs du moteur : Validation des shaders](../internals/shader-validation.md)
+- [Premiers pas : Variantes](../getting-started/variants.md) · [Fonctionnement interne du moteur : validation des shaders](../internals/shader-validation.md)

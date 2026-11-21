@@ -25,17 +25,17 @@ Compile bien mais rend mal.
 - **Cause** : inversion du un-fog par division
 - **Correction** : abandonnez le un-fog ; reconstruisez depuis `s.colour` et appliquez le brouillard exactement une fois à la fin (ou via `bloxdApplyFog`)
 
-## Les blocs lumineux ne brillent pas (packs qui reconstruisent)
+## Les blocs émissifs ne brillent pas
 
 - **Cause** : ré-ajout d'emission manquant — abandonner la sortie par défaut signifie ajouter l'emission vous-même
 - **Correction** : ajoutez `+ s.emission * (1.0 - l.fogAlpha)` ; en v5 la composition `bloxdLitColour()` + emission + `bloxdApplyFog` est la plus sûre ([Éclairage](../api/lighting.md))
 
-## Vagues/motifs coupés aux changements de chunk ou d'origine
+## Motifs coupés aux limites des chunks
 
 - **Cause** : usage direct de positions en espace de rendu — l'origine se déplace avec le joueur
 - **Correction** : utilisez `bloxdWorldPosition(position)` pour les effets dépendant du monde ([Coordonnées](../recipes/coordinates.md)) ; notez les limites de précision de f32 loin de l'origine
 
-## Motifs de surface de l'eau désalignés sur les faces tournées
+## Motifs d'eau désalignés sur les faces tournées
 
 - **Cause** : `bloxdTexel` applique la `textureRotation` propre du fragment à votre uv ([la subtilité de la rotation](../api/texture-api.md#la-subtilité-de-rotation--un-échantillonneur-neutre))
 - **Correction** : pré-tournez avec l'assistant `texelNeutral`

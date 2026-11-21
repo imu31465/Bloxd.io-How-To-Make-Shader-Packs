@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Возвращает**: `position + vec3f(bloxdRenderOffset())`
 - **Примечание**: пределы точности f32 означают, что дальние координаты могут быть неточными (заголовок: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — не документирована, но всё ещё инжектится
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## Теневые функции
 
-Билд API v5 добавил в API паков настоящую систему солнечных/лунных теней движка — проекционные тени, следующие за солнцем, отбрасываемые блоками, игроками, мобами и предметами. Эти две функции **инжектируются в скомпилированный модуль каждого пака** (как `bloxdFragmentBlockPosition`) и числятся в таблице функций валидатора, но не в читаемом тексте заголовка.
+Эти три функции **внедряются в скомпилированный модуль каждого пака** (как `bloxdFragmentBlockPosition`) и указаны в таблице функций валидатора, но отсутствуют в читаемом тексте заголовка.
 
 ### bloxdShadow
 
@@ -184,7 +184,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guard**: `#ifdef BLOXD_SCENE_DEPTH` (определён в жидкостных вариантах)
 - **Смысл**: непрозрачная грань позади этого фрагмента (террейн, видимый сквозь воду); `hit == false` для неба
 - **Переименование из v2**: `found` → `hit`
-- **Подробный разбор**: [История версий: v3](../history/v3.md) и [Внутрянка движка](../internals/rendering-pipeline.md)
+- **Подробный разбор**: [История версий: v3](../history/v3.md) и [Внутреннее устройство движка](../internals/rendering-pipeline.md)
 
 ## См. также
 

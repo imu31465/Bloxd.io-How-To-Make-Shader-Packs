@@ -224,4 +224,4 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## См. также
 
 - **Все 896 пригодных имён** → [Каталог текстур](texture-catalog.md)
-- [Внутрянка движка: реестр текстур](../internals/texture-registry.md) · [Сэмплинг текстур](../internals/texture-sampling.md)
+- [Внутреннее устройство движка: реестр текстур](../internals/texture-registry.md) · [Сэмплинг текстур](../internals/texture-sampling.md)

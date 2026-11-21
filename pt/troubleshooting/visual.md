@@ -35,7 +35,7 @@ Compila bem, mas o visual fica errado.
 - **Causa**: usar posições do espaço de render diretamente — a origem se move com o jogador
 - **Correção**: use `bloxdWorldPosition(position)` para efeitos dependentes do mundo ([Coordenadas](../recipes/coordinates.md)); note os limites de precisão do f32 longe da origem
 
-## Padrões da superfície da água desalinhados em faces rotacionadas
+## Texturas de água desalinhadas em faces rotacionadas
 
 - **Causa**: `bloxdTexel` aplica a própria `textureRotation` do fragmento ao seu uv ([a sutileza da rotação](../api/texture-api.md#a-sutileza-da-rotação--um-sampler-neutro))
 - **Correção**: pré-rotacione com o auxiliar `texelNeutral`

@@ -1,4 +1,4 @@
-# Interioridades da invocação de hooks
+# Como os hooks são invocados
 
 > API alvo: 5 · Tipo: referência técnica
 
@@ -41,11 +41,11 @@ A arquitetura de injeção existia no renderizador da v2 e permaneceu estável n
 | `directional` | a soma interpolada por vértice do Lambert de cada luz direcional (o rig de 2 luzes em [Pipeline de renderização](rendering-pipeline.md)) |
 | `diffuse` / `emissive` | a resposta RGB direcional do material / o brilho RGB |
 | `ambient` | `material.ambient × sceneAmbient` — por material, por frame |
-| `blockLight` / `skyLight` | os varyings de níveis de luz decodificados ([Interioridades de iluminação](lighting-internals.md)) |
+| `blockLight` / `skyLight` | os varyings de níveis de luz decodificados ([Como funciona a iluminação](lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | os uniforms correspondentes |
 | `heldLight` | construída a partir do varying de nível de luz e dos uniforms de luz na mão (a queda do cone em [Interioridades de iluminação](lighting-internals.md)) |
 | `fogColour` | preta só em cenas inteiramente sem névoa (modo 0) |
-| `fogAlpha` | o fator de névoa limitado ([Interioridades da névoa](fog-internals.md)) |
+| `fogAlpha` | o fator de névoa limitado ([Como funciona a névoa](fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varyings e valores de interpolação flat (os mesmos de `BloxdSurfaceIn` — valores posteriores ao hook de vertex) |
 
 ## Relacionado

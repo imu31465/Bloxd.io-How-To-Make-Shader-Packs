@@ -36,7 +36,9 @@ Problemas de brilho, sombra e névoa.
 - **Causa**: entradas só de iluminação (`blockLight` etc.) usadas sem guarda. A v5 não tem `#ifdef BLOXD_LIGHTING` — ramifique em **`bloxdLit()` em tempo de execução**
 - **Correção**: retorne cedo com `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Iluminação](../api/lighting.md#bloxdlit--a-porta))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## Fila do LightEngine excedida
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Causa**: regiões densas de blocos brilhantes transbordam a fila de sementes de luz e o cálculo de luz do chunk é cortado. **Não causado pelo pacote**, mas lacunas de luz perto de aglomerados brilhantes têm origem nisso
 - **Correção**: espalhe fontes de luz no mundo
@@ -44,8 +46,8 @@ Problemas de brilho, sombra e névoa.
 ## Quer a teoria?
 
 - Sombras: [Sombras](../guides/shadows.md) (skyLight = mapa de sombras por voxel)
-- Névoa: [Interioridades do motor: névoa](../internals/fog-internals.md)
+- Névoa: [Funcionamento interno do motor: névoa](../internals/fog-internals.md)
 
 ## Relacionado
 
-- [Iluminação](../api/lighting.md) · [Problemas visuais](visual.md) · [Interioridades da iluminação](../internals/lighting-internals.md)
+- [Iluminação](../api/lighting.md) · [Problemas visuais](visual.md) · [Funcionamento interno da iluminação](../internals/lighting-internals.md)

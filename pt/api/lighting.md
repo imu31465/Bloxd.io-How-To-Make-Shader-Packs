@@ -137,7 +137,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 - **`blockLight` / `skyLight` / `heldLight` chegam já mapeados a 0–1**: os níveis 0–15 passam por uma curva ease-out (p. ex. `6 → 0.45`, `12 → 0.92`). Todos excluem `ambientLightColour`
 - **Curva de lift**: `skyLight` é na verdade "esta posição consegue ver o céu" — dados de oclusão por voxel, ou seja, um shadow map. A separação sol/sombra por limiar pode precisar da transformada inversa (veja o [guia de realismo](../guides/realism.md))
-- **Interioridades da névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Interioridades do motor: interioridades da névoa](../internals/fog-internals.md))
+- **Como funciona a névoa**: no modo linear `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)` (com clamp 0..1), calculado por vértice em espaço de vista. A build atual é apenas linear (detalhes em [Funcionamento interno do motor: névoa](../internals/fog-internals.md))
 
 ## Receitas
 
@@ -178,4 +178,4 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ## Relacionado
 
-- [Funções](functions.md) · [Guias: iluminação](../guides/lighting.md) · [Interioridades do motor: interioridades da iluminação](../internals/lighting-internals.md)
+- [Funções](functions.md) · [Guias: iluminação](../guides/lighting.md) · [Funcionamento interno do motor: iluminação](../internals/lighting-internals.md)

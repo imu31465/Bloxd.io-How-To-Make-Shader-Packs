@@ -1,4 +1,4 @@
-# Interioridades dos identificadores reservados
+# Identificadores reservados: detalhes internos
 
 > API alvo: 5 · Tipo: referência técnica
 

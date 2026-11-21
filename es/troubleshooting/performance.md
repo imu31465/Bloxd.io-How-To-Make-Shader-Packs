@@ -4,7 +4,7 @@
 
 Problemas de velocidad y sus soluciones.
 
-## La comprobación en el dispositivo nunca termina y descarta el paquete
+## La comprobación del dispositivo se queda bloqueada
 
 - **Causa**: la comprobación tiene un **tiempo límite forzado de 60 segundos** (el exceso se trata como `skipped`) — común en dispositivos de gama baja y mundos pesados
 - **Corrección**: reduce el trabajo pesado de vértices y los bucles complejos, y reintenta

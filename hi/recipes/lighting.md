@@ -38,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## पूर्ण-अंधेरी गुफ़ाएँ (आकाशहीन क्षेत्र और भी गहरे करना)
+## अँधेरी गुफ़ाएँ
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

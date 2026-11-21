@@ -1,12 +1,12 @@
-# 퀵 스타트
+# 빠른 시작
 
-> 대상 API: 5 · 대상 빌드: `bbb6l5` (2026-11-20, 프로덕션·preprod 확인) · 상태: Verified
+> 대상 API: 5 · 상태: Verified
 
-5분 만에 첫 팩을 만든다.
+5분이면 첫 셰이더 팩을 만들 수 있다.
 
 ## 1. 파일 만들기
 
-`pack.json` 과 `pack.wgsl` 을 넣은 폴더를 만든다:
+`pack.json`과 `pack.wgsl`을 넣을 폴더를 만든다:
 
 **`pack.json`**:
 
@@ -18,7 +18,7 @@
 }
 ```
 
-**`pack.wgsl`** — 최소한의 난색 틴트 팩:
+**`pack.wgsl`** — 은은하게 따뜻한 색감을 더하는 최소 셰이더 팩:
 
 ```wgsl
 const packWarmth = 0.18;

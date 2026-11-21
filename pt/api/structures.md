@@ -2,7 +2,7 @@
 
 > API alvo: 5 · Build alvo: `bbb6l5` · Estado: Analyzed (restaurado verbatim do cabeçalho em produção)
 
-Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Interioridades do motor](../internals/engine-header.md).
+Sete structs são legíveis/graváveis pelos pacotes. Todo campo está listado abaixo (campos `#ifdef` são condicionais). O cabeçalho completo está em [Funcionamento interno do motor](../internals/engine-header.md).
 
 ## BloxdVertexIn (entrada do hook de vértice)
 

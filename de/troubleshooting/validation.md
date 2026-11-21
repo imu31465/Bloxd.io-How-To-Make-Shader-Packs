@@ -4,28 +4,38 @@
 
 Fehler der statischen Validierung (Analyzer, Stufe 1) — meist reservierte Namen, der strict-Vertrag und hook-übergreifende Aufrufbeschränkungen.
 
-## „Packs can't construct BloxdSurface directly" / „Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+## Ausgabestrukturen nicht direkt erzeugen
+
+> `„Packs can't construct BloxdSurface directly" / „Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **Ursache**: Konstruktoren wie `BloxdSurface(...)` aufgerufen
 - **Fix**: bei `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` beginnen und Felder mutieren (`var out = s;` funktioniert in Light-Hooks)
 
-## „Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+## Reservierte Bezeichner
+
+> `„Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **Ursache**: ein Bezeichner, der mit `bloxd` beginnt (case-insensitive)
 - **Fix**: umbenennen (z. B. `packTint`). Nur die 9 Hook-Namen sind erlaubt
 - **Vorbeugen**: eigene Namen mit `pack` / `my` etc. prefixen
 
-## „bloxdPackInputs isn't part of the bloxd_ header"
+## Unbekannte Uniform-Eingabe
+
+> `„bloxdPackInputs isn't part of the bloxd_ header`
 
 - **Ursache**: das Uniform direkt referenziert
 - **Fix**: über die Header-Funktionen benutzen ([Packformat](../api/pack-format.md#per-frame-uniform-bloxdpackinputs))
 
-## „... reaches bloxdTexel, which only surface and light hooks can use."
+## Texturzugriff aus Vertex-Hooks
+
+> `„... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **Ursache**: aus einem Vertex-Hook (oder einer von dort erreichbaren Funktion) aufgerufen — „reaches“ meint **den Aufrufpfad**
 - **Fix**: den Aufruf in einen Surface-/Light-Hook verschieben
 
-## „... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+## Tiefenzugriff nur mit Bedingung
+
+> `„... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **Ursache**: `bloxdOpaqueBehind()` braucht `BLOXD_SCENE_DEPTH`, nur in allen Liquid-Varianten definiert; den Aufruf aus Terrain-/Model-Hook-Code zu teilen erzeugt unkompilierbare Varianten
 - **Fix**: den Aufruf in `#ifdef BLOXD_SCENE_DEPTH` einpacken

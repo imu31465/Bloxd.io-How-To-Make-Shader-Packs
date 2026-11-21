@@ -4,24 +4,28 @@
 
 Проблемы, возникающие только в некоторых из 6 вариантов (`strict|allow` × `terrain|liquid|model`). v5 убрала ось освещения (старый `BLOXD_LIGHTING`), и загрузчик валидирует **все 6 вариантов разом** при загрузке.
 
-## Загружается только в не-strict играх / отключается в strict
+## Работа в режимах strict и allow
 
 - **Причина**: незащищённый вершинный хук или достижимый `discard`; strict-игры запрещают и то и другое, и нарушение = **автоотключение пака целиком** (`shaderPack:offInStrict`)
 - **Проверка**: экран загрузчика показывает `<hook> moves terrain, which strict games prevent.` / `discard makes terrain see-through, which strict games prevent.`
 - **Исправление**: оберните вершинные хуки и `discard` в `#ifndef BLOXD_STRICT`
 - **Профилактика**: всегда начинайте вершинные хуки от защищённого шаблона ([Варианты](../getting-started/variants.md))
 
-## ".alpha is undefined"
+## Поле `alpha` недоступно в этом варианте
+
+> `.alpha is undefined`
 
 - **Причина**: `alpha` существует только за `#ifdef BLOXD_ALPHA` (все жидкостные + не-strict террейн/модели)
 - **Исправление**: оберните код, трогающий alpha, в `#ifdef BLOXD_ALPHA` ([Препроцессор](../api/preprocessor.md#матрица-макрос--вариант))
 
-## "BloxdVertex only exists when BLOXD_STRICT isn't defined"
+## Вершинные хуки требуют режима allow
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **Причина**: в strict-вариантах вершинных хуков нет вовсе, значит и `BloxdVertex` тоже; вершинный код достижим из strict-вариантов
 - **Исправление**: защитите вершинный хук
 
-## bloxdOpaqueBehind падает только в некоторых вариантах
+## Сбой bloxdOpaqueBehind в отдельных вариантах
 
 - **Причина**: `BLOXD_SCENE_DEPTH` определён только во всех жидкостных вариантах
 - **Исправление**: `#ifdef BLOXD_SCENE_DEPTH` ([Ошибки валидации](validation.md))

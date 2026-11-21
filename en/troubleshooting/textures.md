@@ -4,34 +4,44 @@
 
 Problems around `bloxdTextureId*` / `bloxdTexel`. Search all available names in the [texture catalog](../api/texture-catalog.md).
 
-## "There's no texture called X. Did you mean bloxdTextureIdY?"
+## Unknown texture name
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **Cause**: a misspelling; the validator has **Levenshtein suggestions** (threshold `max(2, floor(len/4)) + 1`)
 - **Fix**: accept the suggestion; cross-check the [catalog](../api/texture-catalog.md)
 - **Prevention**: copy-paste names from the catalog
 
-## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+## Animated texture frame names
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **Cause**: writing a **frame number** on an animated texture (`lava0` etc.)
 - **Fix**: use the base name — sampling returns the current frame automatically
 - **Prevention**: never write frame suffixes for the 43 animation families ([naming](../api/texture-api.md#spelling-rules-and-naming-freedom))
 
-## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+## Rotated texture names
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **Cause**: writing a rotation-family turned-copy spelling (`[rot[N`)
 - **Fix**: use the root name — `bloxdTexel` re-applies the rotation
 
-## "...could name X and Y, which differ only by case or underscores, so it can't be used."
+## Ambiguous texture identifiers
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **Cause**: the case/underscore-insensitive fold left the name **ambiguous**
 - **Fix**: disambiguate the spelling
 
-## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+## Invalid texture constant name
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **Cause**: prefix misspelling (e.g. `bloxdTextureID`, `bloxdtextureid`)
 - **Fix**: start names with exactly `bloxdTextureId`
 
-## "Case and underscores are not distinguished" — how do both rules coexist?
+## Case and underscores
 
 Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdTextureIdGrassTop` resolve to the **same** constant. Only when the fold leaves multiple candidates does the dedicated ambiguity error fire ([naming rules](../api/texture-api.md#spelling-rules-and-naming-freedom)).
 
@@ -44,7 +54,9 @@ Name resolution folds case and `_`, so `bloxdTextureId_grass_top` and `bloxdText
 
 - **Limit**: the shader-pack API only **reads** the atlas; adding textures is the texture-pack system's job ([combinations](../guides/combinations.md))
 
-## "Packs can't use X: the engine binds every texture and sampler..."
+## Texture access restrictions
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **Cause**: declaring `texture_*` / `sampler` types directly
 - **Fix**: go through `bloxdTexel()` ([Restrictions](../api/restrictions.md))

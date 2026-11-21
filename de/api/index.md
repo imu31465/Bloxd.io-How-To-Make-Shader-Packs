@@ -1,8 +1,8 @@
 # API-Referenz
 
-Diese Seite dokumentiert die aktuelle API v5. Die maßgebliche Quelle für die API-Definitionen ist der Engine-Header, den die Engine jedem Pack automatisch voranstellt (den vollständigen Header findest du unter [Engine-Interna](../internals/engine-header.md)).
+Diese Seite dokumentiert die aktuelle API v5. Die maßgebliche Quelle für die API-Definitionen ist der Engine-Header, den die Engine jedem Pack automatisch voranstellt (den vollständigen Header findest du unter [Interne Abläufe der Engine](../internals/engine-header.md)).
 
-## Map
+## Übersicht
 
 | Seite | Inhalt |
 |---|---|

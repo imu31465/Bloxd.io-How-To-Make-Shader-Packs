@@ -65,4 +65,4 @@ Ajustes: **área** = `shTh` (0.93→raio 1.5 / 0.87→2 / 0.80→3 / 0.67→5); 
 
 ## Relacionado
 
-- [receitas de realismo](../recipes/realism.md) (a receita completa de sombra projetada) · [Interioridades de iluminação](../internals/lighting-internals.md) · [Dicas de depuração](debugging.md)
+- [receitas de realismo](../recipes/realism.md) (a receita completa de sombra projetada) · [Funcionamento interno da iluminação](../internals/lighting-internals.md) · [Dicas de depuração](debugging.md)

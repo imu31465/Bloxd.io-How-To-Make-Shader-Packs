@@ -18,7 +18,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 고도를 사용한 투명도의 유사 변화 (진짜 여울 판정이 아니다)
+## 높이 기반 유사 투명 효과
 
 > 진짜 수심에는 액체 한정의 `bloxdOpaqueBehind()` 가 필요하다 — 안쪽 불투명면까지의 두께를 잰다 (완전한 레시피: [물을 자연스럽게 보이게 하기](../guides/water.md)). 아래는 그것을 쓰지 않는 더 간단한 유사 스타일링이다: `s.position.y` 는 로컬 좌표이므로 그대로 쓰면 청크 원점의 변화로 효과가 어긋난다. 월드 고도는 `bloxdWorldPosition()` 으로 변환해 쓴다. 아래는 월드 고도로 알파를 바꿀 뿐인 유사 연출이며, 해안선이나 수중 바닥을 따른 여울 표현이 아니다. `packWaterReferenceY` 는 월드 고도에 맞춰 조정한다.
 

@@ -36,7 +36,9 @@
 - **कारण**: केवल-लाइटिंग इनपुट (`blockLight` आदि) बिना गार्ड उपयोग किए गए। v5 में कोई `#ifdef BLOXD_LIGHTING` नहीं — **रनटाइम `bloxdLit()`** पर शाखा बनाएँ
 - **समाधान**: जल्दी वापसी `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([लाइटिंग](../api/lighting.md#bloxdlit--गेट))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## LightEngine कतार ओवरफ़्लो
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **कारण**: सघन चमकते-ब्लॉक क्षेत्र प्रकाश-सीड क़्यू को उफ़ान दे देते हैं और खंड का प्रकाश-परिकलन बीच में कट जाता है। **पैक-कारित नहीं**, पर चमकते गुच्छों के पास के प्रकाश-अंतराल इसी तक पहुँचते हैं
 - **समाधान**: दुनिया में प्रकाश स्रोत फैलाएँ

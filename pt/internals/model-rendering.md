@@ -1,8 +1,8 @@
-# Interioridades da renderização de modelos
+# Como o motor renderiza os modelos
 
 > API alvo: 5 · Tipo: referência técnica
 
-As interioridades do programa Model da v5. O guia voltado ao usuário: [Modelos e texturas](../guides/models.md).
+Este documento descreve o funcionamento interno do programa Model na v5. Para orientações de uso, consulte: [Modelos e texturas](../guides/models.md).
 
 ## O que é o programa Model
 
