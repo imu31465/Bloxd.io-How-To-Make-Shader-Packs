@@ -29,7 +29,7 @@ v4 以前の「照明 on/off」軸は廃止されました (v4 は8バリアン�
 
 `BLOXD_LIGHTING` は v5 で**廃止**されました。使用すると検証時に専用メッセージが出ます: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."* — ライティング状態は実行時の `bloxdLit()` で分岐します。
 
-## strict ゲームとの契約
+## strict ゲームでの制限
 
 大多数のゲームは strict モードです (頂点移動・`discard` を禁止)。無防備な vertex フックは `<hook> moves terrain, which strict games prevent.` を報告し、到達可能な `discard` は `discard makes terrain see-through, which strict games prevent.` を報告します。いずれもその strict ゲームで**全フックを無効化**するため、vertex フックは必ず `#ifndef BLOXD_STRICT` で括ります。
 
