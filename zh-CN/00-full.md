@@ -5168,49 +5168,45 @@ fn bloxdModelLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ---
 
-## 引擎内部机制与研究
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+## 引擎内部机制
 
-通过分析引擎实现复原的内部规格。这里的一切都直接复原自当前生产构建 (`bny9u`) 的 JavaScript。与公开 API 文档 ([API 参考](api/)) 分离，以保存精确的内部行为与分析结果。
+本分类介绍引擎内部行为，帮助理解着色器包的执行过程。这些实现细节可能随游戏更新而变化；稳定的使用规则和可用 API 请参阅 [API 参考](internals/api)。
+
 
 ### 导航
 
 | 页面 | 内容 |
 |---|---|
-| [渲染管线](internals/rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 实情、贪心网格合并 |
-| [钩子接入](internals/hook-invocation.md) | 钩子如何拼接进引擎的 WGSL |
-| [引擎标头](internals/engine-header.md) | 完整的 v5 标头 (逐字，8,954B) |
-| [着色器验证](internals/shader-validation.md) | 分析器内部、签名表、HEADER_VERSION |
-| [WGSL 编译](internals/wgsl-compilation.md) | 第二阶段真实编译与验证桩 |
-| [保留标识符](internals/reserved-identifiers.md) | 46 个 `bloxdSp*` 符号 |
-| [光照内部](internals/lighting-internals.md) | blockLight / heldLight 结构 |
-| [雾内部](internals/fog-internals.md) | 仅线性、32 格渐变带 |
-| [纹理采样](internals/texture-sampling.md) | 三变体纹理代码生成 |
-| [纹理注册表](internals/texture-registry.md) | 名称→id 解析、896 个名称、实测漂移 |
-| [模型渲染](internals/model-rendering.md) | v5 Model 程序 |
-| [引擎数据](internals/engine-data.md) | v5 常量/限制/布局台账 |
-| [测试因素](internals/testing-factors.md) | 哪些世界/玩家设置会改变包可见值 |
-| [策略](internals/policy.md) | shaderPackPolicy — 12 个 allow 标题 |
-| [太阳与月亮](internals/sun-and-moon.md) | 什么在喂 bloxdSunDirection |
-| [调试手段](internals/debugging.md) | URL 参数、统计面板 |
-| [研究日志](internals/research-log.md) | 方法论、构建历史、未验证事项 |
-
-> 目标API: 5
-
-内部机制不是稳定的 API 契约 — 它们可能随引擎更新而变化，每页都标注其证据构建 ([研究日志](internals/research-log.md))。
+| [渲染管线](internals/index.md/rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 实情、贪心网格合并 |
+| [钩子接入](internals/index.md/hook-invocation.md) | 钩子如何拼接进引擎的 WGSL |
+| [引擎标头](internals/index.md/engine-header.md) | 添加到着色器包前面的 WGSL 声明 |
+| [着色器验证](internals/index.md/shader-validation.md) | 分析器内部、签名表、HEADER_VERSION |
+| [WGSL 编译](internals/index.md/wgsl-compilation.md) | 第二阶段真实编译与验证桩 |
+| [保留标识符](internals/index.md/reserved-identifiers.md) | 46 个 `bloxdSp*` 符号 |
+| [光照内部](internals/index.md/lighting-internals.md) | blockLight / heldLight 结构 |
+| [雾内部](internals/index.md/fog-internals.md) | 仅线性、32 格渐变带 |
+| [纹理采样](internals/index.md/texture-sampling.md) | 三变体纹理代码生成 |
+| [纹理注册表](internals/index.md/texture-registry.md) | 名称解析以及动画和旋转名称 |
+| [模型渲染](internals/index.md/model-rendering.md) | v5 Model 程序 |
+| [引擎数据](internals/index.md/engine-data.md) | API v5 功能和着色器包限制 |
+| [测试因素](internals/index.md/testing-factors.md) | 哪些世界/玩家设置会改变包可见值 |
+| [策略](internals/index.md/policy.md) | shaderPackPolicy — 12 个 allow 标题 |
+| [太阳与月亮](internals/index.md/sun-and-moon.md) | 什么在喂 bloxdSunDirection |
+| [调试手段](internals/index.md/debugging.md) | URL 参数、统计面板 |
 
 
----
+引擎内部实现并非稳定的 API 合约。编写着色器包时，请优先遵循 [API 参考](internals/api) 中的公开规格。
 
 ## 渲染管线
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+
+> 目标 API：5 · 文档类型：技术参考
 
 - **surface 钩子在 alphaTest 「之前」跑**：`out.alpha` 直接喂给丢弃判定。镂空材质 (草、叶) 可做溶解式抖动特效 (配方 R-C)。液体 (混合) 中 `out.alpha` 为真实透明度 (配方 R-D)。通常不透明地形无效果——勿误解
 - **`l.ambient` 内容**为 `material.ambient × sceneAmbient`，按材质各异。场景侧直连图形设置「Ambient Lighting Intensity」(默认 0.5)，切勿写死默认值
 - **场景的方向光为 2 灯组合**：主光 (方向来自天空设置中的太阳位置，强度 1.0) 与补光 (方向 `[-0.5, -1, -1]`，强度 0.35) 的 Lambert 之和到达 `l.directional`。补光朝下，因此对朝上的面没有贡献，而会照到朝下的表面 (洞穴顶等)。地形只考虑 `_initScene` 中追加的光；启动后追加的光对地形与方块模型被忽略 (官方有一则此意的警告消息)
 - **`bloxdSeconds()` 的正体是 `performance.now()`**：浏览器启动后的流逝时间，按 1 小时回绕。与游戏内昼夜及世界流逝时间无关。想做与游戏时钟同步的动画，在昼夜循环世界由 `bloxdSunDirection()` 方位角推定时间比较现实
-- **标头函数读取同一个 uniform**：引擎将 64 字节的 `bloxdPackInputs` uniform 放在 `@group(3) @binding(0)` (5 槽——seconds / lit / renderOffset / sunDirection / eyePosition，little-endian)，`bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽 ([包格式: 逐帧 uniform](api/pack-format.md#逐帧-uniform-bloxdpackinputs))。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同的 group/binding 也不可能。`@group(3) @binding(1)` 是液体场景深度纹理，`@binding(2)` 是 `bloxdSpTextureLayers` 存储缓冲
-- **顶点数据由 mesher (Web Worker) 构建**：方块地形以每顶点 28 字节交织 (开启 atlas 时 32 字节)——position = float32×3 / normal = 8 位有符号整数×4 / colour = 8 位归一化整数×4 (`s.colour` 的本体——tint × AO 在 mesher 阶段烘焙为 8 位，包侧分离或还原原理上不可能) / UV = float32×2 / atlasIndex = float32。只有光照等级走另外的 4 字节顶点缓冲 (实测值见[引擎数据台账](internals/engine-data.md))。顶点按区块实例化绘制
+- **标头函数读取同一个 uniform**：引擎将 64 字节的 `bloxdPackInputs` uniform 放在 `@group(3) @binding(0)` (5 槽——seconds / lit / renderOffset / sunDirection / eyePosition，little-endian)，`bloxdSeconds()` / `bloxdLit()` / `bloxdRenderOffset()` / `bloxdSunDirection()` / `bloxdEyePosition()` 对应读取这些槽 ([包格式: 逐帧 uniform](internals/api/pack-format.md#逐帧-uniform-bloxdpackinputs))。包无法写入该 uniform，且包与引擎的 WGSL 合并为同一模块，自行声明相同的 group/binding 也不可能。`@group(3) @binding(1)` 是液体场景深度纹理，`@binding(2)` 是 `bloxdSpTextureLayers` 存储缓冲
+- **顶点数据由 mesher (Web Worker) 构建**：方块地形以每顶点 28 字节交织 (开启 atlas 时 32 字节)——position = float32×3 / normal = 8 位有符号整数×4 / colour = 8 位归一化整数×4 (`s.colour` 的本体——tint × AO 在 mesher 阶段烘焙为 8 位，包侧分离或还原原理上不可能) / UV = float32×2 / atlasIndex = float32。只有光照等级走另外的 4 字节顶点缓冲 (实测值见[引擎数据台账](internals/rendering-pipeline.md/engine-data.md))。顶点按区块实例化绘制
 - 加载时区块边界的细棋盘格为引擎屏幕空间 Bayer 4×4 抖动的区块淡入，非包 bug (可用图形设置 `chunkFadeIn` 关闭)
 - **`mod` 为保留字**：以 `pack.wgsl:3 'mod' is a reserved word in WGSL.` 拒绝。求余用 `%` 运算符书写
 
@@ -5272,11 +5268,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-
----
-
 ## 钩子接入内部机制
-> 目标API: 5 · 状态: Analyzed (从生产包复原 — Lite 渲染器；其整合源文件 `lite/terrainShaderPack.ts` 仍保留在错误字符串中)
+
+> 目标 API：5 · 文档类型：技术参考
 
 引擎在运行时如何调用钩子。这不改变你写的代码，但能消除「钩子收到什么」的猜测。
 
@@ -5293,9 +5287,9 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 ### 拼接所强制的事实
 
-- **strict 地形忽略 surface 钩子的 alpha 修改。** `alpha = bloxdSpSurface.alpha` 写回只为液体程序或非 strict 变体嫁接 — 即宏表背后的实现 ([预处理器](api/preprocessor.md))
+- **strict 地形忽略 surface 钩子的 alpha 修改。** `alpha = bloxdSpSurface.alpha` 写回只为液体程序或非 strict 变体嫁接 — 即宏表背后的实现 ([预处理器](internals/api/preprocessor.md))
 - **声明了 vertex 钩子的 strict 变体从不运行它。** 引擎在构建期报告: `Shader pack code ${variant} is strict and has a vertex hook, which strict mode never runs`。因此模板要 `#ifndef BLOXD_STRICT`
-- **`bloxdSp*` 标识符**是引擎临时量 — 你的代码看不见它们，但它们出现在诊断与逆向输出中 ([保留标识符](internals/reserved-identifiers.md) — v5 有 46 个)
+- **`bloxdSp*` 标识符**是引擎临时量 — 你的代码看不见它们，但它们出现在诊断与逆向输出中 ([保留标识符](internals/hook-invocation.md/reserved-identifiers.md) — v5 有 46 个)
 - **默认 surface 捷径。** 若某变体的 surface 钩子就是 `bloxdDefaultSurface`，引擎会整体省略 `baseColor` / `alpha` 写回嫁接 — 默认已经产出这些值，赋值是死代码。**未修改的钩子链零开销**
 
 ### v5 改了什么
@@ -5304,8 +5298,8 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 
 - `vBlockFlags` (位) → **`BloxdFlags` 结构体** (经 `bloxdSpFlags` 传递)
 - `litColour` 捕获从引擎内部变为**公开 API** (`bloxdLitColour()` — v4 的 `bloxdSpLitColour` 得到提升)
-- `BloxdLightIn` 获得 `diffuse` / `emissive`，`bloxdShading()` 可重建材质响应 ([光照](api/lighting.md))
-- `localPosition` (`bloxdSpItemLocalPosition`)、附魔输入 (`bloxdSpEnchant`) 与 `overlayColour` 的传递 ([模型渲染](internals/model-rendering.md))
+- `BloxdLightIn` 获得 `diffuse` / `emissive`，`bloxdShading()` 可重建材质响应 ([光照](internals/api/lighting.md))
+- `localPosition` (`bloxdSpItemLocalPosition`)、附魔输入 (`bloxdSpEnchant`) 与 `overlayColour` 的传递 ([模型渲染](internals/hook-invocation.md/model-rendering.md))
 - `fogVisibility` → **`fogAlpha`** (语义反转)
 - Model 程序加入变体矩阵 (3 程序 × 2 模式 = 6 变体)
 
@@ -5314,36 +5308,34 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 | 字段 | 引擎侧来源 |
 |---|---|
 | `litColour` | 雾混合恰之前捕获的片段颜色 — 标头术语中的「emission 与雾之前」 |
-| `directional` | 逐方向光 Lambert 的顶点插值求和 ([渲染管线](internals/rendering-pipeline.md) 中的双光源设置) |
+| `directional` | 逐方向光 Lambert 的顶点插值求和 ([渲染管线](internals/hook-invocation.md/rendering-pipeline.md) 中的双光源设置) |
 | `diffuse` / `emissive` | 材质的方向光 RGB 响应 / RGB 发光 |
 | `ambient` | `material.ambient × sceneAmbient` — 逐材质、逐帧 |
-| `blockLight` / `skyLight` | 解码后的光照等级 varying ([光照内部](internals/lighting-internals.md)) |
+| `blockLight` / `skyLight` | 解码后的光照等级 varying ([光照内部](internals/hook-invocation.md/lighting-internals.md)) |
 | `ambientLightColour` / `skyLightColour` | 对应的 uniform |
-| `heldLight` | 由光照等级 varying 与手持光 uniform 构造 (锥形衰减见[光照内部](internals/lighting-internals.md)) |
+| `heldLight` | 由光照等级 varying 与手持光 uniform 构造 (锥形衰减见[光照内部](internals/hook-invocation.md/lighting-internals.md)) |
 | `fogColour` | 只在完全无雾的场景 (模式 0) 为黑 |
-| `fogAlpha` | 钳制后的雾因子 ([雾内部](internals/fog-internals.md)) |
+| `fogAlpha` | 钳制后的雾因子 ([雾内部](internals/hook-invocation.md/fog-internals.md)) |
 | `position` / `normal` / `localPosition` / `flags` / `textureId` / `textureRotation` / `uv` / `mipLevel` | varying 与平面插值值 (同 `BloxdSurfaceIn` — vertex 钩子之后的值) |
 
 ### 相关
 
-- [着色器钩子](api/hooks.md) · [渲染管线](internals/rendering-pipeline.md) · [保留标识符](internals/reserved-identifiers.md) · [版本历史: v3](history/v3.md)
-
-
----
+- [着色器钩子](internals/api/hooks.md) · [渲染管线](internals/hook-invocation.md/rendering-pipeline.md) · [保留标识符](internals/hook-invocation.md/reserved-identifiers.md) · [版本历史: v3](internals/history/v3.md)
 
 ## 引擎标头 (v5, 逐字)
-> 目标API: 5 · 状态: Analyzed (从现行生产包复原)
 
-引擎为每个着色器包前置的**准确文本**，从当前线上构建的验证器渲染并应用插值（`apiVersion` 与通过 `bloxdPackInputs` 的 6 个 uniform 读取）。216 行。没有任何改写。此前的线上构建（`bny9u`、`v98qt8`）上再次验证——唯一的变化是阴影相关内容。
+> 目标 API：5 · 文档类型：技术参考
+
+这是引擎添加到每个着色器包前面的 WGSL 标头参考文本。各字段和函数的用途请参阅 [API 参考](internals/api)。
 
 阅读指引:
-- 逐字段说明 → [结构体](api/structures.md)
-- 逐函数说明 → [函数](api/functions.md) / [光照](api/lighting.md)
-- 标志 (BloxdFlags) → [标志](api/flags.md)
-- `bloxdTextureId*` 块**不**在本标头中 — 它按包从被引用名称生成 ([纹理 API](api/texture-api.md))
-- `#ifdef BLOXD_ALPHA` 标出条件字段 ([预处理器](api/preprocessor.md))
-- 与 v4 标头 (6,021B) 的差异 → [版本历史: v5](history/v5.md)
-- 标头如何被验证 (HEADER_VERSION) → [着色器验证](internals/shader-validation.md)
+- 逐字段说明 → [结构体](internals/api/structures.md)
+- 逐函数说明 → [函数](internals/api/functions.md) / [光照](internals/api/lighting.md)
+- 标志 (BloxdFlags) → [标志](internals/api/flags.md)
+- `bloxdTextureId*` 块**不**在本标头中 — 它按包从被引用名称生成 ([纹理 API](internals/api/texture-api.md))
+- `#ifdef BLOXD_ALPHA` 标出条件字段 ([预处理器](internals/api/preprocessor.md))
+- 与 v4 标头 (6,021B) 的差异 → [版本历史: v5](internals/history/v5.md)
+- 标头如何被验证 (HEADER_VERSION) → [着色器验证](internals/engine-header.md/shader-validation.md)
 
 ```wgsl
 // The Bloxd shader pack API, apiVersion 5. Read-only, prepended to all packs.
@@ -5565,23 +5557,21 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight {
 
 ### 相关
 
-- [API 参考](api/) — 本标头的注释版
-- [着色器验证](internals/shader-validation.md) — HEADER_VERSION 与已保存包重验
-- [引擎数据](internals/engine-data.md) — 实测台账
-
-
----
+- [API 参考](internals/api) — 本标头的注释版
+- [着色器验证](internals/engine-header.md/shader-validation.md) — HEADER_VERSION 与已保存包重验
+- [引擎数据](internals/engine-header.md/engine-data.md) — 实测台账
 
 ## 着色器验证
-> 目标API: 5 · 状态: Analyzed (从现行验证器复原)
 
-静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](troubleshooting/validation.md)。
+> 目标 API：5 · 文档类型：技术参考
+
+静态验证 (分析器，加载检查的第 1 阶段)。面向用户的修复方法: [验证错误](internals/troubleshooting/validation.md)。
 
 ### 各阶段
 
-1. **加载器限制** (zip / pack.json 形态) → [包格式](api/pack-format.md)
+1. **加载器限制** (zip / pack.json 形态) → [包格式](internals/api/pack-format.md)
 2. **静态验证 (分析器)** — 本页；跨全部 6 种变体检查语法、类型、保留名称、钩子契约
-3. **浏览器真实编译** → [WGSL 编译](internals/wgsl-compilation.md)
+3. **浏览器真实编译** → [WGSL 编译](internals/shader-validation.md/wgsl-compilation.md)
 4. **加入游戏时的运行时重验** — 实际编译每一个既存地形材质 (比设置界面检查更严)；失败则该游戏弃用该包
 
 ### 特殊函数签名表
@@ -5611,7 +5601,7 @@ const Jq = new Map([
 
 ### 纹理名称解析与诊断
 
-`bloxdTextureId*` 的解析有专属路径 ([消息](api/texture-api.md#名称解析错误-逐字取自验证器))：
+`bloxdTextureId*` 的解析有专属路径 ([消息](internals/api/texture-api.md#名称解析错误-逐字取自验证器))：
 
 - **折叠**: 以非字母数字切分、驼峰化、加 `bloxdTextureId` 前缀；反向匹配不区分大小写与下划线
 - **拼写建议** (v5 新增): 未匹配的名称按莱文斯坦距离获得建议，阈值 `max(2, floor(len/4)) + 1`
@@ -5625,36 +5615,34 @@ const Jq = new Map([
 
 ### Y 导数改写
 
-分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](api/restrictions.md#自动改写))。
+分析器的 token 改写环节把每次 `dpdy` / `dpdyCoarse` / `dpdyFine` 调用改写为 `(-dpdy(...))` (dpdy 一族被明确枚举为翻转集)。`dpdx` 与 `fwidth` 不受影响 ([限制](internals/api/restrictions.md#自动改写))。
 
 ### 标头与纹理常量生成
 
-- 标头以只读形式前置 ([引擎标头](internals/engine-header.md))
+- 标头以只读形式前置 ([引擎标头](internals/shader-validation.md/engine-header.md))
 - `bloxdTextureId*` 块按包从被引用名称**逐包生成**
 
 ### HEADER_VERSION
 
-`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](api/compatibility.md#已保存包的重验-需要重新检查))。
+`HEADER_VERSION` 为 `9.<fnv1a32(header)>.<fnv1a32(texture registry)>` (开头整数从 v4 的 8 变为 9)。两个 fnv1a32 后缀分别指纹标头材料与排序后的名称-id 注册表。已保存包的重验用该指纹判定「需要重新检查」([兼容性](internals/api/compatibility.md#已保存包的重验-需要重新检查))。
 
 ### 验证桩
 
-通过静态验证的代码会在浏览器真实 WGSL 检查之前被合成桩代码: `var<private> bloxdValidationP: vec4f` 加 `bloxdValidateVertex` / `bloxdValidateFragment` — 类型桩表 (`bool` → `p.x > 0.0`、`vec3f` → `p.xyz`…) 构造输入结构体并调用钩子。细节: [WGSL 编译](internals/wgsl-compilation.md)。
+通过静态验证的代码会在浏览器真实 WGSL 检查之前被合成桩代码: `var<private> bloxdValidationP: vec4f` 加 `bloxdValidateVertex` / `bloxdValidateFragment` — 类型桩表 (`bool` → `p.x > 0.0`、`vec3f` → `p.xyz`…) 构造输入结构体并调用钩子。细节: [WGSL 编译](internals/shader-validation.md/wgsl-compilation.md)。
 
 ### 相关
 
-- [验证错误](troubleshooting/validation.md) · [WGSL 编译](internals/wgsl-compilation.md) · [纹理注册表](internals/texture-registry.md) · [引擎数据](internals/engine-data.md)
-
-
----
+- [验证错误](internals/troubleshooting/validation.md) · [WGSL 编译](internals/shader-validation.md/wgsl-compilation.md) · [纹理注册表](internals/shader-validation.md/texture-registry.md) · [引擎数据](internals/shader-validation.md/engine-data.md)
 
 ## WGSL 编译
-> 目标API: 5 · 状态: Analyzed (从现行 bundle 复原)
+
+> 目标 API：5 · 文档类型：技术参考
 
 第二验证阶段 — 经浏览器 WGSL 编译器的真实编译 — 以及 v5 的验证桩。
 
 ### 为什么分两个阶段
 
-静态验证的类型检查并不完整，因此有些错误只在这里暴露 (例如 WGSL 的运算符优先级要求，如 `mixing '*' and '^' requires parenthesis`)。错误会带着变体名出现在游戏内 ([编译错误](troubleshooting/compilation.md))。
+静态验证的类型检查并不完整，因此有些错误只在这里暴露 (例如 WGSL 的运算符优先级要求，如 `mixing '*' and '^' requires parenthesis`)。错误会带着变体名出现在游戏内 ([编译错误](internals/troubleshooting/compilation.md))。
 
 ### 验证桩的生成
 
@@ -5707,26 +5695,22 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 
 ### 加入游戏时的运行时重验
 
-`checkCompilation` 在每次加入游戏时运行，实际编译每一个既存的地形材质 (比设置界面的检查更严)。失败则该游戏弃用该包。该检查有 60 秒强制超时 ([性能](troubleshooting/performance.md))。
+`checkCompilation` 在每次加入游戏时运行，实际编译每一个既存的地形材质 (比设置界面的检查更严)。失败则该游戏弃用该包。该检查有 60 秒强制超时 ([性能](internals/troubleshooting/performance.md))。
 
 ### 相关
 
-- [编译错误](troubleshooting/compilation.md) · [着色器验证](internals/shader-validation.md) · [入门指南: 验证](getting-started/validation.md)
-
-
----
+- [编译错误](internals/troubleshooting/compilation.md) · [着色器验证](internals/wgsl-compilation.md/shader-validation.md) · [入门指南: 验证](internals/getting-started/validation.md)
 
 ## 保留标识符内部机制
-> 目标API: 5 · 状态: Analyzed (从现行 bundle 的生成器复原)
 
-`bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](api/restrictions.md)。
+> 目标 API：5 · 文档类型：技术参考
+
+`bloxdSp*` 命名空间 — 生成器可能注入、因而包不能重声明的符号。面向包作者的摘要: [限制](internals/api/restrictions.md)。
 ### 88 个符号
 
-从 v4 的 27 个到 v5 发布时的 46 个，再到 `bbb6l5` 上的 **88 个**（+42，无退役；历史上唯一一次退役是 `bloxdSpLitColour`——升格为公开的 `bloxdLitColour()`）:
 
 `bloxdSpAcross` · `bloxdSpAt` · `bloxdSpBehind` · `bloxdSpCasterBlocks` · `bloxdSpCell` · `bloxdSpCellAt` · `bloxdSpCellFull` · `bloxdSpCellIndex` · `bloxdSpColour` · `bloxdSpCrossed` · `bloxdSpDdx` · `bloxdSpDdy` · `bloxdSpDown` · `bloxdSpEnchant` · `bloxdSpEntityLight` · `bloxdSpEntityRow` · `bloxdSpExitBox` · `bloxdSpEye` · `bloxdSpFacing` · `bloxdSpFacingDot` · `bloxdSpFlags` · `bloxdSpFrame` · `bloxdSpIndex` · `bloxdSpInside` · `bloxdSpItemLocalPosition` · `bloxdSpLayer` · `bloxdSpLevel` · `bloxdSpLight` · `bloxdSpLightIn` · `bloxdSpLit` · `bloxdSpLod` · `bloxdSpMarch` · `bloxdSpMaskBit` · `bloxdSpMaskEdge` · `bloxdSpMipLevel` · `bloxdSpNormal` · `bloxdSpNormalCode` · `bloxdSpOrigin` · `bloxdSpOut` · `bloxdSpOwnTexel` · `bloxdSpOwnTexture` · `bloxdSpPixel` · `bloxdSpPlaneTolerance` · `bloxdSpPosition` · `bloxdSpPositionW` · `bloxdSpQuarterTurns` · `bloxdSpRayFresh` · `bloxdSpScale` · `bloxdSpSceneDepth` · `bloxdSpShadowDz` · `bloxdSpShadowEmissive` · `bloxdSpShadowEntities` · `bloxdSpShadowEntityGrids` · `bloxdSpShadowFirstPerson` · `bloxdSpShadowLight` · `bloxdSpShadowMarch` · `bloxdSpShadowMask` · `bloxdSpShadowNormal` · `bloxdSpShadowPixel` · `bloxdSpShadowPosition` · `bloxdSpShadowSpecial` · `bloxdSpShadowVolume` · `bloxdSpShadowVolumeSampler` · `bloxdSpShadowVoxels` · `bloxdSpShadowZ` · `bloxdSpSize` · `bloxdSpSunShadow` · `bloxdSpSurface` · `bloxdSpSurfaceIn` · `bloxdSpT` · `bloxdSpTexelUV` · `bloxdSpTexture` · `bloxdSpTextureId` · `bloxdSpTextureLayers` · `bloxdSpTextureRotation` · `bloxdSpTurned` · `bloxdSpUv` · `bloxdSpVertex` · `bloxdSpVertexIn` · `bloxdSpVolumeAt` · `bloxdSpVolumeOpenLit` · `bloxdSpVolumeOut` · `bloxdSpVolumeTexel` · `bloxdSpVolumeWork` · `bloxdSpWindowHas` · `bloxdSpWindowSlot` · `bloxdSpWord` · `bloxdSpZ`
 
-### 新名称 ↔ \`bbb6l5\` 阴影系统
 
 全部 42 个新符号都来自引擎的太阳/月亮阴影实现（即 \`bloxdShadow()\` / \`bloxdAirShadow()\` 的支撑）:
 
@@ -5743,42 +5727,38 @@ fn bloxdValidateFragment(@builtin(position) p: vec4f) -> @location(0) vec4f {
 - `bloxdSpFlags` — `BloxdFlags` 结构体的传递
 - `bloxdSpEnchant` / `bloxdSpItemLocalPosition` — 新输入 (附魔、模型局部位置)
 - `bloxdSpAcross` / `bloxdSpAt` / `bloxdSpCell` / `bloxdSpCellAt` / `bloxdSpCellIndex` / `bloxdSpSize` / `bloxdSpLevel` / `bloxdSpOwnTexel` — 单元格采样纹理包路径
-- `bloxdSpQuarterTurns` — 旋转链 ([纹理采样](internals/texture-sampling.md))
+- `bloxdSpQuarterTurns` — 旋转链 ([纹理采样](internals/reserved-identifiers.md/texture-sampling.md))
 - `bloxdSpNormal` / `bloxdSpPosition` / `bloxdSpColour` / `bloxdSpOut` / `bloxdSpWord` / `bloxdSpIndex` / `bloxdSpDown` / `bloxdSpInside` — 扩展钩子局部量
 
 ### 包级规则
 
-比该命名空间更宽: **一切匹配 `/^bloxd/i` (不区分大小写) 者**。只有 9 个钩子函数名可以声明 ([验证错误](troubleshooting/validation.md))。
+比该命名空间更宽: **一切匹配 `/^bloxd/i` (不区分大小写) 者**。只有 9 个钩子函数名可以声明 ([验证错误](internals/troubleshooting/validation.md))。
 
-`bloxdTextureId` 前缀的标识符解析为纹理名称，拥有专属的错误族 ([纹理问题](troubleshooting/textures.md))。
+`bloxdTextureId` 前缀的标识符解析为纹理名称，拥有专属的错误族 ([纹理问题](internals/troubleshooting/textures.md))。
 
 ### 相关
 
-- [限制](api/restrictions.md) · [纹理采样](internals/texture-sampling.md) · [版本历史: v5](history/v5.md)
-
-
----
+- [限制](internals/api/restrictions.md) · [纹理采样](internals/reserved-identifiers.md/texture-sampling.md) · [版本历史: v5](internals/history/v5.md)
 
 ## 光照内部机制
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+
+> 目标 API：5 · 文档类型：技术参考
 
 `blockLight` 是**三通道 RGB 彩色光**。各发光方块定义有发射色 `[R, G, B]` (各 0–15)，该色原样成为光色 (普通火把 = 暖白 (14,14,12) / 岩浆 = 橙 (14,8,2) / 信标 = 青 (5,14,14) / 白色火把 = (15,15,15) 等)。到顶点阶段时，它以 4 nibble——r / g / b / sky——打包进一个 float 属性到达。在 light 钩子内分通道处理，即可实现彩色局部照明——暖色火把配方 (R9.1) 正是以该行为为基准校准的。
 
 解码 `aPackedLightLevels` 时，引擎给每通道铺 **RGB 最亮通道 35% 的下限「35% 通道地板」**。如「纯红光源」在顶点先抬为 (1.00, 0.35, 0) 再经插值·提升。火把橙在游戏中显「白粉而非红」正缘于此，暖色火把配方 (R9.1) 饱和度以此默认行为为基准调整为好。
 
-光照合成不是加法。内部上，引擎取方块光 (经 35% 通道地板后) 与按 `mix(环境色, 天空色, skyLight)` 构成的天空光的**最大值**，再与手持光 (经环境光助推后) 取 max。该合成中的通道值是**提升后**的值——引擎从与到达钩子输入相同的提升后光照等级 (`terrainLightLevels`，经提升曲线后) 合成。因此 `blockLight` 与 `skyLight` 不会相互抵消——较暗一侧的贡献被直接丢弃——削弱天空光也几乎压不暗由方块光主导的地方。请围绕此结构设计曝光/衰减配方 ([夜间表现设计](guides/night.md) 的局部光保护正为此补偿)。
+光照合成不是加法。内部上，引擎取方块光 (经 35% 通道地板后) 与按 `mix(环境色, 天空色, skyLight)` 构成的天空光的**最大值**，再与手持光 (经环境光助推后) 取 max。该合成中的通道值是**提升后**的值——引擎从与到达钩子输入相同的提升后光照等级 (`terrainLightLevels`，经提升曲线后) 合成。因此 `blockLight` 与 `skyLight` 不会相互抵消——较暗一侧的贡献被直接丢弃——削弱天空光也几乎压不暗由方块光主导的地方。请围绕此结构设计曝光/衰减配方 ([夜间表现设计](internals/guides/night.md) 的局部光保护正为此补偿)。
 
 手持光 (`heldLight`) 范围由最亮光色通道定 (最大 15 格)，经 `dist^0.75` 预处理，同 35% 通道地板，`l.heldLight` 为环境光助推**前**之值。圆锥衰减从引擎光照模块复原如下: 光束的角度衰减为 `1 − 0.5 × (smoothstep(0.12, 0.65, t) + smoothstep(0.62, 0.95, t))`，其中 `t` 是距圆锥轴线的归一化角度 (0 = 中心，1 = 边缘)；射程为 `(rangeOverride > 0 ? rangeOverride : 最亮通道) × 圆锥衰减`，`rangeOverride` 取自手持光颜色的 alpha；射程内，覆盖值按 `(range − dist) / range` 衰减，而默认路径按通道减去 (预处理后的) 距离；随后是 35% 通道地板、除以 15、提升曲线，最后是环境光助推。自定义物品可设 `spotlightRange` (射程) 与圆锥角——「持握时出光束」模式，其圆锥跟随相机。包无法得知光束方向。
 
 自定义方块可带 `skyLightEmission` (0–15)，**向 skyLight 通道本身注入，与 blockLight BFS 分开**。R9.12 式以 skyLight 阈值判向阳/阴影的包，在人工光源抬高 skyLight 的世界会误判。分发包与 blockLight 组合判定更稳健。
 
-
----
-
 ## 雾的内部规格
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
 
-雾计算恒为 LINEAR 模式 (等价于 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogAlpha` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**。它随玩家加载距离而变，因此距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (见下方「加载边界带」一节)。(渲染器的雾函数实际实现了 **四种** 模式——off / exponential / exponential-squared / linear——正式发布的游戏驱动的是 linear；复原源码与稳健性讨论保存于[版本历史：v3 迁移指南](history/v3.md)。)
+> 目标 API：5 · 文档类型：技术参考
+
+雾计算恒为 LINEAR 模式 (等价于 `fogAlpha = 1 - (fogEnd - dist) / (fogEnd - fogStart)`，clamp 0..1)，`fogStart = 32 × D`，`fogEnd = 32 × (D + 1)` (D = 雾距离设置；仅 D = 0 特例 fogEnd = 5)。**雾渐变带仅 32 格宽**，`l.fogAlpha` 与其说是「距离雾」，不如说是**到已加载世界边缘的归一化距离**。它随玩家加载距离而变，因此距离系演出应自行计算 `distance(l.position, bloxdEyePosition())` (见下方「加载边界带」一节)。(渲染器的雾函数实际实现了 **四种** 模式——off / exponential / exponential-squared / linear——正式发布的游戏驱动的是 linear；复原源码与稳健性讨论保存于[版本历史：v3 迁移指南](internals/history/v3.md)。)
 
 默认雾色 `rgb(183, 191, 195)` (淡青灰)。世界作者经 `fogColourOverride` (hex) 变更。雾模式 0 (NONE) 时 **fogColour 以黑到达**。标准形 `bloxdApplyFog(col, l)` 是安全的，因为 fogAlpha 为 0 时不用雾色。脚本 API 还提供两个选项：`fogChunkDistanceOverride` 与 `fogOnSkybox`——Custom Game 可分别独立调整雾距 (D 值) 与雾对天空盒的应用。默认天空盒不受雾影响 (只有开启 `fogOnSkybox` 的游戏会让天空盒也染上雾色)。
 
@@ -5799,13 +5779,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-
----
-
 ## 纹理采样内部机制
-> 目标API: 5 · 状态: Analyzed (从现行生成器 c56 复原)
 
-`bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](api/texture-api.md)。
+> 目标 API：5 · 文档类型：技术参考
+
+`bloxdTexel` / `bloxdTextureSize` 实际如何编译 — 三变体纹理代码生成。面向用户的一面: [纹理 API](internals/api/texture-api.md)。
 
 ### 三个变体
 
@@ -5846,7 +5824,7 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 动画帧阶梯
 
-动画纹理 (43 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](api/texture-catalog.md#动画族-43-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
+动画纹理 (43 族) 按逐族固定间隔推进 (200 / 250 / 300 ms — [纹理目录](internals/api/texture-catalog.md#动画族-43-个名称)的间隔列)。把动画族的 id 传给 `bloxdTexel` 会采样当前帧。
 
 ### 采样器设置
 
@@ -5858,39 +5836,13 @@ fn bloxdTexel(bloxdSpTextureId: u32, bloxdSpUv: vec2f, bloxdSpMipLevel: f32) -> 
 
 ### 相关
 
-- [纹理 API](api/texture-api.md) · [纹理注册表](internals/texture-registry.md) · [渲染管线](internals/rendering-pipeline.md)
-
-
----
-
-## 纹理注册表的工作方式
-
-> 目标 API：5 · 用途：通过名称引用纹理
-
-着色器包通过具名常量引用纹理，而不是使用数字 ID。常量格式为 `bloxdTextureId<Name>`。可用名称请参阅[纹理目录](internals/api/texture-catalog.md)。
-
-### 名称解析
-
-加载着色器包时，加载器会根据可用的纹理名称解析每个具名常量。即使内部布局发生变化，只要名称仍然可用，着色器包就可以继续通过名称引用该纹理。
-
-**不要在 WGSL 中直接写入数字纹理 ID。** 游戏内容更新时，内部 ID 和图集位置可能发生变化。使用具名常量可以让包代码不依赖这些内部位置。
-
-### 动画与旋转
-
-- **动画：** 使用基名（例如 `lava`），不要使用 `lava0`–`lava7` 之类的帧名称。采样时会选择当前帧。
-- **旋转：** 使用目录中列出的基名，而不是内部旋转槽位。采样过程会应用面的旋转。
-- **帧间过渡：** 引擎内部使用槽位来插值相邻动画帧。着色器包仍应使用常规具名常量。
-
-### 相关页面
-
-- [纹理目录](internals/api/texture-catalog.md) — 可用名称和常量
-- [纹理 API](internals/api/texture-api.md) — 纹理查找与采样
-- [纹理采样内部机制](internals/texture-registry.md/texture-sampling.md) — 采样过程说明
+- [纹理 API](internals/api/texture-api.md) · [纹理注册表](internals/texture-sampling.md/texture-registry.md) · [渲染管线](internals/texture-sampling.md/rendering-pipeline.md)
 
 ## 模型渲染内部机制
-> 目标API: 5 · 状态: Analyzed (从现行 bundle 复原)
 
-v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](guides/models.md)。
+> 目标 API：5 · 文档类型：技术参考
+
+v5 Model 程序的内部机制。面向用户的指南: [模型与纹理](internals/guides/models.md)。
 
 ### Model 程序是什么
 
@@ -5908,7 +5860,7 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ### 附魔计算
 
-引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](api/lighting.md#完整管线))。
+引擎为闪光扫掠做动画，并把它作为 `enchantColour.a` 交给 surface/light 钩子 ([附魔效果](internals/recipes/enchant-effects.md))。混合发生在 `bloxdLitColour()` 内部 — 紧接着色之后、世界光照之前 ([光照](internals/api/lighting.md#完整管线))。
 
 ### 覆盖色 (受伤红闪等)
 
@@ -5916,66 +5868,19 @@ v5 之前，包只能接入 terrain / liquid；方块模型 (台阶、楼梯、�
 
 ### 纹理路径
 
-大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](api/texture-api.md#模型自带纹理-textureid-0))。
+大多数模型面用 `textureId: 0` (无纹理) — 玩家皮肤与生物纹理不在方块纹理图集的命名空间中。`surface.colour` 到达时已烘焙皮肤 × tint，因此模型面处理从 `colour` 起步 ([模型自带纹理](internals/api/texture-api.md#模型自带纹理-textureid-0))。
 
 ### 变体
 
-Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](api/preprocessor.md#宏--变体矩阵))；strict.model 没有 vertex 钩子。
+Model 程序构成变体矩阵的一根轴: `strict.model` / `allow.model`。`BLOXD_ALPHA` 只在 allow.model 中定义 ([预处理器](internals/api/preprocessor.md#宏--变体矩阵))；strict.model 没有 vertex 钩子。
 
 ### 相关
 
-- [模型与纹理](guides/models.md) · [模型着色器配方](recipes/model-shaders.md) · [标志](api/flags.md) · [渲染管线](internals/rendering-pipeline.md)
-
-
----
-
-## 引擎数据
-
-> 目标 API：5 · 用途：规格摘要
-
-本页汇总着色器包可使用的 API，以及创建着色器包时需要注意的限制。具体定义和示例请参阅对应的参考文档。
-
-### API 概览
-
-| 项目 | 规格 |
-|---|---|
-| API 版本 | `5` |
-| 钩子 | 9 个（Terrain / Liquid / Model × Vertex / Surface / Light） |
-| 变体 | 6 种（allow / strict × terrain / liquid / model） |
-| 宏 | `BLOXD_STRICT`、`BLOXD_ALPHA`、`BLOXD_SCENE_DEPTH`。不提供 `BLOXD_LIGHTING` |
-| 包 uniform | 80 字节。字段偏移见[包格式](internals/api/pack-format.md) |
-| 纹理 | 使用 `bloxdTextureId<Name>` 形式的具名常量。不要固定使用数字 ID |
-| 保留名称 | 以 `bloxd` 开头的标识符由引擎保留 |
-
-### 着色器包限制
-
-| 项目 | 上限 |
-|---|---:|
-| WGSL 文件数 | 256 |
-| WGSL 源码总量 | 256 KB |
-| `pack.json` | 64 KB |
-| ZIP 文件 | 32 MB |
-| ZIP 条目数 | 1,024 |
-
-ZIP 根目录必须且只能放置一个清单文件，所有文件均使用 UTF-8。重复路径和不受支持的 ZIP 格式会被拒绝。详情请参阅[包格式](internals/api/pack-format.md)。
-
-### API v5 的主要功能
-
-- `bloxdShadow()` 和 `bloxdAirShadow(t)` 提供太阳光与月光产生的阴影信息。
-- `bloxdShadowDirection()` 返回投射阴影的光线方向。
-- 将 `pack.json` 中可选的 `keepCircleShadows` 字段设为 `true)，即可在使用阴影 API 时保留传统圆形阴影。
-- 使用 `bloxdLit()` 在运行时判断光照是否启用；不支持 `BLOXD_LIGHTING` 宏。
-
-### 相关页面
-
-- [API 参考](internals/api) — 函数、结构和常量
-- [包格式](internals/api/pack-format.md) — 清单、uniform 和加载器限制
-- [纹理目录](internals/api/texture-catalog.md) — 可用纹理名称
-- [各游戏适用策略](internals/engine-data.md/policy.md) — allow / strict 范围
-- [API v4 迁移指南](internals/history/v4.md) — 从旧版本迁移
+- [模型与纹理](internals/guides/models.md) · [模型着色器配方](internals/recipes/model-shaders.md) · [标志](internals/api/flags.md) · [渲染管线](internals/model-rendering.md/rendering-pipeline.md)
 
 ## 会改变包可见值的因素
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+
+> 目标 API：5 · 文档类型：技术参考
 
 同一包因**世界与玩家设置**渲染各异。分发前至少在以下 3 环境确认外观：
 
@@ -5985,19 +5890,17 @@ ZIP 根目录必须且只能放置一个清单文件，所有文件均使用 UTF
 
 主要变动源：`lightingOverride` (强制光照) / `skyLightColourOverride`、`ambientLightColourOverride` (hex 替换) / `visionMinLightColour` (「可见最暗色」。实现为对 `uSkyLightColour` 与 `uAmbientLightColour` 二者按分量取 max；Night Vision 在用——「洞穴全黑」系包达不到预想之暗，天空色本身也被垫高) / `heldLightColourOverride`、`Range`、`ConeAngle` / `fogChunkDistanceOverride`、`fogColourOverride`、`fogOnSkybox` / `skyBox` (bloxdSunDirection() 有无)。`uSkyLightColour` 默认 = (1,1,1) 白，`uAmbientLightColour` 默认 = (0.25,0.25,0.30)。`l.ambient` 场景成分 = 图形设置「Ambient Lighting Intensity」(默认 0.5)。`(1.0 - l.fogAlpha)` 跟随玩家雾/区块距离设置。另有 `cameraTint` (覆盖全屏的 RGBA 色染) 与 `proximityFadeDistance` / `proximityFadeMinOpacity` (相机对实体的接近淡出) 两种世界侧变动源——`cameraTint` 尤其是叠加在包输出**之上**的最终通道。多数设置也可经脚本 API (`serverOption`) 定义并在对局中更新。
 
-
----
-
 ## 各游戏的着色器适用策略
-> 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
+
+> 目标 API：5 · 文档类型：技术参考
 
 本页把 `allow / strict` 在标题层面的语义确定下来。只有游戏定义中显式写着 `shaderPackPolicy: "allow"` 的标题才以完整模式运行 (vertex 钩子、`discard`、地形 `alpha`)；未指定 (或 allow 以外的值) 的标题视为 strict — 定义 `BLOXD_STRICT`，守卫内的代码自动失效。这个判定不在包一侧可控，因此弄清哪些标题跑什么内容是发布的前提。
 
-- 依据构建: `szby6g.main.94a7596c.js` (2026-10-17 时点的正式部署)。静态解析全部 111 个游戏定义的结果为 **allow 26 条目 (12 个标题) / strict 85 条目**。同样 12 个标题的同样 12 个 allow 字面量已在 v3 生产 bundle (`3ymzdd`，2026-10-20) 上再次确认未变，并在 v4 bundle (`cnty9`，2026-10-27) 上再度确认——下方列表原样沿用至 v3 与 v4。 在 v5 构建上同样未变：已在 `ab90qa` (2026-11-03) 与 `xkg8x` (2026-11-04，重新清点 12 个 allow 字面量) 上再次确认。在 `bny9u` (2026-11-05) 上重新运行了完整枚举: 游戏定义数从 111 增至 **115**，allow 侧从 26 增至 **28 条目** — 仍是同样的 12 个标题，新增 Test Gym 的两个变体 (Imported Mobs、Interest)。下列列表同样原样沿用至 v5。 在 `v98qt8` (2026-11-08) 上重新运行了枚举 (主包中的游戏模块 513，在 harness 中求值): **116 个定义 / 28 个 allow 条目 (12 个标题) / 88 个 strict** — allow 侧不变，新增一个 strict 定义。
 - 在 `shaderPackPolicy` 之上还有分发渠道闸门 (大致 `canUseShaderPacks`)：经外部 portal (如 Coolmath Games 构建) 时，着色器包系统本身可能在 `shaderPackPolicy` 被查看之前就被禁用。下文的 allow/strict 分析基于 bloxd.io 主 Web 构建。
-- allow 共在 12 处声明: 游戏定义内的直接书写 8 处与基底变量 (`tb` / `kz` / `cb` / `Fb`) 的 4 处，变体通过 spread 继承 (`{...tb,...}`)。按变体的个别覆写目前不存在 (也不存在 父 allow·子 strict 的逆模式)。
 
 allow 的 12 个标题 (合计 26 条目):
+
+### allow 适用的游戏
 
 - **Test Gym** — 本体 + Empty / Mobs / Mobs & Worldgen / Imported Mobs / Schematic / Fragment Shader / Item Drops / Bot Armour / Void / Busy / Particles / Interest (合计 13 条目)
 - **Doodle Cube** — 本体 + Solos / Duos (合计 3)
@@ -6015,7 +5918,62 @@ strict 侧特别容易误解的点:
 此一览为上述构建时点的静态解析结果；引擎更新会改变 allow/strict 的分布。新版发布时请再确认。
 
 
----
+发布着色器包前，请在目标游戏中实际测试，并确认所需的钩子在该游戏中正常工作。
+
+## 太阳与月亮
+
+> 目标 API：5 · 文档类型：技术参考
+
+`bloxdSunDirection()` 之源是仅在天空盒种类变化时改写的天空方向缓冲，判定基准不是「天空有无太阳」而是**「天空盒是否为 earth 型」**。
+
+| 天空盒 | `bloxdSunDirection()` |
+|---|---|
+| `default` (程序天空) | 非零 (默认值见下) |
+| `gloomy` / `interstellar` / `space_*` (立方体纹理) | **恒为 (0,0,0)** |
+
+**月亮恒为 `-bloxdSunDirection()`** (引擎将月亮位置算作太阳的严格反方向)。夜晚按太阳高度判定——`bloxdSunDirection().y < 0` (太阳在地平线下) 时月亮在上。但默认世界太阳静止，月亮也静止，只有实现昼夜循环的世界才看得到月动。
+
+默认世界太阳方向约为 `(-0.56, 0.81, -0.18)` (由 inclination = −0.2 / azimuth = 0.55 算出的单位向量，静止)。测试分发包时可在纸面预测高光方向的实用基准值。
+
+昼夜循环并未内置于引擎——inclination 是静态数值，有昼夜移动的世界由游戏侧更新。每次更新 `bloxdSunDirection()` 也改写跟随。
+
+地形方向光仅为场景启动时生成的 2 盏，**方向强度固定，昼夜不变**。总之**决定地形亮度的要素都不随时间，昼夜「观感」只来自天空盒与 bloxdSunDirection()**，夜间想压暗地形的包只能自行由 bloxdSunDirection() 推定时间带 ([夜间表现设计](internals/guides/night.md) 中的 `sunPresent` 手法)。
+
+### R-A. 方向性月光 — moonDir = −bloxdSunDirection()
+
+仅月亮在上时叠加青白色 Lambert 与弱高光。`moonUp` 在默认静止太阳世界为 0，那里什么都不发生——**只在昼夜循环世界触发的安全月光**。
+
+```wgsl
+fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
+    var out = bloxdDefaultLight(s, l);
+    if (bloxdLit()) {
+        // 月亮恒为太阳严格反方向；白天经 moonDir.y < 0 自动熄灭
+        let moonDir = -bloxdSunDirection();
+        let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
+        if (moonUp > 0.0) {
+            let n     = normalize(l.normal);
+            let diff  = max(0.0, dot(n, moonDir));
+            let view  = normalize(bloxdEyePosition() - l.position);
+            let halfV = normalize(moonDir + view);
+            let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
+            out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
+        }
+}
+    return out;
+}
+```
+
+## 调试工具
+
+> 目标 API：5 · 文档类型：技术参考
+
+- URL 参数 `?renderer=lite` — 强制 Lite (WebGPU) 渲染器 (`webgl2` / `babylon` 亦可；`babylon` 是 webgl2 的旧名)。优先级：URL 参数 > localStorage `bloxdRenderer` > 设置画面 > 默认 (webgl2)。无效值附带警告忽略。URL 或 localStorage 中残留的覆盖会使需要 WebGPU (lite) 的场景以「needs the new WebGPU renderer, so remove the renderer override...」出错 ([加载错误](internals/troubleshooting/loading.md))
+- URL 参数 `?vconsole` — 屏幕内控制台 (VConsole)。手机实机验证趁手
+- URL 参数 `?drawcalls=1` — 追加绘制统计调试面板。可从调试控制台拾取游戏对象，或用 `drawCalls()` / `why()` / `configureDrawCallWatching()` 查看大型机制 (包内外) 的重绘与每一次绘制逼近约 65,000 顶点上限的情况——很适合定位性能瓶颈
+- 控制台输出 `noa-engine v0.33.0` 与 `Renderer: lite from <来源>` — 先确认以防渲染路径误诊
+- WebGPU 渲染器在包适用中锁定「强制 ON」。「Disable Block Texture Atlas」设置也锁定 (Atlas 保持 ON)，无 WebGPU 环境包根本无法适用。在分发页写「需要 WebGPU 浏览器」的根据在此
+- 方块纹理为二维数组纹理 (`texture_2d_array`)，地形采样器为 nearest + repeat。mesher 还会将材质 / AO / 光照一致的面合并为一个矩形 (**greedy meshing**)，因此合并面的 UV 可能超过单个 tile 宽 (边缘内缩 0.0015)。平铺由硬件 repeat 寻址处理，合并面看起来无缝。注意依附 `vUV` 的程序化细节会在合并面边界断裂——请改为依附世界坐标 (`s.position` + `bloxdRenderOffset()`)
+- 每次进游戏运行时重验证 (`checkCompilation`)，以浏览器 WebGPU 实编全部地形材质 (比设置画面静态验证更严)。此处失败的包被逐出该游戏
 
 ## 太阳与月亮
 > 目标API: 5 · 状态: Analyzed (基于生产环境包的 JavaScript 级分析)
