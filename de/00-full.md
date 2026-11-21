@@ -48,7 +48,7 @@ Ein Paket dockt an die **3-stufige Flächen-Pipeline** des Renderers an. Die Ren
 
 - **Möglich**: Farben, Transparenz und Emission ändern; Beleuchtung neu aufbauen ([Beleuchtungs-API](api/lighting.md)); die von der Engine berechneten Sonnen- und Mondschatten nutzen (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`); voxelbasierte Himmelsabschattung (`skyLight`) verwenden; Texturen mit `bloxdTexel` sampeln; Effekte pro Modell mit `flags` erstellen; Vertices in allow-Spielen animieren
 - **Nicht möglich**: eigene Texturen hinzufügen (dafür ist das Texturpack-System zuständig); Post-Processing auf das fertige Bild anwenden (Bloom usw.); auf Shadowmap-Tiefendaten zugreifen oder eine eigene Shadowmap erzeugen; echte Reflexionen (SSR) ergänzen; Himmel, Wolken oder die Sonnenscheibe selbst verändern
-- **Die passende Schattenmethode wählen**: Für Schatten, die Sonne und Mond folgen, verwende `bloxdShadow()`. `skyLight` ist eine ältere Methode, um Bereiche unter Bäumen und Dächern abzudunkeln; sie folgt nicht der Sonne oder dem Mond. Siehe [Schatten](guides/shadows.md).
+- **Leicht zu übersehen, aber stark**: **projektionsartige Schatten über `skyLight` (Voxel-Himmels-Okklusion)** — Flächen unter Bäumen und Dächern klar abdunkeln. Blöcke abzubauen lässt die LightEngine sofort neu rechnen, Schatten folgen also in Echtzeit
 
 ### strict- und allow-Modi
 
@@ -58,6 +58,7 @@ Jedes Spiel hat eine Shader-Pack-Policy (`shaderPackPolicy`), und **die meisten 
 
 - Das aktuelle Spiel akzeptiert nur `apiVersion: 5`-Pakete; v1–v4-Pakete werden beim Laden abgelehnt (gespeicherte Pakete werden still deaktiviert — [Kompatibilität](api/compatibility.md))
 - Du migrierst ein Paket, das für eine ältere Version geschrieben wurde? Siehe [Versionsgeschichte](history/)
+- Engine-Interna können sich mit Updates ändern, daher nennt jede Seite ihren Ziel-Build
 
 ---
 
@@ -456,7 +457,7 @@ Siehe den [Test-Leitfaden](guides/testing.md) für die vollständige Checkliste 
 | [Präprozessor](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Einschränkungen](api/restrictions.md) | Sprachgrenzen, reservierte Bezeichner |
 | [Kompatibilität](api/compatibility.md) | Pakete alter Versionen, Re-Validierung gespeicherter Pakete |
-| [Texturkatalog](api/texture-catalog.md) | alle 1,017 benutzbaren Namen (durchsuchbar) |
+| [Texturkatalog](api/texture-catalog.md) | alle 896 benutzbaren Namen (durchsuchbar) |
 
 
 Migration von v4? Siehe [Versionsgeschichte: v5](history/v5.md).
@@ -3993,6 +3994,7 @@ Das aktuelle Spiel akzeptiert nur `apiVersion: 5`; ältere Pakete werden still d
 
 #### F. Ändert sich die API nochmal?
 
+Engine-Interna können sich mit Updates ändern — jede Seite nennt ihren Ziel-Build. Gespeicherte Pakete revalidieren automatisch, wenn sich Header oder Registry ändern ([Kompatibilität](api/compatibility.md#re-validierung-gespeicherter-pakete-muss-erneut-geprüft-werden)).
 
 #### F. Was ist mit „Cinematic-Shader“-Distributionen?
 
@@ -4987,7 +4989,7 @@ Das `BloxdPackInputs`-Feld-Layout aus dem Uniform-Layout-Modul (29838); der 3-Va
 ### Zeitstrahl
 
 | Version | Live seit | Leitfaden | Highlights |
-| --- | --- | --- |
+|---|---|---|---|
 | v1 | (anfänglich) | [v1](history/v1.md) | erste Shader-Pack-API. 6 Hooks (Terrain/Liquid × Vertex/Surface); Vokabular `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
 | v2 | — | [v2](history/v2.md) | vollständige Bezeichner-Umbenennung, `blockId`, `BLOXD_SCENE_DEPTH` und `bloxdOpaqueBehind()` |
 

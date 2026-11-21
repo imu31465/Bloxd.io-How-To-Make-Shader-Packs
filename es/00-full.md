@@ -48,7 +48,7 @@ Un paquete se engancha al **pipeline de 3 etapas por cara** del renderizador. Lo
 
 - **Se puede**: cambiar colores, transparencia y emisión; reconstruir la iluminación ([API de iluminación](api/lighting.md)); usar las sombras solares y lunares calculadas por el motor (`bloxdShadow()`, `bloxdAirShadow(t)`, `bloxdShadowDirection()`); usar la oclusión del cielo por vóxeles (`skyLight`); muestrear texturas con `bloxdTexel`; crear efectos por modelo con `flags`; animar vértices en juegos allow
 - **No se puede**: añadir texturas propias (para eso está el sistema de paquetes de texturas); aplicar postprocesado al fotograma final (bloom, etc.); acceder a la profundidad del mapa de sombras o generar un mapa de sombras propio; añadir reflejos reales (SSR); modificar el cielo, las nubes o el disco solar
-- **Cómo elegir el método de sombras**: usa `bloxdShadow()` para las sombras del motor que siguen al sol y la luna. `skyLight` es un método anterior para oscurecer zonas bajo árboles y tejados; no sigue el movimiento del sol ni de la luna. Consulta [Sombras](guides/shadows.md).
+- **Fácil de pasar por alto pero potente**: **sombras de estilo proyectado usando `skyLight` (oclusión de cielo por vóxeles)** — oscurece con claridad las zonas bajo árboles y techos. Romper bloques hace que LightEngine recalcule de inmediato, así que las sombras siguen los cambios en tiempo real
 
 ### Modos strict y allow
 
@@ -58,6 +58,7 @@ Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayo
 
 - El juego actual solo acepta paquetes `apiVersion: 5`; los paquetes v1–v4 se rechazan al cargar (los guardados quedan inactivos en silencio — [Compatibilidad](api/compatibility.md))
 - ¿Migras un paquete escrito para una versión antigua? Ver [Historial de versiones](history/)
+- Las interioridades del motor pueden cambiar con las actualizaciones, así que cada página nombra su build objetivo
 
 ---
 
@@ -456,7 +457,7 @@ Ver la [guía de pruebas](guides/testing.md) para la lista completa y la lista �
 | [Preprocesador](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restricciones](api/restrictions.md) | límites del lenguaje, identificadores reservados |
 | [Compatibilidad](api/compatibility.md) | paquetes de versiones antiguas, revalidación de paquetes guardados |
-| [Catálogo de texturas](api/texture-catalog.md) | los 1,017 nombres utilizables (con búsqueda) |
+| [Catálogo de texturas](api/texture-catalog.md) | los 896 nombres utilizables (con búsqueda) |
 
 
 ¿Migras desde v4? Ver [Historial de versiones: v5](history/v5.md).
@@ -3991,6 +3992,7 @@ El juego actual solo acepta `apiVersion: 5`; los paquetes antiguos se desactivan
 
 #### P. ¿Cambiará la API de nuevo?
 
+Las interioridades del motor pueden cambiar con las actualizaciones — cada página nombra su build objetivo. Los paquetes guardados se revalidan automáticamente cuando cambian la cabecera o el registro ([Compatibilidad](api/compatibility.md#revalidación-de-paquetes-guardados-necesita-revisión)).
 
 #### P. ¿Y las distribuciones de «shader cinematográfico»?
 
@@ -4983,6 +4985,7 @@ Cambios, pasos de migración y API eliminadas de v1 a v5. Para migrar paquetes a
 
 ### Cronología
 
+| Versión | En producción desde | Guía | Lo esencial |
 |---|---|---|---|
 | v1 | (inicial) | [v1](history/v1.md) | primera API de shader packs. 6 hooks (terrain/liquid × vertex/surface); vocabulario `bloxdTime` / `bloxdOriginOffset` / `bloxdFaceBlock` / `engineColour` / `fogFactor` |
 | v2 | — | [v2](history/v2.md) | renombrado total de identificadores, `blockId`, `BLOXD_SCENE_DEPTH` y `bloxdOpaqueBehind()` |
@@ -5502,6 +5505,7 @@ Dos cosas cambian para los autores respecto a las reglas de v2 ([la guía de mig
 
 ### 49. Interioridades del motor: cómo el renderizador Lite invoca tus hooks
 
+Todo lo de §40–§48 es lo que te dicen el cargador y la cabecera. Esta sección y las siguientes documentan lo que el motor hace realmente en tiempo de ejecución, restaurado del bundle de producción (el renderizador Lite — un chunk de 175 KB; el nombre real del archivo fuente de integración `lite/terrainShaderPack.ts` sobrevive dentro de sus cadenas de error). Nada de esto cambia lo que escribes, pero elimina las conjeturas sobre lo que reciben tus hooks — y resuelve varias preguntas que otras guías de la comunidad todavía listan como abiertas.
 
 El renderizador no «llama» a tus hooks desde JavaScript. Cuando un paquete pasa la validación, el motor **empalma las llamadas a tus hooks en su propio WGSL de terreno** reemplazando líneas ancla fijas en su texto de shader. Un ancla debe coincidir exactamente una vez — cero o varias coincidencias abortan con `at the shader pack ${hook} hook: ${no|more than one} anchor (lite/terrainShaderPack.ts)`.
 
@@ -5745,6 +5749,7 @@ El diseño de recursos completo del programa de terreno, directamente del render
 - **`vTerrainLambert`** (la fuente de `directional`, §49) se genera como una suma sobre las luces direccionales activas: `max(0.0, dot(vNormalW, uDirLights[i].xyz)) * uDirLights[i].w`, protegida por `BLOXD_TERRAIN_DIRECTIONAL`.
 - **Los búferes de índices pasan a 32 bits con la primera malla grande.** El renderizador Lite elige índices `Uint16Array` solo mientras todos los valores de índice se mantienen ≤ 65.534; en cuanto cualquier índice llega a 65.535, el búfer pasa a ser un `Uint32Array` (se rastrea por búfer con un flag `is32Bits`). En la práctica: una malla de chunk con como máximo 65.535 vértices cabe en índices de 16 bits; una con exactamente 65.536 vértices emite necesariamente un índice 65.535 y cambia todo el búfer a 32 bits.
 - **Detalles de carga del manifiesto**: se filtran las entradas zip bajo `__MACOSX/`, los archivos con prefijo `._` y `.DS_Store` (ruido de archivo de macOS); `pack.json` se localiza por comparación de ruta en minúsculas — cero coincidencias → `loadNoManifest`, dos o más → `loadDuplicateManifest`; la lectura del manifiesto está limitada a 65.536 bytes.
+- **Cómo se verificó todo esto**: los módulos del bundle de producción se restauraron (165 chunks; el registro webpack de este bundle cuenta 4.951 módulos — la cifra varía en unas pocas unidades según se incluyan o no las dependencias hijas asíncronas, así que trátala como específica de este bundle) y se ejecutaron en un arnés compatible con webpack bajo Node.js. El `HEADER_VERSION` medido (§53), la cabecera renderizada de 5.637 bytes, el orden canónico de la tabla de variantes y el mapa de funciones especiales provienen de *ejecutar el código distribuido*, no de leer cadenas. El mismo arnés es el núcleo natural para un `pack_check` v6 comunitario — ejecutar el validador propio del motor contra un paquete reproduce sus veredictos exactamente.
 #### La cabecera del motor v3, verbatim
 
 
@@ -5887,6 +5892,8 @@ Investigado por ltf_ahel (investigado con glm)
 
 ## Guía de migración a API v4
 
+
+Una cosa cambió con este lanzamiento que *no* está en el bundle: **el motor ahora cita archivos de referencia por su nombre.** Sus propios mensajes de error señalan `bloxd-api.wgsl` (la cabecera del motor anotada) y `BLOCK_TEXTURES.md` (la lista completa de nombres de texturas) — `...BLOCK_TEXTURES.md lists them.` Esta guía incorpora el contenido de ambos en lugar de remitirte a otro sitio: la cabecera completa, restaurada verbatim del build activo, está incrustada en [Interior del motor: Cabecera del motor (literal)](internals/engine-header.md), y el catálogo completo de nombres de texturas utilizables (905 en el build v4) es el [Catálogo de texturas](api/texture-catalog.md). Cada hecho orientado a paquetes de esta guía fue restaurado del bundle de producción.
 
 El conjunto de cambios de v4 en una pantalla:
 
