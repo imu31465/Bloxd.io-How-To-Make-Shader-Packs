@@ -4766,50 +4766,35 @@ O programa Model forma um eixo da matriz de variantes: `strict.model` / `allow.m
 ---
 
 ## Ledger de dados do motor
+> API alvo: 5 · Estado: Analyzed
 
-Este ledger reúne os valores confirmados da API visível aos shader packs no build atual. Detalhes internos do bundle, como IDs de módulos e chunks, não fazem parte da especificação e não são listados aqui.
+Esta página resume a API disponível para os shader packs. Consulte a [Referência da API](api/) para obter detalhes de uso.
 
-### Especificação atual
+### Superfície da API
 
-| Item | Valor |
+| Item | Especificação |
 |---|---|
-| `apiVersion` | `5` (comparação estrita com número) |
-| Cabeçalho do motor | 216 linhas; texto completo em [Cabeçalho do motor](internals/engine-header.md) |
+| Versão da API | `5` |
+| Cabeçalho do motor | 216 linhas; consulte o [cabeçalho do motor](internals/engine-header.md) |
 | Hooks | 9 (Terrain / Liquid / Model × Vertex / Surface / Light) |
 | Variantes | 6 (strict × terrain / liquid / model) |
-| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH`; `BLOXD_LIGHTING` foi removida no v5 |
-| Uniform do pack | 80 bytes: `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
-| Binding do pack | `@group(3) @binding(0)`; `minBindingSize` 80 |
-| Flags | estrutura `BloxdFlags` com 14 campos booleanos |
-| Atlas de texturas | 1.650 camadas; 1.017 nomes; 776 aliases |
-| Famílias de textura | 64 de rotação e 71 de animação |
-| Identificadores reservados | nomes que correspondem a `/^bloxd/i` e 88 símbolos internos `bloxdSp*` |
-| Definições de jogos | 119 |
-| Política de shader packs | 12 títulos permitidos, 28 entradas; veja [Política por jogo](internals/policy.md) |
-| Template padrão do pack | 1.633 bytes |
-| Limites do loader | 256 arquivos WGSL / 256 KB de código / 64 KB para `pack.json` / ZIP de 32 MB / 1.024 entradas |
+| Macros | `BLOXD_STRICT`, `BLOXD_ALPHA`, `BLOXD_SCENE_DEPTH` |
+| Uniform do pack | 80 bytes; consulte o [formato do pack](api/pack-format.md) |
+| Campos do uniform | `seconds` @0, `lit` @4, `renderOffset` @16, `sunDirection` @32, `eyePosition` @48, `shadowDirection` @64 |
+| Nomes de texturas | As constantes utilizáveis estão no [catálogo de texturas](api/texture-catalog.md) |
 
+### API de sombras
 
-- `bloxdShadow()`, `bloxdAirShadow(t)` e `bloxdShadowDirection()` expõem o sistema de sombras do sol e da lua calculado pelo motor.
-- O uniform recebe `shadowDirection: vec3f` no deslocamento 64 e aumenta de 64 para 80 bytes.
-- `pack.json` aceita o booleano opcional `keepCircleShadows` para manter as antigas sombras circulares.
-- O atlas cresce de 1.227 para 1.650 camadas e passa de 906 para 1.017 nomes disponíveis.
-
-A explicação e as evidências dessas medições estão no [Registro de pesquisa](internals/research-log.md) e nas [Interioridades do registro de texturas](internals/texture-registry.md).
-
-### Versões anteriores
-
-- [Histórico de versões](history/) — mudanças e migrações das APIs anteriores
-- [Registro de pesquisa](internals/research-log.md) — método e referências das medições
+- `bloxdShadow()` retorna o fator de sombra do sol/lua calculado pelo motor.
+- `bloxdAirShadow(t)` avalia a sombra em um ponto entre a câmera e o fragmento.
+- `bloxdShadowDirection()` retorna a direção da luz que projeta a sombra.
+- `keepCircleShadows` é um campo booleano opcional de `pack.json` que mantém as sombras circulares antigas.
 
 ### Relacionado
 
-- [Cabeçalho do motor](internals/engine-header.md) — texto completo do cabeçalho
-- [Política por jogo](internals/policy.md) — títulos com política allow / strict
-- [Registro de texturas](internals/texture-registry.md) — nomes e atribuição de IDs
-
----
-
+- [Referência da API](api/) — APIs disponíveis para os packs
+- [Formato do pack](api/pack-format.md) — manifesto, uniform e limites do carregador
+- [Política por jogo](internals/policy.md) — restrições de cada jogo
 ## O que muda os valores visíveis do pacote — lista de provas
 O mesmo pacote renderiza distinto segundo **mundo e ajustes de jogador**. Revise ao menos estes 3 ambientes antes de distribuir:
 
