@@ -1061,7 +1061,7 @@ La recette d'éclairage propre du moteur, documentée comme WGSL appelable — c
 
 ### Fonctions d’ombres
 
-La API v5 a ajouté à l’API des packs le vrai système d’ombres soleil/lune du moteur — des ombres projetées qui suivent le soleil, portées par les blocs, joueurs, mobs et objets. Ces deux fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
+Ces trois fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
 
 #### bloxdShadow
 
