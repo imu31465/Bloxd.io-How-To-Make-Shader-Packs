@@ -4,7 +4,9 @@
 
 `apiVersion` के आसपास की त्रुटियाँ। मौजूदा गेम **केवल `5`** स्वीकार करता है।
 
-## "pack.json needs "apiVersion": {{version}}."
+## apiVersion मौजूद नहीं है
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **लक्षण**: लोड के तुरंत बाद यही संदेश (`loadNoApiVersion`)
 - **कारण**: `apiVersion` कुंजी पूरी तरह गायब है
