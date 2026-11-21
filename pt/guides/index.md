@@ -1,6 +1,6 @@
 # Guias
 
-Material de "mecanismo e mentalidade". O que é possível em primeiro lugar está em [O que pacotes de shaders podem e não podem fazer](constraints.md); exemplos de código orientados a objetivo vivem em [Receitas](../recipes/).
+Esta seção explica como os shader packs funcionam e os conceitos por trás deles. Para conhecer seus limites, consulte [O que pacotes de shaders podem e não podem fazer](constraints.md). Os exemplos de código organizados por objetivo estão em [Receitas](../recipes/).
 
 ## Mapa
 
