@@ -1,6 +1,6 @@
 # Receitas
 
-Exemplos de código orientados a objetivo. O lado do "como funciona" vive em [Guias](../guides/). Tudo aqui está portado ao vocabulário do v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) e protegido para passar nas 6 variantes (strict × terreno / líquido / modelo).
+Exemplos de código organizados por objetivo. Para entender os mecanismos, consulte os [Guias](../guides/). Os exemplos usam a terminologia da API v5 (`flags`, `bloxdLit()`, `fogAlpha`, `bloxdSeconds()`) e incluem as condições necessárias para as seis variantes (strict × terrain / liquid / model).
 
 ## Mapa
 
