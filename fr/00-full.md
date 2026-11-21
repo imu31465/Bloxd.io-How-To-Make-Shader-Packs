@@ -23,14 +23,12 @@ Ce guide vous accompagne de la découverte des bases jusqu’aux tests et à la 
 8. [Validation](getting-started/validation.md) — le contrôle de chargement en 3 étapes et les tests sur appareil
 9. [Distribution](getting-started/distribution.md) — compression en zip et hygiène de publication
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production et preprod le 2026-11-20) · État : Verified/Analyzed
 
 Quand vous avez besoin de la spécification complète, poursuivez vers la [Référence API](api/) ; pour des effets prêts à l'emploi, voyez les [Recettes](recipes/).
-
 ---
 
 ## Vue d'ensemble et prérequis
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Verified
+> API : 5 · État : Verified
 
 ### Ce qu'est un pack de shaders
 
@@ -48,9 +46,9 @@ Un pack se branche sur le **pipeline en 3 étapes par face** du renderer. Les ci
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | L'eau |
 | **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modèles de blocs (dalles, escaliers, plantes), objets, joueurs, mobs, PNJ, armures, cosmétiques |
 
-- **Possible** : changer les couleurs, la transparence et l'émission ; reconstruire l'éclairage (l'[API d'éclairage](api/lighting.md)) ; les ombres de style projection (via `skyLight`) ; échantillonner des textures (`bloxdTexel` — lire l'atlas de textures de blocs existant) ; les effets par modèle (`flags` vous dit « c'est un objet tenu », « c'est un joueur ») ; l'animation de sommets (jeux allow uniquement)
-- **Impossible** : ajouter vos propres textures (c'est le travail du système de packs de textures) ; le post-traitement (bloom etc.) ; les ombres par shadow map qui tournent avec le soleil ; les vrais reflets (SSR) ; agir sur le ciel, les nuages ou le disque solaire lui-même
-- **Facile à manquer mais puissant** : **les ombres de style projection via `skyLight` (occlusion voxel du ciel)** — assombrissent nettement les zones sous les arbres et les toits. Casser des blocs fait recalculer LightEngine immédiatement, de sorte que les ombres suivent en temps réel
+- **Possible** : modifier les couleurs, la transparence et l’émission ; ajuster l’éclairage (voir l’[API d’éclairage](api/lighting.md)) ; échantillonner les textures avec `bloxdTexel` ; créer des effets par modèle avec `flags` ; animer les sommets (jeux allow uniquement)
+- **Impossible** : ajouter des textures personnalisées ; créer des effets de post-traitement comme le bloom ; générer une carte d’ombre personnalisée ou accéder à ses données de profondeur ; créer de véritables reflets (SSR) ; ou appliquer des shaders au ciel, aux nuages et au disque solaire lui-même
+- **Ombres** : `bloxdShadow()` fournit le facteur d’ombre solaire/lunaire calculé par le moteur, et `bloxdShadowDirection()` indique la direction de déplacement de la lumière qui projette l’ombre. `bloxdAirShadow(t)` évalue un point entre la caméra et le fragment. L’ancienne méthode d’occlusion voxel du ciel avec `skyLight` reste également disponible ([Guide des ombres](guides/shadows.md))
 
 ### Modes strict et allow
 
@@ -60,8 +58,7 @@ Chaque jeu possède une politique de packs de shaders (`shaderPackPolicy`), et *
 
 - Le jeu actuel n'accepte que les packs `apiVersion: 5` ; les packs v1–v4 sont rejetés au chargement (les packs enregistrés deviennent silencieusement inactifs — [Compatibilité](api/compatibility.md))
 - Vous migrez un pack écrit pour une ancienne version ? Voir l'[Historique des versions](history/)
-- Les internals du moteur peuvent changer avec les mises à jour ; chaque page indique donc son build cible
-
+- Les explications sur les mécanismes internes du moteur sont des informations de référence ; consultez la référence de l’API pour connaître les fonctionnalités prises en charge
 ---
 
 ## Prérequis
@@ -449,7 +446,7 @@ Voir le [guide de tests](guides/testing.md) pour la liste de contrôle complète
 ---
 
 ## Référence API
-La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est mesuré sur le build cible `bny9u` (2026-11-05 ; production et preprod identiques). L'en-tête du moteur préfixé à chaque pack (reproduit dans [Internals du moteur](internals/engine-header.md)) est la source principale.
+Cette page présente la référence de l’API v5 actuelle. La source principale des définitions est l’en-tête que le moteur ajoute automatiquement au début de chaque pack (voir [Internals du moteur](internals/engine-header.md) pour l’en-tête complet).
 
 ### Plan
 
@@ -466,13 +463,11 @@ La spécification systématique de l'API v5 actuelle. Tout ce qui figure ici est
 | [Préprocesseur](api/preprocessor.md) | `BLOXD_STRICT` / `BLOXD_ALPHA` / `BLOXD_SCENE_DEPTH` |
 | [Restrictions](api/restrictions.md) | limites du langage, identifiants réservés |
 | [Compatibilité](api/compatibility.md) | packs d'anciennes versions, revalidation des packs enregistrés |
-| [Catalogue de textures](api/texture-catalog.md) | les 896 noms utilisables (recherchables) |
+| [Catalogue de textures](api/texture-catalog.md) | 1 017 constantes nommées disponibles (recherchables) |
 
-> API cible : 5 · Build cible : `bbb6l5` (vérifié en production le 2026-11-20) · État : Analyzed (restauré mot à mot depuis l'en-tête et le validateur)
+> API : 5 · État : Analyzed (reconstitué à partir de l’en-tête du moteur et du validateur)
 
 Vous migrez depuis la v4 ? Voir [Historique des versions : v5](history/v5.md).
-
-
 ---
 
 ## Format du pack
