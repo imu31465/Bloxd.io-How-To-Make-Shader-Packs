@@ -46,8 +46,8 @@ Problemas de brilho, sombra e névoa.
 ## Quer a teoria?
 
 - Sombras: [Sombras](../guides/shadows.md) (skyLight = mapa de sombras por voxel)
-- Névoa: [Interioridades do motor: névoa](../internals/fog-internals.md)
+- Névoa: [Funcionamento interno do motor: névoa](../internals/fog-internals.md)
 
 ## Relacionado
 
-- [Iluminação](../api/lighting.md) · [Problemas visuais](visual.md) · [Interioridades da iluminação](../internals/lighting-internals.md)
+- [Iluminação](../api/lighting.md) · [Problemas visuais](visual.md) · [Funcionamento interno da iluminação](../internals/lighting-internals.md)
