@@ -16,7 +16,7 @@ Problèmes de luminosité, d'ombres et de brouillard.
 
 ## Nuit trop sombre
 
-- **Correction** : garantissez un ambiant minimum ; avec un `bloxdSunDirection()` nul, la vraie direction de la lune est inconnue, donc utilisez un ambiant bleu pseudo ([la recette de nuit](../recipes/lighting.md)). La direction de la lune elle-même est `-bloxdSunDirection()` (mondes avec cycle jour-nuit uniquement)
+- **Correction** : conservez un niveau minimal de lumière ambiante. Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inaccessible ; utilisez alors une faible lumière ambiante bleutée comme solution de repli visuelle ([recette nocturne](../recipes/lighting.md)). Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()`.
 
 ## Jours cramés
 
