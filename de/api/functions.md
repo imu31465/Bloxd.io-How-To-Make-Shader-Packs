@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn es keine Sonne gibt**
+- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn die Welt keine Sonne hat**.
 - **Fakten**:
-  - **der Mond steht immer an `-bloxdSunDirection()`** (die Engine setzt ihn der Sonne gegenüber)
-  - **den Nullvektor nie an `normalize` übergeben** — mit `dot(d, d) < 1e-8` absichern und auf eine konstante Richtung zurückfallen
-  - der aktuelle Build hat keinen Tag/Nacht-Zyklus; Sonne, Mond und Sterne bewegen sich während einer Sitzung nicht (nur die Opacity schaltet). Im Standard-Erde-Himmel steht die Sonne nahe `(−0.56, 0.81, −0.18)` (Elevation ≈ 54°)
-- **Einsatz**: Farbtemperatur, Lichtrichtung, Sonnen-Gating, Pseudo-Mondlicht
+  - Die Mondrichtung ist der Sonne entgegengesetzt: `-bloxdSunDirection()`.
+  - **Den Nullvektor niemals an `normalize` übergeben**. Prüfe `dot(d, d) < 1e-8` und verwende bei Bedarf eine feste Ersatzrichtung.
+  - Die Engine stellt keinen automatischen Tag-Nacht-Zyklus bereit. Im Standard-Earth-Himmel bleibt die Sonne nahe `(−0.56, 0.81, −0.18)` (Höhe ≈ 54°) stehen. Eine Welt kann einen eigenen Zyklus implementieren, indem sie `inclination` aktualisiert; dadurch ändern sich Sonnen- und Mondrichtung.
+- **Einsatz**: Farbtemperatur, Lichtrichtung, Erkennung der Sonnenverfügbarkeit und Umgebungslicht-Effekte für Mondlicht.
 
 ### bloxdSeconds
 
