@@ -950,7 +950,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **Lösung**: Sorge für ein Mindestmaß an Umgebungslicht. Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Mondrichtung nicht bestimmen. Verwende dann schwaches blaues Umgebungslicht als visuellen Ersatz ([Nacht-Rezept](recipes/lighting.md)). In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts mit `-bloxdSunDirection()` bestimmen.
 ```
 
 - **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn es keine Sonne gibt**
