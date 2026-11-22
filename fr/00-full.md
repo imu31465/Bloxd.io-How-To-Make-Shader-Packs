@@ -955,7 +955,7 @@ fn bloxdSunDirection() -> vec3f
 
 - **Renvoie** : vecteur unitaire vers le soleil en orientation monde ; **vecteur nul quand il n'y a pas de soleil**
 - **Faits** :
-  - **la lune est toujours à `-bloxdSunDirection()`** (le moteur la place à l'opposé du soleil)
+- Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inconnue. Dans ce cas, utilisez une faible lumière ambiante bleutée comme effet d’ambiance plutôt que d’essayer de simuler un clair de lune directionnel. Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()` (voir [Le soleil et la lune](internals/sun-and-moon.md)).
   - **ne jamais passer le vecteur nul à `normalize`** — protégez avec `dot(d, d) < 1e-8` et retombez sur une direction constante
   - le build actuel n'a pas de cycle jour/nuit ; soleil, lune et étoiles ne bougent pas pendant une session (seule l'opacité bascule). Dans le ciel « terre » par défaut, le soleil se tient près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°)
 - **Usages** : température de couleur, direction de la lumière, porte solaire, pseudo clair de lune
