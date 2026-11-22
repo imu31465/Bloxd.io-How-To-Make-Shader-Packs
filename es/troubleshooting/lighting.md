@@ -16,7 +16,7 @@ Problemas de brillo, sombra y niebla.
 
 ## Noche demasiado oscura
 
-- **Corrección**: garantiza un ambiente mínimo; con un `bloxdSunDirection()` cero la dirección lunar real es desconocida, así que usa ambiente azul pseudo ([la receta nocturna](../recipes/lighting.md)). La dirección lunar en sí es `-bloxdSunDirection()` (solo mundos con ciclo día-noche)
+- **Solución**: Mantén un nivel mínimo de luz ambiental. Cuando `bloxdSunDirection()` es cero, no se conoce la dirección real de la luna; usa entonces una luz ambiental azul tenue como alternativa visual ([receta nocturna](../recipes/lighting.md)). En mundos con ciclo día/noche, puedes obtener la dirección de la luz lunar con `-bloxdSunDirection()`.
 
 ## El día se quema
 
