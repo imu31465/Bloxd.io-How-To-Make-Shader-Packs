@@ -952,13 +952,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 - **Solução**: mantenha um nível mínimo de luz ambiente. Quando `bloxdSunDirection()` é zero, não é possível determinar a direção real da lua; use então uma luz ambiente azul suave como alternativa visual ([receita noturna](recipes/lighting.md)). Em mundos com ciclo dia/noite, é possível obter a direção da luz lunar com `-bloxdSunDirection()`.
 ```
-
-- **Retorna**: vetor unitário em direção ao sol na orientação de mundo; **vetor zero quando não há sol**
-- **Fatos**:
-- Quando `bloxdSunDirection()` é zero, não é possível determinar a direção real da lua. Nesse caso, use uma luz ambiente azul como recurso visual, em vez de tentar simular luar direcional. Em mundos com ciclo dia/noite, a direção da luz lunar pode ser obtida com `-bloxdSunDirection()` (consulte [O sol e a lua](internals/sun-and-moon.md)).
-  - **nunca passe o vetor zero a `normalize`** — proteja com `dot(d, d) < 1e-8` e recorra a uma direção constante
-  - a build atual não tem ciclo dia/noite; sol, lua e estrelas não se movem durante uma sessão (só a opacidade alterna). No céu de terra padrão o sol fica perto de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°)
-- **Usos**: temperatura de cor, direção da luz, porta solar, pseudo luar
+- **Retorna**: vetor unitário em direção ao sol na orientação do mundo; **zero quando o mundo não tem sol**.
+- **Fatos importantes**:
+  - A direção da lua é oposta à do sol: `-bloxdSunDirection()`.
+  - **Nunca passe o vetor zero para `normalize`**. Verifique `dot(d, d) < 1e-8` e use uma direção fixa como alternativa.
+  - A engine não fornece um ciclo dia/noite automático. No céu Earth padrão, o sol permanece próximo de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°). Cada mundo pode implementar seu próprio ciclo atualizando `inclination`, o que altera as direções do sol e da lua.
+- **Usos**: temperatura de cor, direção da luz, detecção da presença do sol e efeitos de luz lunar ambiente.
 
 #### bloxdSeconds
 
