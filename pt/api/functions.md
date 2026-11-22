@@ -35,7 +35,7 @@ fn bloxdSunDirection() -> vec3f
 ```
 - **Retorna**: vetor unitário em direção ao sol na orientação do mundo; **zero quando o mundo não tem sol**.
 - **Fatos importantes**:
-  - A direção da lua é oposta à do sol: `-bloxdSunDirection()`.
+  - Quando esta função retorna um vetor diferente de zero, a direção da lua é `-bloxdSunDirection()`. Se retorna zero, não informa a direção real da lua.
   - **Nunca passe o vetor zero para `normalize`**. Verifique `dot(d, d) < 1e-8` e use uma direção fixa como alternativa.
   - A engine não fornece um ciclo dia/noite automático. No céu Earth padrão, o sol permanece próximo de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°). Cada mundo pode implementar seu próprio ciclo atualizando `inclination`, o que altera as direções do sol e da lua.
 - **Usos**: temperatura de cor, direção da luz, detecção da presença do sol e efeitos de luz lunar ambiente.
