@@ -5978,7 +5978,7 @@ Antes de distribuir un pack, pruébalo en el juego de destino y confirma que fun
 ## El sol y la luna
 > API objetivo: 5 · Tipo: referencia técnica
 
-La fuente de `bloxdSunDirection()` es un búfer de dirección solar reescrito solo cuando cambia el tipo de skybox — el criterio no es "si el cielo tiene sol" sino **"si el skybox es tipo tierra"**.
+`bloxdSunDirection()` lee un búfer con la dirección del sol, que solo se actualiza cuando cambia el tipo de skybox. La condición decisiva no es si el cielo muestra un sol, sino **si el skybox es de tipo `earth`**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
@@ -5989,7 +5989,7 @@ La fuente de `bloxdSunDirection()` es un búfer de dirección solar reescrito so
 
 La dirección solar por defecto ronda `(-0.56, 0.81, -0.18)` (vector unitario de `inclination` = −0.2 / `azimuth` = 0.55, estático). Referencia útil para estimar la dirección de los reflejos al probar packs.
 
-Los ciclos día/noche no están integrados en el motor — inclination es un número estático que los mundos con día móvil actualizan el propio juego. `bloxdSunDirection()` sigue cada actualización.
+El motor no incorpora un ciclo día/noche. `inclination` permanece estático; los mundos que implementan un ciclo dinámico actualizan ese valor desde la lógica del juego. `bloxdSunDirection()` refleja cada actualización.
 
 Las luces direccionales del terreno son solo 2 lámparas creadas al arrancar escena, de **dirección e intensidad fijas, sin cambio día/noche**. En resumen: **ningún factor de brillo del terreno depende del tiempo. Los "looks" día/noche vienen solo del skybox y bloxdSunDirection()**, así que los paquetes que oscurecen de noche deben estimar la franja horaria desde bloxdSunDirection() (la técnica `sunPresent` de [Diseñar looks nocturnos](guides/night.md)).
 
