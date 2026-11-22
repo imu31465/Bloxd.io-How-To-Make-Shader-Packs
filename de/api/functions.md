@@ -35,7 +35,7 @@ fn bloxdSunDirection() -> vec3f
 ```
 - **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn die Welt keine Sonne hat**.
 - **Fakten**:
-  - Die Mondrichtung ist der Sonne entgegengesetzt: `-bloxdSunDirection()`.
+  - Gibt diese Funktion einen Vektor ungleich null zurück, ist die Mondrichtung `-bloxdSunDirection()`. Bei einem Nullvektor lässt sich die tatsächliche Mondrichtung nicht bestimmen.
   - **Den Nullvektor niemals an `normalize` übergeben**. Prüfe `dot(d, d) < 1e-8` und verwende bei Bedarf eine feste Ersatzrichtung.
   - Die Engine stellt keinen automatischen Tag-Nacht-Zyklus bereit. Im Standard-Earth-Himmel bleibt die Sonne nahe `(−0.56, 0.81, −0.18)` (Höhe ≈ 54°) stehen. Eine Welt kann einen eigenen Zyklus implementieren, indem sie `inclination` aktualisiert; dadurch ändern sich Sonnen- und Mondrichtung.
 - **Einsatz**: Farbtemperatur, Lichtrichtung, Erkennung der Sonnenverfügbarkeit und Umgebungslicht-Effekte für Mondlicht.
