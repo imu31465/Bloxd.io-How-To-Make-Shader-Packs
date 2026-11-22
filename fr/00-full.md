@@ -3078,7 +3078,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-**Limites de ce correctif :** si `bloxdSunDirection()` se comporte en « direction unitaire avec soleil, zéro sans », jour et nuit se distinguent, mais le crépuscule ne peut pas s'estimer en douceur. Et comme elle atténue la couleur terminée, elle affaiblit ensemble la lumière du jour et l'ambiant du moteur — pas une reproduction complète du cycle horaire. Pour appliquer la même chose aux liquides, revoyez la relation de repli du hook liquide.
+**Limites de cette méthode :** `bloxdSunDirection()` fournit la direction du soleil ; celle de la lune se déduit donc en prenant son opposé (`-bloxdSunDirection()`). Dans les mondes par défaut, le soleil est fixe et la lune ne bouge pas non plus ; elle ne se déplace que dans les mondes dotés d’un cycle jour/nuit. Si la valeur ne fournit qu’une direction unitaire ou zéro, elle permet de distinguer le jour de la nuit, mais pas de représenter progressivement l’aube ou le crépuscule. Cet exemple atténue la couleur finale du terrain : il réduit donc à la fois la lumière du jour et l’éclairage ambiant du moteur, sans reproduire tout le cycle lumineux. Pour appliquer la même méthode aux liquides, vérifiez le mécanisme de repli des hooks correspondants.
 
 
 ---
