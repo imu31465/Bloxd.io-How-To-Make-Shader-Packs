@@ -16,5 +16,5 @@ La iluminación por defecto del motor es "solo multiplicación" — no existen e
 | Detalle de superficie | Solo resolución de textura | △ Micro-relieve procedural con hash (R9.8) |
 | Ondas de vértice (agua) | Ninguna (plano) | ◎ Solo allow (R7) |
 | Normales de ola / destello solar | Ningunas | ◎ (R9.7) |
-| Luz lunar nocturna | El color del cielo solo oscurece | △ Sin entrada de dirección lunar, así que solo looks pseudo (ambiente azul en R2 / desaturación en R9.11) |
+| Luz lunar nocturna | Por defecto, solo se oscurece el color del cielo | ◎ La dirección lunar se obtiene con `-bloxdSunDirection()`; R-A añade luz lunar direccional (solo se mueve en mundos con ciclo día/noche) |
 | Sombras (oclusión de cielo) | Solo mezcla suave vía `mix(ambiente, cielo, skyLight)` | ◎ Inversión del realce + corte por umbral + puerta solar (R9.12). La sombra de árboles y bajo techos cae claramente, siguiendo ediciones de bloques en tiempo real |
