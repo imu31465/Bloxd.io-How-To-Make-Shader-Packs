@@ -9,7 +9,7 @@
 | `default` (절차적 하늘) | 0이 아님 (기본값은 아래 참조) |
 | `gloomy` / `interstellar` / `space_*` (큐브 텍스처) | **항상 (0,0,0)** |
 
-**달의 방향은 항상 `-bloxdSunDirection()`이다** (엔진이 달의 위치를 태양의 정반대 방향으로 계산하기 때문). 밤인지 여부는 태양의 고도로 판단한다. `bloxdSunDirection().y < 0` (태양이 지평선 아래)일 때 달이 지평선 위에 있다. 다만 기본 월드에서는 태양이 고정되어 있으므로 달도 움직이지 않는다. 달의 움직임은 낮과 밤의 주기를 구현한 월드에서만 나타난다.
+`bloxdSunDirection()`이 영벡터가 아닌 값을 반환할 때 달의 방향은 태양의 반대쪽인 `-bloxdSunDirection()`이다(엔진이 달을 태양의 정반대 위치에 둔다). 영벡터를 반환하면 이 함수만으로는 실제 달의 방향을 알 수 없다. 밤인지는 태양의 고도로 판단한다. `bloxdSunDirection().y < 0`(태양이 지평선 아래)일 때 달은 지평선 위에 있다. 기본 월드에서는 태양이 고정되어 있으므로 달도 움직이지 않는다. 달은 낮과 밤의 주기를 구현한 월드에서만 움직인다.
 
 기본 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)`이다 (`inclination` = −0.2 / `azimuth` = 0.55에서 계산한 정적 단위 벡터). 배포할 셰이더 팩을 테스트할 때 하이라이트 방향을 가늠하는 기준값으로 사용할 수 있다.
 
@@ -25,7 +25,7 @@
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // 달은 항상 태양의 정반대. 낮 동안은 moonDir.y < 0 으로 자동 소등된다
+        // 태양 방향 벡터가 영벡터가 아닐 때만 달이 태양의 반대쪽에 있다.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
