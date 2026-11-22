@@ -2,9 +2,9 @@
 
 > Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
 
-Nur Schatten abzudunkeln lässt die fertige Farbe (`engineColour`) ohne Sonne hell, und die Flächen/Schatten-Lücke wird unnatürlich. Die ganze fertige Farbe dämpfen.
+Werden nur die Schatten abgedunkelt, bleibt die vom Renderer ausgegebene Endfarbe (`engineColour`) auch ohne Sonne hell. Dadurch wirkt der Kontrast zwischen beleuchteten Flächen und Schatten unnatürlich. Stattdessen sollte die gesamte Endfarbe abgeschwächt werden.
 
-Das Beispiel behandelt `bloxdSunDirection()`-null als Nacht und gerichtete Sonne als Tag und dämpft Terrain-Endfarben in dunklen Stunden. Wo `blockLight` und `heldLight` stark sind, schwächt sich die Dämpfung, um nahe Lampen wie Fackeln zu erhalten. `0.52` ist ein Tuning-Wert — für dunklere Nächte senken.
+Das Beispiel wertet einen Nullvektor von `bloxdSunDirection()` als Nacht und einen Vektor ungleich null als Tag. Während der Nacht wird die Endfarbe des Terrains abgeschwächt. Sind `blockLight` oder `heldLight` stark, fällt die Abdunklung geringer aus, damit nahe Lichtquellen wie Fackeln sichtbar bleiben. Der Wert `0.52` lässt sich anpassen: Für dunklere Nächte kann er weiter gesenkt werden.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -18,11 +18,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let localLight = clamp(max(blockAmt, heldAmt), 0.0, 1.0);
         let protectLocalLight = smoothstep(0.03, 0.35, localLight);
         scale = mix(nightDim, 1.0, protectLocalLight);
-}
+    }
     // fertige Farbe dämpfen; Material-Emission per Default mit Fog addieren
     out.colour = l.engineColour * scale + s.emission * (1.0 - l.fogAlpha);
     return out;
 }
 ```
 
-**Limits dieses Fixes:** Verhält sich `bloxdSunDirection()` wie „Einheitsrichtung mit Sonne, null ohne", lassen sich Tag/Nacht unterscheiden, aber Abendrot nicht weich schätzen. Und da es die fertige Farbe dämpft, schwächt es Engine-Tageslicht und -Ambiente zusammen — keine totale Tageszeit-Reproduktion. Für Flüssigkeiten dieselbe Liquid-Hook-Fallback-Beziehung prüfen.
+**Grenzen dieser Methode:** Gibt `bloxdSunDirection()` bei vorhandener Sonne einen Einheitsvektor und andernfalls null zurück, lassen sich Tag und Nacht unterscheiden, nicht aber Dämmerungsphasen weich abschätzen. Da die Endfarbe abgeschwächt wird, werden zugleich das Tageslicht und das Umgebungslicht der Engine reduziert. Der vollständige Tagesverlauf wird damit nicht nachgebildet. Für Flüssigkeiten muss das Fallback-Verhalten der Liquid-Hooks geprüft werden.
