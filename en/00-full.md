@@ -954,13 +954,11 @@ fn bloxdRenderOffset() -> vec3i
 // It's below the horizon (y < 0) at night. The moon is always opposite it.
 - **Fix**: Keep a minimum ambient level. When `bloxdSunDirection()` is zero, the moon's actual direction is unavailable, so use faint blue ambient light as a visual fallback ([night recipe](recipes/lighting.md)). In worlds with a day/night cycle, directional moonlight can be derived from `-bloxdSunDirection()`.
 ```
-
-- **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
+- **Returns**: unit vector toward the sun in world orientation; **zero when the world has no sun**.
 - **Facts**:
-- When `bloxdSunDirection()` is zero, the moon's actual direction cannot be determined. In that case, use blue ambient light as an artistic approximation rather than trying to simulate directional moonlight. In worlds with a day/night cycle, directional moonlight can instead use `-bloxdSunDirection()` (see [The sun and the moon](internals/sun-and-moon.md)).
-  - **never pass the zero vector to `normalize`** — guard with `dot(d, d) < 1e-8` and fall back to a constant direction
-  - the current build has no day-night cycle; sun, moon and stars do not move during a session (only opacity toggles). In the default earth sky the sun sits near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°)
-- **Uses**: color temperature, light direction, sun gating, pseudo moonlight
+  - **Never pass a zero vector to `normalize`**. Check `dot(d, d) < 1e-8` and use a constant fallback direction.
+  - The engine does not provide an automatic day/night cycle. The default Earth sky keeps the sun near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°); a world can implement its own cycle by updating `inclination`, which changes the sun and moon directions.
+- **Uses**: color temperature, light direction, sun gating, and ambient moonlight effects.
 
 #### bloxdShadowDirection
 
