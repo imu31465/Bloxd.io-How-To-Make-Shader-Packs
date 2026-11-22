@@ -17,5 +17,5 @@ Kompiliererfolg und „gutes Aussehen" sind verschiedene Dinge. In dieser Reihen
 - Pakete beschränken sich auf Terrain-/Flüssigkeits-Hooks — kein Himmel, keine Entities, keine UI mit demselben Code.
 - Keine Inputs, um Shadowmaps, Screen-Space-Reflexionen, Refraktion, Bloom etc. hinzuzufügen (Szenentiefe ist nur in Flüssigkeiten als `bloxdOpaqueBehind()` freigegeben — siehe [Funktionen](../api/functions.md)).
 - `bloxdSeconds()` ist Animationszeit ohne garantierte Bindung an Tag/Nacht im Spiel.
-- Bei `bloxdSunDirection()`-null ist die wahre Mondrichtung unbekannt, keine „Mondlichtphysik" sondern Stimmungsnäherung. Gerichtetes Mondlicht baut man aus `-bloxdSunDirection()` (nur Welten mit Tag/Nacht-Zyklus — [Sonne und Mond](../internals/sun-and-moon.md)).
+- Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Richtung des Mondes nicht bestimmen. Verwende in diesem Fall schwaches blaues Umgebungslicht als visuellen Effekt, statt gerichtetes Mondlicht simulieren zu wollen. In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts dagegen mit `-bloxdSunDirection()` bestimmen (siehe [Sonne und Mond](../internals/sun-and-moon.md)).
 - `s.position` / `l.position` sind lokale Koordinaten: `bloxdRenderOffset()` für weltabhängige Effekte addieren. Für blocklokale Muster sind lokale Koordinaten bewusst das Werkzeug.
