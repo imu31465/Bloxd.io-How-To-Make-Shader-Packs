@@ -27,7 +27,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 夜 (skyLight 駆動の青シフト + 灯りの保護)
+## 夜の青みと灯りの保護
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -42,7 +42,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 洞窟を真っ暗に (skyLight が無い所を更に暗く)
+## 洞窟を暗くする
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -58,7 +58,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` はリフト後の値 (10章) なので、浅い遮蔽 (木の下など。生値 0.87 → リフト後 0.97) はこの方法ではほとんど暗くならない。洞窟 (生値 0) には効果がある。「木陰」をはっきりさせたい場合は R9.12 のリフト逆変換 + しきい値方式を使う。
 
-## 夜の青い環境光 (月の方向を使わない擬似表現)
+## 夜の青い環境光
 
 > このAPIでは、空に太陽がないとき `bloxdSunDirection()` はゼロになる。以下は方向性のある月光ではなく、空が暗いときにごく弱い青い環境光を足すだけの疑似表現。なお月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定 — [太陽と月の正体](../internals/sun-and-moon.md))。
 
@@ -76,7 +76,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 夕暮れの暖色化 (太陽高度で色を寄せる)
+## 夕暮れの暖色化
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -92,7 +92,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## エンジン出力の完全置き換え (最も単純な再照明)
+## エンジン出力を置き換える
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
