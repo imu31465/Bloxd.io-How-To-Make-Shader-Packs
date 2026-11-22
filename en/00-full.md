@@ -957,7 +957,7 @@ fn bloxdSunDirection() -> vec3f
 
 - **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
 - **Facts**:
-  - **the moon is always at `-bloxdSunDirection()`** (the engine places it opposite the sun) — now also stated in the header itself
+- When `bloxdSunDirection()` is zero, the moon's actual direction cannot be determined. In that case, use blue ambient light as an artistic approximation rather than trying to simulate directional moonlight. In worlds with a day/night cycle, directional moonlight can instead use `-bloxdSunDirection()` (see [The sun and the moon](internals/sun-and-moon.md)).
   - **never pass the zero vector to `normalize`** — guard with `dot(d, d) < 1e-8` and fall back to a constant direction
   - the current build has no day-night cycle; sun, moon and stars do not move during a session (only opacity toggles). In the default earth sky the sun sits near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°)
 - **Uses**: color temperature, light direction, sun gating, pseudo moonlight
