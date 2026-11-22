@@ -5959,7 +5959,7 @@ Avant de distribuer un pack, testez-le dans le jeu cible et vérifiez que les ho
 
 ## Le soleil et la lune
 > API cible : 5 · Type : référence technique
-La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit uniquement quand le type de skybox change — le critère n'est pas « si le ciel a un soleil » mais **« si la skybox est de type terre »**.
+`bloxdSunDirection()` lit un tampon contenant la direction du soleil, mis à jour uniquement lorsque le type de skybox change. Le critère déterminant n'est pas la présence visible du soleil dans le ciel, mais **le fait que la skybox soit de type `earth`**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
@@ -5970,13 +5970,13 @@ La source de `bloxdSunDirection()` est un tampon de direction solaire réécrit 
 
 La direction du soleil des mondes par défaut vaut environ `(-0.56, 0.81, -0.18)` (vecteur unitaire statique calculé à partir de `inclination` = −0.2 et `azimuth` = 0.55). Une référence utile pour estimer la direction des reflets pendant les tests de packs.
 
-Les cycles jour/nuit ne sont pas intégrés au moteur — l'inclination est un nombre statique, et les mondes à jour/nuit mobile l'actualisent côté jeu. `bloxdSunDirection()` reflète chaque mise à jour.
+Le moteur n'intègre pas de cycle jour/nuit. `inclination` reste une valeur statique ; les mondes qui implémentent un cycle dynamique la mettent à jour dans leur logique de jeu. `bloxdSunDirection()` reflète chaque mise à jour.
 
 Les lumières directionnelles du terrain ne sont que 2 lampes créées au démarrage de la scène, à **direction et intensité fixes, inchangées jour et nuit**. En bref : **aucun facteur de luminosité du terrain ne dépend du temps. L’apparence du jour et de la nuit dépend uniquement de la skybox et de `bloxdSunDirection()`** — les packs assombrissant le terrain la nuit doivent donc estimer eux-mêmes la tranche horaire depuis bloxdSunDirection() (la technique `sunPresent` de [Conception des looks nocturnes](guides/night.md)).
 
 ### R-A. Clair de lune
 
-Ajoute du Lambert blanc bleuté et un faible specular uniquement pendant que la lune est levée. `moonUp` vaut 0 dans les mondes par défaut à soleil statique, donc rien ne s'y passe — **clair de lune qui ne se déclenche que dans les mondes à cycle jour/nuit, et ne produit donc d’effet que dans les mondes dotés d’un cycle jour/nuit**.
+Ajoute un éclairage diffus de Lambert blanc bleuté et un léger reflet spéculaire uniquement lorsque la lune est au-dessus de l'horizon. Dans les mondes par défaut où le soleil reste fixe, `moonUp` vaut 0 et aucun effet ne se produit. **L'effet de clair de lune ne s'active que dans les mondes qui implémentent un cycle jour/nuit.**
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
