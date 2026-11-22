@@ -8,7 +8,7 @@ Guide non officiel consacré aux shader packs du moteur de rendu WebGPU de Bloxd
 - Cible : renderer WebGPU
 - Hooks de shader : 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). Cherchez-vous une fonction de l'API ? Voir la [Référence API](api/).
+Vous débutez avec les shader packs ? Commencez par [Premiers pas](getting-started/). Vous cherchez une fonction de l’API ? Consultez la [Référence API](api/).
 
 > Cette documentation n’est pas une ressource officielle des développeurs du jeu. Les mécanismes internes du moteur sont des détails d’implémentation susceptibles de changer avec les mises à jour ; consultez la référence de l’API pour connaître les fonctionnalités prises en charge.
 >
@@ -23,8 +23,8 @@ Nouveau avec les shader packs ? Commencez par [Premiers pas](getting-started/). 
 | Créer son premier shader pack | [Premiers pas](getting-started/) | auteurs de packs débutants |
 | Chercher fonctions et champs de l'API | [Référence API](api/) | auteurs en pleine implémentation |
 | Réaliser un effet (lumière, eau, modèles…) | [Guides](guides/) · [Recettes](recipes/) | toute personne construisant un rendu |
-| Corriger une erreur | [Dépannage](troubleshooting/) | toute personne avec un pack cassé |
-| Explorer les fonctionnement interne du moteur | [Fonctionnement interne du moteur](internals/) | analystes du moteur |
+| Corriger une erreur | [Dépannage](troubleshooting/) | toute personne dont le pack ne fonctionne pas |
+| Explorer le fonctionnement interne du moteur | [Fonctionnement interne du moteur](internals/) | analystes du moteur |
 | Consulter les anciennes versions (v1–v5) | [Historique des versions](history/) | migrations d'anciens packs |
 
 ## Carte de la documentation
