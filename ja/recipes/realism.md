@@ -301,7 +301,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 調整ガイド: **影の面積は `shTh` だけで決まる** — `0.93`=半径1.5以上 / `0.87`=半径2 / `0.80`=半径3 / `0.67`=半径5。  
 > 影の縁の硬さは `shSoft` (0.02=硬い / 0.08=ソフト)。影の芯の暗さは `0.09` (最低環境光) と `0.16` (空の散乱光)  
 > の 2 点シフトで決まる。夕方に影を広げたければ  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を足す (長い夕方の影の近似。  
+> 日没前後に影が長くなる様子を近似するには、しきい値に `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を加えます。
+> `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())` です。影の青みを強くするには、`vec3f(0.72, 0.82, 1.05)` の B 成分を上げます。
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
 [← 前の部](../api/)・[マニュアルに戻る](../)・[次の部 →](../guides/realism.md)
