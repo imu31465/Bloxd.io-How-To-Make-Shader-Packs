@@ -954,7 +954,7 @@ fn bloxdRenderOffset() -> vec3i
 ```
 - **Devuelve**: vector unitario hacia el sol en coordenadas de mundo; **cero cuando el mundo no tiene sol**.
 - **Datos importantes**:
-  - La dirección de la luna es la opuesta a la del sol: `-bloxdSunDirection()`.
+  - Cuando esta función devuelve un vector distinto de cero, la dirección de la luna es `-bloxdSunDirection()`. Si devuelve cero, no permite conocer la dirección real de la luna.
   - **No pases nunca el vector cero a `normalize`**. Comprueba `dot(d, d) < 1e-8` y usa una dirección fija como alternativa.
   - El motor no ofrece un ciclo día/noche automático. En el cielo Earth predeterminado, el sol permanece cerca de `(−0.56, 0.81, −0.18)` (elevación ≈ 54°). Cada mundo puede implementar su propio ciclo actualizando `inclination`, lo que cambia las direcciones del sol y de la luna.
 - **Usos**: temperatura de color, dirección de la luz, detección del sol y efectos de luz lunar ambiental.
@@ -5985,7 +5985,7 @@ Antes de distribuir un pack, pruébalo en el juego de destino y confirma que fun
 | `default` (cielo procedural) | Distinto de cero (valor predeterminado más abajo) |
 | `gloomy` / `interstellar` / `space_*` (texturas cubo) | **Siempre (0,0,0)** |
 
-**La luna está siempre en `-bloxdSunDirection()`** (el motor calcula la posición lunar como el opuesto exacto del sol). La noche se juzga por altura solar — hay luna arriba cuando `bloxdSunDirection().y < 0` (sol bajo el horizonte). Pero en mundos por defecto el sol está estático y la luna también — solo los mundos con ciclo día/noche la ven moverse.
+Cuando `bloxdSunDirection()` devuelve un vector distinto de cero, la dirección de la luna es `-bloxdSunDirection()` (el motor la sitúa justo en sentido opuesto al sol). Si devuelve cero, esta función no permite conocer la dirección real de la luna. La noche se determina por la altura del sol: la luna está sobre el horizonte cuando `bloxdSunDirection().y < 0` (el sol está bajo el horizonte). En los mundos predeterminados el sol es estático, por lo que la luna también lo es; solo se mueve en mundos que implementan un ciclo día/noche.
 
 La dirección solar por defecto ronda `(-0.56, 0.81, -0.18)` (vector unitario de `inclination` = −0.2 / `azimuth` = 0.55, estático). Referencia útil para estimar la dirección de los reflejos al probar packs.
 
@@ -6001,7 +6001,7 @@ Añade Lambert blanco-azulado y especular débil solo mientras la luna está arr
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // la luna está siempre exactamente opuesta al sol; auto-off diurno vía moonDir.y < 0
+        // La luna está opuesta al sol solo cuando el vector de dirección solar no es cero.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
