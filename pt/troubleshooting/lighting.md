@@ -16,7 +16,7 @@ Problemas de brilho, sombra e névoa.
 
 ## Noite escura demais
 
-- **Correção**: garanta um ambiente mínimo; com um `bloxdSunDirection()` zero a direção lunar verdadeira é desconhecida, então use pseudo ambiente azul ([a receita noturna](../recipes/lighting.md)). A própria direção da lua é `-bloxdSunDirection()` (só mundos com ciclo dia-noite)
+- **Solução**: mantenha um nível mínimo de luz ambiente. Quando `bloxdSunDirection()` é zero, não é possível determinar a direção real da lua; use então uma luz ambiente azul suave como alternativa visual ([receita noturna](../recipes/lighting.md)). Em mundos com ciclo dia/noite, é possível obter a direção da luz lunar com `-bloxdSunDirection()`.
 
 ## Dia estoura
 
