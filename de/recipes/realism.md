@@ -297,6 +297,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Tuning-Guide: **Schattenfläche entscheidet allein `shTh`** — `0.93` = Radius 1.5+ / `0.87` = Radius 2 / `0.80` = Radius 3 / `0.67` = Radius 5.  
 > Kanten­härte ist `shSoft` (0.02 = hart / 0.08 = weich). Kern­dunkelheit ist die Zwei-Punkt-Verschiebung aus `0.09` (Mindest-Ambiente) und `0.16` (Himmelsstreulicht).  
-> Für breitere Abend­schatten `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` addieren (Näherung langer Abendschatten.  
+> Um längere Schatten bei Sonnenuntergang näherungsweise abzubilden, addiere `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` zum Schwellenwert.
+> `sunDir` entspricht `bloxdSunDirection() / length(bloxdSunDirection())`. Für bläulichere Schatten erhöhe den B-Kanal von `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` ist `bloxdSunDirection() / length(bloxdSunDirection())`). Für blauere Schatten das B von `vec3f(0.72, 0.82, 1.05)` erhöhen.
 >
