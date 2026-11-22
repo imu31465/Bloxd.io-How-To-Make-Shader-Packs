@@ -297,5 +297,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 조정 가이드: **그림자의 면적은 `shTh`만으로 정해진다** — `0.93`=반경1.5 이상 / `0.87`=반경2 / `0.80`=반경3 / `0.67`=반경5.  
 > 그림자 가장자리의 딱딱함은 `shSoft` (0.02=딱딱 / 0.08=소프트). 그림자 심의 어둡기는 `0.09` (최저 환경광) 와 `0.16` (하늘 산란광)  
 > 의 2점 시프트로 정해진다. 해 질 녘에 그림자를 넓히고 싶으면  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` 를 더한다 (긴 해 질 녘 그림자의 근사.  
+> 해 질 무렵 길어지는 그림자를 근사하려면 임계값에 `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))`를 더한다.
+> `sunDir`는 `bloxdSunDirection() / length(bloxdSunDirection())`이다. 그림자를 더 푸르게 하려면 `vec3f(0.72, 0.82, 1.05)`의 B 채널 값을 높인다.
 > `sunDir` 은 `bloxdSunDirection() / length(bloxdSunDirection())`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.
