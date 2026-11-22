@@ -17,5 +17,5 @@ Sucesso de compilação e "boa aparência" são coisas diferentes. Verifique nes
 - Pacotes de shaders se limitam aos hooks de terreno / líquido — sem tratamento de céu, entidades ou UI com o mesmo código.
 - Não existem entradas para adicionar mapas de sombras, reflexos em espaço de tela, refração, bloom etc. (a profundidade de cena é desbloqueada só para líquidos como `bloxdOpaqueBehind()` — veja [Funções](../api/functions.md)).
 - `bloxdSeconds()` é tempo de animação sem vínculo garantido com o dia/noite do jogo.
-- Com `bloxdSunDirection()` zero, a verdadeira direção da lua é desconhecida — não é "física de luar", mas uma aproximação de ambiente. O luar direcional pode ser construído a partir de `-bloxdSunDirection()` (apenas mundos com ciclo dia/noite — [O sol e a lua](../internals/sun-and-moon.md)).
+- Quando `bloxdSunDirection()` é zero, não é possível determinar a direção real da lua. Nesse caso, use uma luz ambiente azul como recurso visual, em vez de tentar simular luar direcional. Em mundos com ciclo dia/noite, a direção da luz lunar pode ser obtida com `-bloxdSunDirection()` (consulte [O sol e a lua](../internals/sun-and-moon.md)).
 - `s.position` / `l.position` são coordenadas locais, então some `bloxdRenderOffset()` para efeitos dependentes do mundo. Para padrões locais ao bloco, as coordenadas locais são intencionalmente a ferramenta.
