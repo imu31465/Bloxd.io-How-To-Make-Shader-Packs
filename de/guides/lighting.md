@@ -6,7 +6,7 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 
 | Feature | Standard | In Paketen baubar? |
 |---|---|---|
-| Diffus (Lambert) | Nur skalare Richtlicht-Summe | ◎ Eigen mit `bloxdSunDirection()` (Wrap-Quellen etc.) |
+| Diffus (Lambert) | Nur skalare Richtlicht-Summe | ◎ Eigene Umsetzung mit `bloxdSunDirection()` (periodische Abschwächung usw.) |
 | Specular | Keins | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Keins | ◎ Schlick-Näherung (R9.3) |
 | Warme Fackel / kaltes Himmelslicht-Trennung | Farblos | ◎ (R9.1) |
@@ -17,4 +17,4 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 | Vertex-Wellen (Wasser) | Keine (flach) | ◎ Nur allow (R7) |
 | Wellennormalen / Sonnenglitzer | Keine | ◎ (R9.7) |
 | Mondlicht bei Nacht | Standardmäßig wird nur die Himmelsfarbe dunkler | ◎ Die Mondrichtung ergibt sich aus `-bloxdSunDirection()`; R-A ergänzt gerichtetes Mondlicht (der Mond bewegt sich nur in Welten mit Tag-Nacht-Zyklus) |
-| Schatten (Himmelsverdeckung) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |
+| Schatten (Abschirmung des Himmelslichts) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |
