@@ -18,5 +18,5 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 | Detalhe de superfície | Só resolução de textura | △ Micro-relevo procedural com hash (R9.8) |
 | Ondas de vértice (água) | Nenhuma (plano) | ◎ Só allow (R7) |
 | Normais de onda / brilho solar | Nenhumas | ◎ (R9.7) |
-| Luar noturno | A cor do céu só escurece | △ A direção lunar está em `-bloxdSunDirection()`: pseudo looks (ambiente azul em R2 / dessaturação em R9.11) mais luar direcional (R-A, só ciclo dia/noite) |
+| Luar noturno | Por padrão, apenas a cor do céu escurece | ◎ A direção da lua pode ser obtida com `-bloxdSunDirection()`; R-A adiciona luar direcional (a lua só se move em mundos com ciclo dia/noite) |
 | Sombras (oclusão de céu) | Só mistura suave via `mix(ambiente, céu, skyLight)` | ◎ Inversão do lift + corte por limiar + porta solar (R9.12). Sombra de árvores e sob telhados cai claramente, seguindo edições de blocos em tempo real |
