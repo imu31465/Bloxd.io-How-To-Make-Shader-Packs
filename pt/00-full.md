@@ -954,7 +954,7 @@ fn bloxdRenderOffset() -> vec3i
 ```
 - **Retorna**: vetor unitário em direção ao sol na orientação do mundo; **zero quando o mundo não tem sol**.
 - **Fatos importantes**:
-  - A direção da lua é oposta à do sol: `-bloxdSunDirection()`.
+  - Quando esta função retorna um vetor diferente de zero, a direção da lua é `-bloxdSunDirection()`. Se retorna zero, não informa a direção real da lua.
   - **Nunca passe o vetor zero para `normalize`**. Verifique `dot(d, d) < 1e-8` e use uma direção fixa como alternativa.
   - A engine não fornece um ciclo dia/noite automático. No céu Earth padrão, o sol permanece próximo de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°). Cada mundo pode implementar seu próprio ciclo atualizando `inclination`, o que altera as direções do sol e da lua.
 - **Usos**: temperatura de cor, direção da luz, detecção da presença do sol e efeitos de luz lunar ambiente.
@@ -5968,7 +5968,7 @@ Antes de distribuir um pack, teste-o no jogo de destino e confirme que os hooks 
 | `default` (céu procedural) | Diferente de zero (valores padrão abaixo) |
 | `gloomy` / `interstellar` / `space_*` (texturas de cubo) | **Sempre (0,0,0)** |
 
-**A lua está sempre em `-bloxdSunDirection()`** (o motor calcula a posição da lua como o oposto exato do sol). A noite é julgada pela elevação do sol — a lua está no céu quando `bloxdSunDirection().y < 0` (sol abaixo do horizonte). Mas em mundos padrão o sol é estático, então a lua também é; apenas mundos que implementam um ciclo dia/noite a veem se mover.
+Quando `bloxdSunDirection()` retorna um vetor diferente de zero, a direção da lua é `-bloxdSunDirection()` (o motor a posiciona exatamente no sentido oposto ao sol). Se retorna zero, esta função não informa a direção real da lua. A noite é determinada pela altura do sol: a lua está acima do horizonte quando `bloxdSunDirection().y < 0` (o sol está abaixo do horizonte). Nos mundos padrão, o sol é estático e a lua também; ela só se move em mundos que implementam um ciclo dia/noite.
 
 A direção do sol em mundos padrão é cerca de `(-0.56, 0.81, -0.18)` (vetor unitário calculado a partir de `inclination` = −0.2 / `azimuth` = 0.55, estático). Uma referência útil para estimar a direção dos reflexos durante os testes dos packs.
 
@@ -5984,7 +5984,7 @@ Adiciona iluminação difusa de Lambert em tom branco-azulado e um leve brilho e
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // a lua está sempre exatamente oposta ao sol; desligamento automático de dia via moonDir.y < 0
+        // A lua fica na direção oposta ao sol apenas quando o vetor solar não é zero.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
