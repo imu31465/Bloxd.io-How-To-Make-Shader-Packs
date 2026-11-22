@@ -9,7 +9,7 @@
 | `default` (prozeduraler Himmel) | Nicht null (Defaults unten) |
 | `gloomy` / `interstellar` / `space_*` (Cube-Texturen) | **Immer (0,0,0)** |
 
-**Der Mond ist immer `-bloxdSunDirection()`** (die Engine berechnet die Mondposition als exaktes Gegenteil der Sonne). Nacht wird per Sonnenhöhe beurteilt — Mond oben bei `bloxdSunDirection().y < 0` (Sonne unterm Horizont). In Standardwelten ist die Sonne aber statisch, der Mond also auch — nur Welten mit Tag/Nacht-Zyklus sehen ihn wandern.
+Gibt `bloxdSunDirection()` einen Vektor ungleich null zurück, zeigt der Mond in die entgegengesetzte Richtung: `-bloxdSunDirection()` (die Engine platziert ihn genau gegenüber der Sonne). Bei einem Nullvektor lässt sich die tatsächliche Mondrichtung mit dieser Funktion nicht bestimmen. Ob Nacht ist, wird anhand der Sonnenhöhe erkannt: Der Mond steht über dem Horizont, wenn `bloxdSunDirection().y < 0` (die Sonne steht unter dem Horizont). In Standardwelten ist die Sonne unbeweglich, daher bewegt sich auch der Mond nicht. Er bewegt sich nur in Welten mit einem implementierten Tag-Nacht-Zyklus.
 
 Die Sonnenrichtung in Standardwelten beträgt etwa `(-0.56, 0.81, -0.18)` (ein statischer Einheitsvektor aus `inclination` = −0.2 und `azimuth` = 0.55). Der Wert hilft dabei, beim Testen von Shader-Packs die Richtung von Glanzlichtern abzuschätzen.
 
@@ -25,7 +25,7 @@ Fügt ein bläulich-weißes Lambert-Licht und einen schwachen Glanzpunkt hinzu, 
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // der Mond ist immer exakt gegenüber der Sonne; Tages-Auto-Off via moonDir.y < 0
+        // Der Mond liegt nur dann der Sonne gegenüber, wenn der Sonnenrichtungsvektor ungleich null ist.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
