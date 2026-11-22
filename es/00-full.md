@@ -950,7 +950,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **Solución**: Mantén un nivel mínimo de luz ambiental. Cuando `bloxdSunDirection()` es cero, no se conoce la dirección real de la luna; usa entonces una luz ambiental azul tenue como alternativa visual ([receta nocturna](recipes/lighting.md)). En mundos con ciclo día/noche, puedes obtener la dirección de la luz lunar con `-bloxdSunDirection()`.
 ```
 
 - **Devuelve**: vector unitario hacia el sol en orientación de mundo; **vector cero cuando no hay sol**
