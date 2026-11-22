@@ -4,7 +4,7 @@
 
 Escurecer só sombras deixa a cor terminada (`engineColour`) brilhante sem sol, e o salto face/sombra fica antinatural. Atenue toda a cor terminada.
 
-O exemplo trata `bloxdSunDirection()` zero como noite e sol direcional como dia, atenuando as cores terminadas do terreno em horas escuras. Onde `blockLight` e `heldLight` são fortes, a atenuação enfraquece para preservar lamparinas próximas como tochas. `0.52` é valor de ajuste — baixe para noites mais escuras.
+O exemplo interpreta `bloxdSunDirection() == 0` como noite e uma direção solar válida como dia. À noite, reduz a intensidade da cor final do terreno. Nas áreas com valores altos de `blockLight` e `heldLight`, a redução é menor para preservar a luz de fontes próximas, como tochas. `0.52` é valor de ajuste — baixe para noites mais escuras.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
