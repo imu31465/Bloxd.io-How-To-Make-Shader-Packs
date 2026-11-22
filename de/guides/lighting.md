@@ -16,5 +16,5 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 | Oberflächendetail | Nur Texturauflösung | △ Prozedurales Hash-Mikro-Bump (R9.8) |
 | Vertex-Wellen (Wasser) | Keine (flach) | ◎ Nur allow (R7) |
 | Wellennormalen / Sonnenglitzer | Keine | ◎ (R9.7) |
-| Nachtmondlicht | Himmelsfarbe dunkelt nur ab | △ Kein Mondrichtungs-Input, also nur Pseudo-Looks (blaues Ambiente in R2 / Entsättigung in R9.11) |
+| Mondlicht bei Nacht | Standardmäßig wird nur die Himmelsfarbe dunkler | ◎ Die Mondrichtung ergibt sich aus `-bloxdSunDirection()`; R-A ergänzt gerichtetes Mondlicht (der Mond bewegt sich nur in Welten mit Tag-Nacht-Zyklus) |
 | Schatten (Himmelsverdeckung) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |
