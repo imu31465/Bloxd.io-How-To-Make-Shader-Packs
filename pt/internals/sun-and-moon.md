@@ -1,7 +1,7 @@
 # O sol e a lua
 
 > API alvo: 5 · Tipo: referência técnica
-A fonte de `bloxdSunDirection()` é um buffer de direção do sol reescrito somente quando o tipo de skybox muda — o critério não é "se o céu tem um sol", e sim **"se o skybox é do tipo terra"**.
+`bloxdSunDirection()` lê um buffer com a direção do sol, atualizado somente quando o tipo de skybox muda. O critério decisivo não é se o céu mostra um sol, mas **se o skybox é do tipo `earth`**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
@@ -12,13 +12,13 @@ A fonte de `bloxdSunDirection()` é um buffer de direção do sol reescrito some
 
 A direção do sol em mundos padrão é cerca de `(-0.56, 0.81, -0.18)` (vetor unitário calculado a partir de `inclination` = −0.2 / `azimuth` = 0.55, estático). Uma referência útil para estimar a direção dos reflexos durante os testes dos packs.
 
-Ciclos dia/noite não são embutidos no motor — inclination é um número estático, e mundos com dia/noite em movimento o atualizam pelo próprio jogo. `bloxdSunDirection()` acompanha cada atualização.
+O motor não inclui um ciclo dia/noite. `inclination` permanece estático; mundos que implementam um ciclo dinâmico atualizam esse valor na lógica do jogo. `bloxdSunDirection()` reflete cada atualização.
 
-As luzes direcionais do terreno são apenas 2 lâmpadas criadas no início da cena, de **direção e intensidade fixas, sem variação dia/noite**. Em resumo: **nenhum fator de brilho do terreno depende do tempo. Os "looks" de dia/noite vêm somente do skybox e de bloxdSunDirection()** — portanto, pacotes que escurecem o terreno à noite devem estimar por conta própria a faixa de horário a partir de bloxdSunDirection() (a técnica `sunPresent` em [Projetando looks noturnos](../guides/night.md)).
+A iluminação direcional do terreno se limita a duas fontes criadas no início da cena. Sua **direção e intensidade permanecem constantes durante o dia e a noite**. Em outras palavras, o brilho do terreno não varia com o horário; a aparência diurna ou noturna depende apenas do skybox e de `bloxdSunDirection()`. Por isso, pacotes que escurecem o terreno à noite precisam estimar o horário a partir de `bloxdSunDirection()`, como na técnica `sunPresent` de [Projetando looks noturnos](../guides/night.md).
 
 ## R-A. Luz da lua
 
-Adiciona Lambert branco-azulado e especular fraco somente enquanto a lua está no céu. `moonUp` é 0 em mundos padrão de sol estático, então nada acontece ali — **luar que só dispara em mundos com ciclo dia/noite, portanto, só produz efeito em mundos com ciclo dia/noite**.
+Adiciona iluminação difusa de Lambert em tom branco-azulado e um leve brilho especular apenas enquanto a lua está acima do horizonte. Nos mundos padrão, em que o sol permanece estático, `moonUp` é 0 e nada acontece. **O efeito de luz lunar só é ativado em mundos que implementam um ciclo dia/noite.**
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
