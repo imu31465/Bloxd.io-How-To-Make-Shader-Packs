@@ -5981,7 +5981,7 @@ Teste ein Pack vor der Veröffentlichung im jeweiligen Spiel und prüfe, ob die 
 ## Sonne und Mond
 > Ziel-API: 5 · Typ: technische Referenz
 
-Die `bloxdSunDirection()`-Quelle ist ein Sonnenrichtungs-Buffer, der nur bei Skybox-Typwechsel neu geschrieben wird — Kriterium ist nicht „ob der Himmel eine Sonne hat", sondern **„ob die Skybox vom Erdtyp ist"**.
+`bloxdSunDirection()` liest einen Puffer mit der Sonnenrichtung, der nur bei einem Wechsel des Skybox-Typs aktualisiert wird. Entscheidend ist nicht, ob am Himmel eine Sonne zu sehen ist, sondern **ob die Skybox vom Typ `earth` ist**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
@@ -5992,13 +5992,13 @@ Die `bloxdSunDirection()`-Quelle ist ein Sonnenrichtungs-Buffer, der nur bei Sky
 
 Die Sonnenrichtung in Standardwelten beträgt etwa `(-0.56, 0.81, -0.18)` (ein statischer Einheitsvektor aus `inclination` = −0.2 und `azimuth` = 0.55). Der Wert hilft dabei, beim Testen von Shader-Packs die Richtung von Glanzlichtern abzuschätzen.
 
-Tag/Nacht-Zyklen sind nicht in die Engine eingebaut — inclination ist eine statische Zahl, die Welten mit einem dynamischen Tag-Nacht-Zyklus aktualisieren den Wert spielseitig. `bloxdSunDirection()` folgt jeder Aktualisierung.
+Ein Tag-Nacht-Zyklus ist nicht in die Engine eingebaut. `inclination` ist ein statischer Wert; Welten mit einem dynamischen Tag-Nacht-Zyklus aktualisieren ihn in ihrer Spiellogik. `bloxdSunDirection()` übernimmt jede Aktualisierung.
 
 gerichteten Terrain-Lichter sind nur 2 Lampen beim Szenenstart, mit **fixer Richtung und Intensität, ohne Tag/Nacht-Wechsel**. Kurz: **Kein Terrain-Helligkeitsfaktor hängt von der Zeit ab. Tag/Nacht-„Looks" kommen nur aus Skybox und bloxdSunDirection()**, also müssen nachts abdunkelnde Pakete die Zeitspanne selbst aus bloxdSunDirection() schätzen (die `sunPresent`-Technik aus [Nacht-Looks gestalten](guides/night.md)).
 
 ### R-A. Mondlicht
 
-Addiert bläulich-weißes Lambert und schwaches Specular nur solange der Mond oben ist. `moonUp` ist in statischen Standardwelten 0: dort passiert nichts — **Mondlicht, das nur in Welten mit Tag/Nacht-Zyklus feuert, also sicher**.
+Fügt ein bläulich-weißes Lambert-Licht und einen schwachen Glanzpunkt hinzu, solange der Mond über dem Horizont steht. In Standardwelten mit unbeweglicher Sonne ist `moonUp` gleich 0; dort tritt kein Effekt auf. **Der Mondlichteffekt ist daher nur in Welten mit einem Tag-Nacht-Zyklus aktiv.**
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
