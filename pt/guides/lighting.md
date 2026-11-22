@@ -1,5 +1,7 @@
 # Iluminação padrão do motor e margem para realismo
 
+> API alvo: 5 · Estado: Verified
+
 
 
 A iluminação padrão do motor é "só multiplicação" — não existem especular, fresnel, separação quente/frio nem ambiente hemisférico. O seguinte pode ser reconstruído:
