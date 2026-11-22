@@ -950,7 +950,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **해결 방법**: 최소한의 환경광을 유지한다. `bloxdSunDirection()`이 영벡터이면 실제 달의 방향을 알 수 없으므로, 시각적 대안으로 희미한 푸른 환경광을 사용한다 ([야간 레시피](recipes/lighting.md)). 낮과 밤의 주기를 구현한 월드에서는 `-bloxdSunDirection()`으로 달빛의 방향을 구할 수 있다.
 ```
 
 - **반환값**: 월드 방향 기준으로 태양을 향하는 단위 벡터. **태양이 없을 때는 제로 벡터**
