@@ -4,7 +4,7 @@
 
 Nur Schatten abzudunkeln lässt die fertige Farbe (`engineColour`) ohne Sonne hell, und die Flächen/Schatten-Lücke wird unnatürlich. Die ganze fertige Farbe dämpfen.
 
-Das Beispiel behandelt `bloxdSunDirection()`-null als Nacht und gerichtete Sonne als Tag und dämpft Terrain-Endfarben in dunklen Stunden. Wo `blockLight` und `heldLight` stark sind, schwächt sich die Dämpfung, um nahe Lampen wie Fackeln zu erhalten. `0.52` ist ein Tuning-Wert — für dunklere Nächte senken.
+Das Beispiel interpretiert `bloxdSunDirection() == 0` als Nacht und eine gültige Sonnenrichtung als Tag. Nachts wird die fertige Terrain-Farbe abgeschwächt. Bei hohen Werten für `blockLight` und `heldLight` fällt die Abschwächung geringer aus, damit Lichtquellen in der Nähe – etwa Fackeln – sichtbar bleiben. `0.52` ist ein einstellbarer Wert. Für dunklere Nächte kann er verringert werden.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
