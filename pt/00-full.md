@@ -3079,7 +3079,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-**Limites desta correção:** se `bloxdSunDirection()` se comporta como "direção unitária com sol, zero sem ele", dia/noite se distinguem mas o ocaso não se estima suavemente. E como atenua a cor terminada, enfraquece juntos a luz diurna e o ambiente do motor — não é reprodução total do horário. Para aplicar o mesmo a líquidos, revise a relação de fallback dos hooks de líquido.
+**Limites deste método:** `bloxdSunDirection()` fornece a direção do sol, então a direção da lua pode ser obtida invertendo-a (`-bloxdSunDirection()`). Nos mundos padrão, o sol é fixo e a lua também não se move; ela só se move em mundos com ciclo dia/noite. Se o valor indicar apenas uma direção unitária ou zero, é possível distinguir dia e noite, mas não representar o crepúsculo de forma gradual. Este exemplo reduz a cor final do terreno e, com isso, enfraquece ao mesmo tempo a luz diurna e a iluminação ambiente do motor; não reproduz toda a iluminação de cada horário. Para aplicar o mesmo aos líquidos, confira a relação de fallback dos hooks de líquido.
 
 
 ---
