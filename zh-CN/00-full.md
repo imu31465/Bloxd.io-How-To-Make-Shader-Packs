@@ -950,7 +950,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **解决方法**：保留最低限度的环境光。当 `bloxdSunDirection()` 为零时，无法确定月亮的实际方向，因此可用微弱的蓝色环境光作为视觉上的替代方案（参见[夜间配方](recipes/lighting.md)）。在实现昼夜循环的世界中，可以通过 `-bloxdSunDirection()` 获取月光方向。
 ```
 
 - **返回**: 世界朝向下指向太阳的单位向量；**没有太阳时为零向量**
