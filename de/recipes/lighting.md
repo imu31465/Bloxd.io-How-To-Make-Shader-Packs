@@ -1,6 +1,6 @@
 # Beleuchtung
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Status: Verified
 
 ## Kontrast-S-Kurve
 
