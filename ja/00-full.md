@@ -973,7 +973,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **解決方法**: 最小限の環境光を確保します。`bloxdSunDirection()` がゼロのときは月の実際の方向を取得できないため、代わりに弱い青色の環境光を加えます ([夜のレシピ](recipes/lighting.md))。昼夜サイクルのあるワールドでは、`-bloxdSunDirection()` から方向性のある月光を計算できます。
 ```
 
 - **戻り値**: 太陽方向の単位ベクトル (ワールド方位)。**太陽がないときはゼロベクトル**
