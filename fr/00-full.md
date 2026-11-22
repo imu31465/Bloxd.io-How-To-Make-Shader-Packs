@@ -952,13 +952,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 - **Correction** : conservez un niveau minimal de lumière ambiante. Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inaccessible ; utilisez alors une faible lumière ambiante bleutée comme solution de repli visuelle ([recette nocturne](recipes/lighting.md)). Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()`.
 ```
-
-- **Renvoie** : vecteur unitaire vers le soleil en orientation monde ; **vecteur nul quand il n'y a pas de soleil**
-- **Faits** :
-- Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inconnue. Dans ce cas, utilisez une faible lumière ambiante bleutée comme effet d’ambiance plutôt que d’essayer de simuler un clair de lune directionnel. Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()` (voir [Le soleil et la lune](internals/sun-and-moon.md)).
-  - **ne jamais passer le vecteur nul à `normalize`** — protégez avec `dot(d, d) < 1e-8` et retombez sur une direction constante
-  - le build actuel n'a pas de cycle jour/nuit ; soleil, lune et étoiles ne bougent pas pendant une session (seule l'opacité bascule). Dans le ciel « terre » par défaut, le soleil se tient près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°)
-- **Usages** : température de couleur, direction de la lumière, porte solaire, pseudo clair de lune
+- **Renvoie** : vecteur unitaire dirigé vers le soleil en orientation monde ; **zéro lorsque le monde n’a pas de soleil**.
+- **Faits importants** :
+  - La direction de la lune est opposée à celle du soleil : `-bloxdSunDirection()`.
+  - **Ne passez jamais le vecteur nul à `normalize`**. Vérifiez `dot(d, d) < 1e-8` et prévoyez une direction fixe en remplacement.
+  - Le moteur ne fournit pas de cycle jour/nuit automatique. Dans le ciel Earth par défaut, le soleil reste près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°). Chaque monde peut implémenter son propre cycle en mettant à jour `inclination`, ce qui modifie les directions du soleil et de la lune.
+- **Usages** : température de couleur, direction de la lumière, détection du soleil et effets de clair de lune ambiant.
 
 #### bloxdSeconds
 
