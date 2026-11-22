@@ -16,7 +16,7 @@ Helligkeits-, Schatten- und Fog-Probleme.
 
 ## Nacht zu dunkel
 
-- **Fix**: ein Mindest-Ambiente garantieren; bei null `bloxdSunDirection()` ist die wahre Mondrichtung unbekannt, also pseudo-blaues Ambiente benutzen ([das Nacht-Rezept](../recipes/lighting.md)). Die Mondrichtung selbst ist `-bloxdSunDirection()` (nur Welten mit Tag/Nacht-Zyklus)
+- **Lösung**: Sorge für ein Mindestmaß an Umgebungslicht. Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Mondrichtung nicht bestimmen. Verwende dann schwaches blaues Umgebungslicht als visuellen Ersatz ([Nacht-Rezept](../recipes/lighting.md)). In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts mit `-bloxdSunDirection()` bestimmen.
 
 ## Tag brennt aus
 
