@@ -103,7 +103,7 @@ Cada nombre de textura utilizable se convierte en una `const` comparable. **La g
 - **Las texturas animadas no llevan número de fotograma**: `lava` es el nombre; `lava0` es un error dedicado
 - **Las familias de rotación usan el nombre raíz**: escribir la grafía de una copia girada produce un mensaje dedicado
 
-### Errores de resolución de nombres (literales del validador)
+### Errores al resolver nombres
 
 > **Grafía del prefijo / mayúsculas:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >
