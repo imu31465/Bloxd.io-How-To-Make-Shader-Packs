@@ -4166,7 +4166,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Guía de ajuste: **el área de sombra la decide solo `shTh`** — `0.93` = radio 1.5+ / `0.87` = radio 2 / `0.80` = radio 3 / `0.67` = radio 5.  
 > La dureza del borde es `shSoft` (0.02 = duro / 0.08 = suave). La oscuridad del núcleo es el doble ajuste de `0.09` (ambiente mínimo) y `0.16` (luz dispersa del cielo).  
-> Para ensanchar sombras al atardecer, suma `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximación de sombras largas de tarde.  
+> Para aproximar las sombras más largas al atardecer, añade `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` al umbral.
+> `sunDir` es `bloxdSunDirection() / length(bloxdSunDirection())`. Para dar un tono más azulado a las sombras, aumenta el canal B de `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` es `bloxdSunDirection() / length(bloxdSunDirection())`). Para sombras más azules sube el B de `vec3f(0.72, 0.82, 1.05)`.
 
 
