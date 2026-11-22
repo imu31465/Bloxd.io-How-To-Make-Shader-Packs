@@ -17,5 +17,5 @@
 - shader pack 은 terrain / liquid 훅에 한정되며, 하늘·엔티티·UI를 같은 코드로 처리하는 구조가 아니다.
 - 섀도맵, 화면 공간 반사, 굴절, 블룸 등을 추가하기 위한 입력은 이 API에 없다 (씬 깊이는 액체 한정의 `bloxdOpaqueBehind()` 로 열려 있다 — [함수](../api/functions.md) 참조).
 - `bloxdSeconds()` 은 애니메이션용 시간으로, 게임 안의 낮밤과 연동된다는 보장은 없다.
-- `bloxdSunDirection()` 이 제로 벡터면 진짜 달의 방향은 알 수 없으며, 파란 환경광을 더하는 처리는 「달빛 물리」가 아니라 분위기를 만드는 근사다. 방향성 달빛은 `-bloxdSunDirection()` 으로 만든다 (낮밤 사이클 월드 한정 — [태양과 달](../internals/sun-and-moon.md) 참조).
+- `bloxdSunDirection()`이 영벡터이면 실제 달의 방향을 알 수 없다. 이때는 방향성 달빛을 흉내 내기보다 약한 푸른 환경광으로 밤 분위기를 표현한다. 낮과 밤의 주기를 구현한 월드에서는 `-bloxdSunDirection()`으로 달빛의 방향을 구할 수 있다 ([태양과 달](../internals/sun-and-moon.md) 참조).
 - `s.position` / `l.position` 은 로컬 좌표이므로, 월드 위치에 의존하는 효과에서는 `bloxdRenderOffset()` 을 더한다. 블록 안 로컬 무늬를 만들 경우는, 의도적으로 로컬 좌표를 쓸 수도 있다.
