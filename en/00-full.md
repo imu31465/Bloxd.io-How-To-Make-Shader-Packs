@@ -951,11 +951,12 @@ fn bloxdRenderOffset() -> vec3i
 
 ```wgsl
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
-// It's below the horizon (y < 0) at night. The moon is always opposite it.
+// At night the sun is below the horizon (y < 0). A zero vector means no sun direction is available.
 - **Fix**: Keep a minimum ambient level. When `bloxdSunDirection()` is zero, the moon's actual direction is unavailable, so use faint blue ambient light as a visual fallback ([night recipe](recipes/lighting.md)). In worlds with a day/night cycle, directional moonlight can be derived from `-bloxdSunDirection()`.
 ```
 - **Returns**: unit vector toward the sun in world orientation; **zero when the world has no sun**.
 - **Facts**:
+  - When this function returns a nonzero vector, the moon's direction is `-bloxdSunDirection()`. A zero return does not reveal the moon's actual direction.
   - **Never pass a zero vector to `normalize`**. Check `dot(d, d) < 1e-8` and use a constant fallback direction.
   - The engine does not provide an automatic day/night cycle. The default Earth sky keeps the sun near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°); a world can implement its own cycle by updating `inclination`, which changes the sun and moon directions.
 - **Uses**: color temperature, light direction, sun gating, and ambient moonlight effects.
@@ -6023,7 +6024,7 @@ Before distributing a pack, test it in the target game and confirm that the hook
 | `default` (procedural sky) | Non-zero (defaults below) |
 | `gloomy` / `interstellar` / `space_*` (cube textures) | **Always (0,0,0)** |
 
-**The moon is always `-bloxdSunDirection()`** (the engine computes the moon position as the exact opposite of the sun). Night is judged by sun elevation — the moon is up when `bloxdSunDirection().y < 0` (sun below horizon). But in default worlds the sun is static, so the moon is static too; only worlds implementing a day/night cycle see it move.
+When `bloxdSunDirection()` returns a nonzero vector, the moon's direction is `-bloxdSunDirection()` (the engine places it directly opposite the sun). If it returns zero, this function does not reveal the moon's actual direction. Night is judged by the sun's elevation: the moon is above the horizon when `bloxdSunDirection().y < 0` (the sun is below the horizon). In default worlds the sun is static, so the moon is static too; only worlds implementing a day/night cycle see it move.
 
 The default-world sun direction is about `(-0.56, 0.81, -0.18)` (unit vector computed from inclination = −0.2 / azimuth = 0.55, static). Use this value as a reference when estimating highlight directions while testing packs.
 
@@ -6040,7 +6041,7 @@ Adds bluish-white Lambert and weak specular only while the moon is up. `moonUp` 
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // the moon is always exactly opposite the sun; auto-off in daytime via moonDir.y < 0
+        // The moon is opposite the sun only when the sun direction is nonzero.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
