@@ -16,7 +16,7 @@
 
 ## 夜晚黑到看不见
 
-- **修复**: 保证最低环境光；`bloxdSunDirection()` 为零时无法得知真实月亮方向，请用拟似蓝色环境光 ([夜晚配方](../recipes/lighting.md))。月亮方向本身是 `-bloxdSunDirection()` (仅昼夜循环世界)
+- **解决方法**：保留最低限度的环境光。当 `bloxdSunDirection()` 为零时，无法确定月亮的实际方向，因此可用微弱的蓝色环境光作为视觉上的替代方案（参见[夜间配方](../recipes/lighting.md)）。在实现昼夜循环的世界中，可以通过 `-bloxdSunDirection()` 获取月光方向。
 
 ## 白天过曝
 
