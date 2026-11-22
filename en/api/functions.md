@@ -32,11 +32,12 @@ fn bloxdRenderOffset() -> vec3i
 
 ```wgsl
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
-// It's below the horizon (y < 0) at night. The moon is always opposite it.
+// At night the sun is below the horizon (y < 0). A zero vector means no sun direction is available.
 fn bloxdSunDirection() -> vec3f
 ```
 - **Returns**: unit vector toward the sun in world orientation; **zero when the world has no sun**.
 - **Facts**:
+  - When this function returns a nonzero vector, the moon's direction is `-bloxdSunDirection()`. A zero return does not reveal the moon's actual direction.
   - **Never pass a zero vector to `normalize`**. Check `dot(d, d) < 1e-8` and use a constant fallback direction.
   - The engine does not provide an automatic day/night cycle. The default Earth sky keeps the sun near `(−0.56, 0.81, −0.18)` (elevation ≈ 54°); a world can implement its own cycle by updating `inclination`, which changes the sun and moon directions.
 - **Uses**: color temperature, light direction, sun gating, and ambient moonlight effects.
