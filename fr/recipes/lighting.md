@@ -1,6 +1,6 @@
 # Éclairage
 
-> API cible : 5 · Build cible : `bbb6l5` (2026-11-20, production et preprod) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> API cible : 5 · État : Verified
 ## Courbe en S de contraste
 
 ```wgsl
