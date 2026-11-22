@@ -1,6 +1,6 @@
 # Iluminación
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Estado: Verified
 
 ## Curva S de contraste
 
