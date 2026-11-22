@@ -16,7 +16,7 @@ Brightness, shadow and fog problems.
 
 ## Night too dark
 
-- **Fix**: guarantee a minimum ambient; with a zero `bloxdSunDirection()` the true moon direction is unknown, so use pseudo blue ambient ([the night recipe](../recipes/lighting.md)). The moon direction itself is `-bloxdSunDirection()` (day-night-cycle worlds only)
+- **Fix**: Keep a minimum ambient level. When `bloxdSunDirection()` is zero, the moon's actual direction is unavailable, so use faint blue ambient light as a visual fallback ([night recipe](../recipes/lighting.md)). In worlds with a day/night cycle, directional moonlight can be derived from `-bloxdSunDirection()`.
 
 ## Daytime blows out
 
