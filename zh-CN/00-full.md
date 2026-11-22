@@ -954,7 +954,7 @@ fn bloxdRenderOffset() -> vec3i
 ```
 - **返回**：世界坐标朝向下指向太阳的单位向量；**世界没有太阳时返回零向量**。
 - **重要事实**：
-  - 月亮方向与太阳方向相反：`-bloxdSunDirection()`。
+  - 此函数返回非零向量时，月亮方向为 `-bloxdSunDirection()`；如果返回零向量，就无法从该函数得知月亮的实际方向。
   - **切勿将零向量传给 `normalize`**。先检查 `dot(d, d) < 1e-8`，必要时改用固定方向。
   - 引擎本身不提供自动昼夜循环。默认 Earth 天空中的太阳固定在 `(−0.56, 0.81, −0.18)` 附近（仰角约 54°）。世界可以自行更新 `inclination` 来实现昼夜变化，从而改变太阳和月亮的方向。
 - **用途**：调整色温、光照方向、判断太阳是否存在，以及实现环境月光效果。
@@ -5996,7 +5996,7 @@ strict 侧特别容易误解的点:
 | `default` (程序天空) | 非零 (默认值见下文) |
 | `gloomy` / `interstellar` / `space_*` (立方体纹理) | **恒为 (0,0,0)** |
 
-**月亮恒为 `-bloxdSunDirection()`** (引擎将月亮位置算作太阳的严格反方向)。夜晚按太阳高度判定——`bloxdSunDirection().y < 0` (太阳在地平线下) 时月亮在上。但默认世界太阳静止，月亮也静止，只有实现昼夜循环的世界才看得到月动。
+当 `bloxdSunDirection()` 返回非零向量时，月亮的方向就是 `-bloxdSunDirection()`（引擎将月亮放在太阳的正反方向）。如果返回零向量，此函数无法提供月亮的实际方向。昼夜状态根据太阳高度判断：当 `bloxdSunDirection().y < 0`（太阳低于地平线）时，月亮位于地平线上方。默认世界中的太阳是静止的，因此月亮也不会移动；只有实现了昼夜循环的世界才会让月亮移动。
 
 默认世界的太阳方向约为 `(-0.56, 0.81, -0.18)` (由 `inclination` = −0.2 / `azimuth` = 0.55 计算出的静态单位向量)。测试着色器包时，可以用这个数值估算高光方向。
 
@@ -6012,7 +6012,7 @@ strict 侧特别容易误解的点:
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // 月亮恒为太阳严格反方向；白天经 moonDir.y < 0 自动熄灭
+        // 只有太阳方向向量非零时，才能确定月亮位于太阳的反方向。
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
