@@ -5994,7 +5994,7 @@ Die Sonnenrichtung in Standardwelten beträgt etwa `(-0.56, 0.81, -0.18)` (ein s
 
 Ein Tag-Nacht-Zyklus ist nicht in die Engine eingebaut. `inclination` ist ein statischer Wert; Welten mit einem dynamischen Tag-Nacht-Zyklus aktualisieren ihn in ihrer Spiellogik. `bloxdSunDirection()` übernimmt jede Aktualisierung.
 
-gerichteten Terrain-Lichter sind nur 2 Lampen beim Szenenstart, mit **fixer Richtung und Intensität, ohne Tag/Nacht-Wechsel**. Kurz: **Kein Terrain-Helligkeitsfaktor hängt von der Zeit ab. Tag/Nacht-„Looks" kommen nur aus Skybox und bloxdSunDirection()**, also müssen nachts abdunkelnde Pakete die Zeitspanne selbst aus bloxdSunDirection() schätzen (die `sunPresent`-Technik aus [Nacht-Looks gestalten](guides/night.md)).
+Die gerichtete Beleuchtung des Terrains besteht aus nur zwei Lichtquellen, die beim Start der Szene erzeugt werden. **Richtung und Intensität bleiben tagsüber und nachts unverändert.** Die Helligkeit des Terrains hängt also nicht von der Tageszeit ab; der Tag-Nacht-Eindruck entsteht allein durch die Skybox und `bloxdSunDirection()`. Shader-Packs, die das Terrain nachts abdunkeln, müssen die Tageszeit daher selbst anhand von `bloxdSunDirection()` abschätzen, etwa mit der `sunPresent`-Technik aus [Nacht-Looks gestalten](guides/night.md)).
 
 ### R-A. Mondlicht
 
