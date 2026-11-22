@@ -15,5 +15,5 @@ L'éclairage par défaut du moteur est « multiplication seule » — aucun spec
 | Détail de surface | Résolution de texture seule | △ Micro-relief procédural par bruit de hachage (R9.8) |
 | Ondes de sommets (eau) | Néant (à plat) | ◎ Allow seul (R7) |
 | Normales de vagues / scintillement solaire | Néant | ◎ (R9.7) |
-| Clair de lune nocturne | La couleur du ciel s'assombrit seulement | △ Pas d'entrée de direction lunaire, donc uniquement des looks pseudo (ambiant bleu en R2 / désaturation en R9.11) |
+| Clair de lune | Par défaut, seule la couleur du ciel s’assombrit | ◎ La direction lunaire se déduit de `-bloxdSunDirection()` ; R-A ajoute un éclairage lunaire directionnel (la lune ne bouge que dans les mondes avec cycle jour/nuit) |
 | Ombres (occlusion du ciel) | Doux mélange via `mix(ambiant, ciel, skyLight)` seul | ◎ Inversion du lift + coupe par seuil + porte solaire (R9.12). L'ombre des arbres et des zones sous toit chute nettement, en suivant les éditions de blocs en temps réel |
