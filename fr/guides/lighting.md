@@ -1,7 +1,7 @@
 # Comment fonctionne l'éclairage
 
 > API cible : 5 · État : Verified
-L'éclairage par défaut du moteur est « multiplication seule » — aucun specular, fresnel, séparation chaud/froid ni ambiant hémisphérique n'existe. Voici ce qui se reconstruit :
+L'éclairage par défaut du moteur est « multiplication seule » — aucun effet spéculaire, effet Fresnel, séparation chaud/froid ni éclairage ambiant hémisphérique n’existe. Voici ce qui se reconstruit :
 
 | Fonctionnalité | Par défaut | Reconstructible en packs ? |
 |---|---|---|
