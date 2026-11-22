@@ -952,13 +952,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 - **Lösung**: Sorge für ein Mindestmaß an Umgebungslicht. Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Mondrichtung nicht bestimmen. Verwende dann schwaches blaues Umgebungslicht als visuellen Ersatz ([Nacht-Rezept](recipes/lighting.md)). In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts mit `-bloxdSunDirection()` bestimmen.
 ```
-
-- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn es keine Sonne gibt**
+- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn die Welt keine Sonne hat**.
 - **Fakten**:
-- Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Richtung des Mondes nicht bestimmen. Verwende in diesem Fall schwaches blaues Umgebungslicht als visuellen Effekt, statt gerichtetes Mondlicht simulieren zu wollen. In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts dagegen mit `-bloxdSunDirection()` bestimmen (siehe [Sonne und Mond](internals/sun-and-moon.md)).
-  - **den Nullvektor nie an `normalize` übergeben** — mit `dot(d, d) < 1e-8` absichern und auf eine konstante Richtung zurückfallen
-  - der aktuelle Build hat keinen Tag/Nacht-Zyklus; Sonne, Mond und Sterne bewegen sich während einer Sitzung nicht (nur die Opacity schaltet). Im Standard-Erde-Himmel steht die Sonne nahe `(−0.56, 0.81, −0.18)` (Elevation ≈ 54°)
-- **Einsatz**: Farbtemperatur, Lichtrichtung, Sonnen-Gating, Pseudo-Mondlicht
+  - Die Mondrichtung ist der Sonne entgegengesetzt: `-bloxdSunDirection()`.
+  - **Den Nullvektor niemals an `normalize` übergeben**. Prüfe `dot(d, d) < 1e-8` und verwende bei Bedarf eine feste Ersatzrichtung.
+  - Die Engine stellt keinen automatischen Tag-Nacht-Zyklus bereit. Im Standard-Earth-Himmel bleibt die Sonne nahe `(−0.56, 0.81, −0.18)` (Höhe ≈ 54°) stehen. Eine Welt kann einen eigenen Zyklus implementieren, indem sie `inclination` aktualisiert; dadurch ändern sich Sonnen- und Mondrichtung.
+- **Einsatz**: Farbtemperatur, Lichtrichtung, Erkennung der Sonnenverfügbarkeit und Umgebungslicht-Effekte für Mondlicht.
 
 #### bloxdSeconds
 
