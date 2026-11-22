@@ -4,7 +4,7 @@
 
 Problemas de velocidade e suas correções.
 
-## A verificação no dispositivo nunca termina e derruba o pacote
+## Verificação no dispositivo bloqueada
 
 - **Causa**: a verificação tem um **timeout forçado de 60 segundos** (o excesso é tratado como `skipped`) — comum em dispositivos de baixo desempenho e mundos pesados
 - **Correção**: reduza o trabalho pesado de vértices e os loops complexos, e tente novamente

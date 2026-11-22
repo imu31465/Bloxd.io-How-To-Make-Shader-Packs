@@ -17,7 +17,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Pseudo depth-based transparency by height (not a real shallows test)
+## Height-based pseudo-transparency
 
 > True water depth needs the liquid-only `bloxdOpaqueBehind()`, which measures the thickness to the opaque face behind (the full recipe: [Making water look natural](../guides/water.md)). The following is a simpler pseudo styling without it: `s.position.y` is a local coordinate, so using it raw shifts the effect as the chunk origin changes. Convert with `bloxdWorldPosition()` for world height. The following only varies alpha by world height — a pseudo effect, not shoreline/bottom-aware shallows. Adjust `packWaterReferenceY` to your world height.
 

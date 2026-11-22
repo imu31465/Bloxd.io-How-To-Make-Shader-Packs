@@ -1,6 +1,6 @@
 # Iluminación
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Estado: Verified
 
 ## Curva S de contraste
 
@@ -24,7 +24,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Noche (tinte azul por skyLight + protección de lámparas)
+## Luz nocturna azul y protección de lámparas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -39,7 +39,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Cuevas a oscuras (oscurecer más donde no hay skyLight)
+## Oscurecer las cuevas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -55,7 +55,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` llega post-realce (sección 10): la oclusión leve (bajo árboles: crudo 0.87 → realzado 0.97) apenas oscurece con este método. Sirve para cuevas (crudo 0). Para marcar la "sombra de árboles", usa inversión + umbral de R9.12.
 
-## Azul nocturno ambiental (pseudo look sin dirección lunar)
+## Ambiente nocturno azulado
 
 > En esta API, `bloxdSunDirection()` es cero cuando el cielo no tiene sol. Lo siguiente no es luz lunar direccional, solo un tenue ambiente azul cuando el cielo está oscuro. La dirección lunar en sí está disponible vía `-bloxdSunDirection()` (solo mundos con ciclo día/noche — [El sol y la luna](../internals/sun-and-moon.md)).
 
@@ -89,7 +89,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Reemplazo total de la salida del motor (reiluminación simple)
+## Reemplazar la salida del motor
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

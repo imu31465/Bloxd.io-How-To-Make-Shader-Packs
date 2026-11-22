@@ -21,12 +21,12 @@ El motor genera una definición distinta de `bloxdTexel` por pipeline, así que 
 | Pipeline | `textureId == 0` | `textureId` no nulo | Notas |
 |---|---|---|---|
 | **Pipelines de atlas** — terreno, líquido y modelos de bloque dibujados desde el atlas de bloques | `vec4f(1.0)` (blanco — «sin textura») | muestrea **esa entrada del atlas** | las constantes con nombre aplican; animación y rotación son automáticas |
-| **Pipelines de textura propia** — modelos cuya malla lleva su propia textura difusa (pieles de jugador, texturas de mobs, sprites de ítem) | muestrea **la textura propia de la malla** en el uv que pases | `vec4f(1.0)` (blanco) | exactamente una textura está en alcance; las constantes con nombre no aplican |
+| **Pipelines de textura propia** — modelos cuya malla lleva su propia textura difusa (pieles de jugador, texturas de mobs, sprites de ítem) | muestrea **la textura propia de la malla** en el uv que pases | `vec4f(1.0)` (blanco) | solo hay una textura disponible en ese contexto; las constantes con nombre no aplican |
 | **Pipelines sin textura** | blanco | blanco | stub; `bloxdTextureSize() -> vec2u(1u)` |
 
 Semántica de los pipelines de atlas en detalle:
 
-- **`textureId == 0` devuelve `vec4f(1.0)` (blanco).** Ese es el id de «sin textura»; las caras sin textura llevan 0 en los cuatro campos de entrada, así que `bloxdTexel(surface.textureId, ...)` siempre es seguro de llamar
+- **`textureId == 0` devuelve `vec4f(1.0)` (blanco).** Ese es el id de «sin textura»; las caras sin textura llevan 0 en los cuatro campos de entrada, así que `bloxdTexel(surface.textureId, ...)` siempre se puede llamar de forma segura
 - **Las texturas animadas devuelven automáticamente el fotograma actual.** Los fotogramas avanzan con el reloj de animación del juego — no puedes detenerlos ni avanzarlos a pasos, y nunca lo necesitarás
 - **`mipLevel` se acota exactamente como el del motor**: `clamp(round(mipLevel), 0, textureNumLevels(textureAtlas0) - 1)`; los mips fuera de rango saturan en lugar de dar error
 - **La `textureRotation` propia del fragmento se aplica al uv que pases** (ver abajo)
@@ -36,8 +36,8 @@ Semántica de los pipelines de atlas en detalle:
 ### El patrón de llamada universal
 
 ```wgsl
-// Works in every pipeline: on atlas faces it samples the atlas entry;
-// on own-texture models textureId is 0 and it samples the model's own texture.
+// Funciona en todas las pipelines: en las caras de atlas toma una muestra de la entrada del atlas;
+// en los modelos con textura propia, textureId es 0 y toma una muestra de la textura del modelo.
 let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
 ```
 
@@ -103,7 +103,7 @@ Cada nombre de textura utilizable se convierte en una `const` comparable. **La g
 - **Las texturas animadas no llevan número de fotograma**: `lava` es el nombre; `lava0` es un error dedicado
 - **Las familias de rotación usan el nombre raíz**: escribir la grafía de una copia girada produce un mensaje dedicado
 
-### Errores de resolución de nombres (literales del validador)
+### Errores al resolver nombres
 
 > **Grafía del prefijo / mayúsculas:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >

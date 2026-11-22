@@ -1,6 +1,6 @@
 # Receitas de iluminação (light)
 
-> API alvo: 5 · Build alvo: `bbb6l5` (2026-11-20, produção e preprod) · Estado: Verified (portado para a API atual — reverificação no dispositivo recomendada)
+> API alvo: 5 · Estado: Verified
 ## Curva S de contraste
 
 ```wgsl
@@ -23,7 +23,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Noite (deslocamento azul guiado por skyLight + proteção de lamparinas)
+## Noite: luz azul e proteção das tochas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -38,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Cavernas totalmente escuras (escurecer ainda mais as áreas sem céu)
+## Escurecer as cavernas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -54,7 +54,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` chega pós-lift (seção 10), então oclusão leve (ex.: sob árvores: cru 0.87 → liftado 0.97) quase não escurece com este método. Ele funciona para cavernas (cru 0). Para afiar a "sombra de árvore", use o método de inversão do lift + limiar de R9.12.
 
-## Azul noturno ambiente (pseudo look sem direção da lua)
+## Ambiente noturno azulado
 
 > Nesta API, `bloxdSunDirection()` é zero quando o céu não tem sol. O que segue não é luar direcional, apenas um tênue ambiente azul somado quando o céu está escuro. A direção da lua em si está disponível via `-bloxdSunDirection()` (apenas mundos com ciclo dia/noite — [O sol e a lua](../internals/sun-and-moon.md)).
 
@@ -72,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Calor de pôr do sol (tingimento pela elevação do sol)
+## Calor do pôr do sol
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -88,7 +88,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Substituição total da saída do motor (reiluminação mais simples)
+## Substituir a saída do motor
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

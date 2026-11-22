@@ -86,4 +86,4 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 
 - Template oficial de 9 hooks → [Primeiros passos: hooks de shader](../getting-started/hooks.md)
 - Cada campo de cada struct → [Estruturas](structures.md)
-- Interioridades da invocação de hooks → [Interior do motor](../internals/hook-invocation.md)
+- Como os hooks são invocados → [Funcionamento interno do motor](../internals/hook-invocation.md)

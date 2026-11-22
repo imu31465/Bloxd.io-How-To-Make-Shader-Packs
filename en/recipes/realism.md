@@ -66,7 +66,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Hemisphere ambient (sky above / ground bounce below)
+## R9.4 Hemispheric ambient
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -101,7 +101,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Aerial perspective ("atmosphere" via distance desaturation)
+## R9.6 Aerial perspective
 
 > Unlike fog (color replacement), layering "distance desaturation" makes distant views much more realistic.  
 > Caution: only reduce saturation — never touch luminance.
@@ -118,7 +118,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Wave normals + sun glitter ("sun road" on water)
+## R9.7 Wave normals and sun glitter
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -149,7 +149,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Procedural micro-bump (texture-ban workaround)
+## R9.8 Procedural micro-bump
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -181,7 +181,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Nonlinear cave darkening + lamp protection
+## R9.9 Nonlinear cave darkening
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -197,7 +197,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Re-applying fog (required when discarding engineColour)
+## R9.10 Reapplying fog
 
 > Setting a floor like `min(l.fogAlpha, 0.75)` caps "no denser than this"
 > (0.0 = engine-accurate / 0.3–0.5 = clearer distance).
@@ -219,7 +219,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Cinema grade (cool shadows / warm highlights / night desaturation)
+## R9.11 Cinematic color grading
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -236,7 +236,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Projected shadows — lift inversion + threshold cut (definitive)
+## R9.12 Projected shadows
 
 > **On `bbb6l5`+ builds you can skip the threshold cut**: `bloxdShadow()` gives the engine's real sun-following shadow factor (0–1, entity shadows included) directly — see [Shadows](../guides/shadows.md). The recipe below remains the one-route-for-all-builds classic and the stylized half-tone look.
 

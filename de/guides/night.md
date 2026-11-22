@@ -4,7 +4,7 @@
 
 Nur Schatten abzudunkeln lässt die fertige Farbe (`engineColour`) ohne Sonne hell, und die Flächen/Schatten-Lücke wird unnatürlich. Die ganze fertige Farbe dämpfen.
 
-Das Beispiel behandelt `bloxdSunDirection()`-null als Nacht und gerichtete Sonne als Tag und dämpft Terrain-Endfarben in dunklen Stunden. Wo `blockLight` und `heldLight` stark sind, schwächt sich die Dämpfung, um nahe Lampen wie Fackeln zu erhalten. `0.52` ist ein Tuning-Wert — für dunklere Nächte senken.
+Das Beispiel interpretiert `bloxdSunDirection() == 0` als Nacht und eine gültige Sonnenrichtung als Tag. Nachts wird die fertige Terrain-Farbe abgeschwächt. Bei hohen Werten für `blockLight` und `heldLight` fällt die Abschwächung geringer aus, damit Lichtquellen in der Nähe – etwa Fackeln – sichtbar bleiben. `0.52` ist ein einstellbarer Wert. Für dunklere Nächte kann er verringert werden.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -25,4 +25,4 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-**Limits dieses Fixes:** Verhält sich `bloxdSunDirection()` wie „Einheitsrichtung mit Sonne, null ohne", lassen sich Tag/Nacht unterscheiden, aber Abendrot nicht weich schätzen. Und da es die fertige Farbe dämpft, schwächt es Engine-Tageslicht und -Ambiente zusammen — keine totale Tageszeit-Reproduktion. Für Flüssigkeiten dieselbe Liquid-Hook-Fallback-Beziehung prüfen.
+**Grenzen dieser Methode:** `bloxdSunDirection()` liefert die Sonnenrichtung; die Mondrichtung lässt sich durch Negation ableiten (`-bloxdSunDirection()`). In Standardwelten steht die Sonne still, daher bewegt sich auch der Mond nicht. Eine Bewegung gibt es nur in Welten mit Tag-Nacht-Zyklus. Liefert der Wert nur eine Einheitsrichtung oder null, lassen sich Tag und Nacht unterscheiden, nicht aber Dämmerungsphasen fließend darstellen. Dieses Beispiel schwächt die fertige Terrain-Farbe ab und reduziert dadurch Tageslicht und Umgebungslicht der Engine zugleich; es bildet nicht den vollständigen Tagesverlauf nach. Für Flüssigkeiten ist die Fallback-Beziehung der Liquid-Hooks zu prüfen.

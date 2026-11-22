@@ -4,34 +4,44 @@
 
 围绕 `bloxdTextureId*` / `bloxdTexel` 的问题。全部 可用名称可在[纹理目录](../api/texture-catalog.md)中搜索。
 
-## 「There's no texture called X. Did you mean bloxdTextureIdY?」
+## 未知纹理名称
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **原因**: 拼写错误；验证器带**莱文斯坦建议** (阈值 `max(2, floor(len/4)) + 1`)
 - **修复**: 采纳建议；与[目录](../api/texture-catalog.md)核对
 - **预防**: 从目录复制粘贴名称
 
-## 「...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.」
+## 动画纹理帧的命名
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **原因**: 给动画纹理写了**帧号** (`lava0` 等)
 - **修复**: 用基础名称 — 采样会自动返回当前帧
 - **预防**: 43 个动画族永远不要写帧号后缀 ([命名](../api/texture-api.md#拼写规则与命名自由度))
 
-## 「...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...」
+## 旋转纹理的命名
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **原因**: 写了旋转族的旋转副本拼写 (`[rot[N`)
 - **修复**: 用根名称 — `bloxdTexel` 会重新应用旋转
 
-## 「...could name X and Y, which differ only by case or underscores, so it can't be used.」
+## 有歧义的纹理标识符
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **原因**: 不区分大小写/下划线的折叠使名称**有歧义**
 - **修复**: 改写拼写以消除歧义
 
-## 「bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?」
+## 无效的纹理常量名称
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **原因**: 前缀拼错 (如 `bloxdTextureID`、`bloxdtextureid`)
 - **修复**: 名称以精确的 `bloxdTextureId` 开头
 
-## 「Case and underscores are not distinguished」— 两条规则怎么共存？
+## 大小写与下划线规则
 
 名称解析会折叠大小写与 `_`，因此 `bloxdTextureId_grass_top` 与 `bloxdTextureIdGrassTop` 解析为**同一个**常量。只有当折叠后剩下多个候选时才会触发专属的歧义错误 ([命名规则](../api/texture-api.md#拼写规则与命名自由度))。
 
@@ -44,7 +54,9 @@
 
 - **限制**: 着色器包 API 只**读取**图集；添加纹理是纹理包系统的职责 ([组合](../guides/combinations.md))
 
-## 「Packs can't use X: the engine binds every texture and sampler...」
+## 纹理访问限制
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **原因**: 直接声明了 `texture_*` / `sampler` 类型
 - **修复**: 经 `bloxdTexel()` 使用 ([限制](../api/restrictions.md))

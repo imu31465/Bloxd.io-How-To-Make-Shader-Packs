@@ -67,7 +67,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 半球环境光 (上=天空 / 下=地面反弹)
+## R9.4 半球环境光
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -102,7 +102,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 大气透视 (随距离降饱和的「空气感」)
+## R9.6 空气透视
 
 > 与雾 (颜色替换) 不同，再叠「随距离去饱和」会让远景真实得多。  
 > 注意：只降饱和度，不动亮度。
@@ -119,7 +119,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 波法线 + 太阳闪光 (水面「太阳之路」)
+## R9.7 波浪法线与阳光闪烁
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -150,7 +150,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 程序化微凹凸 (纹理禁止的绕行法)
+## R9.8 程序化微表面凹凸
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -182,7 +182,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 洞穴非线性压黑 + 灯光保护
+## R9.9 洞穴非线性暗化
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -198,7 +198,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 重打雾 (丢弃 engineColour 时必需)
+## R9.10 重新应用雾效
 
 > `(1.0 - l.fogAlpha)` 加 `min(l.fogAlpha, 0.75)` 式下限可实现「不再更浓」  
 > (0.0 = 引擎一致 / 0.3–0.5 = 远景更透)。
@@ -220,7 +220,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 电影级 (阴影偏冷 / 高光偏暖 / 夜晚去饱和)
+## R9.11 电影风格调色
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -237,7 +237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 投影风阴影 —— 提升逆变换 + 阈值切割 (决定版)
+## R9.12 投影阴影
 
 > **前提复核 (第 10 章)**：`l.skyLight` 不是体素原始值 (n/15)，而是引擎「提升曲线」  
 > `y = 1-(1-x/(3-2x))³` (提亮暗部的 S 曲线) 之后的值。

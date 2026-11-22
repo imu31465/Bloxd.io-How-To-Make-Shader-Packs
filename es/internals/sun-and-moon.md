@@ -6,20 +6,20 @@ La fuente de `bloxdSunDirection()` es un búfer de dirección solar reescrito so
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
-| `default` (cielo procedural) | No cero (defectos abajo) |
+| `default` (cielo procedural) | Distinto de cero (valor predeterminado más abajo) |
 | `gloomy` / `interstellar` / `space_*` (texturas cubo) | **Siempre (0,0,0)** |
 
 **La luna está siempre en `-bloxdSunDirection()`** (el motor calcula la posición lunar como el opuesto exacto del sol). La noche se juzga por altura solar — hay luna arriba cuando `bloxdSunDirection().y < 0` (sol bajo el horizonte). Pero en mundos por defecto el sol está estático y la luna también — solo los mundos con ciclo día/noche la ven moverse.
 
-La dirección solar por defecto ronda `(-0.56, 0.81, -0.18)` (vector unitario de inclination = −0.2 / azimuth = 0.55, estático). Referencia práctica para predecir direcciones de brillo al probar paquetes de distribución.
+La dirección solar por defecto ronda `(-0.56, 0.81, -0.18)` (vector unitario de `inclination` = −0.2 / `azimuth` = 0.55, estático). Referencia útil para estimar la dirección de los reflejos al probar packs.
 
-Los ciclos día/noche no están integrados en el motor — inclination es un número estático que los mundos con día móvil actualizan lado juego. `bloxdSunDirection()` sigue cada actualización.
+Los ciclos día/noche no están integrados en el motor — inclination es un número estático que los mundos con día móvil actualizan el propio juego. `bloxdSunDirection()` sigue cada actualización.
 
-Las luces direccionales del terreno son solo 2 lámparas creadas al arrancar escena, de **dirección e intensidad fijas, sin cambio día/noche**. En corto: **ningún factor de brillo del terreno depende del tiempo. Los "looks" día/noche vienen solo del skybox y bloxdSunDirection()**, así que los paquetes que oscurecen de noche deben estimar la franja horaria desde bloxdSunDirection() (la técnica `sunPresent` de [Diseñar looks nocturnos](../guides/night.md)).
+Las luces direccionales del terreno son solo 2 lámparas creadas al arrancar escena, de **dirección e intensidad fijas, sin cambio día/noche**. En resumen: **ningún factor de brillo del terreno depende del tiempo. Los "looks" día/noche vienen solo del skybox y bloxdSunDirection()**, así que los paquetes que oscurecen de noche deben estimar la franja horaria desde bloxdSunDirection() (la técnica `sunPresent` de [Diseñar looks nocturnos](../guides/night.md)).
 
-## R-A. Luz lunar direccional — moonDir = −bloxdSunDirection()
+## R-A. Luz de luna
 
-Añade Lambert blanco-azulado y especular débil solo mientras la luna está arriba. `moonUp` es 0 en mundos de sol estático por defecto: allí no pasa nada — **luz lunar que solo se activa en mundos con ciclo día/noche, luego segura**.
+Añade Lambert blanco-azulado y especular débil solo mientras la luna está arriba. `moonUp` es 0 en mundos de sol estático por defecto: allí no pasa nada — **luz lunar que solo se activa en mundos con ciclo día/noche, por lo que solo se activa en mundos con ciclo día/noche**.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -36,7 +36,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
             out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
         }
-}
+    }
     return out;
 }
 ```

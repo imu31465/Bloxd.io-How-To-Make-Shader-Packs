@@ -1,6 +1,6 @@
 # Éclairage
 
-> API cible : 5 · Build cible : `bbb6l5` (2026-11-20, production et preprod) · État : Verified (porté à l'API actuelle — revérification sur appareil recommandée)
+> API cible : 5 · État : Verified
 ## Courbe en S de contraste
 
 ```wgsl
@@ -23,7 +23,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Nuit (virage bleu piloté par skyLight + protection des lampes)
+## Nuit : lumière bleutée et protection des lampes
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -38,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Grottes d'un noir profond (assombrir davantage les zones sans ciel)
+## Assombrir les grottes
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -54,7 +54,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` arrive post-lift (section 10) : l'occlusion légère (p. ex. sous les arbres : brut 0.87 → lifté 0.97) s'assombrit à peine avec cette méthode. Cela fonctionne pour les grottes (brut 0). Pour accentuer « l'ombre des arbres », utilisez la méthode d'inversion du lift + coupe par seuil de R9.12.
 
-## Bleu nocturne ambiant (pseudo look sans direction lunaire)
+## Ambiance nocturne bleutée
 
 > Dans cette API, `bloxdSunDirection()` vaut zéro quand le ciel n'a pas de soleil. Ce qui suit n'est pas un clair de lune directionnel, juste un faible ambiant bleu ajouté quand le ciel est sombre. La direction de la lune elle-même est disponible via `-bloxdSunDirection()` (mondes à cycle jour/nuit uniquement — [Le soleil et la lune](../internals/sun-and-moon.md)).
 
@@ -88,7 +88,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Remplacement total de la sortie moteur (rééclairage simple)
+## Remplacer la sortie du moteur
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

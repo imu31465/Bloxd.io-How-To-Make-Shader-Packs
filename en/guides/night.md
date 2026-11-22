@@ -24,4 +24,4 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-**Limits of this fix:** if `bloxdSunDirection()` behaves as "unit direction with sun, zero without", day/night can be told apart but dusk/twilight cannot be smoothly estimated. And since it decays the finished color, it weakens engine daylight and ambient together — not a full time-of-day reproduction. To apply the same to liquids, check the liquid hook fallback relationship.
+**Limitations:** `bloxdSunDirection()` provides the sun direction, so the moon direction can be derived as its negation. In default worlds the sun is static, so the derived moon direction is static too; only worlds with a day/night cycle move it. If the value is only a unit direction or zero, it distinguishes day from night but cannot smoothly represent dusk or twilight. This example dims the finished terrain color, so it weakens engine daylight and ambient together rather than recreating the full time-of-day lighting. For liquids, check the liquid-hook fallback relationship.

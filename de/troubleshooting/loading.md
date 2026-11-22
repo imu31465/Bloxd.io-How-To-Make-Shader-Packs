@@ -4,14 +4,17 @@
 
 Fehler, die an der **Loader-Stufe** (dem ersten Gate) abgelehnt werden, angezeigt in der Statuszeile der Einstellungen mit `shaderPack:load*`-ids.
 
-## „There's no pack.json at the top of the pack."
+## Pack-Manifest fehlt
+
+> `There's no pack.json at the top of the pack.`
 
 - **Ursache**: keine `pack.json` im Zip-Root (z. B. wurde der Ordner mit einer Extra-Verschachtelungsebene gezippt)
 - **Prüfen**: die Zip öffnen — `pack.json` auf der obersten Ebene (oder direkt unter genau einem gemeinsamen Wurzelordner)
 - **Fix**: `pack.json` und die `.wgsl`-Dateien direkt zippen. Ein einzelner gemeinsamer Wurzelordner wird automatisch abgeschnitten ([Pack-Struktur](../getting-started/pack-structure.md))
 - **Vorbeugen**: die Zip-Prozedur fix halten; macOS „Compress“ funktioniert direkt (OS-Müll wird automatisch ausgeschlossen)
 
-## `loadDuplicateManifest` beim Zip-Laden
+## Doppeltes Manifest
+
 
 - **Ursache**: zwei `pack.json`-Dateien (Groß/Klein-Differenzen eingeschlossen)
 - **Fix**: exakt eine behalten
@@ -49,7 +52,9 @@ Split-Zips, zip64, verschlüsselte Einträge und nicht unterstützte Kompression
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | doppelter Pfad / Nicht-UTF-8 / Dekomprimier-Fehler / beschädigte Zip |
 | `loadNoManifest` / `loadDuplicateManifest` | Manifest-Position / Duplikation |
 
-## „Ready. Reload the page to use it.", aber nichts ändert sich
+## Seitenneuladen erforderlich
+
+> `Ready. Reload the page to use it.", aber nichts ändert sich`
 
 - **Ursache**: Pakete brauchen einen **Seiten-Reload**, um zu aktivieren
 - **Fix**: nach der Auswahl neu laden; der Status sollte `Ready to use` werden

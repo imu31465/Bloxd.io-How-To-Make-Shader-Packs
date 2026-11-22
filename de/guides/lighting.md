@@ -1,12 +1,12 @@
 # Wie das Lighting funktioniert
 
-> Ziel-API: 5 · Ziel-Build: `bbb6l5` (2026-11-20, Produktion und Preprod) · Status: Verified (auf die aktuelle API portiert — Prüfung auf dem Gerät empfohlen)
+> Ziel-API: 5 · Status: Verified
 
 Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, Warm-Kalt-Trennung oder Hemisphären-Ambiente existiert. Folgendes lässt sich neu aufbauen:
 
 | Feature | Standard | In Paketen baubar? |
 |---|---|---|
-| Diffus (Lambert) | Nur skalare Richtlicht-Summe | ◎ Eigen mit `bloxdSunDirection()` (Wrap-Quellen etc.) |
+| Diffus (Lambert) | Nur skalare Richtlicht-Summe | ◎ Eigene Umsetzung mit `bloxdSunDirection()` (periodische Abschwächung usw.) |
 | Specular | Keins | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Keins | ◎ Schlick-Näherung (R9.3) |
 | Warme Fackel / kaltes Himmelslicht-Trennung | Farblos | ◎ (R9.1) |
@@ -16,5 +16,5 @@ Das Engine-Standardlicht ist „nur Multiplikation" — kein Specular, Fresnel, 
 | Oberflächendetail | Nur Texturauflösung | △ Prozedurales Hash-Mikro-Bump (R9.8) |
 | Vertex-Wellen (Wasser) | Keine (flach) | ◎ Nur allow (R7) |
 | Wellennormalen / Sonnenglitzer | Keine | ◎ (R9.7) |
-| Nachtmondlicht | Himmelsfarbe dunkelt nur ab | △ Kein Mondrichtungs-Input, also nur Pseudo-Looks (blaues Ambiente in R2 / Entsättigung in R9.11) |
-| Schatten (Himmelsverdeckung) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |
+| Mondlicht bei Nacht | Standardmäßig wird nur die Himmelsfarbe dunkler | ◎ Die Mondrichtung ergibt sich aus `-bloxdSunDirection()`; R-A ergänzt gerichtetes Mondlicht (der Mond bewegt sich nur in Welten mit Tag-Nacht-Zyklus) |
+| Schatten (Abschirmung des Himmelslichts) | Nur sanftes Mischen via `mix(Ambiente, Himmel, skyLight)` | ◎ Lift-Inversion + Schwellenwert-Schnitt + Sonnen-Gate (R9.12). Baumschatten und Dachschatten fallen klar und folgen Block-Edits in Echtzeit |

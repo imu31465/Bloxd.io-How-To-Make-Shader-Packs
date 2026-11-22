@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **返回**: `position + vec3f(bloxdRenderOffset())`
 - **注意**: f32 精度限制意味着远处坐标可能不精确 (标头: *「with possible f32 inaccuracy」*)
 
-### bloxdFragmentBlockPosition — 未写入文档但仍在注入
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +142,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 阴影函数
 
-`API v5` 提供引擎的太阳/月亮阴影系统：方块、玩家、生物和物品投下的投影阴影会随太阳移动。这两个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
+这三个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
 
 ### bloxdShadow
 

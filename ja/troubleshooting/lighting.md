@@ -37,7 +37,9 @@
 - **原因**: ライティング有効時だけ意味のある入力 (`blockLight` 等) をガードせず使っている。v5 では `#ifdef BLOXD_LIGHTING` は廃止 — **実行時の `bloxdLit()`** で分岐する
 - **解決方法**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` の早期 return を入れる ([ライティングAPI](../api/lighting.md#bloxdlit--ライティングのゲート))
 
-## `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
+## LightEngine のキューあふれ
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **症状**: コンソールにこの警告が出て、発光集中部のライトが欠ける
 - **原因**: 発光ブロックが密度の高い領域・領域渡りで光のシードキューが溢れ、そのチャンクのライト計算が途中で打ち切られた。**パック由来ではない**が、発光集中部のライト欠けはこの仕様が原因

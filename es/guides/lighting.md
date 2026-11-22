@@ -1,12 +1,12 @@
 # Cómo funciona la iluminación
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified (portado a la API actual — se recomienda reverificar en el dispositivo)
+> API objetivo: 5 · Estado: Verified
 
 La iluminación por defecto del motor es "solo multiplicación" — no existen especular, fresnel, separación cálido/frío ni ambiente hemisférico. Lo siguiente se puede reconstruir:
 
 | Función | Por defecto | ¿Construible en paquetes? |
 |---|---|---|
-| Difuso (Lambert) | Solo suma escalar de direccionales | ◎ Propio con `bloxdSunDirection()` (caída envuelta etc.) |
+| Difuso (Lambert) | Solo suma escalar de direccionales | ◎ Implementación propia con `bloxdSunDirection()` (atenuación periódica, etc.) |
 | Especular | Ninguno | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Ninguno | ◎ Aproximación de Schlick (R9.3) |
 | Separación antorcha cálida / cielo frío | Sin color | ◎ (R9.1) |
@@ -16,5 +16,5 @@ La iluminación por defecto del motor es "solo multiplicación" — no existen e
 | Detalle de superficie | Solo resolución de textura | △ Micro-relieve procedural con hash (R9.8) |
 | Ondas de vértice (agua) | Ninguna (plano) | ◎ Solo allow (R7) |
 | Normales de ola / destello solar | Ningunas | ◎ (R9.7) |
-| Luz lunar nocturna | El color del cielo solo oscurece | △ Sin entrada de dirección lunar, así que solo looks pseudo (ambiente azul en R2 / desaturación en R9.11) |
+| Luz lunar nocturna | Por defecto, solo se oscurece el color del cielo | ◎ La dirección lunar se obtiene con `-bloxdSunDirection()`; R-A añade luz lunar direccional (solo se mueve en mundos con ciclo día/noche) |
 | Sombras (oclusión de cielo) | Solo mezcla suave vía `mix(ambiente, cielo, skyLight)` | ◎ Inversión del realce + corte por umbral + puerta solar (R9.12). La sombra de árboles y bajo techos cae claramente, siguiendo ediciones de bloques en tiempo real |

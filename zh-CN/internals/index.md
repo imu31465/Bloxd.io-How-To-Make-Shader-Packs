@@ -3,11 +3,11 @@
 本分类介绍引擎内部行为，帮助理解着色器包的执行过程。这些实现细节可能随游戏更新而变化；稳定的使用规则和可用 API 请参阅 [API 参考](../api/)。
 
 
-## 导航
+## 内容
 
 | 页面 | 内容 |
 |---|---|
-| [渲染管线](rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 实情、贪心网格合并 |
+| [渲染管线](rendering-pipeline.md) | alphaTest 位置、双光源设置、uniform 的实际数据布局、贪心网格合并 |
 | [钩子接入](hook-invocation.md) | 钩子如何拼接进引擎的 WGSL |
 | [引擎标头](engine-header.md) | 添加到着色器包前面的 WGSL 声明 |
 | [着色器验证](shader-validation.md) | 分析器内部、签名表、HEADER_VERSION |

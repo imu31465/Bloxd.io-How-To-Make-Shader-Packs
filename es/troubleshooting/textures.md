@@ -4,34 +4,44 @@
 
 Problemas en torno a `bloxdTextureId*` / `bloxdTexel`. Busca los nombres disponibles en el [catálogo de texturas](../api/texture-catalog.md).
 
-## "There's no texture called X. Did you mean bloxdTextureIdY?"
+## Nombre de textura desconocido
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **Causa**: una errata; el validador tiene **sugerencias Levenshtein** (umbral `max(2, floor(len/4)) + 1`)
 - **Corrección**: acepta la sugerencia; contrasta con el [catálogo](../api/texture-catalog.md)
 - **Prevención**: copia y pega los nombres del catálogo
 
-## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+## Nombres de fotogramas animados
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **Causa**: escribir un **número de fotograma** en una textura animada (`lava0` etc.)
 - **Corrección**: usa el nombre base — el muestreo devuelve automáticamente el fotograma actual
 - **Prevención**: nunca escribas sufijos de fotograma para las 43 familias de animación ([nombrado](../api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado))
 
-## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+## Nombres de texturas giradas
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **Causa**: escribir la grafía de copia girada de una familia de rotación (`[rot[N`)
 - **Corrección**: usa el nombre raíz — `bloxdTexel` reaplica la rotación
 
-## "...could name X and Y, which differ only by case or underscores, so it can't be used."
+## Identificadores de textura ambiguos
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **Causa**: el plegado insensible a mayúsculas/guiones bajos dejó el nombre **ambiguo**
 - **Corrección**: desambigua la grafía
 
-## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+## Nombre de constante no válido
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **Causa**: errata en el prefijo (p. ej. `bloxdTextureID`, `bloxdtextureid`)
 - **Corrección**: empieza los nombres exactamente por `bloxdTextureId`
 
-## "Case and underscores are not distinguished" — ¿cómo conviven ambas reglas?
+## Mayúsculas, minúsculas y guiones bajos
 
 La resolución de nombres pliega mayúsculas y `_`, así que `bloxdTextureId_grass_top` y `bloxdTextureIdGrassTop` se resuelven a **la misma** constante. Solo cuando el plegado deja múltiples candidatos se dispara el error dedicado de ambigüedad ([reglas de nombrado](../api/texture-api.md#reglas-de-grafía-y-libertad-de-nombrado)).
 
@@ -44,7 +54,9 @@ La resolución de nombres pliega mayúsculas y `_`, así que `bloxdTextureId_gra
 
 - **Límite**: la API de shader packs solo **lee** el atlas; añadir texturas es tarea del sistema de paquetes de texturas ([combinaciones](../guides/combinations.md))
 
-## "Packs can't use X: the engine binds every texture and sampler..."
+## Restricciones de acceso a texturas
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **Causa**: declarar tipos `texture_*` / `sampler` directamente
 - **Corrección**: pasa por `bloxdTexel()` ([Restricciones](../api/restrictions.md))

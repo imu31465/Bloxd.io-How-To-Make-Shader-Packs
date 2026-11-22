@@ -4,7 +4,7 @@
 
 Oscurecer solo sombras deja el color terminado (`engineColour`) brillante sin sol, y el salto cara/sombra se vuelve antinatural. Atenúa todo el color terminado.
 
-El ejemplo trata `bloxdSunDirection()` cero como noche y sol direccional como día, atenuando los colores terminados del terreno en horas oscuras. Donde `blockLight` y `heldLight` son fuertes, la atenuación se debilita para preservar lámparas cercanas como antorchas. `0.52` es un valor de ajuste — bájalo para noches más oscuras.
+El ejemplo interpreta `bloxdSunDirection() == 0` como noche y una dirección solar válida como día. Durante la noche, reduce la intensidad del color final del terreno. En las zonas con valores altos de `blockLight` y `heldLight`, reduce menos la intensidad para conservar la luz de fuentes cercanas, como las antorchas. `0.52` es un valor de ajuste — bájalo para noches más oscuras.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -25,4 +25,4 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-**Límites de esta corrección:** si `bloxdSunDirection()` se comporta como "dirección unitaria con sol, cero sin él", día/noche se distinguen pero el ocaso no se estima suavemente. Y como atenúa el color terminado, debilita juntos la luz diurna y el ambiente del motor — no es una reproducción total del horario. Para aplicar lo mismo a líquidos, revisa la relación de fallback de los hooks de líquido.
+**Límites de este método:** `bloxdSunDirection()` proporciona la dirección del sol, por lo que la dirección de la luna se obtiene invirtiéndola (`-bloxdSunDirection()`). En los mundos predeterminados el sol permanece fijo, así que la luna tampoco se mueve; solo se mueve en mundos con ciclo día/noche. Si el valor solo indica una dirección unitaria o cero, permite distinguir el día de la noche, pero no representar suavemente el ocaso o el crepúsculo. Este ejemplo atenúa el color final del terreno, por lo que reduce a la vez la luz diurna y la ambiental del motor; no reproduce por completo la iluminación según la hora. Para aplicarlo a líquidos, revisa la relación de fallback de sus hooks.

@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Renvoie** : `position + vec3f(bloxdRenderOffset())`
 - **Note** : les limites de précision du f32 font que les coordonnées lointaines peuvent être inexactes (en-tête : *« with possible f32 inaccuracy »*)
 
-### bloxdFragmentBlockPosition — non documentée mais toujours injectée
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +142,7 @@ La recette d'éclairage propre du moteur, documentée comme WGSL appelable — c
 
 ## Fonctions d’ombres
 
-La API v5 a ajouté à l’API des packs le vrai système d’ombres soleil/lune du moteur — des ombres projetées qui suivent le soleil, portées par les blocs, joueurs, mobs et objets. Ces deux fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
+Ces trois fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
 
 ### bloxdShadow
 
@@ -184,7 +184,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Garde** : `#ifdef BLOXD_SCENE_DEPTH` (défini dans les variantes liquides)
 - **Signification** : la face opaque derrière ce fragment (terrain vu à travers l'eau) ; `hit == false` pour le ciel
 - **Renommage depuis v2** : `found` → `hit`
-- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Intérieurs du moteur](../internals/rendering-pipeline.md)
+- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Fonctionnement interne du moteur](../internals/rendering-pipeline.md)
 
 ## Voir aussi
 

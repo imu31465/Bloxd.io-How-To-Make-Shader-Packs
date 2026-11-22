@@ -1,12 +1,14 @@
 # Iluminação padrão do motor e margem para realismo
 
+> API alvo: 5 · Estado: Verified
+
 
 
 A iluminação padrão do motor é "só multiplicação" — não existem especular, fresnel, separação quente/frio nem ambiente hemisférico. O seguinte pode ser reconstruído:
 
 | Função | Padrão | Reconstruível em pacotes? |
 |---|---|---|
-| Difuso (Lambert) | Só soma escalar de direcionais | ◎ Próprio com `bloxdSunDirection()` (fontes envoltas etc.) |
+| Difuso (Lambert) | Só soma escalar de direcionais | ◎ Implementação própria com `bloxdSunDirection()` (atenuação periódica etc.) |
 | Especular | Nenhum | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Nenhum | ◎ Aproximação de Schlick (R9.3) |
 | Separação tocha quente / céu frio | Sem cor | ◎ (R9.1) |
@@ -15,6 +17,6 @@ A iluminação padrão do motor é "só multiplicação" — não existem especu
 | Perspectiva aérea | Só névoa (troca de cor) | ◎ Dessaturação com distância (R9.6) |
 | Detalhe de superfície | Só resolução de textura | △ Micro-relevo procedural com hash (R9.8) |
 | Ondas de vértice (água) | Nenhuma (plano) | ◎ Só allow (R7) |
-| Normais de onda / brilho solar | Nenhumas | ◎ (R9.7) |
-| Luar noturno | A cor do céu só escurece | △ A direção lunar está em `-bloxdSunDirection()`: pseudo looks (ambiente azul em R2 / dessaturação em R9.11) mais luar direcional (R-A, só ciclo dia/noite) |
+| Normais das ondas / brilho do sol | Nenhumas | ◎ (R9.7) |
+| Luar noturno | Por padrão, apenas a cor do céu escurece | ◎ A direção da lua pode ser obtida com `-bloxdSunDirection()`; R-A adiciona luar direcional (a lua só se move em mundos com ciclo dia/noite) |
 | Sombras (oclusão de céu) | Só mistura suave via `mix(ambiente, céu, skyLight)` | ◎ Inversão do lift + corte por limiar + porta solar (R9.12). Sombra de árvores e sob telhados cai claramente, seguindo edições de blocos em tempo real |

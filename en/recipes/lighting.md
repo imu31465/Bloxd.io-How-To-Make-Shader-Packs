@@ -1,6 +1,6 @@
 # Lighting
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Status: Verified
 ## Contrast S-curve
 
 ```wgsl
@@ -54,7 +54,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` arrives post-lift (section 10), so shallow occlusion (e.g. under trees: raw 0.87 → lifted 0.97) barely darkens with this method. It works for caves (raw 0). To sharpen "tree shade", use the lift-inversion + threshold method in R9.12.
 
-## Blue night ambience (pseudo look without moon direction)
+## Blue night ambience
 
 > In this API, `bloxdSunDirection()` is zero when the sky has no sun. The following is not directional moonlight, just a faint blue ambient added when the sky is dark. Moon direction itself is available via `-bloxdSunDirection()` (day/night-cycle worlds only — [The sun and the moon](../internals/sun-and-moon.md)).
 

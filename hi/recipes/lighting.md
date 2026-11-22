@@ -1,6 +1,6 @@
 # प्रकाश
 
-> लक्ष्य API: 5 · लक्ष्य बिल्ड: `bbb6l5` (2026-11-20, प्रोडक्शन और preprod) · स्थिति: Verified (वर्तमान API पर पोर्ट किया गया — डिवाइस पर पुनः जाँच की सिफ़ारिश)
+> लक्ष्य API: 5 · स्थिति: Verified
 ## कंट्रास्ट S-वक्र
 
 ```wgsl
@@ -23,7 +23,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## रात (skyLight-संचालित नीला झुकाव + दीया रक्षा)
+## रात की नीली रोशनी और दीपक सुरक्षा
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -38,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## पूर्ण-अंधेरी गुफ़ाएँ (आकाशहीन क्षेत्र और भी गहरे करना)
+## अँधेरी गुफ़ाएँ
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -54,7 +54,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` लिफ्ट-बाद का मान आता है (अध्याय 10), इसलिए हल्का अवरोध (जैसे पेड़ के नीचे: कच्चा 0.87 → लिफ्ट के बाद 0.97) इस विधि से लगभग गहरा नहीं होता। यह गुफ़ाओं (कच्चा 0) पर काम करता है। "पेड़ की छाया" को तेज़ करने के लिए R9.12 की लिफ्ट-व्युत्क्रम + देहली विधि प्रयोग करें।
 
-## रात का नीला परिवेश (चंद्र दिशा के बिना छद्म रूप)
+## रात का नीला परिवेश
 
 > इस API में आकाश में सूर्य न होने पर `bloxdSunDirection()` शून्य हो जाता है। नीचे दिया गया दिशात्मक चांदनी नहीं है, बस अंधेरे आकाश पर जोड़ा गया क्षीण नीला परिवेश है। चंद्र दिशा स्वयं `-bloxdSunDirection()` से उपलब्ध है (केवल दिन-रात-चक्र वाली दुनियाएँ — [सूर्य और चंद्र](../internals/sun-and-moon.md))।
 
@@ -72,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## संध्या की उष्णता (सूर्य की ऊँचाई से रंजन)
+## सूर्यास्त के गर्म रंग
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -88,7 +88,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## इंजन-निर्गम का पूर्ण प्रतिस्थापन (सरलतम पुनःप्रकाशन)
+## इंजन आउटपुट बदलना
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

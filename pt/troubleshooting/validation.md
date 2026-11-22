@@ -4,28 +4,38 @@
 
 Erros da validação estática (analisador, etapa 1) — em sua maioria nomes reservados, o contrato strict e restrições de chamadas entre hooks.
 
-## "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+## Não construa diretamente as estruturas de saída
+
+> `Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **Causa**: chamar construtores como `BloxdSurface(...)`
 - **Correção**: comece de `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` e altere campos (`var out = s;` funciona em hooks light)
 
-## "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+## Identificadores reservados
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **Causa**: um identificador começando com `bloxd` (sem distinção de maiúsculas/minúsculas)
 - **Correção**: renomeie (ex. `packTint`). Só os 9 nomes de hooks são permitidos
 - **Prevenção**: prefixe os seus próprios nomes com `pack` / `my` etc.
 
-## "bloxdPackInputs isn't part of the bloxd_ header"
+## Nome inválido da entrada uniforme
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **Causa**: referenciar o uniform diretamente
 - **Correção**: use-o por meio das funções de cabeçalho ([Formato do pacote](../api/pack-format.md#uniform-por-frame-bloxdpackinputs))
 
-## "... reaches bloxdTexel, which only surface and light hooks can use."
+## Acesso a texturas em hooks de vértice
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **Causa**: chamada a partir de um hook vertex (ou de uma função alcançável a partir de um) — "reaches" significa **o caminho de chamada**
 - **Correção**: mova a chamada para um hook surface / light
 
-## "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+## O acesso à profundidade exige uma condição
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **Causa**: `bloxdOpaqueBehind()` precisa de `BLOXD_SCENE_DEPTH`, definido apenas nas variantes all-liquid; compartilhar a chamada a partir de código de hooks terrain/model cria variantes que não compilam
 - **Correção**: envolva a chamada em `#ifdef BLOXD_SCENE_DEPTH`
@@ -55,4 +65,4 @@ Erros de resolução de nomes de textura (sugestões de grafia, grafias de quadr
 
 ## Relacionado
 
-- [Restrições e nomes reservados](../api/restrictions.md) · [Interioridades do motor: validação de shaders](../internals/shader-validation.md) · [Problemas específicos de variantes](variants.md)
+- [Restrições e nomes reservados](../api/restrictions.md) · [Funcionamento interno do motor: validação de shaders](../internals/shader-validation.md) · [Problemas específicos de variantes](variants.md)

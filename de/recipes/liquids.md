@@ -18,7 +18,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## Höhen-Pseudo-Transparenz (kein echter Flachwassertest)
+## Pseudo-Transparenz nach Höhe
 
 > Echte Wassertiefe braucht das liquid-exklusive `bloxdOpaqueBehind()`, das die Dicke bis zur opaken Fläche dahinter misst (das vollständige Rezept: [Wasser natürlich aussehen lassen](../guides/water.md)). Folgendes ist ein einfacherer Pseudo-Stil ohne diese Funktion: `s.position.y` ist eine lokale Koordinate, roh verwendet verschiebt sich der Effekt mit dem Chunk-Ursprung. Für Welthöhe per `bloxdWorldPosition()` konvertieren. Das folgende variiert alpha nur über die Welthöhe — ein Pseudo-Effekt, kein küsten-/grundbewusstes Flachwasser. `packWaterReferenceY` an die eigene Welthöhe anpassen.
 

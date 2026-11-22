@@ -1,6 +1,6 @@
 # How lighting works
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Status: Verified
 Engine default lighting is "multiplication only" — no specular, fresnel, warm/cool separation, or hemisphere ambient exists. The following can be rebuilt:
 
 | Feature | Default | Buildable in packs? |
@@ -15,5 +15,5 @@ Engine default lighting is "multiplication only" — no specular, fresnel, warm/
 | Surface detail | Texture resolution only | △ Procedural hash-noise micro-bump (R9.8) |
 | Vertex waves (water) | None (flat) | ◎ Allow only (R7) |
 | Wave normals / sun glitter | None | ◎ (R9.7) |
-| Night moonlight | Sky color just darkens | △ No moon direction input, so only pseudo looks (blue ambient in R2 / desaturation in R9.11) |
+| Night moonlight | Sky color just darkens by default | ◎ Derive moon direction as `-bloxdSunDirection()`; R-A adds directional moonlight (it moves only in day/night-cycle worlds) |
 | Shadows (sky-occlusion) | Gently blended via `mix(ambient, sky, skyLight)` only | ◎ Lift inversion + threshold cut + sun gate (R9.12). Tree shade and under-roof areas drop clearly, following block edits in real time |

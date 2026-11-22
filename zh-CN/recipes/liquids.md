@@ -18,7 +18,7 @@ fn bloxdLiquidSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 高度伪透明度 (非真正的浅滩判定)
+## 基于高度的伪透明效果
 
 > 真实水深需要液体限定的 `bloxdOpaqueBehind()`——它测得到到后方不透明面的厚度 (完整配方：[让水看起来自然](../guides/water.md))。以下是不使用它的简化拟似做法：`s.position.y` 是局部坐标，直接用会随区块原点漂移。要按世界高度使用时请换算为 `bloxdWorldPosition()`。以下仅按世界高度改变 alpha——是拟似效果，并非感知岸线/水底的浅滩表现。`packWaterReferenceY` 请按你的世界高度调整。
 

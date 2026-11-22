@@ -103,7 +103,7 @@ Chaque nom de texture utilisable devient une `const` comparable. **L'orthographe
 - **Les textures animées ne prennent pas de numéro d'image** : `lava` est le nom ; `lava0` est une erreur dédiée
 - **Les familles de rotation utilisent le nom racine** : écrire l'orthographe d'une copie tournée produit un message dédié
 
-### Erreurs de résolution de noms (verbatim depuis le validateur)
+### Erreurs de résolution des noms
 
 > **Préfixe mal orthographié / casse :** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >
@@ -224,4 +224,4 @@ fn bloxdTerrainSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 ## Voir aussi
 
 - **Les noms disponibles utilisables** → [Catalogue des textures](texture-catalog.md)
-- [Intérieurs du moteur : registre des textures](../internals/texture-registry.md) · [Échantillonnage des textures](../internals/texture-sampling.md)
+- [Fonctionnement interne du moteur : registre des textures](../internals/texture-registry.md) · [Échantillonnage des textures](../internals/texture-sampling.md)

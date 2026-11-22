@@ -36,7 +36,9 @@
 - **원인**: 라이팅 전용 입력 (`blockLight` 등) 을 가드 없이 씀. v5 에는 `#ifdef BLOXD_LIGHTING` 이 없다 — **런타임 `bloxdLit()`** 으로 분기한다
 - **해결**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` 로 조기 반환한다 ([라이팅](../api/lighting.md#bloxdlit--게이트))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## LightEngine 대기열 초과
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **원인**: 빛나는 블록이 밀집한 구역이 라이트 시드 큐를 넘쳐하게 해, 그 청크의 라이트 계산이 도중에 잘린다. **팩 탓이 아니다**. 다만 빛나는 덩어리 근처의 라이트 빈틈은 여기서 온다
 - **해결**: 월드에서 광원을 흩어 놓는다

@@ -1,6 +1,6 @@
 # Рецепты освещения (light)
 
-> Целевой API: 5 · Целевой билд: `bbb6l5` (2026-11-20, прод и preprod) · Статус: Verified (портировано на текущий API — рекомендуется перепроверка на устройстве)
+> Целевой API: 5 · Статус: Verified
 ## S-кривая контраста
 
 ```wgsl
@@ -23,7 +23,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Ночь (синий сдвиг по skyLight + защита ламп)
+## Синяя ночная подсветка и защита ламп
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -38,7 +38,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Пещеры впотьмах (ещё сильнее затемняем места без неба)
+## Затемнение пещер
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -54,7 +54,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` приходит пост-лифт (раздел 10), поэтому лёгкое затенение (напр. под деревьями: сырое 0.87 → поднятое 0.97) этим методом почти не темнеет. Для пещер он работает (сырое 0). Чтобы заострить «тень деревьев», используйте инверсию лифта + порог из R9.12.
 
-## Синее ночное окружение (псевдо-вид без направления луны)
+## Синяя ночная подсветка
 
 > В этом API `bloxdSunDirection()` равен нулю, когда на небе нет солнца. Ниже — не направленный лунный свет, а лишь слабый синий ambient, добавляемый при тёмном небе. Само направление луны доступно через `-bloxdSunDirection()` (только миры с циклом день/ночь — [Солнце и луна](../internals/sun-and-moon.md)).
 
@@ -72,7 +72,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Закатное тепло (тинт по высоте солнца)
+## Тёплые цвета заката
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -88,7 +88,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## Полная замена вывода движка (простейшее переосвещение)
+## Полная замена вывода движка
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {

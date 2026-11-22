@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Rückgabe**: `position + vec3f(bloxdRenderOffset())`
 - **Hinweis**: f32-Präzisionsgrenzen bedeuten, dass ferne Koordinaten ungenau sein können (Header: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — undokumentiert, aber weiterhin injiziert
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +142,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ## Schattenfunktionen
 
-API v5 stellt das Sonnen-/Mondschattensystem der Engine bereit: projizierte, sonnenfolgende Schatten von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+Diese drei Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 ### bloxdShadow
 

@@ -10,21 +10,21 @@ Bloxd.io 셰이더 팩은 게임의 **WebGPU 렌더러만** 외관을 바꾼다.
 
 ## 바꿀 수 있는 것
 
-팩은 렌더러의 **면별 3단계 파이프라인**에 끼어든다. 렌더 대상은 세 프로그램으로 나뉘며, 합계 **9개의 훅**을 가진다:
+셰이더 팩은 렌더러가 각 면을 그리는 **3단계 파이프라인에 적용된다**. 렌더 대상은 세 프로그램으로 나뉘며, 훅은 총 **9개**다:
 
 | 대상 | 훅 (Vertex / Surface / Light) | 그리는 것 |
 |---|---|---|
 | **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | 물과 블록 모델을 제외한 모든 블록 |
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | 물 |
-| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 블록 모델 (반 블록, 계단, 식물), 아이템, 플레이어, 몹, NPC, 방어구, 화장품 |
+| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | 블록 모델(반 블록, 계단, 식물), 아이템, 플레이어, 몹, NPC, 방어구, 꾸미기 아이템 |
 
-- **할 수 있는 것**: 색상·투명도·발광 변경, 라이팅 조정 ([라이팅 API](../api/lighting.md)), `bloxdTexel`을 이용한 텍스처 샘플링, `flags`를 이용한 모델별 효과, 정점 애니메이션 (allow 게임만)
+- **할 수 있는 것**: 색상·투명도·발광 변경, 라이팅 조정 ([라이팅 API](../api/lighting.md)), `bloxdTexel`을 이용한 텍스처 샘플링, `flags`를 이용한 모델별 효과, 정점 애니메이션(allow 모드인 게임에서만)
 - **할 수 없는 것**: 사용자 텍스처 추가, 블룸 등의 후처리 효과 생성, 사용자 섀도맵 생성 또는 깊이 데이터 직접 접근, 실제 반사 (SSR), 하늘·구름·태양 원반 자체에 셰이더 적용
 - **그림자**: `bloxdShadow()`는 엔진이 계산한 태양·달 그림자 계수를 제공하고, `bloxdShadowDirection()`은 그림자를 만드는 빛의 진행 방향을 반환한다. `bloxdAirShadow(t)`는 카메라와 프래그먼트 사이의 한 지점에서 그림자를 평가한다. 기존 `skyLight` 복셀 하늘 가림 방식도 계속 사용할 수 있다 ([그림자 가이드](../guides/shadows.md))
 
 ## strict 와 allow 모드
 
-모든 게임에는 셰이더 팩 정책 (`shaderPackPolicy`) 이 있고, **대부분의 게임은 strict 모드로 돈다** (정점 애니메이션 없음, `discard` 없음). 일반 배포용 팩은 strict 모드에서 동작해야 한다. [베리언트](variants.md) 와 [정책 레퍼런스](../internals/policy.md) 를 보라.
+모든 게임에는 셰이더 팩 정책 (`shaderPackPolicy`) 이 있고, **대부분의 게임은 strict 모드로 돈다** (정점 애니메이션 없음, `discard` 없음). 일반 배포용 셰이더 팩은 strict 모드에서 동작하도록 만들어야 한다. [베리언트](variants.md) 와 [정책 레퍼런스](../internals/policy.md) 를 보라.
 
 ## 이 문서의 전제
 

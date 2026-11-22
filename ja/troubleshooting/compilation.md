@@ -4,7 +4,9 @@
 
 静的検証は通るが WGSL としてコンパイルできない、またはブラウザの WGSL コンパイラ (第2段階) でだけ失敗するエラーです。
 
-## 「bloxdTerrainVertex must be declared as: fn ...」
+## フックの関数シグネチャ
+
+> `bloxdTerrainVertex must be declared as: fn ...`
 
 - **症状**: フックのシグネチャ不一致
 - **原因**: 引数の型・戻り値の型が宣言と異なる
@@ -12,7 +14,9 @@
 - **解決方法**: 表示された宣言どおりに書き直す (引数名は自由、型は完全一致)
 - **再発防止**: [シェーダーフック](../api/hooks.md) の比較表を参照してコピペから始める
 
-## 「mixing '*' and '^' requires parenthesis (only in ...)」
+## 演算子の優先順位
+
+> `mixing '*' and '^' requires parenthesis (only in ...)`
 
 - **症状**: 静的検証は通るが第2段階 (ブラウザ WGSL コンパイラ) で失敗
 - **原因**: WGSL 仕様上、`^` `&` `|` `<<` `>>` と他の演算子の混合には括弧が必要
@@ -20,19 +24,25 @@
 - **解決方法**: 該当演算のオペランドを括弧で括る
 - **再発防止**: ビット演算は常に括弧で明示する
 
-## 「... can only be a function's parameter or return type, ...」
+## 出力変数の宣言方法
+
+> `... can only be a function's parameter or return type, ...`
 
 - **症状**: 未初期化変数の宣言が弾かれる
 - **原因**: `var x: BloxdSurface;` のような型注釈だけの宣言。ヘッダー構造体はフィールドが増えるため、直接構築・未初期化宣言が禁止されている
 - **解決方法**: `var out = bloxdDefaultSurface(s);` から作る。light フックなら `var out = s;` (第1引数は出力と同型) も可
 - **再発防止**: 出力構造体は必ず `bloxdDefault*` 起点 ([作法](../api/structures.md#書き方の作法-再掲))
 
-## 「_ can only be the target of a phony assignment, as in _ = f();」
+## アンダースコアへの代入
+
+> `_ can only be the target of a phony assignment, as in _ = f();`
 
 - **原因**: `let _ = f();` は WGSL で不可
 - **解決方法**: `_ = f();` と書く (式文の捨て代入)
 
-## 「Lite: …reads scene depth on a page that didn't turn it on」
+## シーン深度の有効化
+
+> `Lite: …reads scene depth on a page that didn't turn it on`
 
 - **症状**: ページ読み込み時にこの警告が出てパックが有効にならない
 - **原因**: 深度読み取り (`bloxdOpaqueBehind`) をするパックが有効な状態でページを開いたが、深度テクスチャの用意はページ生成時に確定するため間に合わなかった

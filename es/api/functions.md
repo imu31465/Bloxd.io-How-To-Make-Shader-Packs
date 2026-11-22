@@ -4,7 +4,7 @@
 
 Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](texture-api.md), junto con `bloxdOpaqueBehind`.
 
-## Funciones de fotograma (mismo valor durante todo el fotograma)
+## Funciones de fotograma
 
 Nota de la cabecera: *"These functions return the same value for the entire frame."* Leen el uniform `bloxdPackInputs`, así que también son llamables desde hooks de vértice y funciones de ámbito de módulo.
 
@@ -87,7 +87,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Devuelve**: `position + vec3f(bloxdRenderOffset())`
 - **Nota**: los límites de precisión de f32 hacen que las coordenadas lejanas puedan ser inexactas (cabecera: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — indocumentado pero sigue inyectado
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +142,7 @@ La receta de iluminación del propio motor, documentada como WGSL llamable — c
 
 ## Funciones de sombras
 
-La API v5 añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
+Estas tres funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
 
 ### bloxdShadow
 

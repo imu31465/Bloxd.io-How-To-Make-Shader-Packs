@@ -35,7 +35,7 @@ Kompiliert einwandfrei, sieht aber falsch aus.
 - **Ursache**: Render-Space-Positionen direkt benutzt — der Ursprung wandert mit dem Spieler
 - **Fix**: für weltabhängige Effekte `bloxdWorldPosition(position)` benutzen ([Koordinaten](../recipes/coordinates.md)); die f32-Präzisionsgrenzen weit vom Ursprung beachten
 
-## Wasser-Oberflächenmuster stehen auf gedrehten Flächen schief
+## Wassermuster auf gedrehten Flächen verschoben
 
 - **Ursache**: `bloxdTexel` wendet das eigene `textureRotation` des Fragments auf deine uv an ([die Rotations-Subtilität](../api/texture-api.md#die-rotations-subtilität--ein-neutraler-sampler))
 - **Fix**: mit dem `texelNeutral`-Helfer vor-drehen
