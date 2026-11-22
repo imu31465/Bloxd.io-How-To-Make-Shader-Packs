@@ -950,7 +950,7 @@ fn bloxdRenderOffset() -> vec3i
 #### bloxdSunDirection
 
 ```wgsl
-fn bloxdSunDirection() -> vec3f
+- **Correction** : conservez un niveau minimal de lumière ambiante. Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inaccessible ; utilisez alors une faible lumière ambiante bleutée comme solution de repli visuelle ([recette nocturne](recipes/lighting.md)). Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()`.
 ```
 
 - **Renvoie** : vecteur unitaire vers le soleil en orientation monde ; **vecteur nul quand il n'y a pas de soleil**
