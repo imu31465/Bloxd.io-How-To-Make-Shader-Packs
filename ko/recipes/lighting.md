@@ -24,7 +24,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 밤 (skyLight 구동의 파랑 시프트 + 등불 보호)
+## 밤의 푸른빛과 조명 보호
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -39,7 +39,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 동굴을 깜깜하게 (skyLight 없는 곳을 더 어둡게)
+## 동굴 어둡게 하기
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -55,7 +55,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` 는 리프트 후의 값 (10장) 이므로, 옅은 가림 (나무 밑 등. 생값 0.87 → 리프트 후 0.97) 은 이 방법으로는 거의 어두워지지 않는다. 동굴 (생값 0) 에는 통한다. 「숲그늘」 을 또렷하게 하고 싶으면 R9.12 의 리프트 역변환 + 임계값 방식을 쓴다.
 
-## 밤의 파란 환경광 (달의 방향을 쓰지 않는 유사 표현)
+## 밤의 푸른 환경광
 
 > 이 API에서는 태양 없는 하늘의 `bloxdSunDirection()` 은 제로이다. 방향성 달빛이 아니라, 어두운 하늘에 희미한 파란 환경광을 더할 뿐이다. 단 달의 방향 자체는 `-bloxdSunDirection()` 으로 얻을 수 있다 (낮밤 사이클 월드 한정 — [태양과 달](../internals/sun-and-moon.md) 참조).
 
@@ -73,7 +73,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 노을의 따뜻함 (태양 고도로 색을 기울이기)
+## 노을의 따뜻한 색감
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -89,7 +89,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 엔진 출력의 완전 교체 (가장 단순한 재조명)
+## 엔진 출력 교체
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
