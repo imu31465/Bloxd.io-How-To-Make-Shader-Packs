@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Retorna**: vetor unitário em direção ao sol na orientação de mundo; **vetor zero quando não há sol**
-- **Fatos**:
-  - **a lua está sempre em `-bloxdSunDirection()`** (o motor a coloca oposta ao sol)
-  - **nunca passe o vetor zero a `normalize`** — proteja com `dot(d, d) < 1e-8` e recorra a uma direção constante
-  - a build atual não tem ciclo dia/noite; sol, lua e estrelas não se movem durante uma sessão (só a opacidade alterna). No céu de terra padrão o sol fica perto de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°)
-- **Usos**: temperatura de cor, direção da luz, porta solar, pseudo luar
+- **Retorna**: vetor unitário em direção ao sol na orientação do mundo; **zero quando o mundo não tem sol**.
+- **Fatos importantes**:
+  - A direção da lua é oposta à do sol: `-bloxdSunDirection()`.
+  - **Nunca passe o vetor zero para `normalize`**. Verifique `dot(d, d) < 1e-8` e use uma direção fixa como alternativa.
+  - A engine não fornece um ciclo dia/noite automático. No céu Earth padrão, o sol permanece próximo de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°). Cada mundo pode implementar seu próprio ciclo atualizando `inclination`, o que altera as direções do sol e da lua.
+- **Usos**: temperatura de cor, direção da luz, detecção da presença do sol e efeitos de luz lunar ambiente.
 
 ### bloxdSeconds
 
