@@ -21,7 +21,7 @@ O motor gera uma definição diferente de `bloxdTexel` por pipeline, então uma 
 | Pipeline | `textureId == 0` | `textureId` não nulo | Notas |
 |---|---|---|---|
 | **Pipelines de atlas** — terreno, líquido e modelos de bloco desenhados a partir do atlas de blocos | `vec4f(1.0)` (branco — "sem textura") | amostra **essa entrada do atlas** | as constantes nomeadas se aplicam; animação e rotação são automáticas |
-| **Pipelines de textura própria** — modelos cuja malha carrega sua própria textura difusa (skins de jogador, texturas de mobs, sprites de item) | amostra **a textura própria da malha** no uv que você passar | `vec4f(1.0)` (branco) | exatamente uma textura está em escopo; constantes nomeadas não se aplicam |
+| **Pipelines de textura própria** — modelos cuja malha carrega sua própria textura difusa (skins de jogador, texturas de mobs, sprites de item) | amostra **a textura própria da malha** no uv que você passar | `vec4f(1.0)` (branco) | há apenas uma textura disponível nesse contexto; constantes nomeadas não se aplicam |
 | **Pipelines sem textura** | branco | branco | stub; `bloxdTextureSize() -> vec2u(1u)` |
 
 Semântica dos pipelines de atlas em detalhe:
@@ -103,7 +103,7 @@ Cada nome de textura utilizável vira uma `const` comparável. **A grafia é o n
 - **Texturas animadas não levam número de quadro**: `lava` é o nome; `lava0` é um erro dedicado
 - **Famílias de rotação usam o nome raiz**: escrever a grafia de uma cópia girada produz uma mensagem dedicada
 
-### Erros de resolução de nomes (verbatim do validador)
+### Erros ao resolver nomes
 
 > **Grafia incorreta do prefixo / caixa:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 >
