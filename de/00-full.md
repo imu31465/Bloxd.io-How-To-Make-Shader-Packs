@@ -1307,7 +1307,7 @@ Die API zum Lesen der Texturen des Spiels selbst: zwei Funktionen, eine Familie 
 fn bloxdTexel(textureId: u32, uv: vec2f, mipLevel: f32) -> vec4f
 ```
 
-- **Aufrufbar von**: **nur Surface-/Light-Hooks** (aus einem Vertex-Hook zu reaching scheitert mit einer „reaches“-Diagnose)
+- **Aufrufbar von**: **nur Surface-/Light-Hooks** (ein Aufruf aus einem Vertex-Hook scheitert mit einer „reaches“-Diagnose)
 
 Liest ein Texel **genau so, wie der eigene Sampler der Engine es tut** — derselbe `texture_2d_array<f32>`-Atlas, derselbe Sampler, `textureSampleLevel` bei `round(mipLevel)` — das gelesene Texel entspricht strukturell also dem Texel, das die Engine gezeichnet hat.
 
@@ -1333,8 +1333,8 @@ Die Semantik der Atlas-Pipelines im Detail:
 #### Das universelle Aufrufmuster
 
 ```wgsl
-// Works in every pipeline: on atlas faces it samples the atlas entry;
-// on own-texture models textureId is 0 and it samples the model's own texture.
+// Funktioniert in jeder Pipeline: Bei Atlas-Flächen wird der Atlas-Eintrag abgetastet;
+// bei Modellen mit eigener Textur ist textureId 0 und die Modelltextur wird abgetastet.
 let texel = bloxdTexel(surface.textureId, fract(surface.uv), surface.mipLevel);
 ```
 
@@ -1400,7 +1400,7 @@ Jeder benutzbare Texturname wird zu einer vergleichbaren `const`. **Die Schreibw
 - **Animierte Texturen tragen keine Rahmennummer**: `lava` ist der Name; `lava0` ist ein eigener Fehler
 - **Rotationsfamilien nutzen den Wurzelnamen**: eine gedrehte Kopie zu schreiben erzeugt eine eigene Meldung
 
-#### Fehler der Namensauflösung (wortwörtlich aus dem Validator)
+#### Fehler bei der Namensauflösung
 
 > **Präfix falsch geschrieben / Case:** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 > **Animationsrahmen:** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
