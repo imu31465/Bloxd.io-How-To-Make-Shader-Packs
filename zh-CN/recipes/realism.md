@@ -298,5 +298,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 调整指南：**阴影面积只由 `shTh` 决定** —— `0.93`=半径1.5以上 / `0.87`=半径2 / `0.80`=半径3 / `0.67`=半径5。  
 > 边缘硬度为 `shSoft` (0.02=硬 / 0.08=软)。影芯暗度由 `0.09` (最低环境光) 与 `0.16` (天空散射光)  
 > 的两点偏移决定。黄昏想扩大阴影请加  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (长暮影近似。  
+> 若要近似日落时逐渐变长的阴影，可将 `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` 加到阈值中。
+> `sunDir` 等于 `bloxdSunDirection() / length(bloxdSunDirection())`。若要让阴影更偏蓝，请提高 `vec3f(0.72, 0.82, 1.05)` 的 B 通道值。
 > `sunDir` 为 `bloxdSunDirection() / length(bloxdSunDirection())`)。阴影偏蓝请调高 `vec3f(0.72, 0.82, 1.05)` 的 B。
