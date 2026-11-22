@@ -1400,7 +1400,7 @@ Chaque nom de texture utilisable devient une `const` comparable. **L'orthographe
 - **Les textures animées ne prennent pas de numéro d'image** : `lava` est le nom ; `lava0` est une erreur dédiée
 - **Les familles de rotation utilisent le nom racine** : écrire l'orthographe d'une copie tournée produit un message dédié
 
-#### Erreurs de résolution de noms (verbatim depuis le validateur)
+#### Erreurs de résolution des noms
 
 > **Préfixe mal orthographié / casse :** `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 > **Image d'animation :** `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
