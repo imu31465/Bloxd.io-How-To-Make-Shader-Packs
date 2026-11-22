@@ -4,7 +4,7 @@
 
 Todas las funciones de cabecera. La API de texturas (`bloxdTexel` / `bloxdTextureSize` / `bloxdTextureId*`) se trata en [API de texturas](texture-api.md), junto con `bloxdOpaqueBehind`.
 
-## Funciones de fotograma (mismo valor durante todo el fotograma)
+## Funciones de fotograma
 
 Nota de la cabecera: *"These functions return the same value for the entire frame."* Leen el uniform `bloxdPackInputs`, así que también son llamables desde hooks de vértice y funciones de ámbito de módulo.
 
