@@ -3060,7 +3060,7 @@ Puntos prácticos: los paquetes siguen funcionando bajo el agua / el velo no se 
 
 Oscurecer solo sombras deja el color terminado (`engineColour`) brillante sin sol, y el salto cara/sombra se vuelve antinatural. Atenúa todo el color terminado.
 
-El ejemplo trata `bloxdSunDirection()` cero como noche y sol direccional como día, atenuando los colores terminados del terreno en horas oscuras. Donde `blockLight` y `heldLight` son fuertes, la atenuación se debilita para preservar lámparas cercanas como antorchas. `0.52` es un valor de ajuste — bájalo para noches más oscuras.
+El ejemplo interpreta `bloxdSunDirection() == 0` como noche y una dirección solar válida como día. Durante la noche, reduce la intensidad del color final del terreno. En las zonas con valores altos de `blockLight` y `heldLight`, reduce menos la intensidad para conservar la luz de fuentes cercanas, como las antorchas. `0.52` es un valor de ajuste — bájalo para noches más oscuras.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
