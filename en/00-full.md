@@ -952,7 +952,7 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 // The unit vector towards the sun, in world orientation; 0 when there's no sun.
 // It's below the horizon (y < 0) at night. The moon is always opposite it.
-fn bloxdSunDirection() -> vec3f
+- **Fix**: Keep a minimum ambient level. When `bloxdSunDirection()` is zero, the moon's actual direction is unavailable, so use faint blue ambient light as a visual fallback ([night recipe](recipes/lighting.md)). In worlds with a day/night cycle, directional moonlight can be derived from `-bloxdSunDirection()`.
 ```
 
 - **Returns**: unit vector toward the sun in world orientation; **zero vector when there is no sun**
