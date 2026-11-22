@@ -1,6 +1,6 @@
 # Lighting
 
-> Target API: 5 · Target build: `bbb6l5` (2026-11-20, production and preprod) · Status: Verified (ported to the current API — on-device re-check recommended)
+> Target API: 5 · Status: Verified
 ## Contrast S-curve
 
 ```wgsl
