@@ -2,9 +2,9 @@
 
 > API alvo: 5 · Build alvo: `bbb6l5` (2026-11-20, produção e preprod) · Estado: Verified (portado para a API atual — reverificação em jogo recomendada)
 
-Escurecer só sombras deixa a cor terminada (`engineColour`) brilhante sem sol, e o salto face/sombra fica antinatural. Atenue toda a cor terminada.
+Escurecer apenas as sombras mantém brilhante a cor final produzida pelo motor (`engineColour`) mesmo quando não há sol. Com isso, o contraste entre as faces iluminadas e as áreas sombreadas fica pouco natural. Em vez de alterar apenas as sombras, reduza a intensidade da cor final como um todo.
 
-O exemplo trata `bloxdSunDirection()` zero como noite e sol direcional como dia, atenuando as cores terminadas do terreno em horas escuras. Onde `blockLight` e `heldLight` são fortes, a atenuação enfraquece para preservar lamparinas próximas como tochas. `0.52` é valor de ajuste — baixe para noites mais escuras.
+O exemplo considera um vetor `bloxdSunDirection()` igual a zero como noite e um vetor não nulo como dia, reduzindo a cor final do terreno durante os períodos escuros. Quando `blockLight` ou `heldLight` têm valores altos, a redução é menor para preservar fontes de luz próximas, como tochas. `0.52` é um valor ajustável: diminua-o para deixar as noites mais escuras.
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -18,11 +18,11 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
         let localLight = clamp(max(blockAmt, heldAmt), 0.0, 1.0);
         let protectLocalLight = smoothstep(0.03, 0.35, localLight);
         scale = mix(nightDim, 1.0, protectLocalLight);
-}
+    }
     // atenua a cor terminada; soma a emissão do material com névoa por padrão
     out.colour = l.engineColour * scale + s.emission * (1.0 - l.fogAlpha);
     return out;
 }
 ```
 
-**Limites desta correção:** se `bloxdSunDirection()` se comporta como "direção unitária com sol, zero sem ele", dia/noite se distinguem mas o ocaso não se estima suavemente. E como atenua a cor terminada, enfraquece juntos a luz diurna e o ambiente do motor — não é reprodução total do horário. Para aplicar o mesmo a líquidos, revise a relação de fallback dos hooks de líquido.
+**Limitações:** se `bloxdSunDirection()` retorna um vetor unitário quando há sol e zero quando não há, este método distingue o dia da noite, mas não estima o crepúsculo de forma gradual. Além disso, como reduz a cor final, também enfraquece a iluminação diurna e a luz ambiente do motor; não reproduz integralmente as mudanças de iluminação ao longo do dia. Para aplicar o mesmo método aos líquidos, confira o comportamento de fallback dos hooks correspondentes.
