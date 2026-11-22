@@ -10,21 +10,21 @@ El código del pack se valida y compila como WGSL. Desde el WGSL del pack no se 
 
 ## Qué puedes cambiar
 
-Un paquete se engancha al **pipeline de 3 etapas por cara** del renderizador. Los objetivos de render se dividen en tres programas con un total de **9 hooks**:
+Un paquete se integra en el **pipeline de renderizado de cada cara, que consta de tres etapas**. Los objetivos de renderizado se reparten entre tres programas con un total de **9 hooks**:
 
 | Objetivo | Hooks (Vertex / Surface / Light) | Qué se dibuja |
 |---|---|---|
 | **Terrain** | `bloxdTerrainVertex` · `bloxdTerrainSurface` · `bloxdTerrainLight` | Todos los bloques salvo el agua y los modelos de bloque |
 | **Liquid** | `bloxdLiquidVertex` · `bloxdLiquidSurface` · `bloxdLiquidLight` | El agua |
-| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modelos de bloque (losas, escaleras, plantas), ítems, jugadores, mobs, NPC, armaduras, cosmética |
+| **Model** | `bloxdModelVertex` · `bloxdModelSurface` · `bloxdModelLight` | Modelos de bloque (losas, escaleras, plantas), objetos, jugadores, mobs, NPC, armaduras y objetos cosméticos |
 
-- **Se puede**: cambiar colores, transparencia y emisión; ajustar la iluminación (la [API de iluminación](../api/lighting.md)); muestrear texturas con `bloxdTexel`; crear efectos por modelo mediante `flags`; animar vértices (solo juegos allow)
+- **Se puede**: cambiar colores, transparencia y emisión; ajustar la iluminación (la [API de iluminación](../api/lighting.md)); muestrear texturas con `bloxdTexel`; crear efectos por modelo mediante `flags`; animar vértices (solo en juegos con modo allow)
 - **No se puede**: añadir texturas propias; crear efectos de posprocesado como bloom; generar un mapa de sombras propio ni acceder a sus datos de profundidad; crear reflejos reales (SSR); ni aplicar sombreado al cielo, las nubes o el disco solar
 - **Sombras**: `bloxdShadow()` proporciona el factor de sombra solar/lunar calculado por el motor, y `bloxdShadowDirection()` indica la dirección en la que viaja la luz que proyecta la sombra. `bloxdAirShadow(t)` evalúa un punto entre la cámara y el fragmento. También sigue disponible el método anterior de oclusión del cielo por vóxeles mediante `skyLight` ([Guía de sombras](../guides/shadows.md))
 
 ## Modos strict y allow
 
-Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayoría de los juegos corre en modo strict** (sin animación de vértices, sin `discard`). Los paquetes para distribución general deben funcionar en modo strict. Ver [Variantes](variants.md) y la [referencia de política](../internals/policy.md).
+Cada juego tiene una política de shader packs (`shaderPackPolicy`), y **la mayoría de los juegos funciona en modo strict** (sin animación de vértices, sin `discard`). Los paquetes para distribución general deben funcionar en modo strict. Ver [Variantes](variants.md) y la [referencia de política](../internals/policy.md).
 
 ## Supuestos de esta documentación
 

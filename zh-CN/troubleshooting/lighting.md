@@ -16,7 +16,7 @@
 
 ## 夜晚黑到看不见
 
-- **修复**: 保证最低环境光；`bloxdSunDirection()` 为零时无法得知真实月亮方向，请用拟似蓝色环境光 ([夜晚配方](../recipes/lighting.md))。月亮方向本身是 `-bloxdSunDirection()` (仅昼夜循环世界)
+- **解决方法**：保留最低限度的环境光。当 `bloxdSunDirection()` 为零时，无法确定月亮的实际方向，因此可用微弱的蓝色环境光作为视觉上的替代方案（参见[夜间配方](../recipes/lighting.md)）。在实现昼夜循环的世界中，可以通过 `-bloxdSunDirection()` 获取月光方向。
 
 ## 白天过曝
 
@@ -36,7 +36,9 @@
 - **原因**: 光照专属输入 (`blockLight` 等) 未加守卫地使用。v5 没有 `#ifdef BLOXD_LIGHTING` — 请按**运行时 `bloxdLit()`** 分支
 - **修复**: 提前返回 `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([光照](../api/lighting.md#bloxdlit--门控))
 
-## 「LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk」
+## LightEngine 队列溢出
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **原因**: 密集的发光方块区溢出光照种子队列，该区块的光照计算被截断。**不是包造成的**，但发光簇附近的光照缺口源于此
 - **修复**: 在世界中分散光源

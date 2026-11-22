@@ -10,7 +10,7 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 
 ## 你能改变什么
 
-包接入渲染器的**逐面 3 阶段管线**。渲染目标分为三个程序，共 **9 个钩子**：
+着色器包接入渲染器为每个面执行的**三阶段渲染管线**。渲染目标分为三个程序，共包含 **9 个钩子**：
 
 | 目标 | 钩子 (Vertex / Surface / Light) | 绘制内容 |
 |---|---|---|
@@ -24,7 +24,7 @@ Bloxd.io 着色器包只改变游戏 **WebGPU 渲染器**的画面观感。包�
 
 ## strict 与 allow 模式
 
-每个游戏都有自己的着色器包策略 (`shaderPackPolicy`)，而**大多数游戏以 strict 模式运行** (无顶点动画、无 `discard`)。面向大众分发的包必须在 strict 模式下可用。见[变体](variants.md)与[策略参考](../internals/policy.md)。
+每个游戏都有自己的着色器包策略 (`shaderPackPolicy`)，而**大多数游戏以 strict 模式运行** (无顶点动画、无 `discard`)。面向普通用户发布的着色器包必须能在 strict 模式下运行。见[变体](variants.md)与[策略参考](../internals/policy.md)。
 
 ## 本文档的前提
 

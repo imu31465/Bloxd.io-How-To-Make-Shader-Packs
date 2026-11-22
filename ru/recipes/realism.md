@@ -67,7 +67,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Полусферическое окружение (небо сверху / отскок земли снизу)
+## R9.4 Полусферическое освещение
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -102,7 +102,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Воздушная перспектива («воздух» через обесцвечивание вдаль)
+## R9.6 Воздушная перспектива
 
 > Осторожно: если применить к цвету дымки обработку, поднимающую яркость (`normalize` и т.п.), в тёмных сценах всплывает «яркий белый туман»,  
 > а добавление цвета тумана поверх engineColour (уже с туманом) даёт двойной туман и белесость. **«Воздух» выражайте только снижением насыщенности** — это безопасно.
@@ -119,7 +119,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Волновые нормали + солнечный глиттер («солнечная дорожка» на воде)
+## R9.7 Нормали волн и солнечные блики
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -150,7 +150,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Процедурный микробамп (обход запрета текстур)
+## R9.8 Процедурный микрорельеф
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -182,7 +182,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Нелинейное затемнение пещер + защита ламп
+## R9.9 Затемнение пещер
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -198,7 +198,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Переналожение тумана (обязательно при отбросе engineColour)
+## R9.10 Повторное наложение тумана
 
 > Полом вида `min(l.fogAlpha, 0.75)` задаёт «плотнее этого не будет»  
 > (0.0 = как у движка / 0.3–0.5 = дали чище).  
@@ -220,7 +220,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Кино-грейд (холодные тени / тёплые света / ночное обесцвечивание)
+## R9.11 Кинематографическая цветокоррекция
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -237,7 +237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Проекционные тени — инверсия лифта + пороговый срез (финал)
+## R9.12 Проекционные тени
 
 > **Перепроверка предпосылки (раздел 10)**: `l.skyLight` — не сырое воксельное значение (n/15), а значение после движковой «lift-кривой»  
 > `y = 1-(1-x/(3-2x))³` (S-кривая, поднимающая тёмные места).
@@ -297,6 +297,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Гайд по настройке: **площадь тени решает только `shTh`** — `0.93` = радиус 1.5+ / `0.87` = радиус 2 / `0.80` = радиус 3 / `0.67` = радиус 5.  
 > Жёсткость кромки — это `shSoft` (0.02 = жёстко / 0.08 = мягко). Темнота ядра — двухточечный сдвиг `0.09` (минимальный ambient) и `0.16` (рассеянный свет неба).  
-> Чтобы расширить тени к вечеру, добавьте `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (приближение длинных вечерних теней.  
+> Чтобы приблизительно учесть удлинение теней на закате, добавьте `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` к порогу.
+> `sunDir` равен `bloxdSunDirection() / length(bloxdSunDirection())`. Чтобы сделать тени более синими, увеличьте значение канала B в `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` — это `bloxdSunDirection() / length(bloxdSunDirection())`). Для более синих теней поднимите B в `vec3f(0.72, 0.82, 1.05)`.
 >

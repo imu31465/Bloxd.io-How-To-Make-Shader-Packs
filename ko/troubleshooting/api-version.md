@@ -4,14 +4,18 @@
 
 `apiVersion` 관련 오류. 현행 게임은 **`5` 만** 받는다.
 
-## "pack.json needs "apiVersion": {{version}}."
+## apiVersion 누락
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **증상**: 로드 직후 이 메시지 (`loadNoApiVersion`)
 - **원인**: `apiVersion` 키가 통째로 없다
 - **해결**: `"apiVersion": 5` 를 추가 — **숫자**로 (문자열 `"5"` 는 실패)
 - **예방**: [pack.json](../getting-started/manifest.md) 템플릿에서 시작한다
 
-## "This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}."
+## API 버전 불일치
+
+> `This pack is shader pack API version {{packVersion}}. Bloxd supports version {{version}}.`
 
 - **증상**: `loadWrongApiVersion`
 - **원인**: `apiVersion` 은 있지만 5가 아니다 (v1–v4 팩)

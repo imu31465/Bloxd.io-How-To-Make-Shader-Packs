@@ -16,7 +16,7 @@ Problèmes de luminosité, d'ombres et de brouillard.
 
 ## Nuit trop sombre
 
-- **Correction** : garantissez un ambiant minimum ; avec un `bloxdSunDirection()` nul, la vraie direction de la lune est inconnue, donc utilisez un ambiant bleu pseudo ([la recette de nuit](../recipes/lighting.md)). La direction de la lune elle-même est `-bloxdSunDirection()` (mondes avec cycle jour-nuit uniquement)
+- **Correction** : conservez un niveau minimal de lumière ambiante. Lorsque `bloxdSunDirection()` vaut zéro, la direction réelle de la lune est inaccessible ; utilisez alors une faible lumière ambiante bleutée comme solution de repli visuelle ([recette nocturne](../recipes/lighting.md)). Dans les mondes dotés d’un cycle jour/nuit, la direction de la lumière lunaire peut être obtenue avec `-bloxdSunDirection()`.
 
 ## Jours cramés
 
@@ -36,7 +36,9 @@ Problèmes de luminosité, d'ombres et de brouillard.
 - **Cause** : entrées propres à l'éclairage (`blockLight` etc.) utilisées sans garde. La v5 n'a pas de `#ifdef BLOXD_LIGHTING` — branchez sur **`bloxdLit()` à l'exécution**
 - **Correction** : retour anticipé `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Éclairage](../api/lighting.md#bloxdlit--la-porte))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## Débordement de la file LightEngine
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Cause** : les régions denses de blocs lumineux font déborder la file de graines de lumière et le calcul de lumière du chunk est écourté. **Non causé par le pack**, mais les trous de lumière près des clusters lumineux remontent à cela
 - **Correction** : espacez les sources de lumière dans le monde

@@ -7,7 +7,7 @@
 Shader packs are WebGPU-renderer only. You need a WebGPU-capable browser:
 
 - Chromium-based browsers (Chrome / Edge / Opera etc.) — stable on desktop
-- Safari 17+ / Firefox (WebGPU support varies by period)
+- Safari 17+ / Firefox — WebGPU availability depends on browser version and platform.
 - **Mobile**: WebGPU support may be limited on iOS / Android. Mention this on your pack's release page
 
 While a pack is installed, the game setting for the WebGPU renderer is force-enabled.
@@ -20,7 +20,7 @@ No special tooling is required, though these help:
 - A zip tool for distribution; during development you can use folder loading (desktop browsers only)
 - Browser developer tools — compile errors show in the in-game UI and also in the console
 
-## On-device verification environments
+## Device testing
 
 Before distribution, verify on ([Validation](validation.md)):
 

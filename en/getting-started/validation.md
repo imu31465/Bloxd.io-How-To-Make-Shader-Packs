@@ -2,13 +2,13 @@
 
 > Target API: 5 · Target build: `bbb6l5` (verified in production and preprod 2026-11-20) · Status: Verified
 
-## The 3-stage load check
+## Three-stage load check
 
 1. **Loader limits** — size, shape, manifest validity (see [Pack structure](pack-structure.md))
 2. **Static validation (analyzer)** — syntax, types, reserved names, strict contract, across all 6 variants
 3. **Real WebGPU compilation in the browser** — static validation's type-checking is incomplete, so some mistakes only surface here
 
-For reading each error, see [Troubleshooting](../troubleshooting/) (organized by symptom).
+For help interpreting errors, see [Troubleshooting](../troubleshooting/), organized by symptom.
 
 ## Procedure
 

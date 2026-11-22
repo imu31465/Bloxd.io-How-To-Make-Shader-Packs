@@ -1,8 +1,8 @@
 # 着色器钩子
 
-> 目标API: 5 · 目标构建: `bbb6l5` (2026-11-20 生产与preprod确认) · 状态: Verified
+> API 版本：5 · 状态：Verified
 
-包可以接入 **9 个钩子**: 3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。全部可选 — 未定义的钩子回退到引擎默认。
+着色器包最多可以定义 **9 个钩子**：3 个渲染目标 (Terrain / Liquid / Model) × 3 个管线阶段 (Vertex / Surface / Light)。所有钩子都是可选的。未定义某个钩子时，引擎会使用该阶段的默认实现。
 
 ## 钩子一览
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## 渲染目标的划分
+## 渲染目标
 
 - **Terrain** — 水与方块模型以外的所有方块
 - **Liquid** — 水
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **重要**: 包若未定义任何 Liquid 钩子，**水面上任何 Terrain 钩子也不运行** (水只由 Liquid 钩子处理)。这与 v4 之前液体回退到 terrain 钩子的行为不同。
 
-## 回退与代码共享
+## 默认行为与代码复用
 
 - 未定义的钩子表示该阶段使用引擎默认 (与 `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight` 行为相同)
 - **要在钩子间共享代码**，定义一个模块级函数，两处都调用：
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## 默认包 (官方 9 钩子模板)
+## 默认包模板
 
 起始模板现在包含 light 钩子。随包分发时为 1,683 字节，逐字如下：
 

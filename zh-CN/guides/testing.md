@@ -17,5 +17,5 @@
 - 包限于地形/液体钩子，同一代码不处理天空、实体与 UI。
 - 无添加阴影贴图、屏幕空间反射、折射、泛光等的输入 (场景深度为液体限定以 `bloxdOpaqueBehind()` 解禁——见[函数](../api/functions.md))。
 - `bloxdSeconds()` 为动画时间，不保证关联游戏内昼夜。
-- `bloxdSunDirection()` 为零则真月亮方向未知，是氛围近似而非「月光物理」。方向性月光经 `-bloxdSunDirection()` 制作 (仅昼夜循环世界——见[引擎内部机制与研究：太阳与月亮](../internals/sun-and-moon.md))。
+- 当 `bloxdSunDirection()` 为零时，无法确定月亮的实际方向。此时应使用微弱的蓝色环境光营造夜间氛围，而不是尝试模拟有明确方向的月光。在实现昼夜循环的世界中，则可以通过 `-bloxdSunDirection()` 获取月光方向（参见[太阳与月亮](../internals/sun-and-moon.md)）。
 - `s.position` / `l.position` 为局部坐标，世界相关效果请加 `bloxdRenderOffset()`。方块内局部花纹则有意用局部坐标。

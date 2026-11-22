@@ -4,7 +4,7 @@
 
 ## 6 variantes
 
-Você escreve um único corpo de código, mas ele deve compilar em todas as **6 variantes**: `{strict, allow} × {terrain, liquid, model}`. O carregador valida as seis no momento do carregamento.
+Você mantém uma única base de código, mas ela deve compilar em todas as **6 variantes**: `{strict, allow} × {terrain, liquid, model}`. O carregador valida as seis no momento do carregamento.
 
 O eixo "iluminação ligada/desligada" da v4 e anteriores desapareceu (a v4 tinha 8 variantes). O estado de iluminação agora é uma pergunta de tempo de execução para [`bloxdLit()`](../api/lighting.md), não um ramo de tempo de compilação.
 
@@ -29,8 +29,8 @@ Somente `#define NAME` (sem valor) / `#ifdef` / `#ifndef` / `#else` / `#endif` e
 
 `BLOXD_LIGHTING` foi **removida na v5**. Usá-la falha na validação com: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## O contrato dos jogos strict
+## Restrições dos jogos strict
 
 A maioria dos jogos é strict (sem animação de vértices, sem `discard`). Um hook de vértice sem guarda reporta `<hook> moves terrain, which strict games prevent.` e um `discard` alcançável reporta `discard makes terrain see-through, which strict games prevent.` — ambos desativam **todos os hooks** naquele jogo strict. Sempre envolva os hooks de vértice em `#ifndef BLOXD_STRICT`.
 
-Para as interioridades da política por jogo, veja [Interioridades do motor: política](../internals/policy.md).
+Para conhecer a política de cada jogo, consulte [Funcionamento interno do motor: política](../internals/policy.md).

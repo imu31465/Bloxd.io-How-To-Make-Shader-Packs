@@ -6,7 +6,7 @@
 
 코드 본체는 하나지만, **6개 베리언트** 모두에서 컴파일되어야 한다: `{strict, allow} × {terrain, liquid, model}`. 로더는 로드 시 여섯 개 전부를 검증한다.
 
-v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언트였다). 라이팅 상태는 이제 [`bloxdLit()`](../api/lighting.md) 의 런타임 질문이지, 컴파일 시점 분기가 아니다.
+v4 이전에 있던 「라이팅 켜기/끄기」 축은 제거되었다 (v4는 8개 베리언트였다). 이제 라이팅 상태는 컴파일 시점 분기가 아니라 [`bloxdLit()`](../api/lighting.md)로 실행 중에 확인한다.
 
 | 베리언트 | 예 | 정의되는 매크로 |
 |---|---|---|
@@ -29,7 +29,7 @@ v4 이전의 「라이팅 온/오프」 축은 없어졌다 (v4 는 8베리언�
 
 `BLOXD_LIGHTING` 은 **v5 에서 제거되었다**. 쓰면 다음과 함께 검증에 실패한다: *"BLOXD_LIGHTING was removed in apiVersion 5; test bloxdLit() in code instead."*
 
-## strict 게임 계약
+## strict 게임의 제한
 
 대부분의 게임은 strict 다 (정점 애니메이션 없음, `discard` 없음). 가드 없는 버텍스 훅은 `<hook> moves terrain, which strict games prevent.` 를, 도달 가능한 `discard` 는 `discard makes terrain see-through, which strict games prevent.` 를 낸다 — 둘 다 그 strict 게임에서 **모든 훅**을 비활성화한다. 버텍스 훅은 항상 `#ifndef BLOXD_STRICT` 로 감싸라.
 

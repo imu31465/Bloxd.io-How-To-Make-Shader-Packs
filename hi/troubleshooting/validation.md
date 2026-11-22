@@ -4,28 +4,38 @@
 
 स्थैतिक सत्यापन (एनालाइज़र, चरण 1) की त्रुटियाँ — ज़्यादातर आरक्षित नाम, strict अनुबंध और हुकों-के-पार कॉल प्रतिबंध।
 
-## "Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ..."
+## आउटपुट संरचनाएँ सीधे न बनाएँ
+
+> `Packs can't construct BloxdSurface directly" / "Packs can't construct BloxdLight directly, since header structs gain fields; ...`
 
 - **कारण**: `BloxdSurface(...)` जैसे कंस्ट्रक्टरों को बुलाना
 - **समाधान**: `bloxdDefaultSurface(s)` / `bloxdDefaultLight(s, l)` से शुरू करके फ़ील्ड बदलें (`var out = s;` light हुकों में चलता है)
 
-## "Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>"
+## आरक्षित पहचानकर्ता
+
+> `Packs can't declare names starting with bloxd, other than the hook functions bloxd<Terrain|Liquid|Model><Vertex|Surface|Light>`
 
 - **कारण**: `bloxd` से शुरू होने वाला पहचानकर्ता (केस-असंवेदनशील)
 - **समाधान**: नाम बदलें (जैसे `packTint`)। केवल 9 हुक नाम अनुमत हैं
 - **रोकथाम**: अपने नामों में `pack` / `my` आदि उपसर्ग लगाएँ
 
-## "bloxdPackInputs isn't part of the bloxd_ header"
+## अज्ञात यूनिफ़ॉर्म इनपुट
+
+> `bloxdPackInputs isn't part of the bloxd_ header`
 
 - **कारण**: uniform को सीधे संदर्भित करना
 - **समाधान**: हेडर फ़ंक्शनों के ज़रिए उसका उपयोग करें ([पैक फ़ॉर्मैट](../api/pack-format.md#प्रति-फ़्रेम-uniform-bloxdpackinputs))
 
-## "... reaches bloxdTexel, which only surface and light hooks can use."
+## वर्टेक्स हुक से टेक्सचर एक्सेस
+
+> `... reaches bloxdTexel, which only surface and light hooks can use.`
 
 - **कारण**: किसी vertex हुक (या उससे पहुँच योग्य किसी फ़ंक्शन) से कॉल — "reaches" का मतलब **कॉल पथ** है
 - **समाधान**: कॉल को surface / light हुक में खिसकाएँ
 
-## "... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ..."
+## सीन डेप्थ से पहले शर्त जाँचें
+
+> `... reaches bloxdOpaqueBehind, which needs BLOXD_SCENE_DEPTH, and <program> doesn't define it; ...`
 
 - **कारण**: `bloxdOpaqueBehind()` को `BLOXD_SCENE_DEPTH` चाहिए, जो केवल सभी-liquid वेरिएंट में परिभाषित होता है; terrain/model-हुक कोड से यह कॉल साझा करना अन-कंपाइलेबल वेरिएंट बना देता है
 - **समाधान**: कॉल को `#ifdef BLOXD_SCENE_DEPTH` में लपेटें

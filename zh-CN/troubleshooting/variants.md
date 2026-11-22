@@ -11,12 +11,16 @@
 - **修复**: 用 `#ifndef BLOXD_STRICT` 包住 vertex 钩子与 `discard`
 - **预防**: vertex 钩子永远从带守卫的模板起步 ([变体](../getting-started/variants.md))
 
-## 「.alpha is undefined」
+## 当前变体不提供 `alpha` 字段
+
+> `.alpha is undefined`
 
 - **原因**: `alpha` 只在 `#ifdef BLOXD_ALPHA` 之后存在 (全部 liquid + 非 strict 的 terrain/model)
 - **修复**: 用 `#ifdef BLOXD_ALPHA` 包住涉及 alpha 的代码 ([预处理器](../api/preprocessor.md#宏--变体矩阵))
 
-## 「BloxdVertex only exists when BLOXD_STRICT isn't defined」
+## 顶点钩子需要 allow 模式
+
+> `BloxdVertex only exists when BLOXD_STRICT isn't defined`
 
 - **原因**: strict 变体根本没有 vertex 钩子，也就没有 `BloxdVertex`；而 vertex 代码从 strict 变体中也可触达
 - **修复**: 给 vertex 钩子加守卫

@@ -1,6 +1,6 @@
 # Recettes
 
-Exemples de code orientés vers un objectif. Le versant « comment ça marche » se trouve dans les [Guides](../guides/). Tout ce qui suit est porté au vocabulaire v5 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) et protégé pour passer les 6 variantes (strict × terrain / liquid / model).
+Exemples de code classés par objectif. Pour comprendre les mécanismes, consultez les [Guides](../guides/). Les exemples utilisent la terminologie de l’API v5 (`flags`, `bloxdLit()`, `fogAlpha`, `bloxdSeconds()`) et prévoient les protections nécessaires pour les six variantes (strict × terrain / liquid / model).
 
 ## Carte
 

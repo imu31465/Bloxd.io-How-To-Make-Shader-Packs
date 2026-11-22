@@ -61,4 +61,4 @@ Les identifiants commençant par `bloxdTextureId` sont résolus comme des consta
 
 ## Voir aussi
 
-- [Dépannage : compilation](../troubleshooting/compilation.md) · [Intérieurs du moteur : Validation des shaders](../internals/shader-validation.md)
+- [Dépannage : compilation](../troubleshooting/compilation.md) · [Fonctionnement interne du moteur : validation des shaders](../internals/shader-validation.md)

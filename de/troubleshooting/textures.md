@@ -4,34 +4,44 @@
 
 Probleme rund um `bloxdTextureId*` / `bloxdTexel`. Alle verfügbare Namen im [Texturkatalog](../api/texture-catalog.md) durchsuchen.
 
-## „There's no texture called X. Did you mean bloxdTextureIdY?"
+## Unbekannter Texturname
+
+> `„There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **Ursache**: ein Tippfehler; der Validator hat **Levenshtein-Vorschläge** (Schwelle `max(2, floor(len/4)) + 1`)
 - **Fix**: den Vorschlag annehmen; gegen den [Katalog](../api/texture-catalog.md) abgleichen
 - **Vorbeugen**: Namen aus dem Katalog kopieren
 
-## „...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+## Frame-Namen animierter Texturen
+
+> `„...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **Ursache**: eine **Rahmennummer** auf einer animierten Textur geschrieben (`lava0` etc.)
 - **Fix**: den Basisnamen benutzen — Sampeln liefert automatisch den aktuellen Rahmen
 - **Vorbeugen**: für die 43 Animationsfamilien nie Rahmen-Suffixe schreiben ([Namensgebung](../api/texture-api.md#schreibregeln-und-namensfreiheit))
 
-## „...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+## Namen gedrehter Texturen
+
+> `„...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **Ursache**: eine Rotationsfamilien-Gedrehtkopie-Schreibweise geschrieben (`[rot[N`)
 - **Fix**: den Wurzelnamen benutzen — `bloxdTexel` wendet die Rotation erneut an
 
-## „...could name X and Y, which differ only by case or underscores, so it can't be used."
+## Mehrdeutige Texturbezeichner
+
+> `„...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **Ursache**: das Case-/Unterstrich-insensitive Falten ließ den Namen **mehrdeutig**
 - **Fix**: die Schreibweise disambiguieren
 
-## „bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+## Ungültiger Texturkonstantenname
+
+> `„bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **Ursache**: Präfix falsch geschrieben (z. B. `bloxdTextureID`, `bloxdtextureid`)
 - **Fix**: Namen exakt mit `bloxdTextureId` beginnen lassen
 
-## „Case and underscores are not distinguished“ — wie koexistieren beide Regeln?
+## Groß-/Kleinschreibung und Unterstriche
 
 Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top` und `bloxdTextureIdGrassTop` auf **dieselbe** Konstante auf. Nur wenn das Falten mehrere Kandidaten übrig lässt, feuert der eigene Mehrdeutigkeitsfehler ([Namensregeln](../api/texture-api.md#schreibregeln-und-namensfreiheit)).
 
@@ -44,7 +54,9 @@ Die Namensauflösung faltet Case und `_`, daher lösen `bloxdTextureId_grass_top
 
 - **Grenze**: die Shader-Pack-API **liest** den Atlas nur; Texturen hinzuzufügen ist Aufgabe des Texturpack-Systems ([Kombinationen](../guides/combinations.md))
 
-## „Packs can't use X: the engine binds every texture and sampler..."
+## Einschränkungen beim Texturzugriff
+
+> `„Packs can't use X: the engine binds every texture and sampler...`
 
 - **Ursache**: `texture_*` / `sampler`-Typen direkt deklariert
 - **Fix**: über `bloxdTexel()` gehen ([Einschränkungen](../api/restrictions.md))

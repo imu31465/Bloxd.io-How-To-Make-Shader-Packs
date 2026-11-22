@@ -11,7 +11,7 @@
 - 加载时区块边界的细棋盘格为引擎屏幕空间 Bayer 4×4 抖动的区块淡入，非包 bug (可用图形设置 `chunkFadeIn` 关闭)
 - **`mod` 为保留字**：以 `pack.wgsl:3 'mod' is a reserved word in WGSL.` 拒绝。求余用 `%` 运算符书写
 
-## R-C. Bayer 抖动溶解 — out.alpha 控制 discard
+## R-C. Bayer 抖动溶解
 
 复现引擎区块淡入所用的**同一 Bayer 4×4 表**，由低方块起按抖动做「熔解」镂空。alphaTest 材质 (草、叶) 触发 discard，液体则为混合透明度。
 
@@ -54,7 +54,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## R-D. 水的相机近接淡入 — 液体 alpha 保障视野
+## R-D. 镜头附近的水面淡化
 
 液体钩子的 `out.alpha` 直连混合。仅透过相机正下方水面，保障潜水·水上相机的视野。
 

@@ -2,30 +2,30 @@
 
 > 대상 API: 5 · 문서 유형: 기술 참조
 
-`bloxdSunDirection()` 의 공급원은 스카이박스 종류가 바뀔 때만 다시 쓰는 태양 방향 버퍼이며, 판단 기준은 「하늘에 태양이 있는가」 가 아니라 **「스카이박스가 earth 타입인가」** 이다.
+`bloxdSunDirection()`은 태양 방향 버퍼를 읽는다. 이 버퍼는 스카이박스 종류가 바뀔 때만 갱신된다. 판단 기준은 하늘에 태양이 보이는지가 아니라 **스카이박스의 종류가 `earth`인지 여부**이다.
 
 | 스카이박스 | `bloxdSunDirection()` |
 |---|---|
-| `default` (절차 하늘) | 0이 아님 (기존값 아래) |
+| `default` (절차적 하늘) | 0이 아님 (기본값은 아래 참조) |
 | `gloomy` / `interstellar` / `space_*` (큐브 텍스처) | **항상 (0,0,0)** |
 
-**달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 달의 위치를 태양의 정반대로 계산하기 때문). 밤낮 판정은 태양 고도로 한다 — `bloxdSunDirection().y < 0` (태양이 지평선 밑) 일 때 달이 위에 있다. 단 기존 월드에서는 태양이 정지해 있으므로 달도 정지해 있으며, 움직이는 달이 의미 있는 것은 낮밤 사이클을 구현한 월드뿐이다.
+`bloxdSunDirection()`이 영벡터가 아닌 값을 반환할 때 달의 방향은 태양의 반대쪽인 `-bloxdSunDirection()`이다(엔진이 달을 태양의 정반대 위치에 둔다). 영벡터를 반환하면 이 함수만으로는 실제 달의 방향을 알 수 없다. 밤인지는 태양의 고도로 판단한다. `bloxdSunDirection().y < 0`(태양이 지평선 아래)일 때 달은 지평선 위에 있다. 기본 월드에서는 태양이 고정되어 있으므로 달도 움직이지 않는다. 달은 낮과 밤의 주기를 구현한 월드에서만 움직인다.
 
-기존 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)` (inclination = −0.2 / azimuth = 0.55 에서 계산되는 단위 벡터, 정지). 배포 팩 테스트 때 하이라이트 방향을 미리 예측할 수 있는 실용 기준값이다.
+기본 월드의 태양 방향은 약 `(-0.56, 0.81, -0.18)`이다 (`inclination` = −0.2 / `azimuth` = 0.55에서 계산한 정적 단위 벡터). 배포할 셰이더 팩을 테스트할 때 하이라이트 방향을 가늠하는 기준값으로 사용할 수 있다.
 
-낮밤 사이클은 엔진에 내장되어 있지 않다 — inclination 은 정적인 수치이며, 낮밤이 움직이는 월드는 게임측이 갱신한다. 그 갱신 때마다 `bloxdSunDirection()` 도 다시 쓰이므로 따라간다.
+엔진에는 낮과 밤의 주기가 내장되어 있지 않다. `inclination`은 정적인 값이며, 낮과 밤의 변화를 구현한 월드는 게임 로직에서 이 값을 갱신한다. `bloxdSunDirection()`은 그 변경 사항을 반영한다.
 
-지형의 방향광은 씬 기동시에 만들어지는 2등뿐이며 **방향도 강도도 고정, 낮밤에 변하지 않는다**. 정리하면 **지형 밝기를 정하는 요소는 어느 것도 시간에 의존하지 않는다. 낮밤의 「겉모습」 은 스카이박스와 bloxdSunDirection() 뿐**이며, 밤에 지형을 어둡게 하고 싶은 팩은 bloxdSunDirection() 에서 직접 시간대를 추정할 수밖에 없다 ([야간 표현 설계](../guides/night.md)의 `sunPresent` 수법).
+지형 조명에는 씬 시작 시 생성되는 방향광 2개만 사용되며, **방향과 강도는 낮과 밤에 관계없이 고정되어 있다**. 즉, 지형의 밝기는 시간에 따라 변하지 않는다. 낮과 밤의 시각적 차이는 스카이박스와 `bloxdSunDirection()`으로만 표현된다. 밤에 지형을 어둡게 만들려는 셰이더 팩은 `bloxdSunDirection()`을 바탕으로 시간대를 직접 추정해야 한다 ([야간 표현 설계](../guides/night.md)의 `sunPresent` 기법 참조).
 
-## R-A. 방향성 달빛 — moonDir = −bloxdSunDirection()
+## R-A. 달빛 효과
 
-달이 위에 있을 때만 푸르스름한 흰 Lambert 와 약한 스페큘러를 더한다. `moonUp` 이 0인 세계 (기존 정지 태양 월드) 에서는 아무 일도 일어나지 않으므로, **낮밤 사이클 있는 월드에서만 발동하는 안전한 달빛**이 된다.
+달이 지평선 위에 있을 때만 푸른빛이 도는 흰색 Lambert 조명과 약한 정반사광을 더한다. 태양이 고정된 기본 월드에서는 `moonUp`이 0이므로 아무 효과도 나타나지 않는다. **이 달빛 효과는 낮과 밤의 주기를 구현한 월드에서만 활성화된다.**
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // 달은 항상 태양의 정반대. 낮 동안은 moonDir.y < 0 으로 자동 소등된다
+        // 태양 방향 벡터가 영벡터가 아닐 때만 달이 태양의 반대쪽에 있다.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
@@ -36,7 +36,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
             out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
         }
-}
+    }
     return out;
 }
 ```

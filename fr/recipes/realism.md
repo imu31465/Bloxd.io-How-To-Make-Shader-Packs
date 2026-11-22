@@ -66,7 +66,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Ambiant hémisphérique (ciel dessus / rebond du sol dessous)
+## R9.4 Éclairage hémisphérique
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -101,7 +101,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Perspective aérienne (« atmosphère » par désaturation à distance)
+## R9.6 Perspective aérienne
 
 > Contrairement au brouillard (remplacement de couleur), superposer « désaturation à distance » rend les vues lointaines bien plus réalistes.  
 > Prudence : ne réduisez que la saturation — ne touchez jamais à la luminance.
@@ -118,7 +118,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Normales de vague + scintillement solaire (« route du soleil » sur l'eau)
+## R9.7 Normales des vagues et reflets solaires
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -149,7 +149,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Micro-relief procédural (contournement de l'interdit des textures)
+## R9.8 Micro-relief procédural
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -181,7 +181,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Assombrissement non linéaire des grottes + protection des lampes
+## R9.9 Assombrissement des grottes
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -197,7 +197,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Réappliquer le brouillard (obligatoire en écartant engineColour)
+## R9.10 Réappliquer le brouillard
 
 > Poser un plancher comme `min(l.fogAlpha, 0.75)` limite « pas plus dense que ceci »
 > (0.0 = fidèle au moteur / 0.3–0.5 = distance plus claire).
@@ -219,7 +219,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Grade cinéma (ombres froides / hautes lumières chaudes / désaturation nocturne)
+## R9.11 Étalonnage cinéma
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -236,7 +236,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Ombres projetées — inversion du lift + coupe par seuil (définitif)
+## R9.12 Ombres projetées
 
 > **Rappel de prémisse (section 10)** : `l.skyLight` n'est pas la valeur voxel brute (n/15) mais la valeur après la « courbe de lift » du moteur  
 > `y = 1-(1-x/(3-2x))³` (courbe en S qui relève les zones sombres).
@@ -296,6 +296,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Guide de réglage : **la surface d'ombre tient au seul `shTh`** — `0.93` = rayon 1.5+ / `0.87` = rayon 2 / `0.80` = rayon 3 / `0.67` = rayon 5.  
 > La dureté du bord, c'est `shSoft` (0.02 = dur / 0.08 = doux). L'obscurité du cœur d'ombre est le réglage à deux points de `0.09` (ambiant minimum) et `0.16` (diffusion du ciel).  
-> Pour élargir les ombres au couchant, ajoutez `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (approximation des longues ombres du crépuscule.  
+> Pour approximer l’allongement des ombres au coucher du soleil, ajoutez `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` au seuil.
+> `sunDir` correspond à `bloxdSunDirection() / length(bloxdSunDirection())`. Pour bleuir davantage les ombres, augmentez le canal B de `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` vaut `bloxdSunDirection() / length(bloxdSunDirection())`). Pour des ombres plus bleues, montez le B de `vec3f(0.72, 0.82, 1.05)`.
 >

@@ -1,4 +1,4 @@
-# Interioridades da amostragem de texturas
+# Como o motor amostra texturas
 
 > API alvo: 5 · Tipo: referência técnica
 

@@ -118,4 +118,4 @@ Referências restantes às constantes `bloxdBlockFlag*` falham no diagnóstico d
 ## Relacionados
 
 - Migração completa da v4 → [Histórico de versões: v5](../history/v5.md)
-- Interioridades da entrega de flags → [Interior do motor](../internals/rendering-pipeline.md)
+- Como as flags são fornecidas → [Funcionamento interno do motor](../internals/rendering-pipeline.md)

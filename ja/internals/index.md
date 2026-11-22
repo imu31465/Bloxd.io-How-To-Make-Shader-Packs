@@ -2,11 +2,11 @@
 
 エンジン内部の動作を説明する技術資料です。シェーダーパックがどのように処理されるかを詳しく知りたい場合に参照してください。安定した利用方法と公開仕様は[APIリファレンス](../api/)を参照してください。
 
-## このカテゴリーの構成
+## ページ一覧
 
 | ページ | 内容 |
 |---|---|
-| [レンダリングパイプライン](rendering-pipeline.md) | alphaTest の位置、方位光 2 灯、uniform の実体、greedy meshing |
+| [レンダリングパイプライン](rendering-pipeline.md) | alphaTest の位置、方向光2灯、uniform の実体、greedy meshing |
 | [フック呼び出しの内部](hook-invocation.md) | フックがどう呼び出されるか |
 | [エンジンヘッダー](engine-header.md) | パックに付加されるWGSLヘッダー |
 | [シェーダー検証の内部](shader-validation.md) | 静的検証の内部、シグネチャ表、HEADER_VERSION |

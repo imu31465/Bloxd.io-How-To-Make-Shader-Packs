@@ -4,34 +4,44 @@
 
 Проблемы вокруг `bloxdTextureId*` / `bloxdTexel`. Все доступные имена ищите в [каталоге текстур](../api/texture-catalog.md).
 
-## "There's no texture called X. Did you mean bloxdTextureIdY?"
+## Неизвестное имя текстуры
+
+> `There's no texture called X. Did you mean bloxdTextureIdY?`
 
 - **Причина**: опечатка; у валидатора есть **подсказки Левенштейна** (порог `max(2, floor(len/4)) + 1`)
 - **Исправление**: примите подсказку; сверьтесь с [каталогом](../api/texture-catalog.md)
 - **Профилактика**: копируйте имена из каталога
 
-## "...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates."
+## Имена кадров анимированных текстур
+
+> `...names a frame of the animated texture lava: use bloxdTextureIdLava, which bloxdTexel animates.`
 
 - **Причина**: написан **номер кадра** у анимированной текстуры (`lava0` и т.п.)
 - **Исправление**: используйте базовое имя — сэмплинг автоматически возвращает текущий кадр
 - **Профилактика**: никогда не пишите суффиксы кадров для 42 семейств анимаций ([правила имён](../api/texture-api.md#правила-правописания-и-свобода-именования))
 
-## "...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ..."
+## Имена повёрнутых текстур
+
+> `...names a turned copy of radar_screen0: use bloxdTextureIdRadarScreen0, ...`
 
 - **Причина**: написано имя повёрнутой копии из семейства поворотов (`[rot[N`)
 - **Исправление**: используйте корневое имя — `bloxdTexel` заново применяет поворот
 
-## "...could name X and Y, which differ only by case or underscores, so it can't be used."
+## Неоднозначные идентификаторы текстур
+
+> `...could name X and Y, which differ only by case or underscores, so it can't be used.`
 
 - **Причина**: свёртка, нечувствительная к регистру и подчёркиваниям, оставила имя **неоднозначным**
 - **Исправление**: устраните неоднозначность написания
 
-## "bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?"
+## Недопустимое имя константы текстуры
+
+> `bloxdTextureIdGrassTop isn't part of the shader pack API. Texture names start with exactly bloxdTextureId: did you mean bloxdTextureIdGrassTop?`
 
 - **Причина**: опечатка в префиксе (напр. `bloxdTextureID`, `bloxdtextureid`)
 - **Исправление**: начинайте имена ровно с `bloxdTextureId`
 
-## "Case and underscores are not distinguished" — как сосуществуют оба правила?
+## Регистр и символы подчёркивания
 
 Разрешение имён сворачивает регистр и `_`, поэтому `bloxdTextureId_grass_top` и `bloxdTextureIdGrassTop` резолвятся в **одну и ту же** константу. Специальная ошибка неоднозначности срабатывает, только когда свёртка оставляет несколько кандидатов ([правила имён](../api/texture-api.md#правила-правописания-и-свобода-именования)).
 
@@ -44,7 +54,9 @@
 
 - **Предел**: API шейдер-паков только **читает** атлас; добавление текстур — дело системы текстурных паков ([комбинирование](../guides/combinations.md))
 
-## "Packs can't use X: the engine binds every texture and sampler..."
+## Ограничения доступа к текстурам
+
+> `Packs can't use X: the engine binds every texture and sampler...`
 
 - **Причина**: прямое объявление типов `texture_*` / `sampler`
 - **Исправление**: идите через `bloxdTexel()` ([Ограничения](../api/restrictions.md))
@@ -56,4 +68,4 @@
 
 ## Смотрите также
 
-- [API текстур](../api/texture-api.md) · [Каталог текстур](../api/texture-catalog.md) · [Внутрянка реестра текстур](../internals/texture-registry.md)
+- [API текстур](../api/texture-api.md) · [Каталог текстур](../api/texture-catalog.md) · [Внутреннее устройство реестра текстур](../internals/texture-registry.md)

@@ -67,7 +67,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Hemisphären-Ambiente (Himmel oben / Boden-Bounce unten)
+## R9.4 Hemisphärische Beleuchtung
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -102,7 +102,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Luftperspektive („Atmosphäre" per Distanz-Entsättigung)
+## R9.6 Luftperspektive
 
 > Anders als Fog (Farbtausch) macht überlagerte „Distanz-Entsättigung" Fernen deutlich realistischer.  
 > Vorsicht: nur Sättigung senken — nie Luminanz anfassen.
@@ -119,7 +119,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Wellennormalen + Sonnenglitzer („Sonnenstraße" auf Wasser)
+## R9.7 Wellennormalen und Sonnenglitzern
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -150,7 +150,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Prozedurales Mikro-Bump (Texturverbots-Workaround)
+## R9.8 Prozedurales Mikro-Bump
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -182,7 +182,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Nichtlineare Höhlenabdunklung + Lampenschutz
+## R9.9 Höhlen abdunkeln
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -198,7 +198,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Fog neu anwenden (Pflicht beim Verwerfen von engineColour)
+## R9.10 Nebel erneut anwenden
 
 > Ein Floor wie `min(l.fogAlpha, 0.75)` begrenzt „nicht dichter als dies"
 > (0.0 = engine-treu / 0.3–0.5 = klarere Ferne).
@@ -220,7 +220,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Cinema-Grade (kalte Schatten / warme Highlights / Nacht-Entsättigung)
+## R9.11 Filmischer Farblook
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -237,7 +237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Projektionsschatten — Lift-Inversion + Schwellenwert-Schnitt (definitiv)
+## R9.12 Projektionsschatten
 
 > **Prämissen-Recheck (Abschnitt 10)**: `l.skyLight` ist nicht der rohe Voxel-Wert (n/15), sondern der Wert nach der Engine-„Lift-Kurve"  
 > `y = 1-(1-x/(3-2x))³` (dunkle Bereiche anhebende S-Kurve).
@@ -297,6 +297,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Tuning-Guide: **Schattenfläche entscheidet allein `shTh`** — `0.93` = Radius 1.5+ / `0.87` = Radius 2 / `0.80` = Radius 3 / `0.67` = Radius 5.  
 > Kanten­härte ist `shSoft` (0.02 = hart / 0.08 = weich). Kern­dunkelheit ist die Zwei-Punkt-Verschiebung aus `0.09` (Mindest-Ambiente) und `0.16` (Himmelsstreulicht).  
-> Für breitere Abend­schatten `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` addieren (Näherung langer Abendschatten.  
+> Um längere Schatten bei Sonnenuntergang näherungsweise abzubilden, addiere `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` zum Schwellenwert.
+> `sunDir` entspricht `bloxdSunDirection() / length(bloxdSunDirection())`. Für bläulichere Schatten erhöhe den B-Kanal von `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` ist `bloxdSunDirection() / length(bloxdSunDirection())`). Für blauere Schatten das B von `vec3f(0.72, 0.82, 1.05)` erhöhen.
 >

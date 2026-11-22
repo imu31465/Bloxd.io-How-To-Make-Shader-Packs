@@ -16,5 +16,5 @@ Compile success and "good looks" are different things. Check in this order:
 - Shader packs are limited to terrain / liquid hooks — no same-code handling of sky, entities, or UI.
 - No inputs exist for adding shadow maps, screen-space reflections, refraction, bloom, etc. (scene depth is unlocked liquid-only as `bloxdOpaqueBehind()` — see [Functions](../api/functions.md)).
 - `bloxdSeconds()` is animation time with no guaranteed link to in-game day/night.
-- Zero `bloxdSunDirection()` means true moon direction is unknown, not "moonlight physics" but a mood approximation. Directional moonlight can be built from `-bloxdSunDirection()` (day/night-cycle worlds only — [The sun and the moon](../internals/sun-and-moon.md)).
+- When `bloxdSunDirection()` is zero, the moon's actual direction cannot be determined. In that case, use blue ambient light as an artistic approximation rather than trying to simulate directional moonlight. In worlds with a day/night cycle, directional moonlight can instead use `-bloxdSunDirection()` (see [The sun and the moon](../internals/sun-and-moon.md)).
 - `s.position` / `l.position` are local coordinates, so add `bloxdRenderOffset()` for world-dependent effects. For in-block-local patterns, local coordinates are intentionally the tool.

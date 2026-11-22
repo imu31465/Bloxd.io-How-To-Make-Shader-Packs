@@ -16,7 +16,7 @@ Brightness, shadow and fog problems.
 
 ## Night too dark
 
-- **Fix**: guarantee a minimum ambient; with a zero `bloxdSunDirection()` the true moon direction is unknown, so use pseudo blue ambient ([the night recipe](../recipes/lighting.md)). The moon direction itself is `-bloxdSunDirection()` (day-night-cycle worlds only)
+- **Fix**: Keep a minimum ambient level. When `bloxdSunDirection()` is zero, the moon's actual direction is unavailable, so use faint blue ambient light as a visual fallback ([night recipe](../recipes/lighting.md)). In worlds with a day/night cycle, directional moonlight can be derived from `-bloxdSunDirection()`.
 
 ## Daytime blows out
 
@@ -36,7 +36,9 @@ Brightness, shadow and fog problems.
 - **Cause**: lighting-only inputs (`blockLight` etc.) used unguarded. v5 has no `#ifdef BLOXD_LIGHTING` — branch on **runtime `bloxdLit()`**
 - **Fix**: early return `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Lighting](../api/lighting.md#bloxdlit--the-gate))
 
-## "LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## LightEngine queue overflow
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Cause**: dense glowing-block regions overflow the light seed queue and the chunk's light computation is cut short. **Not pack-caused**, but light gaps near glowing clusters trace to this
 - **Fix**: spread light sources in the world

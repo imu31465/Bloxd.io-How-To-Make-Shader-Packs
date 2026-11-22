@@ -4,7 +4,9 @@
 
 `apiVersion` まわりのエラーです。現行ゲームは **`5` のみ**を受け付けます。
 
-## 「pack.json needs "apiVersion": {{version}}.」
+## apiVersion キーがない
+
+> `pack.json needs "apiVersion": {{version}}.`
 
 - **症状**: 読み込み直後にこのメッセージが出る (`loadNoApiVersion`)
 - **原因**: `apiVersion` キー自体が存在しない

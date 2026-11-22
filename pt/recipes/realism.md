@@ -67,7 +67,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 Ambiente hemisférico (céu em cima / rebote do chão embaixo)
+## R9.4 Iluminação hemisférica
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -102,7 +102,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 Perspectiva aérea ("atmosfera" por dessaturação com distância)
+## R9.6 Perspectiva aérea
 
 > Ao contrário da névoa (troca de cor), sobrepor "dessaturação com distância" deixa vistas longes bem mais realistas.  
 > Cuidado: reduza só a saturação — nunca toque a luminância.
@@ -119,7 +119,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 Normais de onda + brilho solar ("estrada do sol" na água)
+## R9.7 Normais de onda e brilho solar
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -150,7 +150,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 Micro-relevo procedural (truque contra a proibição de texturas)
+## R9.8 Micro-relevo procedural
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -182,7 +182,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 Escurecimento não linear de cavernas + proteção de lamparinas
+## R9.9 Escurecimento de cavernas
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -198,7 +198,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 Reaplicar névoa (obrigatório ao descartar engineColour)
+## R9.10 Reaplicar a névoa
 
 > Por um piso como `min(l.fogAlpha, 0.75)` limita "não mais denso que isto"  
 > (0.0 = fiel ao motor / 0.3–0.5 = distância mais clara).  
@@ -220,7 +220,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 Grau cinema (sombras frias / altas quentes / dessaturação noturna)
+## R9.11 Color grading cinematográfico
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -237,7 +237,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 Sombras projetadas — inversão do lift + corte por limiar (definitivo)
+## R9.12 Sombras projetadas
 
 > **Revisão da premissa (seção 10)**: `l.skyLight` não é o valor de voxel cru (n/15) mas o valor após a "curva de lift" do motor  
 > `y = 1-(1-x/(3-2x))³` (curva S que levanta áreas escuras).
@@ -297,6 +297,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > Guia de ajuste: **a área de sombra é só `shTh`** — `0.93` = raio 1.5+ / `0.87` = raio 2 / `0.80` = raio 3 / `0.67` = raio 5.  
 > A dureza da borda é `shSoft` (0.02 = duro / 0.08 = suave). A escuridão do núcleo é o duplo ajuste de `0.09` (ambiente mínimo) e `0.16` (luz dispersa do céu).  
-> Para alargar sombras ao entardecer, some `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` (aproximação de sombras longas de tarde.  
+> Para aproximar sombras mais longas ao entardecer, some `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` ao limite.
+> `sunDir` é `bloxdSunDirection() / length(bloxdSunDirection())`. Para deixar as sombras mais azuladas, aumente o canal B de `vec3f(0.72, 0.82, 1.05)`. 
 > `sunDir` é `bloxdSunDirection() / length(bloxdSunDirection())`). Para sombras mais azuis suba o B de `vec3f(0.72, 0.82, 1.05)`.
 >

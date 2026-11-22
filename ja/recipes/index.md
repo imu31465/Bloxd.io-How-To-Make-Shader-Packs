@@ -1,6 +1,6 @@
 # レシピ
 
-目的別のコード例集です。仕組みや考え方の解説は[ガイド](../guides/)に分かれています。すべて API v5 の語彙 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) に移植済みで、6バリアント (strict × terrain / liquid / model) を通す前提のガード付きです。
+目的別にコード例をまとめています。仕組みや考え方の解説は[ガイド](../guides/)を参照してください。例はAPI v5の用語 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) に対応し、6バリアント (strict × terrain / liquid / model) で動くようにガードを付けています。
 
 ## このカテゴリーの構成
 

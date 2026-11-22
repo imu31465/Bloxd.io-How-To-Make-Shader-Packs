@@ -6,7 +6,7 @@
 
 - **Format** : un unique `.zip`, ou un dossier (le chargement par dossier n'existe que sur navigateurs de bureau)
 - **Contenu** : un `pack.json` (au niveau supérieur du pack ; insensible à la casse) + 1–256 fichiers `.wgsl`
-- Les fichiers `.wgsl` multiples sont concaténés en un seul module, donc découpage et sous-dossiers ne coûtent rien. Aucune contrainte sur les noms de fichiers. La concaténation se fait par **ordre de dictionnaire du nom de chemin** (les déclarations à portée de module sont indépendantes de l'ordre, donc cela ne compte que pour du code dépendant de l'ordre d'initialisation des `var`). Les fichiers non-`.wgsl` (README etc.) sont ignorés
+- Les fichiers `.wgsl` sont concaténés en un seul module : vous pouvez donc répartir le code entre plusieurs fichiers et sous-dossiers. Les noms de fichiers ne sont soumis à aucune restriction. La concaténation suit l’**ordre lexicographique des chemins** (les déclarations au niveau du module ne dépendent pas de l’ordre ; cela ne compte que pour le code qui dépend de l’ordre d’initialisation des `var`). Les fichiers autres que `.wgsl` (comme les README) sont ignorés.
 
 ## Limites de taille et de format
 

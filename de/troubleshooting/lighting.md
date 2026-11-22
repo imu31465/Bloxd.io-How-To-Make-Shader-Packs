@@ -16,7 +16,7 @@ Helligkeits-, Schatten- und Fog-Probleme.
 
 ## Nacht zu dunkel
 
-- **Fix**: ein Mindest-Ambiente garantieren; bei null `bloxdSunDirection()` ist die wahre Mondrichtung unbekannt, also pseudo-blaues Ambiente benutzen ([das Nacht-Rezept](../recipes/lighting.md)). Die Mondrichtung selbst ist `-bloxdSunDirection()` (nur Welten mit Tag/Nacht-Zyklus)
+- **Lösung**: Sorge für ein Mindestmaß an Umgebungslicht. Wenn `bloxdSunDirection()` null ist, lässt sich die tatsächliche Mondrichtung nicht bestimmen. Verwende dann schwaches blaues Umgebungslicht als visuellen Ersatz ([Nacht-Rezept](../recipes/lighting.md)). In Welten mit Tag-Nacht-Zyklus lässt sich die Richtung des Mondlichts mit `-bloxdSunDirection()` bestimmen.
 
 ## Tag brennt aus
 
@@ -36,7 +36,9 @@ Helligkeits-, Schatten- und Fog-Probleme.
 - **Ursache**: beleuchtungsexklusive Eingaben (`blockLight` etc.) ungeschützt benutzt. v5 hat kein `#ifdef BLOXD_LIGHTING` — auf **Laufzeit-`bloxdLit()`** verzweigen
 - **Fix**: früh zurückgeben mit `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` ([Beleuchtung](../api/lighting.md#bloxdlit--das-gate))
 
-## „LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk"
+## LightEngine-Warteschlange überlastet
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **Ursache**: dichte Leuchtblock-Regionen überlaufen die Licht-Seed-Queue, und die Lichtberechnung des Chunks wird abgeschnitten. **Nicht paket-verursacht**, aber Lichtlücken nahe glühender Cluster gehen darauf zurück
 - **Fix**: Lichtquellen in der Welt verteilen

@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **반환값**: 월드 방향 기준으로 태양을 향하는 단위 벡터. **태양이 없을 때는 제로 벡터**
-- **사실**:
-  - **달은 항상 `-bloxdSunDirection()` 에 있다** (엔진이 태양의 반대쪽에 놓는다)
-  - **제로 벡터를 `normalize` 에 넘기지 마라** — `dot(d, d) < 1e-8` 으로 가드하고 상수 방향으로 폴백한다
-  - 현행 빌드에는 낮밤 사이클이 없다. 태양·달·별은 세션 동안 움직이지 않는다 (불투명도 토글만 있다). 기본 지구 하늘에서 태양은 `(−0.56, 0.81, −0.18)` 부근에 있다 (고도 ≈ 54°)
-- **용도**: 색 온도, 광원 방향, 태양 게이팅, 유사 달빛
+- **반환값**: 월드 좌표계에서 태양을 향하는 단위 벡터. **월드에 태양이 없으면 영벡터**를 반환한다.
+- **중요한 사실**:
+  - 이 함수가 영벡터가 아닌 값을 반환하면 달의 방향은 `-bloxdSunDirection()`이다. 영벡터를 반환하면 실제 달의 방향을 알 수 없다.
+  - **영벡터를 `normalize`에 넘기지 않는다**. `dot(d, d) < 1e-8`인지 확인하고, 필요하면 고정된 대체 방향을 사용한다.
+  - 엔진은 자동 낮밤 주기를 제공하지 않는다. 기본 Earth 하늘에서는 태양이 `(−0.56, 0.81, −0.18)` 부근(고도 약 54°)에 고정되어 있다. 월드에서 `inclination`을 직접 갱신하면 자체 낮밤 주기를 구현해 태양과 달의 방향을 바꿀 수 있다.
+- **용도**: 색온도와 광원 방향 조정, 태양 유무 판정, 환경광을 이용한 달빛 효과.
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **반환값**: `position + vec3f(bloxdRenderOffset())`
 - **주의**: f32 정밀도 한계로 먼 좌표는 부정확할 수 있다 (헤더: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — 문서화되지 않았지만 여전히 주입된다
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 섀도 함수
 
-`API v5`는 엔진의 태양/달 그림자 시스템을 제공합니다. 블록·플레이어·몹·아이템이 드리우는 투영 그림자는 태양을 따라 움직입니다. 이 두 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 팩 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 없습니다.
+이 세 함수는 `bloxdFragmentBlockPosition`처럼 **컴파일된 각 팩의 모듈에 주입**되며 검증기의 함수표에 기록되지만, 읽을 수 있는 헤더 본문에는 포함되지 않는다.
 
 ### bloxdShadow
 

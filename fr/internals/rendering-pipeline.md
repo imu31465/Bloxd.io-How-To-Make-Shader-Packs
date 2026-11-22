@@ -10,7 +10,7 @@
 - Les fins damiers aux bords de chunk pendant le chargement sont le fondu de chunk par dither Bayer 4×4 en espace écran du moteur, pas des bugs du pack (désactivable via le réglage graphique `chunkFadeIn`)
 - **`mod` est un mot réservé** : rejeté avec `pack.wgsl:3 'mod' is a reserved word in WGSL.` Écrivez les restes avec l'opérateur `%`
 
-## R-C. Dissolution par dither Bayer — out.alpha pilote discard
+## R-C. Dissolution par tramage Bayer
 
 Reproduit la **même table Bayer 4×4** que le moteur utilise pour les fondus de chunk, en dissolvant les cutouts depuis les blocs bas vers le haut. discard se déclenche sur les matériaux alphaTest (herbe, feuilles) ; en liquides il devient de la transparence de blend.
 
@@ -53,7 +53,7 @@ fn bloxdTerrainSurface(s: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## R-D. Fondu d'eau proche caméra — l'alpha liquide préserve la vue
+## R-D. Fondu de l’eau près de la caméra
 
 L'`out.alpha` du hook liquide alimente le blend directement. Estompe juste la surface d'eau sous la caméra pour préserver la vue en plongée et caméra hors de l'eau.
 

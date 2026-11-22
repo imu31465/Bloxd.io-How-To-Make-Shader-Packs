@@ -1,6 +1,6 @@
 # Documentación de shader packs de Bloxd.io
 
-Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io — desde la creación, implementación, validación y distribución hasta la especificación de la API y la investigación de las interioridades del motor.
+Guía no oficial sobre los shader packs del renderizador WebGPU de Bloxd.io. Cubre todo el proceso —desde la creación y las pruebas hasta la referencia de la API y el análisis del funcionamiento interno del motor—.
 
 ## Especificación vigente
 
@@ -8,11 +8,11 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 - Objetivo: renderizador WebGPU
 - Hooks de sombreado: 9 (Terrain / Liquid / Model × Vertex / Surface / Light)
 
-¿Nuevo con los shader packs? Empieza por [Primeros pasos](getting-started/). ¿Consultas de la API? Mira [Referencia de la API](api/).
+¿Es tu primer shader pack? Empieza por [Primeros pasos](getting-started/). ¿Buscas una función o un campo? Consulta la [Referencia de la API](api/).
 
 > Esta documentación no es un recurso oficial de los desarrolladores del juego. Los mecanismos internos del motor son detalles de implementación y pueden cambiar con las actualizaciones; consulta la referencia de la API para conocer el comportamiento compatible.
 >
-> Esta guía se creó con asistencia de IA; la exactitud no está garantizada. Verifícala contra el comportamiento real del juego. Sigue verificando las recetas contra la pantalla del cargador y la compilación en el juego.
+> Esta guía se preparó con ayuda de IA. Comprueba el comportamiento en el juego, ya que los detalles internos pueden cambiar.
 >
 > Los packs se escriben únicamente en WGSL: no ejecutan JavaScript ni realizan solicitudes de red.
 
@@ -22,19 +22,19 @@ Una guía no oficial sobre shader packs para el renderizador WebGPU de Bloxd.io 
 |---|---|---|
 | Crear tu primer shader pack | [Primeros pasos](getting-started/) | autores primerizos de packs |
 | Consultar funciones y campos de la API | [Referencia de la API](api/) | autores en plena implementación |
-| Implementar un efecto (luz, agua, modelos…) | [Guías](guides/) · [Recetas](recipes/) | cualquiera que construya un look |
+| Implementar un efecto (luz, agua, modelos…) | [Guías](guides/) · [Recetas](recipes/) | quienes quieran implementar un estilo visual |
 | Corregir un error | [Solución de problemas](troubleshooting/) | cualquiera con un pack roto |
-| Investigar las interioridades del motor | [Interior del motor e investigación](internals/) | analistas del motor |
+| Entender el funcionamiento interno del motor | [Funcionamiento interno del motor](internals/) | lectores técnicos |
 | Consultar versiones antiguas (v1–v5) | [Historial de versiones](history/) | quien migra packs antiguos |
 
 ## Mapa de la documentación
 
 - **[Primeros pasos](getting-started/)** — visión general, inicio rápido, estructura del pack, pack.json, los 9 hooks, variantes, validación, distribución.
-- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 1,017 nombres.
+- **[Referencia de la API](api/)** — la especificación sistemática de la v5: hooks, flags, estructuras de entrada/salida, todas las funciones, iluminación, API de texturas, constantes, preprocesador, restricciones, compatibilidad y el catálogo de 1.017 identificadores de textura.
 - **[Guías](guides/)** — cómo funciona la iluminación, sombras, agua, noche, renderizado de modelos, rendimiento, conceptos de realismo.
 - **[Recetas](recipes/)** — ejemplos de código orientados a objetivo: colores, iluminación, emisión, coordenadas, animación, líquidos, vértices, matemáticas, realismo, sombreadores de modelo, efectos de encantamiento.
 - **[Solución de problemas](troubleshooting/)** — resolución de errores por síntoma: carga, versión de API, compilación, validación, variantes, visual, texturas, iluminación, modelos, rendimiento.
-- **[Interior del motor e investigación](internals/)** — canalización de renderizado, invocación de hooks, cabecera del motor, interioridades de validación y compilación, identificadores reservados, interioridades de iluminación/niebla, muestreo y registro de texturas, renderizado de modelos, datos medidos.
+- **[Funcionamiento interno del motor](internals/)** — canalización de renderizado, invocación de hooks, cabecera del motor, detalles internos del validador y del compilador, identificadores reservados, mecanismos internos de iluminación y niebla, muestreo y registro de texturas, renderizado de modelos, datos medidos.
 - **[Historial de versiones](history/)** — de v1 a v5: cambios por versión, pasos de migración, API eliminadas.
 
 ## Estados de verificación
@@ -49,4 +49,4 @@ Cada página indica la versión de API que cubre y el estado de verificación de
 | Experimental | experimental / sin consolidar |
 | Historical | material de una versión pasada |
 
-Los datos crudos extraídos del motor (cabecera, registro, mediciones) viven en [Interior del motor e investigación](internals/); la metodología y los registros que hay detrás se siguen en el [registro de investigación](internals/research-log.md).
+Los datos extraídos del motor (cabecera, registro y mediciones) están disponibles en [Funcionamiento interno del motor](internals/); la metodología y los registros se recogen en el [registro de investigación](internals/research-log.md).

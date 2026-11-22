@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **返回**: 世界朝向下指向太阳的单位向量；**没有太阳时为零向量**
-- **事实**:
-  - **月亮永远在 `-bloxdSunDirection()`** (引擎把它放在太阳的反侧)
-  - **切勿把零向量传给 `normalize`** — 用 `dot(d, d) < 1e-8` 守卫并回退到常量方向
-  - 当前构建没有昼夜循环；一次会话中太阳、月亮和星星都不移动 (只有不透明度切换)。默认大地天空中太阳位于 `(−0.56, 0.81, −0.18)` 附近 (仰角 ≈ 54°)
-- **用途**: 色温、光照方向、太阳门控、拟似月光
+- **返回**：世界坐标朝向下指向太阳的单位向量；**世界没有太阳时返回零向量**。
+- **重要事实**：
+  - 此函数返回非零向量时，月亮方向为 `-bloxdSunDirection()`；如果返回零向量，就无法从该函数得知月亮的实际方向。
+  - **切勿将零向量传给 `normalize`**。先检查 `dot(d, d) < 1e-8`，必要时改用固定方向。
+  - 引擎本身不提供自动昼夜循环。默认 Earth 天空中的太阳固定在 `(−0.56, 0.81, −0.18)` 附近（仰角约 54°）。世界可以自行更新 `inclination` 来实现昼夜变化，从而改变太阳和月亮的方向。
+- **用途**：调整色温、光照方向、判断太阳是否存在，以及实现环境月光效果。
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **返回**: `position + vec3f(bloxdRenderOffset())`
 - **注意**: f32 精度限制意味着远处坐标可能不精确 (标头: *「with possible f32 inaccuracy」*)
 
-### bloxdFragmentBlockPosition — 未写入文档但仍在注入
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ fn bloxdDefaultLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight
 
 ## 阴影函数
 
-`API v5` 提供引擎的太阳/月亮阴影系统：方块、玩家、生物和物品投下的投影阴影会随太阳移动。这两个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
+这三个函数会**注入每个包编译后的模块**（与 `bloxdFragmentBlockPosition` 一样），并记录在验证器的函数表里，但不属于可读头文件正文。
 
 ### bloxdShadow
 

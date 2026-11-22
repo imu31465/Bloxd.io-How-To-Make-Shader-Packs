@@ -7,10 +7,10 @@
 Pacotes de shaders são exclusivos do renderizador WebGPU. Você precisa de um navegador com suporte a WebGPU:
 
 - Navegadores baseados em Chromium (Chrome / Edge / Opera etc.) — estáveis no desktop
-- Safari 17+ / Firefox (o suporte a WebGPU varia conforme a época)
+- Safari 17+ / Firefox (a disponibilidade de WebGPU depende do navegador e de sua versão)
 - **Celular**: o suporte a WebGPU pode ser limitado no iOS / Android. Mencione isso na página de lançamento do seu pacote
 
-Enquanto um pacote estiver instalado, a configuração do jogo para o renderizador WebGPU fica ativada à força.
+Enquanto um pacote estiver instalado, a configuração do jogo para o renderizador WebGPU é ativada automaticamente enquanto o pacote estiver instalado.
 
 ## Ambiente de desenvolvimento
 
@@ -20,7 +20,7 @@ Não é necessária nenhuma ferramenta especial, embora estas ajudem:
 - Uma ferramenta de zip para a distribuição; durante o desenvolvimento você pode usar o carregamento por pasta (somente navegadores de desktop)
 - Ferramentas de desenvolvedor do navegador — erros de compilação aparecem na interface do jogo e também no console
 
-## Ambientes de verificação no dispositivo
+## Testes em dispositivos
 
 Antes de distribuir, verifique em ([Validação](validation.md)):
 

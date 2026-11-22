@@ -66,7 +66,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 반구 환경광 (위=하늘 / 아래=바닥의 튐)
+## R9.4 반구형 주변광
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -101,7 +101,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 대기 원근법 (거리로 채도가 떨어지는 「공기감」)
+## R9.6 대기 원근감
 
 > 포그 (색 교체) 와 달리 「거리 디새추레이트」를 겹쳐 쓰면 원경이 훨씬 리얼해진다.  
 > 주의: 채도만 떨어뜨릴 것 — 휘도는 절대 건드리지 않는다.
@@ -118,7 +118,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 파법선 + 태양 글린트 (수면의 「태양의 길」)
+## R9.7 파도 노멀과 햇빛 반짝임
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -149,7 +149,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 절차적 마이크로범프 (텍스처 금지의 회피책)
+## R9.8 절차적 미세 범프
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -181,7 +181,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 동굴의 비선형 암화 + 등불 보호
+## R9.9 동굴 비선형 어둡게 하기
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -197,7 +197,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 포그를 다시 거는 정석 (engineColour 를 버렸을 때 필수)
+## R9.10 안개 다시 적용
 
 > `(1.0 - l.fogAlpha)` 를 `min(l.fogAlpha, 0.75)` 처럼 하한과 함께 쓰면 「이 이상 짙어지지 않는다」 조정이 된다  
 > (0.0 = 엔진 준수 / 0.3~0.5 = 원경 클리어).  
@@ -219,7 +219,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 시네마-grade (그림자는 한색 / 하이라이트는 난색 / 밤은 디새추레이트)
+## R9.11 시네마틱 색 보정
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -236,7 +236,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 투영풍 섀도우 — 리프트 역변환 + 임계값 커트 (결정판)
+## R9.12 투영 그림자
 
 > **전제 재확인 (10장)**: `l.skyLight` 는 생 voxel 값 (n/15) 이 아니라 엔진이 「리프트 곡선」  
 > `y = 1-(1-x/(3-2x))³` (어두운 곳을 들어올리는 S 커브) 를 통과시킨 후의 값.
@@ -297,5 +297,6 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 조정 가이드: **그림자의 면적은 `shTh`만으로 정해진다** — `0.93`=반경1.5 이상 / `0.87`=반경2 / `0.80`=반경3 / `0.67`=반경5.  
 > 그림자 가장자리의 딱딱함은 `shSoft` (0.02=딱딱 / 0.08=소프트). 그림자 심의 어둡기는 `0.09` (최저 환경광) 와 `0.16` (하늘 산란광)  
 > 의 2점 시프트로 정해진다. 해 질 녘에 그림자를 넓히고 싶으면  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` 를 더한다 (긴 해 질 녘 그림자의 근사.  
+> 해 질 무렵 길어지는 그림자를 근사하려면 임계값에 `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))`를 더한다.
+> `sunDir`는 `bloxdSunDirection() / length(bloxdSunDirection())`이다. 그림자를 더 푸르게 하려면 `vec3f(0.72, 0.82, 1.05)`의 B 채널 값을 높인다.
 > `sunDir` 은 `bloxdSunDirection() / length(bloxdSunDirection())`). 그림자의 푸름은 `vec3f(0.72, 0.82, 1.05)` 의 B 를 올린다.

@@ -16,7 +16,7 @@
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `apiVersion` | number | required | Must **exactly equal `5`** (strict `===`). A string `"5"` or any other type fails, reported with the JSON spelling |
+| `apiVersion` | number | required | Must **exactly equal `5`** (strict `===`). A string `"5"` or any other type fails, the diagnostic includes its JSON representation |
 | `name` | string | required | Non-empty after trimming. Shown in the settings UI |
 | `author` | string | optional | May be omitted; must be a string if present |
 

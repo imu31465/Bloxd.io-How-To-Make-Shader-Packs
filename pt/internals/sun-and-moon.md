@@ -1,30 +1,30 @@
 # O sol e a lua
 
 > API alvo: 5 · Tipo: referência técnica
-A fonte de `bloxdSunDirection()` é um buffer de direção do sol reescrito somente quando o tipo de skybox muda — o critério não é "se o céu tem um sol", e sim **"se o skybox é do tipo terra"**.
+`bloxdSunDirection()` lê um buffer com a direção do sol, atualizado somente quando o tipo de skybox muda. O critério decisivo não é se o céu mostra um sol, mas **se o skybox é do tipo `earth`**.
 
 | Skybox | `bloxdSunDirection()` |
 |---|---|
-| `default` (céu procedural) | Não zero (padrões abaixo) |
+| `default` (céu procedural) | Diferente de zero (valores padrão abaixo) |
 | `gloomy` / `interstellar` / `space_*` (texturas de cubo) | **Sempre (0,0,0)** |
 
-**A lua está sempre em `-bloxdSunDirection()`** (o motor calcula a posição da lua como o oposto exato do sol). A noite é julgada pela elevação do sol — a lua está no céu quando `bloxdSunDirection().y < 0` (sol abaixo do horizonte). Mas em mundos padrão o sol é estático, então a lua também é; apenas mundos que implementam um ciclo dia/noite a veem se mover.
+Quando `bloxdSunDirection()` retorna um vetor diferente de zero, a direção da lua é `-bloxdSunDirection()` (o motor a posiciona exatamente no sentido oposto ao sol). Se retorna zero, esta função não informa a direção real da lua. A noite é determinada pela altura do sol: a lua está acima do horizonte quando `bloxdSunDirection().y < 0` (o sol está abaixo do horizonte). Nos mundos padrão, o sol é estático e a lua também; ela só se move em mundos que implementam um ciclo dia/noite.
 
-A direção do sol em mundos padrão é cerca de `(-0.56, 0.81, -0.18)` (vetor unitário calculado a partir de inclination = −0.2 / azimuth = 0.55, estático). Uma referência prática para prever no papel as direções de brilho ao testar pacotes de distribuição.
+A direção do sol em mundos padrão é cerca de `(-0.56, 0.81, -0.18)` (vetor unitário calculado a partir de `inclination` = −0.2 / `azimuth` = 0.55, estático). Uma referência útil para estimar a direção dos reflexos durante os testes dos packs.
 
-Ciclos dia/noite não são embutidos no motor — inclination é um número estático, e mundos com dia/noite em movimento o atualizam do lado do jogo. `bloxdSunDirection()` acompanha cada atualização.
+O motor não inclui um ciclo dia/noite. `inclination` permanece estático; mundos que implementam um ciclo dinâmico atualizam esse valor na lógica do jogo. `bloxdSunDirection()` reflete cada atualização.
 
-As luzes direcionais do terreno são apenas 2 lâmpadas criadas no início da cena, de **direção e intensidade fixas, sem variação dia/noite**. Em resumo: **nenhum fator de brilho do terreno depende do tempo. Os "looks" de dia/noite vêm somente do skybox e de bloxdSunDirection()** — portanto, pacotes que escurecem o terreno à noite devem estimar por conta própria a faixa de horário a partir de bloxdSunDirection() (a técnica `sunPresent` em [Projetando looks noturnos](../guides/night.md)).
+A iluminação direcional do terreno se limita a duas fontes criadas no início da cena. Sua **direção e intensidade permanecem constantes durante o dia e a noite**. Em outras palavras, o brilho do terreno não varia com o horário; a aparência diurna ou noturna depende apenas do skybox e de `bloxdSunDirection()`. Por isso, pacotes que escurecem o terreno à noite precisam estimar o horário a partir de `bloxdSunDirection()`, como na técnica `sunPresent` de [Projetando looks noturnos](../guides/night.md).
 
-## R-A. Luar direcional — moonDir = −bloxdSunDirection()
+## R-A. Luz da lua
 
-Adiciona Lambert branco-azulado e especular fraco somente enquanto a lua está no céu. `moonUp` é 0 em mundos padrão de sol estático, então nada acontece ali — **luar que só dispara em mundos com ciclo dia/noite, logo seguro**.
+Adiciona iluminação difusa de Lambert em tom branco-azulado e um leve brilho especular apenas enquanto a lua está acima do horizonte. Nos mundos padrão, em que o sol permanece estático, `moonUp` é 0 e nada acontece. **O efeito de luz lunar só é ativado em mundos que implementam um ciclo dia/noite.**
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
     var out = bloxdDefaultLight(s, l);
     if (bloxdLit()) {
-        // a lua está sempre exatamente oposta ao sol; desligamento automático de dia via moonDir.y < 0
+        // A lua fica na direção oposta ao sol apenas quando o vetor solar não é zero.
         let moonDir = -bloxdSunDirection();
         let moonUp  = smoothstep(0.0, 0.15, moonDir.y);
         if (moonUp > 0.0) {
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
             let spec  = pow(max(0.0, dot(n, halfV)), 48.0) * 0.25;
             out.colour += vec3f(0.10, 0.14, 0.24) * (diff * 0.6 + spec) * moonUp;
         }
-}
+    }
     return out;
 }
 ```

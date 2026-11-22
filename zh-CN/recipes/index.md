@@ -1,6 +1,6 @@
 # 实战配方
 
-按目的组织的代码示例。「原理怎么运作」的一面在[指南](../guides/)。这里的一切都已移植到 v5 词汇 (`flags` / `bloxdLit()` / `fogAlpha` / `bloxdSeconds()`) 并加了守卫以通过 6 种变体 (strict × terrain / liquid / model)。
+按用途整理的代码示例。相关原理见[指南](../guides/)。示例采用 API v5 术语 (`flags`、`bloxdLit()`、`fogAlpha`、`bloxdSeconds()`)，并包含适用于六种变体 (strict × terrain / liquid / model) 的条件保护。
 
 ## 导航
 

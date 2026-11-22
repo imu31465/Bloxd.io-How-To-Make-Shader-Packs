@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Renvoie** : vecteur unitaire vers le soleil en orientation monde ; **vecteur nul quand il n'y a pas de soleil**
-- **Faits** :
-  - **la lune est toujours à `-bloxdSunDirection()`** (le moteur la place à l'opposé du soleil)
-  - **ne jamais passer le vecteur nul à `normalize`** — protégez avec `dot(d, d) < 1e-8` et retombez sur une direction constante
-  - le build actuel n'a pas de cycle jour/nuit ; soleil, lune et étoiles ne bougent pas pendant une session (seule l'opacité bascule). Dans le ciel « terre » par défaut, le soleil se tient près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°)
-- **Usages** : température de couleur, direction de la lumière, porte solaire, pseudo clair de lune
+- **Renvoie** : vecteur unitaire dirigé vers le soleil en orientation monde ; **zéro lorsque le monde n’a pas de soleil**.
+- **Faits importants** :
+  - Lorsque cette fonction renvoie un vecteur non nul, la direction de la lune est `-bloxdSunDirection()`. Si elle renvoie zéro, la direction réelle de la lune est inconnue.
+  - **Ne passez jamais le vecteur nul à `normalize`**. Vérifiez `dot(d, d) < 1e-8` et prévoyez une direction fixe en remplacement.
+  - Le moteur ne fournit pas de cycle jour/nuit automatique. Dans le ciel Earth par défaut, le soleil reste près de `(−0.56, 0.81, −0.18)` (élévation ≈ 54°). Chaque monde peut implémenter son propre cycle en mettant à jour `inclination`, ce qui modifie les directions du soleil et de la lune.
+- **Usages** : température de couleur, direction de la lumière, détection du soleil et effets de clair de lune ambiant.
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Renvoie** : `position + vec3f(bloxdRenderOffset())`
 - **Note** : les limites de précision du f32 font que les coordonnées lointaines peuvent être inexactes (en-tête : *« with possible f32 inaccuracy »*)
 
-### bloxdFragmentBlockPosition — non documentée mais toujours injectée
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ La recette d'éclairage propre du moteur, documentée comme WGSL appelable — c
 
 ## Fonctions d’ombres
 
-La API v5 a ajouté à l’API des packs le vrai système d’ombres soleil/lune du moteur — des ombres projetées qui suivent le soleil, portées par les blocs, joueurs, mobs et objets. Ces deux fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
+Ces trois fonctions sont **injectées dans le module compilé de chaque pack** (comme `bloxdFragmentBlockPosition`) et figurent dans la table de fonctions du validateur, mais pas dans le texte lisible de l’en-tête.
 
 ### bloxdShadow
 
@@ -184,7 +183,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Garde** : `#ifdef BLOXD_SCENE_DEPTH` (défini dans les variantes liquides)
 - **Signification** : la face opaque derrière ce fragment (terrain vu à travers l'eau) ; `hit == false` pour le ciel
 - **Renommage depuis v2** : `found` → `hit`
-- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Intérieurs du moteur](../internals/rendering-pipeline.md)
+- **Pour aller plus loin** : [Historique des versions : v3](../history/v3.md) et [Fonctionnement interne du moteur](../internals/rendering-pipeline.md)
 
 ## Voir aussi
 

@@ -66,7 +66,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 अर्धगोल परिवेश (ऊपर आकाश / नीचे भूमि प्रतिक्षेप)
+## R9.4 अर्धगोल प्रकाश
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -101,7 +101,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 वायुमंडलीय परिप्रेक्ष्य (दूरी-विसंतृप्ति से "वायुरूप")
+## R9.6 वायुमंडलीय परिप्रेक्ष्य
 
 > फ़ॉग (रंग प्रतिस्थापन) के विपरीत, "दूरी से विसंतृप्ति" की परत चढ़ाने से दूर के दृश्य कहीं अधिक यथार्थवादी बनते हैं।  
 > सावधानी: केवल संतृप्ति घटाएँ — चमक को कभी न छुएँ।
@@ -118,7 +118,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 तरंग अभिलंब + सूर्य चमक (जल पर "सूर्य-पथ")
+## R9.7 लहरों के नॉर्मल और सूर्य की चमक
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -149,7 +149,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 प्रक्रियात्मक सूक्ष्म-उभार (टेक्सचर-प्रतिबंध का विकल्प)
+## R9.8 प्रक्रियात्मक सूक्ष्म उभार
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -181,7 +181,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 अरैखिक गुफ़ा-अंधेरा + दीया रक्षा
+## R9.9 गुफाओं को अँधेरा करना
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -197,7 +197,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 फ़ॉग दोबारा लगाना (engineColour त्यागने पर आवश्यक)
+## R9.10 फ़ॉग फिर से लगाना
 
 > `min(l.fogAlpha, 0.75)` जैसी निम्नसीमा लगाने से "इससे सघन नहीं" की टोपी बैठती है
 > (0.0 = इंजन-अनुरूप / 0.3–0.5 = साफ़ दूरी)।
@@ -219,7 +219,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 सिनेमा-ग्रेड (शीत छायाएँ / उष्ण हाइलाइट / रात विसंतृप्ति)
+## R9.11 सिनेमाई रंग-संशोधन
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -236,7 +236,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 प्रक्षेपित छायाएँ — लिफ्ट व्युत्क्रम + देहली कट (निर्णायक)
+## R9.12 प्रक्षेपित छायाएँ
 
 > **प्राकल्पना पुनः जाँच (अध्याय 10)**: `l.skyLight` कच्चा वॉक्सेल मान (n/15) नहीं, बल्कि इंजन के "लिफ्ट वक्र"  
 > `y = 1-(1-x/(3-2x))³` (अंधेरे क्षेत्रों को उठाने वाला S-वक्र) के बाद का मान है।
@@ -296,6 +296,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > समायोजन मार्गदर्शिका: **छाया क्षेत्रफल केवल `shTh` से तय होता है** — `0.93` = त्रिज्या 1.5+ / `0.87` = त्रिज्या 2 / `0.80` = त्रिज्या 3 / `0.67` = त्रिज्या 5।  
 > किनारे की कठोरता `shSoft` (0.02 = कठोर / 0.08 = नरम) है। छाया-क्रोड का अंधेरा `0.09` (न्यूनतम परिवेश) और `0.16` (आकाश प्रकीर्णन) के दो-बिंदु स्थानांतरण से तय होता है।  
-> संध्या में छायाएँ फैलानी हों तो `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें (लंबी-संध्या-छाया सन्निकटन।  
+> सूर्यास्त के समय लंबी होती छायाओं का अनुमान दिखाने के लिए threshold में `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` जोड़ें।
+> `sunDir` का मान `bloxdSunDirection() / length(bloxdSunDirection())` है। छायाओं को और नीला करने के लिए `vec3f(0.72, 0.82, 1.05)` का B चैनल बढ़ाएँ।
 > `sunDir` यानी `bloxdSunDirection() / length(bloxdSunDirection())`)। ज़्यादा नीली छायाओं के लिए `vec3f(0.72, 0.82, 1.05)` का B बढ़ाएँ।
 >

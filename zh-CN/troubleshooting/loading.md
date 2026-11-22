@@ -4,14 +4,17 @@
 
 在**加载器阶段** (第一道关卡) 被拒绝的错误，显示在设置状态行中，ID 为 `shaderPack:load*`。
 
-## 「There's no pack.json at the top of the pack.」
+## 未找到包清单文件
+
+> `There's no pack.json at the top of the pack.`
 
 - **原因**: zip 根部没有 `pack.json` (例如文件夹被打包时多了一层嵌套)
 - **检查**: 打开 zip — `pack.json` 应在顶层 (或恰好位于单个公共根文件夹之下)
 - **修复**: 直接把 `pack.json` 与 `.wgsl` 文件打进 zip。单个公共根文件夹会被自动剥掉 ([包结构](../getting-started/pack-structure.md))
 - **预防**: 固定你的打包流程；macOS 的「压缩」直接可用 (系统杂物会被自动排除)
 
-## zip 加载时报 `loadDuplicateManifest`
+## 清单文件重复
+
 
 - **原因**: 出现两个 `pack.json` (包括仅大小写不同的情况)
 - **修复**: 只保留一个
@@ -49,7 +52,9 @@
 | `loadDuplicatePath` / `loadNotUtf8` / `loadDecompressFailed` / `loadZipDamaged` | 路径重复 / 非 UTF-8 / 解压失败 / zip 损坏 |
 | `loadNoManifest` / `loadDuplicateManifest` | manifest 位置 / 重复 |
 
-## 显示「Ready. Reload the page to use it.」却毫无变化
+## 加载后需要刷新页面
+
+> `显示「Ready. Reload the page to use it.」却毫无变化`
 
 - **原因**: 包需要**页面重载**才会激活
 - **修复**: 选中后重载页面；状态应变为 `Ready to use`

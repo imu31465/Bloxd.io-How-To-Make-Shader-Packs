@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Devuelve**: vector unitario hacia el sol en orientación de mundo; **vector cero cuando no hay sol**
-- **Datos**:
-  - **la luna está siempre en `-bloxdSunDirection()`** (el motor la coloca opuesta al sol)
-  - **nunca pases el vector cero a `normalize`** — protégelo con `dot(d, d) < 1e-8` y recurre a una dirección constante
-  - el build actual no tiene ciclo día-noche; sol, luna y estrellas no se mueven durante una sesión (solo se alterna la opacidad). En el cielo terrestre por defecto el sol está cerca de `(−0.56, 0.81, −0.18)` (elevación ≈ 54°)
-- **Usos**: temperatura de color, dirección de la luz, puertas solares, luz lunar pseudo
+- **Devuelve**: vector unitario hacia el sol en coordenadas de mundo; **cero cuando el mundo no tiene sol**.
+- **Datos importantes**:
+  - Cuando esta función devuelve un vector distinto de cero, la dirección de la luna es `-bloxdSunDirection()`. Si devuelve cero, no permite conocer la dirección real de la luna.
+  - **No pases nunca el vector cero a `normalize`**. Comprueba `dot(d, d) < 1e-8` y usa una dirección fija como alternativa.
+  - El motor no ofrece un ciclo día/noche automático. En el cielo Earth predeterminado, el sol permanece cerca de `(−0.56, 0.81, −0.18)` (elevación ≈ 54°). Cada mundo puede implementar su propio ciclo actualizando `inclination`, lo que cambia las direcciones del sol y de la luna.
+- **Usos**: temperatura de color, dirección de la luz, detección del sol y efectos de luz lunar ambiental.
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Devuelve**: `position + vec3f(bloxdRenderOffset())`
 - **Nota**: los límites de precisión de f32 hacen que las coordenadas lejanas puedan ser inexactas (cabecera: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — indocumentado pero sigue inyectado
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ La receta de iluminación del propio motor, documentada como WGSL llamable — c
 
 ## Funciones de sombras
 
-La API v5 añadió a la API de packs el sistema real de sombras sol/luna del motor — sombras proyectadas que siguen al sol, proyectadas por bloques, jugadores, mobs y objetos. Estas dos funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
+Estas tres funciones se **inyectan en el módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) y figuran en la tabla de funciones del validador, pero no en el texto legible de la cabecera.
 
 ### bloxdShadow
 

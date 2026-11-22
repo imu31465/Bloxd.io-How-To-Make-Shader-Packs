@@ -1,8 +1,8 @@
 # Hooks de sombreado
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
+> API: 5 · Estado: Verified
 
-Un paquete puede enchufarse en **9 hooks**: 3 objetivos de render (Terrain / Liquid / Model) × 3 etapas del pipeline (Vertex / Surface / Light). Todos son opcionales — un hook indefinido cae en el valor por defecto del motor.
+Un shader pack puede definir hasta **9 hooks**: 3 objetivos de renderizado (Terrain / Liquid / Model) × 3 etapas del pipeline (Vertex / Surface / Light). Todos son opcionales. Si no defines un hook, el motor utiliza su implementación predeterminada.
 
 ## Los hooks
 
@@ -27,7 +27,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 // bloxdLiquid* / bloxdModel* take the same types
 ```
 
-## Reparto de objetivos de render
+## Objetivos de renderizado
 
 - **Terrain** — todo bloque salvo el agua y los modelos de bloque
 - **Liquid** — el agua
@@ -35,7 +35,7 @@ fn bloxdTerrainLight(surface: BloxdSurface, light: BloxdLightIn) -> BloxdLight;
 
 **Importante**: si un paquete no define ningún hook de Liquid, **tampoco corre ningún hook de Terrain sobre el agua** (el agua la manejan solos los hooks de Liquid). Esto difiere del comportamiento anterior a v4, donde el líquido caía en los hooks de terreno.
 
-## Fallbacks y compartición de código
+## Comportamiento predeterminado y reutilización de código
 
 - Un hook indefinido significa que esa etapa usa el valor por defecto del motor (mismo comportamiento que `bloxdDefaultVertex` / `bloxdDefaultSurface` / `bloxdDefaultLight`)
 - **Para compartir código entre hooks**, define una función de ámbito de módulo y llámala desde ambos:
@@ -56,7 +56,7 @@ fn bloxdModelSurface(surface: BloxdSurfaceIn) -> BloxdSurface {
 }
 ```
 
-## El paquete por defecto (plantilla oficial de 9 hooks)
+## Plantilla del pack predeterminado
 
 La plantilla de partida ahora incluye los hooks de luz. 1.683 bytes tal como se distribuye, literal:
 

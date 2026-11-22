@@ -1,6 +1,6 @@
 # Inicio rápido
 
-> API objetivo: 5 · Build objetivo: `bbb6l5` (2026-11-20, producción y preprod) · Estado: Verified
+> API objetivo: 5 · Estado: Verified
 
 Tu primer paquete en cinco minutos.
 

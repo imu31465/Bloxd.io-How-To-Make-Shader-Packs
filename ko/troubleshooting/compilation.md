@@ -4,29 +4,39 @@
 
 정적 검증은 통과하지만 WGSL 로는 실패하거나, 브라우저의 WGSL 컴파일러 (2단계) 에서만 실패하는 오류.
 
-## "bloxdTerrainVertex must be declared as: fn ..."
+## 훅 함수 시그니처 불일치
+
+> `bloxdTerrainVertex must be declared as: fn ...`
 
 - **원인**: 훅 시그니처 불일치 (인수/반환형)
 - **해결**: 메시지에 표시된 선언으로 다시 쓴다 (파라미터명은 자유. 형은 정확히 맞아야 한다)
 - **예방**: [훅 비교표](../api/hooks.md) 에서 시작한다
 
-## "mixing '*' and '^' requires parenthesis (only in ...)"
+## 연산자 우선순위
+
+> `mixing '*' and '^' requires parenthesis (only in ...)`
 
 - **원인**: WGSL 은 `^` `&` `|` `<<` `>>` 를 다른 연산자와 섞을 때 괄호를 요구한다
 - **해결**: 피연산자에 괄호를 친다
 
-## "... can only be a function's parameter or return type, ..."
+## 출력 변수 선언
+
+> `... can only be a function's parameter or return type, ...`
 
 - **원인**: `var x: BloxdSurface;` — 형 주석만 붙은 선언은 거부된다. 헤더 구조체가 필드를 얻기 때문이다
 - **해결**: `var out = bloxdDefaultSurface(s);` (light 훅에서는 `var out = s;`)
 - **예방**: 출력은 항상 `bloxdDefault*` 에서 구축한다 ([작성 규칙](../api/structures.md#작성-규칙-재정리))
 
-## "_ can only be the target of a phony assignment, as in _ = f();"
+## 밑줄 대입 규칙
+
+> `_ can only be the target of a phony assignment, as in _ = f();`
 
 - **원인**: `let _ = f();` 은 무효한 WGSL 이다
 - **해결**: `_ = f();` 로 쓴다
 
-## "Lite: …reads scene depth on a page that didn't turn it on"
+## 씬 깊이 사용 조건
+
+> `Lite: …reads scene depth on a page that didn't turn it on`
 
 - **원인**: 깊이를 읽는 팩 (`bloxdOpaqueBehind`) 이 활성화된 채 페이지가 생성되었다. 깊이 가용 여부는 페이지 생성 시점에 정해진다
 - **해결**: 팩을 켠 채 페이지를 다시 불러온다

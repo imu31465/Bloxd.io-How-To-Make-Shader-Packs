@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn es keine Sonne gibt**
+- **Rückgabe**: Einheitsvektor zur Sonne in Welt-Ausrichtung; **Nullvektor, wenn die Welt keine Sonne hat**.
 - **Fakten**:
-  - **der Mond steht immer an `-bloxdSunDirection()`** (die Engine setzt ihn der Sonne gegenüber)
-  - **den Nullvektor nie an `normalize` übergeben** — mit `dot(d, d) < 1e-8` absichern und auf eine konstante Richtung zurückfallen
-  - der aktuelle Build hat keinen Tag/Nacht-Zyklus; Sonne, Mond und Sterne bewegen sich während einer Sitzung nicht (nur die Opacity schaltet). Im Standard-Erde-Himmel steht die Sonne nahe `(−0.56, 0.81, −0.18)` (Elevation ≈ 54°)
-- **Einsatz**: Farbtemperatur, Lichtrichtung, Sonnen-Gating, Pseudo-Mondlicht
+  - Gibt diese Funktion einen Vektor ungleich null zurück, ist die Mondrichtung `-bloxdSunDirection()`. Bei einem Nullvektor lässt sich die tatsächliche Mondrichtung nicht bestimmen.
+  - **Den Nullvektor niemals an `normalize` übergeben**. Prüfe `dot(d, d) < 1e-8` und verwende bei Bedarf eine feste Ersatzrichtung.
+  - Die Engine stellt keinen automatischen Tag-Nacht-Zyklus bereit. Im Standard-Earth-Himmel bleibt die Sonne nahe `(−0.56, 0.81, −0.18)` (Höhe ≈ 54°) stehen. Eine Welt kann einen eigenen Zyklus implementieren, indem sie `inclination` aktualisiert; dadurch ändern sich Sonnen- und Mondrichtung.
+- **Einsatz**: Farbtemperatur, Lichtrichtung, Erkennung der Sonnenverfügbarkeit und Umgebungslicht-Effekte für Mondlicht.
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Rückgabe**: `position + vec3f(bloxdRenderOffset())`
 - **Hinweis**: f32-Präzisionsgrenzen bedeuten, dass ferne Koordinaten ungenau sein können (Header: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — undokumentiert, aber weiterhin injiziert
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ Das eigene Beleuchtungsrezept der Engine, als aufrufbares WGSL dokumentiert — 
 
 ## Schattenfunktionen
 
-API v5 stellt das Sonnen-/Mondschattensystem der Engine bereit: projizierte, sonnenfolgende Schatten von Blöcken, Spielern, Mobs und Items. Diese beiden Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
+Diese drei Funktionen werden **in das kompilierte Modul jedes Packs injiziert** (wie `bloxdFragmentBlockPosition`) und stehen in der Funktionstabelle des Validators, nicht aber im lesbaren Headertext.
 
 ### bloxdShadow
 

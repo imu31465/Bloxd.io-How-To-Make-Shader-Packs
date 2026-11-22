@@ -1,8 +1,8 @@
-# Référence API
+# Référence de l’API
 
-Cette page présente la référence de l’API v5 actuelle. La source principale des définitions est l’en-tête que le moteur ajoute automatiquement au début de chaque pack (voir [Internals du moteur](../internals/engine-header.md) pour l’en-tête complet).
+Cette page présente la référence de l’API v5 actuelle. La source principale des définitions est l’en-tête que le moteur ajoute automatiquement au début de chaque pack (voir [Fonctionnement interne du moteur](../internals/engine-header.md) pour l’en-tête complet).
 
-## Plan
+## Contenu
 
 | Page | Contenu |
 |---|---|

@@ -70,7 +70,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.4 半球環境光 (上=空 / 下=地面の跳ね返り)
+## R9.4 半球ライティング
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -105,7 +105,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.6 大気遠近法 (距離で彩度が落ちる「空気感」)
+## R9.6 空気遠近法
 
 > 注意: 霞の色に輝度を持ち上げる処理 (`normalize` 等) を適用すると、霧が暗いシーンで「明るい白い靄」が浮かび、  
 > 既定の出力 (フォグ済み) にさらに霧色を加算すると二重フォグで白濁する。**空気感は彩度の低下のみで表現**するのが安全。
@@ -122,7 +122,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.7 波法線 + 太陽グリント (水面の「太陽の道」)
+## R9.7 波の法線と太陽光のきらめき
 
 ```wgsl
 fn pack_waveNormal(p: vec3f, t: f32) -> vec3f {
@@ -153,7 +153,7 @@ fn bloxdLiquidLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.8 手続き的マイクロバンプ (テクスチャ禁止の回避策)
+## R9.8 プロシージャルな微細凹凸
 
 ```wgsl
 fn pack_hash(p: vec3f) -> f32 {
@@ -185,7 +185,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.9 洞窟の非線形暗化 + 灯りの保護
+## R9.9 洞窟を暗くする
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -201,7 +201,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.10 フォグをかけ直す定石 (既定の出力を捨てたとき必須)
+## R9.10 フォグの再適用
 
 > `(1.0 - l.fogAlpha)` を `min(l.fogAlpha, 0.75)` のように下限を設けることで、「これ以上濃くしない」調整が可能になる。
 > (0.0 = エンジン準拠 / 0.3〜0.5 = 遠景クリア)。
@@ -223,7 +223,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.11 シネマ-grade (影は寒色 / ハイライトは暖色 / 夜はデサチュレート)
+## R9.11 映画調のカラーグレーディング
 
 ```wgsl
 fn pack_luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
@@ -240,7 +240,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## R9.12 投影風シャドウ — リフト逆変換 + しきい値カット (決定版)
+## R9.12 投影シャドウ
 
 > **前提の再確認 (10章)**: `l.skyLight` は生のボクセル値 (n/15) ではなく、エンジンが「リフト曲線」  
 > `y = 1-(1-x/(3-2x))³` (暗部を持ち上げる S 字カーブ) を適用した後の値である。
@@ -301,7 +301,8 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 > 調整ガイド: **影の面積は `shTh` だけで決まる** — `0.93`=半径1.5以上 / `0.87`=半径2 / `0.80`=半径3 / `0.67`=半径5。  
 > 影の縁の硬さは `shSoft` (0.02=硬い / 0.08=ソフト)。影の芯の暗さは `0.09` (最低環境光) と `0.16` (空の散乱光)  
 > の 2 点シフトで決まる。夕方に影を広げたければ  
-> `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を足す (長い夕方の影の近似。  
+> 日没前後に影が長くなる様子を近似するには、しきい値に `thEff = shTh + 0.10 * (1.0 - clamp(sunDir.y, 0.0, 1.0))` を加えます。
+> `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())` です。影の青みを強くするには、`vec3f(0.72, 0.82, 1.05)` の B 成分を上げます。
 > `sunDir` は `bloxdSunDirection() / length(bloxdSunDirection())`)。影の青味は `vec3f(0.72, 0.82, 1.05)` の B を上げる。
 
 [← 前の部](../api/)・[マニュアルに戻る](../)・[次の部 →](../guides/realism.md)

@@ -16,8 +16,7 @@
 
 ## 夜が暗すぎる
 
-- **解決方法**: 最小環境光を確保する。`bloxdSunDirection()` がゼロのときは真の月方向が不明なため、青い環境光などの擬似表現を用いる ([夜の青い環境光](../recipes/lighting.md))
-- **補足**: 月の方向自体は `-bloxdSunDirection()` で得られる (昼夜サイクルワールド限定)
+- **解決方法**: 最小限の環境光を確保します。`bloxdSunDirection()` がゼロのときは月の実際の方向を取得できないため、代わりに弱い青色の環境光を加えます ([夜のレシピ](../recipes/lighting.md))。昼夜サイクルのあるワールドでは、`-bloxdSunDirection()` から方向性のある月光を計算できます。
 
 ## 昼間が白飛びする
 
@@ -37,7 +36,9 @@
 - **原因**: ライティング有効時だけ意味のある入力 (`blockLight` 等) をガードせず使っている。v5 では `#ifdef BLOXD_LIGHTING` は廃止 — **実行時の `bloxdLit()`** で分岐する
 - **解決方法**: `if (!bloxdLit()) { return bloxdDefaultLight(surface, light); }` の早期 return を入れる ([ライティングAPI](../api/lighting.md#bloxdlit--ライティングのゲート))
 
-## `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
+## LightEngine のキューあふれ
+
+> `LightEngine: block light seed queue overflow - lighting may be incomplete for this chunk`
 
 - **症状**: コンソールにこの警告が出て、発光集中部のライトが欠ける
 - **原因**: 発光ブロックが密度の高い領域・領域渡りで光のシードキューが溢れ、そのチャンクのライト計算が途中で打ち切られた。**パック由来ではない**が、発光集中部のライト欠けはこの仕様が原因

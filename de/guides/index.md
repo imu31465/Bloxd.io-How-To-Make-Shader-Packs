@@ -2,7 +2,7 @@
 
 Material zu „Mechanismus und Denkweise“. Was überhaupt möglich ist, steht in [Was Shader Packs können und was nicht](constraints.md); zielgerichtete Codebeispiele leben in den [Rezepten](../recipes/).
 
-## Map
+## Übersicht
 
 | Seite | Inhalt |
 |---|---|

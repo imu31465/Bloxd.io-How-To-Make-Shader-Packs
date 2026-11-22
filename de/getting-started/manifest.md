@@ -16,13 +16,13 @@
 
 | Feld | Typ | Pflicht | Beschreibung |
 |---|---|---|---|
-| `apiVersion` | Zahl | Pflicht | muss **exakt `5` entsprechen** (strikt `===`). Ein String `"5"` oder jeder andere Typ scheitert, gemeldet mit der JSON-Schreibweise |
+| `apiVersion` | Zahl | Pflicht | muss **exakt `5` entsprechen** (strikt `===`). Ein String `"5"` oder jeder andere Typ scheitert, die Fehlermeldung zeigt den Wert in JSON-Schreibweise |
 | `name` | String | Pflicht | nach dem Trimmen nicht leer; wird in der Einstellungen-UI angezeigt |
 | `author` | String | optional | darf fehlen; muss, falls vorhanden, ein String sein |
 
 Alle anderen Felder ignoriert der Loader.
 
-## Was bei Versions-Nichtübereinstimmung passiert
+## Bei abweichender API-Version
 
 Der Loader vergleicht `manifest.apiVersion !== 5` strikt und **scheitert im Augenblick des Ladens**. Meldungen, wortwörtlich aus dem Live-i18n-Wörterbuch:
 

@@ -33,13 +33,12 @@ fn bloxdRenderOffset() -> vec3i
 ```wgsl
 fn bloxdSunDirection() -> vec3f
 ```
-
-- **Retorna**: vetor unitário em direção ao sol na orientação de mundo; **vetor zero quando não há sol**
-- **Fatos**:
-  - **a lua está sempre em `-bloxdSunDirection()`** (o motor a coloca oposta ao sol)
-  - **nunca passe o vetor zero a `normalize`** — proteja com `dot(d, d) < 1e-8` e recorra a uma direção constante
-  - a build atual não tem ciclo dia/noite; sol, lua e estrelas não se movem durante uma sessão (só a opacidade alterna). No céu de terra padrão o sol fica perto de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°)
-- **Usos**: temperatura de cor, direção da luz, porta solar, pseudo luar
+- **Retorna**: vetor unitário em direção ao sol na orientação do mundo; **zero quando o mundo não tem sol**.
+- **Fatos importantes**:
+  - Quando esta função retorna um vetor diferente de zero, a direção da lua é `-bloxdSunDirection()`. Se retorna zero, não informa a direção real da lua.
+  - **Nunca passe o vetor zero para `normalize`**. Verifique `dot(d, d) < 1e-8` e use uma direção fixa como alternativa.
+  - A engine não fornece um ciclo dia/noite automático. No céu Earth padrão, o sol permanece próximo de `(−0.56, 0.81, −0.18)` (elevação ≈ 54°). Cada mundo pode implementar seu próprio ciclo atualizando `inclination`, o que altera as direções do sol e da lua.
+- **Usos**: temperatura de cor, direção da luz, detecção da presença do sol e efeitos de luz lunar ambiente.
 
 ### bloxdSeconds
 
@@ -87,7 +86,7 @@ fn bloxdWorldPosition(position: vec3f) -> vec3f
 - **Retorna**: `position + vec3f(bloxdRenderOffset())`
 - **Nota**: os limites de precisão do f32 fazem com que coordenadas distantes possam ser inexatas (cabeçalho: *"with possible f32 inaccuracy"*)
 
-### bloxdFragmentBlockPosition — indocumentada, mas ainda injetada
+### `bloxdFragmentBlockPosition`
 
 ```wgsl
 fn bloxdFragmentBlockPosition(position: vec3f, normal: vec3f) -> vec3i
@@ -142,7 +141,7 @@ A própria receita de iluminação do motor, documentada como WGSL chamável —
 
 ## Funções de sombras
 
-A API v5 adicionou à API de packs o sistema real de sombras sol/lua do engine — sombras projetadas que seguem o sol, lançadas por blocos, jogadores, mobs e itens. Estas duas funções são **injetadas no módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) e constam na tabela de funções do validador, mas não no texto legível do cabeçalho.
+Estas três funções são **injetadas no módulo compilado de cada pack** (como `bloxdFragmentBlockPosition`) e constam na tabela de funções do validador, mas não no texto legível do cabeçalho.
 
 ### bloxdShadow
 
@@ -184,7 +183,7 @@ fn bloxdOpaqueBehind() -> BloxdOpaqueBehind
 - **Guarda**: `#ifdef BLOXD_SCENE_DEPTH` (definida em variantes de líquido)
 - **Significado**: a face opaca atrás deste fragmento (terreno visto através da água); `hit == false` para o céu
 - **Renomeação da v2**: `found` → `hit`
-- **A fundo**: [Histórico de versões: v3](../history/v3.md) e [Interioridades do motor](../internals/rendering-pipeline.md)
+- **A fundo**: [Histórico de versões: v3](../history/v3.md) e [Funcionamento interno do motor](../internals/rendering-pipeline.md)
 
 ## Relacionado
 
