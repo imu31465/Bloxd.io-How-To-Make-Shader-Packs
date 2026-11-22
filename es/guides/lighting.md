@@ -6,7 +6,7 @@ La iluminación por defecto del motor es "solo multiplicación" — no existen e
 
 | Función | Por defecto | ¿Construible en paquetes? |
 |---|---|---|
-| Difuso (Lambert) | Solo suma escalar de direccionales | ◎ Propio con `bloxdSunDirection()` (caída envuelta etc.) |
+| Difuso (Lambert) | Solo suma escalar de direccionales | ◎ Implementación propia con `bloxdSunDirection()` (atenuación periódica, etc.) |
 | Especular | Ninguno | ◎ Blinn-Phong (R9.2) |
 | Fresnel | Ninguno | ◎ Aproximación de Schlick (R9.3) |
 | Separación antorcha cálida / cielo frío | Sin color | ◎ (R9.1) |
