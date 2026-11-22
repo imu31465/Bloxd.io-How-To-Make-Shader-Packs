@@ -24,7 +24,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 夜晚 (skyLight 驱动偏蓝 + 灯光保护)
+## 夜间蓝光与灯光保护
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -39,7 +39,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 洞穴压黑 (无 skyLight 处更暗)
+## 加深洞穴阴影
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -55,7 +55,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 
 > `skyLight` 为提升后之值 (第 10 章)，浅遮蔽 (树下：原始 0.87 → 提升后 0.97) 用此法几乎压不暗。对洞穴 (原始 0) 有效。「树荫」要明显请用 R9.12 的提升逆变换 + 阈值法。
 
-## 夜晚蓝色环境光 (无月亮方向的拟似表现)
+## 夜间蓝色环境光
 
 > 本 API 中无太阳的天空 `bloxdSunDirection()` 为零。这不是方向性月光，只是天空暗时极弱的蓝色环境光。月亮方向本身经 `-bloxdSunDirection()` 可得 (仅昼夜循环世界——见[引擎内部机制与研究：太阳与月亮](../internals/sun-and-moon.md))。
 
@@ -73,7 +73,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 黄昏暖化 (随太阳高度偏色)
+## 黄昏暖色调
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
@@ -89,7 +89,7 @@ fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
 }
 ```
 
-## 引擎输出完全替换 (最简单的重光照)
+## 替换引擎输出
 
 ```wgsl
 fn bloxdTerrainLight(s: BloxdSurface, l: BloxdLightIn) -> BloxdLight {
